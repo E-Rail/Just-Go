@@ -15,7 +15,7 @@ xcuserdata/
 
 ## Playgrounds
 timeline.xctimeline
-playground.xcworkspace
+playground.xworkspace
 
 # Swift Package Manager
 #
@@ -25,7 +25,7 @@ playground.xcworkspace
 # Package.resolved
 # *.xcodeproj
 #
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
+# Xcode automatically generates this directory with the .xcworkspacedata file and xcuserdata
 # hence it is not needed unless you have added a package configuration file to your project
 # .swiftpm
 
@@ -60,3 +60,7 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Code Injection
+# After new samples of the injection, add them to .gitignore
+iOSInjectionProject/

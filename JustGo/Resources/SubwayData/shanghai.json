@@ -1,0 +1,41 @@
+{
+  "cityID": "3100",
+  "cityName": "上海",
+  "cityNameEn": "Shanghai",
+  "version": "2025.01.15",
+  "lastUpdated": "2025-01-15T00:00:00Z",
+  "lines": [
+    {
+      "lineID": "line_1_sh",
+      "name": "1号线",
+      "nameEn": "Line 1",
+      "colorHex": "#E4002B",
+      "stationIDs": ["stn_sh_1_01", "stn_sh_1_02", "stn_sh_1_03"]
+    }
+  ],
+  "stations": [
+    {
+      "stationID": "stn_sh_1_01",
+      "name": "莘庄",
+      "nameEn": "Xinzhuang",
+      "namePinyin": "xinzhuang",
+      "latitude": 31.1129,
+      "longitude": 121.3804,
+      "isTransferStation": true,
+      "floorCount": 2,
+      "lineIDs": ["line_1_sh"],
+      "accessibility": {
+        "hasElevator": true,
+        "hasEscalator": true,
+        "hasWheelchairRamp": true,
+        "isFullyAccessible": true,
+        "elevatorLocations": ["North entrance", "South entrance"],
+        "accessibleEntrances": ["North entrance", "South entrance"],
+        "hasTactilePath": true,
+        "hasBrailleSigns": true,
+        "hasAudioAnnouncement": true,
+        "hasVisualAnnouncement": true
+      }
+    }
+  ]
+}

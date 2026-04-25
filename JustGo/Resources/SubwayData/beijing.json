@@ -1,0 +1,71 @@
+{
+  "cityID": "1100",
+  "cityName": "北京",
+  "cityNameEn": "Beijing",
+  "version": "2025.01.15",
+  "lastUpdated": "2025-01-15T00:00:00Z",
+  "lines": [
+    {
+      "lineID": "line_1",
+      "name": "1号线",
+      "nameEn": "Line 1",
+      "colorHex": "#C23A30",
+      "stationIDs": ["stn_1_01", "stn_1_02", "stn_1_03", "stn_1_04", "stn_1_05"]
+    },
+    {
+      "lineID": "line_2",
+      "name": "2号线",
+      "nameEn": "Line 2",
+      "colorHex": "#0060A9",
+      "stationIDs": ["stn_2_01", "stn_2_02", "stn_2_03", "stn_2_04", "stn_2_05"]
+    }
+  ],
+  "stations": [
+    {
+      "stationID": "stn_1_01",
+      "name": "苹果园",
+      "nameEn": "Pingguoyuan",
+      "namePinyin": "pingguoyuan",
+      "latitude": 39.9268,
+      "longitude": 116.1776,
+      "isTransferStation": false,
+      "floorCount": 2,
+      "lineIDs": ["line_1"],
+      "accessibility": {
+        "hasElevator": true,
+        "hasEscalator": true,
+        "hasWheelchairRamp": true,
+        "isFullyAccessible": true,
+        "elevatorLocations": ["North entrance", "Platform"],
+        "accessibleEntrances": ["North entrance"],
+        "hasTactilePath": true,
+        "hasBrailleSigns": true,
+        "hasAudioAnnouncement": true,
+        "hasVisualAnnouncement": true
+      }
+    },
+    {
+      "stationID": "stn_1_02",
+      "name": "古城",
+      "nameEn": "Gucheng",
+      "namePinyin": "gucheng",
+      "latitude": 39.9134,
+      "longitude": 116.1920,
+      "isTransferStation": false,
+      "floorCount": 2,
+      "lineIDs": ["line_1"],
+      "accessibility": {
+        "hasElevator": true,
+        "hasEscalator": true,
+        "hasWheelchairRamp": false,
+        "isFullyAccessible": false,
+        "elevatorLocations": ["South entrance"],
+        "accessibleEntrances": ["South entrance"],
+        "hasTactilePath": true,
+        "hasBrailleSigns": false,
+        "hasAudioAnnouncement": true,
+        "hasVisualAnnouncement": true
+      }
+    }
+  ]
+}

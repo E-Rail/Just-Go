@@ -1,0 +1,607 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001 /* JustGoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* JustGoApp.swift */; };
+		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* ContentView.swift */; };
+		A1000003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AppState.swift */; };
+		A1000004 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* DIContainer.swift */; };
+		A1000005 /* MapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* MapContainerView.swift */; };
+		A1000006 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* MapViewModel.swift */; };
+		A1000007 /* StationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* StationAnnotationView.swift */; };
+		A1000008 /* StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* StationDetailView.swift */; };
+		A1000009 /* StationDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* StationDetailViewModel.swift */; };
+		A100000A /* RoutePlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000A /* RoutePlannerView.swift */; };
+		A100000B /* RouteResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000B /* RouteResultsView.swift */; };
+		A100000C /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000C /* RouteDetailView.swift */; };
+		A100000D /* RouteNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000D /* RouteNavigationView.swift */; };
+		A100000E /* RoutePlannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000E /* RoutePlannerViewModel.swift */; };
+		A100000F /* RouteResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000F /* RouteResultsViewModel.swift */; };
+		A1000010 /* StationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* StationSearchView.swift */; };
+		A1000011 /* StationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* StationSearchViewModel.swift */; };
+		A1000012 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* ProfileView.swift */; };
+		A1000013 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* SettingsView.swift */; };
+		A1000014 /* OfflineDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000014 /* OfflineDataView.swift */; };
+		A1000015 /* AccessibilitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015 /* AccessibilitySettingsView.swift */; };
+		A1000016 /* StationAccessibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000016 /* StationAccessibilityView.swift */; };
+		A1000017 /* StationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* StationRow.swift */; };
+		A1000018 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* GlassCard.swift */; };
+		A1000019 /* LineColorIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* LineColorIndicator.swift */; };
+		A100001A /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001A /* LoadingView.swift */; };
+		A100001B /* AMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* AMapService.swift */; };
+		A100001C /* AMapConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* AMapConfiguration.swift */; };
+		A100001D /* RoutePlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* RoutePlanningService.swift */; };
+		A100001E /* StationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* StationSearchService.swift */; };
+		A100001F /* OfflineRouteEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001F /* OfflineRouteEngine.swift */; };
+		A1000020 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* LocationService.swift */; };
+		A1000021 /* AccessibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* AccessibilityService.swift */; };
+		A1000022 /* OfflineDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* OfflineDataManager.swift */; };
+		A1000023 /* CityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* CityService.swift */; };
+		A1000024 /* Station.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* Station.swift */; };
+		A1000025 /* StationAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000025 /* StationAccessibility.swift */; };
+		A1000026 /* StationExit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026 /* StationExit.swift */; };
+		A1000027 /* SubwayLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* SubwayLine.swift */; };
+		A1000028 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* Route.swift */; };
+		A1000029 /* RealTimeArrival.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* RealTimeArrival.swift */; };
+		A100002A /* TransferPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002A /* TransferPoint.swift */; };
+		A100002B /* City.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* City.swift */; };
+		A100002C /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002C /* UserProfile.swift */; };
+		A100002D /* AccessibilityPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002D /* AccessibilityPreference.swift */; };
+		A100002E /* FavoriteRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002E /* FavoriteRoute.swift */; };
+		A100002F /* SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002F /* SearchHistory.swift */; };
+		A1000030 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* AppRouter.swift */; };
+		A1000031 /* InjectedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* InjectedKeys.swift */; };
+		A1000032 /* CLLocationCoordinate2D+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* CLLocationCoordinate2D+Codable.swift */; };
+		A1000033 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* Color+Hex.swift */; };
+		A1000034 /* Date+Relative.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034 /* Date+Relative.swift */; };
+		A1000035 /* TransitActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000035 /* TransitActivityAttributes.swift */; };
+		A1000036 /* TransitActivityLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000036 /* TransitActivityLiveActivity.swift */; };
+		A1000037 /* TransitWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000037 /* TransitWidget.swift */; };
+		A1000038 /* FindRouteIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000038 /* FindRouteIntent.swift */; };
+		A1000039 /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000039 /* cities.json */; };
+		A100003A /* beijing.json in Resources */ = {isa = PBXBuildFile; fileRef = A200003A /* beijing.json */; };
+		A100003B /* shanghai.json in Resources */ = {isa = PBXBuildFile; fileRef = A200003B /* shanghai.json */; };
+		A100003C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200003C /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A2000001 /* JustGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustGoApp.swift; sourceTree = "<group>"; };
+		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A2000003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A2000004 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DI/DIContainer.swift"; sourceTree = "<group>"; };
+		A2000005 /* MapContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/MapContainerView.swift"; sourceTree = "<group>"; };
+		A2000006 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/MapViewModel.swift"; sourceTree = "<group>"; };
+		A2000007 /* StationAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/StationAnnotationView.swift"; sourceTree = "<group>"; };
+		A2000008 /* StationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Station/StationDetailView.swift"; sourceTree = "<group>"; };
+		A2000009 /* StationDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/StationDetailViewModel.swift"; sourceTree = "<group>"; };
+		A200000A /* RoutePlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RoutePlannerView.swift"; sourceTree = "<group>"; };
+		A200000B /* RouteResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteResultsView.swift"; sourceTree = "<group>"; };
+		A200000C /* RouteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteDetailView.swift"; sourceTree = "<group>"; };
+		A200000D /* RouteNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteNavigationView.swift"; sourceTree = "<group>"; };
+		A200000E /* RoutePlannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RoutePlannerViewModel.swift"; sourceTree = "<group>"; };
+		A200000F /* RouteResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteResultsViewModel.swift"; sourceTree = "<group>"; };
+		A2000010 /* StationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Search/StationSearchView.swift"; sourceTree = "<group>"; };
+		A2000011 /* StationSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Search/StationSearchViewModel.swift"; sourceTree = "<group>"; };
+		A2000012 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Profile/ProfileView.swift"; sourceTree = "<group>"; };
+		A2000013 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Profile/SettingsView.swift"; sourceTree = "<group>"; };
+		A2000014 /* OfflineDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Profile/OfflineDataView.swift"; sourceTree = "<group>"; };
+		A2000015 /* AccessibilitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Accessibility/AccessibilitySettingsView.swift"; sourceTree = "<group>"; };
+		A2000016 /* StationAccessibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Station/StationAccessibilityView.swift"; sourceTree = "<group>"; };
+		A2000017 /* StationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Transit/StationRow.swift"; sourceTree = "<group>"; };
+		A2000018 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Glass/GlassCard.swift"; sourceTree = "<group>"; };
+		A2000019 /* LineColorIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Transit/LineColorIndicator.swift"; sourceTree = "<group>"; };
+		A200001A /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Common/LoadingView.swift"; sourceTree = "<group>"; };
+		A200001B /* AMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/AMapService.swift"; sourceTree = "<group>"; };
+		A200001C /* AMapConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Map/AMapConfiguration.swift"; sourceTree = "<group>"; };
+		A200001D /* RoutePlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/RoutePlanningService.swift"; sourceTree = "<group>"; };
+		A200001E /* StationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/StationSearchService.swift"; sourceTree = "<group>"; };
+		A200001F /* OfflineRouteEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/OfflineRouteEngine.swift"; sourceTree = "<group>"; };
+		A2000020 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location/LocationService.swift"; sourceTree = "<group>"; };
+		A2000021 /* AccessibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Accessibility/AccessibilityService.swift"; sourceTree = "<group>"; };
+		A2000022 /* OfflineDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data/OfflineDataManager.swift"; sourceTree = "<group>"; };
+		A2000023 /* CityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data/CityService.swift"; sourceTree = "<group>"; };
+		A2000024 /* Station.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Station/Station.swift"; sourceTree = "<group>"; };
+		A2000025 /* StationAccessibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Station/StationAccessibility.swift"; sourceTree = "<group>"; };
+		A2000026 /* StationExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Station/StationExit.swift"; sourceTree = "<group>"; };
+		A2000027 /* SubwayLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/SubwayLine.swift"; sourceTree = "<group>"; };
+		A2000028 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/Route.swift"; sourceTree = "<group>"; };
+		A2000029 /* RealTimeArrival.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/RealTimeArrival.swift"; sourceTree = "<group>"; };
+		A200002A /* TransferPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/TransferPoint.swift"; sourceTree = "<group>"; };
+		A200002B /* City.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "City/City.swift"; sourceTree = "<group>"; };
+		A200002C /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User/UserProfile.swift"; sourceTree = "<group>"; };
+		A200002D /* AccessibilityPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User/AccessibilityPreference.swift"; sourceTree = "<group>"; };
+		A200002E /* FavoriteRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User/FavoriteRoute.swift"; sourceTree = "<group>"; };
+		A200002F /* SearchHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User/SearchHistory.swift"; sourceTree = "<group>"; };
+		A2000030 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigation/AppRouter.swift"; sourceTree = "<group>"; };
+		A2000031 /* InjectedKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DI/InjectedKeys.swift"; sourceTree = "<group>"; };
+		A2000032 /* CLLocationCoordinate2D+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/CLLocationCoordinate2D+Codable.swift"; sourceTree = "<group>"; };
+		A2000033 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Color+Hex.swift"; sourceTree = "<group>"; };
+		A2000034 /* Date+Relative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Date+Relative.swift"; sourceTree = "<group>"; };
+		A2000035 /* TransitActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitActivityAttributes.swift; sourceTree = "<group>"; };
+		A2000036 /* TransitActivityLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitActivityLiveActivity.swift; sourceTree = "<group>"; };
+		A2000037 /* TransitWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitWidget.swift; sourceTree = "<group>"; };
+		A2000038 /* FindRouteIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindRouteIntent.swift; sourceTree = "<group>"; };
+		A2000039 /* cities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cities.json; sourceTree = "<group>"; };
+		A200003A /* beijing.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = beijing.json; sourceTree = "<group>"; };
+		A200003B /* shanghai.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = shanghai.json; sourceTree = "<group>"; };
+		A200003C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A200003D /* JustGo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "JustGo-Info.plist"; sourceTree = "<group>"; };
+		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A4000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A5000001 = {
+			isa = PBXGroup;
+			children = (
+				A5000002 /* JustGo */,
+				A500000F /* JustGoTests */,
+				A5000010 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A5000002 /* JustGo */ = {
+			isa = PBXGroup;
+			children = (
+				A5000003 /* App */,
+				A5000004 /* Core */,
+				A5000005 /* Models */,
+				A5000006 /* Services */,
+				A5000007 /* ViewModels */,
+				A5000008 /* Views */,
+				A5000009 /* LiveActivity */,
+				A500000A /* Widget */,
+				A500000B /* Intents */,
+				A500000C /* Resources */,
+				A200003D /* JustGo-Info.plist */,
+			);
+			path = JustGo;
+			sourceTree = "<group>";
+		};
+		A5000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A2000001 /* JustGoApp.swift */,
+				A2000002 /* ContentView.swift */,
+				A2000003 /* AppState.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A5000004 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A2000004 /* DIContainer.swift */,
+				A2000031 /* InjectedKeys.swift */,
+				A2000030 /* AppRouter.swift */,
+				A2000032 /* CLLocationCoordinate2D+Codable.swift */,
+				A2000033 /* Color+Hex.swift */,
+				A2000034 /* Date+Relative.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A5000005 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A2000024 /* Station.swift */,
+				A2000025 /* StationAccessibility.swift */,
+				A2000026 /* StationExit.swift */,
+				A2000027 /* SubwayLine.swift */,
+				A2000028 /* Route.swift */,
+				A2000029 /* RealTimeArrival.swift */,
+				A200002A /* TransferPoint.swift */,
+				A200002B /* City.swift */,
+				A200002C /* UserProfile.swift */,
+				A200002D /* AccessibilityPreference.swift */,
+				A200002E /* FavoriteRoute.swift */,
+				A200002F /* SearchHistory.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A5000006 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A200001B /* AMapService.swift */,
+				A200001C /* AMapConfiguration.swift */,
+				A200001D /* RoutePlanningService.swift */,
+				A200001E /* StationSearchService.swift */,
+				A200001F /* OfflineRouteEngine.swift */,
+				A2000020 /* LocationService.swift */,
+				A2000021 /* AccessibilityService.swift */,
+				A2000022 /* OfflineDataManager.swift */,
+				A2000023 /* CityService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A5000007 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A2000006 /* MapViewModel.swift */,
+				A2000009 /* StationDetailViewModel.swift */,
+				A200000E /* RoutePlannerViewModel.swift */,
+				A200000F /* RouteResultsViewModel.swift */,
+				A2000011 /* StationSearchViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A5000008 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A2000005 /* MapContainerView.swift */,
+				A2000007 /* StationAnnotationView.swift */,
+				A2000008 /* StationDetailView.swift */,
+				A2000016 /* StationAccessibilityView.swift */,
+				A200000A /* RoutePlannerView.swift */,
+				A200000B /* RouteResultsView.swift */,
+				A200000C /* RouteDetailView.swift */,
+				A200000D /* RouteNavigationView.swift */,
+				A2000010 /* StationSearchView.swift */,
+				A2000012 /* ProfileView.swift */,
+				A2000013 /* SettingsView.swift */,
+				A2000014 /* OfflineDataView.swift */,
+				A2000015 /* AccessibilitySettingsView.swift */,
+				A2000017 /* StationRow.swift */,
+				A2000018 /* GlassCard.swift */,
+				A2000019 /* LineColorIndicator.swift */,
+				A200001A /* LoadingView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A5000009 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				A2000035 /* TransitActivityAttributes.swift */,
+				A2000036 /* TransitActivityLiveActivity.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		A500000A /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				A2000037 /* TransitWidget.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		A500000B /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				A2000038 /* FindRouteIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		A500000C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A200003C /* Assets.xcassets */,
+				A5000011 /* SubwayData */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A5000011 /* SubwayData */ = {
+			isa = PBXGroup;
+			children = (
+				A2000039 /* cities.json */,
+				A200003A /* beijing.json */,
+				A200003B /* shanghai.json */,
+			);
+			path = SubwayData;
+			sourceTree = "<group>";
+		};
+		A500000F /* JustGoTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = JustGoTests;
+			sourceTree = "<group>";
+		};
+		A5000010 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A3000001 /* JustGo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A6000001 /* JustGo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A8000001 /* Build configuration list for PBXNativeTarget "JustGo" */;
+			buildPhases = (
+				A7000001 /* Sources */,
+				A4000001 /* Frameworks */,
+				A7000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JustGo;
+			productName = JustGo;
+			productReference = A3000001 /* JustGo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A9000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A6000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A8000003 /* Build configuration list for PBXProject "JustGo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A5000001;
+			productRefGroup = A5000010 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A6000001 /* JustGo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A7000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000039 /* cities.json in Resources */,
+				A100003A /* beijing.json in Resources */,
+				A100003B /* shanghai.json in Resources */,
+				A100003C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A7000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000001 /* JustGoApp.swift in Sources */,
+				A1000002 /* ContentView.swift in Sources */,
+				A1000003 /* AppState.swift in Sources */,
+				A1000004 /* DIContainer.swift in Sources */,
+				A1000005 /* MapContainerView.swift in Sources */,
+				A1000006 /* MapViewModel.swift in Sources */,
+				A1000007 /* StationAnnotationView.swift in Sources */,
+				A1000008 /* StationDetailView.swift in Sources */,
+				A1000009 /* StationDetailViewModel.swift in Sources */,
+				A100000A /* RoutePlannerView.swift in Sources */,
+				A100000B /* RouteResultsView.swift in Sources */,
+				A100000C /* RouteDetailView.swift in Sources */,
+				A100000D /* RouteNavigationView.swift in Sources */,
+				A100000E /* RoutePlannerViewModel.swift in Sources */,
+				A100000F /* RouteResultsViewModel.swift in Sources */,
+				A1000010 /* StationSearchView.swift in Sources */,
+				A1000011 /* StationSearchViewModel.swift in Sources */,
+				A1000012 /* ProfileView.swift in Sources */,
+				A1000013 /* SettingsView.swift in Sources */,
+				A1000014 /* OfflineDataView.swift in Sources */,
+				A1000015 /* AccessibilitySettingsView.swift in Sources */,
+				A1000016 /* StationAccessibilityView.swift in Sources */,
+				A1000017 /* StationRow.swift in Sources */,
+				A1000018 /* GlassCard.swift in Sources */,
+				A1000019 /* LineColorIndicator.swift in Sources */,
+				A100001A /* LoadingView.swift in Sources */,
+				A100001B /* AMapService.swift in Sources */,
+				A100001C /* AMapConfiguration.swift in Sources */,
+				A100001D /* RoutePlanningService.swift in Sources */,
+				A100001E /* StationSearchService.swift in Sources */,
+				A100001F /* OfflineRouteEngine.swift in Sources */,
+				A1000020 /* LocationService.swift in Sources */,
+				A1000021 /* AccessibilityService.swift in Sources */,
+				A1000022 /* OfflineDataManager.swift in Sources */,
+				A1000023 /* CityService.swift in Sources */,
+				A1000024 /* Station.swift in Sources */,
+				A1000025 /* StationAccessibility.swift in Sources */,
+				A1000026 /* StationExit.swift in Sources */,
+				A1000027 /* SubwayLine.swift in Sources */,
+				A1000028 /* Route.swift in Sources */,
+				A1000029 /* RealTimeArrival.swift in Sources */,
+				A100002A /* TransferPoint.swift in Sources */,
+				A100002B /* City.swift in Sources */,
+				A100002C /* UserProfile.swift in Sources */,
+				A100002D /* AccessibilityPreference.swift in Sources */,
+				A100002E /* FavoriteRoute.swift in Sources */,
+				A100002F /* SearchHistory.swift in Sources */,
+				A1000030 /* AppRouter.swift in Sources */,
+				A1000031 /* InjectedKeys.swift in Sources */,
+				A1000032 /* CLLocationCoordinate2D+Codable.swift in Sources */,
+				A1000033 /* Color+Hex.swift in Sources */,
+				A1000034 /* Date+Relative.swift in Sources */,
+				A1000035 /* TransitActivityAttributes.swift in Sources */,
+				A1000036 /* TransitActivityLiveActivity.swift in Sources */,
+				A1000037 /* TransitWidget.swift in Sources */,
+				A1000038 /* FindRouteIntent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AB000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = JustGo/JustGo-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JustGo;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.justgo.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AB000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = JustGo/JustGo-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JustGo;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.justgo.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A8000001 /* Build configuration list for PBXNativeTarget "JustGo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB000001 /* Debug */,
+				AB000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A8000003 /* Build configuration list for PBXProject "JustGo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000001 /* Debug */,
+				AA000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A9000001 /* Project object */;
+}

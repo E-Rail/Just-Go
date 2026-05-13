@@ -1,20 +1,14 @@
 import SwiftUI
-import CoreLocation
 
 @Observable
 final class AppState {
     var selectedCity: City?
-    var isOnboardingComplete: Bool = false
     var accessibilityPreference: AccessibilityPreference = .default
-    var locationManager: LocationService?
-    var isLocationAuthorized: Bool = false
 
     func initialize(container: DIContainer) async {
-        locationManager = container.locationService
-        await locationManager?.requestPermission()
-        isLocationAuthorized = locationManager?.authorizationStatus == .authorizedWhenInUse || locationManager?.authorizationStatus == .authorizedAlways
+        await container.cityService.refreshCities()
 
-        if let location = locationManager?.currentLocation {
+        if let location = container.locationService.currentLocation {
             selectedCity = await container.cityService.findNearestCity(to: location)
         }
 

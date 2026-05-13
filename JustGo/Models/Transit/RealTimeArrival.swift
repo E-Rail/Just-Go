@@ -5,18 +5,21 @@ struct RealTimeArrival: Identifiable, Codable {
     let lineName: String
     let lineColorHex: String
     let destination: String
-    let arrivalTime: Date
-    let minutesRemaining: Int
+    let arrivalTime: Date?
+    let minutesRemaining: Int?
+    let timeText: String?
     let isAccessible: Bool
     let platformNumber: String?
 
     var formattedArrival: String {
-        if minutesRemaining <= 0 { return "Arriving" }
-        if minutesRemaining == 1 { return "1 min" }
-        return "\(minutesRemaining) min"
+        if let minutesRemaining {
+            if minutesRemaining <= 0 { return AppLocalization.localized("Arriving") }
+            return AppLocalization.minutes(minutesRemaining)
+        }
+        return timeText ?? AppLocalization.localized("Schedule unavailable")
     }
 
     var isArriving: Bool {
-        minutesRemaining <= 1
+        minutesRemaining.map { $0 <= 1 } ?? false
     }
 }

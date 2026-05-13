@@ -13,11 +13,11 @@ struct AccessibilitySettingsView: View {
                 hearingSection
                 cognitiveSection
             }
-            .navigationTitle("Accessibility")
+            .navigationTitle(AppLocalization.localized("Accessibility"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(AppLocalization.localized("Done")) { dismiss() }
                 }
             }
         }
@@ -25,33 +25,33 @@ struct AccessibilitySettingsView: View {
 
     private var primaryCategorySection: some View {
         Section {
-            Picker("Primary Category", selection: preferenceBinding(\.primaryCategory)) {
+            Picker(AppLocalization.localized("Primary Category"), selection: preferenceBinding(\.primaryCategory)) {
                 ForEach(DisabilityCategory.allCases, id: \.self) { category in
                     Label(category.displayName, systemImage: category.icon)
                         .tag(category)
                 }
             }
         } header: {
-            Text("Primary Disability Category")
+            Text(AppLocalization.localized("Primary Disability Category"))
         } footer: {
-            Text("This helps us customize the app experience for you")
+            Text(AppLocalization.localized("This helps us customize the app experience for you"))
         }
     }
 
     private var mobilitySection: some View {
-        Section("Mobility") {
-            Toggle("Requires Wheelchair Access", isOn: preferenceBinding(\.requiresWheelchairAccess))
-            Toggle("Prefer Elevator", isOn: preferenceBinding(\.prefersElevator))
-            Toggle("Avoid Stairs", isOn: preferenceBinding(\.avoidStairs))
+        Section(AppLocalization.localized("Mobility")) {
+            Toggle(AppLocalization.localized("Requires Wheelchair Access"), isOn: preferenceBinding(\.requiresWheelchairAccess))
+            Toggle(AppLocalization.localized("Prefer Elevator"), isOn: preferenceBinding(\.prefersElevator))
+            Toggle(AppLocalization.localized("Avoid Stairs"), isOn: preferenceBinding(\.avoidStairs))
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Max Walking Distance")
+                Text(AppLocalization.localized("Max Walking Distance"))
                 Slider(
                     value: preferenceBinding(\.maxWalkingDistance),
                     in: 100...1000,
                     step: 50
                 ) {
-                    Text("Distance")
+                    Text(AppLocalization.localized("Distance"))
                 } minimumValueLabel: {
                     Text("100m")
                         .font(.caption)
@@ -67,26 +67,26 @@ struct AccessibilitySettingsView: View {
     }
 
     private var visionSection: some View {
-        Section("Vision") {
-            Toggle("VoiceOver Support", isOn: preferenceBinding(\.voiceOverEnabled))
-            Toggle("High Contrast Mode", isOn: preferenceBinding(\.highContrastMode))
-            Toggle("Large Text", isOn: preferenceBinding(\.largeText))
-            Toggle("Audio Navigation", isOn: preferenceBinding(\.audioNavigation))
+        Section(AppLocalization.localized("Vision")) {
+            Toggle(AppLocalization.localized("VoiceOver Support"), isOn: preferenceBinding(\.voiceOverEnabled))
+            Toggle(AppLocalization.localized("High Contrast Mode"), isOn: preferenceBinding(\.highContrastMode))
+            Toggle(AppLocalization.localized("Large Text"), isOn: preferenceBinding(\.largeText))
+            Toggle(AppLocalization.localized("Audio Navigation"), isOn: preferenceBinding(\.audioNavigation))
         }
     }
 
     private var hearingSection: some View {
-        Section("Hearing") {
-            Toggle("Visual Announcements", isOn: preferenceBinding(\.visualAnnouncements))
-            Toggle("Vibration Alerts", isOn: preferenceBinding(\.vibrationAlerts))
-            Toggle("Flash Alerts", isOn: preferenceBinding(\.flashAlerts))
+        Section(AppLocalization.localized("Hearing")) {
+            Toggle(AppLocalization.localized("Visual Announcements"), isOn: preferenceBinding(\.visualAnnouncements))
+            Toggle(AppLocalization.localized("Vibration Alerts"), isOn: preferenceBinding(\.vibrationAlerts))
+            Toggle(AppLocalization.localized("Flash Alerts"), isOn: preferenceBinding(\.flashAlerts))
         }
     }
 
     private var cognitiveSection: some View {
-        Section("Cognitive") {
-            Toggle("Simplified UI", isOn: preferenceBinding(\.simplifiedUI))
-            Toggle("Step-by-Step Guidance", isOn: preferenceBinding(\.stepByStepGuidance))
+        Section(AppLocalization.localized("Cognitive")) {
+            Toggle(AppLocalization.localized("Simplified UI"), isOn: preferenceBinding(\.simplifiedUI))
+            Toggle(AppLocalization.localized("Step-by-Step Guidance"), isOn: preferenceBinding(\.stepByStepGuidance))
         }
     }
 

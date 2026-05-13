@@ -17,7 +17,7 @@ struct StationDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(station.name)
+        .navigationTitle(station.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             viewModel = StationDetailViewModel(aMapService: container.aMapService)
@@ -31,11 +31,11 @@ struct StationDetailView: View {
             VStack(spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(station.name)
+                        Text(station.localizedName)
                             .font(.title)
                             .fontWeight(.bold)
-                        if let en = station.nameEn {
-                            Text(en)
+                        if let alternateName = station.alternateLocalizedName {
+                            Text(alternateName)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -44,7 +44,7 @@ struct StationDetailView: View {
                     Spacer()
 
                     if station.isTransferStation {
-                        Text("Transfer")
+                        Text(AppLocalization.localized("Transfer"))
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -57,7 +57,7 @@ struct StationDetailView: View {
                     HStack {
                         Image(systemName: "figure.roll")
                             .foregroundStyle(.green)
-                        Text("Fully Accessible Station")
+                        Text(AppLocalization.localized("Fully Accessible Station"))
                             .font(.subheadline)
                             .foregroundStyle(.green)
                     }
@@ -72,7 +72,7 @@ struct StationDetailView: View {
     private var linesSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Lines")
+                Text(AppLocalization.localized("Lines"))
                     .font(.headline)
 
                 ForEach(station.lines) { line in
@@ -80,10 +80,10 @@ struct StationDetailView: View {
                         Circle()
                             .fill(Color(hex: line.colorHex))
                             .frame(width: 12, height: 12)
-                        Text(line.name)
+                        Text(line.localizedName)
                             .font(.body)
-                        if let en = line.nameEn {
-                            Text(en)
+                        if let alternateName = line.alternateLocalizedName {
+                            Text(alternateName)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -96,14 +96,14 @@ struct StationDetailView: View {
     private var accessibilitySection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Accessibility")
+                Text(AppLocalization.localized("Accessibility"))
                     .font(.headline)
 
                 if let accessibility = station.accessibility {
                     // Mobility
                     if accessibility.hasElevator || accessibility.hasWheelchairRamp {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Mobility")
+                            Text(AppLocalization.localized("Mobility"))
                                 .font(.subheadline)
                                 .fontWeight(.medium)
 
@@ -130,7 +130,7 @@ struct StationDetailView: View {
                     // Vision
                     if accessibility.hasTactilePath || accessibility.hasBrailleSigns || accessibility.hasAudioAnnouncement {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Vision")
+                            Text(AppLocalization.localized("Vision"))
                                 .font(.subheadline)
                                 .fontWeight(.medium)
 
@@ -138,7 +138,10 @@ struct StationDetailView: View {
                                 accessibilityRow(
                                     icon: "hand.raised.fill",
                                     title: "Tactile Path",
-                                    subtitle: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
+                                    subtitle: AppLocalization.text(
+                                        english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
+                                        chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
+                                    ),
                                     status: .available
                                 )
                             }
@@ -147,7 +150,7 @@ struct StationDetailView: View {
                                 accessibilityRow(
                                     icon: "textformat.abc",
                                     title: "Braille Signs",
-                                    subtitle: "Available",
+                                    subtitle: AppLocalization.localized("Available"),
                                     status: .available
                                 )
                             }
@@ -156,7 +159,7 @@ struct StationDetailView: View {
                                 accessibilityRow(
                                     icon: "speaker.wave.2.fill",
                                     title: "Audio Announcement",
-                                    subtitle: "Available",
+                                    subtitle: AppLocalization.localized("Available"),
                                     status: .available
                                 )
                             }
@@ -166,7 +169,7 @@ struct StationDetailView: View {
                     // Hearing
                     if accessibility.hasVisualAnnouncement || accessibility.hasHearingLoop {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Hearing")
+                            Text(AppLocalization.localized("Hearing"))
                                 .font(.subheadline)
                                 .fontWeight(.medium)
 
@@ -174,7 +177,7 @@ struct StationDetailView: View {
                                 accessibilityRow(
                                     icon: "eye.fill",
                                     title: "Visual Display",
-                                    subtitle: "Available",
+                                    subtitle: AppLocalization.localized("Available"),
                                     status: .available
                                 )
                             }
@@ -183,14 +186,14 @@ struct StationDetailView: View {
                                 accessibilityRow(
                                     icon: "ear.badge.waveform",
                                     title: "Hearing Loop",
-                                    subtitle: "Available",
+                                    subtitle: AppLocalization.localized("Available"),
                                     status: .available
                                 )
                             }
                         }
                     }
                 } else {
-                    Text("No accessibility information available")
+                    Text(AppLocalization.localized("No accessibility information available"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -205,10 +208,10 @@ struct StationDetailView: View {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                Text(AppLocalization.localized(title))
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text(subtitle)
+                Text(AppLocalization.localized(subtitle))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -224,11 +227,11 @@ struct StationDetailView: View {
     private var arrivalsSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Real-Time Arrivals")
+                Text(AppLocalization.localized("Real-Time Arrivals"))
                     .font(.headline)
 
                 if viewModel?.arrivals.isEmpty ?? true {
-                    Text("No real-time data available")
+                    Text(viewModel?.errorMessage ?? AppLocalization.localized("No real-time data available"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
@@ -243,17 +246,17 @@ struct StationDetailView: View {
     private var exitsSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Exits")
+                Text(AppLocalization.localized("Exits"))
                     .font(.headline)
 
                 ForEach(station.exits) { exit in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(exit.name)
+                            Text(exit.localizedName)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            if let en = exit.nameEn {
-                                Text(en)
+                            if let alternateName = exit.alternateLocalizedName {
+                                Text(alternateName)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }

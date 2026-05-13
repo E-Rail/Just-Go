@@ -12,41 +12,47 @@ struct RouteNavigationView: View {
         return route.segments[currentSegmentIndex]
     }
 
+    var currentAccessGuide: RouteAccessGuide? {
+        guard let segment = currentSegment, segment.type == .walking else { return nil }
+        if currentSegmentIndex < (route.segments.firstIndex { $0.type == .subway } ?? route.segments.count) {
+            return route.originAccessGuide
+        }
+        if currentSegmentIndex > (route.segments.lastIndex { $0.type == .subway } ?? -1) {
+            return route.destinationAccessGuide
+        }
+        return nil
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Map placeholder
-            Rectangle()
-                .fill(Color(.systemGroupedBackground))
-                .frame(height: 300)
-                .overlay {
-                    VStack {
-                        Image(systemName: "map.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(.secondary)
-                        Text("Navigation Map")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+            TransitMapView(
+                visibleRegion: .constant(route.previewRegion),
+                stations: [],
+                subwayLines: [],
+                route: route,
+                showsUserLocation: true,
+                onStationSelected: { _ in }
+            )
+            .frame(height: 300)
 
-            // Navigation info
             VStack(spacing: 16) {
                 if let segment = currentSegment {
                     currentStepCard(segment)
                 }
 
-                // Progress
                 VStack(spacing: 8) {
                     ProgressView(value: Double(currentSegmentIndex), total: Double(route.segments.count))
                         .tint(.blue)
 
-                    Text("Step \(currentSegmentIndex + 1) of \(route.segments.count)")
+                    Text(AppLocalization.text(
+                        english: "Step \(currentSegmentIndex + 1) of \(route.segments.count)",
+                        chinese: "第 \(currentSegmentIndex + 1) 步，共 \(route.segments.count) 步"
+                    ))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.horizontal)
 
-                // Controls
                 HStack(spacing: 20) {
                     Button(action: previousStep) {
                         Image(systemName: "chevron.left")
@@ -73,7 +79,6 @@ struct RouteNavigationView: View {
                     .disabled(currentSegmentIndex >= route.segments.count - 1)
                 }
 
-                // Accessibility announcements
                 if let segment = currentSegment {
                     accessibilityAnnouncementBar(segment)
                 }
@@ -82,11 +87,11 @@ struct RouteNavigationView: View {
 
             Spacer()
         }
-        .navigationTitle("Navigation")
+        .navigationTitle(AppLocalization.localized("Navigation"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("End") {
+                Button(AppLocalization.localized("End")) {
                     dismiss()
                 }
             }
@@ -95,27 +100,51 @@ struct RouteNavigationView: View {
 
     private func currentStepCard(_ segment: RouteSegment) -> some View {
         GlassCard {
-            HStack {
-                segmentIcon(segment)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    segmentIcon(segment)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(segmentLabel(segment))
-                        .font(.headline)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(currentAccessGuide?.primaryInstruction ?? segment.navigationLabel)
+                            .font(.headline)
 
-                    if let from = segment.fromStationName, let to = segment.toStationName {
-                        Text("\(from) → \(to)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        if let from = segment.fromStationName, let to = segment.toStationName {
+                            Text("\(from) → \(to)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
                     }
+
+                    Spacer()
+
+                    Text(segment.formattedDuration)
+                        .font(.title3)
+                        .fontWeight(.bold)
                 }
 
-                Spacer()
+                if let firstStep = segment.walkingDirections?.first, segment.type == .walking {
+                    Label(firstStep.instruction, systemImage: walkingStepIcon(firstStep))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
 
-                Text(segment.formattedDuration)
-                    .font(.title3)
-                    .fontWeight(.bold)
+                if let guide = currentAccessGuide, !guide.accessibilityNotes.isEmpty {
+                    ForEach(guide.accessibilityNotes, id: \.self) { note in
+                        Label(note, systemImage: "info.circle")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
+                    }
+                }
             }
         }
+    }
+
+    private func walkingStepIcon(_ step: WalkingStep) -> String {
+        if step.hasElevator { return "arrow.up.arrow.down.square" }
+        if step.hasRamp { return "figure.roll" }
+        if step.hasEscalator { return "arrow.up.right.square" }
+        if step.hasStairs { return "stairs" }
+        return "figure.walk"
     }
 
     private func segmentIcon(_ segment: RouteSegment) -> some View {
@@ -133,28 +162,17 @@ struct RouteNavigationView: View {
         .foregroundStyle(Color(hex: segment.lineColorHex ?? "#000000"))
     }
 
-    private func segmentLabel(_ segment: RouteSegment) -> String {
-        switch segment.type {
-        case .walking:
-            return "Walk to \(segment.toStationName ?? "station")"
-        case .subway:
-            return "\(segment.lineName ?? "Subway") toward \(segment.toStationName ?? "")"
-        case .transfer:
-            return "Transfer to \(segment.lineName ?? "next line")"
-        }
-    }
-
     private func accessibilityAnnouncementBar(_ segment: RouteSegment) -> some View {
         HStack {
             Image(systemName: "speaker.wave.2.fill")
                 .foregroundStyle(.blue)
-            Text("Voice guidance active")
+            Text(AppLocalization.localized("Voice guidance active"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
-            Button("Announce") {
+            Button(AppLocalization.localized("Announce")) {
                 accessibilityService.announce(
-                    segmentLabel(segment),
+                    segment.navigationLabel,
                     priority: .high
                 )
             }
@@ -170,7 +188,7 @@ struct RouteNavigationView: View {
             currentSegmentIndex += 1
             accessibilityService.playHaptic(.navigation)
             if let segment = currentSegment {
-                accessibilityService.announce(segmentLabel(segment), priority: .high)
+                accessibilityService.announce(segment.navigationLabel, priority: .high)
             }
         }
     }

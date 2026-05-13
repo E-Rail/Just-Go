@@ -1,47 +1,10 @@
 import Foundation
-import CoreLocation
 
 final class RoutePlanningService {
-    private let aMapService: AMapServiceProtocol
-    private let offlineEngine: OfflineRouteEngine
-    private let offlineDataManager: OfflineDataManager
+    private let aMapService: AMapService
 
-    init(
-        aMapService: AMapServiceProtocol,
-        offlineEngine: OfflineRouteEngine,
-        offlineDataManager: OfflineDataManager
-    ) {
+    init(aMapService: AMapService) {
         self.aMapService = aMapService
-        self.offlineEngine = offlineEngine
-        self.offlineDataManager = offlineDataManager
-    }
-
-    func planRoute(
-        from origin: Station,
-        to destination: Station,
-        accessibilityFilter: AccessibilityFilter = .none
-    ) async throws -> [Route] {
-        let cityID = origin.cityID
-
-        // Use offline engine if pack is downloaded
-        if offlineDataManager.isAvailable(cityID: cityID) {
-            let offlineRoutes = offlineEngine.findRoute(
-                from: origin,
-                to: destination,
-                filter: accessibilityFilter
-            )
-            if !offlineRoutes.isEmpty {
-                return offlineRoutes
-            }
-        }
-
-        // Fall back to online
-        return try await aMapService.planTransitRoute(
-            from: origin.coordinate,
-            to: destination.coordinate,
-            city: cityID,
-            accessibilityFilter: accessibilityFilter
-        )
     }
 
     func planRoute(
@@ -50,17 +13,40 @@ final class RoutePlanningService {
         city: String,
         accessibilityFilter: AccessibilityFilter = .none
     ) async throws -> [Route] {
-        let origins = try await aMapService.searchStations(keyword: originName, city: city)
-        let destinations = try await aMapService.searchStations(keyword: destinationName, city: city)
+        async let originPlaces = aMapService.searchPlaces(keyword: originName, city: city, limit: 8)
+        async let destinationPlaces = aMapService.searchPlaces(keyword: destinationName, city: city, limit: 8)
 
-        guard let origin = origins.first, let destination = destinations.first else {
+        let originPlace = try await originPlaces.first
+        let destinationPlace = try await destinationPlaces.first
+
+        guard let origin = originPlace,
+              let destination = destinationPlace else {
             throw RoutePlanningError.stationNotFound
         }
 
-        return try await planRoute(from: origin, to: destination, accessibilityFilter: accessibilityFilter)
+        return try await aMapService.planTransitRoute(
+            from: origin,
+            to: destination,
+            city: city,
+            accessibilityFilter: accessibilityFilter
+        )
     }
 
-    func getAccessibilityScore(for route: Route, preferences: AccessibilityPreference) -> Double {
+    func planRoute(
+        from origin: TransitPlace,
+        to destination: TransitPlace,
+        city: String,
+        accessibilityFilter: AccessibilityFilter = .none
+    ) async throws -> [Route] {
+        try await aMapService.planTransitRoute(
+            from: origin,
+            to: destination,
+            city: city,
+            accessibilityFilter: accessibilityFilter
+        )
+    }
+
+    private func accessibilityScore(for route: Route, preferences: AccessibilityPreference) -> Double {
         var score: Double = 1.0
 
         if preferences.requiresWheelchairAccess {
@@ -74,9 +60,22 @@ final class RoutePlanningService {
 
         if preferences.avoidStairs {
             for segment in route.segments {
-                for note in segment.accessibilityNotes where note.contains("stairs") {
+                for note in segment.accessibilityNotes where note.localizedCaseInsensitiveContains("stairs") || note.contains("楼梯") || note.contains("階梯") {
                     score -= 0.2
                 }
+            }
+        }
+
+        for warning in route.warnings {
+            switch warning.type {
+            case .stairsDetected:
+                score -= preferences.avoidStairs ? 0.3 : 0.1
+            case .stepFreeAccessUnconfirmed:
+                score -= preferences.requiresWheelchairAccess ? 0.3 : 0.15
+            case .longWalk:
+                score -= 0.1
+            default:
+                break
             }
         }
 
@@ -85,14 +84,29 @@ final class RoutePlanningService {
 
     func sortRoutes(_ routes: [Route], by strategy: RouteSortStrategy, preferences: AccessibilityPreference) -> [Route] {
         switch strategy {
+        case .metroFirst:
+            return routes.sorted {
+                if $0.strategy != $1.strategy {
+                    return $0.strategy == .metroFirst
+                }
+                return $0.totalDuration < $1.totalDuration
+            }
         case .fastest:
-            return routes.sorted { $0.totalDuration < $1.totalDuration }
-        case .fewestTransfers:
-            return routes.sorted { $0.transferCount < $1.transferCount }
+            return routes.sorted {
+                if $0.strategy != $1.strategy {
+                    return $0.strategy == .fastest
+                }
+                return $0.totalDuration < $1.totalDuration
+            }
+        case .leastWalking:
+            return routes.sorted {
+                if $0.strategy != $1.strategy {
+                    return $0.strategy == .leastWalking
+                }
+                return $0.walkingDistance < $1.walkingDistance
+            }
         case .mostAccessible:
-            return routes.sorted { getAccessibilityScore(for: $0, preferences: preferences) > getAccessibilityScore(for: $1, preferences: preferences) }
-        case .fewestStops:
-            return routes.sorted { $0.totalStops < $1.totalStops }
+            return routes.sorted { accessibilityScore(for: $0, preferences: preferences) > accessibilityScore(for: $1, preferences: preferences) }
         }
     }
 }
@@ -101,27 +115,58 @@ enum RoutePlanningError: Error {
     case stationNotFound
     case noRouteFound
     case networkError
-    case offlineDataNotAvailable
+    case realTimeDataUnavailable
+    case amapAPIKeyMissing
 }
 
 extension RoutePlanningError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .stationNotFound:
-            return "Station not found. Try another station name."
+            return AppLocalization.localized("Station not found. Try another station name.")
         case .noRouteFound:
-            return "No route found between these stations."
+            return AppLocalization.localized("No route found between these stations.")
         case .networkError:
-            return "Network connection failed. Try again later."
-        case .offlineDataNotAvailable:
-            return "Offline data is not available for this city."
+            return AppLocalization.localized("Network connection failed. Try again later.")
+        case .realTimeDataUnavailable:
+            return AppLocalization.localized("AMap does not provide live arrival times for this station.")
+        case .amapAPIKeyMissing:
+            return AppLocalization.localized("Add an AMap Web API key to enable public transit routing and place search.")
         }
     }
 }
 
-enum RouteSortStrategy {
+enum RouteSortStrategy: CaseIterable, Identifiable {
+    case metroFirst
     case fastest
-    case fewestTransfers
+    case leastWalking
     case mostAccessible
-    case fewestStops
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .metroFirst:
+            return "Metro First"
+        case .fastest:
+            return "Fastest"
+        case .leastWalking:
+            return "Least Walking"
+        case .mostAccessible:
+            return "Most Accessible"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .metroFirst:
+            return "tram.fill"
+        case .fastest:
+            return "clock"
+        case .leastWalking:
+            return "figure.walk"
+        case .mostAccessible:
+            return "accessibility"
+        }
+    }
 }

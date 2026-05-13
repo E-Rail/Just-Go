@@ -1,9 +1,7 @@
-import SwiftData
 import CoreLocation
 
-@Model
 final class Station: Identifiable {
-    @Attribute(.unique) var stationID: String
+    var stationID: String
     var id: String { stationID }
     var name: String
     var nameEn: String?
@@ -14,14 +12,9 @@ final class Station: Identifiable {
     var isTransferStation: Bool
     var floorCount: Int
     var sortOrder: Int
-
-    @Relationship(deleteRule: .nullify)
+    var poiIDs: [String]
     var lines: [SubwayLine]
-
-    @Relationship(deleteRule: .cascade)
     var accessibility: StationAccessibility?
-
-    @Relationship(deleteRule: .cascade)
     var exits: [StationExit]
 
     var coordinate: CLLocationCoordinate2D {
@@ -50,6 +43,7 @@ final class Station: Identifiable {
         self.isTransferStation = isTransferStation
         self.floorCount = floorCount
         self.sortOrder = sortOrder
+        self.poiIDs = []
         self.lines = []
         self.exits = []
     }

@@ -1,0 +1,145 @@
+{
+  "cityID": "4418",
+  "version": "amap-subway-2026-05-11",
+  "lastUpdated": "2026-05-11T11:46:34.293Z",
+  "lines": [
+    {
+      "lineID": "900000208956|900000208957",
+      "name": "磁浮旅游专线",
+      "nameEn": null,
+      "colorHex": "#3080B7",
+      "stationIDs": [
+        "900000208956001",
+        "900000208956002",
+        "900000208956003"
+      ],
+      "amapLineIDs": [
+        "900000208956",
+        "900000208957"
+      ],
+      "polyline": null
+    }
+  ],
+  "stations": [
+    {
+      "stationID": "900000208956002",
+      "name": "湖蝶湾",
+      "nameEn": null,
+      "namePinyin": "Hu DieWan",
+      "latitude": 23.572545,
+      "longitude": 113.130417,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000208956|900000208957"
+      ],
+      "poiIDs": [
+        "BV09237240",
+        "900000208956002"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000208956001",
+      "name": "清远长隆",
+      "nameEn": null,
+      "namePinyin": "QingYuan ChangLong",
+      "latitude": 23.549293,
+      "longitude": 113.129801,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000208956|900000208957"
+      ],
+      "poiIDs": [
+        "BV09425277",
+        "900000208956001"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000208956003",
+      "name": "长隆森林王国",
+      "nameEn": null,
+      "namePinyin": "ChangLong SenLin WangGuo",
+      "latitude": 23.58951,
+      "longitude": 113.164068,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000208956|900000208957"
+      ],
+      "poiIDs": [
+        "BV09425276",
+        "900000208956003"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    }
+  ]
+}

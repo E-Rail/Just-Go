@@ -1,0 +1,2 @@
+"NSLocationWhenInUseUsageDescription" = "JustGo 需要使用你的位置來查找附近地鐵站並提供導航。";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "JustGo 會使用你的位置來提供即時導航和地鐵站到達提醒。";

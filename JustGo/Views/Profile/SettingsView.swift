@@ -2,21 +2,20 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("autoDownloadOffline") private var autoDownload = false
     @AppStorage("showAccessibilityBadges") private var showBadges = true
 
     var body: some View {
         NavigationStack {
             Form {
                 languageSection
-                offlineSection
+                dataSection
                 accessibilitySection
             }
-            .navigationTitle("Settings")
+            .navigationTitle(AppLocalization.localized("Settings"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(AppLocalization.localized("Done")) { dismiss() }
                 }
             }
         }
@@ -24,11 +23,11 @@ struct SettingsView: View {
 
     private var languageSection: some View {
         Section {
-            LabeledContent("App Language", value: systemLanguageName)
+            LabeledContent(AppLocalization.localized("App Language"), value: systemLanguageName)
         } header: {
-            Text("Language")
+            Text(AppLocalization.localized("Language"))
         } footer: {
-            Text("JustGo follows the system language configured in iOS Settings.")
+            Text(AppLocalization.localized("JustGo follows the system language configured in iOS Settings."))
         }
     }
 
@@ -37,23 +36,23 @@ struct SettingsView: View {
             ?? Locale.autoupdatingCurrent.identifier
     }
 
-    private var offlineSection: some View {
+    private var dataSection: some View {
         Section {
-            Toggle("Auto-download on visit", isOn: $autoDownload)
+            LabeledContent(AppLocalization.localized("Transit Provider"), value: AppLocalization.localized("AMap"))
         } header: {
-            Text("Offline Data")
+            Text(AppLocalization.localized("Transit Data"))
         } footer: {
-            Text("Automatically prompt to download city data when you visit a new city")
+            Text(AppLocalization.localized("Public transit plans, metro lines, and station search use AMap live data."))
         }
     }
 
     private var accessibilitySection: some View {
         Section {
-            Toggle("Show Accessibility Badges", isOn: $showBadges)
+            Toggle(AppLocalization.localized("Show Accessibility Badges"), isOn: $showBadges)
         } header: {
-            Text("Accessibility")
+            Text(AppLocalization.localized("Accessibility"))
         } footer: {
-            Text("Show accessibility indicators on station annotations and lists")
+            Text(AppLocalization.localized("Show accessibility indicators on station annotations and lists"))
         }
     }
 }

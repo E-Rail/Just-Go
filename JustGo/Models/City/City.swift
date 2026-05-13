@@ -10,14 +10,9 @@ struct City: Identifiable, Codable {
     let longitude: Double
     let stationCount: Int
     let lineCount: Int
-    let offlinePackSizeMB: Double
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-
-    var displayImage: String {
-        "city_\(id)"
     }
 }
 
@@ -35,6 +30,8 @@ struct SubwayLineData: Codable {
     let nameEn: String?
     let colorHex: String
     let stationIDs: [String]
+    let amapLineIDs: [String]?
+    let polyline: [CodableCoordinate]?
 }
 
 struct StationData: Codable {
@@ -47,8 +44,12 @@ struct StationData: Codable {
     let isTransferStation: Bool
     let floorCount: Int
     let lineIDs: [String]
+    let poiIDs: [String]?
     let exits: [StationExitData]?
     let accessibility: AccessibilityData?
+    let platformCount: Int?
+    let firstTrainTime: String?
+    let lastTrainTime: String?
 }
 
 struct StationExitData: Codable {

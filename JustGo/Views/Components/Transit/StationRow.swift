@@ -13,12 +13,12 @@ struct StationRow: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(station.name)
+                        Text(station.localizedName)
                             .font(.body)
                             .fontWeight(.medium)
 
                         if station.isTransferStation {
-                            Text("Transfer")
+                            Text(AppLocalization.localized("Transfer"))
                                 .font(.caption)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -27,8 +27,8 @@ struct StationRow: View {
                         }
                     }
 
-                    if let en = station.nameEn {
-                        Text(en)
+                    if let alternateName = station.alternateLocalizedName {
+                        Text(alternateName)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -74,7 +74,7 @@ struct StationRow: View {
                 AccessibilityIcon(icon: "figure.roll", label: "Wheelchair")
             }
             if station.accessibility?.hasTactilePath == true {
-                AccessibilityIcon(icon: "hand.raised.fill", label: "Tactile")
+                AccessibilityIcon(icon: "hand.raised.fill", label: "Tactile Path")
             }
         }
     }
@@ -96,6 +96,6 @@ struct AccessibilityIcon: View {
         Image(systemName: icon)
             .font(.caption)
             .foregroundStyle(.green)
-            .accessibilityLabel(label)
+            .accessibilityLabel(AppLocalization.localized(label))
     }
 }

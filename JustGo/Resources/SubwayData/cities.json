@@ -1,5 +1,5 @@
 {
-  "version": "2025.01.15",
+  "version": "amap-subway-2026-05-11",
   "cities": [
     {
       "id": "1100",
@@ -8,20 +8,8 @@
       "namePinyin": "beijing",
       "latitude": 39.9042,
       "longitude": 116.4074,
-      "stationCount": 490,
-      "lineCount": 27,
-      "offlinePackSizeMB": 15.2
-    },
-    {
-      "id": "3100",
-      "name": "上海",
-      "nameEn": "Shanghai",
-      "namePinyin": "shanghai",
-      "latitude": 31.2304,
-      "longitude": 121.4737,
-      "stationCount": 508,
-      "lineCount": 20,
-      "offlinePackSizeMB": 12.1
+      "stationCount": 411,
+      "lineCount": 27
     },
     {
       "id": "4401",
@@ -30,53 +18,48 @@
       "namePinyin": "guangzhou",
       "latitude": 23.1291,
       "longitude": 113.2644,
-      "stationCount": 320,
-      "lineCount": 16,
-      "offlinePackSizeMB": 11.8
+      "stationCount": 334,
+      "lineCount": 23
     },
     {
-      "id": "4403",
-      "name": "深圳",
-      "nameEn": "Shenzhen",
-      "namePinyin": "shenzhen",
-      "latitude": 22.5431,
-      "longitude": 114.0579,
-      "stationCount": 310,
-      "lineCount": 16,
-      "offlinePackSizeMB": 9.4
+      "id": "3100",
+      "name": "上海",
+      "nameEn": "Shanghai",
+      "namePinyin": "shanghai",
+      "latitude": 31.2304,
+      "longitude": 121.4737,
+      "stationCount": 418,
+      "lineCount": 24
     },
     {
-      "id": "5101",
-      "name": "成都",
-      "nameEn": "Chengdu",
-      "namePinyin": "chengdu",
-      "latitude": 30.5728,
-      "longitude": 104.0668,
-      "stationCount": 280,
-      "lineCount": 13,
-      "offlinePackSizeMB": 8.7
+      "id": "1200",
+      "name": "天津",
+      "nameEn": "Tianjin",
+      "namePinyin": "tianjin",
+      "latitude": 39.3434,
+      "longitude": 117.3616,
+      "stationCount": 238,
+      "lineCount": 14
     },
     {
-      "id": "3301",
-      "name": "杭州",
-      "nameEn": "Hangzhou",
-      "namePinyin": "hangzhou",
-      "latitude": 30.2741,
-      "longitude": 120.1551,
-      "stationCount": 250,
-      "lineCount": 12,
-      "offlinePackSizeMB": 8.2
+      "id": "5000",
+      "name": "重庆",
+      "nameEn": "Chongqing",
+      "namePinyin": "chongqing",
+      "latitude": 29.563,
+      "longitude": 106.5516,
+      "stationCount": 273,
+      "lineCount": 15
     },
     {
-      "id": "4201",
-      "name": "武汉",
-      "nameEn": "Wuhan",
-      "namePinyin": "wuhan",
-      "latitude": 30.5928,
-      "longitude": 114.3055,
-      "stationCount": 230,
-      "lineCount": 11,
-      "offlinePackSizeMB": 7.8
+      "id": "2101",
+      "name": "沈阳",
+      "nameEn": "Shenyang",
+      "namePinyin": "shenyang",
+      "latitude": 41.8057,
+      "longitude": 123.4315,
+      "stationCount": 134,
+      "lineCount": 6
     },
     {
       "id": "3201",
@@ -85,9 +68,518 @@
       "namePinyin": "nanjing",
       "latitude": 32.0603,
       "longitude": 118.7969,
-      "stationCount": 200,
-      "lineCount": 12,
-      "offlinePackSizeMB": 7.1
+      "stationCount": 251,
+      "lineCount": 14
+    },
+    {
+      "id": "4201",
+      "name": "武汉",
+      "nameEn": "Wuhan",
+      "namePinyin": "wuhan",
+      "latitude": 30.5928,
+      "longitude": 114.3055,
+      "stationCount": 289,
+      "lineCount": 13
+    },
+    {
+      "id": "5101",
+      "name": "成都",
+      "nameEn": "Chengdu",
+      "namePinyin": "chengdu",
+      "latitude": 30.5728,
+      "longitude": 104.0668,
+      "stationCount": 365,
+      "lineCount": 18
+    },
+    {
+      "id": "6101",
+      "name": "西安",
+      "nameEn": "Xian",
+      "namePinyin": "xian",
+      "latitude": 34.3416,
+      "longitude": 108.9398,
+      "stationCount": 246,
+      "lineCount": 12
+    },
+    {
+      "id": "1301",
+      "name": "石家庄",
+      "nameEn": "Shijiazhuang",
+      "namePinyin": "shijiazhuang",
+      "latitude": 38.0428,
+      "longitude": 114.5149,
+      "stationCount": 60,
+      "lineCount": 3
+    },
+    {
+      "id": "1401",
+      "name": "太原",
+      "nameEn": "Taiyuan",
+      "namePinyin": "taiyuan",
+      "latitude": 37.8706,
+      "longitude": 112.5489,
+      "stationCount": 46,
+      "lineCount": 2
+    },
+    {
+      "id": "4101",
+      "name": "郑州",
+      "nameEn": "Zhengzhou",
+      "namePinyin": "zhengzhou",
+      "latitude": 34.7466,
+      "longitude": 113.6254,
+      "stationCount": 235,
+      "lineCount": 13
+    },
+    {
+      "id": "4103",
+      "name": "洛阳",
+      "nameEn": "Luoyang",
+      "namePinyin": "luoyang",
+      "latitude": 34.6197,
+      "longitude": 112.454,
+      "stationCount": 33,
+      "lineCount": 2
+    },
+    {
+      "id": "4110",
+      "name": "许昌",
+      "nameEn": "Xuchang",
+      "namePinyin": "xuchang",
+      "latitude": 34.0355,
+      "longitude": 113.8525,
+      "stationCount": 27,
+      "lineCount": 1
+    },
+    {
+      "id": "5120",
+      "name": "资阳",
+      "nameEn": "Ziyang",
+      "namePinyin": "ziyang",
+      "latitude": 30.1286,
+      "longitude": 104.6276,
+      "stationCount": 7,
+      "lineCount": 1
+    },
+    {
+      "id": "2102",
+      "name": "大连",
+      "nameEn": "Dalian",
+      "namePinyin": "dalian",
+      "latitude": 38.914,
+      "longitude": 121.6147,
+      "stationCount": 100,
+      "lineCount": 8
+    },
+    {
+      "id": "2201",
+      "name": "长春",
+      "nameEn": "Changchun",
+      "namePinyin": "changchun",
+      "latitude": 43.8171,
+      "longitude": 125.3235,
+      "stationCount": 117,
+      "lineCount": 6
+    },
+    {
+      "id": "2301",
+      "name": "哈尔滨",
+      "nameEn": "Haerbin",
+      "namePinyin": "haerbin",
+      "latitude": 45.8038,
+      "longitude": 126.5349,
+      "stationCount": 73,
+      "lineCount": 3
+    },
+    {
+      "id": "1501",
+      "name": "呼和浩特",
+      "nameEn": "Huhehaote",
+      "namePinyin": "huhehaote",
+      "latitude": 40.8426,
+      "longitude": 111.7492,
+      "stationCount": 43,
+      "lineCount": 2
+    },
+    {
+      "id": "3202",
+      "name": "无锡",
+      "nameEn": "Wuxi",
+      "namePinyin": "wuxi",
+      "latitude": 31.4912,
+      "longitude": 120.3119,
+      "stationCount": 89,
+      "lineCount": 5
+    },
+    {
+      "id": "3205",
+      "name": "苏州",
+      "nameEn": "Suzhou",
+      "namePinyin": "suzhou",
+      "latitude": 31.2989,
+      "longitude": 120.5853,
+      "stationCount": 236,
+      "lineCount": 9
+    },
+    {
+      "id": "3203",
+      "name": "徐州",
+      "nameEn": "Xuzhou",
+      "namePinyin": "xuzhou",
+      "latitude": 34.2058,
+      "longitude": 117.2841,
+      "stationCount": 70,
+      "lineCount": 4
+    },
+    {
+      "id": "3204",
+      "name": "常州",
+      "nameEn": "Changzhou",
+      "namePinyin": "changzhou",
+      "latitude": 31.8107,
+      "longitude": 119.9741,
+      "stationCount": 43,
+      "lineCount": 2
+    },
+    {
+      "id": "3701",
+      "name": "济南",
+      "nameEn": "Jinan",
+      "namePinyin": "jinan",
+      "latitude": 36.6512,
+      "longitude": 117.1201,
+      "stationCount": 145,
+      "lineCount": 8
+    },
+    {
+      "id": "3702",
+      "name": "青岛",
+      "nameEn": "Qingdao",
+      "namePinyin": "qingdao",
+      "latitude": 36.0671,
+      "longitude": 120.3826,
+      "stationCount": 172,
+      "lineCount": 8
+    },
+    {
+      "id": "3401",
+      "name": "合肥",
+      "nameEn": "Hefei",
+      "namePinyin": "hefei",
+      "latitude": 31.8206,
+      "longitude": 117.2272,
+      "stationCount": 185,
+      "lineCount": 7
+    },
+    {
+      "id": "3402",
+      "name": "芜湖",
+      "nameEn": "Wuhu",
+      "namePinyin": "wuhu",
+      "latitude": 31.3529,
+      "longitude": 118.4331,
+      "stationCount": 35,
+      "lineCount": 2
+    },
+    {
+      "id": "3411",
+      "name": "滁州",
+      "nameEn": "Chuzhou",
+      "namePinyin": "chuzhou",
+      "latitude": 32.3016,
+      "longitude": 118.3163,
+      "stationCount": 10,
+      "lineCount": 1
+    },
+    {
+      "id": "3301",
+      "name": "杭州",
+      "nameEn": "Hangzhou",
+      "namePinyin": "hangzhou",
+      "latitude": 30.2741,
+      "longitude": 120.1551,
+      "stationCount": 298,
+      "lineCount": 16
+    },
+    {
+      "id": "3302",
+      "name": "宁波",
+      "nameEn": "Ningbo",
+      "namePinyin": "ningbo",
+      "latitude": 29.8683,
+      "longitude": 121.544,
+      "stationCount": 170,
+      "lineCount": 8
+    },
+    {
+      "id": "3306",
+      "name": "绍兴",
+      "nameEn": "Shaoxing",
+      "namePinyin": "shaoxing",
+      "latitude": 30.0303,
+      "longitude": 120.5802,
+      "stationCount": 41,
+      "lineCount": 3
+    },
+    {
+      "id": "3303",
+      "name": "温州",
+      "nameEn": "Wenzhou",
+      "namePinyin": "wenzhou",
+      "latitude": 27.9949,
+      "longitude": 120.6994,
+      "stationCount": 36,
+      "lineCount": 2
+    },
+    {
+      "id": "3307",
+      "name": "金华",
+      "nameEn": "Jinhua",
+      "namePinyin": "jinhua",
+      "latitude": 29.0792,
+      "longitude": 119.6474,
+      "stationCount": 29,
+      "lineCount": 2
+    },
+    {
+      "id": "3310",
+      "name": "台州",
+      "nameEn": "Taizhou",
+      "namePinyin": "taizhou",
+      "latitude": 28.6564,
+      "longitude": 121.4208,
+      "stationCount": 15,
+      "lineCount": 1
+    },
+    {
+      "id": "3501",
+      "name": "福州",
+      "nameEn": "Fuzhou",
+      "namePinyin": "fuzhou",
+      "latitude": 26.0745,
+      "longitude": 119.2965,
+      "stationCount": 105,
+      "lineCount": 6
+    },
+    {
+      "id": "3502",
+      "name": "厦门",
+      "nameEn": "Xiamen",
+      "namePinyin": "xiamen",
+      "latitude": 24.4798,
+      "longitude": 118.0894,
+      "stationCount": 70,
+      "lineCount": 3
+    },
+    {
+      "id": "4301",
+      "name": "长沙",
+      "nameEn": "Changsha",
+      "namePinyin": "changsha",
+      "latitude": 28.2282,
+      "longitude": 112.9388,
+      "stationCount": 143,
+      "lineCount": 7
+    },
+    {
+      "id": "4303",
+      "name": "湘潭",
+      "nameEn": "Xiangtan",
+      "namePinyin": "xiangtan",
+      "latitude": 27.8298,
+      "longitude": 112.944,
+      "stationCount": 33,
+      "lineCount": 1
+    },
+    {
+      "id": "4331",
+      "name": "湘西",
+      "nameEn": "Xiangxi",
+      "namePinyin": "xiangxi",
+      "latitude": 28.3119,
+      "longitude": 109.7389,
+      "stationCount": 4,
+      "lineCount": 1
+    },
+    {
+      "id": "4403",
+      "name": "深圳",
+      "nameEn": "Shenzhen",
+      "namePinyin": "shenzhen",
+      "latitude": 22.5431,
+      "longitude": 114.0579,
+      "stationCount": 355,
+      "lineCount": 17
+    },
+    {
+      "id": "4406",
+      "name": "佛山",
+      "nameEn": "Foshan",
+      "namePinyin": "foshan",
+      "latitude": 23.0215,
+      "longitude": 113.1214,
+      "stationCount": 111,
+      "lineCount": 6
+    },
+    {
+      "id": "4419",
+      "name": "东莞",
+      "nameEn": "Dongguan",
+      "namePinyin": "dongguan",
+      "latitude": 23.0207,
+      "longitude": 113.7518,
+      "stationCount": 39,
+      "lineCount": 2
+    },
+    {
+      "id": "4501",
+      "name": "南宁",
+      "nameEn": "Nanning",
+      "namePinyin": "nanning",
+      "latitude": 22.817,
+      "longitude": 108.3669,
+      "stationCount": 95,
+      "lineCount": 5
+    },
+    {
+      "id": "3601",
+      "name": "南昌",
+      "nameEn": "Nanchang",
+      "namePinyin": "nanchang",
+      "latitude": 28.6829,
+      "longitude": 115.8582,
+      "stationCount": 113,
+      "lineCount": 4
+    },
+    {
+      "id": "5201",
+      "name": "贵阳",
+      "nameEn": "Guiyang",
+      "namePinyin": "guiyang",
+      "latitude": 26.647,
+      "longitude": 106.6302,
+      "stationCount": 93,
+      "lineCount": 4
+    },
+    {
+      "id": "5301",
+      "name": "昆明",
+      "nameEn": "Kunming",
+      "namePinyin": "kunming",
+      "latitude": 25.0389,
+      "longitude": 102.7183,
+      "stationCount": 104,
+      "lineCount": 7
+    },
+    {
+      "id": "6201",
+      "name": "兰州",
+      "nameEn": "Lanzhou",
+      "namePinyin": "lanzhou",
+      "latitude": 36.0611,
+      "longitude": 103.8343,
+      "stationCount": 27,
+      "lineCount": 2
+    },
+    {
+      "id": "3206",
+      "name": "南通",
+      "nameEn": "Nantong",
+      "namePinyin": "nantong",
+      "latitude": 31.9802,
+      "longitude": 120.8943,
+      "stationCount": 42,
+      "lineCount": 2
+    },
+    {
+      "id": "6501",
+      "name": "乌鲁木齐",
+      "nameEn": "Wulumuqi",
+      "namePinyin": "wulumuqi",
+      "latitude": 43.8256,
+      "longitude": 87.6168,
+      "stationCount": 22,
+      "lineCount": 2
+    },
+    {
+      "id": "8100",
+      "name": "香港",
+      "nameEn": "Xianggang",
+      "namePinyin": "xianggang",
+      "latitude": 22.3193,
+      "longitude": 114.1694,
+      "stationCount": 98,
+      "lineCount": 12
+    },
+    {
+      "id": "8200",
+      "name": "澳门",
+      "nameEn": "Aomen",
+      "namePinyin": "aomen",
+      "latitude": 22.1987,
+      "longitude": 113.5439,
+      "stationCount": 15,
+      "lineCount": 3
+    },
+    {
+      "id": "4207",
+      "name": "鄂州",
+      "nameEn": "Ezhou",
+      "namePinyin": "ezhou",
+      "latitude": 30.3919,
+      "longitude": 114.8949,
+      "stationCount": 23,
+      "lineCount": 1
+    },
+    {
+      "id": "4418",
+      "name": "清远",
+      "nameEn": "Qingyuan",
+      "namePinyin": "qingyuan",
+      "latitude": 23.682,
+      "longitude": 113.056,
+      "stationCount": 3,
+      "lineCount": 1
+    },
+    {
+      "id": "7101",
+      "name": "台北",
+      "nameEn": "Taibei",
+      "namePinyin": "taibei",
+      "latitude": 25.033,
+      "longitude": 121.5654,
+      "stationCount": 164,
+      "lineCount": 15
+    },
+    {
+      "id": "7102",
+      "name": "高雄",
+      "nameEn": "Gaoxiong",
+      "namePinyin": "gaoxiong",
+      "latitude": 22.6273,
+      "longitude": 120.3014,
+      "stationCount": 76,
+      "lineCount": 3
+    },
+    {
+      "id": "7106",
+      "name": "桃园",
+      "nameEn": "Taoyuan",
+      "namePinyin": "taoyuan",
+      "latitude": 24.9937,
+      "longitude": 121.301,
+      "stationCount": 22,
+      "lineCount": 2
+    },
+    {
+      "id": "7104",
+      "name": "台中",
+      "nameEn": "Taizhong",
+      "namePinyin": "taizhong",
+      "latitude": 24.1477,
+      "longitude": 120.6736,
+      "stationCount": 18,
+      "lineCount": 1
     }
   ]
 }

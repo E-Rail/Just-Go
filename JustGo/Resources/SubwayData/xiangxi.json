@@ -1,0 +1,186 @@
+{
+  "cityID": "4331",
+  "version": "amap-subway-2026-05-11",
+  "lastUpdated": "2026-05-11T11:46:32.351Z",
+  "lines": [
+    {
+      "lineID": "900000179382|900000179383",
+      "name": "凤凰磁浮观光快线",
+      "nameEn": null,
+      "colorHex": "#818530",
+      "stationIDs": [
+        "900000179382001",
+        "900000179382004",
+        "900000179382005",
+        "900000179382006"
+      ],
+      "amapLineIDs": [
+        "900000179382",
+        "900000179383"
+      ],
+      "polyline": null
+    }
+  ],
+  "stations": [
+    {
+      "stationID": "900000179382006",
+      "name": "凤凰等待",
+      "nameEn": null,
+      "namePinyin": "FengHuang DengDai",
+      "latitude": 27.95444,
+      "longitude": 109.615046,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000179382|900000179383"
+      ],
+      "poiIDs": [
+        "BV11674109",
+        "900000179382006"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000179382001",
+      "name": "凤凰古城",
+      "nameEn": null,
+      "namePinyin": "FengHuang GuCheng",
+      "latitude": 28.015877,
+      "longitude": 109.603861,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000179382|900000179383"
+      ],
+      "poiIDs": [
+        "BV11674106",
+        "900000179382001"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000179382005",
+      "name": "凤凰揽胜",
+      "nameEn": null,
+      "namePinyin": "FengHuang LanSheng",
+      "latitude": 27.958606,
+      "longitude": 109.597791,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000179382|900000179383"
+      ],
+      "poiIDs": [
+        "BV11674105",
+        "900000179382005"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000179382004",
+      "name": "凤凰迎宾",
+      "nameEn": null,
+      "namePinyin": "FengHuang YingBin",
+      "latitude": 27.96709,
+      "longitude": 109.592772,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000179382|900000179383"
+      ],
+      "poiIDs": [
+        "BV11674110",
+        "900000179382004"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    }
+  ]
+}

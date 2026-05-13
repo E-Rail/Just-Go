@@ -9,17 +9,32 @@ struct RouteDetailView: View {
         ScrollView {
             VStack(spacing: 20) {
                 routeSummaryCard
+                routeMapPreview
+                accessGuidanceCard
                 accessibilityInfoCard
                 segmentsTimeline
                 startNavigationButton
             }
             .padding()
         }
-        .navigationTitle("Route Details")
+        .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showNavigation) {
             RouteNavigationView(route: route)
         }
+    }
+
+    private var routeMapPreview: some View {
+        TransitMapView(
+            visibleRegion: .constant(route.previewRegion),
+            stations: [],
+            subwayLines: [],
+            route: route,
+            showsUserLocation: false,
+            onStationSelected: { _ in }
+        )
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private var routeSummaryCard: some View {
@@ -29,7 +44,7 @@ struct RouteDetailView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(route.origin)
                             .font(.headline)
-                        Text("Origin")
+                        Text(AppLocalization.localized("Origin"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -44,7 +59,7 @@ struct RouteDetailView: View {
                     VStack(alignment: .trailing, spacing: 4) {
                         Text(route.destination)
                             .font(.headline)
-                        Text("Destination")
+                        Text(AppLocalization.localized("Destination"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -62,7 +77,7 @@ struct RouteDetailView: View {
                     HStack {
                         Image(systemName: "figure.roll")
                             .foregroundStyle(.green)
-                        Text("Fully Accessible Route")
+                        Text(AppLocalization.localized("Fully Accessible Route"))
                             .font(.subheadline)
                             .foregroundStyle(.green)
                     }
@@ -77,14 +92,14 @@ struct RouteDetailView: View {
     private var accessibilityInfoCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Accessibility Info")
+                Text(AppLocalization.localized("Accessibility Info"))
                     .font(.headline)
 
                 if route.isFullyAccessible {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
-                        Text("All stations on this route have elevator access")
+                        Text(AppLocalization.localized("All stations on this route have elevator access"))
                             .font(.subheadline)
                     }
                 }
@@ -101,9 +116,63 @@ struct RouteDetailView: View {
                 }
 
                 let accessibleStops = route.segments.filter { $0.type == .subway }.count
-                Text("\(accessibleStops) accessible stations on this route")
+                Text(AppLocalization.text(
+                    english: "\(accessibleStops) accessible stations on this route",
+                    chinese: "此路线有\(accessibleStops)座无障碍车站"
+                ))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var accessGuidanceCard: some View {
+        if !route.accessGuidance.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text(AppLocalization.localized("Access Guidance"))
+                        .font(.headline)
+
+                    ForEach(route.accessGuidance) { guide in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: guide.kind == .origin ? "arrow.down.forward.circle.fill" : "arrow.up.forward.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.blue)
+                                    .frame(width: 26)
+
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(guide.title)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text(guide.primaryInstruction)
+                                        .font(.subheadline)
+                                    Text(guide.formattedWalk)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            ForEach(guide.accessibilityNotes, id: \.self) { note in
+                                Label(note, systemImage: "info.circle")
+                                    .font(.caption)
+                                    .foregroundStyle(.blue)
+                            }
+
+                            if let firstStep = guide.walkingSteps.first {
+                                Text(firstStep.instruction)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.leading, 36)
+                            }
+                        }
+
+                        if guide.id != route.accessGuidance.last?.id {
+                            Divider()
+                        }
+                    }
+                }
             }
         }
     }
@@ -111,7 +180,7 @@ struct RouteDetailView: View {
     private var segmentsTimeline: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Route Steps")
+                Text(AppLocalization.localized("Route Steps"))
                     .font(.headline)
 
                 ForEach(route.segments) { segment in
@@ -131,7 +200,7 @@ struct RouteDetailView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(segmentLabel(segment))
+                Text(segment.summaryLabel)
                     .font(.body)
                     .fontWeight(.medium)
 
@@ -144,6 +213,13 @@ struct RouteDetailView: View {
                 Text(segment.formattedDuration)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                if let firstDirection = segment.walkingDirections?.first?.instruction,
+                   segment.type == .walking {
+                    Text(firstDirection)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 ForEach(segment.accessibilityNotes, id: \.self) { note in
                     HStack(spacing: 4) {
@@ -179,22 +255,11 @@ struct RouteDetailView: View {
         }
     }
 
-    private func segmentLabel(_ segment: RouteSegment) -> String {
-        switch segment.type {
-        case .walking:
-            return "Walk \(Int(segment.duration / 60)) min"
-        case .subway:
-            return "\(segment.lineName ?? "Subway") • \(segment.stops) stops"
-        case .transfer:
-            return "Transfer"
-        }
-    }
-
     private var startNavigationButton: some View {
         Button(action: { showNavigation = true }) {
             HStack {
                 Image(systemName: "location.fill")
-                Text("Start Navigation")
+                Text(AppLocalization.localized("Start Navigation"))
                     .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
@@ -218,7 +283,7 @@ struct StatItem: View {
                 .foregroundStyle(.secondary)
             Text(value)
                 .font(.headline)
-            Text(title)
+            Text(AppLocalization.localized(title))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

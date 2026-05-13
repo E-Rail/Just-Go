@@ -1,0 +1,1472 @@
+{
+  "cityID": "3402",
+  "version": "amap-subway-2026-05-11",
+  "lastUpdated": "2026-05-11T11:46:30.663Z",
+  "lines": [
+    {
+      "lineID": "900000075437|900000075449",
+      "name": "轨道交通1号线",
+      "nameEn": null,
+      "colorHex": "#CC0000",
+      "stationIDs": [
+        "900000075437001",
+        "900000075437002",
+        "900000075437003",
+        "900000075437004",
+        "900000075437005",
+        "900000075437006",
+        "900000075437007",
+        "900000075437008",
+        "900000075437009",
+        "900000075437010",
+        "900000075437011",
+        "900000075437012",
+        "900000075437013",
+        "900000075437014",
+        "900000075437015",
+        "900000075437016",
+        "900000075437017",
+        "900000075437018",
+        "900000075437019",
+        "900000075437020",
+        "900000075437021",
+        "900000075437022",
+        "900000075437023",
+        "900000075437024",
+        "900000075437025"
+      ],
+      "amapLineIDs": [
+        "900000075437",
+        "900000075449"
+      ],
+      "polyline": null
+    },
+    {
+      "lineID": "900000075459|900000075460",
+      "name": "轨道交通2号线",
+      "nameEn": null,
+      "colorHex": "#01A2E2",
+      "stationIDs": [
+        "900000075437017",
+        "900000075459002",
+        "900000075459003",
+        "900000075459004",
+        "900000075459012",
+        "900000075459013",
+        "900000075459006",
+        "900000075459008",
+        "900000075459009",
+        "900000075459010",
+        "900000075459011"
+      ],
+      "amapLineIDs": [
+        "900000075459",
+        "900000075460"
+      ],
+      "polyline": null
+    }
+  ],
+  "stations": [
+    {
+      "stationID": "900000075437006",
+      "name": "鞍山路",
+      "nameEn": null,
+      "namePinyin": "AnShan Lu",
+      "latitude": 31.431767,
+      "longitude": 118.382984,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856778",
+        "900000075437006"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437019",
+      "name": "奥体中心",
+      "nameEn": null,
+      "namePinyin": "AoTi ZhongXin",
+      "latitude": 31.31138,
+      "longitude": 118.378882,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856762",
+        "900000075437019"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437025",
+      "name": "白马山",
+      "nameEn": null,
+      "namePinyin": "BaiMaShan",
+      "latitude": 31.245257,
+      "longitude": 118.372376,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856759",
+        "900000075437025"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437001",
+      "name": "保顺路",
+      "nameEn": null,
+      "namePinyin": "BaoShun Lu",
+      "latitude": 31.479819,
+      "longitude": 118.412095,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856754",
+        "900000075437001"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437021",
+      "name": "博览中心",
+      "nameEn": null,
+      "namePinyin": "BoLan ZhongXin",
+      "latitude": 31.294078,
+      "longitude": 118.380897,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856755",
+        "900000075437021"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437013",
+      "name": "赤铸山路",
+      "nameEn": null,
+      "namePinyin": "ChiZhuShan Lu",
+      "latitude": 31.361992,
+      "longitude": 118.374245,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856765",
+        "900000075437013"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459009",
+      "name": "方特·徽州路",
+      "nameEn": null,
+      "namePinyin": "FangTe HuiZhou Lu",
+      "latitude": 31.356145,
+      "longitude": 118.459758,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV09265572",
+        "900000075459009"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437007",
+      "name": "港湾路",
+      "nameEn": null,
+      "namePinyin": "GangWan Lu",
+      "latitude": 31.41685,
+      "longitude": 118.380973,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856764",
+        "900000075437007"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437010",
+      "name": "港一路",
+      "nameEn": null,
+      "namePinyin": "GangYiLu",
+      "latitude": 31.391503,
+      "longitude": 118.372902,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856776",
+        "900000075437010"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459008",
+      "name": "海晏路",
+      "nameEn": null,
+      "namePinyin": "HaiYan Lu",
+      "latitude": 31.354898,
+      "longitude": 118.440757,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856792",
+        "900000075459008"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437023",
+      "name": "珩琅山路",
+      "nameEn": null,
+      "namePinyin": "HengLang ShanLu",
+      "latitude": 31.265191,
+      "longitude": 118.389031,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856774",
+        "900000075437023"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437004",
+      "name": "衡山路",
+      "nameEn": null,
+      "namePinyin": "HengShan Lu",
+      "latitude": 31.4517,
+      "longitude": 118.393773,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856770",
+        "900000075437004"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437020",
+      "name": "红花山路",
+      "nameEn": null,
+      "namePinyin": "HongHua ShanLu",
+      "latitude": 31.301666,
+      "longitude": 118.379874,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856771",
+        "900000075437020"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437002",
+      "name": "华山路",
+      "nameEn": null,
+      "namePinyin": "HuaShan Lu",
+      "latitude": 31.471,
+      "longitude": 118.40386,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856758",
+        "900000075437002"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437018",
+      "name": "环城北路",
+      "nameEn": null,
+      "namePinyin": "HuanCheng BeiLu",
+      "latitude": 31.32477,
+      "longitude": 118.380744,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856773",
+        "900000075437018"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437017",
+      "name": "鸠兹广场",
+      "nameEn": null,
+      "namePinyin": "JiuZi GuangChang",
+      "latitude": 31.332566,
+      "longitude": 118.371759,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449",
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV11554563",
+        "900000075437017"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437005",
+      "name": "龙山路",
+      "nameEn": null,
+      "namePinyin": "LongShan Lu",
+      "latitude": 31.440102,
+      "longitude": 118.381457,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856768",
+        "900000075437005"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459010",
+      "name": "梦溪路",
+      "nameEn": null,
+      "namePinyin": "MengXi Lu",
+      "latitude": 31.351545,
+      "longitude": 118.481371,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856788",
+        "900000075459010"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459012",
+      "name": "神山公园",
+      "nameEn": null,
+      "namePinyin": "ShenShan GongYuan",
+      "latitude": 31.357263,
+      "longitude": 118.409984,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10867549",
+        "900000075459012"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459003",
+      "name": "神山口",
+      "nameEn": null,
+      "namePinyin": "Shen ShanKou",
+      "latitude": 31.338301,
+      "longitude": 118.397119,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856787",
+        "900000075459003"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437003",
+      "name": "泰山路",
+      "nameEn": null,
+      "namePinyin": "TaiShan Lu",
+      "latitude": 31.460096,
+      "longitude": 118.40091,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856777",
+        "900000075437003"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437012",
+      "name": "天门山路",
+      "nameEn": null,
+      "namePinyin": "TianMen ShanLu",
+      "latitude": 31.370012,
+      "longitude": 118.37374,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856761",
+        "900000075437012"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437011",
+      "name": "天柱山路",
+      "nameEn": null,
+      "namePinyin": "TianZhuShan Lu",
+      "latitude": 31.378453,
+      "longitude": 118.373254,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856760",
+        "900000075437011"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459011",
+      "name": "万春湖路",
+      "nameEn": null,
+      "namePinyin": "WanChunHu Lu",
+      "latitude": 31.362525,
+      "longitude": 118.49614,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856794",
+        "900000075459011"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459002",
+      "name": "文化路",
+      "nameEn": null,
+      "namePinyin": "WenHua Lu",
+      "latitude": 31.335487,
+      "longitude": 118.383807,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856790",
+        "900000075459002"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437022",
+      "name": "文津东路",
+      "nameEn": null,
+      "namePinyin": "WenJin DongLu",
+      "latitude": 31.283299,
+      "longitude": 118.384043,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV11161553",
+        "900000075437022"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459004",
+      "name": "芜湖火车站",
+      "nameEn": null,
+      "namePinyin": "WuHu HuoCheZhan",
+      "latitude": 31.348059,
+      "longitude": 118.394746,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856793",
+        "900000075459004"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437024",
+      "name": "芜湖南站",
+      "nameEn": null,
+      "namePinyin": "WuHu NanZhan",
+      "latitude": 31.250717,
+      "longitude": 118.378615,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856767",
+        "900000075437024"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437009",
+      "name": "武夷山路",
+      "nameEn": null,
+      "namePinyin": "WuYiShan Lu",
+      "latitude": 31.399344,
+      "longitude": 118.373896,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856775",
+        "900000075437009"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437008",
+      "name": "裕安路",
+      "nameEn": null,
+      "namePinyin": "YuAn Lu",
+      "latitude": 31.409852,
+      "longitude": 118.375178,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856756",
+        "900000075437008"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459013",
+      "name": "云从路",
+      "nameEn": null,
+      "namePinyin": "YunCong Lu",
+      "latitude": 31.357368,
+      "longitude": 118.421869,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10867550",
+        "900000075459013"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437015",
+      "name": "赭山公园",
+      "nameEn": null,
+      "namePinyin": "ZheShan GongYuan",
+      "latitude": 31.34515,
+      "longitude": 118.372786,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856763",
+        "900000075437015"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437014",
+      "name": "赭山路",
+      "nameEn": null,
+      "namePinyin": "ZheShan Lu",
+      "latitude": 31.351189,
+      "longitude": 118.374973,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856757",
+        "900000075437014"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075459006",
+      "name": "政务中心",
+      "nameEn": null,
+      "namePinyin": "ZhengWu ZhongXin",
+      "latitude": 31.357423,
+      "longitude": 118.430649,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075459|900000075460"
+      ],
+      "poiIDs": [
+        "BV10856786",
+        "900000075459006"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    },
+    {
+      "stationID": "900000075437016",
+      "name": "中山北路",
+      "nameEn": null,
+      "namePinyin": "ZhongShan BeiLu",
+      "latitude": 31.339753,
+      "longitude": 118.368674,
+      "isTransferStation": true,
+      "floorCount": 1,
+      "lineIDs": [
+        "900000075437|900000075449"
+      ],
+      "poiIDs": [
+        "BV10856769",
+        "900000075437016"
+      ],
+      "exits": null,
+      "accessibility": {
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "isFullyAccessible": null,
+        "elevatorLocations": null,
+        "accessibleEntrances": null,
+        "wheelchairBoardingAssistance": null,
+        "hasTactilePath": null,
+        "hasBrailleSigns": null,
+        "hasAudioAnnouncement": null,
+        "tactilePathCoverage": null,
+        "hasVisualAnnouncement": null,
+        "hasHearingLoop": null,
+        "hasSignLanguageDisplay": null,
+        "hasSimplifiedSignage": null,
+        "hasColorCoding": true,
+        "hasPictograms": true
+      },
+      "platformCount": null,
+      "firstTrainTime": null,
+      "lastTrainTime": null
+    }
+  ]
+}

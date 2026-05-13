@@ -1,6 +1,3 @@
-import SwiftData
-
-@Model
 final class StationExit: Identifiable {
     var exitID: String
     var stationID: String

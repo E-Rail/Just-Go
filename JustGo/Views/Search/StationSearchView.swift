@@ -6,15 +6,25 @@ struct StationSearchView: View {
     @State private var viewModel: StationSearchViewModel?
     @State private var selectedStation: Station?
     @State private var showStationDetail = false
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                searchBar
-                filterBar
-                resultsList
+            ZStack(alignment: .top) {
+                VStack(spacing: 0) {
+                    searchBar
+                    filterBar
+                    resultsList
+                }
+
+                if isSearchFocused && viewModel?.searchResults.isEmpty == false {
+                    searchDropdown
+                        .padding(.horizontal)
+                        .padding(.top, 58)
+                        .zIndex(40)
+                }
             }
-            .navigationTitle("Search")
+            .navigationTitle(AppLocalization.localized("Search"))
             .navigationBarTitleDisplayMode(.large)
             .navigationDestination(isPresented: $showStationDetail) {
                 if let station = selectedStation {
@@ -29,6 +39,12 @@ struct StationSearchView: View {
                     accessibilityService: container.accessibilityService
                 )
             }
+            await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
+        }
+        .onChange(of: appState.selectedCity?.id) { _, cityID in
+            Task {
+                await viewModel?.loadInitialStations(city: cityID ?? "")
+            }
         }
     }
 
@@ -39,9 +55,15 @@ struct StationSearchView: View {
 
             TextField("Search stations...", text: Binding(
                 get: { viewModel?.searchText ?? "" },
-                set: { viewModel?.searchText = $0 }
+                set: { newValue in
+                    viewModel?.searchText = newValue
+                    Task {
+                        await viewModel?.search(city: appState.selectedCity?.id ?? "")
+                    }
+                }
             ))
             .textFieldStyle(.plain)
+            .focused($isSearchFocused)
             .onSubmit {
                 Task {
                     await viewModel?.search(city: appState.selectedCity?.id ?? "")
@@ -58,6 +80,48 @@ struct StationSearchView: View {
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
+    }
+
+    private var searchDropdown: some View {
+        VStack(spacing: 0) {
+            ForEach(viewModel?.searchResults.prefix(8) ?? []) { station in
+                Button {
+                    isSearchFocused = false
+                    viewModel?.selectStation(station)
+                    selectedStation = station
+                    showStationDetail = true
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(station.localizedName)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            if let alternateName = station.alternateLocalizedName {
+                                Text(alternateName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        if let line = station.lines.first {
+                            Text(line.localizedName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                }
+                .buttonStyle(.plain)
+
+                if station.id != viewModel?.searchResults.prefix(8).last?.id {
+                    Divider()
+                        .padding(.leading, 12)
+                }
+            }
+        }
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
     private var filterBar: some View {
@@ -104,17 +168,18 @@ struct StationSearchView: View {
             } else if let results = viewModel?.searchResults, !results.isEmpty {
                 ForEach(results) { station in
                     StationRow(station: station) {
+                        viewModel?.selectStation(station)
                         selectedStation = station
                         showStationDetail = true
                     }
                 }
             } else if !(viewModel?.searchText.isEmpty ?? true) {
                 ContentUnavailableView {
-                    Label("No Results", systemImage: "magnifyingglass")
+                    Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
                 } description: {
-                    Text("Try a different search term")
+                    Text(AppLocalization.localized("Try a different search term"))
                 }
-            } else {
+            } else if viewModel?.recentSearches.isEmpty == false {
                 recentSearchesSection
             }
         }
@@ -122,7 +187,7 @@ struct StationSearchView: View {
     }
 
     private var recentSearchesSection: some View {
-        Section("Recent Searches") {
+        Section(AppLocalization.localized("Recent Searches")) {
             ForEach(viewModel?.recentSearches ?? []) { search in
                 HStack {
                     Image(systemName: "clock")
@@ -133,6 +198,9 @@ struct StationSearchView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+            .onDelete { offsets in
+                viewModel?.deleteRecentSearches(at: offsets)
             }
         }
     }
@@ -149,7 +217,7 @@ struct FilterChip: View {
             HStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
-                Text(title)
+                Text(AppLocalization.localized(title))
                     .font(.caption)
             }
             .padding(.horizontal, 12)

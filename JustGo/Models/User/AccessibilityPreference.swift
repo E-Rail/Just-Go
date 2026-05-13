@@ -66,12 +66,12 @@ enum DisabilityCategory: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .mobility: return "Mobility"
-        case .visualImpairment: return "Visual Impairment"
-        case .hearingImpairment: return "Hearing Impairment"
-        case .cognitive: return "Cognitive"
-        case .multiple: return "Multiple"
-        case .none: return "None"
+        case .mobility: return AppLocalization.localized("Mobility")
+        case .visualImpairment: return AppLocalization.localized("Visual Impairment")
+        case .hearingImpairment: return AppLocalization.localized("Hearing Impairment")
+        case .cognitive: return AppLocalization.localized("Cognitive")
+        case .multiple: return AppLocalization.localized("Multiple")
+        case .none: return AppLocalization.localized("None")
         }
     }
 

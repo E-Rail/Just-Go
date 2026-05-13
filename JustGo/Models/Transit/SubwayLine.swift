@@ -1,16 +1,11 @@
-import SwiftData
-
-@Model
 final class SubwayLine: Identifiable {
-    @Attribute(.unique) var lineID: String
+    var lineID: String
     var id: String { lineID }
     var name: String
     var nameEn: String?
     var colorHex: String
     var cityID: String
     var sortOrder: Int
-
-    @Relationship(deleteRule: .nullify)
     var stations: [Station]
 
     init(

@@ -7,9 +7,9 @@ final class StationDetailViewModel {
     var isLoading = false
     var errorMessage: String?
 
-    private let aMapService: AMapServiceProtocol
+    private let aMapService: AMapService
 
-    init(aMapService: AMapServiceProtocol) {
+    init(aMapService: AMapService) {
         self.aMapService = aMapService
     }
 
@@ -32,7 +32,9 @@ final class StationDetailViewModel {
                 )
                 arrivals.append(contentsOf: lineArrivals)
             }
-            arrivals.sort { $0.minutesRemaining < $1.minutesRemaining }
+            arrivals.sort {
+                ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

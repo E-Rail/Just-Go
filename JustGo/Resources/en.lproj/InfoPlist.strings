@@ -1,0 +1,2 @@
+"NSLocationWhenInUseUsageDescription" = "JustGo needs your location to find nearby subway stations and provide navigation.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "JustGo uses your location to provide real-time navigation and proximity alerts for subway stations.";

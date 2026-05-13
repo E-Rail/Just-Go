@@ -10,12 +10,11 @@ final class StationSearchViewModel {
     var errorMessage: String?
     private var unfilteredResults: [Station] = []
 
-    // Filters
     var filter = StationFilter()
-    var sortStrategy: StationSortStrategy = .name
 
     private let stationSearchService: StationSearchService
     private let accessibilityService: AccessibilityService
+    private let recentSearchesKey = "recentStationSearches"
 
     init(
         stationSearchService: StationSearchService,
@@ -23,11 +22,24 @@ final class StationSearchViewModel {
     ) {
         self.stationSearchService = stationSearchService
         self.accessibilityService = accessibilityService
+        recentSearches = UserDefaults.standard.codableValue(forKey: recentSearchesKey, as: [SearchHistory].self, default: [])
+    }
+
+    func loadInitialStations(city: String) async {
+        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard !city.isEmpty else { return }
+
+        do {
+            unfilteredResults = try await stationSearchService.search(keyword: "", city: city)
+            applyFilters()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     func search(city: String) async {
         guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
-            searchResults = []
+            await loadInitialStations(city: city)
             return
         }
 
@@ -70,8 +82,24 @@ final class StationSearchViewModel {
         accessibilityService.stationAccessibilityLabel(station)
     }
 
+    func selectStation(_ station: Station) {
+        var recent = recentSearches.filter { $0.stationID != station.stationID }
+        recent.insert(SearchHistory(
+            stationID: station.stationID,
+            stationName: station.localizedName,
+            cityID: station.cityID
+        ), at: 0)
+        recentSearches = Array(recent.prefix(10))
+        UserDefaults.standard.setCodable(recentSearches, forKey: recentSearchesKey)
+    }
+
+    func deleteRecentSearches(at offsets: IndexSet) {
+        recentSearches.remove(atOffsets: offsets)
+        UserDefaults.standard.setCodable(recentSearches, forKey: recentSearchesKey)
+    }
+
     private func applyFilters() {
         searchResults = stationSearchService.filterStations(unfilteredResults, by: filter)
-        searchResults = stationSearchService.sortStations(searchResults, by: sortStrategy, userLocation: nil)
+        searchResults.sort { $0.localizedName < $1.localizedName }
     }
 }

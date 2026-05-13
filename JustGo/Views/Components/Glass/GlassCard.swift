@@ -73,24 +73,3 @@ struct GlassButton: View {
         .buttonStyle(.plain)
     }
 }
-
-#Preview {
-    ZStack {
-        Color.blue.ignoresSafeArea()
-
-        VStack(spacing: 16) {
-            GlassCard {
-                VStack(alignment: .leading) {
-                    Text("Glass Card")
-                        .font(.headline)
-                    Text("This is a glass card component")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            GlassButton("Action", icon: "star.fill") {}
-        }
-        .padding()
-    }
-}

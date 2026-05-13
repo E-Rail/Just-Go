@@ -2,18 +2,28 @@ import Foundation
 import CoreLocation
 
 final class StationSearchService {
-    private let aMapService: AMapServiceProtocol
+    private let aMapService: AMapService
 
-    init(aMapService: AMapServiceProtocol) {
+    init(aMapService: AMapService) {
         self.aMapService = aMapService
     }
 
     func search(keyword: String, city: String) async throws -> [Station] {
-        return try await aMapService.searchStations(keyword: keyword, city: city)
+        try await aMapService.searchStations(keyword: keyword, city: city)
+    }
+
+    func suggestions(keyword: String, city: String, limit: Int = 6) async throws -> [Station] {
+        let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return [] }
+        return Array(try await search(keyword: query, city: city).prefix(limit))
     }
 
     func searchNearby(location: CLLocationCoordinate2D, radius: Double = 2000) async throws -> [Station] {
-        return try await aMapService.searchStations(near: location, radius: radius)
+        try await aMapService.searchStations(near: location, radius: radius)
+    }
+
+    func stationDetails(stationID: String, city: String) async throws -> Station {
+        try await aMapService.getStationDetails(stationID: stationID, city: city)
     }
 
     func filterStations(
@@ -38,47 +48,12 @@ final class StationSearchService {
             return matches
         }
     }
-
-    func sortStations(
-        _ stations: [Station],
-        by strategy: StationSortStrategy,
-        userLocation: CLLocationCoordinate2D?
-    ) -> [Station] {
-        switch strategy {
-        case .name:
-            return stations.sorted { $0.name < $1.name }
-        case .distance:
-            guard let location = userLocation else { return stations }
-            return stations.sorted { s1, s2 in
-                let d1 = s1.coordinate.distance(to: location)
-                let d2 = s2.coordinate.distance(to: location)
-                return d1 < d2
-            }
-        case .accessibility:
-            return stations.sorted { s1, s2 in
-                let score1 = s1.accessibility?.communityRating ?? 0
-                let score2 = s2.accessibility?.communityRating ?? 0
-                return score1 > score2
-            }
-        }
-    }
 }
 
 struct StationFilter {
     var accessibleOnly: Bool = false
     var elevatorOnly: Bool = false
     var transferOnly: Bool = false
-    var searchText: String = ""
-
-    static var none: StationFilter {
-        StationFilter()
-    }
-}
-
-enum StationSortStrategy {
-    case name
-    case distance
-    case accessibility
 }
 
 // MARK: - CLLocationCoordinate2D Extension

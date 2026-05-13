@@ -14,7 +14,7 @@ struct RouteResultsView: View {
                     Spacer()
                     VStack(spacing: 12) {
                         ProgressView()
-                        Text("Finding routes...")
+                        Text(AppLocalization.localized("Finding routes..."))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -23,7 +23,7 @@ struct RouteResultsView: View {
                 }
             } else if let error = viewModel.errorMessage {
                 ContentUnavailableView {
-                    Label("No Routes Found", systemImage: "map")
+                    Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
                 } description: {
                     Text(error)
                 }
@@ -31,7 +31,7 @@ struct RouteResultsView: View {
                 routesSection
             }
         }
-        .navigationTitle("Routes")
+        .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showRouteDetail) {
             if let route = selectedRoute {
@@ -44,21 +44,15 @@ struct RouteResultsView: View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    SortChip(title: "Fastest", icon: "clock", isSelected: viewModel.sortStrategy == .fastest) {
-                        viewModel.sortStrategy = .fastest
-                        viewModel.sortRoutes()
-                    }
-                    SortChip(title: "Fewest Transfers", icon: "arrow.triangle.swap", isSelected: viewModel.sortStrategy == .fewestTransfers) {
-                        viewModel.sortStrategy = .fewestTransfers
-                        viewModel.sortRoutes()
-                    }
-                    SortChip(title: "Most Accessible", icon: "accessibility", isSelected: viewModel.sortStrategy == .mostAccessible) {
-                        viewModel.sortStrategy = .mostAccessible
-                        viewModel.sortRoutes()
-                    }
-                    SortChip(title: "Fewest Stops", icon: "number", isSelected: viewModel.sortStrategy == .fewestStops) {
-                        viewModel.sortStrategy = .fewestStops
-                        viewModel.sortRoutes()
+                    ForEach(RouteSortStrategy.allCases) { strategy in
+                        SortChip(
+                            title: strategy.title,
+                            icon: strategy.icon,
+                            isSelected: viewModel.sortStrategy == strategy
+                        ) {
+                            viewModel.sortStrategy = strategy
+                            viewModel.sortRoutes()
+                        }
                     }
                 }
                 .padding(.vertical, 4)
@@ -89,7 +83,7 @@ struct SortChip: View {
             HStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
-                Text(title)
+                Text(AppLocalization.localized(title))
                     .font(.caption)
             }
             .padding(.horizontal, 12)
@@ -114,7 +108,7 @@ struct RouteCard: View {
                         Text(route.formattedDuration)
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("\(route.formattedStops) • \(route.formattedTransfers)")
+                        Text("\(route.strategy.localizedName) • \(route.formattedWalkingDistance)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -124,7 +118,7 @@ struct RouteCard: View {
                     if route.isFullyAccessible {
                         HStack(spacing: 4) {
                             Image(systemName: "figure.roll")
-                            Text("Accessible")
+                            Text(AppLocalization.localized("Accessible"))
                         }
                         .font(.caption)
                         .padding(.horizontal, 8)
@@ -143,9 +137,14 @@ struct RouteCard: View {
                 .frame(height: 4)
                 .clipShape(Capsule())
 
-                // Segment details
-                ForEach(route.segments) { segment in
-                    segmentDetail(segment)
+                RouteStationTimeline(stops: route.stationTimelineStops)
+
+                if let originGuide = route.originAccessGuide,
+                   let destinationGuide = route.destinationAccessGuide {
+                    VStack(alignment: .leading, spacing: 6) {
+                        accessPreviewRow(guide: originGuide, icon: "arrow.down.forward.circle")
+                        accessPreviewRow(guide: destinationGuide, icon: "arrow.up.forward.circle")
+                    }
                 }
 
                 // Warnings
@@ -182,56 +181,74 @@ struct RouteCard: View {
         .frame(minWidth: segment.type == .walking ? 20 : 40)
     }
 
-    private func segmentDetail(_ segment: RouteSegment) -> some View {
-        HStack(spacing: 8) {
-            segmentIcon(segment)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(segmentLabel(segment))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                if let notes = segment.accessibilityNotes.first {
-                    Text(notes)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Spacer()
-
-            Text(segment.formattedDuration)
+    private func accessPreviewRow(guide: RouteAccessGuide, icon: String) -> some View {
+        Label {
+            Text(guide.primaryInstruction)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .lineLimit(2)
+        } icon: {
+            Image(systemName: icon)
         }
+        .foregroundStyle(.secondary)
     }
 
-    private func segmentIcon(_ segment: RouteSegment) -> some View {
-        Group {
-            switch segment.type {
-            case .walking:
-                Image(systemName: "figure.walk")
-                    .foregroundStyle(.gray)
-            case .subway:
-                Image(systemName: "tram.fill")
-                    .foregroundStyle(Color(hex: segment.lineColorHex ?? "#000000"))
-            case .transfer:
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .foregroundStyle(.orange)
+}
+
+struct RouteStationTimeline: View {
+    let stops: [RouteStationStop]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(stops.enumerated()), id: \.element.id) { index, stop in
+                HStack(alignment: .top, spacing: 10) {
+                    VStack(spacing: 0) {
+                        Circle()
+                            .fill(Color(.systemBackground))
+                            .frame(width: stop.isTransfer ? 14 : 10, height: stop.isTransfer ? 14 : 10)
+                            .overlay {
+                                Circle()
+                                    .stroke(Color(hex: stop.lineColorHex ?? "#007AFF"), lineWidth: stop.isTransfer ? 4 : 3)
+                            }
+
+                        if index < stops.count - 1 {
+                            Rectangle()
+                                .fill(Color(hex: stop.lineColorHex ?? "#007AFF"))
+                                .frame(width: 4, height: 22)
+                        }
+                    }
+                    .frame(width: 18)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(stop.name)
+                            .font(.subheadline)
+                            .fontWeight(index == 0 || index == stops.count - 1 ? .semibold : .regular)
+                        HStack(spacing: 6) {
+                            if let lineColor = stop.lineColorHex {
+                                LineColorIndicator(colorHex: lineColor, size: 8)
+                            }
+                            if let lineName = stop.lineName {
+                                Text(lineName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if stop.isTransfer {
+                                Text(AppLocalization.localized("Transfer"))
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                            if let arrivalTimeText = stop.arrivalTimeText {
+                                Text(arrivalTimeText)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    Spacer()
+                }
+                .padding(.vertical, 2)
             }
         }
-        .font(.caption)
-        .frame(width: 20)
-    }
-
-    private func segmentLabel(_ segment: RouteSegment) -> String {
-        switch segment.type {
-        case .walking:
-            return "Walk \(Int(segment.duration / 60)) min"
-        case .subway:
-            return "\(segment.lineName ?? "Subway") • \(segment.stops) stops"
-        case .transfer:
-            return "Transfer"
-        }
+        .padding(.top, 4)
     }
 }

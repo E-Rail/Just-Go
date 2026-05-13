@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LoadingView: View {
-    var message: String = "Loading..."
+    var message: String = AppLocalization.localized("Loading...")
 
     var body: some View {
         VStack(spacing: 16) {
@@ -22,7 +22,7 @@ struct ErrorView: View {
     let retryAction: (() -> Void)?
 
     init(title: String = "Error", message: String, retryAction: (() -> Void)? = nil) {
-        self.title = title
+        self.title = AppLocalization.localized(title)
         self.message = message
         self.retryAction = retryAction
     }
@@ -42,7 +42,7 @@ struct ErrorView: View {
                 .multilineTextAlignment(.center)
 
             if let retry = retryAction {
-                Button("Retry", action: retry)
+                Button(AppLocalization.localized("Retry"), action: retry)
                     .buttonStyle(.bordered)
             }
         }

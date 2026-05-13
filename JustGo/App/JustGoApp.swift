@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 @main
 struct JustGoApp: App {
@@ -22,6 +21,5 @@ struct JustGoApp: App {
                     await appState.initialize(container: container)
                 }
         }
-        .modelContainer(container.modelContainer)
     }
 }

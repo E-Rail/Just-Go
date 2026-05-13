@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(AppState.self) private var appState
-    @Environment(DIContainer.self) private var container
     @State private var selectedTab: Tab = .map
 
     enum Tab: String, CaseIterable {
@@ -16,25 +14,25 @@ struct ContentView: View {
         TabView(selection: $selectedTab) {
             MapContainerView()
                 .tabItem {
-                    Label("Map", systemImage: "map.fill")
+                    Label(AppLocalization.localized("Map"), systemImage: "map.fill")
                 }
                 .tag(Tab.map)
 
             RoutePlannerView()
                 .tabItem {
-                    Label("Route", systemImage: "arrow.triangle.branch")
+                    Label(AppLocalization.localized("Route"), systemImage: "arrow.triangle.branch")
                 }
                 .tag(Tab.route)
 
             StationSearchView()
                 .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
+                    Label(AppLocalization.localized("Search"), systemImage: "magnifyingglass")
                 }
                 .tag(Tab.search)
 
             ProfileView()
                 .tabItem {
-                    Label("Profile", systemImage: "person.fill")
+                    Label(AppLocalization.localized("Profile"), systemImage: "person.fill")
                 }
                 .tag(Tab.profile)
         }

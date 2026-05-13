@@ -1,7 +1,5 @@
-import SwiftData
 import Foundation
 
-@Model
 final class StationAccessibility {
     var stationID: String
 
@@ -35,9 +33,6 @@ final class StationAccessibility {
     var elevatorStatus: String
     var communityRating: Double
     var reportCount: Int
-
-    @Relationship(inverse: \Station.accessibility)
-    var station: Station?
 
     var elevatorStatusEnum: ElevatorStatus {
         ElevatorStatus(rawValue: elevatorStatus) ?? .unknown

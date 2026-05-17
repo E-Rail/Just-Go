@@ -48,7 +48,7 @@ struct MapContainerView: View {
                 set: { appState.selectedCity = $0 }
             ))
         }
-        .task {
+        .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
                 viewModel = MapViewModel(
                     locationService: container.locationService,
@@ -56,16 +56,11 @@ struct MapContainerView: View {
                     aMapService: container.aMapService
                 )
             }
-            if let city = appState.selectedCity {
-                await viewModel?.loadStations(for: city)
-            }
-            await viewModel?.loadNearbyStations()
-        }
-        .onChange(of: appState.selectedCity?.id) { _, _ in
-            Task {
-                if let city = appState.selectedCity {
-                    await viewModel?.loadStations(for: city)
-                }
+
+            guard let city = appState.selectedCity else { return }
+            await viewModel?.loadStations(for: city)
+            if viewModel?.isLocationAuthorized == true {
+                await viewModel?.loadNearbyStations()
             }
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
@@ -84,7 +79,7 @@ struct MapContainerView: View {
             stations: viewModel?.stations ?? [],
             subwayLines: viewModel?.subwayLines ?? [],
             route: nil,
-            showsUserLocation: true,
+            showsUserLocation: viewModel?.isLocationAuthorized == true,
             onStationSelected: { station in
                 Task {
                     guard let viewModel else { return }

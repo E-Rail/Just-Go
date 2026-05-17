@@ -3,6 +3,7 @@ import SwiftUI
 struct RouteNavigationView: View {
     let route: Route
     @Environment(AccessibilityService.self) private var accessibilityService
+    @Environment(DIContainer.self) private var container
     @State private var currentSegmentIndex = 0
     @State private var isNavigating = false
     @Environment(\.dismiss) private var dismiss
@@ -30,7 +31,7 @@ struct RouteNavigationView: View {
                 stations: [],
                 subwayLines: [],
                 route: route,
-                showsUserLocation: true,
+                showsUserLocation: container.locationService.isAuthorized,
                 onStationSelected: { _ in }
             )
             .frame(height: 300)

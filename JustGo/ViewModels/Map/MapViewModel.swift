@@ -27,6 +27,8 @@ final class MapViewModel {
     private let locationService: LocationService
     private let stationSearchService: StationSearchService
     private let aMapService: AMapService
+    private var loadedCityID: String?
+    private var loadingCityID: String?
 
     init(
         locationService: LocationService,
@@ -43,12 +45,26 @@ final class MapViewModel {
     }
 
     func loadStations(for city: City) async {
+        guard loadedCityID != city.id, loadingCityID != city.id else { return }
+
+        let cityID = city.id
+        loadingCityID = cityID
         isLoading = true
-        defer { isLoading = false }
+        defer {
+            if loadingCityID == cityID {
+                loadingCityID = nil
+                isLoading = false
+            }
+        }
 
         do {
-            stations = try await stationSearchService.search(keyword: "", city: city.id)
-            subwayLines = try await aMapService.getSubwayLines(city: city.id)
+            let nextStations = try await stationSearchService.search(keyword: "", city: cityID)
+            let nextSubwayLines = try await aMapService.getSubwayLines(city: cityID)
+            guard loadingCityID == cityID else { return }
+
+            stations = nextStations
+            subwayLines = nextSubwayLines
+            loadedCityID = cityID
             updateCamera(to: city.coordinate, spanDelta: 0.22)
         } catch {
             errorMessage = error.localizedDescription
@@ -67,6 +83,9 @@ final class MapViewModel {
 
     func requestLocationAccess() async {
         await locationService.requestPermission()
+        if let locationErrorMessage = locationService.locationErrorMessage {
+            errorMessage = locationErrorMessage
+        }
         await loadNearbyStations()
     }
 

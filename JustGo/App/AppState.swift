@@ -1,17 +1,31 @@
 import SwiftUI
 
+@MainActor
 @Observable
 final class AppState {
     var selectedCity: City?
     var accessibilityPreference: AccessibilityPreference = .default
+    private(set) var isInitializing = false
+    private(set) var hasInitialized = false
 
     func initialize(container: DIContainer) async {
-        await container.cityService.refreshCities()
+        guard !isInitializing, !hasInitialized else { return }
 
-        if let location = container.locationService.currentLocation {
-            selectedCity = await container.cityService.findNearestCity(to: location)
+        isInitializing = true
+        defer {
+            isInitializing = false
+            hasInitialized = true
         }
 
-        selectedCity = selectedCity ?? container.cityService.getCity(byID: "1100")
+        await container.cityService.refreshCities()
+
+        let nearestCity: City?
+        if let location = container.locationService.currentLocation {
+            nearestCity = await container.cityService.findNearestCity(to: location)
+        } else {
+            nearestCity = nil
+        }
+
+        selectedCity = nearestCity ?? container.cityService.getCity(byID: "1100") ?? container.cityService.getAllCities().first
     }
 }

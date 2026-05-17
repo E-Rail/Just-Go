@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AMapAPIKey</key>
-	<string></string>
+	<string>112b16faf76f7ce98e01ea4de0f2e8c7</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

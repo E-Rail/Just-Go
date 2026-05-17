@@ -22,11 +22,11 @@ struct StationAccessibilityView: View {
     private var accessibilityOverview: some View {
         GlassCard {
             VStack(spacing: 12) {
-                Image(systemName: station.accessibility?.isFullyAccessible == true ? "figure.roll" : "exclamationmark.triangle")
+                Image(systemName: station.accessibility?.summary.iconName ?? "questionmark.circle.fill")
                     .font(.largeTitle)
-                    .foregroundStyle(station.accessibility?.isFullyAccessible == true ? .green : .orange)
+                    .foregroundStyle(station.accessibility?.summary.color ?? .gray)
 
-                Text(AppLocalization.localized(station.accessibility?.isFullyAccessible == true ? "Fully Accessible" : "Partial Accessibility"))
+                Text(AppLocalization.localized(station.accessibility?.summary.titleKey ?? "Accessibility not verified"))
                     .font(.headline)
 
                 if let rating = station.accessibility?.communityRating {
@@ -54,21 +54,21 @@ struct StationAccessibilityView: View {
                     AccessibleFeatureRow(
                         icon: "arrow.up.arrow.down.circle.fill",
                         title: AppLocalization.localized("Elevator"),
-                        isAvailable: accessibility.hasElevator,
+                        availability: accessibility.elevatorAvailability,
                         details: accessibility.elevatorLocations
                     )
 
                     AccessibleFeatureRow(
                         icon: "figure.roll",
                         title: AppLocalization.localized("Wheelchair Ramp"),
-                        isAvailable: accessibility.hasWheelchairRamp,
+                        availability: accessibility.wheelchairRampAvailability,
                         details: accessibility.accessibleEntrances
                     )
 
                     AccessibleFeatureRow(
                         icon: "arrow.up.to.line",
                         title: AppLocalization.localized("Escalator"),
-                        isAvailable: accessibility.hasEscalator,
+                        availability: accessibility.escalatorAvailability,
                         details: []
                     )
                 }
@@ -86,24 +86,24 @@ struct StationAccessibilityView: View {
                     AccessibleFeatureRow(
                         icon: "hand.raised.fill",
                         title: AppLocalization.localized("Tactile Path"),
-                        isAvailable: accessibility.hasTactilePath,
-                        details: [AppLocalization.text(
+                        availability: accessibility.tactilePathAvailability,
+                        details: accessibility.tactilePathAvailability == .available ? [AppLocalization.text(
                             english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
                             chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
-                        )]
+                        )] : []
                     )
 
                     AccessibleFeatureRow(
                         icon: "textformat.abc",
                         title: AppLocalization.localized("Braille Signs"),
-                        isAvailable: accessibility.hasBrailleSigns,
+                        availability: accessibility.brailleSignsAvailability,
                         details: []
                     )
 
                     AccessibleFeatureRow(
                         icon: "speaker.wave.2.fill",
                         title: AppLocalization.localized("Audio Announcement"),
-                        isAvailable: accessibility.hasAudioAnnouncement,
+                        availability: accessibility.audioAnnouncementAvailability,
                         details: []
                     )
                 }
@@ -121,21 +121,21 @@ struct StationAccessibilityView: View {
                     AccessibleFeatureRow(
                         icon: "eye.fill",
                         title: AppLocalization.localized("Visual Display"),
-                        isAvailable: accessibility.hasVisualAnnouncement,
+                        availability: accessibility.visualAnnouncementAvailability,
                         details: []
                     )
 
                     AccessibleFeatureRow(
                         icon: "ear.badge.waveform",
                         title: AppLocalization.localized("Hearing Loop"),
-                        isAvailable: accessibility.hasHearingLoop,
+                        availability: accessibility.hearingLoopAvailability,
                         details: []
                     )
 
                     AccessibleFeatureRow(
                         icon: "hand.thumbsup.fill",
                         title: AppLocalization.localized("Sign Language"),
-                        isAvailable: accessibility.hasSignLanguageDisplay,
+                        availability: accessibility.signLanguageDisplayAvailability,
                         details: []
                     )
                 }
@@ -153,21 +153,21 @@ struct StationAccessibilityView: View {
                     AccessibleFeatureRow(
                         icon: "textformat.size",
                         title: AppLocalization.localized("Simplified Signage"),
-                        isAvailable: accessibility.hasSimplifiedSignage,
+                        availability: accessibility.simplifiedSignageAvailability,
                         details: []
                     )
 
                     AccessibleFeatureRow(
                         icon: "paintpalette.fill",
                         title: AppLocalization.localized("Color Coding"),
-                        isAvailable: accessibility.hasColorCoding,
+                        availability: accessibility.colorCodingAvailability,
                         details: []
                     )
 
                     AccessibleFeatureRow(
                         icon: "photo",
                         title: AppLocalization.localized("Pictograms"),
-                        isAvailable: accessibility.hasPictograms,
+                        availability: accessibility.pictogramsAvailability,
                         details: []
                     )
                 }
@@ -214,20 +214,23 @@ struct StationAccessibilityView: View {
 struct AccessibleFeatureRow: View {
     let icon: String
     let title: String
-    let isAvailable: Bool
+    let availability: AccessibilityAvailability
     let details: [String]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Image(systemName: icon)
-                    .foregroundStyle(isAvailable ? .green : .red)
+                    .foregroundStyle(availability.color)
                     .frame(width: 24)
                 Text(title)
                     .fontWeight(.medium)
                 Spacer()
+                Text(availability.localizedStatusText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Circle()
-                    .fill(isAvailable ? Color.green : Color.red)
+                    .fill(availability.color)
                     .frame(width: 8, height: 8)
             }
 
@@ -239,6 +242,54 @@ struct AccessibleFeatureRow: View {
                         .padding(.leading, 32)
                 }
             }
+        }
+    }
+}
+
+private extension AccessibilityAvailability {
+    var color: Color {
+        switch self {
+        case .available:
+            return .green
+        case .unavailable:
+            return .red
+        case .unknown:
+            return .gray
+        }
+    }
+}
+
+private extension StationAccessibilitySummary {
+    var titleKey: String {
+        switch self {
+        case .fullyAccessible:
+            return "Fully Accessible"
+        case .partial:
+            return "Partial Accessibility"
+        case .notVerified:
+            return "Accessibility not verified"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .fullyAccessible:
+            return "checkmark.circle.fill"
+        case .partial:
+            return "info.circle.fill"
+        case .notVerified:
+            return "questionmark.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .fullyAccessible:
+            return .green
+        case .partial:
+            return .orange
+        case .notVerified:
+            return .gray
         }
     }
 }

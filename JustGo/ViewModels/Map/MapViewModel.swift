@@ -82,11 +82,12 @@ final class MapViewModel {
     }
 
     func requestLocationAccess() async {
-        await locationService.requestPermission()
-        if let locationErrorMessage = locationService.locationErrorMessage {
-            errorMessage = locationErrorMessage
+        do {
+            _ = try await locationService.requestCurrentLocation()
+            await loadNearbyStations()
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        await loadNearbyStations()
     }
 
     func toggleNearbyList() {

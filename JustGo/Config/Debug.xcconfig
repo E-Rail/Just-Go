@@ -1,0 +1,3 @@
+#include? "Secrets.xcconfig"
+
+AMAP_API_KEY = $(AMAP_SECRET_API_KEY)

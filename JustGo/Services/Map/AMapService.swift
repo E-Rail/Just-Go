@@ -29,6 +29,54 @@ private func amapQueryItems(_ items: [URLQueryItem]) -> [URLQueryItem] {
     [URLQueryItem(name: "output", value: "JSON")]
 }
 
+struct AMapResponseDiagnostic: Codable, Equatable {
+    let endpoint: String
+    let city: String?
+    let queryType: String
+    let status: String
+    let info: String?
+    let infocode: String?
+    let itemCount: Int
+
+    var developerSummary: String {
+        [
+            "endpoint=\(endpoint)",
+            city.map { "city=\($0)" },
+            "query=\(queryType)",
+            "status=\(status)",
+            info.map { "info=\($0)" },
+            infocode.map { "infocode=\($0)" },
+            "items=\(itemCount)"
+        ]
+            .compactMap { $0 }
+            .joined(separator: " ")
+    }
+
+    var userMessage: String {
+        switch infocode {
+        case "10001":
+            return AppLocalization.localized("AMap key is invalid or expired")
+        case "10002":
+            return AppLocalization.localized("AMap service is unavailable for this key")
+        case "10003", "10004", "10010", "10014", "10015", "10019", "10020", "10021", "10029":
+            return AppLocalization.localized("AMap request limit reached")
+        case "10005":
+            return AppLocalization.localized("AMap key IP whitelist blocked this request")
+        case "10007":
+            return AppLocalization.localized("AMap key signature check failed")
+        case "10009":
+            return AppLocalization.localized("AMap key is not a Web Service key")
+        case "10012":
+            return AppLocalization.localized("AMap Bus Inquiry API is not enabled for this key")
+        default:
+            if status == "1" {
+                return AppLocalization.localized("AMap returned no schedule for this line")
+            }
+            return AppLocalization.localized("AMap schedule lookup failed")
+        }
+    }
+}
+
 struct AccessibilityFilter {
     var requiresWheelchairAccess: Bool
     var requiresElevator: Bool
@@ -104,6 +152,23 @@ final class AMapService {
         return station
     }
 
+    func getStationExits(station: Station) async throws -> [StationExit] {
+        guard AMapConfiguration.apiKey.isEmpty == false else {
+            throw RoutePlanningError.amapAPIKeyMissing
+        }
+
+        let poiIDs = Array(station.poiIDs.filter { !$0.isEmpty }.prefix(10))
+        let pois: [AMapPlacePOI]
+        if poiIDs.isEmpty {
+            pois = try await amapStationPOIs(keyword: station.name, city: station.cityID)
+        } else {
+            pois = try await amapPlaceDetails(ids: poiIDs)
+        }
+
+        let exits = amapStationExits(from: pois, station: station)
+        return exits
+    }
+
     func planTransitRoute(
         from origin: TransitPlace,
         to destination: TransitPlace,
@@ -142,11 +207,17 @@ final class AMapService {
         throw RoutePlanningError.noRouteFound
     }
 
-    func getRealTimeArrivals(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
+    func getTrainTimes(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
+        var scheduleLookupError: Error?
+
         if AMapConfiguration.apiKey.isEmpty == false {
-            let onlineArrivals = try await amapLineSchedules(lineID: lineID, stationID: stationID)
-            if !onlineArrivals.isEmpty {
-                return onlineArrivals
+            do {
+                let onlineArrivals = try await amapLineSchedules(lineID: lineID, stationID: stationID)
+                if !onlineArrivals.isEmpty {
+                    return onlineArrivals
+                }
+            } catch {
+                scheduleLookupError = error
             }
         }
 
@@ -155,7 +226,20 @@ final class AMapService {
         if !arrivals.isEmpty {
             return arrivals
         }
-        throw RoutePlanningError.realTimeDataUnavailable
+
+        if AMapConfiguration.apiKey.isEmpty {
+            throw RoutePlanningError.amapScheduleLookupNotEnabled
+        }
+
+        if let scheduleLookupError {
+            throw scheduleLookupError
+        }
+
+        throw RoutePlanningError.trainScheduleUnavailable
+    }
+
+    func getRealTimeArrivals(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
+        try await getTrainTimes(lineID: lineID, stationID: stationID)
     }
 
     func getSubwayLines(city: String) async throws -> [SubwayLineMapOverlay] {
@@ -164,8 +248,8 @@ final class AMapService {
             return cached
         }
 
-        if AMapConfiguration.apiKey.isEmpty == false {
-            let liveOverlays = try await amapLineOverlays(for: system)
+        if AMapConfiguration.apiKey.isEmpty == false,
+           let liveOverlays = try? await amapLineOverlays(for: system) {
             if !liveOverlays.isEmpty {
                 lineOverlayCache[system.cityID] = liveOverlays
                 return liveOverlays
@@ -330,6 +414,113 @@ final class AMapService {
         }
 
         return poi.transitPlace(source: .poiSearch)
+    }
+
+    private func amapPlaceDetails(ids: [String]) async throws -> [AMapPlacePOI] {
+        let result: AMapPlaceTextResponse = try await fetchJSON(
+            AMapPlaceTextResponse.self,
+            endpoint: "https://restapi.amap.com/v5/place/detail",
+            queryItems: amapQueryItems([
+                URLQueryItem(name: "id", value: ids.joined(separator: "|")),
+                URLQueryItem(name: "show_fields", value: "children,navi")
+            ]),
+            urlSession: urlSession
+        )
+
+        guard result.status == "1" else {
+            return []
+        }
+
+        return result.pois
+    }
+
+    private func amapStationPOIs(keyword: String, city: String) async throws -> [AMapPlacePOI] {
+        let cityQuery = try await localDataStore.webCityQuery(for: city, urlSession: urlSession)
+        let result: AMapPlaceTextResponse = try await fetchJSON(
+            AMapPlaceTextResponse.self,
+            endpoint: "https://restapi.amap.com/v5/place/text",
+            queryItems: amapQueryItems([
+                URLQueryItem(name: "keywords", value: keyword),
+                URLQueryItem(name: "types", value: "150500"),
+                URLQueryItem(name: "region", value: cityQuery),
+                URLQueryItem(name: "city_limit", value: "true"),
+                URLQueryItem(name: "show_fields", value: "children,navi")
+            ]),
+            urlSession: urlSession
+        )
+
+        guard result.status == "1" else {
+            return []
+        }
+
+        return result.pois
+    }
+
+    private func amapStationExits(from pois: [AMapPlacePOI], station: Station) -> [StationExit] {
+        var exitsByKey: [String: StationExit] = [:]
+
+        func appendExit(
+            id: String?,
+            name: String,
+            coordinate: CLLocationCoordinate2D?,
+            source: String
+        ) {
+            let normalizedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard normalizedName.isEmpty == false else { return }
+            let coordinateKey = coordinate.map {
+                String(format: "%.6f,%.6f", $0.latitude, $0.longitude)
+            }
+            let key = [id, normalizedName, coordinateKey]
+                .compactMap { $0 }
+                .joined(separator: "|")
+            guard exitsByKey[key] == nil else { return }
+
+            exitsByKey[key] = StationExit(
+                exitID: id ?? "\(station.stationID)-amap-\(exitsByKey.count)",
+                stationID: station.stationID,
+                name: normalizedName,
+                hasElevator: false,
+                hasEscalator: false,
+                hasWheelchairRamp: false,
+                isAccessible: false,
+                nearbyLandmarks: [source],
+                latitude: coordinate?.latitude,
+                longitude: coordinate?.longitude
+            )
+        }
+
+        for poi in pois {
+            for child in poi.children where child.isSubwayEntranceOrExit {
+                appendExit(
+                    id: child.id,
+                    name: child.name,
+                    coordinate: child.coordinate ?? child.entranceCoordinate ?? child.exitCoordinate,
+                    source: AppLocalization.localized("AMap entrance/exit")
+                )
+            }
+
+            if let entranceCoordinate = poi.entranceCoordinate {
+                appendExit(
+                    id: poi.naviPOIID ?? poi.id,
+                    name: AppLocalization.localized("AMap entrance"),
+                    coordinate: entranceCoordinate,
+                    source: AppLocalization.localized("AMap navigation point")
+                )
+            }
+
+            if let exitCoordinate = poi.exitCoordinate {
+                appendExit(
+                    id: poi.naviPOIID ?? poi.id,
+                    name: AppLocalization.localized("AMap exit"),
+                    coordinate: exitCoordinate,
+                    source: AppLocalization.localized("AMap navigation point")
+                )
+            }
+        }
+
+        return exitsByKey.values.sorted {
+            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+        }
     }
 
     private func searchFallbackPlaces(keyword: String, city: String, limit: Int) async throws -> [TransitPlace] {
@@ -547,6 +738,20 @@ final class AMapService {
             )
         }
 
+        if busLines.isEmpty {
+            let diagnostic = AMapResponseDiagnostic(
+                endpoint: "v3/bus/linename",
+                city: cityQuery,
+                queryType: "schedule:empty-lines:\(context.line.lineID)",
+                status: "1",
+                info: "OK",
+                infocode: "10000",
+                itemCount: 0
+            )
+            debugPrint("[AMap] \(diagnostic.developerSummary)")
+            throw RoutePlanningError.amapNoScheduleForLine(diagnostic)
+        }
+
         var seenIDs: Set<String> = []
         var arrivals: [RealTimeArrival] = []
 
@@ -565,8 +770,23 @@ final class AMapService {
                 minutesRemaining: nil,
                 timeText: timeText,
                 isAccessible: context.station?.accessibility?.isFullyAccessible ?? false,
-                platformNumber: nil
+                platformNumber: nil,
+                source: .amapSchedule
             ))
+        }
+
+        if arrivals.isEmpty {
+            let diagnostic = AMapResponseDiagnostic(
+                endpoint: "v3/bus/lineid|linename",
+                city: cityQuery,
+                queryType: "schedule:empty-times:\(context.line.lineID)",
+                status: "1",
+                info: "OK",
+                infocode: "10000",
+                itemCount: busLines.count
+            )
+            debugPrint("[AMap] \(diagnostic.developerSummary)")
+            throw RoutePlanningError.amapNoScheduleForLine(diagnostic)
         }
 
         return arrivals
@@ -600,7 +820,19 @@ final class AMapService {
             ]),
             urlSession: urlSession
         )
-        guard payload.status == "1" else { return [] }
+        let diagnostic = AMapResponseDiagnostic(
+            endpoint: "v3/bus/\(endpoint)",
+            city: cityQuery,
+            queryType: "\(queryName)=\(queryValue)",
+            status: payload.status,
+            info: payload.info,
+            infocode: payload.infocode,
+            itemCount: payload.buslines.count
+        )
+        debugPrint("[AMap] \(diagnostic.developerSummary)")
+        guard payload.status == "1" else {
+            throw RoutePlanningError.amapServiceDiagnostic(diagnostic)
+        }
         return payload.buslines
     }
 
@@ -718,7 +950,7 @@ final class AMapService {
                     stationStops: [],
                     polylineCoordinates: walking.routeCoordinates,
                     walkingDirections: steps,
-                    accessibilityNotes: filter.avoidStairs ? [AppLocalization.localized("Check for step-free path before walking")] : []
+                    accessibilityNotes: walkingAccessibilityNotes(from: steps, filter: filter)
                 ))
             }
 
@@ -930,7 +1162,9 @@ final class AMapService {
         if filter.avoidStairs && walkingSteps.contains(where: \.hasBarrierRisk) {
             warnings.append(RouteWarning(
                 type: .stairsDetected,
-                message: AppLocalization.localized("Stairs may be present"),
+                message: walkingSteps.contains(where: \.hasStairs)
+                    ? AppLocalization.localized("Stairs detected from AMap walking directions")
+                    : AppLocalization.localized("Stairs may be present"),
                 affectedStationID: nil
             ))
         }
@@ -939,9 +1173,14 @@ final class AMapService {
             (!fullyAccessible || accessGuidance.contains(where: { guide in
                 guide.accessPoint?.hasElevatorHint != true && guide.accessPoint?.isWheelchairLikely != true
             })) {
+            let missingStationData = accessGuidance.contains { guide in
+                guide.accessibilityNotes.contains(AppLocalization.localized("Step-free access not confirmed because station accessibility data is missing"))
+            }
             warnings.append(RouteWarning(
                 type: .stepFreeAccessUnconfirmed,
-                message: AppLocalization.localized("Step-free access not confirmed"),
+                message: missingStationData
+                    ? AppLocalization.localized("Step-free access not confirmed because station accessibility data is missing")
+                    : AppLocalization.localized("Step-free access not confirmed from station data"),
                 affectedStationID: nil
             ))
         }
@@ -955,6 +1194,31 @@ final class AMapService {
         }
 
         return warnings
+    }
+
+    private func walkingAccessibilityNotes(from steps: [WalkingStep], filter: AccessibilityFilter) -> [String] {
+        var notes: [String] = []
+
+        if steps.contains(where: \.hasStairs) {
+            notes.append(AppLocalization.localized("Stairs detected from AMap walking directions"))
+        } else if filter.avoidStairs && steps.contains(where: \.hasBarrierRisk) {
+            notes.append(AppLocalization.localized("Check for step-free path before walking"))
+        }
+
+        if steps.contains(where: \.hasElevator) {
+            notes.append(AppLocalization.localized("Elevator indicated by AMap walking directions"))
+        }
+
+        if steps.contains(where: \.hasRamp) {
+            notes.append(AppLocalization.localized("Ramp indicated by AMap walking directions"))
+        }
+
+        if steps.contains(where: \.hasEscalator) {
+            notes.append(AppLocalization.localized("Escalator indicated by AMap walking directions"))
+        }
+
+        var seen: Set<String> = []
+        return notes.filter { seen.insert($0).inserted }
     }
 
     private func station(for stop: RouteStationStop, system: LoadedSubwaySystem) -> Station? {
@@ -1059,22 +1323,35 @@ final class AMapService {
         var notes: [String] = []
 
         if filter.avoidStairs && steps.contains(where: \.hasBarrierRisk) {
-            notes.append(AppLocalization.localized("Stairs may be present"))
+            notes.append(steps.contains(where: \.hasStairs)
+                ? AppLocalization.localized("Stairs detected from AMap walking directions")
+                : AppLocalization.localized("Stairs may be present"))
         }
 
-        if steps.contains(where: \.hasElevator) || accessPoint?.hasElevatorHint == true || station?.accessibility?.hasElevator == true {
+        if steps.contains(where: \.hasElevator) {
+            notes.append(AppLocalization.localized("Elevator indicated by AMap walking directions"))
+        } else if accessPoint?.hasElevatorHint == true || station?.accessibility?.hasElevator == true {
             notes.append(AppLocalization.localized("Elevator available"))
         }
 
-        if steps.contains(where: \.hasRamp) || accessPoint?.isWheelchairLikely == true || station?.accessibility?.hasWheelchairRamp == true {
+        if steps.contains(where: \.hasRamp) {
+            notes.append(AppLocalization.localized("Ramp indicated by AMap walking directions"))
+        } else if accessPoint?.isWheelchairLikely == true || station?.accessibility?.hasWheelchairRamp == true {
             notes.append(AppLocalization.localized("Wheelchair path likely"))
+        }
+
+        if steps.contains(where: \.hasEscalator) {
+            notes.append(AppLocalization.localized("Escalator indicated by AMap walking directions"))
         }
 
         if (filter.requiresWheelchairAccess || filter.requiresElevator) &&
             accessPoint?.hasElevatorHint != true &&
             accessPoint?.isWheelchairLikely != true &&
             station?.accessibility?.isFullyAccessible != true {
-            notes.append(AppLocalization.localized("Step-free access not confirmed"))
+            let stationDataMissing = station?.accessibility?.summary == .notVerified || station?.accessibility == nil
+            notes.append(stationDataMissing
+                ? AppLocalization.localized("Step-free access not confirmed because station accessibility data is missing")
+                : AppLocalization.localized("Step-free access not confirmed from station data"))
         }
 
         if notes.isEmpty && accessPoint?.source == .inferred {
@@ -1247,7 +1524,8 @@ private final class SubwayDataStore {
                 minutesRemaining: nil,
                 timeText: timeText,
                 isAccessible: stationsByCityID[system.cityID]?.first(where: { $0.stationID == stationID })?.accessibility?.isFullyAccessible ?? false,
-                platformNumber: "\(index + 1)"
+                platformNumber: "\(index + 1)",
+                source: .bundledSchedule
             )
         }
     }
@@ -1326,6 +1604,68 @@ private final class SubwayDataStore {
         var rawStationByID: [String: AMapSubwayStation] = [:]
         var lines: [SubwayLineData] = []
         var lineModels: [String: SubwayLine] = [:]
+        let localSystem = systemsByCityID[cityID]
+        let localStations = stationsByCityID[cityID] ?? []
+        var localStationDataByID: [String: StationData] = [:]
+        var localStationByID: [String: Station] = [:]
+
+        for stationData in localSystem?.stations ?? [] {
+            localStationDataByID[stationData.stationID] = stationData
+        }
+
+        for station in localStations {
+            localStationByID[station.stationID] = station
+        }
+
+        func matches(rawStation: AMapSubwayStation, localName: String, localNameEn: String?, localPinyin: String?) -> Bool {
+            let rawVariants = AppLocalization.searchVariants(for: rawStation.name)
+                .union(AppLocalization.searchVariants(for: rawStation.pinyin ?? ""))
+            let localVariants = AppLocalization.searchVariants(for: localName)
+                .union(AppLocalization.searchVariants(for: localNameEn ?? ""))
+                .union(AppLocalization.searchVariants(for: localPinyin ?? ""))
+
+            return rawVariants.contains { rawVariant in
+                localVariants.contains { localVariant in
+                    rawVariant == localVariant ||
+                    rawVariant.contains(localVariant) ||
+                    localVariant.contains(rawVariant)
+                }
+            }
+        }
+
+        func localStationData(for rawStation: AMapSubwayStation) -> StationData? {
+            if let stationData = localStationDataByID[rawStation.stationID] {
+                return stationData
+            }
+
+            let poiIDs = Set(rawStation.poiIDs)
+            if !poiIDs.isEmpty,
+               let poiMatch = localSystem?.stations.first(where: { stationData in
+                   Set(stationData.poiIDs ?? []).isDisjoint(with: poiIDs) == false
+               }) {
+                return poiMatch
+            }
+
+            return localSystem?.stations.first {
+                matches(rawStation: rawStation, localName: $0.name, localNameEn: $0.nameEn, localPinyin: $0.namePinyin)
+            }
+        }
+
+        func localStation(for rawStation: AMapSubwayStation) -> Station? {
+            if let station = localStationByID[rawStation.stationID] {
+                return station
+            }
+
+            let poiIDs = Set(rawStation.poiIDs)
+            if !poiIDs.isEmpty,
+               let poiMatch = localStations.first(where: { Set($0.poiIDs).isDisjoint(with: poiIDs) == false }) {
+                return poiMatch
+            }
+
+            return localStations.first {
+                matches(rawStation: rawStation, localName: $0.name, localNameEn: $0.nameEn, localPinyin: $0.namePinyin)
+            }
+        }
 
         for line in payload.l {
             let colorHex = line.colorHex.isEmpty ? "#007AFF" : "#\(line.colorHex)"
@@ -1350,17 +1690,31 @@ private final class SubwayDataStore {
             for rawStation in line.stations {
                 guard let coordinate = rawStation.coordinate else { continue }
                 rawStationByID[rawStation.stationID] = rawStation
+                let localStation = localStation(for: rawStation)
                 let station = stationByID[rawStation.stationID] ?? Station(
                     stationID: rawStation.stationID,
                     name: rawStation.name,
-                    nameEn: nil,
+                    nameEn: localStation?.nameEn,
                     namePinyin: rawStation.pinyin,
                     latitude: coordinate.latitude,
                     longitude: coordinate.longitude,
                     cityID: cityID,
                     isTransferStation: false,
-                    floorCount: 1
+                    floorCount: localStation?.floorCount ?? 1
                 )
+                station.latitude = coordinate.latitude
+                station.longitude = coordinate.longitude
+                station.nameEn = station.nameEn ?? localStation?.nameEn
+                station.floorCount = max(station.floorCount, localStation?.floorCount ?? 1)
+                if station.exits.isEmpty, let exits = localStation?.exits {
+                    station.exits = exits
+                }
+                if station.accessibility == nil {
+                    station.accessibility = localStation?.accessibility
+                }
+                for poiID in localStation?.poiIDs ?? [] where !station.poiIDs.contains(poiID) {
+                    station.poiIDs.append(poiID)
+                }
                 if station.lines.contains(where: { $0.lineID == line.lineID }) == false {
                     station.lines.append(lineModel)
                 }
@@ -1383,6 +1737,9 @@ private final class SubwayDataStore {
             lines: lines,
             stations: stations.map { station in
                 let rawStation = rawStationByID[station.stationID]
+                let localData = rawStation.flatMap { localStationData(for: $0) } ?? localStationDataByID[station.stationID]
+                let firstTrainTime = rawStation.flatMap { firstTimeText(from: $0.firstDepartures) } ?? localData?.firstTrainTime
+                let lastTrainTime = rawStation.flatMap { firstTimeText(from: $0.lastDepartures) } ?? localData?.lastTrainTime
                 return StationData(
                     stationID: station.stationID,
                     name: station.name,
@@ -1393,12 +1750,12 @@ private final class SubwayDataStore {
                     isTransferStation: station.isTransferStation,
                     floorCount: station.floorCount,
                     lineIDs: station.lines.map(\.lineID),
-                    poiIDs: rawStation?.poiIDs,
-                    exits: nil,
-                    accessibility: AccessibilityData.inferredFromAMapStation,
-                    platformCount: nil,
-                    firstTrainTime: rawStation.flatMap { firstTimeText(from: $0.firstDepartures) },
-                    lastTrainTime: rawStation.flatMap { firstTimeText(from: $0.lastDepartures) }
+                    poiIDs: station.poiIDs,
+                    exits: localData?.exits,
+                    accessibility: (localData?.accessibility).mergedWithAMapStationHints,
+                    platformCount: localData?.platformCount,
+                    firstTrainTime: firstTrainTime,
+                    lastTrainTime: lastTrainTime
                 )
             }
         )
@@ -1446,29 +1803,8 @@ private final class SubwayDataStore {
                         nearbyLandmarks: exit.nearbyLandmarks ?? []
                     )
                 }
-                station.accessibility = data.accessibility.map { accessibility in
-                    StationAccessibility(
-                        stationID: data.stationID,
-                        hasElevator: accessibility.hasElevator ?? false,
-                        hasEscalator: accessibility.hasEscalator ?? false,
-                        hasWheelchairRamp: accessibility.hasWheelchairRamp ?? false,
-                        isFullyAccessible: accessibility.isFullyAccessible ?? false,
-                        elevatorLocations: accessibility.elevatorLocations ?? [],
-                        accessibleEntrances: accessibility.accessibleEntrances ?? [],
-                        wheelchairBoardingAssistance: accessibility.wheelchairBoardingAssistance ?? false,
-                        hasTactilePath: accessibility.hasTactilePath ?? false,
-                        hasBrailleSigns: accessibility.hasBrailleSigns ?? false,
-                        hasAudioAnnouncement: accessibility.hasAudioAnnouncement ?? false,
-                        tactilePathCoverage: accessibility.tactilePathCoverage ?? 0,
-                        hasVisualAnnouncement: accessibility.hasVisualAnnouncement ?? false,
-                        hasHearingLoop: accessibility.hasHearingLoop ?? false,
-                        hasSignLanguageDisplay: accessibility.hasSignLanguageDisplay ?? false,
-                        hasSimplifiedSignage: accessibility.hasSimplifiedSignage ?? false,
-                        hasColorCoding: accessibility.hasColorCoding ?? false,
-                        hasPictograms: accessibility.hasPictograms ?? false,
-                        communityRating: accessibility.isFullyAccessible == true ? 4.6 : 3.2,
-                        reportCount: accessibility.isFullyAccessible == true ? 18 : 5
-                    )
+                station.accessibility = data.accessibility.map {
+                    StationAccessibility(stationID: data.stationID, data: $0)
                 }
                 return station
             }
@@ -1738,6 +2074,39 @@ private extension AccessibilityData {
             hasPictograms: true
         )
     }
+
+    var mergedWithAMapStationHints: AccessibilityData {
+        AccessibilityData(
+            hasElevator: hasElevator,
+            hasEscalator: hasEscalator,
+            hasWheelchairRamp: hasWheelchairRamp,
+            isFullyAccessible: isFullyAccessible,
+            elevatorLocations: elevatorLocations,
+            accessibleEntrances: accessibleEntrances,
+            wheelchairBoardingAssistance: wheelchairBoardingAssistance,
+            hasTactilePath: hasTactilePath,
+            hasBrailleSigns: hasBrailleSigns,
+            hasAudioAnnouncement: hasAudioAnnouncement,
+            tactilePathCoverage: tactilePathCoverage,
+            hasVisualAnnouncement: hasVisualAnnouncement,
+            hasHearingLoop: hasHearingLoop,
+            hasSignLanguageDisplay: hasSignLanguageDisplay,
+            hasSimplifiedSignage: hasSimplifiedSignage,
+            hasColorCoding: hasColorCoding ?? true,
+            hasPictograms: hasPictograms ?? true
+        )
+    }
+}
+
+private extension Optional where Wrapped == AccessibilityData {
+    var mergedWithAMapStationHints: AccessibilityData {
+        switch self {
+        case .some(let accessibility):
+            return accessibility.mergedWithAMapStationHints
+        case .none:
+            return .inferredFromAMapStation
+        }
+    }
 }
 
 private struct CitiesResponse: Codable {
@@ -1952,7 +2321,24 @@ private struct AMapTransitBusStop: Decodable {
 
 private struct AMapBusLineResponse: Decodable {
     let status: String
+    let info: String?
+    let infocode: String?
     let buslines: [AMapBusLineDetail]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case info
+        case infocode
+        case buslines
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = (try? container.decode(String.self, forKey: .status)) ?? "0"
+        info = try? container.decodeIfPresent(String.self, forKey: .info)
+        infocode = try? container.decodeIfPresent(String.self, forKey: .infocode)
+        buslines = (try? container.decodeIfPresent([AMapBusLineDetail].self, forKey: .buslines)) ?? []
+    }
 }
 
 private struct AMapBusLineDetail: Decodable {
@@ -1990,6 +2376,17 @@ private struct AMapBusLineDetail: Decodable {
 private struct AMapPlaceTextResponse: Decodable {
     let status: String
     let pois: [AMapPlacePOI]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case pois
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = container.decodeFlexibleString(forKey: .status) ?? "0"
+        pois = container.decodeFlexiblePOIArray(forKey: .pois)
+    }
 }
 
 private struct AMapInputTipsResponse: Decodable {
@@ -2186,6 +2583,9 @@ private struct AMapPlacePOI: Decodable {
     let adcode: String?
     let naviPOIID: String?
     let entrLocation: String?
+    let exitLocation: String?
+    let navi: AMapPlaceNavi?
+    let children: [AMapPlacePOI]
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -2198,6 +2598,9 @@ private struct AMapPlacePOI: Decodable {
         case adcode
         case naviPOIID = "navi_poiid"
         case entrLocation = "entr_location"
+        case exitLocation = "exit_location"
+        case navi
+        case children
     }
 
     init(from decoder: Decoder) throws {
@@ -2212,6 +2615,9 @@ private struct AMapPlacePOI: Decodable {
         adcode = container.decodeFlexibleString(forKey: .adcode)
         naviPOIID = container.decodeFlexibleString(forKey: .naviPOIID)
         entrLocation = container.decodeFlexibleString(forKey: .entrLocation)
+        exitLocation = container.decodeFlexibleString(forKey: .exitLocation)
+        navi = try? container.decodeIfPresent(AMapPlaceNavi.self, forKey: .navi)
+        children = container.decodeFlexiblePOIArray(forKey: .children)
     }
 
     var coordinate: CLLocationCoordinate2D? {
@@ -2220,8 +2626,24 @@ private struct AMapPlacePOI: Decodable {
     }
 
     var entranceCoordinate: CLLocationCoordinate2D? {
-        guard let entrLocation else { return nil }
+        guard let entrLocation = entrLocation ?? navi?.entrLocation else { return nil }
         return parseCoordinate(entrLocation)
+    }
+
+    var exitCoordinate: CLLocationCoordinate2D? {
+        guard let exitLocation = exitLocation ?? navi?.exitLocation else { return nil }
+        return parseCoordinate(exitLocation)
+    }
+
+    var isSubwayEntranceOrExit: Bool {
+        let text = [name, type, typecode]
+            .compactMap { $0 }
+            .joined(separator: " ")
+        return text.contains("出入口") ||
+            text.contains("入口") ||
+            text.contains("出口") ||
+            text.localizedCaseInsensitiveContains("entrance") ||
+            text.localizedCaseInsensitiveContains("exit")
     }
 
     func transitPlace(coordinate: CLLocationCoordinate2D? = nil, source: TransitPlaceSource) -> TransitPlace? {
@@ -2239,6 +2661,56 @@ private struct AMapPlacePOI: Decodable {
             entranceCoordinate: entranceCoordinate,
             source: source
         )
+    }
+}
+
+private struct AMapPlaceNavi: Decodable {
+    let naviPOIID: String?
+    let entrLocation: String?
+    let exitLocation: String?
+
+    enum CodingKeys: String, CodingKey {
+        case naviPOIID = "navi_poiid"
+        case entrLocation = "entr_location"
+        case exitLocation = "exit_location"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        naviPOIID = container.decodeFlexibleString(forKey: .naviPOIID)
+        entrLocation = container.decodeFlexibleString(forKey: .entrLocation)
+        exitLocation = container.decodeFlexibleString(forKey: .exitLocation)
+    }
+}
+
+private struct AMapPlacePOIList: Decodable {
+    let values: [AMapPlacePOI]
+
+    enum CodingKeys: String, CodingKey {
+        case poi
+        case child
+        case children
+    }
+
+    init(from decoder: Decoder) throws {
+        if let values = try? [AMapPlacePOI](from: decoder) {
+            self.values = values
+            return
+        }
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        for key in [CodingKeys.poi, .child, .children] {
+            if let values = try? container.decodeIfPresent([AMapPlacePOI].self, forKey: key) {
+                self.values = values
+                return
+            }
+            if let value = try? container.decodeIfPresent(AMapPlacePOI.self, forKey: key) {
+                self.values = [value]
+                return
+            }
+        }
+
+        self.values = []
     }
 }
 
@@ -2263,6 +2735,22 @@ private extension KeyedDecodingContainer {
         }
 
         return nil
+    }
+
+    func decodeFlexiblePOIArray(forKey key: Key) -> [AMapPlacePOI] {
+        if let values = try? decodeIfPresent([AMapPlacePOI].self, forKey: key) {
+            return values
+        }
+
+        if let values = try? decodeIfPresent(AMapPlacePOIList.self, forKey: key) {
+            return values.values
+        }
+
+        if let value = try? decodeIfPresent(AMapPlacePOI.self, forKey: key) {
+            return [value]
+        }
+
+        return []
     }
 }
 

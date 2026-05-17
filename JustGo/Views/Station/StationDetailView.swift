@@ -22,7 +22,8 @@ struct StationDetailView: View {
         .task {
             viewModel = StationDetailViewModel(aMapService: container.aMapService)
             viewModel?.loadStation(station)
-            await viewModel?.loadRealTimeArrivals()
+            await viewModel?.loadStationExits()
+            await viewModel?.loadTrainTimes()
         }
     }
 
@@ -53,7 +54,7 @@ struct StationDetailView: View {
                     }
                 }
 
-                if station.accessibility?.isFullyAccessible == true {
+                if station.accessibility?.summary == .fullyAccessible {
                     HStack {
                         Image(systemName: "figure.roll")
                             .foregroundStyle(.green)
@@ -100,111 +101,143 @@ struct StationDetailView: View {
                     .font(.headline)
 
                 if let accessibility = station.accessibility {
-                    // Mobility
-                    if accessibility.hasElevator || accessibility.hasWheelchairRamp {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(AppLocalization.localized("Mobility"))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
+                    accessibilitySummary(accessibility)
 
-                            if accessibility.hasElevator {
-                                accessibilityRow(
-                                    icon: "arrow.up.arrow.down.circle.fill",
-                                    title: "Elevator",
-                                    subtitle: accessibility.elevatorLocations.joined(separator: ", "),
-                                    status: accessibility.elevatorStatusEnum == .operational ? .available : .unavailable
-                                )
-                            }
+                    if accessibility.hasVerifiedAccessibilityData {
+                        verifiedAccessibilitySections(accessibility)
 
-                            if accessibility.hasWheelchairRamp {
-                                accessibilityRow(
-                                    icon: "figure.roll",
-                                    title: "Wheelchair Ramp",
-                                    subtitle: accessibility.accessibleEntrances.joined(separator: ", "),
-                                    status: .available
-                                )
-                            }
+                        if accessibility.hasUnverifiedCoreAccessibilityData {
+                            Text(AppLocalization.localized("Some facilities are not verified"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                    }
-
-                    // Vision
-                    if accessibility.hasTactilePath || accessibility.hasBrailleSigns || accessibility.hasAudioAnnouncement {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(AppLocalization.localized("Vision"))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-
-                            if accessibility.hasTactilePath {
-                                accessibilityRow(
-                                    icon: "hand.raised.fill",
-                                    title: "Tactile Path",
-                                    subtitle: AppLocalization.text(
-                                        english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
-                                        chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
-                                    ),
-                                    status: .available
-                                )
-                            }
-
-                            if accessibility.hasBrailleSigns {
-                                accessibilityRow(
-                                    icon: "textformat.abc",
-                                    title: "Braille Signs",
-                                    subtitle: AppLocalization.localized("Available"),
-                                    status: .available
-                                )
-                            }
-
-                            if accessibility.hasAudioAnnouncement {
-                                accessibilityRow(
-                                    icon: "speaker.wave.2.fill",
-                                    title: "Audio Announcement",
-                                    subtitle: AppLocalization.localized("Available"),
-                                    status: .available
-                                )
-                            }
-                        }
-                    }
-
-                    // Hearing
-                    if accessibility.hasVisualAnnouncement || accessibility.hasHearingLoop {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(AppLocalization.localized("Hearing"))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-
-                            if accessibility.hasVisualAnnouncement {
-                                accessibilityRow(
-                                    icon: "eye.fill",
-                                    title: "Visual Display",
-                                    subtitle: AppLocalization.localized("Available"),
-                                    status: .available
-                                )
-                            }
-
-                            if accessibility.hasHearingLoop {
-                                accessibilityRow(
-                                    icon: "ear.badge.waveform",
-                                    title: "Hearing Loop",
-                                    subtitle: AppLocalization.localized("Available"),
-                                    status: .available
-                                )
-                            }
-                        }
+                    } else {
+                        accessibilityUnverifiedNote
                     }
                 } else {
-                    Text(AppLocalization.localized("No accessibility information available"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    accessibilityUnverifiedNote
                 }
             }
         }
     }
 
+    @ViewBuilder
+    private func verifiedAccessibilitySections(_ accessibility: StationAccessibility) -> some View {
+        if accessibility.hasMobilityRows {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalization.localized("Mobility"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if accessibility.elevatorAvailability != .unknown || !accessibility.elevatorLocations.isEmpty {
+                    accessibilityRow(
+                        icon: "arrow.up.arrow.down.circle.fill",
+                        title: "Elevator",
+                        subtitle: detailText(accessibility.elevatorLocations, fallback: accessibility.elevatorAvailability.localizedStatusText),
+                        status: AccessibilityStatus(accessibility.elevatorAvailability)
+                    )
+                }
+
+                if accessibility.wheelchairRampAvailability != .unknown || !accessibility.accessibleEntrances.isEmpty {
+                    accessibilityRow(
+                        icon: "figure.roll",
+                        title: "Wheelchair Ramp",
+                        subtitle: detailText(accessibility.accessibleEntrances, fallback: accessibility.wheelchairRampAvailability.localizedStatusText),
+                        status: AccessibilityStatus(accessibility.wheelchairRampAvailability)
+                    )
+                }
+
+                if accessibility.escalatorAvailability != .unknown {
+                    accessibilityRow(
+                        icon: "arrow.up.to.line",
+                        title: "Escalator",
+                        subtitle: accessibility.escalatorAvailability.localizedStatusText,
+                        status: AccessibilityStatus(accessibility.escalatorAvailability)
+                    )
+                }
+            }
+        }
+
+        if accessibility.hasVisionRows {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalization.localized("Vision"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if accessibility.tactilePathAvailability != .unknown {
+                    accessibilityRow(
+                        icon: "hand.raised.fill",
+                        title: "Tactile Path",
+                        subtitle: accessibility.tactilePathAvailability == .available ? AppLocalization.text(
+                            english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
+                            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
+                        ) : accessibility.tactilePathAvailability.localizedStatusText,
+                        status: AccessibilityStatus(accessibility.tactilePathAvailability)
+                    )
+                }
+
+                if accessibility.audioAnnouncementAvailability != .unknown {
+                    accessibilityRow(
+                        icon: "speaker.wave.2.fill",
+                        title: "Audio Announcement",
+                        subtitle: accessibility.audioAnnouncementAvailability.localizedStatusText,
+                        status: AccessibilityStatus(accessibility.audioAnnouncementAvailability)
+                    )
+                }
+            }
+        }
+
+        if accessibility.hasHearingRows {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalization.localized("Hearing"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if accessibility.visualAnnouncementAvailability != .unknown {
+                    accessibilityRow(
+                        icon: "eye.fill",
+                        title: "Visual Display",
+                        subtitle: accessibility.visualAnnouncementAvailability.localizedStatusText,
+                        status: AccessibilityStatus(accessibility.visualAnnouncementAvailability)
+                    )
+                }
+            }
+        }
+    }
+
+    private var accessibilityUnverifiedNote: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(AppLocalization.localized("Accessibility not verified"))
+                .font(.subheadline)
+                .fontWeight(.medium)
+            Text(AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func accessibilitySummary(_ accessibility: StationAccessibility) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: accessibility.summary.iconName)
+                .foregroundStyle(accessibility.summary.color)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(AppLocalization.localized(accessibility.summary.titleKey))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(AppLocalization.localized(accessibility.summary.descriptionKey))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
     private func accessibilityRow(icon: String, title: String, subtitle: String, status: AccessibilityStatus) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundStyle(status == .available ? .green : .red)
+                .foregroundStyle(status.color)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -219,24 +252,43 @@ struct StationDetailView: View {
             Spacer()
 
             Circle()
-                .fill(status == .available ? Color.green : Color.red)
+                .fill(status.color)
                 .frame(width: 8, height: 8)
         }
+    }
+
+    private func detailText(_ details: [String], fallback: String) -> String {
+        let text = details.joined(separator: ", ").trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? fallback : text
     }
 
     private var arrivalsSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Real-Time Arrivals"))
+                Text(AppLocalization.localized("Train Times"))
                     .font(.headline)
 
-                if viewModel?.arrivals.isEmpty ?? true {
-                    Text(viewModel?.errorMessage ?? AppLocalization.localized("No real-time data available"))
+                if viewModel?.isLoading == true {
+                    ProgressView()
+                } else if viewModel?.arrivals.isEmpty ?? true {
+                    Text(viewModel?.errorMessage ?? AppLocalization.localized("Schedule unavailable"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(viewModel?.arrivals ?? []) { arrival in
                         ArrivalCountdown(arrival: arrival)
+                    }
+
+                    if let statusMessage = viewModel?.trainTimeStatusMessage {
+                        Text(statusMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if viewModel?.arrivals.contains(where: \.hasLiveCountdown) == false {
+                        Text(AppLocalization.localized("Shows first/last train times, not live arrival countdowns."))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -249,33 +301,75 @@ struct StationDetailView: View {
                 Text(AppLocalization.localized("Exits"))
                     .font(.headline)
 
-                ForEach(station.exits) { exit in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(exit.localizedName)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            if let alternateName = exit.alternateLocalizedName {
-                                Text(alternateName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                if viewModel?.isLoadingExits == true {
+                    ProgressView()
+                } else if displayedExits.isEmpty {
+                    Text(viewModel?.exitStatusMessage ?? AppLocalization.localized("Exit information not provided"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(displayedExits) { exit in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(exit.localizedName)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                if let alternateName = exit.alternateLocalizedName {
+                                    Text(alternateName)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                if !exit.nearbyLandmarks.isEmpty {
+                                    Text(exit.nearbyLandmarks.joined(separator: ", "))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            if exit.isAccessible {
+                                Image(systemName: "figure.roll")
+                                    .foregroundStyle(.green)
+                            }
+                            if exit.hasElevator {
+                                Image(systemName: "arrow.up.arrow.down")
+                                    .foregroundStyle(.blue)
                             }
                         }
+                    }
 
-                        Spacer()
-
-                        if exit.isAccessible {
-                            Image(systemName: "figure.roll")
-                                .foregroundStyle(.green)
-                        }
-                        if exit.hasElevator {
-                            Image(systemName: "arrow.up.arrow.down")
-                                .foregroundStyle(.blue)
-                        }
+                    if let exitStatusMessage = viewModel?.exitStatusMessage {
+                        Text(exitStatusMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
         }
+    }
+
+    private var displayedExits: [StationExit] {
+        viewModel?.station?.exits ?? station.exits
+    }
+}
+
+private extension StationAccessibility {
+    var hasMobilityRows: Bool {
+        elevatorAvailability != .unknown ||
+            !elevatorLocations.isEmpty ||
+            wheelchairRampAvailability != .unknown ||
+            !accessibleEntrances.isEmpty ||
+            escalatorAvailability != .unknown
+    }
+
+    var hasVisionRows: Bool {
+        tactilePathAvailability != .unknown ||
+            audioAnnouncementAvailability != .unknown
+    }
+
+    var hasHearingRows: Bool {
+        visualAnnouncementAvailability != .unknown
     }
 }
 
@@ -283,4 +377,72 @@ enum AccessibilityStatus {
     case available
     case unavailable
     case unknown
+
+    init(_ availability: AccessibilityAvailability) {
+        switch availability {
+        case .available:
+            self = .available
+        case .unavailable:
+            self = .unavailable
+        case .unknown:
+            self = .unknown
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .available:
+            return .green
+        case .unavailable:
+            return .red
+        case .unknown:
+            return .gray
+        }
+    }
+}
+
+private extension StationAccessibilitySummary {
+    var titleKey: String {
+        switch self {
+        case .fullyAccessible:
+            return "Fully Accessible"
+        case .partial:
+            return "Partial Accessibility"
+        case .notVerified:
+            return "Accessibility not verified"
+        }
+    }
+
+    var descriptionKey: String {
+        switch self {
+        case .fullyAccessible:
+            return "Station accessibility data is verified"
+        case .partial:
+            return "Some accessibility features are verified"
+        case .notVerified:
+            return "Station accessibility data is missing"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .fullyAccessible:
+            return "checkmark.circle.fill"
+        case .partial:
+            return "info.circle.fill"
+        case .notVerified:
+            return "questionmark.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .fullyAccessible:
+            return .green
+        case .partial:
+            return .orange
+        case .notVerified:
+            return .gray
+        }
+    }
 }

@@ -1,21 +1,6 @@
 import Foundation
 import CoreLocation
 
-extension UserDefaults {
-    func codableValue<Value: Decodable>(forKey key: String, as type: Value.Type, default defaultValue: Value) -> Value {
-        guard let data = data(forKey: key),
-              let value = try? JSONDecoder().decode(type, from: data) else {
-            return defaultValue
-        }
-        return value
-    }
-
-    func setCodable<Value: Encodable>(_ value: Value, forKey key: String) {
-        guard let data = try? JSONEncoder().encode(value) else { return }
-        set(data, forKey: key)
-    }
-}
-
 enum RouteInputField: Hashable {
     case origin
     case destination
@@ -115,13 +100,10 @@ final class RoutePlannerViewModel {
 
     func useCurrentLocation(for field: RouteInputField) async {
         pendingQuickPlaceKind = nil
-        await locationService.requestPermission()
-        guard let coordinate = locationService.currentLocation?.coordinate else {
-            errorMessage = AppLocalization.localized("Current location unavailable")
-            return
-        }
 
         do {
+            let location = try await locationService.requestCurrentLocation()
+            let coordinate = location.coordinate
             let place = try await aMapService.reverseGeocode(
                 location: coordinate,
                 name: AppLocalization.localized("Current Location")

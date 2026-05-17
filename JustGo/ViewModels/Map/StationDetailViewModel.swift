@@ -5,7 +5,9 @@ final class StationDetailViewModel {
     var station: Station?
     var arrivals: [RealTimeArrival] = []
     var isLoading = false
+    var isLoadingExits = false
     var errorMessage: String?
+    var exitStatusMessage: String?
 
     private let aMapService: AMapService
 
@@ -18,26 +20,66 @@ final class StationDetailViewModel {
     }
 
     func loadRealTimeArrivals() async {
+        await loadTrainTimes()
+    }
+
+    func loadTrainTimes() async {
         guard let station = station else { return }
 
         isLoading = true
         arrivals = []
+        errorMessage = nil
         defer { isLoading = false }
 
-        do {
-            for line in station.lines {
-                let lineArrivals = try await aMapService.getRealTimeArrivals(
+        var lookupErrors: [Error] = []
+
+        for line in station.lines {
+            do {
+                let lineArrivals = try await aMapService.getTrainTimes(
                     lineID: line.lineID,
                     stationID: station.stationID
                 )
                 arrivals.append(contentsOf: lineArrivals)
+            } catch {
+                lookupErrors.append(error)
             }
-            arrivals.sort {
-                ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
-            }
-        } catch {
-            errorMessage = error.localizedDescription
         }
+
+        arrivals.sort {
+            ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
+        }
+
+        if arrivals.isEmpty {
+            errorMessage = preferredTrainTimeError(from: lookupErrors)
+        }
+    }
+
+    func loadStationExits() async {
+        guard let station else { return }
+        guard station.exits.isEmpty else { return }
+
+        isLoadingExits = true
+        exitStatusMessage = nil
+        defer { isLoadingExits = false }
+
+        do {
+            let exits = try await aMapService.getStationExits(station: station)
+            if exits.isEmpty {
+                exitStatusMessage = AppLocalization.localized("AMap returned no station entrances or exits")
+            } else {
+                station.exits = exits
+                exitStatusMessage = AppLocalization.localized("Entrance/exit information from AMap")
+            }
+        } catch RoutePlanningError.amapAPIKeyMissing {
+            exitStatusMessage = AppLocalization.localized("AMap entrance/exit lookup is not enabled")
+        } catch {
+            exitStatusMessage = AppLocalization.localized("AMap entrance/exit lookup failed")
+        }
+    }
+
+    var trainTimeStatusMessage: String? {
+        guard !arrivals.isEmpty else { return nil }
+        return arrivals.contains(where: \.hasLiveCountdown) ? nil : AppLocalization.localized("Live countdown unavailable")
     }
 
     var accessibilityInfo: StationAccessibility? {
@@ -106,6 +148,24 @@ final class StationDetailViewModel {
         }
 
         return badges
+    }
+
+    private func preferredTrainTimeError(from errors: [Error]) -> String {
+        if errors.contains(where: { error in
+            guard case .amapScheduleLookupNotEnabled? = error as? RoutePlanningError else { return false }
+            return true
+        }) {
+            return AppLocalization.localized("AMap schedule lookup is not enabled")
+        }
+
+        if errors.contains(where: { error in
+            guard case .trainScheduleUnavailable? = error as? RoutePlanningError else { return false }
+            return true
+        }) {
+            return AppLocalization.localized("Schedule unavailable")
+        }
+
+        return errors.first?.localizedDescription ?? AppLocalization.localized("Schedule unavailable")
     }
 }
 

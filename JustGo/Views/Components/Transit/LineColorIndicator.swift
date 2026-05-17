@@ -58,6 +58,9 @@ struct ArrivalCountdown: View {
                 Text(AppLocalization.text(english: "to \(arrival.destination)", chinese: "开往 \(arrival.destination)"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                Text(arrival.statusLabel)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
 
             Spacer()

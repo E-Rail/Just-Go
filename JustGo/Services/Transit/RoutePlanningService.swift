@@ -116,6 +116,10 @@ enum RoutePlanningError: Error {
     case noRouteFound
     case networkError
     case realTimeDataUnavailable
+    case trainScheduleUnavailable
+    case amapScheduleLookupNotEnabled
+    case amapServiceDiagnostic(AMapResponseDiagnostic)
+    case amapNoScheduleForLine(AMapResponseDiagnostic)
     case amapAPIKeyMissing
 }
 
@@ -129,7 +133,15 @@ extension RoutePlanningError: LocalizedError {
         case .networkError:
             return AppLocalization.localized("Network connection failed. Try again later.")
         case .realTimeDataUnavailable:
-            return AppLocalization.localized("AMap does not provide live arrival times for this station.")
+            return AppLocalization.localized("Live countdown unavailable")
+        case .trainScheduleUnavailable:
+            return AppLocalization.localized("Schedule unavailable")
+        case .amapScheduleLookupNotEnabled:
+            return AppLocalization.localized("AMap schedule lookup is not enabled")
+        case .amapServiceDiagnostic(let diagnostic):
+            return diagnostic.userMessage
+        case .amapNoScheduleForLine(let diagnostic):
+            return diagnostic.userMessage
         case .amapAPIKeyMissing:
             return AppLocalization.localized("Add an AMap Web API key to enable public transit routing and place search.")
         }

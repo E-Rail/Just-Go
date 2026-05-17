@@ -24,10 +24,13 @@ An accessible subway navigation app for China, designed with accessibility-first
 
 1. Clone the repository
 2. Open `JustGo.xcworkspace` in Xcode
-3. Add your AMap Web API key to the `AMapAPIKey` value in `JustGo/JustGo-Info.plist`
-4. Build and run
+3. Add your AMap Web Service API key to a local, untracked `JustGo/Config/Secrets.xcconfig` file:
+   `AMAP_SECRET_API_KEY = your_web_service_key`
+4. In the AMap console, make sure the key has access to the advanced `公交信息查询` API if you want first/last train schedule lookup
+5. Build and run
 
 The app uses AMap Web APIs, not the native AMap iOS SDK, so it works on iOS simulators without vendor frameworks.
+If `AMAP_API_KEY` is empty, the bundled subway data still loads, but live place search, route planning, and AMap schedule lookup are disabled.
 
 ## Architecture
 

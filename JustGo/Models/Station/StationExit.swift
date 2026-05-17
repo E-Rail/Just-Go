@@ -9,6 +9,8 @@ final class StationExit: Identifiable {
     var hasWheelchairRamp: Bool
     var isAccessible: Bool
     var nearbyLandmarks: [String]
+    var latitude: Double?
+    var longitude: Double?
 
     init(
         exitID: String,
@@ -19,7 +21,9 @@ final class StationExit: Identifiable {
         hasEscalator: Bool = false,
         hasWheelchairRamp: Bool = false,
         isAccessible: Bool = false,
-        nearbyLandmarks: [String] = []
+        nearbyLandmarks: [String] = [],
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) {
         self.exitID = exitID
         self.stationID = stationID
@@ -30,5 +34,7 @@ final class StationExit: Identifiable {
         self.hasWheelchairRamp = hasWheelchairRamp
         self.isAccessible = isAccessible
         self.nearbyLandmarks = nearbyLandmarks
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }

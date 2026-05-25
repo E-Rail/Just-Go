@@ -2426,7 +2426,8 @@ private actor CityPackStore {
     private static var configuredManifestURL: URL? {
         let candidates = [
             Bundle.main.object(forInfoDictionaryKey: "CityPackBaseURL") as? String,
-            Bundle.main.object(forInfoDictionaryKey: "CityPackManifestURL") as? String
+            Bundle.main.object(forInfoDictionaryKey: "CityPackManifestURL") as? String,
+            Bundle.main.object(forInfoDictionaryKey: "CityPackFallbackBaseURL") as? String
         ]
             .compactMap { $0 }
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -2445,7 +2446,8 @@ private actor CityPackStore {
 
 private extension String {
     var isPlaceholderCityPackURL: Bool {
-        contains("justgo-city-packs.cos.ap-beijing.myqcloud.com")
+        contains("justgo-city-packs.cos.ap-beijing.myqcloud.com") ||
+        contains("gitee.com/E-Rail/just-go/raw")
     }
 }
 

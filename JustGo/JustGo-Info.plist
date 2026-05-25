@@ -6,6 +6,8 @@
 	<string>$(AMAP_API_KEY)</string>
 	<key>CityPackBaseURL</key>
 	<string>$(CITY_PACK_BASE_URL)</string>
+	<key>CityPackFallbackBaseURL</key>
+	<string>$(CITY_PACK_FALLBACK_BASE_URL)</string>
 	<key>CityPackManifestURL</key>
 	<string>$(CITY_PACK_MANIFEST_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>

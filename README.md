@@ -27,14 +27,14 @@ An accessible subway navigation app for China, designed with accessibility-first
 3. Add your AMap Web Service API key to a local, untracked `JustGo/Config/Secrets.xcconfig` file:
    `AMAP_SECRET_API_KEY = your_web_service_key`
 4. In the AMap console, make sure the key has access to the advanced `公交信息查询` API if you want first/last train schedule lookup
-5. Keep the public Gitee data repo at `https://gitee.com/E-Rail/just-go.git`, add `GITEE_TOKEN` to GitHub Secrets, and let GitHub Actions mirror `DataPacks/` to Gitee
-6. The app defaults to `https:/$()/gitee.com/E-Rail/just-go/raw/main` for city packs; override `CITY_PACK_SECRET_BASE_URL` only if the data repo changes
+5. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
+6. The app falls back to GitHub raw city packs for development testing, but production/mainland builds should use object storage or another static host that permits public JSON/file downloads
 7. Build and run
 
 The app uses AMap Web APIs, not the native AMap iOS SDK, so it works on iOS simulators without vendor frameworks.
 If `AMAP_API_KEY` is empty, the bundled subway data still loads, but live place search, route planning, and AMap schedule lookup are disabled.
 Rich station accessibility, official schedules, and station-map assets are downloaded per city pack when a city is opened; they are not bundled into the app binary.
-See `DataPacks/README.md` for the Gitee raw-file hosting contract and sync workflow.
+See `DataPacks/README.md` for the city-pack hosting contract and sync workflow.
 
 ## Architecture
 

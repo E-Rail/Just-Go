@@ -1,3 +1,5 @@
 #include? "Secrets.xcconfig"
 
 AMAP_API_KEY = $(AMAP_SECRET_API_KEY)
+CITY_PACK_BASE_URL = https:/$()/gitee.com/E-Rail/just-go/raw/main
+CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)

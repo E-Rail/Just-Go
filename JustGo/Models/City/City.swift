@@ -64,6 +64,7 @@ struct StationExitData: Codable {
 }
 
 struct AccessibilityData: Codable {
+    let source: String?
     let hasElevator: Bool?
     let hasEscalator: Bool?
     let hasWheelchairRamp: Bool?
@@ -81,4 +82,44 @@ struct AccessibilityData: Codable {
     let hasSimplifiedSignage: Bool?
     let hasColorCoding: Bool?
     let hasPictograms: Bool?
+
+    init(
+        source: String? = nil,
+        hasElevator: Bool? = nil,
+        hasEscalator: Bool? = nil,
+        hasWheelchairRamp: Bool? = nil,
+        isFullyAccessible: Bool? = nil,
+        elevatorLocations: [String]? = nil,
+        accessibleEntrances: [String]? = nil,
+        wheelchairBoardingAssistance: Bool? = nil,
+        hasTactilePath: Bool? = nil,
+        hasBrailleSigns: Bool? = nil,
+        hasAudioAnnouncement: Bool? = nil,
+        tactilePathCoverage: Double? = nil,
+        hasVisualAnnouncement: Bool? = nil,
+        hasHearingLoop: Bool? = nil,
+        hasSignLanguageDisplay: Bool? = nil,
+        hasSimplifiedSignage: Bool? = nil,
+        hasColorCoding: Bool? = nil,
+        hasPictograms: Bool? = nil
+    ) {
+        self.source = source
+        self.hasElevator = hasElevator
+        self.hasEscalator = hasEscalator
+        self.hasWheelchairRamp = hasWheelchairRamp
+        self.isFullyAccessible = isFullyAccessible
+        self.elevatorLocations = elevatorLocations
+        self.accessibleEntrances = accessibleEntrances
+        self.wheelchairBoardingAssistance = wheelchairBoardingAssistance
+        self.hasTactilePath = hasTactilePath
+        self.hasBrailleSigns = hasBrailleSigns
+        self.hasAudioAnnouncement = hasAudioAnnouncement
+        self.tactilePathCoverage = tactilePathCoverage
+        self.hasVisualAnnouncement = hasVisualAnnouncement
+        self.hasHearingLoop = hasHearingLoop
+        self.hasSignLanguageDisplay = hasSignLanguageDisplay
+        self.hasSimplifiedSignage = hasSimplifiedSignage
+        self.hasColorCoding = hasColorCoding
+        self.hasPictograms = hasPictograms
+    }
 }

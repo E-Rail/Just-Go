@@ -1,0 +1,936 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-19T08:29:30Z",
+  "primaryHost": null,
+  "cities": [
+    {
+      "cityID": "1100",
+      "version": "beijing-official-20260519",
+      "sizeBytes": 359176,
+      "sha256": "8c4f4fa53e5d7167dd6c26bc9240e27cfa38cdc810a503aa08cc99d458c28032",
+      "downloadURL": "packs/1100/beijing-official-20260519/city_pack.json",
+      "sourceURLs": [
+        "https://www.bjsubway.com/station/wzass/",
+        "https://www.bjsubway.com/station/smcsj/"
+      ],
+      "capabilities": {
+        "accessibility": "official_static",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4401",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3100",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "1200",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "5000",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "2101",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3201",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4201",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "5101",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "6101",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "1301",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "1401",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4101",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4103",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4110",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "5120",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "2102",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "2201",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "2301",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "1501",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3202",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3205",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3203",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3204",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3701",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3702",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3401",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3402",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3411",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3301",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3302",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3306",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3303",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3307",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3310",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3501",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3502",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4301",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4303",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4331",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4403",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4406",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4419",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4501",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3601",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "5201",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "5301",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "6201",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "3206",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "6501",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "8100",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "8200",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4207",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "4418",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "7101",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "7102",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "7106",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    },
+    {
+      "cityID": "7104",
+      "version": "source-pending",
+      "sizeBytes": 0,
+      "sha256": null,
+      "downloadURL": null,
+      "sourceURLs": [
+
+      ],
+      "capabilities": {
+        "accessibility": "source_pending",
+        "schedules": "source_pending",
+        "liveArrivals": "source_pending",
+        "stationMaps": "source_pending"
+      }
+    }
+  ]
+}

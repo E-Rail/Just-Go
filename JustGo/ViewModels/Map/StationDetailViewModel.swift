@@ -5,9 +5,10 @@ final class StationDetailViewModel {
     var station: Station?
     var arrivals: [RealTimeArrival] = []
     var isLoading = false
-    var isLoadingExits = false
+    var isLoadingCityPack = false
     var errorMessage: String?
-    var exitStatusMessage: String?
+    var cityPackStatusMessage: String?
+    var stationMap: CityPackStationMap?
 
     private let aMapService: AMapService
 
@@ -54,26 +55,27 @@ final class StationDetailViewModel {
         }
     }
 
-    func loadStationExits() async {
+    func loadCityPack() async {
         guard let station else { return }
-        guard station.exits.isEmpty else { return }
 
-        isLoadingExits = true
-        exitStatusMessage = nil
-        defer { isLoadingExits = false }
+        isLoadingCityPack = true
+        cityPackStatusMessage = nil
+        defer { isLoadingCityPack = false }
 
-        do {
-            let exits = try await aMapService.getStationExits(station: station)
-            if exits.isEmpty {
-                exitStatusMessage = AppLocalization.localized("AMap returned no station entrances or exits")
-            } else {
-                station.exits = exits
-                exitStatusMessage = AppLocalization.localized("Entrance/exit information from AMap")
-            }
-        } catch RoutePlanningError.amapAPIKeyMissing {
-            exitStatusMessage = AppLocalization.localized("AMap entrance/exit lookup is not enabled")
-        } catch {
-            exitStatusMessage = AppLocalization.localized("AMap entrance/exit lookup failed")
+        let status = await aMapService.loadCityPack(for: station.cityID)
+        switch status {
+        case .loaded:
+            self.station = await aMapService.enrichStationFromCityPack(station)
+            stationMap = await aMapService.stationMapFromCityPack(for: station)
+            cityPackStatusMessage = AppLocalization.localized("Official city data downloaded")
+        case .notConfigured:
+            cityPackStatusMessage = AppLocalization.localized("Official city data cloud address is not configured")
+        case .sourcePending:
+            cityPackStatusMessage = AppLocalization.localized("Official city data source is pending")
+        case .notAvailable:
+            cityPackStatusMessage = AppLocalization.localized("Official city data not available yet")
+        case .failed:
+            cityPackStatusMessage = AppLocalization.localized("Official city data download failed")
         }
     }
 

@@ -28,7 +28,7 @@ An accessible subway navigation app for China, designed with accessibility-first
    `AMAP_SECRET_API_KEY = your_web_service_key`
 4. In the AMap console, make sure the key has access to the advanced `公交信息查询` API if you want first/last train schedule lookup
 5. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
-6. The app falls back to GitHub raw city packs for development testing, but production/mainland builds should use object storage or another static host that permits public JSON/file downloads
+6. The app falls back to jsDelivr's GitHub CDN for development testing, but production/mainland builds should use object storage or another static host that permits public JSON/file downloads
 7. Build and run
 
 The app uses AMap Web APIs, not the native AMap iOS SDK, so it works on iOS simulators without vendor frameworks.

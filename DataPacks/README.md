@@ -15,10 +15,10 @@ CITY_PACK_SECRET_BASE_URL = https:/$()/your-static-host.example/justgo-city-data
 
 Do not use Gitee raw URLs as the production host. Gitee may block repositories that are used for external RAW-file hosting, which makes the app receive HTTP 403 even when the GitHub Action pushes successfully.
 
-The tracked app config falls back to GitHub raw files for development testing only:
+The tracked app config falls back to jsDelivr's GitHub CDN for development testing only:
 
 ```xcconfig
-CITY_PACK_FALLBACK_BASE_URL = https:/$()/raw.githubusercontent.com/E-Rail/JustGo/main/DataPacks
+CITY_PACK_FALLBACK_BASE_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/JustGo@main/DataPacks
 ```
 
 For China mainland users, set `CITY_PACK_SECRET_BASE_URL` to object storage or another static host that allows public JSON/file downloads.

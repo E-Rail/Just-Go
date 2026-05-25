@@ -20,7 +20,9 @@ struct GlassCard<Content: View>: View {
 
     var body: some View {
         content
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(padding)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(material, in: RoundedRectangle(cornerRadius: cornerRadius))
             .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
     }

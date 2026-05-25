@@ -90,6 +90,7 @@
 "No accessibility information available" = "暂无无障碍信息";
 "No nearby stations found" = "附近未找到车站";
 "No route found between these stations." = "未找到这两个车站之间的路线。";
+"No entrance/exit data returned by AMap" = "高德未返回此车站出入口信息";
 "Add an AMap Web API key to enable public transit routing and place search." = "请添加高德 Web 服务 API Key 以启用公共交通路线规划和地点搜索。";
 "AMap" = "高德地图";
 "AMap Bus Inquiry API is not enabled for this key" = "此 Key 未开通高德公交信息查询 API";
@@ -181,6 +182,7 @@
 "Step-by-Step Guidance" = "分步指引";
 "Stops" = "站数";
 "Subway" = "地铁";
+"Subway entrance/exit" = "地铁出入口";
 "Swap origin and destination" = "交换起点和终点";
 "System" = "系统";
 "Tactile Path" = "盲道";
@@ -230,3 +232,15 @@
 "Metro First" = "地铁优先";
 "School" = "学校";
 "Search a place to save %@" = "搜索地点以保存%@";
+"Accessibility information from official Beijing Subway data." = "无障碍信息来自北京地铁官方数据。";
+"Official scheduled time" = "官方计划时刻";
+"Station Map" = "站内图";
+"Official station map not collected yet" = "官方站内图暂未收录";
+"Station map could not be loaded" = "站内图无法加载";
+"Open station map" = "打开站内图";
+"Official city data downloaded" = "官方城市数据已下载";
+"Official city data cloud address is not configured" = "官方城市数据云端地址未配置";
+"Official city data source is pending" = "官方城市数据源待接入";
+"Official city data not available yet" = "官方城市数据暂不可用";
+"Official city data download failed" = "官方城市数据下载失败";
+"Tactile path available" = "盲道：有";

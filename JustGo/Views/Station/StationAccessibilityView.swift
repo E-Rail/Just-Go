@@ -87,10 +87,7 @@ struct StationAccessibilityView: View {
                         icon: "hand.raised.fill",
                         title: AppLocalization.localized("Tactile Path"),
                         availability: accessibility.tactilePathAvailability,
-                        details: accessibility.tactilePathAvailability == .available ? [AppLocalization.text(
-                            english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
-                            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
-                        )] : []
+                        details: tactilePathDetails(accessibility)
                     )
 
                     AccessibleFeatureRow(
@@ -109,6 +106,19 @@ struct StationAccessibilityView: View {
                 }
             }
         }
+    }
+
+    private func tactilePathDetails(_ accessibility: StationAccessibility) -> [String] {
+        guard accessibility.tactilePathAvailability == .available else {
+            return []
+        }
+        guard accessibility.tactilePathCoverage > 0 else {
+            return [AppLocalization.localized("Tactile path available")]
+        }
+        return [AppLocalization.text(
+            english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
+            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
+        )]
     }
 
     private var hearingSection: some View {

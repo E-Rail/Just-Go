@@ -13,22 +13,23 @@ struct StationDetailView: View {
                 linesSection
                 accessibilitySection
                 arrivalsSection
-                exitsSection
+                stationMapSection
             }
             .padding()
         }
-        .navigationTitle(station.localizedName)
+        .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             viewModel = StationDetailViewModel(aMapService: container.aMapService)
             viewModel?.loadStation(station)
-            await viewModel?.loadStationExits()
+            await viewModel?.loadCityPack()
             await viewModel?.loadTrainTimes()
         }
     }
 
     private var stationHeader: some View {
-        GlassCard {
+        let station = displayedStation
+        return GlassCard {
             VStack(spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
@@ -71,7 +72,8 @@ struct StationDetailView: View {
     }
 
     private var linesSection: some View {
-        GlassCard {
+        let station = displayedStation
+        return GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.localized("Lines"))
                     .font(.headline)
@@ -95,7 +97,8 @@ struct StationDetailView: View {
     }
 
     private var accessibilitySection: some View {
-        GlassCard {
+        let station = displayedStation
+        return GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.localized("Accessibility"))
                     .font(.headline)
@@ -111,8 +114,11 @@ struct StationDetailView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
+                        if accessibility.dataSource == "beijing_official" {
+                            accessibilitySourceNote(accessibility)
+                        }
                     } else {
-                        accessibilityUnverifiedNote
+                        accessibilitySourceNote(accessibility)
                     }
                 } else {
                     accessibilityUnverifiedNote
@@ -168,10 +174,7 @@ struct StationDetailView: View {
                     accessibilityRow(
                         icon: "hand.raised.fill",
                         title: "Tactile Path",
-                        subtitle: accessibility.tactilePathAvailability == .available ? AppLocalization.text(
-                            english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
-                            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
-                        ) : accessibility.tactilePathAvailability.localizedStatusText,
+                        subtitle: tactilePathDetail(accessibility),
                         status: AccessibilityStatus(accessibility.tactilePathAvailability)
                     )
                 }
@@ -213,7 +216,18 @@ struct StationDetailView: View {
             Text(AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    private func accessibilitySourceNote(_ accessibility: StationAccessibility) -> some View {
+        let message = accessibility.dataSource == "beijing_official"
+            ? AppLocalization.localized("Accessibility information from official Beijing Subway data.")
+            : AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available.")
+        return Text(message)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func accessibilitySummary(_ accessibility: StationAccessibility) -> some View {
@@ -262,6 +276,19 @@ struct StationDetailView: View {
         return text.isEmpty ? fallback : text
     }
 
+    private func tactilePathDetail(_ accessibility: StationAccessibility) -> String {
+        guard accessibility.tactilePathAvailability == .available else {
+            return accessibility.tactilePathAvailability.localizedStatusText
+        }
+        guard accessibility.tactilePathCoverage > 0 else {
+            return AppLocalization.localized("Tactile path available")
+        }
+        return AppLocalization.text(
+            english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
+            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
+        )
+    }
+
     private var arrivalsSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -295,62 +322,64 @@ struct StationDetailView: View {
         }
     }
 
-    private var exitsSection: some View {
+    private var stationMapSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Exits"))
+                Text(AppLocalization.localized("Station Map"))
                     .font(.headline)
 
-                if viewModel?.isLoadingExits == true {
+                if viewModel?.isLoadingCityPack == true {
                     ProgressView()
-                } else if displayedExits.isEmpty {
-                    Text(viewModel?.exitStatusMessage ?? AppLocalization.localized("Exit information not provided"))
+                } else if let stationMap = viewModel?.stationMap {
+                    stationMapContent(stationMap)
+                } else {
+                    Text(AppLocalization.localized("Official station map not collected yet"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                } else {
-                    ForEach(displayedExits) { exit in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(exit.localizedName)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                if let alternateName = exit.alternateLocalizedName {
-                                    Text(alternateName)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                if !exit.nearbyLandmarks.isEmpty {
-                                    Text(exit.nearbyLandmarks.joined(separator: ", "))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-                            Spacer()
-
-                            if exit.isAccessible {
-                                Image(systemName: "figure.roll")
-                                    .foregroundStyle(.green)
-                            }
-                            if exit.hasElevator {
-                                Image(systemName: "arrow.up.arrow.down")
-                                    .foregroundStyle(.blue)
-                            }
-                        }
-                    }
-
-                    if let exitStatusMessage = viewModel?.exitStatusMessage {
-                        Text(exitStatusMessage)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                if let statusMessage = viewModel?.cityPackStatusMessage {
+                    Text(statusMessage)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
     }
 
-    private var displayedExits: [StationExit] {
-        viewModel?.station?.exits ?? station.exits
+    @ViewBuilder
+    private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
+        if stationMap.isImage, let url = stationMap.resolvedURL {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                case .failure:
+                    Text(AppLocalization.localized("Station map could not be loaded"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                case .empty:
+                    ProgressView()
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        } else if let url = stationMap.resolvedURL {
+            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
+                .font(.subheadline)
+        } else {
+            Text(AppLocalization.localized("Station map could not be loaded"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var displayedStation: Station {
+        viewModel?.station ?? station
     }
 }
 

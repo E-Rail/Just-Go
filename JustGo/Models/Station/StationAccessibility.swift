@@ -40,6 +40,7 @@ enum StationAccessibilitySummary {
 
 final class StationAccessibility {
     var stationID: String
+    var dataSource: String?
 
     // Mobility
     var elevatorAvailability: AccessibilityAvailability
@@ -127,6 +128,7 @@ final class StationAccessibility {
 
     init(
         stationID: String,
+        dataSource: String? = nil,
         hasElevator: Bool? = nil,
         hasEscalator: Bool? = nil,
         hasWheelchairRamp: Bool? = nil,
@@ -149,6 +151,7 @@ final class StationAccessibility {
         reportCount: Int = 0
     ) {
         self.stationID = stationID
+        self.dataSource = dataSource
         self.elevatorAvailability = AccessibilityAvailability(hasElevator)
         self.escalatorAvailability = AccessibilityAvailability(hasEscalator)
         self.wheelchairRampAvailability = AccessibilityAvailability(hasWheelchairRamp)
@@ -182,6 +185,7 @@ extension StationAccessibility {
     convenience init(stationID: String, data: AccessibilityData) {
         self.init(
             stationID: stationID,
+            dataSource: data.source,
             hasElevator: data.hasElevator,
             hasEscalator: data.hasEscalator,
             hasWheelchairRamp: data.hasWheelchairRamp,

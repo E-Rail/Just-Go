@@ -89,6 +89,7 @@
 "No accessibility information available" = "No accessibility information available";
 "No nearby stations found" = "No nearby stations found";
 "No route found between these stations." = "No route found between these stations.";
+"No entrance/exit data returned by AMap" = "No entrance/exit data returned by AMap";
 "Add an AMap Web API key to enable public transit routing and place search." = "Add an AMap Web API key to enable public transit routing and place search.";
 "AMap" = "AMap";
 "AMap Bus Inquiry API is not enabled for this key" = "AMap Bus Inquiry API is not enabled for this key";
@@ -181,6 +182,7 @@
 "Step-by-Step Guidance" = "Step-by-Step Guidance";
 "Stops" = "Stops";
 "Subway" = "Subway";
+"Subway entrance/exit" = "Subway entrance/exit";
 "Swap origin and destination" = "Swap origin and destination";
 "System" = "System";
 "Tactile Path" = "Tactile Path";
@@ -230,3 +232,15 @@
 "Metro First" = "Metro First";
 "School" = "School";
 "Search a place to save %@" = "Search a place to save %@";
+"Accessibility information from official Beijing Subway data." = "Accessibility information from official Beijing Subway data.";
+"Official scheduled time" = "Official scheduled time";
+"Station Map" = "Station Map";
+"Official station map not collected yet" = "Official station map not collected yet";
+"Station map could not be loaded" = "Station map could not be loaded";
+"Open station map" = "Open station map";
+"Official city data downloaded" = "Official city data downloaded";
+"Official city data cloud address is not configured" = "Official city data cloud address is not configured";
+"Official city data source is pending" = "Official city data source is pending";
+"Official city data not available yet" = "Official city data not available yet";
+"Official city data download failed" = "Official city data download failed";
+"Tactile path available" = "Tactile path available";

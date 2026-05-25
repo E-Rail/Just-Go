@@ -11,8 +11,16 @@ require "time"
 require "uri"
 
 BASE_URL = "https://www.bjsubway.com"
+BJMTR_BASE_URL = "https://www.mtr.bj.cn"
 ACCESSIBILITY_URL = "#{BASE_URL}/station/wzass/"
 FIRST_LAST_URL = "#{BASE_URL}/station/smcsj/"
+BJ_SUBWAY_FACILITY_SEED_URL = "#{BASE_URL}/station/fwss/line5/2013-08-21/50.html"
+BJMTR_LINE_URLS = %w[
+  https://www.mtr.bj.cn/service/line/line-4.html
+  https://www.mtr.bj.cn/service/line/line-14.html
+  https://www.mtr.bj.cn/service/line/line-16.html
+  https://www.mtr.bj.cn/service/line/line-17.html
+].freeze
 DEFAULT_VERSION = "beijing-official-#{Time.now.utc.strftime("%Y%m%d")}"
 DEFAULT_OUTPUT = File.expand_path("../DataPacks/packs/1100/#{DEFAULT_VERSION}/city_pack.json", __dir__)
 DEFAULT_MANIFEST_OUTPUT = File.expand_path("../DataPacks/manifest.json", __dir__)
@@ -24,12 +32,27 @@ def fetch_html(url)
   response.body.force_encoding("GB18030").encode("UTF-8", invalid: :replace, undef: :replace)
 end
 
+def fetch_utf8_html(url)
+  response = Net::HTTP.get_response(URI(url))
+  raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+  response.body.force_encoding("UTF-8")
+end
+
+def fetch_bytes(url)
+  response = Net::HTTP.get_response(URI(url))
+  raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+  response.body
+end
+
 def text_content(html)
   text = html
     .gsub(/<br\s*\/?>/i, " ")
     .gsub(/<\/(?:td|th|tr|p|div)>/i, " ")
     .gsub(/<[^>]+>/, " ")
   CGI.unescapeHTML(text)
+    .gsub(/&nbsp;/i, " ")
     .gsub(/\u00a0/, " ")
     .gsub(/[[:space:]]+/, " ")
     .strip
@@ -55,7 +78,7 @@ def header_cells(row)
 end
 
 def blank_value?(value)
-  value.nil? || value.empty? || value == "无" || value.match?(/\A[—\-－]+期?\z/)
+  value.nil? || value.empty? || value == "无" || value == "暂无" || value.match?(/\A[—\-－]+期?\z/)
 end
 
 def usable_time?(value)
@@ -71,11 +94,64 @@ def add_unique(target, values)
 end
 
 def station_record(records, station_name)
+  station_name = normalize_station_name(station_name)
   records[station_name] ||= {
     "stationName" => station_name,
     "accessibility" => nil,
     "schedules" => []
   }
+end
+
+def normalize_station_name(value)
+  value.to_s
+    .gsub(/\s+/, "")
+    .strip
+end
+
+def slug(value)
+  normalize_station_name(value)
+    .encode("UTF-8")
+    .bytes
+    .map { |byte| byte.to_s(16).rjust(2, "0") }
+    .join
+end
+
+def absolute_url(base_url, href)
+  return nil if href.nil? || href.empty? || href.start_with?("data:")
+
+  href = "https:#{href}" if href.start_with?("//")
+  URI.join(base_url, href).to_s
+end
+
+def asset_extension(url)
+  path = URI(url).path
+  ext = File.extname(path).downcase.sub(".", "")
+  %w[jpg jpeg png webp gif].include?(ext) ? ext : "jpg"
+rescue URI::InvalidURIError
+  "jpg"
+end
+
+def ensure_accessibility(record, source)
+  accessibility = record["accessibility"] ||= {
+    "source" => source,
+    "hasElevator" => nil,
+    "hasEscalator" => nil,
+    "hasWheelchairRamp" => nil,
+    "hasTactilePath" => nil,
+    "hasAccessibleRestroom" => nil,
+    "elevatorLocations" => [],
+    "accessibleEntrances" => [],
+    "facilityNotes" => []
+  }
+  accessibility["source"] = source if accessibility["source"].to_s.empty?
+  accessibility
+end
+
+def add_facility_note(accessibility, label, value)
+  return if blank_value?(label) || blank_value?(value)
+
+  note = "#{label}: #{value}"
+  accessibility["facilityNotes"] << note unless accessibility["facilityNotes"].include?(note)
 end
 
 def parse_accessibility(html, records)
@@ -96,17 +172,7 @@ def parse_accessibility(html, records)
     restroom = row_cells[8]
 
     record = station_record(records, station_name)
-    accessibility = record["accessibility"] ||= {
-      "source" => "beijing_official",
-      "hasElevator" => nil,
-      "hasEscalator" => nil,
-      "hasWheelchairRamp" => nil,
-      "hasTactilePath" => nil,
-      "hasAccessibleRestroom" => nil,
-      "elevatorLocations" => [],
-      "accessibleEntrances" => [],
-      "facilityNotes" => []
-    }
+    accessibility = ensure_accessibility(record, "beijing_official")
 
     elevator_locations = [station_elevator, entrance_elevator].reject { |value| blank_value?(value) }
     add_unique(accessibility["elevatorLocations"], elevator_locations)
@@ -125,9 +191,157 @@ def parse_accessibility(html, records)
     }.each do |label, value|
       next if blank_value?(value)
 
-      note = "#{label}: #{value}"
-      accessibility["facilityNotes"] << note unless accessibility["facilityNotes"].include?(note)
+      add_facility_note(accessibility, label, value)
     end
+  end
+end
+
+def bjsubway_station_links(seed_html)
+  seed_html
+    .scan(/href=["']([^"']*\/station\/fwss\/[^"']+\.html)["'][^>]*>([^<]+)/i)
+    .map do |href, name|
+      station_name = normalize_station_name(text_content(name))
+      next if station_name.empty? || station_name == "服务设施"
+
+      [station_name, absolute_url(BASE_URL, href)]
+    end
+    .compact
+    .uniq
+end
+
+def parse_bjsubway_facility_page(station_name, url, html, records)
+  record = station_record(records, station_name)
+  record["sourceURLs"] ||= []
+  record["sourceURLs"] << url unless record["sourceURLs"].include?(url)
+  accessibility = ensure_accessibility(record, "beijing_official")
+
+  html.scan(/<div class="cardpays2?".*?(?=<div class="cardpays2?"|<\/div>\s*<\/div>\s*<div class="other")/mi).each do |block|
+    labels = block.scan(/<div class="img_title">(.*?)<\/div>/mi).map { |label| text_content(label.first) }
+    location = text_content(block[/<div class="cards_title">(.*?)<\/div>/mi, 1].to_s)
+    labels.each do |label|
+      case label
+      when /直梯|电梯/
+        accessibility["hasElevator"] = true
+        add_unique(accessibility["elevatorLocations"], [location])
+      when /卫生间/
+        accessibility["hasAccessibleRestroom"] = true
+        add_facility_note(accessibility, label, location)
+      else
+        add_facility_note(accessibility, label, location)
+      end
+    end
+  end
+end
+
+def parse_bjsubway_facilities(records)
+  seed_html = fetch_html(BJ_SUBWAY_FACILITY_SEED_URL)
+  bjsubway_station_links(seed_html).each do |station_name, url|
+    parse_bjsubway_facility_page(station_name, url, fetch_html(url), records)
+  rescue StandardError => error
+    warn "Skipping Beijing Subway facility page #{station_name} #{url}: #{error.message}"
+  end
+end
+
+def bjmtr_station_links(line_html)
+  line_html
+    .scan(/href=["']([^"']*\/service\/line\/station\/[^"']+\.html)["'][^>]*>([^<]+)/i)
+    .map do |href, name|
+      station_name = normalize_station_name(text_content(name))
+      next if station_name.empty?
+
+      [station_name, absolute_url(BJMTR_BASE_URL, href)]
+    end
+    .compact
+    .uniq
+end
+
+def parse_bjmtr_facilities(html)
+  facilities = []
+  html.scan(/<section class="facility">(.*?)<\/section>/mi).each do |match|
+    block = match.first
+    label = text_content(block[/<h3>(.*?)<\/h3>/mi, 1].to_s)
+    location = text_content(block.gsub(/<h3>.*?<\/h3>/mi, " "))
+    next if blank_value?(label) || blank_value?(location)
+
+    facilities << [label, location]
+  end
+  facilities.uniq
+end
+
+def bjmtr_station_map_url(page_url, station_name, html)
+  image = html
+    .scan(/<img\b[^>]+>/i)
+    .find { |tag| tag.include?("#{station_name}站立体图") || tag.include?("#{station_name}立体图") }
+  src = image&.match(/src=["']([^"']+)["']/i)&.captures&.first
+  absolute_url(page_url, src)
+end
+
+def download_station_map(source_url, station_name, provider, output_path, dry_run)
+  ext = asset_extension(source_url)
+  relative_path = "station_maps/#{provider}/#{slug(station_name)}.#{ext}"
+  return relative_path if dry_run
+
+  asset_path = File.join(File.dirname(output_path), relative_path)
+  return relative_path if File.file?(asset_path)
+
+  FileUtils.mkdir_p(File.dirname(asset_path))
+  File.binwrite(asset_path, fetch_bytes(source_url))
+  relative_path
+end
+
+def add_station_map(record, title, relative_path, source_url)
+  record["stationMaps"] ||= []
+  map = {
+    "title" => title,
+    "assetURL" => relative_path,
+    "assetType" => asset_extension(relative_path),
+    "sourceURL" => source_url
+  }
+  record["stationMaps"] << map unless record["stationMaps"].any? { |existing| existing["assetURL"] == relative_path }
+end
+
+def parse_bjmtr_station_page(station_name, url, html, records, output_path, dry_run)
+  record = station_record(records, station_name)
+  record["sourceURLs"] ||= []
+  record["sourceURLs"] << url unless record["sourceURLs"].include?(url)
+  accessibility = ensure_accessibility(record, "beijing_official")
+
+  parse_bjmtr_facilities(html).each do |label, location|
+    case label
+    when /直升电梯|直梯|电梯/
+      accessibility["hasElevator"] = true
+      add_unique(accessibility["elevatorLocations"], [location])
+    when /坡道/
+      accessibility["hasWheelchairRamp"] = true
+      add_unique(accessibility["accessibleEntrances"], [location])
+    when /盲道/
+      accessibility["hasTactilePath"] = true
+    when /无障碍卫生间/
+      accessibility["hasAccessibleRestroom"] = true
+      add_facility_note(accessibility, label, location)
+    when /紧急呼叫|召援/
+      add_facility_note(accessibility, label, location)
+    else
+      add_facility_note(accessibility, label, location)
+    end
+  end
+
+  if (map_url = bjmtr_station_map_url(url, station_name, html))
+    relative_path = download_station_map(map_url, station_name, "bjmtr", output_path, dry_run)
+    add_station_map(record, "#{station_name}站立体图", relative_path, url)
+  end
+end
+
+def parse_bjmtr_facilities_and_maps(records, output_path, dry_run)
+  BJMTR_LINE_URLS.flat_map do |line_url|
+    bjmtr_station_links(fetch_utf8_html(line_url))
+  rescue StandardError => error
+    warn "Skipping BJMTR line #{line_url}: #{error.message}"
+    []
+  end.uniq.each do |station_name, url|
+    parse_bjmtr_station_page(station_name, url, fetch_utf8_html(url), records, output_path, dry_run)
+  rescue StandardError => error
+    warn "Skipping BJMTR station page #{station_name} #{url}: #{error.message}"
   end
 end
 
@@ -204,25 +418,30 @@ end
 records = {}
 parse_accessibility(fetch_html(ACCESSIBILITY_URL), records)
 parse_schedules(fetch_html(FIRST_LAST_URL), records)
+parse_bjsubway_facilities(records)
+parse_bjmtr_facilities_and_maps(records, output_path, dry_run)
+
+source_urls = [ACCESSIBILITY_URL, FIRST_LAST_URL, BJ_SUBWAY_FACILITY_SEED_URL, *BJMTR_LINE_URLS]
+station_map_count = records.values.sum { |record| record.fetch("stationMaps", []).length }
 
 payload = {
   "schemaVersion" => 1,
   "cityID" => "1100",
   "version" => DEFAULT_VERSION,
   "generatedAt" => Time.now.utc.iso8601,
-  "sourceURLs" => [ACCESSIBILITY_URL, FIRST_LAST_URL],
+  "sourceURLs" => source_urls,
   "capabilities" => {
     "accessibility" => "official_static",
     "schedules" => "official_static",
     "liveArrivals" => "schedule_only",
-    "stationMaps" => "source_pending"
+    "stationMaps" => station_map_count.positive? ? "official_static" : "source_pending"
   },
   "liveProvider" => "schedule_only",
   "sourceAttribution" => "北京地铁官方数据",
   "stations" => records.values.sort_by { |record| record["stationName"] }.map do |record|
     record.merge(
       "stationID" => nil,
-      "stationMaps" => []
+      "stationMaps" => record.fetch("stationMaps", [])
     )
   end
 }
@@ -230,7 +449,7 @@ payload = {
 if dry_run
   schedule_count = payload["stations"].sum { |station| station["schedules"].length }
   accessibility_count = payload["stations"].count { |station| station["accessibility"] }
-  warn "stations=#{payload["stations"].length} accessibility=#{accessibility_count} schedules=#{schedule_count}"
+  warn "stations=#{payload["stations"].length} accessibility=#{accessibility_count} schedules=#{schedule_count} stationMaps=#{station_map_count}"
   puts JSON.pretty_generate(payload)
 else
   FileUtils.mkdir_p(File.dirname(output_path))

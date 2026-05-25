@@ -2145,6 +2145,21 @@ struct CityPackStationMap: Codable, Equatable {
         URL(string: assetURL)
     }
 
+    func resolving(relativeTo baseURL: URL?) -> CityPackStationMap {
+        guard URL(string: assetURL)?.scheme == nil,
+              let baseURL,
+              let resolvedURL = URL(string: assetURL, relativeTo: baseURL)?.absoluteURL else {
+            return self
+        }
+
+        return CityPackStationMap(
+            title: title,
+            assetURL: resolvedURL.absoluteString,
+            assetType: assetType,
+            sourceURL: sourceURL
+        )
+    }
+
     var isImage: Bool {
         ["image", "png", "jpg", "jpeg", "webp"].contains(assetType.lowercased())
     }
@@ -2259,10 +2274,15 @@ private struct CityPackSchedule: Decodable {
 }
 
 private actor CityPackStore {
+    private struct LoadedCityPack {
+        let pack: CityDataPack
+        let assetBaseURL: URL?
+    }
+
     private let manifestURL: URL?
     private let fileManager: FileManager
     private var manifest: RemoteDataManifest?
-    private var packsByCityID: [String: CityDataPack] = [:]
+    private var packsByCityID: [String: LoadedCityPack] = [:]
 
     init(
         manifestURL: URL? = CityPackStore.configuredManifestURL,
@@ -2273,8 +2293,8 @@ private actor CityPackStore {
     }
 
     func ensurePack(cityID: String, urlSession: URLSession) async throws -> CityPackLoadStatus {
-        if let pack = packsByCityID[cityID] {
-            return .loaded(version: pack.version)
+        if let loadedPack = packsByCityID[cityID] {
+            return .loaded(version: loadedPack.pack.version)
         }
         guard manifestURL != nil else {
             return .notConfigured
@@ -2293,7 +2313,7 @@ private actor CityPackStore {
         }
 
         if let cachedPack = try? loadCachedPack(entry: entry) {
-            packsByCityID[cityID] = cachedPack
+            packsByCityID[cityID] = LoadedCityPack(pack: cachedPack, assetBaseURL: assetBaseURL(for: entry))
             return .loaded(version: cachedPack.version)
         }
 
@@ -2309,21 +2329,25 @@ private actor CityPackStore {
         let pack = try JSONDecoder().decode(CityDataPack.self, from: data)
         try cache(data: data, entry: entry)
         try deleteOldVersions(cityID: cityID, keeping: entry.version)
-        packsByCityID[cityID] = pack
+        packsByCityID[cityID] = LoadedCityPack(pack: pack, assetBaseURL: assetBaseURL(for: entry))
         return .loaded(version: pack.version)
     }
 
     func station(cityID: String, stationName: String) -> CityPackStation? {
-        packsByCityID[cityID]?.station(named: stationName)
+        packsByCityID[cityID]?.pack.station(named: stationName)
     }
 
     func stationMap(cityID: String, stationName: String) -> CityPackStationMap? {
-        packsByCityID[cityID]?.station(named: stationName)?.stationMaps.first
+        guard let loadedPack = packsByCityID[cityID] else { return nil }
+        return loadedPack.pack.station(named: stationName)?
+            .stationMaps
+            .first?
+            .resolving(relativeTo: loadedPack.assetBaseURL)
     }
 
     func officialArrivals(context: (system: CitySubwaySystem, line: SubwayLineData, station: StationData?)) -> [RealTimeArrival] {
         guard let station = context.station,
-              let cityPackStation = packsByCityID[context.system.cityID]?.station(named: station.name) else {
+              let cityPackStation = packsByCityID[context.system.cityID]?.pack.station(named: station.name) else {
             return []
         }
 
@@ -2408,6 +2432,10 @@ private actor CityPackStore {
         }
         guard let manifestURL else { return nil }
         return URL(string: rawValue, relativeTo: manifestURL)?.absoluteURL
+    }
+
+    private func assetBaseURL(for entry: RemoteCityPack) -> URL? {
+        resolvedDownloadURL(entry.downloadURL)?.deletingLastPathComponent()
     }
 
     private func cacheURL(cityID: String, version: String) -> URL {

@@ -239,6 +239,8 @@
 "Station map could not be loaded" = "站內圖無法載入";
 "Open station map" = "開啟站內圖";
 "Official city data downloaded" = "官方城市資料已下載";
+"Official station map downloaded" = "官方站內圖已下載";
+"Official station map not collected for this station" = "本站官方站內圖暫未收錄";
 "Official city data cloud address is not configured" = "官方城市資料雲端地址未設定";
 "Official city data source is pending" = "官方城市資料來源待接入";
 "Official city data not available yet" = "官方城市資料暫不可用";

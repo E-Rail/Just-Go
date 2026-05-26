@@ -8,6 +8,7 @@ final class StationDetailViewModel {
     var isLoadingCityPack = false
     var errorMessage: String?
     var cityPackStatusMessage: String?
+    var stationMapStatusMessage: String?
     var stationMap: CityPackStationMap?
 
     private let aMapService: AMapService
@@ -60,6 +61,7 @@ final class StationDetailViewModel {
 
         isLoadingCityPack = true
         cityPackStatusMessage = nil
+        stationMapStatusMessage = nil
         defer { isLoadingCityPack = false }
 
         let status = await aMapService.loadCityPack(for: station.cityID)
@@ -68,14 +70,21 @@ final class StationDetailViewModel {
             self.station = await aMapService.enrichStationFromCityPack(station)
             stationMap = await aMapService.stationMapFromCityPack(for: station)
             cityPackStatusMessage = AppLocalization.localized("Official city data downloaded")
+            stationMapStatusMessage = stationMap == nil
+                ? AppLocalization.localized("Official station map not collected for this station")
+                : AppLocalization.localized("Official station map downloaded")
         case .notConfigured:
             cityPackStatusMessage = AppLocalization.localized("Official city data cloud address is not configured")
+            stationMapStatusMessage = cityPackStatusMessage
         case .sourcePending:
             cityPackStatusMessage = AppLocalization.localized("Official city data source is pending")
+            stationMapStatusMessage = cityPackStatusMessage
         case .notAvailable:
             cityPackStatusMessage = AppLocalization.localized("Official city data not available yet")
+            stationMapStatusMessage = cityPackStatusMessage
         case .failed:
             cityPackStatusMessage = AppLocalization.localized("Official city data download failed")
+            stationMapStatusMessage = cityPackStatusMessage
         }
     }
 

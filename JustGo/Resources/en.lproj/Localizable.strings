@@ -239,6 +239,8 @@
 "Station map could not be loaded" = "Station map could not be loaded";
 "Open station map" = "Open station map";
 "Official city data downloaded" = "Official city data downloaded";
+"Official station map downloaded" = "Official station map downloaded";
+"Official station map not collected for this station" = "Official station map not collected for this station";
 "Official city data cloud address is not configured" = "Official city data cloud address is not configured";
 "Official city data source is pending" = "Official city data source is pending";
 "Official city data not available yet" = "Official city data not available yet";

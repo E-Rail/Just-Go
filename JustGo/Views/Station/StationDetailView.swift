@@ -339,7 +339,7 @@ struct StationDetailView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if let statusMessage = viewModel?.cityPackStatusMessage {
+                if let statusMessage = viewModel?.stationMapStatusMessage {
                     Text(statusMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -357,17 +357,29 @@ struct StationDetailView: View {
                     image
                         .resizable()
                         .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 160)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                        }
                 case .failure:
                     Text(AppLocalization.localized("Station map could not be loaded"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 case .empty:
                     ProgressView()
+                        .frame(maxWidth: .infinity, minHeight: 160)
                 @unknown default:
                     EmptyView()
                 }
             }
+
+            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
+                .font(.caption)
+                .foregroundStyle(.blue)
         } else if let url = stationMap.resolvedURL {
             Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
                 .font(.subheadline)

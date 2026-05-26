@@ -49,6 +49,6 @@ struct RealTimeArrival: Identifiable, Codable {
     }
 
     var hasLiveCountdown: Bool {
-        minutesRemaining != nil
+        source == .liveCountdown && minutesRemaining != nil
     }
 }

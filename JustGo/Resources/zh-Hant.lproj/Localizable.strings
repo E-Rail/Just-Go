@@ -245,6 +245,8 @@
 "Official Station Images" = "官方車站圖片";
 "Official station image" = "官方車站圖片";
 "Open official image" = "開啟官方圖片";
+"Open station image full screen" = "全螢幕開啟車站圖片";
+"Close station image" = "關閉車站圖片";
 "Station Status" = "車站狀態";
 "Status data is from Beijing Subway official web map, not train arrival countdowns." = "狀態資料來自北京地鐵官方網頁地圖，不是列車到站倒數。";
 "Official city data cloud address is not configured" = "官方城市資料雲端地址未設定";

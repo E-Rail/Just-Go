@@ -241,6 +241,12 @@
 "Official city data downloaded" = "官方城市数据已下载";
 "Official station map downloaded" = "官方站内图已下载";
 "Official station map not collected for this station" = "本站官方站内图暂未收录";
+"Official station images downloaded" = "官方车站图片已下载";
+"Official Station Images" = "官方车站图片";
+"Official station image" = "官方车站图片";
+"Open official image" = "打开官方图片";
+"Station Status" = "车站状态";
+"Status data is from Beijing Subway official web map, not train arrival countdowns." = "状态数据来自北京地铁官方网页地图，不是列车到站倒计时。";
 "Official city data cloud address is not configured" = "官方城市数据云端地址未配置";
 "Official city data source is pending" = "官方城市数据源待接入";
 "Official city data not available yet" = "官方城市数据暂不可用";

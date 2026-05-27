@@ -241,6 +241,12 @@
 "Official city data downloaded" = "Official city data downloaded";
 "Official station map downloaded" = "Official station map downloaded";
 "Official station map not collected for this station" = "Official station map not collected for this station";
+"Official station images downloaded" = "Official station images downloaded";
+"Official Station Images" = "Official Station Images";
+"Official station image" = "Official station image";
+"Open official image" = "Open official image";
+"Station Status" = "Station Status";
+"Status data is from Beijing Subway official web map, not train arrival countdowns." = "Status data is from Beijing Subway official web map, not train arrival countdowns.";
 "Official city data cloud address is not configured" = "Official city data cloud address is not configured";
 "Official city data source is pending" = "Official city data source is pending";
 "Official city data not available yet" = "Official city data not available yet";

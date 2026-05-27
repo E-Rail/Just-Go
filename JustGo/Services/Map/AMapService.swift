@@ -284,6 +284,14 @@ final class AMapService {
         await cityPackStore.stationMap(cityID: station.cityID, stationName: station.name)
     }
 
+    func stationAssetsFromCityPack(for station: Station) async -> [CityPackStationAsset] {
+        await cityPackStore.stationAssets(cityID: station.cityID, stationName: station.name)
+    }
+
+    func stationServiceStatusFromCityPack(for station: Station) async -> CityPackServiceStatus? {
+        await cityPackStore.serviceStatus(cityID: station.cityID, stationName: station.name)
+    }
+
     func getRealTimeArrivals(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
         try await getTrainTimes(lineID: lineID, stationID: stationID)
     }
@@ -2165,6 +2173,49 @@ struct CityPackStationMap: Codable, Equatable {
     }
 }
 
+struct CityPackStationAsset: Codable, Equatable {
+    let category: String
+    let title: String?
+    let assetURL: String
+    let assetType: String
+    let sourceURL: String?
+
+    var resolvedURL: URL? {
+        URL(string: assetURL)
+    }
+
+    func resolving(relativeTo baseURL: URL?) -> CityPackStationAsset {
+        guard URL(string: assetURL)?.scheme == nil,
+              let baseURL,
+              let resolvedURL = URL(string: assetURL, relativeTo: baseURL)?.absoluteURL else {
+            return self
+        }
+
+        return CityPackStationAsset(
+            category: category,
+            title: title,
+            assetURL: resolvedURL.absoluteString,
+            assetType: assetType,
+            sourceURL: sourceURL
+        )
+    }
+
+    var isImage: Bool {
+        ["image", "png", "jpg", "jpeg", "webp"].contains(assetType.lowercased())
+    }
+}
+
+struct CityPackServiceStatus: Codable, Equatable {
+    let accIDs: [String]
+    let crowdControlWindows: [String]
+    let statusColor: String?
+    let statusUpdatedAt: String?
+
+    var hasDisplayableStatus: Bool {
+        !crowdControlWindows.isEmpty || statusColor?.isEmpty == false
+    }
+}
+
 private struct RemoteDataManifest: Decodable {
     let schemaVersion: Int
     let generatedAt: String?
@@ -2224,6 +2275,29 @@ private struct CityPackStation: Decodable {
     let accessibility: CityPackAccessibility?
     let schedules: [CityPackSchedule]
     let stationMaps: [CityPackStationMap]
+    let stationAssets: [CityPackStationAsset]
+    let serviceStatus: CityPackServiceStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case stationName
+        case stationID
+        case accessibility
+        case schedules
+        case stationMaps
+        case stationAssets
+        case serviceStatus
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        stationName = try container.decode(String.self, forKey: .stationName)
+        stationID = try container.decodeIfPresent(String.self, forKey: .stationID)
+        accessibility = try container.decodeIfPresent(CityPackAccessibility.self, forKey: .accessibility)
+        schedules = try container.decodeIfPresent([CityPackSchedule].self, forKey: .schedules) ?? []
+        stationMaps = try container.decodeIfPresent([CityPackStationMap].self, forKey: .stationMaps) ?? []
+        stationAssets = try container.decodeIfPresent([CityPackStationAsset].self, forKey: .stationAssets) ?? []
+        serviceStatus = try container.decodeIfPresent(CityPackServiceStatus.self, forKey: .serviceStatus)
+    }
 
     var accessibilityData: AccessibilityData? {
         accessibility?.accessibilityData
@@ -2343,6 +2417,17 @@ private actor CityPackStore {
             .stationMaps
             .first?
             .resolving(relativeTo: loadedPack.assetBaseURL)
+    }
+
+    func stationAssets(cityID: String, stationName: String) -> [CityPackStationAsset] {
+        guard let loadedPack = packsByCityID[cityID] else { return [] }
+        return loadedPack.pack.station(named: stationName)?
+            .stationAssets
+            .map { $0.resolving(relativeTo: loadedPack.assetBaseURL) } ?? []
+    }
+
+    func serviceStatus(cityID: String, stationName: String) -> CityPackServiceStatus? {
+        packsByCityID[cityID]?.pack.station(named: stationName)?.serviceStatus
     }
 
     func officialArrivals(context: (system: CitySubwaySystem, line: SubwayLineData, station: StationData?)) -> [RealTimeArrival] {

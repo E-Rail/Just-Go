@@ -13,6 +13,7 @@ struct StationDetailView: View {
                 linesSection
                 accessibilitySection
                 arrivalsSection
+                serviceStatusSection
                 stationMapSection
             }
             .padding()
@@ -325,13 +326,17 @@ struct StationDetailView: View {
     private var stationMapSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Station Map"))
+                Text(AppLocalization.localized(viewModel?.stationMap == nil && (viewModel?.stationAssets.isEmpty == false) ? "Official Station Images" : "Station Map"))
                     .font(.headline)
 
                 if viewModel?.isLoadingCityPack == true {
                     ProgressView()
                 } else if let stationMap = viewModel?.stationMap {
                     stationMapContent(stationMap)
+                } else if let stationAssets = viewModel?.stationAssets, stationAssets.isEmpty == false {
+                    ForEach(stationAssets, id: \.assetURL) { asset in
+                        stationAssetContent(asset)
+                    }
                 } else {
                     Text(AppLocalization.localized("Official station map not collected yet"))
                         .font(.subheadline)
@@ -349,33 +354,41 @@ struct StationDetailView: View {
     }
 
     @ViewBuilder
-    private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
-        if stationMap.isImage, let url = stationMap.resolvedURL {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: 160)
-                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
-                        }
-                case .failure:
-                    Text(AppLocalization.localized("Station map could not be loaded"))
+    private var serviceStatusSection: some View {
+        if let status = viewModel?.serviceStatus, status.hasDisplayableStatus {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(AppLocalization.localized("Station Status"))
+                        .font(.headline)
+
+                    if let statusColor = status.statusColor, statusColor.isEmpty == false {
+                        Text(AppLocalization.text(
+                            english: "Official live station status: \(statusColor)",
+                            chinese: "官方实时车站状态：\(localizedStatusColor(statusColor))"
+                        ))
                         .font(.subheadline)
+                    }
+
+                    ForEach(status.crowdControlWindows, id: \.self) { window in
+                        Text(AppLocalization.text(
+                            english: "Crowd-control window: \(window)",
+                            chinese: "限流时段：\(window)"
+                        ))
+                        .font(.subheadline)
+                    }
+
+                    Text(AppLocalization.localized("Status data is from Beijing Subway official web map, not train arrival countdowns."))
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-                case .empty:
-                    ProgressView()
-                        .frame(maxWidth: .infinity, minHeight: 160)
-                @unknown default:
-                    EmptyView()
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
+        if stationMap.isImage, let url = stationMap.resolvedURL {
+            remoteImage(url: url)
 
             Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
                 .font(.caption)
@@ -387,6 +400,65 @@ struct StationDetailView: View {
             Text(AppLocalization.localized("Station map could not be loaded"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func stationAssetContent(_ asset: CityPackStationAsset) -> some View {
+        if asset.isImage, let url = asset.resolvedURL {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(asset.title ?? AppLocalization.localized("Official station image"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                remoteImage(url: url)
+                Link(AppLocalization.localized("Open official image"), destination: url)
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func remoteImage(url: URL) -> some View {
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .success(let image):
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 160)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                    }
+            case .failure:
+                Text(AppLocalization.localized("Station map could not be loaded"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            case .empty:
+                ProgressView()
+                    .frame(maxWidth: .infinity, minHeight: 160)
+            @unknown default:
+                EmptyView()
+            }
+        }
+    }
+
+    private func localizedStatusColor(_ color: String) -> String {
+        switch color.lowercased() {
+        case "green":
+            return AppLocalization.text(english: "green", chinese: "绿色")
+        case "yellow":
+            return AppLocalization.text(english: "yellow", chinese: "黄色")
+        case "red":
+            return AppLocalization.text(english: "red", chinese: "红色")
+        case "black":
+            return AppLocalization.text(english: "black", chinese: "黑色")
+        default:
+            return color
         }
     }
 

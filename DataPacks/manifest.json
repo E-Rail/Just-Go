@@ -1,18 +1,22 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-25T11:35:11Z",
+  "generatedAt": "2026-05-26T23:57:56Z",
   "primaryHost": null,
   "cities": [
     {
       "cityID": "1100",
-      "version": "beijing-official-20260525",
-      "sizeBytes": 734450,
-      "sha256": "06a5098d000bf5fd87e1765b4565998edede885acbc019f13f62dbeca730c4d1",
-      "downloadURL": "packs/1100/beijing-official-20260525/city_pack.json",
+      "version": "beijing-official-20260526",
+      "sizeBytes": 1112023,
+      "sha256": "e59a3320eb883aacea3b82d37fda360f3f526929d54dc3deab93ff12f8fd51aa",
+      "downloadURL": "packs/1100/beijing-official-20260526/city_pack.json",
       "sourceURLs": [
         "https://www.bjsubway.com/station/wzass/",
         "https://www.bjsubway.com/station/smcsj/",
         "https://www.bjsubway.com/station/fwss/line5/2013-08-21/50.html",
+        "https://map.bjsubway.com/subwaymap/stations.xml?v=20260515",
+        "https://map.bjsubway.com/subwaymap/beijing.xml?v=20260515",
+        "https://map.bjsubway.com/getblocks",
+        "https://map.bjsubway.com/getrealdatas",
         "https://www.mtr.bj.cn/service/line/line-4.html",
         "https://www.mtr.bj.cn/service/line/line-14.html",
         "https://www.mtr.bj.cn/service/line/line-16.html",

@@ -4,6 +4,7 @@ struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
     @State private var viewModel: StationDetailViewModel?
+    @State private var selectedStationImage: FullScreenStationImage?
     @Environment(AccessibilityService.self) private var accessibilityService
 
     var body: some View {
@@ -25,6 +26,9 @@ struct StationDetailView: View {
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()
             await viewModel?.loadTrainTimes()
+        }
+        .fullScreenCover(item: $selectedStationImage) { image in
+            FullScreenStationImageView(image: image)
         }
     }
 
@@ -388,7 +392,10 @@ struct StationDetailView: View {
     @ViewBuilder
     private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
         if stationMap.isImage, let url = stationMap.resolvedURL {
-            remoteImage(url: url)
+            remoteImage(
+                url: url,
+                title: stationMap.title ?? AppLocalization.localized("Station Map")
+            )
 
             Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
                 .font(.caption)
@@ -410,7 +417,10 @@ struct StationDetailView: View {
                 Text(asset.title ?? AppLocalization.localized("Official station image"))
                     .font(.subheadline)
                     .fontWeight(.medium)
-                remoteImage(url: url)
+                remoteImage(
+                    url: url,
+                    title: asset.title ?? AppLocalization.localized("Official station image")
+                )
                 Link(AppLocalization.localized("Open official image"), destination: url)
                     .font(.caption)
                     .foregroundStyle(.blue)
@@ -419,21 +429,36 @@ struct StationDetailView: View {
     }
 
     @ViewBuilder
-    private func remoteImage(url: URL) -> some View {
+    private func remoteImage(url: URL, title: String) -> some View {
         AsyncImage(url: url) { phase in
             switch phase {
             case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 160)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                Button {
+                    selectedStationImage = FullScreenStationImage(url: url, title: title)
+                } label: {
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 160)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .padding(8)
+                                .background(.black.opacity(0.55), in: Circle())
+                                .padding(8)
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                        }
                     }
+                .buttonStyle(.plain)
+                .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
             case .failure:
                 Text(AppLocalization.localized("Station map could not be loaded"))
                     .font(.subheadline)
@@ -464,6 +489,66 @@ struct StationDetailView: View {
 
     private var displayedStation: Station {
         viewModel?.station ?? station
+    }
+}
+
+private struct FullScreenStationImage: Identifiable {
+    let url: URL
+    let title: String
+
+    var id: String {
+        url.absoluteString
+    }
+}
+
+private struct FullScreenStationImageView: View {
+    let image: FullScreenStationImage
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
+
+                AsyncImage(url: image.url) { phase in
+                    switch phase {
+                    case .success(let loadedImage):
+                        loadedImage
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    case .failure:
+                        ContentUnavailableView(
+                            AppLocalization.localized("Station map could not be loaded"),
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .foregroundStyle(.white)
+                    case .empty:
+                        ProgressView()
+                            .tint(.white)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            }
+            .navigationTitle(image.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.black, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                    }
+                    .foregroundStyle(.white)
+                    .accessibilityLabel(AppLocalization.localized("Close station image"))
+                }
+            }
+        }
     }
 }
 

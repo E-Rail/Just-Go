@@ -2737,10 +2737,30 @@ private struct CitiesResponse: Codable {
 private struct AMapTransitResponse: Decodable {
     let status: String
     let route: AMapTransitRoute?
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case route
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = container.decodeFlexibleString(forKey: .status) ?? "0"
+        route = try? container.decodeIfPresent(AMapTransitRoute.self, forKey: .route)
+    }
 }
 
 private struct AMapTransitRoute: Decodable {
     let transits: [AMapTransitPlan]
+
+    enum CodingKeys: String, CodingKey {
+        case transits
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        transits = container.decodeLossyArray(forKey: .transits)
+    }
 }
 
 private struct AMapTransitPlan: Decodable {
@@ -2756,6 +2776,15 @@ private struct AMapTransitPlan: Decodable {
         case walkingDistance = "walking_distance"
         case cost
         case segments
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        duration = container.decodeFlexibleString(forKey: .duration)
+        distance = container.decodeFlexibleString(forKey: .distance)
+        walkingDistance = container.decodeFlexibleString(forKey: .walkingDistance)
+        cost = try? container.decodeIfPresent(AMapTransitCost.self, forKey: .cost)
+        segments = container.decodeLossyArray(forKey: .segments)
     }
 
     var durationValue: TimeInterval {
@@ -2775,17 +2804,53 @@ private struct AMapTransitPlan: Decodable {
 
 private struct AMapTransitCost: Decodable {
     let duration: String?
+
+    enum CodingKeys: String, CodingKey {
+        case duration
+    }
+
+    init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            duration = container.decodeFlexibleString(forKey: .duration)
+        } else {
+            duration = nil
+        }
+    }
 }
 
 private struct AMapTransitSegment: Decodable {
     let walking: AMapTransitWalking?
     let bus: AMapTransitBus?
+
+    enum CodingKeys: String, CodingKey {
+        case walking
+        case bus
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        walking = try? container.decodeIfPresent(AMapTransitWalking.self, forKey: .walking)
+        bus = try? container.decodeIfPresent(AMapTransitBus.self, forKey: .bus)
+    }
 }
 
 private struct AMapTransitWalking: Decodable {
     let distance: String?
     let duration: String?
     let steps: [AMapTransitWalkingStep]
+
+    enum CodingKeys: String, CodingKey {
+        case distance
+        case duration
+        case steps
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        distance = container.decodeFlexibleString(forKey: .distance)
+        duration = container.decodeFlexibleString(forKey: .duration)
+        steps = container.decodeLossyArray(forKey: .steps)
+    }
 
     var distanceValue: Double {
         Double(distance ?? "") ?? 0
@@ -2821,6 +2886,18 @@ private struct AMapTransitWalkingStep: Decodable {
         case polyline
     }
 
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        instruction = container.decodeFlexibleString(forKey: .instruction)
+        road = container.decodeFlexibleString(forKey: .road)
+        action = container.decodeFlexibleString(forKey: .action)
+        assistantAction = container.decodeFlexibleString(forKey: .assistantAction)
+        walkType = container.decodeFlexibleString(forKey: .walkType)
+        distance = container.decodeFlexibleString(forKey: .distance)
+        duration = container.decodeFlexibleString(forKey: .duration)
+        polyline = container.decodeFlexiblePolylineString(forKey: .polyline)
+    }
+
     var distanceValue: Double {
         Double(distance ?? "") ?? 0
     }
@@ -2847,6 +2924,15 @@ private struct AMapTransitWalkingStep: Decodable {
 
 private struct AMapTransitBus: Decodable {
     let buslines: [AMapTransitBusLine]
+
+    enum CodingKeys: String, CodingKey {
+        case buslines
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        buslines = container.decodeLossyArray(forKey: .buslines)
+    }
 }
 
 private struct AMapTransitBusLine: Decodable {
@@ -2880,6 +2966,24 @@ private struct AMapTransitBusLine: Decodable {
         case departureStop = "departure_stop"
         case arrivalStop = "arrival_stop"
         case viaStops = "via_stops"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = container.decodeFlexibleString(forKey: .id)
+        name = container.decodeFlexibleString(forKey: .name)
+        type = container.decodeFlexibleString(forKey: .type)
+        polyline = container.decodeFlexiblePolylineString(forKey: .polyline)
+        distance = container.decodeFlexibleString(forKey: .distance)
+        duration = container.decodeFlexibleString(forKey: .duration)
+        viaNum = container.decodeFlexibleString(forKey: .viaNum)
+        startTime = container.decodeFlexibleString(forKey: .startTime)
+        endTime = container.decodeFlexibleString(forKey: .endTime)
+        stationStartTime = container.decodeFlexibleString(forKey: .stationStartTime)
+        stationEndTime = container.decodeFlexibleString(forKey: .stationEndTime)
+        departureStop = try container.decode(AMapTransitBusStop.self, forKey: .departureStop)
+        arrivalStop = try container.decode(AMapTransitBusStop.self, forKey: .arrivalStop)
+        viaStops = container.decodeLossyArray(forKey: .viaStops)
     }
 
     var displayName: String {
@@ -2925,6 +3029,15 @@ private struct AMapTransitBusStop: Decodable {
         case location
         case startTime = "start_time"
         case endTime = "end_time"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = container.decodeFlexibleString(forKey: .name) ?? AppLocalization.localized("Station")
+        id = container.decodeFlexibleString(forKey: .id) ?? name
+        location = container.decodeFlexibleString(forKey: .location)
+        startTime = container.decodeFlexibleString(forKey: .startTime)
+        endTime = container.decodeFlexibleString(forKey: .endTime)
     }
 
     var coordinate: CLLocationCoordinate2D? {
@@ -3358,6 +3471,58 @@ private func parseCoordinate(_ value: String) -> CLLocationCoordinate2D? {
     return CLLocationCoordinate2D(latitude: parts[1], longitude: parts[0])
 }
 
+private struct LossyDecodableArray<Element: Decodable>: Decodable {
+    let values: [Element]
+
+    init(from decoder: Decoder) throws {
+        if var container = try? decoder.unkeyedContainer() {
+            var decodedValues: [Element] = []
+            while !container.isAtEnd {
+                if let value = try? container.decode(Element.self) {
+                    decodedValues.append(value)
+                } else {
+                    _ = try? container.decode(DiscardedDecodable.self)
+                }
+            }
+            values = decodedValues
+            return
+        }
+
+        if let value = try? Element(from: decoder) {
+            values = [value]
+            return
+        }
+
+        values = []
+    }
+}
+
+private struct DiscardedDecodable: Decodable {}
+
+private struct AMapPolylineValue: Decodable {
+    let value: String?
+
+    enum CodingKeys: String, CodingKey {
+        case polyline
+    }
+
+    init(from decoder: Decoder) throws {
+        if let container = try? decoder.singleValueContainer(),
+           let stringValue = try? container.decode(String.self) {
+            let text = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            value = text.isEmpty || text == "[]" ? nil : text
+            return
+        }
+
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            value = container.decodeFlexibleString(forKey: .polyline)
+            return
+        }
+
+        value = nil
+    }
+}
+
 private extension KeyedDecodingContainer {
     func decodeFlexibleString(forKey key: Key) -> String? {
         if let value = try? decodeIfPresent(String.self, forKey: key) {
@@ -3373,6 +3538,18 @@ private extension KeyedDecodingContainer {
         }
 
         return nil
+    }
+
+    func decodeFlexiblePolylineString(forKey key: Key) -> String? {
+        if let value = decodeFlexibleString(forKey: key) {
+            return value
+        }
+
+        return (try? decodeIfPresent(AMapPolylineValue.self, forKey: key))??.value
+    }
+
+    func decodeLossyArray<Element: Decodable>(forKey key: Key) -> [Element] {
+        (try? decodeIfPresent(LossyDecodableArray<Element>.self, forKey: key))??.values ?? []
     }
 
     func decodeFlexiblePOIArray(forKey key: Key) -> [AMapPlacePOI] {

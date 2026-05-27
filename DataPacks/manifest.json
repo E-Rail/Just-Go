@@ -5,10 +5,10 @@
   "cities": [
     {
       "cityID": "1100",
-      "version": "beijing-official-20260526",
+      "version": "beijing-official-20260527",
       "sizeBytes": 1112023,
-      "sha256": "e59a3320eb883aacea3b82d37fda360f3f526929d54dc3deab93ff12f8fd51aa",
-      "downloadURL": "packs/1100/beijing-official-20260526/city_pack.json",
+      "sha256": "7570cb617ce059266b0b23feb4acff6ac411ac012e5c12adca72e194900378e3",
+      "downloadURL": "packs/1100/beijing-official-20260527/city_pack.json",
       "sourceURLs": [
         "https://www.bjsubway.com/station/wzass/",
         "https://www.bjsubway.com/station/smcsj/",

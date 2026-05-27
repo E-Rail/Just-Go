@@ -2560,7 +2560,9 @@ private actor CityPackStore {
 private extension String {
     var isPlaceholderCityPackURL: Bool {
         contains("justgo-city-packs.cos.ap-beijing.myqcloud.com") ||
-        contains("gitee.com/E-Rail/just-go/raw")
+        contains("<owner>") ||
+        contains("<repo>") ||
+        contains("example.com/justgo-city-data")
     }
 }
 

@@ -10,6 +10,8 @@ final class StationDetailViewModel {
     var cityPackStatusMessage: String?
     var stationMapStatusMessage: String?
     var stationMap: CityPackStationMap?
+    var stationAssets: [CityPackStationAsset] = []
+    var serviceStatus: CityPackServiceStatus?
 
     private let aMapService: AMapService
 
@@ -62,6 +64,8 @@ final class StationDetailViewModel {
         isLoadingCityPack = true
         cityPackStatusMessage = nil
         stationMapStatusMessage = nil
+        stationAssets = []
+        serviceStatus = nil
         defer { isLoadingCityPack = false }
 
         let status = await aMapService.loadCityPack(for: station.cityID)
@@ -69,10 +73,16 @@ final class StationDetailViewModel {
         case .loaded:
             self.station = await aMapService.enrichStationFromCityPack(station)
             stationMap = await aMapService.stationMapFromCityPack(for: station)
+            stationAssets = await aMapService.stationAssetsFromCityPack(for: station)
+            serviceStatus = await aMapService.stationServiceStatusFromCityPack(for: station)
             cityPackStatusMessage = AppLocalization.localized("Official city data downloaded")
-            stationMapStatusMessage = stationMap == nil
-                ? AppLocalization.localized("Official station map not collected for this station")
-                : AppLocalization.localized("Official station map downloaded")
+            if stationMap != nil {
+                stationMapStatusMessage = AppLocalization.localized("Official station map downloaded")
+            } else if stationAssets.isEmpty == false {
+                stationMapStatusMessage = AppLocalization.localized("Official station images downloaded")
+            } else {
+                stationMapStatusMessage = AppLocalization.localized("Official station map not collected for this station")
+            }
         case .notConfigured:
             cityPackStatusMessage = AppLocalization.localized("Official city data cloud address is not configured")
             stationMapStatusMessage = cityPackStatusMessage

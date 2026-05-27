@@ -21,29 +21,52 @@ BJMTR_LINE_URLS = %w[
   https://www.mtr.bj.cn/service/line/line-16.html
   https://www.mtr.bj.cn/service/line/line-17.html
 ].freeze
+BJ_SUBWAY_STATIONS_XML_URL = "https://map.bjsubway.com/subwaymap/stations.xml?v=20260515"
+BJ_SUBWAY_MAP_XML_URL = "https://map.bjsubway.com/subwaymap/beijing.xml?v=20260515"
+BJ_SUBWAY_BLOCKS_URL = "https://map.bjsubway.com/getblocks"
+BJ_SUBWAY_REAL_STATUS_URL = "https://map.bjsubway.com/getrealdatas"
 DEFAULT_VERSION = "beijing-official-#{Time.now.utc.strftime("%Y%m%d")}"
 DEFAULT_OUTPUT = File.expand_path("../DataPacks/packs/1100/#{DEFAULT_VERSION}/city_pack.json", __dir__)
 DEFAULT_MANIFEST_OUTPUT = File.expand_path("../DataPacks/manifest.json", __dir__)
+HTTP_OPEN_TIMEOUT = 8
+HTTP_READ_TIMEOUT = 20
+
+def http_get_response(url)
+  uri = URI(url)
+  Net::HTTP.start(
+    uri.host,
+    uri.port,
+    use_ssl: uri.scheme == "https",
+    open_timeout: HTTP_OPEN_TIMEOUT,
+    read_timeout: HTTP_READ_TIMEOUT
+  ) do |http|
+    http.get(uri.request_uri)
+  end
+end
 
 def fetch_html(url)
-  response = Net::HTTP.get_response(URI(url))
+  response = http_get_response(url)
   raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
   response.body.force_encoding("GB18030").encode("UTF-8", invalid: :replace, undef: :replace)
 end
 
 def fetch_utf8_html(url)
-  response = Net::HTTP.get_response(URI(url))
+  response = http_get_response(url)
   raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
   response.body.force_encoding("UTF-8")
 end
 
 def fetch_bytes(url)
-  response = Net::HTTP.get_response(URI(url))
+  response = http_get_response(url)
   raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
   response.body
+end
+
+def fetch_json(url)
+  JSON.parse(fetch_utf8_html(url))
 end
 
 def text_content(html)
@@ -98,7 +121,9 @@ def station_record(records, station_name)
   records[station_name] ||= {
     "stationName" => station_name,
     "accessibility" => nil,
-    "schedules" => []
+    "schedules" => [],
+    "stationAssets" => [],
+    "serviceStatus" => nil
   }
 end
 
@@ -120,6 +145,7 @@ def absolute_url(base_url, href)
   return nil if href.nil? || href.empty? || href.start_with?("data:")
 
   href = "https:#{href}" if href.start_with?("//")
+  href = URI::DEFAULT_PARSER.escape(href) unless href.ascii_only?
   URI.join(base_url, href).to_s
 end
 
@@ -209,7 +235,66 @@ def bjsubway_station_links(seed_html)
     .uniq
 end
 
-def parse_bjsubway_facility_page(station_name, url, html, records)
+def page_image_urls(page_url, html)
+  html.scan(/<img\b([^>]+)>/i).map do |attrs_match|
+    src = attrs_match.first[/src=["']([^"']+)["']/i, 1]
+    next unless src
+
+    absolute_url(page_url, src)
+  end.compact.uniq
+end
+
+def download_station_asset(source_url, station_name, provider, category, index, output_path, dry_run)
+  ext = asset_extension(source_url)
+  relative_path = "station_assets/#{provider}/#{category}/#{slug(station_name)}_#{index}.#{ext}"
+  return relative_path if dry_run
+
+  asset_path = File.join(File.dirname(output_path), relative_path)
+  return relative_path if File.file?(asset_path)
+
+  FileUtils.mkdir_p(File.dirname(asset_path))
+  File.binwrite(asset_path, fetch_bytes(source_url))
+  relative_path
+end
+
+def add_station_asset(record, category, title, relative_path, source_url)
+  record["stationAssets"] ||= []
+  asset = {
+    "category" => category,
+    "title" => title,
+    "assetURL" => relative_path,
+    "assetType" => asset_extension(relative_path),
+    "sourceURL" => source_url
+  }
+  record["stationAssets"] << asset unless record["stationAssets"].any? { |existing| existing["assetURL"] == relative_path }
+end
+
+def collect_bjsubway_station_assets(station_name, page_url, html, records, output_path, dry_run)
+  record = station_record(records, station_name)
+  index_by_category = Hash.new(0)
+
+  page_image_urls(page_url, html).each do |image_url|
+    next unless image_url.include?("/d/file/station/")
+
+    category = image_url.include?("/xltcx/") ? "timetable_image" : "facility_image"
+    index_by_category[category] += 1
+    relative_path = download_station_asset(
+      image_url,
+      station_name,
+      "bjsubway",
+      category == "timetable_image" ? "timetable" : "facility",
+      index_by_category[category],
+      output_path,
+      dry_run
+    )
+    title = category == "timetable_image" ? "#{station_name}官方列车时刻图" : "#{station_name}官方车站设施图"
+    add_station_asset(record, category, title, relative_path, page_url)
+  rescue StandardError => error
+    warn "Skipping Beijing Subway image #{station_name} #{image_url}: #{error.message}"
+  end
+end
+
+def parse_bjsubway_facility_page(station_name, url, html, records, output_path, dry_run)
   record = station_record(records, station_name)
   record["sourceURLs"] ||= []
   record["sourceURLs"] << url unless record["sourceURLs"].include?(url)
@@ -231,14 +316,39 @@ def parse_bjsubway_facility_page(station_name, url, html, records)
       end
     end
   end
+
+  collect_bjsubway_station_assets(station_name, url, html, records, output_path, dry_run)
 end
 
-def parse_bjsubway_facilities(records)
+def parse_bjsubway_facilities(records, output_path, dry_run)
   seed_html = fetch_html(BJ_SUBWAY_FACILITY_SEED_URL)
   bjsubway_station_links(seed_html).each do |station_name, url|
-    parse_bjsubway_facility_page(station_name, url, fetch_html(url), records)
+    parse_bjsubway_facility_page(station_name, url, fetch_html(url), records, output_path, dry_run)
   rescue StandardError => error
     warn "Skipping Beijing Subway facility page #{station_name} #{url}: #{error.message}"
+  end
+end
+
+def bjsubway_timetable_links(xml)
+  xml.scan(/<s\b([^>]*)>/i).map do |attrs_match|
+    attrs = attrs_match.first
+    station_name = normalize_station_name(attrs[/\bname=["']([^"']+)["']/i, 1])
+    href = attrs[/\burl=["']([^"']+)["']/i, 1]
+    next if station_name.empty? || href.to_s.empty?
+
+    [station_name, absolute_url(BASE_URL, href)]
+  end.compact.uniq
+end
+
+def parse_bjsubway_timetable_pages(records, output_path, dry_run)
+  xml = fetch_utf8_html(BJ_SUBWAY_STATIONS_XML_URL)
+  bjsubway_timetable_links(xml).each do |station_name, url|
+    record = station_record(records, station_name)
+    record["sourceURLs"] ||= []
+    record["sourceURLs"] << url unless record["sourceURLs"].include?(url)
+    collect_bjsubway_station_assets(station_name, url, fetch_html(url), records, output_path, dry_run)
+  rescue StandardError => error
+    warn "Skipping Beijing Subway timetable page #{station_name} #{url}: #{error.message}"
   end
 end
 
@@ -345,6 +455,104 @@ def parse_bjmtr_facilities_and_maps(records, output_path, dry_run)
   end
 end
 
+def bjsubway_acc_lookup(xml)
+  lookup = {}
+  xml.scan(/<p\b([^>]*)\/?>/i).each do |attrs_match|
+    attrs = attrs_match.first
+    acc = attrs[/\bacc=["']([^"']+)["']/i, 1]
+    station_name = normalize_station_name(attrs[/\blb=["']([^"']+)["']/i, 1])
+    next if acc.to_s.empty? || station_name.empty?
+
+    lookup[acc] = station_name
+  end
+  lookup
+end
+
+def ensure_service_status(record)
+  record["serviceStatus"] ||= {
+    "accIDs" => [],
+    "crowdControlWindows" => [],
+    "statusColor" => nil,
+    "statusUpdatedAt" => nil
+  }
+end
+
+def parse_bjsubway_web_map_status(records)
+  acc_to_station = bjsubway_acc_lookup(fetch_utf8_html(BJ_SUBWAY_MAP_XML_URL))
+  acc_to_station.each do |acc, station_name|
+    status = ensure_service_status(station_record(records, station_name))
+    status["accIDs"] << acc unless status["accIDs"].include?(acc)
+  end
+
+  fetch_json(BJ_SUBWAY_BLOCKS_URL).each do |block|
+    station_name = normalize_station_name(block["name"] || acc_to_station[block["acc"].to_s])
+    next if station_name.empty?
+
+    status = ensure_service_status(station_record(records, station_name))
+    acc = block["acc"].to_s
+    status["accIDs"] << acc unless acc.empty? || status["accIDs"].include?(acc)
+    window = block["blocktime"].to_s.strip
+    status["crowdControlWindows"] << window unless window.empty? || status["crowdControlWindows"].include?(window)
+  end
+
+  real_status = fetch_json(BJ_SUBWAY_REAL_STATUS_URL)
+  Array(real_status["sr"]).each do |entry|
+    station_name = acc_to_station[entry["s"].to_s]
+    next if station_name.to_s.empty?
+
+    status = ensure_service_status(station_record(records, station_name))
+    status["statusColor"] = entry["color"] if entry["color"]
+    status["statusUpdatedAt"] = entry["update_at"] if entry["update_at"]
+  end
+rescue StandardError => error
+  warn "Skipping Beijing Subway web map status: #{error.message}"
+end
+
+def previous_city_pack_path(output_path)
+  current_pack = File.expand_path(output_path)
+  city_dir = File.dirname(File.dirname(current_pack))
+  Dir.glob(File.join(city_dir, "*", "city_pack.json"))
+    .map { |path| File.expand_path(path) }
+    .reject { |path| path == current_pack }
+    .sort
+    .last
+end
+
+def merge_previous_station_maps(records, output_path, dry_run)
+  previous_path = previous_city_pack_path(output_path)
+  return unless previous_path && File.file?(previous_path)
+
+  previous_pack = JSON.parse(File.read(previous_path))
+  previous_base = File.dirname(previous_path)
+  current_base = File.dirname(output_path)
+
+  previous_pack.fetch("stations", []).each do |station|
+    maps = Array(station["stationMaps"])
+    next if maps.empty?
+
+    record = station_record(records, station["stationName"])
+    next unless record.fetch("stationMaps", []).empty?
+
+    record["stationMaps"] = maps
+    next if dry_run
+
+    maps.each do |station_map|
+      asset_url = station_map["assetURL"].to_s
+      next if asset_url.empty? || asset_url.match?(%r{\Ahttps?://}i)
+
+      source_path = File.join(previous_base, asset_url)
+      destination_path = File.join(current_base, asset_url)
+      next unless File.file?(source_path)
+      next if File.file?(destination_path)
+
+      FileUtils.mkdir_p(File.dirname(destination_path))
+      FileUtils.cp(source_path, destination_path)
+    end
+  end
+rescue StandardError => error
+  warn "Skipping previous station map merge: #{error.message}"
+end
+
 def schedule_groups(table)
   header_rows = row_blocks(table).take_while { |row| !row.include?("<tbody") }
   candidate = header_rows
@@ -418,11 +626,25 @@ end
 records = {}
 parse_accessibility(fetch_html(ACCESSIBILITY_URL), records)
 parse_schedules(fetch_html(FIRST_LAST_URL), records)
-parse_bjsubway_facilities(records)
+parse_bjsubway_facilities(records, output_path, dry_run)
+parse_bjsubway_timetable_pages(records, output_path, dry_run)
+parse_bjsubway_web_map_status(records)
 parse_bjmtr_facilities_and_maps(records, output_path, dry_run)
+merge_previous_station_maps(records, output_path, dry_run)
 
-source_urls = [ACCESSIBILITY_URL, FIRST_LAST_URL, BJ_SUBWAY_FACILITY_SEED_URL, *BJMTR_LINE_URLS]
+source_urls = [
+  ACCESSIBILITY_URL,
+  FIRST_LAST_URL,
+  BJ_SUBWAY_FACILITY_SEED_URL,
+  BJ_SUBWAY_STATIONS_XML_URL,
+  BJ_SUBWAY_MAP_XML_URL,
+  BJ_SUBWAY_BLOCKS_URL,
+  BJ_SUBWAY_REAL_STATUS_URL,
+  *BJMTR_LINE_URLS
+]
 station_map_count = records.values.sum { |record| record.fetch("stationMaps", []).length }
+station_asset_count = records.values.sum { |record| record.fetch("stationAssets", []).length }
+service_status_count = records.values.count { |record| record["serviceStatus"] }
 
 payload = {
   "schemaVersion" => 1,
@@ -441,7 +663,9 @@ payload = {
   "stations" => records.values.sort_by { |record| record["stationName"] }.map do |record|
     record.merge(
       "stationID" => nil,
-      "stationMaps" => record.fetch("stationMaps", [])
+      "stationMaps" => record.fetch("stationMaps", []),
+      "stationAssets" => record.fetch("stationAssets", []),
+      "serviceStatus" => record["serviceStatus"]
     )
   end
 }
@@ -449,7 +673,7 @@ payload = {
 if dry_run
   schedule_count = payload["stations"].sum { |station| station["schedules"].length }
   accessibility_count = payload["stations"].count { |station| station["accessibility"] }
-  warn "stations=#{payload["stations"].length} accessibility=#{accessibility_count} schedules=#{schedule_count} stationMaps=#{station_map_count}"
+  warn "stations=#{payload["stations"].length} accessibility=#{accessibility_count} schedules=#{schedule_count} stationMaps=#{station_map_count} stationAssets=#{station_asset_count} serviceStatus=#{service_status_count}"
   puts JSON.pretty_generate(payload)
 else
   FileUtils.mkdir_p(File.dirname(output_path))

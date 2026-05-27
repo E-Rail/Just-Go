@@ -52,15 +52,20 @@ cities.each do |city|
   fail_with("#{city_id} city_pack version mismatch") unless pack["version"] == city["version"]
   fail_with("#{city_id} city_pack stations must be an array") unless pack["stations"].is_a?(Array)
   pack["stations"].each do |station|
-    Array(station["stationMaps"]).each do |station_map|
-      asset_url = station_map["assetURL"].to_s
-      fail_with("#{city_id} station map assetURL is missing") if asset_url.empty?
-      fail_with("#{city_id} station map must be a relative asset path") if asset_url.match?(%r{\Ahttps?://}i)
-      fail_with("#{city_id} station map hotlinks official source") if asset_url.include?("bjsubway.com") || asset_url.include?("mtr.bj.cn")
+    {
+      "station map" => Array(station["stationMaps"]),
+      "station asset" => Array(station["stationAssets"])
+    }.each do |label, assets|
+      assets.each do |asset|
+        asset_url = asset["assetURL"].to_s
+        fail_with("#{city_id} #{label} assetURL is missing") if asset_url.empty?
+        fail_with("#{city_id} #{label} must be a relative asset path") if asset_url.match?(%r{\Ahttps?://}i)
+        fail_with("#{city_id} #{label} hotlinks official source") if asset_url.include?("bjsubway.com") || asset_url.include?("mtr.bj.cn")
 
-      asset_path = File.expand_path(asset_url, File.dirname(pack_path))
-      fail_with("#{city_id} station map escapes pack directory") unless asset_path.start_with?("#{File.dirname(pack_path)}/")
-      fail_with("#{city_id} station map is missing at #{asset_url}") unless File.file?(asset_path)
+        asset_path = File.expand_path(asset_url, File.dirname(pack_path))
+        fail_with("#{city_id} #{label} escapes pack directory") unless asset_path.start_with?("#{File.dirname(pack_path)}/")
+        fail_with("#{city_id} #{label} is missing at #{asset_url}") unless File.file?(asset_path)
+      end
     end
   end
 

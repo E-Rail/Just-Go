@@ -89,6 +89,7 @@
 "No accessibility information available" = "No accessibility information available";
 "No nearby stations found" = "No nearby stations found";
 "No route found between these stations." = "No route found between these stations.";
+"Route data format changed. Please try again later." = "Route data format changed. Please try again later.";
 "No entrance/exit data returned by AMap" = "No entrance/exit data returned by AMap";
 "Add an AMap Web API key to enable public transit routing and place search." = "Add an AMap Web API key to enable public transit routing and place search.";
 "AMap" = "AMap";

@@ -90,6 +90,7 @@
 "No accessibility information available" = "暂无无障碍信息";
 "No nearby stations found" = "附近未找到车站";
 "No route found between these stations." = "未找到这两个车站之间的路线。";
+"Route data format changed. Please try again later." = "路线数据格式已变化，请稍后重试。";
 "No entrance/exit data returned by AMap" = "高德未返回此车站出入口信息";
 "Add an AMap Web API key to enable public transit routing and place search." = "请添加高德 Web 服务 API Key 以启用公共交通路线规划和地点搜索。";
 "AMap" = "高德地图";

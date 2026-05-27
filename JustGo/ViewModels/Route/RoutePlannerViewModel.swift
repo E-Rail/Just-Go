@@ -111,7 +111,7 @@ final class RoutePlannerViewModel {
 
             assignPlace(place, for: field)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = userFacingErrorMessage(for: error)
         }
     }
 
@@ -151,7 +151,7 @@ final class RoutePlannerViewModel {
                 saveRecentRoute(firstRoute)
             }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = userFacingErrorMessage(for: error)
         }
     }
 
@@ -213,7 +213,7 @@ final class RoutePlannerViewModel {
                 return
             } catch {
                 guard !Task.isCancelled else { return }
-                errorMessage = error.localizedDescription
+                errorMessage = userFacingErrorMessage(for: error)
             }
         }
     }
@@ -284,6 +284,19 @@ final class RoutePlannerViewModel {
         UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
         pendingQuickPlaceKind = nil
         return quickPlace.transitPlace
+    }
+
+    private func userFacingErrorMessage(for error: Error) -> String {
+        if let routeError = error as? RoutePlanningError {
+            return routeError.localizedDescription
+        }
+
+        if error is DecodingError {
+            return AppLocalization.localized("Route data format changed. Please try again later.")
+        }
+
+        return (error as? LocalizedError)?.errorDescription ??
+            AppLocalization.localized("Network connection failed. Try again later.")
     }
 }
 

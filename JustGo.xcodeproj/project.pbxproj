@@ -33,6 +33,9 @@
 		A100001A /* Components/Common/LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001A /* Components/Common/LoadingView.swift */; };
 		A100001B /* Map/AMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* Map/AMapService.swift */; };
 		A100001C /* Map/AMapConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* Map/AMapConfiguration.swift */; };
+		A100004A /* Map/AMapResponseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Map/AMapResponseModels.swift */; };
+		A100004B /* Map/AMapDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Map/AMapDecoding.swift */; };
+		A100004C /* Map/AMapTransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004C /* Map/AMapTransitFormatting.swift */; };
 		A100001D /* Transit/RoutePlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* Transit/RoutePlanningService.swift */; };
 		A100001E /* Transit/StationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* Transit/StationSearchService.swift */; };
 		A1000020 /* Location/LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* Location/LocationService.swift */; };
@@ -84,6 +87,9 @@
 		A200001A /* Components/Common/LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Common/LoadingView.swift; sourceTree = "<group>"; };
 		A200001B /* Map/AMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapService.swift; sourceTree = "<group>"; };
 		A200001C /* Map/AMapConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapConfiguration.swift; sourceTree = "<group>"; };
+		A200004A /* Map/AMapResponseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapResponseModels.swift; sourceTree = "<group>"; };
+		A200004B /* Map/AMapDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapDecoding.swift; sourceTree = "<group>"; };
+		A200004C /* Map/AMapTransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapTransitFormatting.swift; sourceTree = "<group>"; };
 		A200001D /* Transit/RoutePlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RoutePlanningService.swift; sourceTree = "<group>"; };
 		A200001E /* Transit/StationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/StationSearchService.swift; sourceTree = "<group>"; };
 		A2000020 /* Location/LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location/LocationService.swift; sourceTree = "<group>"; };
@@ -193,6 +199,9 @@
 			children = (
 				A200001B /* Map/AMapService.swift */,
 				A200001C /* Map/AMapConfiguration.swift */,
+				A200004A /* Map/AMapResponseModels.swift */,
+				A200004B /* Map/AMapDecoding.swift */,
+				A200004C /* Map/AMapTransitFormatting.swift */,
 				A200001D /* Transit/RoutePlanningService.swift */,
 				A200001E /* Transit/StationSearchService.swift */,
 				A2000020 /* Location/LocationService.swift */,
@@ -366,6 +375,9 @@
 				A100001A /* Components/Common/LoadingView.swift in Sources */,
 				A100001B /* Map/AMapService.swift in Sources */,
 				A100001C /* Map/AMapConfiguration.swift in Sources */,
+				A100004A /* Map/AMapResponseModels.swift in Sources */,
+				A100004B /* Map/AMapDecoding.swift in Sources */,
+				A100004C /* Map/AMapTransitFormatting.swift in Sources */,
 				A100001D /* Transit/RoutePlanningService.swift in Sources */,
 				A100001E /* Transit/StationSearchService.swift in Sources */,
 				A1000020 /* Location/LocationService.swift in Sources */,

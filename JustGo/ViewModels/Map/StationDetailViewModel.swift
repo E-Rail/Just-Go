@@ -75,25 +75,25 @@ final class StationDetailViewModel {
             stationMap = await aMapService.stationMapFromCityPack(for: station)
             stationAssets = await aMapService.stationAssetsFromCityPack(for: station)
             serviceStatus = await aMapService.stationServiceStatusFromCityPack(for: station)
-            cityPackStatusMessage = AppLocalization.localized("Official city data downloaded")
+            cityPackStatusMessage = AppLocalization.localized("Official city data available")
             if stationMap != nil {
-                stationMapStatusMessage = AppLocalization.localized("Official station map downloaded")
+                stationMapStatusMessage = AppLocalization.localized("Official station map available")
             } else if stationAssets.isEmpty == false {
-                stationMapStatusMessage = AppLocalization.localized("Official station images downloaded")
+                stationMapStatusMessage = AppLocalization.localized("Official station images available")
             } else {
                 stationMapStatusMessage = AppLocalization.localized("Official station map not collected for this station")
             }
         case .notConfigured:
-            cityPackStatusMessage = AppLocalization.localized("Official city data cloud address is not configured")
+            cityPackStatusMessage = AppLocalization.localized("Official city data is not configured; basic station data still works.")
             stationMapStatusMessage = cityPackStatusMessage
         case .sourcePending:
-            cityPackStatusMessage = AppLocalization.localized("Official city data source is pending")
+            cityPackStatusMessage = AppLocalization.localized("Official city data is pending for this city.")
             stationMapStatusMessage = cityPackStatusMessage
         case .notAvailable:
-            cityPackStatusMessage = AppLocalization.localized("Official city data not available yet")
+            cityPackStatusMessage = AppLocalization.localized("Official city data is not available for this city yet.")
             stationMapStatusMessage = cityPackStatusMessage
         case .failed:
-            cityPackStatusMessage = AppLocalization.localized("Official city data download failed")
+            cityPackStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
             stationMapStatusMessage = cityPackStatusMessage
         }
     }

@@ -16,9 +16,9 @@ struct TransitDataView: View {
                         Image(systemName: "antenna.radiowaves.left.and.right")
                             .foregroundStyle(.green)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(AppLocalization.localized("AMap Live Transit"))
+                            Text(AppLocalization.localized("Transit Data Sources"))
                                 .font(.headline)
-                            Text(AppLocalization.localized("Stations, metro lines, and public transit routes are loaded from AMap."))
+                            Text(AppLocalization.localized("AMap powers search, route planning, line geometry, and POIs. Official city packs add verified station details where available."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -26,7 +26,34 @@ struct TransitDataView: View {
                     .padding(.vertical, 4)
                 }
 
-                Section(AppLocalization.localized("Supported Cities")) {
+                Section {
+                    dataCapabilityRow(
+                        icon: "map.fill",
+                        title: "Map, station search, and routes",
+                        detail: "AMap plus bundled subway data"
+                    )
+                    dataCapabilityRow(
+                        icon: "accessibility",
+                        title: "Accessibility and station facilities",
+                        detail: "Official city packs when public sources exist"
+                    )
+                    dataCapabilityRow(
+                        icon: "clock.fill",
+                        title: "Train times",
+                        detail: "Official first/last schedules; live countdown only when an official provider exists"
+                    )
+                    dataCapabilityRow(
+                        icon: "photo.fill",
+                        title: "Station maps and images",
+                        detail: "Official city-pack assets where collected"
+                    )
+                } header: {
+                    Text(AppLocalization.localized("Essential Rider Information"))
+                } footer: {
+                    Text(AppLocalization.localized("Unavailable data is shown honestly instead of guessed."))
+                }
+
+                Section {
                     ForEach(cities) { city in
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -42,6 +69,8 @@ struct TransitDataView: View {
                                 .foregroundStyle(.green)
                         }
                     }
+                } header: {
+                    Text(AppLocalization.localized("Supported Cities"))
                 }
             }
             .navigationTitle(AppLocalization.localized("Transit Data"))
@@ -52,5 +81,23 @@ struct TransitDataView: View {
                 }
             }
         }
+    }
+
+    private func dataCapabilityRow(icon: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(.blue)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(AppLocalization.localized(title))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(AppLocalization.localized(detail))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.vertical, 3)
     }
 }

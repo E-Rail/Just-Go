@@ -284,8 +284,8 @@ final class AMapService {
         await cityPackStore.stationMap(cityID: station.cityID, stationName: station.name)
     }
 
-    func stationAssetsFromCityPack(for station: Station) async -> [CityPackStationAsset] {
-        await cityPackStore.stationAssets(cityID: station.cityID, stationName: station.name)
+    func timetableAssetsFromCityPack(for station: Station) async -> [CityPackStationAsset] {
+        await cityPackStore.stationAssets(cityID: station.cityID, stationName: station.name, category: "timetable_image")
     }
 
     func stationServiceStatusFromCityPack(for station: Station) async -> CityPackServiceStatus? {
@@ -2322,9 +2322,11 @@ private struct CityPackAccessibility: Decodable {
             hasElevator: hasElevator,
             hasEscalator: hasEscalator,
             hasWheelchairRamp: hasWheelchairRamp,
+            hasAccessibleRestroom: hasAccessibleRestroom,
             isFullyAccessible: hasMobilityAid ? true : nil,
             elevatorLocations: elevatorLocations,
             accessibleEntrances: accessibleEntrances,
+            facilityNotes: facilityNotes,
             hasTactilePath: hasTactilePath,
             hasColorCoding: true,
             hasPictograms: true
@@ -2419,10 +2421,13 @@ private actor CityPackStore {
             .resolving(relativeTo: loadedPack.assetBaseURL)
     }
 
-    func stationAssets(cityID: String, stationName: String) -> [CityPackStationAsset] {
+    func stationAssets(cityID: String, stationName: String, category: String? = nil) -> [CityPackStationAsset] {
         guard let loadedPack = packsByCityID[cityID] else { return [] }
         return loadedPack.pack.station(named: stationName)?
             .stationAssets
+            .filter { asset in
+                category == nil || asset.category == category
+            }
             .map { $0.resolving(relativeTo: loadedPack.assetBaseURL) } ?? []
     }
 
@@ -2637,9 +2642,11 @@ private extension AccessibilityData {
             hasElevator: nil,
             hasEscalator: nil,
             hasWheelchairRamp: nil,
+            hasAccessibleRestroom: nil,
             isFullyAccessible: nil,
             elevatorLocations: nil,
             accessibleEntrances: nil,
+            facilityNotes: nil,
             wheelchairBoardingAssistance: nil,
             hasTactilePath: nil,
             hasBrailleSigns: nil,
@@ -2660,9 +2667,11 @@ private extension AccessibilityData {
             hasElevator: hasElevator,
             hasEscalator: hasEscalator,
             hasWheelchairRamp: hasWheelchairRamp,
+            hasAccessibleRestroom: hasAccessibleRestroom,
             isFullyAccessible: isFullyAccessible,
             elevatorLocations: elevatorLocations,
             accessibleEntrances: accessibleEntrances,
+            facilityNotes: facilityNotes,
             wheelchairBoardingAssistance: wheelchairBoardingAssistance,
             hasTactilePath: hasTactilePath,
             hasBrailleSigns: hasBrailleSigns,
@@ -2742,9 +2751,11 @@ private extension Optional where Wrapped == AccessibilityData {
             hasElevator: officialData.hasElevator ?? existing.hasElevator,
             hasEscalator: officialData.hasEscalator ?? existing.hasEscalator,
             hasWheelchairRamp: officialData.hasWheelchairRamp ?? existing.hasWheelchairRamp,
+            hasAccessibleRestroom: officialData.hasAccessibleRestroom ?? existing.hasAccessibleRestroom,
             isFullyAccessible: officialData.isFullyAccessible ?? existing.isFullyAccessible,
             elevatorLocations: mergeOfficialValues(existing.elevatorLocations, officialData.elevatorLocations),
             accessibleEntrances: mergeOfficialValues(existing.accessibleEntrances, officialData.accessibleEntrances),
+            facilityNotes: mergeOfficialValues(existing.facilityNotes, officialData.facilityNotes),
             wheelchairBoardingAssistance: officialData.wheelchairBoardingAssistance ?? existing.wheelchairBoardingAssistance,
             hasTactilePath: officialData.hasTactilePath ?? existing.hasTactilePath,
             hasBrailleSigns: officialData.hasBrailleSigns ?? existing.hasBrailleSigns,
@@ -2767,9 +2778,11 @@ private extension StationAccessibility {
             hasElevator: elevatorAvailability.boolValue,
             hasEscalator: escalatorAvailability.boolValue,
             hasWheelchairRamp: wheelchairRampAvailability.boolValue,
+            hasAccessibleRestroom: accessibleRestroomAvailability.boolValue,
             isFullyAccessible: fullAccessibilityAvailability.boolValue,
             elevatorLocations: elevatorLocations.isEmpty ? nil : elevatorLocations,
             accessibleEntrances: accessibleEntrances.isEmpty ? nil : accessibleEntrances,
+            facilityNotes: facilityNotes.isEmpty ? nil : facilityNotes,
             wheelchairBoardingAssistance: wheelchairBoardingAssistanceAvailability.boolValue,
             hasTactilePath: tactilePathAvailability.boolValue,
             hasBrailleSigns: brailleSignsAvailability.boolValue,

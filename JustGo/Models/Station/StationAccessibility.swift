@@ -46,9 +46,11 @@ final class StationAccessibility {
     var elevatorAvailability: AccessibilityAvailability
     var escalatorAvailability: AccessibilityAvailability
     var wheelchairRampAvailability: AccessibilityAvailability
+    var accessibleRestroomAvailability: AccessibilityAvailability
     var fullAccessibilityAvailability: AccessibilityAvailability
     var elevatorLocations: [String]
     var accessibleEntrances: [String]
+    var facilityNotes: [String]
     var wheelchairBoardingAssistanceAvailability: AccessibilityAvailability
 
     // Visual Impairment
@@ -80,6 +82,7 @@ final class StationAccessibility {
     var hasElevator: Bool { elevatorAvailability.isAvailable }
     var hasEscalator: Bool { escalatorAvailability.isAvailable }
     var hasWheelchairRamp: Bool { wheelchairRampAvailability.isAvailable }
+    var hasAccessibleRestroom: Bool { accessibleRestroomAvailability.isAvailable }
     var isFullyAccessible: Bool { fullAccessibilityAvailability.isAvailable }
     var wheelchairBoardingAssistance: Bool { wheelchairBoardingAssistanceAvailability.isAvailable }
     var hasTactilePath: Bool { tactilePathAvailability.isAvailable }
@@ -100,12 +103,14 @@ final class StationAccessibility {
             wheelchairRampAvailability,
             tactilePathAvailability,
             audioAnnouncementAvailability,
-            visualAnnouncementAvailability
+            visualAnnouncementAvailability,
+            accessibleRestroomAvailability
         ]
 
         return stationSpecificStates.contains { $0 != .unknown } ||
             !elevatorLocations.isEmpty ||
-            !accessibleEntrances.isEmpty
+            !accessibleEntrances.isEmpty ||
+            !facilityNotes.isEmpty
     }
 
     var hasUnverifiedCoreAccessibilityData: Bool {
@@ -113,6 +118,7 @@ final class StationAccessibility {
             elevatorLocations.isEmpty ? elevatorAvailability : .available,
             escalatorAvailability,
             accessibleEntrances.isEmpty ? wheelchairRampAvailability : .available,
+            accessibleRestroomAvailability,
             tactilePathAvailability,
             audioAnnouncementAvailability,
             visualAnnouncementAvailability
@@ -132,9 +138,11 @@ final class StationAccessibility {
         hasElevator: Bool? = nil,
         hasEscalator: Bool? = nil,
         hasWheelchairRamp: Bool? = nil,
+        hasAccessibleRestroom: Bool? = nil,
         isFullyAccessible: Bool? = nil,
         elevatorLocations: [String] = [],
         accessibleEntrances: [String] = [],
+        facilityNotes: [String] = [],
         wheelchairBoardingAssistance: Bool? = nil,
         hasTactilePath: Bool? = nil,
         hasBrailleSigns: Bool? = nil,
@@ -155,9 +163,11 @@ final class StationAccessibility {
         self.elevatorAvailability = AccessibilityAvailability(hasElevator)
         self.escalatorAvailability = AccessibilityAvailability(hasEscalator)
         self.wheelchairRampAvailability = AccessibilityAvailability(hasWheelchairRamp)
+        self.accessibleRestroomAvailability = AccessibilityAvailability(hasAccessibleRestroom)
         self.fullAccessibilityAvailability = AccessibilityAvailability(isFullyAccessible)
         self.elevatorLocations = elevatorLocations
         self.accessibleEntrances = accessibleEntrances
+        self.facilityNotes = facilityNotes
         self.wheelchairBoardingAssistanceAvailability = AccessibilityAvailability(wheelchairBoardingAssistance)
         self.tactilePathAvailability = AccessibilityAvailability(hasTactilePath)
         self.brailleSignsAvailability = AccessibilityAvailability(hasBrailleSigns)
@@ -189,9 +199,11 @@ extension StationAccessibility {
             hasElevator: data.hasElevator,
             hasEscalator: data.hasEscalator,
             hasWheelchairRamp: data.hasWheelchairRamp,
+            hasAccessibleRestroom: data.hasAccessibleRestroom,
             isFullyAccessible: data.isFullyAccessible,
             elevatorLocations: data.elevatorLocations ?? [],
             accessibleEntrances: data.accessibleEntrances ?? [],
+            facilityNotes: data.facilityNotes ?? [],
             wheelchairBoardingAssistance: data.wheelchairBoardingAssistance,
             hasTactilePath: data.hasTactilePath,
             hasBrailleSigns: data.hasBrailleSigns,

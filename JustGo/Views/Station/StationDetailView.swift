@@ -195,6 +195,30 @@ struct StationDetailView: View {
             }
         }
 
+        if accessibility.hasFacilityRows {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppLocalization.localized("Station Facilities"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if accessibility.accessibleRestroomAvailability != .unknown {
+                    accessibilityRow(
+                        icon: "figure.roll",
+                        title: "Accessible Restroom",
+                        subtitle: accessibility.accessibleRestroomAvailability.localizedStatusText,
+                        status: AccessibilityStatus(accessibility.accessibleRestroomAvailability)
+                    )
+                }
+
+                ForEach(accessibility.facilityNotes, id: \.self) { note in
+                    Label(note, systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+
         if accessibility.hasHearingRows {
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalization.localized("Hearing"))
@@ -226,9 +250,15 @@ struct StationDetailView: View {
     }
 
     private func accessibilitySourceNote(_ accessibility: StationAccessibility) -> some View {
-        let message = accessibility.dataSource == "beijing_official"
-            ? AppLocalization.localized("Accessibility information from official Beijing Subway data.")
-            : AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available.")
+        let message: String
+        if accessibility.dataSource == "beijing_official" {
+            message = AppLocalization.localized("Accessibility information from official Beijing Subway data.")
+        } else if accessibility.dataSource?.contains("_official") == true ||
+            accessibility.dataSource?.contains("official") == true {
+            message = AppLocalization.localized("Accessibility information from official city data.")
+        } else {
+            message = AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available.")
+        }
         return Text(message)
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -295,20 +325,34 @@ struct StationDetailView: View {
     }
 
     private var arrivalsSection: some View {
-        GlassCard {
+        let arrivals = viewModel?.arrivals ?? []
+        let timetableAssets = viewModel?.timetableAssets ?? []
+        return GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.localized("Train Times"))
                     .font(.headline)
 
                 if viewModel?.isLoading == true {
                     ProgressView()
-                } else if viewModel?.arrivals.isEmpty ?? true {
+                } else if arrivals.isEmpty && timetableAssets.isEmpty {
                     Text(viewModel?.errorMessage ?? AppLocalization.localized("Schedule unavailable"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(viewModel?.arrivals ?? []) { arrival in
+                    ForEach(arrivals) { arrival in
                         ArrivalCountdown(arrival: arrival)
+                    }
+
+                    if timetableAssets.isEmpty == false {
+                        Text(AppLocalization.localized("Official Timetable Images"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        ForEach(timetableAssets, id: \.assetURL) { asset in
+                            stationAssetContent(
+                                asset,
+                                defaultTitle: AppLocalization.localized("Official timetable image")
+                            )
+                        }
                     }
 
                     if let statusMessage = viewModel?.trainTimeStatusMessage {
@@ -317,7 +361,7 @@ struct StationDetailView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    if viewModel?.arrivals.contains(where: \.hasLiveCountdown) == false {
+                    if arrivals.contains(where: \.hasLiveCountdown) == false {
                         Text(AppLocalization.localized("Shows first/last train times, not live arrival countdowns."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -330,19 +374,15 @@ struct StationDetailView: View {
     private var stationMapSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized(viewModel?.stationMap == nil && (viewModel?.stationAssets.isEmpty == false) ? "Official Station Images" : "Station Map"))
+                Text(AppLocalization.localized("Station Map"))
                     .font(.headline)
 
                 if viewModel?.isLoadingCityPack == true {
                     ProgressView()
                 } else if let stationMap = viewModel?.stationMap {
                     stationMapContent(stationMap)
-                } else if let stationAssets = viewModel?.stationAssets, stationAssets.isEmpty == false {
-                    ForEach(stationAssets, id: \.assetURL) { asset in
-                        stationAssetContent(asset)
-                    }
                 } else {
-                    Text(AppLocalization.localized("Official station map not collected yet"))
+                    Text(AppLocalization.localized("Official 3D station map not collected yet"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -411,17 +451,17 @@ struct StationDetailView: View {
     }
 
     @ViewBuilder
-    private func stationAssetContent(_ asset: CityPackStationAsset) -> some View {
+    private func stationAssetContent(_ asset: CityPackStationAsset, defaultTitle: String) -> some View {
         if asset.isImage, let url = asset.resolvedURL {
             VStack(alignment: .leading, spacing: 6) {
-                Text(asset.title ?? AppLocalization.localized("Official station image"))
+                Text(asset.title ?? defaultTitle)
                     .font(.subheadline)
                     .fontWeight(.medium)
                 remoteImage(
                     url: url,
-                    title: asset.title ?? AppLocalization.localized("Official station image")
+                    title: asset.title ?? defaultTitle
                 )
-                Link(AppLocalization.localized("Open official image"), destination: url)
+                Link(AppLocalization.localized("Open official timetable image"), destination: url)
                     .font(.caption)
                     .foregroundStyle(.blue)
             }
@@ -568,6 +608,10 @@ private extension StationAccessibility {
 
     var hasHearingRows: Bool {
         visualAnnouncementAvailability != .unknown
+    }
+
+    var hasFacilityRows: Bool {
+        accessibleRestroomAvailability != .unknown || !facilityNotes.isEmpty
     }
 }
 

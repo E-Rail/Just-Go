@@ -68,9 +68,11 @@ struct AccessibilityData: Codable {
     let hasElevator: Bool?
     let hasEscalator: Bool?
     let hasWheelchairRamp: Bool?
+    let hasAccessibleRestroom: Bool?
     let isFullyAccessible: Bool?
     let elevatorLocations: [String]?
     let accessibleEntrances: [String]?
+    let facilityNotes: [String]?
     let wheelchairBoardingAssistance: Bool?
     let hasTactilePath: Bool?
     let hasBrailleSigns: Bool?
@@ -88,9 +90,11 @@ struct AccessibilityData: Codable {
         hasElevator: Bool? = nil,
         hasEscalator: Bool? = nil,
         hasWheelchairRamp: Bool? = nil,
+        hasAccessibleRestroom: Bool? = nil,
         isFullyAccessible: Bool? = nil,
         elevatorLocations: [String]? = nil,
         accessibleEntrances: [String]? = nil,
+        facilityNotes: [String]? = nil,
         wheelchairBoardingAssistance: Bool? = nil,
         hasTactilePath: Bool? = nil,
         hasBrailleSigns: Bool? = nil,
@@ -107,9 +111,11 @@ struct AccessibilityData: Codable {
         self.hasElevator = hasElevator
         self.hasEscalator = hasEscalator
         self.hasWheelchairRamp = hasWheelchairRamp
+        self.hasAccessibleRestroom = hasAccessibleRestroom
         self.isFullyAccessible = isFullyAccessible
         self.elevatorLocations = elevatorLocations
         self.accessibleEntrances = accessibleEntrances
+        self.facilityNotes = facilityNotes
         self.wheelchairBoardingAssistance = wheelchairBoardingAssistance
         self.hasTactilePath = hasTactilePath
         self.hasBrailleSigns = hasBrailleSigns

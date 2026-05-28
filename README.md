@@ -1,17 +1,17 @@
 # JustGo
 
-An accessible subway navigation app for China, designed with accessibility-first principles.
+An accessible subway navigation app for China. The goal is simple: riders with mobility, vision, hearing, cognitive, or mixed needs should be able to see the station, route, schedule, and access information they need before they travel.
 
 ## Features
 
-- **Accessibility-First Design**: Full support for mobility, visual, hearing, and cognitive disabilities
+- **Accessibility-First Design**: Mobility, vision, hearing, cognitive, and mixed-needs preferences
 - **Glass UI**: Modern SwiftUI material-based interface
 - **AMap Integration**: High-quality China subway data and routing
 - **Apple Map Rendering**: Native MapKit display with AMap transit data overlays
-- **AMap Live Transit**: Metro city lists, station search, line geometry, and public transit route plans from AMap Web APIs
+- **Transit Data**: Metro city lists, station search, line geometry, and public transit route plans from AMap Web APIs
+- **Official City Packs**: Downloadable official station accessibility, first/last train schedules, station images, and station status where public sources exist
 - **Transit Route Modes**: Fastest and least-walking public transportation plans
-- **Voice Navigation**: Turn-by-turn audio guidance for blind users
-- **Visual Alerts**: Flash and vibration alerts for deaf users
+- **Clear Data States**: The app labels official schedules, AMap routing data, unavailable live countdowns, and unverified accessibility instead of pretending missing data is known
 
 ## Requirements
 
@@ -28,13 +28,13 @@ An accessible subway navigation app for China, designed with accessibility-first
    `AMAP_SECRET_API_KEY = your_web_service_key`
 4. In the AMap console, make sure the key has access to the advanced `公交信息查询` API if you want first/last train schedule lookup
 5. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
-6. The app falls back to jsDelivr's GitHub CDN for development testing, but production/mainland builds should use object storage or another static host that permits public JSON/file downloads
+6. The app falls back to jsDelivr's GitHub CDN for development and beta testing
 7. Build and run
 
 The app uses AMap Web APIs, not the native AMap iOS SDK, so it works on iOS simulators without vendor frameworks.
 If `AMAP_API_KEY` is empty, the bundled subway data still loads, but live place search, route planning, and AMap schedule lookup are disabled.
 Rich station accessibility, official schedules, and station-map assets are downloaded per city pack when a city is opened; they are not bundled into the app binary.
-See `DataPacks/README.md` for the city-pack hosting contract and sync workflow.
+See `DataPacks/README.md` for the city-pack hosting contract.
 
 ## Architecture
 

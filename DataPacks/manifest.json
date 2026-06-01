@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-28T11:19:21Z",
+  "generatedAt": "2026-06-01T10:52:07Z",
   "primaryHost": null,
   "cities": [
     {
@@ -31,33 +31,41 @@
     },
     {
       "cityID": "4401",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "guangzhou-official-20260601",
+      "sizeBytes": 1625346,
+      "sha256": "980c2ef5ecf8f9cd8f1a4e0707c828a716e9ed6564cdddd9485b79fc0ab5992e",
+      "downloadURL": "packs/4401/guangzhou-official-20260601/city_pack.json",
       "sourceURLs": [
-
+        "https://cs.gzmtr.com/ckfw/stationInfo/index.html",
+        "https://cs.gzmtr.com/ckfw/images/ajaxUtil.js",
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/体育西路",
+        "https://apis.gzmtr.com/app-map/station/getDevice/体育西路"
       ],
       "capabilities": {
-        "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "accessibility": "official_static",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
     {
       "cityID": "3100",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "shanghai-official-20260601",
+      "sizeBytes": 1203052,
+      "sha256": "f3885316136d46ee1fb736c5b0251cc8c43a91d6fc6c62278209d3c2f7971762",
+      "downloadURL": "packs/3100/shanghai-official-20260601/city_pack.json",
       "sourceURLs": [
-
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://service.shmetro.com/wzai/index.htm",
+        "https://service.shmetro.com/cw/index.htm",
+        "https://service.shmetro.com/skin/js/pca.js",
+        "http://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id=111"
       ],
       "capabilities": {
-        "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "accessibility": "official_static",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },

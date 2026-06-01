@@ -3,4 +3,4 @@
 AMAP_API_KEY = $(AMAP_SECRET_API_KEY)
 CITY_PACK_BASE_URL = $(CITY_PACK_SECRET_BASE_URL)
 CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
-CITY_PACK_FALLBACK_BASE_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/JustGo@afb17a3/DataPacks
+CITY_PACK_FALLBACK_BASE_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/JustGo@main/DataPacks

@@ -40,6 +40,29 @@ HANGZHOU_SOURCE_URLS = [
   HANGZHOU_OPERATION_API_URL
 ].freeze
 
+SHANGHAI_PCA_URL = "https://service.shmetro.com/skin/js/pca.js"
+SHANGHAI_STATION_INFO_URL = "http://m.shmetro.com/interface/metromap/metromap.aspx"
+SHANGHAI_SOURCE_URLS = [
+  "https://service.shmetro.com/hcskb/index.htm",
+  "https://service.shmetro.com/wzai/index.htm",
+  "https://service.shmetro.com/cw/index.htm",
+  SHANGHAI_PCA_URL,
+  "#{SHANGHAI_STATION_INFO_URL}?func=stationInfo&stat_id=111"
+].freeze
+
+GUANGZHOU_API_BASE = "https://apis.gzmtr.com"
+# Public parameters used by Guangzhou Metro's own passenger-service web page.
+# These are not JustGo secrets and are used only by this offline importer.
+GUANGZHOU_ACCESS_KEY = "247919A174804353AE72BAB00981C6E8"
+GUANGZHOU_AUTHORIZATION = "Bearer 38c7e7b3ka1f3k44dak8707k806a1f8bf978"
+GUANGZHOU_SOURCE_URLS = [
+  "https://cs.gzmtr.com/ckfw/stationInfo/index.html",
+  "https://cs.gzmtr.com/ckfw/images/ajaxUtil.js",
+  "#{GUANGZHOU_API_BASE}/app-map/metroweb/linestation",
+  "#{GUANGZHOU_API_BASE}/app-map/serviceTime/list/体育西路",
+  "#{GUANGZHOU_API_BASE}/app-map/station/getDevice/体育西路"
+].freeze
+
 def http_request(uri, request)
   attempts = 0
   begin
@@ -95,6 +118,59 @@ def post_json(url, payload)
   JSON.parse(response.body.force_encoding("UTF-8"))
 end
 
+def post_guangzhou_api(path)
+  url = "#{GUANGZHOU_API_BASE}#{path}?auto_type=key&acccesskey=#{GUANGZHOU_ACCESS_KEY}"
+  uri = URI(url)
+  request = Net::HTTP::Post.new(uri)
+  request["User-Agent"] = "Mozilla/5.0"
+  request["Content-Type"] = "application/json"
+  request["Authorization"] = GUANGZHOU_AUTHORIZATION
+  response = http_request(uri, request)
+  raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+  json = JSON.parse(response.body.force_encoding("UTF-8"))
+  raise "Guangzhou API failed #{path}" if json.key?("success") && !json["success"]
+
+  json["businessObject"]
+end
+
+def extract_js_object(script, variable_name)
+  marker = "var #{variable_name} = "
+  start = script.index(marker)
+  raise "Missing JS variable #{variable_name}" unless start
+
+  index = start + marker.length
+  raise "Missing object for #{variable_name}" unless script[index] == "{"
+
+  depth = 0
+  in_string = false
+  escape = false
+  index.upto(script.length - 1) do |offset|
+    char = script[offset]
+    if in_string
+      if escape
+        escape = false
+      elsif char == "\\"
+        escape = true
+      elsif char == "\""
+        in_string = false
+      end
+      next
+    end
+
+    if char == "\""
+      in_string = true
+    elsif char == "{"
+      depth += 1
+    elsif char == "}"
+      depth -= 1
+      return JSON.parse(script[index..offset]) if depth.zero?
+    end
+  end
+
+  raise "Unclosed JS object #{variable_name}"
+end
+
 def normalize_station_name(value)
   value.to_s
     .gsub(/[[:space:]]+/, "")
@@ -110,6 +186,15 @@ def usable_time?(value)
   value.to_s.match?(/\A\d{1,2}:\d{2}\z/)
 end
 
+def seconds_to_time(value)
+  seconds = value.to_i
+  return nil if seconds <= 60
+
+  hours = (seconds / 3600) % 24
+  minutes = (seconds % 3600) / 60
+  format("%02d:%02d", hours, minutes)
+end
+
 def station_record(records, station_name)
   normalized = normalize_station_name(station_name)
   records[normalized] ||= {
@@ -117,6 +202,7 @@ def station_record(records, station_name)
     "stationID" => nil,
     "accessibility" => nil,
     "schedules" => [],
+    "stationFacilities" => [],
     "stationMaps" => [],
     "stationAssets" => [],
     "serviceStatus" => nil,
@@ -160,6 +246,21 @@ def add_facility_note(accessibility, note)
   return if text.empty?
 
   accessibility["facilityNotes"] << text unless accessibility["facilityNotes"].include?(text)
+end
+
+def add_station_facility(record, type, name, location_text = nil)
+  text = name.to_s.gsub(/[[:space:]]+/, " ").strip
+  location = location_text.to_s.gsub(/[[:space:]]+/, " ").strip
+  return if text.empty?
+
+  facility = {
+    "type" => type,
+    "name" => text,
+    "locationText" => location.empty? ? nil : location,
+    "source" => "officialCityPack",
+    "verification" => "verified"
+  }
+  record["stationFacilities"] << facility unless record["stationFacilities"].include?(facility)
 end
 
 def write_pack(city_id:, version:, source_urls:, capabilities:, live_provider:, source_attribution:, records:)
@@ -328,6 +429,197 @@ def import_hangzhou
   )
 end
 
+def import_shanghai
+  records = {}
+  pca = fetch_utf8(SHANGHAI_PCA_URL).sub(/\A\xEF\xBB\xBF/, "")
+  stations = extract_js_object(pca, "stations")
+  lines = extract_js_object(pca, "lines")
+  timetables = extract_js_object(pca, "smbctm")
+  numeric_station_names = stations.to_h { |key, name| [key.to_s.sub(/\A0+/, ""), normalize_station_name(name)] }
+  line_by_numeric_station = {}
+
+  lines.each do |line_name, station_ids|
+    Array(station_ids).each do |station_id|
+      line_by_numeric_station[station_id.to_s.sub(/\A0+/, "")] ||= line_name
+    end
+  end
+
+  timetables.each do |destination_key, table|
+    destination = numeric_station_names[destination_key.to_s.sub(/\A0+/, "")]
+    next if blank_value?(destination)
+
+    station_ids = table[0].to_s.split("-")
+    first_times = table[1].to_s.split("-")
+    last_times = table[2].to_s.split("-")
+    line_name = line_by_numeric_station[station_ids.first] || line_by_numeric_station[destination_key.to_s.sub(/\A0+/, "")]
+    next if blank_value?(line_name)
+
+    station_ids.each_with_index do |station_id, index|
+      station_name = numeric_station_names[station_id]
+      next if blank_value?(station_name)
+
+      record = station_record(records, station_name)
+      add_source(record, SHANGHAI_PCA_URL)
+      add_schedule(record, line_name, "开往 #{destination}", seconds_to_time(first_times[index]), seconds_to_time(last_times[index]))
+    end
+  end
+
+  stations.keys.map { |key| key.to_s.sub(/\A0+/, "") }.uniq.each do |station_id|
+    station_info_url = "#{SHANGHAI_STATION_INFO_URL}?func=stationInfo&stat_id=#{CGI.escape(station_id)}"
+    response = fetch_utf8(station_info_url)
+    data = JSON.parse(response)
+    station = Array(data).first
+    next unless station && !blank_value?(station["name_cn"])
+
+    record = station_record(records, station["name_cn"])
+    add_source(record, station_info_url)
+    accessibility = ensure_accessibility(record, "shanghai_metro_official")
+
+    begin
+      elevator_data = JSON.parse(station["elevator"].to_s)
+      Array(elevator_data["line"]).each do |line|
+        Array(line["elevator"]).each do |elevator|
+          description = elevator["description"]
+          next if blank_value?(description)
+
+          accessibility["hasElevator"] = true
+          accessibility["elevatorLocations"] << description unless accessibility["elevatorLocations"].include?(description)
+          add_facility_note(accessibility, "无障碍电梯：#{description}")
+          add_station_facility(record, "elevator", "无障碍电梯", description)
+        end
+      end
+    rescue JSON::ParserError
+      nil
+    end
+
+    begin
+      toilet_data = JSON.parse(station["toilet_position"].to_s)
+      Array(toilet_data["toilet"]).each do |toilet|
+        description = toilet["description"]
+        next if blank_value?(description)
+
+        if toilet["icon2"].to_s != "w_os.png"
+          accessibility["hasAccessibleRestroom"] = true
+          add_facility_note(accessibility, "无障碍卫生间：#{description}")
+          add_station_facility(record, "accessibleRestroom", "无障碍卫生间", description)
+        else
+          add_station_facility(record, "restroom", "卫生间", description)
+        end
+      end
+    rescue JSON::ParserError
+      nil
+    end
+  rescue StandardError => error
+    warn "Skipping Shanghai station #{station_id}: #{error.message}"
+  end
+
+  write_pack(
+    city_id: "3100",
+    version: "shanghai-official-#{VERSION_DATE}",
+    source_urls: SHANGHAI_SOURCE_URLS,
+    capabilities: {
+      "accessibility" => records.values.any? { |record| record["accessibility"] } ? "official_static" : "source_pending",
+      "schedules" => "official_static",
+      "liveArrivals" => "schedule_only",
+      "stationMaps" => "source_pending"
+    },
+    live_provider: "schedule_only",
+    source_attribution: "上海地铁官方数据",
+    records: records
+  )
+end
+
+def guangzhou_facility_type(name)
+  normalized = name.to_s.strip
+  return "elevator" if normalized.include?("电梯") || normalized.include?("升降机")
+  return "escalator" if normalized.include?("扶梯")
+  return "ramp" if normalized.include?("斜坡") || normalized.include?("坡道")
+  return "tactilePath" if normalized.include?("盲道")
+  return "accessibleRestroom" if normalized.include?("无障碍") && normalized.match?(/公厕|卫生间|厕所/)
+  return "restroom" if normalized.match?(/公厕|卫生间|厕所/)
+  return "aed" if normalized.match?(/AED|急救/i)
+  return "motherBabyRoom" if normalized.include?("母婴")
+  return "serviceCenter" if normalized.match?(/客服|服务/)
+  return "general"
+end
+
+def import_guangzhou
+  records = {}
+  line_station_data = Array(post_guangzhou_api("/app-map/metroweb/linestation"))
+  station_names = Set.new
+  line_station_data.each do |line|
+    line_name = line["lineName"]
+    Array(line["stations"]).each do |station|
+      name = normalize_station_name(station["stationName"])
+      next if blank_value?(name)
+
+      station_names << name
+      record = station_record(records, name)
+      add_source(record, "#{GUANGZHOU_API_BASE}/app-map/metroweb/linestation")
+      Array(station["hcLines"]).each { |hc_line| add_source(record, "#{GUANGZHOU_API_BASE}/app-map/metroweb/linestation") if hc_line["lineName"] }
+      record["stationID"] ||= station["stationId"].to_s if station["stationId"]
+    end
+  end
+
+  station_names.each do |station_name|
+    encoded_name = CGI.escape(station_name)
+    record = station_record(records, station_name)
+
+    Array(post_guangzhou_api("/app-map/serviceTime/list/#{encoded_name}")).each do |row|
+      add_source(record, "#{GUANGZHOU_API_BASE}/app-map/serviceTime/list/#{station_name}")
+      add_schedule(record, row["lineCn"], "开往 #{row["toStationName"]}", row["startTime"], row["endTime"])
+    end
+
+    Array(post_guangzhou_api("/app-map/station/getDevice/#{encoded_name}")).each do |device|
+      name = device["nameCN"].to_s.strip
+      location = device["locationCN"].to_s.strip
+      next if blank_value?(name) || blank_value?(location)
+
+      add_source(record, "#{GUANGZHOU_API_BASE}/app-map/station/getDevice/#{station_name}")
+      type = guangzhou_facility_type(name)
+      add_station_facility(record, type, name, location)
+
+      accessibility = ensure_accessibility(record, "guangzhou_metro_official") if %w[elevator escalator ramp tactilePath accessibleRestroom].include?(type)
+      next unless accessibility
+
+      case type
+      when "elevator"
+        accessibility["hasElevator"] = true
+        accessibility["elevatorLocations"] << location unless accessibility["elevatorLocations"].include?(location)
+      when "escalator"
+        accessibility["hasEscalator"] = true
+      when "ramp"
+        accessibility["hasWheelchairRamp"] = true
+        accessibility["accessibleEntrances"] << location unless accessibility["accessibleEntrances"].include?(location)
+      when "tactilePath"
+        accessibility["hasTactilePath"] = true
+      when "accessibleRestroom"
+        accessibility["hasAccessibleRestroom"] = true
+      end
+      add_facility_note(accessibility, "#{name}：#{location}")
+    end
+  rescue StandardError => error
+    warn "Skipping Guangzhou station #{station_name}: #{error.message}"
+  end
+
+  write_pack(
+    city_id: "4401",
+    version: "guangzhou-official-#{VERSION_DATE}",
+    source_urls: GUANGZHOU_SOURCE_URLS,
+    capabilities: {
+      "accessibility" => records.values.any? { |record| record["accessibility"] } ? "official_static" : "source_pending",
+      "schedules" => "official_static",
+      "liveArrivals" => "schedule_only",
+      "stationMaps" => "source_pending"
+    },
+    live_provider: "schedule_only",
+    source_attribution: "广州地铁官方数据",
+    records: records
+  )
+end
+
+import_shanghai
+import_guangzhou
 import_shenzhen
 import_chengdu
 import_hangzhou

@@ -13,21 +13,23 @@ final class StationSearchViewModel {
     var filter = StationFilter()
 
     private let stationSearchService: StationSearchService
-    private let accessibilityService: AccessibilityService
+    private let locationService: LocationService
     private let recentSearchesKey = "recentStationSearches"
+    private var hasRequestedSearchLocation = false
 
     init(
         stationSearchService: StationSearchService,
-        accessibilityService: AccessibilityService
+        locationService: LocationService
     ) {
         self.stationSearchService = stationSearchService
-        self.accessibilityService = accessibilityService
+        self.locationService = locationService
         recentSearches = UserDefaults.standard.codableValue(forKey: recentSearchesKey, as: [SearchHistory].self, default: [])
     }
 
     func loadInitialStations(city: String) async {
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard !city.isEmpty else { return }
+        await refreshLocationIfAlreadyAllowed()
 
         do {
             unfilteredResults = try await stationSearchService.search(keyword: "", city: city)
@@ -46,6 +48,7 @@ final class StationSearchViewModel {
         isSearching = true
         errorMessage = nil
         defer { isSearching = false }
+        await refreshLocationIfAlreadyAllowed()
 
         do {
             let results = try await stationSearchService.search(keyword: searchText, city: city)
@@ -78,8 +81,14 @@ final class StationSearchViewModel {
         applyFilters()
     }
 
-    func accessibilityLabel(for station: Station) -> String {
-        accessibilityService.stationAccessibilityLabel(station)
+    func distanceText(for station: Station) -> String? {
+        guard let location = locationService.currentLocation else { return nil }
+        let meters = station.coordinate.distance(to: location.coordinate)
+        return AppLocalization.text(
+            english: "\(AppLocalization.distance(meters)) from here",
+            simplified: "距当前位置 \(AppLocalization.distance(meters))",
+            traditional: "距目前位置 \(AppLocalization.distance(meters))"
+        )
     }
 
     func selectStation(_ station: Station) {
@@ -100,6 +109,19 @@ final class StationSearchViewModel {
 
     private func applyFilters() {
         searchResults = stationSearchService.filterStations(unfilteredResults, by: filter)
-        searchResults.sort { $0.localizedName < $1.localizedName }
+        if let location = locationService.currentLocation {
+            searchResults.sort {
+                $0.coordinate.distance(to: location.coordinate) < $1.coordinate.distance(to: location.coordinate)
+            }
+        } else {
+            searchResults.sort { $0.localizedName < $1.localizedName }
+        }
+    }
+
+    private func refreshLocationIfAlreadyAllowed() async {
+        guard locationService.isAuthorized else { return }
+        guard !hasRequestedSearchLocation || locationService.currentLocation == nil else { return }
+        hasRequestedSearchLocation = true
+        _ = try? await locationService.requestCurrentLocation()
     }
 }

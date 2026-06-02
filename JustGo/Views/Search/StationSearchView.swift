@@ -36,7 +36,7 @@ struct StationSearchView: View {
             if viewModel == nil {
                 viewModel = StationSearchViewModel(
                     stationSearchService: container.stationSearchService,
-                    accessibilityService: container.accessibilityService
+                    locationService: container.locationService
                 )
             }
             await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
@@ -103,8 +103,8 @@ struct StationSearchView: View {
                             }
                         }
                         Spacer()
-                        if let line = station.lines.first {
-                            Text(line.localizedName)
+                        if let distance = viewModel?.distanceText(for: station) {
+                            Text(distance)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -145,7 +145,7 @@ struct StationSearchView: View {
 
                 FilterChip(
                     title: "Transfer",
-                    icon: "arrow.triangle.branch",
+                    icon: "arrow.triangle.2.circlepath",
                     isSelected: viewModel?.filter.transferOnly ?? false
                 ) {
                     viewModel?.toggleTransferFilter()
@@ -167,7 +167,10 @@ struct StationSearchView: View {
                 }
             } else if let results = viewModel?.searchResults, !results.isEmpty {
                 ForEach(results) { station in
-                    StationRow(station: station) {
+                    StationRow(
+                        station: station,
+                        distanceText: viewModel?.distanceText(for: station)
+                    ) {
                         viewModel?.selectStation(station)
                         selectedStation = station
                         showStationDetail = true
@@ -194,9 +197,6 @@ struct StationSearchView: View {
                         .foregroundStyle(.secondary)
                     Text(search.stationName)
                     Spacer()
-                    Text(search.cityID)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
             .onDelete { offsets in

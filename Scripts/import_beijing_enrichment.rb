@@ -17,6 +17,7 @@ FIRST_LAST_URL = "#{BASE_URL}/station/smcsj/"
 BJ_SUBWAY_FACILITY_SEED_URL = "#{BASE_URL}/station/fwss/line5/2013-08-21/50.html"
 BJMTR_LINE_URLS = %w[
   https://www.mtr.bj.cn/service/line/line-4.html
+  https://www.mtr.bj.cn/service/line/line-daxing.html
   https://www.mtr.bj.cn/service/line/line-14.html
   https://www.mtr.bj.cn/service/line/line-16.html
   https://www.mtr.bj.cn/service/line/line-17.html

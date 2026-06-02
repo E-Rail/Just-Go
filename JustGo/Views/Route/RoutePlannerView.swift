@@ -3,10 +3,13 @@ import SwiftUI
 struct RoutePlannerView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var viewModel: RoutePlannerViewModel?
     @State private var showResults = false
     @FocusState private var focusedField: RouteInputField?
     @State private var showCityPicker = false
+    @State private var showSaveCurrentTrip = false
+    @State private var savedTripName = ""
 
     var body: some View {
         NavigationStack {
@@ -16,7 +19,11 @@ struct RoutePlannerView: View {
                         citySelector
                         routeInputSection
                         quickTagsSection
+                        if !tripMemoryService.savedTrips.isEmpty {
+                            savedTripsSection
+                        }
                         accessibilityFiltersSection
+                        saveCurrentTripButton
                         searchButton
                         if viewModel?.recentRoutes.isEmpty == false {
                             recentRoutesSection
@@ -46,6 +53,9 @@ struct RoutePlannerView: View {
                 if let viewModel = viewModel {
                     RouteResultsView(viewModel: viewModel)
                 }
+            }
+            .sheet(isPresented: $showSaveCurrentTrip) {
+                saveCurrentTripSheet
             }
         }
         .task {
@@ -311,6 +321,60 @@ struct RoutePlannerView: View {
         }
     }
 
+    private var savedTripsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(AppLocalization.localized("Saved Trips"))
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
+                        Button {
+                            _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                            viewModel?.useSavedTrip(trip)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(trip.name)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .lineLimit(1)
+                                Text(trip.routeTitle)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                                if trip.hasAccessibilityOverrides {
+                                    Label(AppLocalization.localized("Accessibility overrides"), systemImage: "accessibility")
+                                        .font(.caption2)
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                            .frame(width: 180, alignment: .leading)
+                            .padding()
+                            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private var saveCurrentTripButton: some View {
+        Button {
+            savedTripName = defaultSavedTripName
+            showSaveCurrentTrip = true
+        } label: {
+            Label(AppLocalization.localized("Save this trip"), systemImage: "bookmark")
+                .font(.subheadline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel?.canSearch != true)
+        .opacity(viewModel?.canSearch == true ? 1 : 0.55)
+    }
+
     private var searchButton: some View {
         Button(action: {
             Task {
@@ -375,5 +439,62 @@ struct RoutePlannerView: View {
             .frame(minHeight: 80, maxHeight: 220)
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+    }
+
+    private var saveCurrentTripSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField(AppLocalization.localized("Trip name"), text: $savedTripName)
+                    Text(defaultSavedTripName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text(AppLocalization.localized("Saved Trip"))
+                }
+
+                Section {
+                    Label(AppLocalization.localized("Accessibility filters will be saved with this trip."), systemImage: "accessibility")
+                }
+            }
+            .navigationTitle(AppLocalization.localized("Save Trip"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) {
+                        showSaveCurrentTrip = false
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(AppLocalization.localized("Save")) {
+                        saveCurrentTrip()
+                    }
+                    .disabled(viewModel?.canSearch != true)
+                }
+            }
+        }
+    }
+
+    private var defaultSavedTripName: String {
+        let origin = viewModel?.originSnapshot()?.name ?? AppLocalization.localized("Origin")
+        let destination = viewModel?.destinationSnapshot()?.name ?? AppLocalization.localized("Destination")
+        return "\(origin) -> \(destination)"
+    }
+
+    private func saveCurrentTrip() {
+        guard let city = appState.selectedCity,
+              let origin = viewModel?.originSnapshot(),
+              let destination = viewModel?.destinationSnapshot(),
+              let filter = viewModel?.accessibilityFilter else { return }
+
+        tripMemoryService.createSavedTrip(
+            name: savedTripName,
+            origin: origin,
+            destination: destination,
+            city: city,
+            preferredStrategy: nil,
+            accessibilityFilter: filter
+        )
+        showSaveCurrentTrip = false
     }
 }

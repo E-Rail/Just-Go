@@ -2,6 +2,9 @@ import SwiftUI
 
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
+    @Environment(DIContainer.self) private var container
+    @Environment(AccessibilityReportService.self) private var accessibilityReportService
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var selectedRoute: Route?
     @State private var showRouteDetail = false
 
@@ -63,7 +66,18 @@ struct RouteResultsView: View {
     private var routesSection: some View {
         Section {
             ForEach(viewModel.routes) { route in
-                RouteCard(route: route) {
+                RouteCard(
+                    route: route,
+                    feasibility: container.routeFeasibilityService.feasibility(
+                        for: route,
+                        personalReports: accessibilityReportService.reports(affecting: route)
+                    )
+                ) {
+                    _ = tripMemoryService.recordPlannedTrip(
+                        route: route,
+                        cityID: viewModel.selectedCity?.id ?? "",
+                        accessibilityFilter: viewModel.accessibilityFilter
+                    )
                     selectedRoute = route
                     showRouteDetail = true
                 }
@@ -98,6 +112,7 @@ struct SortChip: View {
 
 struct RouteCard: View {
     let route: Route
+    let feasibility: RouteFeasibility
     let action: () -> Void
 
     var body: some View {
@@ -115,17 +130,7 @@ struct RouteCard: View {
 
                     Spacer()
 
-                    if route.isFullyAccessible {
-                        HStack(spacing: 4) {
-                            Image(systemName: "figure.roll")
-                            Text(AppLocalization.localized("Accessible"))
-                        }
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.green.opacity(0.2), in: Capsule())
-                        .foregroundStyle(.green)
-                    }
+                    feasibilityBadge
                 }
 
                 // Route segments preview
@@ -148,14 +153,15 @@ struct RouteCard: View {
                 }
 
                 // Warnings
-                if !route.warnings.isEmpty {
-                    ForEach(route.warnings) { warning in
+                let explanations = Array(feasibility.allExplanations.prefix(2))
+                if !explanations.isEmpty {
+                    ForEach(explanations, id: \.self) { explanation in
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
-                            Text(warning.message)
+                                .foregroundStyle(feasibility.level.warningColor)
+                            Text(explanation)
                                 .font(.caption)
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(feasibility.level.warningColor)
                         }
                     }
                 }
@@ -192,6 +198,50 @@ struct RouteCard: View {
         .foregroundStyle(.secondary)
     }
 
+    private var feasibilityBadge: some View {
+        HStack(spacing: 4) {
+            Image(systemName: feasibility.level.iconName)
+            Text(feasibility.title)
+        }
+        .font(.caption)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(feasibility.level.color.opacity(0.16), in: Capsule())
+        .foregroundStyle(feasibility.level.color)
+    }
+
+}
+
+private extension RouteFeasibilityLevel {
+    var color: Color {
+        switch self {
+        case .good:
+            return .green
+        case .caution:
+            return .orange
+        case .risky:
+            return .red
+        case .unknown:
+            return .gray
+        }
+    }
+
+    var warningColor: Color {
+        self == .risky ? .red : .orange
+    }
+
+    var iconName: String {
+        switch self {
+        case .good:
+            return "checkmark.circle.fill"
+        case .caution:
+            return "exclamationmark.triangle.fill"
+        case .risky:
+            return "xmark.octagon.fill"
+        case .unknown:
+            return "questionmark.circle.fill"
+        }
+    }
 }
 
 struct RouteStationTimeline: View {

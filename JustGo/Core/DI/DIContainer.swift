@@ -6,40 +6,51 @@ final class DIContainer {
     let aMapService: AMapService
     let routePlanningService: RoutePlanningService
     let stationSearchService: StationSearchService
-    let accessibilityService: AccessibilityService
     let cityService: CityService
+    let tripMemoryService: TripMemoryService
+    let accessibilityReportService: AccessibilityReportService
+    let routeFeasibilityService: RouteFeasibilityService
 
     init(
         locationService: LocationService,
         aMapService: AMapService,
         routePlanningService: RoutePlanningService,
         stationSearchService: StationSearchService,
-        accessibilityService: AccessibilityService,
-        cityService: CityService
+        cityService: CityService,
+        tripMemoryService: TripMemoryService,
+        accessibilityReportService: AccessibilityReportService,
+        routeFeasibilityService: RouteFeasibilityService
     ) {
         self.locationService = locationService
         self.aMapService = aMapService
         self.routePlanningService = routePlanningService
         self.stationSearchService = stationSearchService
-        self.accessibilityService = accessibilityService
         self.cityService = cityService
+        self.tripMemoryService = tripMemoryService
+        self.accessibilityReportService = accessibilityReportService
+        self.routeFeasibilityService = routeFeasibilityService
     }
 
+    @MainActor
     static func configure() -> DIContainer {
         let locationService = LocationService()
         let aMapService = AMapService()
-        let accessibilityService = AccessibilityService()
         let stationSearchService = StationSearchService(aMapService: aMapService)
         let routePlanningService = RoutePlanningService(aMapService: aMapService)
         let cityService = CityService(aMapService: aMapService)
+        let tripMemoryService = TripMemoryService()
+        let accessibilityReportService = AccessibilityReportService()
+        let routeFeasibilityService = RouteFeasibilityService()
 
         return DIContainer(
             locationService: locationService,
             aMapService: aMapService,
             routePlanningService: routePlanningService,
             stationSearchService: stationSearchService,
-            accessibilityService: accessibilityService,
-            cityService: cityService
+            cityService: cityService,
+            tripMemoryService: tripMemoryService,
+            accessibilityReportService: accessibilityReportService,
+            routeFeasibilityService: routeFeasibilityService
         )
     }
 }

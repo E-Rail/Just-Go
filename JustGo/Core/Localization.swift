@@ -174,8 +174,8 @@ extension RouteSegment {
         switch type {
         case .walking:
             return AppLocalization.text(
-                english: "Walk \(AppLocalization.minutes(Int(duration / 60)))",
-                chinese: "步行 \(AppLocalization.minutes(Int(duration / 60)))"
+                english: "Walk \(AppLocalization.distance(distance))",
+                chinese: "步行 \(AppLocalization.distance(distance))"
             )
         case .subway:
             return "\(lineName ?? AppLocalization.localized("Subway")) • \(AppLocalization.stops(stops))"

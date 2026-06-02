@@ -5,7 +5,12 @@ struct StationDetailView: View {
     @Environment(DIContainer.self) private var container
     @State private var viewModel: StationDetailViewModel?
     @State private var selectedStationImage: FullScreenStationImage?
-    @Environment(AccessibilityService.self) private var accessibilityService
+    @State private var showStationReport = false
+    @State private var reportItemType: VerificationItemType = .elevator
+    @State private var reportStatus: VerificationStatus = .outOfService
+    @State private var reportSeverity: AccessibilityReportSeverity = .medium
+    @State private var reportNote = ""
+    @Environment(AccessibilityReportService.self) private var accessibilityReportService
 
     var body: some View {
         ScrollView {
@@ -13,6 +18,7 @@ struct StationDetailView: View {
                 stationHeader
                 linesSection
                 accessibilitySection
+                stationEssentialsSection
                 arrivalsSection
                 serviceStatusSection
                 stationMapSection
@@ -29,6 +35,9 @@ struct StationDetailView: View {
         }
         .fullScreenCover(item: $selectedStationImage) { image in
             FullScreenStationImageView(image: image)
+        }
+        .sheet(isPresented: $showStationReport) {
+            stationReportSheet
         }
     }
 
@@ -51,7 +60,7 @@ struct StationDetailView: View {
                     Spacer()
 
                     if station.isTransferStation {
-                        Text(AppLocalization.localized("Transfer"))
+                        Label(AppLocalization.localized("Transfer"), systemImage: "arrow.triangle.2.circlepath")
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -195,27 +204,18 @@ struct StationDetailView: View {
             }
         }
 
-        if accessibility.hasFacilityRows {
+        if accessibility.accessibleRestroomAvailability != .unknown {
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalization.localized("Station Facilities"))
                     .font(.subheadline)
                     .fontWeight(.medium)
 
-                if accessibility.accessibleRestroomAvailability != .unknown {
-                    accessibilityRow(
-                        icon: "figure.roll",
-                        title: "Accessible Restroom",
-                        subtitle: accessibility.accessibleRestroomAvailability.localizedStatusText,
-                        status: AccessibilityStatus(accessibility.accessibleRestroomAvailability)
-                    )
-                }
-
-                ForEach(accessibility.facilityNotes, id: \.self) { note in
-                    Label(note, systemImage: "info.circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                accessibilityRow(
+                    icon: "figure.roll",
+                    title: "Accessible Restroom",
+                    subtitle: accessibility.accessibleRestroomAvailability.localizedStatusText,
+                    status: AccessibilityStatus(accessibility.accessibleRestroomAvailability)
+                )
             }
         }
 
@@ -368,6 +368,81 @@ struct StationDetailView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var stationEssentialsSection: some View {
+        let station = displayedStation
+        let personalReports = accessibilityReportService.reports(for: station)
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text(AppLocalization.localized("Station Essentials"))
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        reportItemType = .elevator
+                        reportStatus = .outOfService
+                        reportSeverity = .medium
+                        reportNote = ""
+                        showStationReport = true
+                    } label: {
+                        Image(systemName: "exclamationmark.bubble")
+                            .imageScale(.medium)
+                    }
+                    .accessibilityLabel(AppLocalization.localized("Report station issue"))
+                }
+
+                if !station.facilities.isEmpty {
+                    ForEach(station.facilities) { facility in
+                        facilityRow(facility)
+                    }
+                } else {
+                    Text(AppLocalization.localized("Official station facilities are pending for this station."))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                if !personalReports.isEmpty {
+                    Divider()
+                    Text(AppLocalization.localized("Your Reports"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    ForEach(personalReports.prefix(3)) { report in
+                        Label("\(report.itemType.title): \(report.displayNote)", systemImage: "person.crop.circle.badge.exclamationmark")
+                            .font(.caption)
+                            .foregroundStyle(report.status.isProblem ? .orange : .secondary)
+                    }
+                }
+
+                Text(station.facilities.isEmpty ? AppLocalization.localized("Source pending") : AppLocalization.localized("Official city data"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func facilityRow(_ facility: StationFacility) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: facility.type.iconName)
+                .foregroundStyle(facility.type.isAccessibilityCritical ? .green : .blue)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(facility.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                if let location = facility.locationText, !location.isEmpty {
+                    Text(location)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("\(facility.source.label) • \(facility.verification.label)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
         }
     }
 
@@ -530,6 +605,56 @@ struct StationDetailView: View {
     private var displayedStation: Station {
         viewModel?.station ?? station
     }
+
+    private var stationReportSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker(AppLocalization.localized("Facility"), selection: $reportItemType) {
+                        ForEach(VerificationItemType.allCases.filter { $0 != .routeConcern }, id: \.self) { item in
+                            Text(item.title).tag(item)
+                        }
+                    }
+                    Picker(AppLocalization.localized("Status"), selection: $reportStatus) {
+                        ForEach(VerificationStatus.allCases.filter { $0 != .note }, id: \.self) { status in
+                            Text(status.title).tag(status)
+                        }
+                    }
+                    Picker(AppLocalization.localized("Severity"), selection: $reportSeverity) {
+                        ForEach(AccessibilityReportSeverity.allCases, id: \.self) { severity in
+                            Text(severity.title).tag(severity)
+                        }
+                    }
+                    TextEditor(text: $reportNote)
+                        .frame(minHeight: 120)
+                } header: {
+                    Text(AppLocalization.localized("Personal Station Report"))
+                } footer: {
+                    Text(AppLocalization.localized("This stays on your device and is not shown as official data."))
+                }
+            }
+            .navigationTitle(AppLocalization.localized("Report Station Issue"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) { showStationReport = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(AppLocalization.localized("Save")) {
+                        accessibilityReportService.createStationReport(
+                            cityID: displayedStation.cityID,
+                            station: displayedStation,
+                            itemType: reportItemType,
+                            status: reportStatus,
+                            severity: reportSeverity,
+                            note: reportNote
+                        )
+                        showStationReport = false
+                    }
+                }
+            }
+        }
+    }
 }
 
 private struct FullScreenStationImage: Identifiable {
@@ -610,9 +735,6 @@ private extension StationAccessibility {
         visualAnnouncementAvailability != .unknown
     }
 
-    var hasFacilityRows: Bool {
-        accessibleRestroomAvailability != .unknown || !facilityNotes.isEmpty
-    }
 }
 
 enum AccessibilityStatus {

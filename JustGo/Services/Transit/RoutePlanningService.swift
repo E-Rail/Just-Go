@@ -181,4 +181,15 @@ enum RouteSortStrategy: CaseIterable, Identifiable {
             return "accessibility"
         }
     }
+
+    init(routeStrategy: RouteStrategy) {
+        switch routeStrategy {
+        case .metroFirst:
+            self = .metroFirst
+        case .fastest:
+            self = .fastest
+        case .leastWalking:
+            self = .leastWalking
+        }
+    }
 }

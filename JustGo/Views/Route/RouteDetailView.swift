@@ -2,8 +2,15 @@ import SwiftUI
 
 struct RouteDetailView: View {
     let route: Route
-    @State private var showNavigation = false
-    @Environment(AccessibilityService.self) private var accessibilityService
+    @State private var showRouteReport = false
+    @State private var showTripNote = false
+    @State private var tripNote = ""
+    @State private var routeReportNote = ""
+    @State private var routeReportSeverity: AccessibilityReportSeverity = .medium
+    @Environment(DIContainer.self) private var container
+    @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(AccessibilityReportService.self) private var accessibilityReportService
 
     var body: some View {
         ScrollView {
@@ -11,16 +18,20 @@ struct RouteDetailView: View {
                 routeSummaryCard
                 routeMapPreview
                 accessGuidanceCard
+                routeFeasibilityCard
                 accessibilityInfoCard
                 segmentsTimeline
-                startNavigationButton
+                riderTrustActions
             }
             .padding()
         }
         .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showNavigation) {
-            RouteNavigationView(route: route)
+        .sheet(isPresented: $showRouteReport) {
+            routeReportSheet
+        }
+        .sheet(isPresented: $showTripNote) {
+            tripNoteSheet
         }
     }
 
@@ -126,6 +137,51 @@ struct RouteDetailView: View {
         }
     }
 
+    private var routeFeasibilityCard: some View {
+        let feasibility = currentFeasibility
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label(feasibility.title, systemImage: feasibility.level.iconName)
+                        .font(.headline)
+                        .foregroundStyle(feasibility.level.color)
+                    Spacer()
+                    if feasibility.estimatedExtraMinutes > 0 {
+                        Text(AppLocalization.text(
+                            english: "+\(feasibility.estimatedExtraMinutes) min possible",
+                            chinese: "可能增加\(feasibility.estimatedExtraMinutes)分钟"
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+
+                if let bottleneck = feasibility.bottleneck {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(AppLocalization.localized("Bottleneck"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Text("\(bottleneck.segmentTitle): \(bottleneck.reason)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                ForEach(feasibility.allExplanations.prefix(4), id: \.self) { explanation in
+                    Label(explanation, systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                if feasibility.allExplanations.isEmpty {
+                    Text(AppLocalization.localized("No accessibility concerns found from available data."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
     @ViewBuilder
     private var accessGuidanceCard: some View {
         if !route.accessGuidance.isEmpty {
@@ -210,9 +266,11 @@ struct RouteDetailView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Text(segment.formattedDuration)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if segment.duration >= 60 {
+                    Text(segment.formattedDuration)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 if let firstDirection = segment.walkingDirections?.first?.instruction,
                    segment.type == .walking {
@@ -255,19 +313,110 @@ struct RouteDetailView: View {
         }
     }
 
-    private var startNavigationButton: some View {
-        Button(action: { showNavigation = true }) {
-            HStack {
-                Image(systemName: "location.fill")
-                Text(AppLocalization.localized("Start Navigation"))
-                    .fontWeight(.semibold)
+    private var riderTrustActions: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.localized("Rider Notes"))
+                    .font(.headline)
+
+                Button {
+                    tripNote = ""
+                    showTripNote = true
+                } label: {
+                    Label(AppLocalization.localized("Mark complete or add trip note"), systemImage: "checkmark.circle")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                Button {
+                    routeReportNote = ""
+                    routeReportSeverity = .medium
+                    showRouteReport = true
+                } label: {
+                    Label(AppLocalization.localized("Report route issue"), systemImage: "exclamationmark.bubble")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
         }
+    }
+
+    private var routeReportSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker(AppLocalization.localized("Severity"), selection: $routeReportSeverity) {
+                        ForEach(AccessibilityReportSeverity.allCases, id: \.self) { severity in
+                            Text(severity.title).tag(severity)
+                        }
+                    }
+
+                    TextEditor(text: $routeReportNote)
+                        .frame(minHeight: 120)
+                } header: {
+                    Text(AppLocalization.localized("Route Issue"))
+                } footer: {
+                    Text(AppLocalization.localized("This stays on your device and affects your own route warnings."))
+                }
+            }
+            .navigationTitle(AppLocalization.localized("Report Route Issue"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) { showRouteReport = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(AppLocalization.localized("Save")) {
+                        accessibilityReportService.createRouteReport(
+                            cityID: appState.selectedCity?.id ?? "",
+                            route: route,
+                            status: .note,
+                            severity: routeReportSeverity,
+                            note: routeReportNote
+                        )
+                        showRouteReport = false
+                    }
+                    .disabled(routeReportNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+    }
+
+    private var tripNoteSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextEditor(text: $tripNote)
+                        .frame(minHeight: 120)
+                } header: {
+                    Text(AppLocalization.localized("Trip Note"))
+                } footer: {
+                    Text(AppLocalization.localized("Trip history is stored locally on this device."))
+                }
+            }
+            .navigationTitle(AppLocalization.localized("Complete Trip"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) { showTripNote = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(AppLocalization.localized("Save")) {
+                        tripMemoryService.markTripComplete(
+                            route: route,
+                            cityID: appState.selectedCity?.id ?? "",
+                            note: tripNote
+                        )
+                        showTripNote = false
+                    }
+                }
+            }
+        }
+    }
+
+    private var currentFeasibility: RouteFeasibility {
+        container.routeFeasibilityService.feasibility(
+            for: route,
+            personalReports: accessibilityReportService.reports(affecting: route)
+        )
     }
 }
 
@@ -288,5 +437,33 @@ struct StatItem: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+private extension RouteFeasibilityLevel {
+    var color: Color {
+        switch self {
+        case .good:
+            return .green
+        case .caution:
+            return .orange
+        case .risky:
+            return .red
+        case .unknown:
+            return .gray
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .good:
+            return "checkmark.circle.fill"
+        case .caution:
+            return "exclamationmark.triangle.fill"
+        case .risky:
+            return "xmark.octagon.fill"
+        case .unknown:
+            return "questionmark.circle.fill"
+        }
     }
 }

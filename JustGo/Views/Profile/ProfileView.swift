@@ -1,16 +1,18 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
     @State private var showAccessibilitySettings = false
     @State private var showTransitData = false
+    @State private var showTripMemory = false
+    @State private var showReports = false
     @State private var showSettings = false
 
     var body: some View {
         NavigationStack {
             List {
                 accessibilitySection
+                riderTrustSection
                 transitDataSection
                 settingsSection
                 aboutSection
@@ -22,6 +24,12 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showTransitData) {
                 TransitDataView()
+            }
+            .sheet(isPresented: $showTripMemory) {
+                TripMemoryView()
+            }
+            .sheet(isPresented: $showReports) {
+                AccessibilityReportsView()
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
@@ -80,6 +88,38 @@ struct ProfileView: View {
             Text(AppLocalization.localized("Data Source"))
         } footer: {
             Text(AppLocalization.localized("Routes use AMap; station accessibility, schedules, and official images use downloadable city packs where available."))
+        }
+    }
+
+    private var riderTrustSection: some View {
+        Section {
+            Button(action: { showTripMemory = true }) {
+                HStack {
+                    Image(systemName: "bookmark.fill")
+                        .foregroundStyle(.blue)
+                    Text(AppLocalization.localized("My Trips"))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Button(action: { showReports = true }) {
+                HStack {
+                    Image(systemName: "person.crop.circle.badge.exclamationmark")
+                        .foregroundStyle(.orange)
+                    Text(AppLocalization.localized("My Reports"))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text(AppLocalization.localized("Rider Trust"))
+        } footer: {
+            Text(AppLocalization.localized("Saved trips, history, and reports stay on this device."))
         }
     }
 

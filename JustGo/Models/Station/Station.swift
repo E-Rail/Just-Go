@@ -16,6 +16,7 @@ final class Station: Identifiable {
     var lines: [SubwayLine]
     var accessibility: StationAccessibility?
     var exits: [StationExit]
+    var facilities: [StationFacility]
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -46,5 +47,6 @@ final class Station: Identifiable {
         self.poiIDs = []
         self.lines = []
         self.exits = []
+        self.facilities = []
     }
 }

@@ -5,7 +5,7 @@ final class CityService {
     private let aMapService: AMapService?
     private var cachedCities: [City]
 
-    private static let fallbackCities: [City] = [
+    private static let seedCities: [City] = [
         City(id: "1100", name: "北京", nameEn: "Beijing", namePinyin: "beijing", latitude: 39.9042, longitude: 116.4074, stationCount: 324, lineCount: 27),
         City(id: "3100", name: "上海", nameEn: "Shanghai", namePinyin: "shanghai", latitude: 31.2304, longitude: 121.4737, stationCount: 404, lineCount: 21),
         City(id: "4401", name: "广州", nameEn: "Guangzhou", namePinyin: "guangzhou", latitude: 23.1291, longitude: 113.2644, stationCount: 320, lineCount: 16),
@@ -18,7 +18,7 @@ final class CityService {
 
     init(aMapService: AMapService? = nil) {
         self.aMapService = aMapService
-        self.cachedCities = Self.fallbackCities
+        self.cachedCities = Self.loadBundledCities()
     }
 
     func getAllCities() -> [City] {
@@ -37,7 +37,7 @@ final class CityService {
                 cachedCities = cities
             }
         } catch {
-            cachedCities = Self.fallbackCities
+            cachedCities = Self.loadBundledCities()
         }
     }
 
@@ -49,4 +49,25 @@ final class CityService {
         }
     }
 
+}
+
+private extension CityService {
+    struct CityCatalog: Decodable {
+        let cities: [City]
+    }
+
+    static func loadBundledCities(bundle: Bundle = .main) -> [City] {
+        guard let url = bundle.url(forResource: "cities", withExtension: "json", subdirectory: "SubwayData") ??
+            bundle.url(forResource: "cities", withExtension: "json", subdirectory: "Resources/SubwayData") else {
+            return seedCities
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let catalog = try JSONDecoder().decode(CityCatalog.self, from: data)
+            return catalog.cities.isEmpty ? seedCities : catalog.cities
+        } catch {
+            return seedCities
+        }
+    }
 }

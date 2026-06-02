@@ -58,7 +58,7 @@ struct TransitMapView: UIViewRepresentable {
         private func syncContent(on mapView: MKMapView) {
             let nextSignature = [
                 parent.stations.map(\.stationID).joined(separator: ","),
-                parent.subwayLines.map(\.id).joined(separator: ","),
+                parent.subwayLines.map(\.renderSignature).joined(separator: ","),
                 parent.route?.id.uuidString ?? "no-route"
             ].joined(separator: "|")
 
@@ -106,9 +106,48 @@ struct TransitMapView: UIViewRepresentable {
 
         private func addPolyline(_ coordinates: [CLLocationCoordinate2D], colorHex: String, to mapView: MKMapView) {
             guard coordinates.count >= 2 else { return }
-            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+            let displayCoordinates = simplifiedCoordinates(coordinates)
+            let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))
             mapView.addOverlay(polyline, level: .aboveRoads)
+        }
+
+        private func simplifiedCoordinates(
+            _ coordinates: [CLLocationCoordinate2D],
+            maxPoints: Int = 520,
+            minDistanceMeters: Double = 12
+        ) -> [CLLocationCoordinate2D] {
+            guard coordinates.count > maxPoints else { return coordinates }
+
+            var simplified: [CLLocationCoordinate2D] = []
+            simplified.reserveCapacity(maxPoints)
+
+            for coordinate in coordinates {
+                guard let previous = simplified.last else {
+                    simplified.append(coordinate)
+                    continue
+                }
+
+                if previous.distance(to: coordinate) >= minDistanceMeters {
+                    simplified.append(coordinate)
+                }
+            }
+
+            if let last = coordinates.last {
+                let currentLast = simplified.last
+                if currentLast?.latitude != last.latitude || currentLast?.longitude != last.longitude {
+                    simplified.append(last)
+                }
+            }
+
+            if simplified.count > maxPoints {
+                let stride = max(1, simplified.count / maxPoints)
+                simplified = simplified.enumerated().compactMap { index, coordinate in
+                    index == 0 || index == simplified.count - 1 || index.isMultiple(of: stride) ? coordinate : nil
+                }
+            }
+
+            return simplified.count >= 2 ? simplified : coordinates
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -119,7 +158,7 @@ struct TransitMapView: UIViewRepresentable {
                 MKMarkerAnnotationView(annotation: stationAnnotation, reuseIdentifier: identifier)
             view.annotation = stationAnnotation
             view.markerTintColor = stationAnnotation.station.isTransferStation ? .systemOrange : .systemBlue
-            view.glyphImage = UIImage(systemName: stationAnnotation.station.isTransferStation ? "arrow.triangle.branch" : "tram.fill")
+            view.glyphImage = UIImage(systemName: stationAnnotation.station.isTransferStation ? "arrow.triangle.2.circlepath" : "tram.fill")
             view.canShowCallout = true
             view.displayPriority = stationAnnotation.station.isTransferStation ? .required : .defaultHigh
             return view
@@ -144,6 +183,19 @@ struct TransitMapView: UIViewRepresentable {
             renderer.lineJoin = .round
             return renderer
         }
+    }
+}
+
+private extension SubwayLineMapOverlay {
+    var renderSignature: String {
+        let first = coordinates.first
+        let last = coordinates.last
+        return [
+            id,
+            "\(coordinates.count)",
+            first.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) } ?? "no-first",
+            last.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) } ?? "no-last"
+        ].joined(separator: ":")
     }
 }
 

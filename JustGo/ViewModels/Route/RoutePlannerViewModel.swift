@@ -176,6 +176,36 @@ final class RoutePlannerViewModel {
         clearSuggestions()
     }
 
+    func useSavedTrip(_ savedTrip: SavedTrip) {
+        originName = savedTrip.origin.name
+        destinationName = savedTrip.destination.name
+        originPlace = savedTrip.origin.hasUsableRouteCoordinate ? savedTrip.origin.transitPlace : nil
+        destinationPlace = savedTrip.destination.hasUsableRouteCoordinate ? savedTrip.destination.transitPlace : nil
+        requiresWheelchairAccess = savedTrip.accessibilityFilter.requiresWheelchairAccess
+        requiresElevator = savedTrip.accessibilityFilter.requiresElevator
+        avoidStairs = savedTrip.accessibilityFilter.avoidStairs
+        if let preferredStrategy = savedTrip.preferredStrategy {
+            sortStrategy = RouteSortStrategy(routeStrategy: preferredStrategy)
+        }
+        clearSuggestions()
+    }
+
+    func originSnapshot() -> TransitPlaceSnapshot? {
+        if let originPlace {
+            return TransitPlaceSnapshot(place: originPlace)
+        }
+        let trimmed = originName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : TransitPlaceSnapshot(name: trimmed)
+    }
+
+    func destinationSnapshot() -> TransitPlaceSnapshot? {
+        if let destinationPlace {
+            return TransitPlaceSnapshot(place: destinationPlace)
+        }
+        let trimmed = destinationName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : TransitPlaceSnapshot(name: trimmed)
+    }
+
     func deleteRecentRoutes(at offsets: IndexSet) {
         recentRoutes.remove(atOffsets: offsets)
         UserDefaults.standard.setCodable(recentRoutes, forKey: recentRoutesKey)

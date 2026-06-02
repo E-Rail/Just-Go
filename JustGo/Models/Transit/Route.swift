@@ -184,7 +184,10 @@ struct RouteAccessGuide: Identifiable, Codable {
     }
 
     var formattedWalk: String {
-        "\(AppLocalization.distance(walkingDistance)) • \(AppLocalization.minutes(Int(walkingDuration / 60)))"
+        guard walkingDuration >= 60 else {
+            return AppLocalization.distance(walkingDistance)
+        }
+        return "\(AppLocalization.distance(walkingDistance)) • \(AppLocalization.minutes(Int(walkingDuration / 60)))"
     }
 }
 

@@ -4,6 +4,7 @@ struct StationRow: View {
     let station: Station
     var showDistance: Bool = false
     var distance: Double?
+    var distanceText: String?
     var action: (() -> Void)?
 
     var body: some View {
@@ -18,7 +19,7 @@ struct StationRow: View {
                             .fontWeight(.medium)
 
                         if station.isTransferStation {
-                            Text(AppLocalization.localized("Transfer"))
+                            Label(AppLocalization.localized("Transfer"), systemImage: "arrow.triangle.2.circlepath")
                                 .font(.caption)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -38,7 +39,11 @@ struct StationRow: View {
 
                 Spacer()
 
-                if showDistance, let distance = distance {
+                if let distanceText {
+                    Text(distanceText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if showDistance, let distance = distance {
                     Text(formatDistance(distance))
                         .font(.caption)
                         .foregroundStyle(.secondary)

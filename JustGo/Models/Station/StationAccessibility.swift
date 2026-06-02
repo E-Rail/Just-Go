@@ -109,8 +109,7 @@ final class StationAccessibility {
 
         return stationSpecificStates.contains { $0 != .unknown } ||
             !elevatorLocations.isEmpty ||
-            !accessibleEntrances.isEmpty ||
-            !facilityNotes.isEmpty
+            !accessibleEntrances.isEmpty
     }
 
     var hasUnverifiedCoreAccessibilityData: Bool {

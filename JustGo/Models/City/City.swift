@@ -14,6 +14,63 @@ struct City: Identifiable, Codable {
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
+
+    var dataCapabilities: CityDataCapabilities {
+        CityDataCapabilities.forCity(id)
+    }
+}
+
+struct CityDataCapabilities: Equatable {
+    let accessibility: CityDataCapabilityStatus
+    let stationEssentials: CityDataCapabilityStatus
+    let stationMap: CityDataCapabilityStatus
+
+    static func forCity(_ cityID: String) -> CityDataCapabilities {
+        switch cityID {
+        case "1100":
+            return CityDataCapabilities(accessibility: .available, stationEssentials: .available, stationMap: .available)
+        case "3100", "4401":
+            return CityDataCapabilities(accessibility: .available, stationEssentials: .available, stationMap: .pending)
+        case "3301":
+            return CityDataCapabilities(accessibility: .available, stationEssentials: .partial, stationMap: .pending)
+        case "4403", "5101":
+            return CityDataCapabilities(accessibility: .pending, stationEssentials: .pending, stationMap: .pending)
+        default:
+            return CityDataCapabilities(accessibility: .pending, stationEssentials: .pending, stationMap: .pending)
+        }
+    }
+}
+
+enum CityDataCapabilityStatus: String, Codable {
+    case available
+    case partial
+    case pending
+
+    var isAvailable: Bool {
+        self == .available || self == .partial
+    }
+
+    var iconName: String {
+        switch self {
+        case .available:
+            return "checkmark.circle.fill"
+        case .partial:
+            return "circle.lefthalf.filled"
+        case .pending:
+            return "clock"
+        }
+    }
+
+    var colorName: String {
+        switch self {
+        case .available:
+            return "green"
+        case .partial:
+            return "orange"
+        case .pending:
+            return "gray"
+        }
+    }
 }
 
 struct CitySubwaySystem: Codable {

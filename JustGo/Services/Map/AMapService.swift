@@ -96,7 +96,9 @@ final class AMapService {
     private let localDataStore = SubwayDataStore()
     private let cityPackStore = CityPackStore()
     private let urlSession: URLSession
+    private let lineOverlayDiskCache = LineOverlayDiskCache()
     private var lineOverlayCache: [String: [SubwayLineMapOverlay]] = [:]
+    private var cityPackEnrichedCityIDs: Set<String> = []
 
     init(urlSession: URLSession = .shared) {
         self.urlSession = urlSession
@@ -276,6 +278,7 @@ final class AMapService {
             let mergedData = existingAccessibilityData.merged(with: accessibilityData) ?? accessibilityData
             station.accessibility = StationAccessibility(stationID: station.stationID, data: mergedData)
         }
+        station.facilities = cityPackStation.stationFacilities(for: station)
 
         return station
     }
@@ -302,17 +305,26 @@ final class AMapService {
             return cached
         }
 
+        if let persisted = try? lineOverlayDiskCache.load(cityID: system.cityID),
+           !persisted.isEmpty {
+            lineOverlayCache[system.cityID] = persisted
+            return persisted
+        }
+
         if AMapConfiguration.apiKey.isEmpty == false,
            let liveOverlays = try? await amapLineOverlays(for: system) {
             if !liveOverlays.isEmpty {
-                lineOverlayCache[system.cityID] = liveOverlays
-                return liveOverlays
+                let displayOverlays = liveOverlays.map { $0.simplifiedForMap() }
+                lineOverlayCache[system.cityID] = displayOverlays
+                try? lineOverlayDiskCache.save(displayOverlays, cityID: system.cityID)
+                return displayOverlays
             }
         }
 
         let fallback = system.lineOverlays.isEmpty ? stationSequenceLineOverlays(for: system) : system.lineOverlays
-        lineOverlayCache[system.cityID] = fallback
-        return fallback
+        let displayFallback = fallback.map { $0.simplifiedForMap() }
+        lineOverlayCache[system.cityID] = displayFallback
+        return displayFallback
     }
 
     func searchPlaces(keyword: String, city: String, limit: Int) async throws -> [TransitPlace] {
@@ -654,7 +666,34 @@ final class AMapService {
     }
 
     private func subwaySystem(for city: String?) async throws -> LoadedSubwaySystem {
-        try await localDataStore.system(for: city, urlSession: urlSession)
+        let system = try await localDataStore.system(for: city, urlSession: urlSession)
+        return await systemEnrichedWithCityPack(system)
+    }
+
+    private func systemEnrichedWithCityPack(_ system: LoadedSubwaySystem) async -> LoadedSubwaySystem {
+        guard !cityPackEnrichedCityIDs.contains(system.cityID) else {
+            return system
+        }
+
+        let loadStatus = try? await cityPackStore.ensurePack(cityID: system.cityID, urlSession: urlSession)
+
+        for station in system.stations {
+            guard let cityPackStation = await cityPackStore.station(cityID: station.cityID, stationName: station.name) else {
+                continue
+            }
+
+            if let accessibilityData = cityPackStation.accessibilityData {
+                let existingAccessibilityData: AccessibilityData? = station.accessibility?.accessibilityData
+                let mergedData = existingAccessibilityData.merged(with: accessibilityData) ?? accessibilityData
+                station.accessibility = StationAccessibility(stationID: station.stationID, data: mergedData)
+            }
+            station.facilities = cityPackStation.stationFacilities(for: station)
+        }
+
+        if loadStatus != nil {
+            cityPackEnrichedCityIDs.insert(system.cityID)
+        }
+        return system
     }
 
     private func matches(station: Station, queryVariants: Set<String>) -> Bool {
@@ -797,13 +836,22 @@ final class AMapService {
     }
 
     private func uniqueRoutes(_ routes: [Route]) -> [Route] {
-        var seen: Set<String> = []
-        return routes.filter { route in
+        var bestRoutesByKey: [String: Route] = [:]
+        var orderedKeys: [String] = []
+
+        for route in routes {
             let key = route.deduplicationKey
-            guard !seen.contains(key) else { return false }
-            seen.insert(key)
-            return true
+            if let existing = bestRoutesByKey[key] {
+                if route.isBetterDuplicate(than: existing) {
+                    bestRoutesByKey[key] = route
+                }
+            } else {
+                bestRoutesByKey[key] = route
+                orderedKeys.append(key)
+            }
         }
+
+        return orderedKeys.compactMap { bestRoutesByKey[$0] }
     }
 
     private func amapLineOverlays(for system: LoadedSubwaySystem) async throws -> [SubwayLineMapOverlay] {
@@ -1046,6 +1094,9 @@ final class AMapService {
                         walkType: $0.walkType
                     )
                 }
+                guard shouldDisplayWalkingSegment(distance: walking.distanceValue, duration: walking.durationValue, steps: steps) else {
+                    continue
+                }
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .walking,
@@ -1280,10 +1331,7 @@ final class AMapService {
             ))
         }
 
-        if (filter.requiresWheelchairAccess || filter.requiresElevator) &&
-            (!fullyAccessible || accessGuidance.contains(where: { guide in
-                guide.accessPoint?.hasElevatorHint != true && guide.accessPoint?.isWheelchairLikely != true
-            })) {
+        if (filter.requiresWheelchairAccess || filter.requiresElevator) && !fullyAccessible {
             let missingStationData = accessGuidance.contains { guide in
                 guide.accessibilityNotes.contains(AppLocalization.localized("Step-free access not confirmed because station accessibility data is missing"))
             }
@@ -1330,6 +1378,20 @@ final class AMapService {
 
         var seen: Set<String> = []
         return notes.filter { seen.insert($0).inserted }
+    }
+
+    private func shouldDisplayWalkingSegment(distance: Double, duration: TimeInterval, steps: [WalkingStep]) -> Bool {
+        if distance >= 10 || duration >= 60 {
+            return true
+        }
+        return steps.contains { step in
+            step.hasStairs ||
+                step.hasRamp ||
+                step.hasElevator ||
+                step.hasEscalator ||
+                step.hasOverpass ||
+                step.hasUnderpass
+        }
     }
 
     private func station(for stop: RouteStationStop, system: LoadedSubwaySystem) -> Station? {
@@ -2031,6 +2093,86 @@ struct SubwayLineMapOverlay: Identifiable, Codable {
     var polylineCoordinates: [CLLocationCoordinate2D] {
         coordinates.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
     }
+
+    func simplifiedForMap(maxPoints: Int = 420, minDistanceMeters: Double = 14) -> SubwayLineMapOverlay {
+        guard coordinates.count > maxPoints else { return self }
+
+        var simplified: [CodableCoordinate] = []
+        simplified.reserveCapacity(min(coordinates.count, maxPoints))
+
+        for coordinate in coordinates {
+            guard let previous = simplified.last else {
+                simplified.append(coordinate)
+                continue
+            }
+
+            let previousLocation = CLLocationCoordinate2D(latitude: previous.latitude, longitude: previous.longitude)
+            let currentLocation = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            if previousLocation.distance(to: currentLocation) >= minDistanceMeters {
+                simplified.append(coordinate)
+            }
+        }
+
+        if let last = coordinates.last {
+            let currentLast = simplified.last
+            if currentLast?.latitude != last.latitude || currentLast?.longitude != last.longitude {
+                simplified.append(last)
+            }
+        }
+
+        if simplified.count > maxPoints {
+            let stride = max(1, simplified.count / maxPoints)
+            simplified = simplified.enumerated().compactMap { index, coordinate in
+                index == 0 || index == simplified.count - 1 || index.isMultiple(of: stride) ? coordinate : nil
+            }
+        }
+
+        return SubwayLineMapOverlay(
+            id: id,
+            name: name,
+            colorHex: colorHex,
+            coordinates: simplified.count >= 2 ? simplified : coordinates
+        )
+    }
+}
+
+private final class LineOverlayDiskCache {
+    private let fileManager = FileManager.default
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+
+    func load(cityID: String) throws -> [SubwayLineMapOverlay] {
+        let url = try cacheURL(cityID: cityID)
+        guard fileManager.fileExists(atPath: url.path) else { return [] }
+        let data = try Data(contentsOf: url)
+        let overlays = try decoder.decode([SubwayLineMapOverlay].self, from: data)
+        return overlays.filter { $0.coordinates.count >= 2 }
+    }
+
+    func save(_ overlays: [SubwayLineMapOverlay], cityID: String) throws {
+        let validOverlays = overlays.filter { $0.coordinates.count >= 2 }
+        guard !validOverlays.isEmpty else { return }
+        let url = try cacheURL(cityID: cityID)
+        try fileManager.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+        let data = try encoder.encode(validOverlays)
+        try data.write(to: url, options: [.atomic])
+    }
+
+    private func cacheURL(cityID: String) throws -> URL {
+        let baseURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        return baseURL
+            .appendingPathComponent("LineOverlays", isDirectory: true)
+            .appendingPathComponent("\(cityID)-amap-v1.json")
+    }
 }
 
 struct TransitPlace: Identifiable, Equatable {
@@ -2276,6 +2418,7 @@ private struct CityPackStation: Decodable {
     let schedules: [CityPackSchedule]
     let stationMaps: [CityPackStationMap]
     let stationAssets: [CityPackStationAsset]
+    let stationFacilities: [CityPackStationFacility]
     let serviceStatus: CityPackServiceStatus?
 
     enum CodingKeys: String, CodingKey {
@@ -2285,6 +2428,7 @@ private struct CityPackStation: Decodable {
         case schedules
         case stationMaps
         case stationAssets
+        case stationFacilities
         case serviceStatus
     }
 
@@ -2296,11 +2440,53 @@ private struct CityPackStation: Decodable {
         schedules = try container.decodeIfPresent([CityPackSchedule].self, forKey: .schedules) ?? []
         stationMaps = try container.decodeIfPresent([CityPackStationMap].self, forKey: .stationMaps) ?? []
         stationAssets = try container.decodeIfPresent([CityPackStationAsset].self, forKey: .stationAssets) ?? []
+        stationFacilities = try container.decodeIfPresent([CityPackStationFacility].self, forKey: .stationFacilities) ?? []
         serviceStatus = try container.decodeIfPresent(CityPackServiceStatus.self, forKey: .serviceStatus)
     }
 
     var accessibilityData: AccessibilityData? {
         accessibility?.accessibilityData
+    }
+
+    func stationFacilities(for station: Station) -> [StationFacility] {
+        let explicitFacilities = stationFacilities.map { $0.stationFacility(stationID: station.stationID) }
+        if !explicitFacilities.isEmpty {
+            return explicitFacilities
+        }
+
+        let notes = accessibility?.facilityNotes ?? []
+        return notes.enumerated().map { index, note in
+            StationFacility(
+                id: "\(station.stationID)-note-\(index)",
+                stationID: station.stationID,
+                type: StationFacilityType.inferred(from: note),
+                name: note,
+                locationText: nil,
+                source: .officialCityPack,
+                verification: .verified
+            )
+        }
+    }
+}
+
+private struct CityPackStationFacility: Decodable {
+    let id: String?
+    let type: String?
+    let name: String
+    let locationText: String?
+    let source: String?
+    let verification: String?
+
+    func stationFacility(stationID: String) -> StationFacility {
+        StationFacility(
+            id: id ?? "\(stationID)-facility-\(name)",
+            stationID: stationID,
+            type: StationFacilityType(rawValue: type ?? "") ?? StationFacilityType.inferred(from: "\(name) \(locationText ?? "")"),
+            name: name,
+            locationText: locationText,
+            source: StationFacilitySource(rawValue: source ?? "") ?? .officialCityPack,
+            verification: StationFacilityVerification(rawValue: verification ?? "") ?? .verified
+        )
     }
 }
 
@@ -2573,17 +2759,36 @@ private extension String {
 
 private extension Route {
     var deduplicationKey: String {
-        [
-            strategy.rawValue,
-            segments.map { segment in
-                [
-                    segment.type.rawValue,
-                    segment.lineName ?? "",
-                    segment.fromStationName ?? "",
-                    segment.toStationName ?? ""
-                ].joined(separator: ":")
-            }.joined(separator: "|")
-        ].joined(separator: "-")
+        let stationSequence = stationTimelineStops
+            .map { AppLocalization.searchVariants(for: $0.stationID).sorted().first ?? AppLocalization.searchVariants(for: $0.name).sorted().first ?? $0.name }
+            .joined(separator: ">")
+        let lineSequence = segments
+            .filter { $0.type == .subway }
+            .map { AppLocalization.searchVariants(for: $0.lineName ?? "").sorted().first ?? ($0.lineName ?? "") }
+            .joined(separator: ">")
+        let walkingBucket = Int((walkingDistance / 100).rounded())
+        return [
+            stationSequence,
+            lineSequence,
+            "\(transferCount)",
+            "\(walkingBucket)"
+        ].joined(separator: "|")
+    }
+
+    func isBetterDuplicate(than other: Route) -> Bool {
+        if warnings.count != other.warnings.count {
+            return warnings.count < other.warnings.count
+        }
+        if abs(walkingDistance - other.walkingDistance) > 1 {
+            return walkingDistance < other.walkingDistance
+        }
+        if abs(totalDuration - other.totalDuration) > 1 {
+            return totalDuration < other.totalDuration
+        }
+        if accessibilityScore != other.accessibilityScore {
+            return accessibilityScore > other.accessibilityScore
+        }
+        return strategy == .metroFirst && other.strategy != .metroFirst
     }
 }
 

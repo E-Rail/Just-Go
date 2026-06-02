@@ -63,10 +63,9 @@ struct TransitDataView: View {
                                 Text(AppLocalization.cityLineSummary(stations: city.stationCount, lines: city.lineCount))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                CityCapabilityTags(city: city)
                             }
                             Spacer()
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
                         }
                     }
                 } header: {
@@ -99,5 +98,55 @@ struct TransitDataView: View {
             }
         }
         .padding(.vertical, 3)
+    }
+}
+
+struct CityCapabilityTags: View {
+    let city: City
+
+    var body: some View {
+        HStack(spacing: 6) {
+            capabilityTag(title: "Access", status: city.dataCapabilities.accessibility)
+            capabilityTag(title: "Essentials", status: city.dataCapabilities.stationEssentials)
+            capabilityTag(title: "3D Map", status: city.dataCapabilities.stationMap)
+        }
+        .padding(.top, 2)
+    }
+
+    private func capabilityTag(title: String, status: CityDataCapabilityStatus) -> some View {
+        Label {
+            Text(AppLocalization.localized(title))
+                .lineLimit(1)
+        } icon: {
+            Image(systemName: status.iconName)
+        }
+        .font(.caption2)
+        .foregroundStyle(tagColor(for: status))
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(tagColor(for: status).opacity(0.12), in: Capsule())
+        .accessibilityLabel("\(AppLocalization.localized(title)): \(accessibilityText(for: status))")
+    }
+
+    private func tagColor(for status: CityDataCapabilityStatus) -> Color {
+        switch status {
+        case .available:
+            return .green
+        case .partial:
+            return .orange
+        case .pending:
+            return .secondary
+        }
+    }
+
+    private func accessibilityText(for status: CityDataCapabilityStatus) -> String {
+        switch status {
+        case .available:
+            return AppLocalization.localized("Available")
+        case .partial:
+            return AppLocalization.localized("Partial")
+        case .pending:
+            return AppLocalization.localized("Pending")
+        }
     }
 }

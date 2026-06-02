@@ -16,7 +16,8 @@ struct JustGoApp: App {
             ContentView()
                 .environment(appState)
                 .environment(container)
-                .environment(container.accessibilityService)
+                .environment(container.tripMemoryService)
+                .environment(container.accessibilityReportService)
                 .task {
                     await appState.initialize(container: container)
                 }

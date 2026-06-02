@@ -310,6 +310,7 @@ struct CityPickerView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
+                            CityCapabilityTags(city: city)
                         }
 
                         Spacer()

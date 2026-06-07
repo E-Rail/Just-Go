@@ -249,7 +249,7 @@ struct RouteDetailView: View {
             VStack {
                 segmentIcon(segment)
                 Rectangle()
-                    .fill(.secondary)
+                    .fill(segmentColor(segment).opacity(0.65))
                     .frame(width: 2, height: 20)
             }
 
@@ -297,17 +297,31 @@ struct RouteDetailView: View {
             switch segment.type {
             case .walking:
                 Image(systemName: "figure.walk")
+                    .foregroundStyle(segmentColor(segment))
                     .padding(6)
                     .background(Color.gray.opacity(0.2), in: Circle())
             case .subway:
                 Image(systemName: "tram.fill")
+                    .foregroundStyle(segmentColor(segment))
                     .padding(6)
                     .background(Color(hex: segment.lineColorHex ?? "#000000").opacity(0.2), in: Circle())
             case .transfer:
                 Image(systemName: "arrow.triangle.2.circlepath")
+                    .foregroundStyle(segmentColor(segment))
                     .padding(6)
                     .background(Color.orange.opacity(0.2), in: Circle())
             }
+        }
+    }
+
+    private func segmentColor(_ segment: RouteSegment) -> Color {
+        switch segment.type {
+        case .walking:
+            return .gray
+        case .subway:
+            return Color(hex: segment.lineColorHex ?? "#007AFF")
+        case .transfer:
+            return .orange
         }
     }
 

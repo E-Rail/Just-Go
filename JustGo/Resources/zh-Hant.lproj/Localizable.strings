@@ -123,6 +123,8 @@
 "Feature available" = "可用";
 "First/last train from AMap" = "高德首末班時刻";
 "Long walking segment" = "步行距離較長";
+"Walking-heavy route" = "步行較多的路線";
+"Step-free barrier detected" = "偵測到無障礙通行障礙";
 "Live countdown" = "即時倒數";
 "Live countdown unavailable" = "暫無即時倒數";
 "nearest entrance" = "最近入口";

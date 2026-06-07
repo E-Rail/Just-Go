@@ -2,21 +2,29 @@ import Foundation
 
 final class RouteFeasibilityService {
     func feasibility(for route: Route, personalReports: [LocalAccessibilityReport]) -> RouteFeasibility {
-        var level: RouteFeasibilityLevel = route.isFullyAccessible ? .good : .unknown
+        var level: RouteFeasibilityLevel = route.stepFreeAssessment.supportsStepFreeTravel ? .good : .unknown
         var reasons: [String] = []
         var unknowns: [String] = []
         var estimatedExtraMinutes = 0
         var bottleneck: RouteBottleneck?
+        var hasStepFreeUncertainty = false
+        var hasAccessibilityRisk = route.stepFreeAssessment == .barrierDetected
+        var hasLongWalk = false
 
-        if route.isFullyAccessible {
+        switch route.stepFreeAssessment {
+        case .confirmed, .likely:
             reasons.append(AppLocalization.localized("Step-free likely from available station data."))
-        } else {
-            unknowns.append(AppLocalization.localized("Step-free access is not confirmed for every station on this route."))
+        case .barrierDetected:
+            level = .risky
+            reasons.append(AppLocalization.localized("Step-free barrier detected"))
+        case .unknown:
+            break
         }
 
         for warning in route.warnings {
             switch warning.type {
             case .stairsDetected:
+                hasAccessibilityRisk = true
                 level = max(level, .risky)
                 reasons.append(warning.message)
                 estimatedExtraMinutes += 8
@@ -26,6 +34,7 @@ final class RouteFeasibilityService {
                     severity: .risky
                 )
             case .stepFreeAccessUnconfirmed:
+                hasStepFreeUncertainty = true
                 level = max(level, .caution)
                 unknowns.append(warning.message)
                 bottleneck = bottleneck ?? RouteBottleneck(
@@ -34,6 +43,7 @@ final class RouteFeasibilityService {
                     severity: .caution
                 )
             case .longWalk:
+                hasLongWalk = true
                 level = max(level, .caution)
                 reasons.append(warning.message)
                 estimatedExtraMinutes += 5
@@ -45,6 +55,7 @@ final class RouteFeasibilityService {
 
         let walkingSteps = route.segments.flatMap { $0.walkingDirections ?? [] }
         if walkingSteps.contains(where: \.hasStairs) {
+            hasAccessibilityRisk = true
             level = max(level, .risky)
             reasons.append(AppLocalization.localized("AMap walking hints include stairs."))
             estimatedExtraMinutes += 8
@@ -81,16 +92,17 @@ final class RouteFeasibilityService {
         }
 
         let title: String
-        switch level {
-        case .good:
-            title = AppLocalization.localized("Step-free likely")
-        case .caution:
+        if !problemReports.isEmpty {
+            title = AppLocalization.localized("Personal issue reported")
+        } else if hasAccessibilityRisk {
+            title = AppLocalization.localized("Accessibility risk")
+        } else if hasStepFreeUncertainty {
             title = AppLocalization.localized("Step-free not confirmed")
-        case .risky:
-            title = problemReports.isEmpty
-                ? AppLocalization.localized("Accessibility risk")
-                : AppLocalization.localized("Personal issue reported")
-        case .unknown:
+        } else if hasLongWalk {
+            title = AppLocalization.localized("Walking-heavy route")
+        } else if route.stepFreeAssessment.supportsStepFreeTravel {
+            title = AppLocalization.localized("Step-free likely")
+        } else {
             title = AppLocalization.localized("Accessibility unknown")
         }
 

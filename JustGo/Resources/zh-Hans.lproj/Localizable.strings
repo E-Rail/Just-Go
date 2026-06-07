@@ -124,6 +124,8 @@
 "Feature available" = "可用";
 "First/last train from AMap" = "高德首末班时刻";
 "Long walking segment" = "步行距离较长";
+"Walking-heavy route" = "步行较多的路线";
+"Step-free barrier detected" = "检测到无障碍通行障碍";
 "Live countdown" = "实时倒计时";
 "Live countdown unavailable" = "暂无实时倒计时";
 "nearest entrance" = "最近入口";

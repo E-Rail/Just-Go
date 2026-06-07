@@ -24,6 +24,7 @@ final class TripMemoryService {
         destination: TransitPlaceSnapshot,
         city: City,
         preferredStrategy: RouteStrategy?,
+        preferredRoutePreference: RoutePreference? = nil,
         accessibilityFilter: AccessibilityFilter,
         notes: String? = nil
     ) {
@@ -37,6 +38,7 @@ final class TripMemoryService {
             cityID: city.id,
             cityName: city.localizedName,
             preferredStrategy: preferredStrategy,
+            preferredRoutePreference: preferredRoutePreference,
             accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
             createdAt: .now,
             lastUsedAt: nil,

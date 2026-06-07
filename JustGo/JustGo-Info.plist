@@ -4,12 +4,6 @@
 <dict>
 	<key>AMapAPIKey</key>
 	<string>$(AMAP_API_KEY)</string>
-	<key>CityPackBaseURL</key>
-	<string>$(CITY_PACK_BASE_URL)</string>
-	<key>CityPackFallbackBaseURL</key>
-	<string>$(CITY_PACK_FALLBACK_BASE_URL)</string>
-	<key>CityPackManifestURL</key>
-	<string>$(CITY_PACK_MANIFEST_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -26,6 +20,12 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CityPackBaseURL</key>
+	<string>$(CITY_PACK_BASE_URL)</string>
+	<key>CityPackFallbackBaseURL</key>
+	<string>$(CITY_PACK_FALLBACK_BASE_URL)</string>
+	<key>CityPackManifestURL</key>
+	<string>$(CITY_PACK_MANIFEST_URL)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

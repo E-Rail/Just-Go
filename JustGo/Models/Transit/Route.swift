@@ -17,6 +17,7 @@ struct Route: Identifiable, Codable {
     let isFullyAccessible: Bool
     let warnings: [RouteWarning]
     let accessGuidance: [RouteAccessGuide]
+    var dataCoverage: RouteDataCoverage = .unknown
 
     var formattedDuration: String {
         let minutes = Int(totalDuration / 60)
@@ -80,6 +81,109 @@ struct Route: Identifiable, Codable {
             latitudeDelta: latitudeDelta,
             longitudeDelta: longitudeDelta
         )
+    }
+}
+
+struct RouteDataCoverage: Codable, Equatable {
+    let stationCount: Int
+    let officialAccessibilityCount: Int
+    let officialScheduleCount: Int
+    let officialStationMapCount: Int
+    let officialFacilityCount: Int
+
+    static let unknown = RouteDataCoverage(
+        stationCount: 0,
+        officialAccessibilityCount: 0,
+        officialScheduleCount: 0,
+        officialStationMapCount: 0,
+        officialFacilityCount: 0
+    )
+
+    var accessibilityConfidence: DataConfidence {
+        confidence(available: officialAccessibilityCount)
+    }
+
+    var scheduleConfidence: DataConfidence {
+        confidence(available: officialScheduleCount)
+    }
+
+    var stationMapConfidence: DataConfidence {
+        confidence(available: officialStationMapCount)
+    }
+
+    var hasOfficialCoreData: Bool {
+        officialAccessibilityCount > 0 || officialScheduleCount > 0 ||
+            officialStationMapCount > 0 || officialFacilityCount > 0
+    }
+
+    var unknownCoreCount: Int {
+        guard stationCount > 0 else { return 3 }
+        return [
+            officialAccessibilityCount,
+            officialScheduleCount,
+            officialStationMapCount
+        ].filter { $0 == 0 }.count
+    }
+
+    private func confidence(available: Int) -> DataConfidence {
+        guard stationCount > 0 else { return .unknown }
+        if available >= stationCount { return .official }
+        if available > 0 { return .sourcePending }
+        return .sourcePending
+    }
+}
+
+enum DataConfidence: String, Codable, Equatable {
+    case official
+    case amap
+    case communityVerified
+    case personal
+    case estimated
+    case sourcePending
+    case unavailable
+    case unknown
+
+    var label: String {
+        switch self {
+        case .official: return AppLocalization.localized("Official")
+        case .amap: return AppLocalization.localized("AMap route data")
+        case .communityVerified: return AppLocalization.localized("Community verified")
+        case .personal: return AppLocalization.localized("Personal report")
+        case .estimated: return AppLocalization.localized("Estimated")
+        case .sourcePending: return AppLocalization.localized("Source pending")
+        case .unavailable: return AppLocalization.localized("Unavailable")
+        case .unknown: return AppLocalization.localized("Unknown")
+        }
+    }
+}
+
+struct RouteConfidence: Equatable {
+    let score: Int
+    let level: RouteConfidenceLevel
+    let explanation: String
+    let positiveReasons: [String]
+    let warnings: [String]
+}
+
+enum RouteConfidenceLevel: Equatable {
+    case high
+    case medium
+    case low
+
+    var title: String {
+        switch self {
+        case .high: return AppLocalization.localized("High confidence")
+        case .medium: return AppLocalization.localized("Medium confidence")
+        case .low: return AppLocalization.localized("Low confidence")
+        }
+    }
+
+    var summary: String {
+        switch self {
+        case .high: return AppLocalization.localized("Likely smooth")
+        case .medium: return AppLocalization.localized("Some uncertainty")
+        case .low: return AppLocalization.localized("Check before going")
+        }
     }
 }
 

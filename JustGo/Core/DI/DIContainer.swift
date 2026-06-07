@@ -10,6 +10,7 @@ final class DIContainer {
     let tripMemoryService: TripMemoryService
     let accessibilityReportService: AccessibilityReportService
     let routeFeasibilityService: RouteFeasibilityService
+    let routeConfidenceService: RouteConfidenceService
 
     init(
         locationService: LocationService,
@@ -19,7 +20,8 @@ final class DIContainer {
         cityService: CityService,
         tripMemoryService: TripMemoryService,
         accessibilityReportService: AccessibilityReportService,
-        routeFeasibilityService: RouteFeasibilityService
+        routeFeasibilityService: RouteFeasibilityService,
+        routeConfidenceService: RouteConfidenceService
     ) {
         self.locationService = locationService
         self.aMapService = aMapService
@@ -29,6 +31,7 @@ final class DIContainer {
         self.tripMemoryService = tripMemoryService
         self.accessibilityReportService = accessibilityReportService
         self.routeFeasibilityService = routeFeasibilityService
+        self.routeConfidenceService = routeConfidenceService
     }
 
     @MainActor
@@ -41,6 +44,7 @@ final class DIContainer {
         let tripMemoryService = TripMemoryService()
         let accessibilityReportService = AccessibilityReportService()
         let routeFeasibilityService = RouteFeasibilityService()
+        let routeConfidenceService = RouteConfidenceService()
 
         return DIContainer(
             locationService: locationService,
@@ -50,7 +54,8 @@ final class DIContainer {
             cityService: cityService,
             tripMemoryService: tripMemoryService,
             accessibilityReportService: accessibilityReportService,
-            routeFeasibilityService: routeFeasibilityService
+            routeFeasibilityService: routeFeasibilityService,
+            routeConfidenceService: routeConfidenceService
         )
     }
 }

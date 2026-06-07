@@ -2,8 +2,11 @@ import SwiftUI
 
 struct RouteDetailView: View {
     let route: Route
+    let preference: RoutePreference
+    let alternatives: [Route]
     @State private var showRouteReport = false
     @State private var showTripNote = false
+    @State private var showExpandedRouteMap = false
     @State private var tripNote = ""
     @State private var routeReportNote = ""
     @State private var routeReportSeverity: AccessibilityReportSeverity = .medium
@@ -16,10 +19,10 @@ struct RouteDetailView: View {
         ScrollView {
             VStack(spacing: 20) {
                 routeSummaryCard
+                tripConfidenceCard
                 routeMapPreview
                 accessGuidanceCard
                 routeFeasibilityCard
-                accessibilityInfoCard
                 segmentsTimeline
                 riderTrustActions
             }
@@ -33,6 +36,19 @@ struct RouteDetailView: View {
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
         }
+        .fullScreenCover(isPresented: $showExpandedRouteMap) {
+            FullScreenRouteMapView(route: route)
+        }
+    }
+
+    init(
+        route: Route,
+        preference: RoutePreference = .fastest,
+        alternatives: [Route] = []
+    ) {
+        self.route = route
+        self.preference = preference
+        self.alternatives = alternatives
     }
 
     private var routeMapPreview: some View {
@@ -46,6 +62,21 @@ struct RouteDetailView: View {
         )
         .frame(height: 220)
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(alignment: .topTrailing) {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(8)
+                .background(.black.opacity(0.55), in: Circle())
+                .padding(10)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .onTapGesture {
+            showExpandedRouteMap = true
+        }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
     }
 
     private var routeSummaryCard: some View {
@@ -100,43 +131,6 @@ struct RouteDetailView: View {
         }
     }
 
-    private var accessibilityInfoCard: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Accessibility Info"))
-                    .font(.headline)
-
-                if route.isFullyAccessible {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                        Text(AppLocalization.localized("All stations on this route have elevator access"))
-                            .font(.subheadline)
-                    }
-                }
-
-                if !route.warnings.isEmpty {
-                    ForEach(route.warnings) { warning in
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
-                            Text(warning.message)
-                                .font(.subheadline)
-                        }
-                    }
-                }
-
-                let accessibleStops = route.segments.filter { $0.type == .subway }.count
-                Text(AppLocalization.text(
-                    english: "\(accessibleStops) accessible stations on this route",
-                    chinese: "此路线有\(accessibleStops)座无障碍车站"
-                ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
     private var routeFeasibilityCard: some View {
         let feasibility = currentFeasibility
         return GlassCard {
@@ -180,6 +174,10 @@ struct RouteDetailView: View {
                 }
             }
         }
+    }
+
+    private var tripConfidenceCard: some View {
+        TripConfidenceCard(confidence: currentConfidence)
     }
 
     @ViewBuilder
@@ -418,6 +416,102 @@ struct RouteDetailView: View {
             personalReports: accessibilityReportService.reports(affecting: route)
         )
     }
+
+    private var currentConfidence: RouteConfidence {
+        container.routeConfidenceService.confidence(
+            for: route,
+            feasibility: currentFeasibility,
+            preference: preference,
+            alternatives: alternatives.isEmpty ? [route] : alternatives
+        )
+    }
+}
+
+private struct TripConfidenceCard: View {
+    let confidence: RouteConfidence
+
+    var body: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(AppLocalization.localized("Trip Confidence"))
+                            .font(.headline)
+                        Text(confidence.level.summary)
+                            .font(.subheadline)
+                            .foregroundStyle(confidence.level.color)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(confidence.score) / 100")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                        Text(confidence.level.title)
+                            .font(.caption)
+                            .foregroundStyle(confidence.level.color)
+                    }
+                    .accessibilityLabel("\(confidence.level.title), \(confidence.score) \(AppLocalization.localized("out of 100"))")
+                }
+
+                Text(confidence.explanation)
+                    .font(.subheadline)
+
+                ForEach(confidence.positiveReasons.prefix(3), id: \.self) { reason in
+                    Label(reason, systemImage: "checkmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                }
+
+                ForEach(confidence.warnings.prefix(3), id: \.self) { warning in
+                    Label(warning, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Text(AppLocalization.localized("Based on available data, not a safety guarantee."))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct FullScreenRouteMapView: View {
+    let route: Route
+    @Environment(\.dismiss) private var dismiss
+    @State private var visibleRegion: MapVisibleRegion?
+
+    init(route: Route) {
+        self.route = route
+        _visibleRegion = State(initialValue: route.previewRegion)
+    }
+
+    var body: some View {
+        NavigationStack {
+            TransitMapView(
+                visibleRegion: $visibleRegion,
+                stations: [],
+                subwayLines: [],
+                route: route,
+                showsUserLocation: false,
+                onStationSelected: { _ in }
+            )
+            .ignoresSafeArea(edges: .bottom)
+            .navigationTitle(AppLocalization.localized("Route Map"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                    }
+                    .accessibilityLabel(AppLocalization.localized("Close route map"))
+                }
+            }
+        }
+    }
 }
 
 struct StatItem: View {
@@ -464,6 +558,16 @@ private extension RouteFeasibilityLevel {
             return "xmark.octagon.fill"
         case .unknown:
             return "questionmark.circle.fill"
+        }
+    }
+}
+
+private extension RouteConfidenceLevel {
+    var color: Color {
+        switch self {
+        case .high: return .green
+        case .medium: return .orange
+        case .low: return .red
         }
     }
 }

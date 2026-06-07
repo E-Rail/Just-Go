@@ -75,6 +75,7 @@ struct SavedTrip: Identifiable, Codable, Equatable {
     var cityID: String
     var cityName: String
     var preferredStrategy: RouteStrategy?
+    var preferredRoutePreference: RoutePreference?
     var accessibilityFilter: SavedTripAccessibilityFilter
     var createdAt: Date
     var lastUsedAt: Date?

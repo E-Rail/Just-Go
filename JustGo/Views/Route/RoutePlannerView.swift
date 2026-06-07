@@ -294,8 +294,8 @@ struct RoutePlannerView: View {
     private var accessibilityFiltersSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Accessibility"))
-                    .font(.headline)
+            Text(AppLocalization.localized("Travel Support"))
+                .font(.headline)
 
                 Toggle(isOn: Binding(
                     get: { viewModel?.requiresWheelchairAccess ?? false },
@@ -493,6 +493,7 @@ struct RoutePlannerView: View {
             destination: destination,
             city: city,
             preferredStrategy: nil,
+            preferredRoutePreference: viewModel?.sortStrategy,
             accessibilityFilter: filter
         )
         showSaveCurrentTrip = false

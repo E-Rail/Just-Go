@@ -12,6 +12,7 @@ final class StationDetailViewModel {
     var stationMap: CityPackStationMap?
     var timetableAssets: [CityPackStationAsset] = []
     var serviceStatus: CityPackServiceStatus?
+    var cityPackLoadStatus: CityPackLoadStatus?
 
     private let aMapService: AMapService
 
@@ -69,6 +70,7 @@ final class StationDetailViewModel {
         defer { isLoadingCityPack = false }
 
         let status = await aMapService.loadCityPack(for: station.cityID)
+        cityPackLoadStatus = status
         switch status {
         case .loaded:
             self.station = await aMapService.enrichStationFromCityPack(station)
@@ -103,6 +105,25 @@ final class StationDetailViewModel {
 
     var accessibilityInfo: StationAccessibility? {
         station?.accessibility
+    }
+
+    var scheduleConfidence: DataConfidence {
+        if arrivals.contains(where: { $0.source == .officialSchedule || $0.source == .bundledSchedule }) {
+            return .official
+        }
+        return arrivals.isEmpty ? cityPackPendingConfidence : .estimated
+    }
+
+    var stationMapConfidence: DataConfidence {
+        stationMap == nil ? cityPackPendingConfidence : .official
+    }
+
+    var accessibilityConfidence: DataConfidence {
+        accessibilityInfo?.hasVerifiedAccessibilityData == true ? .official : cityPackPendingConfidence
+    }
+
+    var liveArrivalConfidence: DataConfidence {
+        arrivals.contains(where: \.hasLiveCountdown) ? .official : .unavailable
     }
 
     var isAccessible: Bool {
@@ -171,20 +192,26 @@ final class StationDetailViewModel {
 
     private func preferredTrainTimeError(from errors: [Error]) -> String {
         if errors.contains(where: { error in
-            guard case .amapScheduleLookupNotEnabled? = error as? RoutePlanningError else { return false }
-            return true
-        }) {
-            return AppLocalization.localized("AMap schedule lookup is not enabled")
-        }
-
-        if errors.contains(where: { error in
             guard case .trainScheduleUnavailable? = error as? RoutePlanningError else { return false }
             return true
         }) {
-            return AppLocalization.localized("Schedule unavailable")
+            return AppLocalization.localized("Official schedule pending for this city/station")
         }
 
-        return errors.first?.localizedDescription ?? AppLocalization.localized("Schedule unavailable")
+        return AppLocalization.localized("Official schedule pending for this city/station")
+    }
+
+    private var cityPackPendingConfidence: DataConfidence {
+        switch cityPackLoadStatus {
+        case .loaded:
+            return .sourcePending
+        case .sourcePending:
+            return .sourcePending
+        case .notConfigured, .notAvailable, .failed:
+            return .unavailable
+        case nil:
+            return .unknown
+        }
     }
 }
 

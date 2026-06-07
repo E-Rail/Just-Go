@@ -92,6 +92,12 @@ struct AccessibilityFilter {
     }
 }
 
+private enum AMapUsage {
+    static let routeSearchEnabled = true
+    static let geometryEnabled = true
+    static let stationInfoEnabled = false
+}
+
 final class AMapService {
     private let localDataStore = SubwayDataStore()
     private let cityPackStore = CityPackStore()
@@ -112,7 +118,7 @@ final class AMapService {
             return stations
         }
 
-        if AMapConfiguration.apiKey.isEmpty == false {
+        if AMapUsage.routeSearchEnabled, AMapConfiguration.apiKey.isEmpty == false {
             let places = try await searchPlaces(keyword: keyword, city: city, limit: 20)
             let placeIDs = Set(places.compactMap(\.uid))
             let placeNames = places.flatMap { AppLocalization.searchVariants(for: $0.name) }
@@ -157,6 +163,10 @@ final class AMapService {
     }
 
     func getStationExits(station: Station) async throws -> [StationExit] {
+        guard AMapUsage.stationInfoEnabled else {
+            return station.exits
+        }
+
         guard AMapConfiguration.apiKey.isEmpty == false else {
             throw RoutePlanningError.amapAPIKeyMissing
         }
@@ -188,7 +198,7 @@ final class AMapService {
         city: String,
         accessibilityFilter: AccessibilityFilter?
     ) async throws -> [Route] {
-        guard AMapConfiguration.apiKey.isEmpty == false else {
+        guard AMapUsage.routeSearchEnabled, AMapConfiguration.apiKey.isEmpty == false else {
             throw RoutePlanningError.amapAPIKeyMissing
         }
 
@@ -221,8 +231,6 @@ final class AMapService {
     }
 
     func getTrainTimes(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
-        var scheduleLookupError: Error?
-
         if let context = localDataStore.lineContext(lineID: lineID, stationID: stationID) {
             _ = try? await cityPackStore.ensurePack(cityID: context.system.cityID, urlSession: urlSession)
             let cityPackArrivals = await cityPackStore.officialArrivals(context: context)
@@ -231,30 +239,11 @@ final class AMapService {
             }
         }
 
-        if AMapConfiguration.apiKey.isEmpty == false {
-            do {
-                let onlineArrivals = try await amapLineSchedules(lineID: lineID, stationID: stationID)
-                if !onlineArrivals.isEmpty {
-                    return onlineArrivals
-                }
-            } catch {
-                scheduleLookupError = error
-            }
-        }
-
         let fallbackCityID = localDataStore.lineContext(lineID: lineID, stationID: stationID)?.system.cityID
         let system = try await subwaySystem(for: fallbackCityID)
         let arrivals = localDataStore.arrivals(lineID: lineID, stationID: stationID, systemOverride: system)
         if !arrivals.isEmpty {
             return arrivals
-        }
-
-        if AMapConfiguration.apiKey.isEmpty {
-            throw RoutePlanningError.amapScheduleLookupNotEnabled
-        }
-
-        if let scheduleLookupError {
-            throw scheduleLookupError
         }
 
         throw RoutePlanningError.trainScheduleUnavailable
@@ -311,7 +300,8 @@ final class AMapService {
             return persisted
         }
 
-        if AMapConfiguration.apiKey.isEmpty == false,
+        if AMapUsage.geometryEnabled,
+           AMapConfiguration.apiKey.isEmpty == false,
            let liveOverlays = try? await amapLineOverlays(for: system) {
             if !liveOverlays.isEmpty {
                 let displayOverlays = liveOverlays.map { $0.simplifiedForMap() }
@@ -328,7 +318,7 @@ final class AMapService {
     }
 
     func searchPlaces(keyword: String, city: String, limit: Int) async throws -> [TransitPlace] {
-        guard !AMapConfiguration.apiKey.isEmpty else {
+        guard AMapUsage.routeSearchEnabled, !AMapConfiguration.apiKey.isEmpty else {
             return try await searchFallbackPlaces(keyword: keyword, city: city, limit: limit)
         }
 
@@ -352,7 +342,7 @@ final class AMapService {
     }
 
     func inputTips(keyword: String, city: String, limit: Int) async throws -> [TransitPlace] {
-        guard !AMapConfiguration.apiKey.isEmpty else {
+        guard AMapUsage.routeSearchEnabled, !AMapConfiguration.apiKey.isEmpty else {
             return try await searchFallbackPlaces(keyword: keyword, city: city, limit: limit)
         }
 
@@ -428,7 +418,7 @@ final class AMapService {
     }
 
     func reverseGeocode(location: CLLocationCoordinate2D, name: String? = nil) async throws -> TransitPlace {
-        guard !AMapConfiguration.apiKey.isEmpty else {
+        guard AMapUsage.routeSearchEnabled, !AMapConfiguration.apiKey.isEmpty else {
             throw RoutePlanningError.amapAPIKeyMissing
         }
 
@@ -460,7 +450,7 @@ final class AMapService {
     }
 
     private func placeDetail(id: String, city: String) async throws -> TransitPlace? {
-        guard !AMapConfiguration.apiKey.isEmpty else {
+        guard AMapUsage.routeSearchEnabled, !AMapConfiguration.apiKey.isEmpty else {
             return nil
         }
 
@@ -820,16 +810,18 @@ final class AMapService {
                 urlSession: urlSession
             )
             guard payload.status == "1" else { continue }
-            routes.append(contentsOf: payload.route?.transits.compactMap {
-                route(
-                    from: $0,
+            for transit in payload.route?.transits ?? [] {
+                if let route = await route(
+                    from: transit,
                     strategy: request.strategy,
                     originName: originName,
                     destinationName: destinationName,
                     system: system,
                     filter: filter
-                )
-            } ?? [])
+                ) {
+                    routes.append(route)
+                }
+            }
         }
 
         return uniqueRoutes(routes)
@@ -865,90 +857,6 @@ final class AMapService {
         }
 
         return overlays
-    }
-
-    private func amapLineSchedules(lineID: String, stationID: String) async throws -> [RealTimeArrival] {
-        guard let context = localDataStore.lineContext(lineID: lineID, stationID: stationID) else {
-            return []
-        }
-
-        let cityQuery = try await localDataStore.webCityQuery(for: context.system.cityID, urlSession: urlSession)
-        var busLines: [AMapBusLineDetail] = []
-
-        for amapLineID in context.line.scheduleCandidateLineIDs {
-            busLines.append(contentsOf: try await amapBusLines(
-                endpoint: "lineid",
-                queryName: "id",
-                queryValue: amapLineID,
-                cityQuery: cityQuery
-            ))
-        }
-
-        if busLines.isEmpty || busLines.contains(where: { $0.scheduleText != nil }) == false {
-            for lineName in context.line.scheduleQueryNames {
-                busLines.append(contentsOf: try await amapBusLines(
-                    endpoint: "linename",
-                    queryName: "keywords",
-                    queryValue: lineName,
-                    cityQuery: cityQuery
-                ))
-            }
-        }
-
-        busLines = busLines.filter { $0.matchesSubwayLine(context.line) }
-
-        if busLines.isEmpty {
-            let diagnostic = AMapResponseDiagnostic(
-                endpoint: "v3/bus/linename",
-                city: cityQuery,
-                queryType: "schedule:empty-lines:\(context.line.lineID)",
-                status: "1",
-                info: "OK",
-                infocode: "10000",
-                itemCount: 0
-            )
-            debugPrint("[AMap] \(diagnostic.developerSummary)")
-            throw RoutePlanningError.amapNoScheduleForLine(diagnostic)
-        }
-
-        var seenIDs: Set<String> = []
-        var arrivals: [RealTimeArrival] = []
-
-        for busLine in busLines {
-            let id = busLine.id ?? "\(busLine.name ?? context.line.lineID)-\(busLine.startStop ?? "")-\(busLine.endStop ?? "")"
-            guard !seenIDs.contains(id) else { continue }
-            seenIDs.insert(id)
-
-            guard let timeText = busLine.scheduleText else { continue }
-            arrivals.append(RealTimeArrival(
-                id: UUID(),
-                lineName: busLine.displayName ?? context.line.localizedName,
-                lineColorHex: context.line.colorHex,
-                destination: busLine.endStop ?? context.line.localizedName,
-                arrivalTime: nil,
-                minutesRemaining: nil,
-                timeText: timeText,
-                isAccessible: context.station?.accessibility?.isFullyAccessible ?? false,
-                platformNumber: nil,
-                source: .amapSchedule
-            ))
-        }
-
-        if arrivals.isEmpty {
-            let diagnostic = AMapResponseDiagnostic(
-                endpoint: "v3/bus/lineid|linename",
-                city: cityQuery,
-                queryType: "schedule:empty-times:\(context.line.lineID)",
-                status: "1",
-                info: "OK",
-                infocode: "10000",
-                itemCount: busLines.count
-            )
-            debugPrint("[AMap] \(diagnostic.developerSummary)")
-            throw RoutePlanningError.amapNoScheduleForLine(diagnostic)
-        }
-
-        return arrivals
     }
 
     private func amapLineOverlays(for line: SubwayLineData, cityQuery: String) async throws -> [SubwayLineMapOverlay] {
@@ -1075,7 +983,7 @@ final class AMapService {
         destinationName: String,
         system: LoadedSubwaySystem,
         filter: AccessibilityFilter
-    ) -> Route? {
+    ) async -> Route? {
         var segments: [RouteSegment] = []
         var routeStops: [RouteStationStop] = []
         var transferCount = 0
@@ -1177,6 +1085,11 @@ final class AMapService {
             filter: filter
         )
 
+        let dataCoverage = await cityPackStore.routeCoverage(
+            cityID: system.cityID,
+            stationNames: routeStops.map(\.name)
+        )
+
         return Route(
             id: UUID(),
             origin: originName,
@@ -1192,7 +1105,8 @@ final class AMapService {
             accessibilityScore: fullyAccessible ? 1.0 : 0.65,
             isFullyAccessible: fullyAccessible,
             warnings: warnings,
-            accessGuidance: accessGuidance
+            accessGuidance: accessGuidance,
+            dataCoverage: dataCoverage
         )
     }
 
@@ -2451,11 +2365,11 @@ private struct CityPackStation: Decodable {
     func stationFacilities(for station: Station) -> [StationFacility] {
         let explicitFacilities = stationFacilities.map { $0.stationFacility(stationID: station.stationID) }
         if !explicitFacilities.isEmpty {
-            return explicitFacilities
+            return deduplicatedFacilities(explicitFacilities)
         }
 
         let notes = accessibility?.facilityNotes ?? []
-        return notes.enumerated().map { index, note in
+        return deduplicatedFacilities(notes.enumerated().map { index, note in
             StationFacility(
                 id: "\(station.stationID)-note-\(index)",
                 stationID: station.stationID,
@@ -2465,7 +2379,31 @@ private struct CityPackStation: Decodable {
                 source: .officialCityPack,
                 verification: .verified
             )
+        })
+    }
+
+    private func deduplicatedFacilities(_ facilities: [StationFacility]) -> [StationFacility] {
+        var seen = Set<String>()
+        return facilities.filter { facility in
+            let key = [
+                facility.type.rawValue,
+                normalizedFacilityText(facility.name),
+                normalizedFacilityText(facility.locationText ?? ""),
+                facility.source.rawValue,
+                facility.verification.rawValue
+            ].joined(separator: "|")
+            return seen.insert(key).inserted
         }
+    }
+
+    private func normalizedFacilityText(_ text: String) -> String {
+        text
+            .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "，", with: ",")
+            .replacingOccurrences(of: "。", with: ".")
+            .replacingOccurrences(of: "（", with: "(")
+            .replacingOccurrences(of: "）", with: ")")
+            .lowercased()
     }
 }
 
@@ -2615,6 +2553,32 @@ private actor CityPackStore {
                 category == nil || asset.category == category
             }
             .map { $0.resolving(relativeTo: loadedPack.assetBaseURL) } ?? []
+    }
+
+    func routeCoverage(cityID: String, stationNames: [String]) -> RouteDataCoverage {
+        let uniqueNames = Array(Set(stationNames.map(normalizeStationKey)))
+        guard let pack = packsByCityID[cityID]?.pack else {
+            return RouteDataCoverage(
+                stationCount: uniqueNames.count,
+                officialAccessibilityCount: 0,
+                officialScheduleCount: 0,
+                officialStationMapCount: 0,
+                officialFacilityCount: 0
+            )
+        }
+
+        let stationsByName = Dictionary(
+            pack.stations.map { (normalizeStationKey($0.stationName), $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let stations = uniqueNames.compactMap { stationsByName[$0] }
+        return RouteDataCoverage(
+            stationCount: max(uniqueNames.count, stations.count),
+            officialAccessibilityCount: stations.filter { $0.accessibilityData != nil }.count,
+            officialScheduleCount: stations.filter { !$0.schedules.isEmpty }.count,
+            officialStationMapCount: stations.filter { !$0.stationMaps.isEmpty }.count,
+            officialFacilityCount: stations.filter { !$0.stationFacilities.isEmpty }.count
+        )
     }
 
     func serviceStatus(cityID: String, stationName: String) -> CityPackServiceStatus? {

@@ -211,9 +211,25 @@ struct RouteCard: View {
             }
             .padding()
             .background(Color(.systemBackground))
+            .overlay(alignment: .leading) {
+                routeColorAccent
+                    .frame(width: 5)
+            }
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
+    }
+
+    private var routeColorAccent: some View {
+        VStack(spacing: 0) {
+            let subwaySegments = route.segments.filter { $0.type == .subway }
+            ForEach(subwaySegments) { segment in
+                Color(hex: segment.lineColorHex ?? "#007AFF")
+            }
+            if subwaySegments.isEmpty {
+                Color.gray
+            }
+        }
     }
 
     private func segmentBar(_ segment: RouteSegment) -> some View {

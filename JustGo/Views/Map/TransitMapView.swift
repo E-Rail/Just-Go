@@ -98,9 +98,20 @@ struct TransitMapView: UIViewRepresentable {
                 guard coordinates.count >= 2 else { continue }
                 addPolyline(
                     coordinates,
-                    colorHex: segment.type == .walking ? "#8E8E93" : (segment.lineColorHex ?? "#007AFF"),
+                    colorHex: routeColorHex(for: segment),
                     to: mapView
                 )
+            }
+        }
+
+        private func routeColorHex(for segment: RouteSegment) -> String {
+            switch segment.type {
+            case .walking:
+                return "#8E8E93"
+            case .subway:
+                return segment.lineColorHex ?? "#007AFF"
+            case .transfer:
+                return "#FF9500"
             }
         }
 

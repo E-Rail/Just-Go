@@ -1066,9 +1066,12 @@ final class AMapService {
         let firstStationID = routeStops.first?.stationID ?? originName
         let lastStationID = routeStops.last?.stationID ?? destinationName
         let totalStops = segments.filter { $0.type == .subway }.reduce(0) { $0 + $1.stops }
-        let fullyAccessible = routeStops.allSatisfy { stop in
-            system.stations.first(where: { $0.stationID == stop.stationID })?.accessibility?.isFullyAccessible == true
-        }
+        let stepFreeAssessment = stepFreeAssessment(
+            for: routeStops,
+            segments: segmentsWithPlaceNames,
+            system: system
+        )
+        let fullyAccessible = stepFreeAssessment == .confirmed
         let accessGuidance = buildAccessGuidance(
             originName: originName,
             destinationName: destinationName,
@@ -1081,7 +1084,7 @@ final class AMapService {
             from: segmentsWithPlaceNames,
             accessGuidance: accessGuidance,
             walkingDistance: transit.walkingDistanceValue,
-            fullyAccessible: fullyAccessible,
+            stepFreeAssessment: stepFreeAssessment,
             filter: filter
         )
 
@@ -1102,8 +1105,9 @@ final class AMapService {
             walkingDistance: transit.walkingDistanceValue,
             totalStops: totalStops,
             transferCount: transferCount,
-            accessibilityScore: fullyAccessible ? 1.0 : 0.65,
+            accessibilityScore: stepFreeAssessment == .confirmed ? 1.0 : stepFreeAssessment == .likely ? 0.85 : 0.65,
             isFullyAccessible: fullyAccessible,
+            stepFreeAssessment: stepFreeAssessment,
             warnings: warnings,
             accessGuidance: accessGuidance,
             dataCoverage: dataCoverage
@@ -1229,7 +1233,7 @@ final class AMapService {
         from segments: [RouteSegment],
         accessGuidance: [RouteAccessGuide],
         walkingDistance: Double,
-        fullyAccessible: Bool,
+        stepFreeAssessment: RouteStepFreeAssessment,
         filter: AccessibilityFilter
     ) -> [RouteWarning] {
         let walkingSteps = segments.flatMap { $0.walkingDirections ?? [] }
@@ -1245,7 +1249,7 @@ final class AMapService {
             ))
         }
 
-        if (filter.requiresWheelchairAccess || filter.requiresElevator) && !fullyAccessible {
+        if (filter.requiresWheelchairAccess || filter.requiresElevator) && stepFreeAssessment == .unknown {
             let missingStationData = accessGuidance.contains { guide in
                 guide.accessibilityNotes.contains(AppLocalization.localized("Step-free access not confirmed because station accessibility data is missing"))
             }
@@ -1267,6 +1271,61 @@ final class AMapService {
         }
 
         return warnings
+    }
+
+    private func stepFreeAssessment(
+        for routeStops: [RouteStationStop],
+        segments: [RouteSegment],
+        system: LoadedSubwaySystem
+    ) -> RouteStepFreeAssessment {
+        let walkingSteps = segments.flatMap { $0.walkingDirections ?? [] }
+        if walkingSteps.contains(where: \.hasStairs) {
+            return .barrierDetected
+        }
+
+        var criticalStops = segments
+            .filter { $0.type == .subway }
+            .flatMap { segment in
+                [segment.stationStops.first, segment.stationStops.last].compactMap { $0 }
+            }
+        if criticalStops.isEmpty {
+            criticalStops = [routeStops.first, routeStops.last].compactMap { $0 }
+        }
+
+        var seen: Set<String> = []
+        let stations = criticalStops
+            .filter { seen.insert($0.stationID).inserted }
+            .compactMap { station(for: $0, system: system) }
+
+        guard !criticalStops.isEmpty, stations.count == seen.count else {
+            return .unknown
+        }
+
+        var allConfirmed = true
+        for station in stations {
+            guard let accessibility = station.accessibility else {
+                return .unknown
+            }
+
+            let hasAccessibleExit = station.exits.contains {
+                $0.isAccessible || $0.hasElevator || $0.hasWheelchairRamp
+            }
+            let hasPositiveEvidence = accessibility.isFullyAccessible ||
+                accessibility.hasElevator ||
+                accessibility.hasWheelchairRamp ||
+                !accessibility.accessibleEntrances.isEmpty ||
+                hasAccessibleExit
+
+            if accessibility.fullAccessibilityAvailability == .unavailable && !hasPositiveEvidence {
+                return .barrierDetected
+            }
+            guard hasPositiveEvidence else {
+                return .unknown
+            }
+            allConfirmed = allConfirmed && accessibility.isFullyAccessible
+        }
+
+        return allConfirmed ? .confirmed : .likely
     }
 
     private func walkingAccessibilityNotes(from steps: [WalkingStep], filter: AccessibilityFilter) -> [String] {

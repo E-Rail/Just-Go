@@ -50,7 +50,7 @@ final class RoutePlanningService {
         var score: Double = 1.0
 
         if preferences.requiresWheelchairAccess {
-            if !route.isFullyAccessible {
+            if !route.stepFreeAssessment.supportsStepFreeTravel {
                 score -= 0.5
             }
             for warning in route.warnings where warning.type == .elevatorOutage {
@@ -128,15 +128,26 @@ final class RoutePlanningService {
     }
 
     private func luggageScore(_ route: Route) -> Double {
-        accessibilityScore(for: route, preferences: .default) * 100 -
+        accessibilityScore(for: route, preferences: .default) * 100 +
+            stepFreeScore(route) -
             Double(route.transferCount * 18) - route.walkingDistance / 80 -
             Double(route.warnings.count * 12)
     }
 
     private func elderlyScore(_ route: Route) -> Double {
-        accessibilityScore(for: route, preferences: .default) * 120 -
+        accessibilityScore(for: route, preferences: .default) * 120 +
+            stepFreeScore(route) -
             Double(route.transferCount * 22) - route.walkingDistance / 70 -
             Double(route.warnings.count * 15)
+    }
+
+    private func stepFreeScore(_ route: Route) -> Double {
+        switch route.stepFreeAssessment {
+        case .confirmed: return 20
+        case .likely: return 12
+        case .unknown: return 0
+        case .barrierDetected: return -25
+        }
     }
 
     private func officialDataScore(_ route: Route) -> Double {

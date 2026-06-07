@@ -123,6 +123,8 @@
 "Feature available" = "Available";
 "First/last train from AMap" = "First/last train from AMap";
 "Long walking segment" = "Long walking segment";
+"Walking-heavy route" = "Walking-heavy route";
+"Step-free barrier detected" = "Step-free barrier detected";
 "Live countdown" = "Live countdown";
 "Live countdown unavailable" = "Live countdown unavailable";
 "nearest entrance" = "nearest entrance";

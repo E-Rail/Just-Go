@@ -15,6 +15,7 @@ struct Route: Identifiable, Codable {
     let transferCount: Int
     let accessibilityScore: Double
     let isFullyAccessible: Bool
+    var stepFreeAssessment: RouteStepFreeAssessment = .unknown
     let warnings: [RouteWarning]
     let accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
@@ -81,6 +82,17 @@ struct Route: Identifiable, Codable {
             latitudeDelta: latitudeDelta,
             longitudeDelta: longitudeDelta
         )
+    }
+}
+
+enum RouteStepFreeAssessment: String, Codable, Equatable {
+    case confirmed
+    case likely
+    case unknown
+    case barrierDetected
+
+    var supportsStepFreeTravel: Bool {
+        self == .confirmed || self == .likely
     }
 }
 

@@ -19,12 +19,12 @@ struct StationRow: View {
                             .fontWeight(.medium)
 
                         if station.isTransferStation {
-                            Label(AppLocalization.localized("Transfer"), systemImage: "arrow.triangle.2.circlepath")
+                            Image(systemName: "arrow.triangle.2.circlepath")
                                 .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.orange.opacity(0.2), in: Capsule())
                                 .foregroundStyle(.orange)
+                                .padding(4)
+                                .background(Color.orange.opacity(0.18), in: Circle())
+                                .accessibilityLabel(AppLocalization.localized("Transfer"))
                         }
                     }
 

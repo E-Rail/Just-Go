@@ -38,7 +38,11 @@ struct RouteResultsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showRouteDetail) {
             if let route = selectedRoute {
-                RouteDetailView(route: route)
+                RouteDetailView(
+                    route: route,
+                    preference: viewModel.sortStrategy,
+                    alternatives: viewModel.routes
+                )
             }
         }
     }
@@ -47,7 +51,7 @@ struct RouteResultsView: View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(RouteSortStrategy.allCases) { strategy in
+                    ForEach(RoutePreference.primary) { strategy in
                         SortChip(
                             title: strategy.title,
                             icon: strategy.icon,
@@ -57,6 +61,30 @@ struct RouteResultsView: View {
                             viewModel.sortRoutes()
                         }
                     }
+
+                    Menu {
+                        ForEach(RoutePreference.allCases.filter { !$0.isPrimary }) { strategy in
+                            Button {
+                                viewModel.sortStrategy = strategy
+                                viewModel.sortRoutes()
+                            } label: {
+                                Label(AppLocalization.localized(strategy.title), systemImage: strategy.icon)
+                            }
+                        }
+                    } label: {
+                        Label(
+                            viewModel.sortStrategy.isPrimary
+                                ? AppLocalization.localized("More")
+                                : AppLocalization.localized(viewModel.sortStrategy.title),
+                            systemImage: viewModel.sortStrategy.isPrimary ? "ellipsis.circle" : viewModel.sortStrategy.icon
+                        )
+                        .font(.caption)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(viewModel.sortStrategy.isPrimary ? Color(.systemGray5) : Color.blue)
+                        .foregroundStyle(viewModel.sortStrategy.isPrimary ? Color.primary : Color.white)
+                        .clipShape(Capsule())
+                    }
                 }
                 .padding(.vertical, 4)
             }
@@ -65,23 +93,37 @@ struct RouteResultsView: View {
 
     private var routesSection: some View {
         Section {
-            ForEach(viewModel.routes) { route in
-                RouteCard(
-                    route: route,
-                    feasibility: container.routeFeasibilityService.feasibility(
-                        for: route,
-                        personalReports: accessibilityReportService.reports(affecting: route)
-                    )
-                ) {
-                    _ = tripMemoryService.recordPlannedTrip(
-                        route: route,
-                        cityID: viewModel.selectedCity?.id ?? "",
-                        accessibilityFilter: viewModel.accessibilityFilter
-                    )
-                    selectedRoute = route
-                    showRouteDetail = true
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(alignment: .top, spacing: 12) {
+                    ForEach(viewModel.routes) { route in
+                        let feasibility = container.routeFeasibilityService.feasibility(
+                            for: route,
+                            personalReports: accessibilityReportService.reports(affecting: route)
+                        )
+                        RouteCard(
+                            route: route,
+                            confidence: container.routeConfidenceService.confidence(
+                                for: route,
+                                feasibility: feasibility,
+                                preference: viewModel.sortStrategy,
+                                alternatives: viewModel.routes
+                            )
+                        ) {
+                            _ = tripMemoryService.recordPlannedTrip(
+                                route: route,
+                                cityID: viewModel.selectedCity?.id ?? "",
+                                accessibilityFilter: viewModel.accessibilityFilter
+                            )
+                            selectedRoute = route
+                            showRouteDetail = true
+                        }
+                        .frame(width: 320)
+                    }
                 }
+                .padding(.vertical, 4)
             }
+        } header: {
+            Text(AppLocalization.localized("Swipe routes"))
         }
     }
 }
@@ -112,7 +154,7 @@ struct SortChip: View {
 
 struct RouteCard: View {
     let route: Route
-    let feasibility: RouteFeasibility
+    let confidence: RouteConfidence
     let action: () -> Void
 
     var body: some View {
@@ -126,11 +168,14 @@ struct RouteCard: View {
                         Text("\(route.strategy.localizedName) • \(route.formattedWalkingDistance)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                        Text(DataConfidence.amap.label)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()
 
-                    feasibilityBadge
+                    confidenceBadge
                 }
 
                 // Route segments preview
@@ -152,18 +197,16 @@ struct RouteCard: View {
                     }
                 }
 
-                // Warnings
-                let explanations = Array(feasibility.allExplanations.prefix(2))
-                if !explanations.isEmpty {
-                    ForEach(explanations, id: \.self) { explanation in
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(feasibility.level.warningColor)
-                            Text(explanation)
-                                .font(.caption)
-                                .foregroundStyle(feasibility.level.warningColor)
-                        }
-                    }
+                Text(confidence.explanation)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+
+                if let warning = confidence.warnings.first {
+                    Label(warning, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(confidence.level.color)
+                        .lineLimit(2)
                 }
             }
             .padding()
@@ -198,18 +241,41 @@ struct RouteCard: View {
         .foregroundStyle(.secondary)
     }
 
-    private var feasibilityBadge: some View {
-        HStack(spacing: 4) {
-            Image(systemName: feasibility.level.iconName)
-            Text(feasibility.title)
+    private var confidenceBadge: some View {
+        VStack(spacing: 2) {
+            Image(systemName: confidence.level.iconName)
+            Text("\(confidence.score)")
+                .fontWeight(.semibold)
+            Text(confidence.level.title)
+                .font(.caption2)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .font(.caption)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(feasibility.level.color.opacity(0.16), in: Capsule())
-        .foregroundStyle(feasibility.level.color)
+        .frame(minWidth: 74)
+        .padding(.vertical, 6)
+        .foregroundStyle(confidence.level.color)
+        .accessibilityLabel("\(confidence.level.title), \(confidence.score) \(AppLocalization.localized("out of 100"))")
     }
 
+}
+
+private extension RouteConfidenceLevel {
+    var color: Color {
+        switch self {
+        case .high: return .green
+        case .medium: return .orange
+        case .low: return .red
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .high: return "checkmark.seal.fill"
+        case .medium: return "exclamationmark.triangle.fill"
+        case .low: return "xmark.octagon.fill"
+        }
+    }
 }
 
 private extension RouteFeasibilityLevel {
@@ -282,9 +348,10 @@ struct RouteStationTimeline: View {
                                     .foregroundStyle(.secondary)
                             }
                             if stop.isTransfer {
-                                Text(AppLocalization.localized("Transfer"))
+                                Image(systemName: "arrow.triangle.2.circlepath")
                                     .font(.caption)
                                     .foregroundStyle(.orange)
+                                    .accessibilityLabel(AppLocalization.localized("Transfer"))
                             }
                             if let arrivalTimeText = stop.arrivalTimeText {
                                 Text(arrivalTimeText)

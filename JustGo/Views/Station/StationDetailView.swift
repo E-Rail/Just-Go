@@ -1,5 +1,16 @@
 import SwiftUI
 
+private extension DataConfidence {
+    var color: Color {
+        switch self {
+        case .official, .communityVerified: return .green
+        case .amap, .estimated: return .blue
+        case .personal, .sourcePending: return .orange
+        case .unavailable, .unknown: return .gray
+        }
+    }
+}
+
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
@@ -17,6 +28,7 @@ struct StationDetailView: View {
             VStack(spacing: 20) {
                 stationHeader
                 linesSection
+                beforeYouGoSection
                 accessibilitySection
                 stationEssentialsSection
                 arrivalsSection
@@ -39,6 +51,72 @@ struct StationDetailView: View {
         .sheet(isPresented: $showStationReport) {
             stationReportSheet
         }
+    }
+
+    private var beforeYouGoSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.localized("Before You Go"))
+                    .font(.headline)
+
+                Text(AppLocalization.localized("Best data available"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                confidenceRow(
+                    title: "Schedule",
+                    confidence: viewModel?.scheduleConfidence ?? .unknown,
+                    icon: "clock"
+                )
+                confidenceRow(
+                    title: "Station Map",
+                    confidence: viewModel?.stationMapConfidence ?? .unknown,
+                    icon: "map"
+                )
+                confidenceRow(
+                    title: "Accessibility",
+                    confidence: viewModel?.accessibilityConfidence ?? .unknown,
+                    icon: "accessibility"
+                )
+                confidenceRow(
+                    title: "Live arrivals",
+                    confidence: viewModel?.liveArrivalConfidence ?? .unknown,
+                    icon: "wave.3.right"
+                )
+
+                if displayedStation.isTransferStation {
+                    Label(AppLocalization.localized("Transfer station"), systemImage: "arrow.triangle.2.circlepath")
+                        .font(.caption)
+                }
+                if !displayedStation.facilities.isEmpty {
+                    Label(AppLocalization.localized("Station essentials available"), systemImage: "info.circle.fill")
+                        .font(.caption)
+                }
+                if viewModel?.arrivals.isEmpty == false {
+                    Label(AppLocalization.localized("First and last train information available"), systemImage: "clock.fill")
+                        .font(.caption)
+                }
+
+                Text(AppLocalization.localized("JustGo shows what is known before you enter the station."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func confidenceRow(title: String, confidence: DataConfidence, icon: String) -> some View {
+        Label {
+            HStack {
+                Text(AppLocalization.localized(title))
+                Spacer()
+                Text(confidence.label)
+                    .foregroundStyle(.secondary)
+            }
+        } icon: {
+            Image(systemName: icon)
+                .foregroundStyle(confidence.color)
+        }
+        .font(.subheadline)
     }
 
     private var stationHeader: some View {
@@ -373,6 +451,7 @@ struct StationDetailView: View {
 
     private var stationEssentialsSection: some View {
         let station = displayedStation
+        let facilities = station.facilities.deduplicatedForDisplay()
         let personalReports = accessibilityReportService.reports(for: station)
         return GlassCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -393,8 +472,8 @@ struct StationDetailView: View {
                     .accessibilityLabel(AppLocalization.localized("Report station issue"))
                 }
 
-                if !station.facilities.isEmpty {
-                    ForEach(station.facilities) { facility in
+                if !facilities.isEmpty {
+                    ForEach(facilities) { facility in
                         facilityRow(facility)
                     }
                 } else {
@@ -415,7 +494,7 @@ struct StationDetailView: View {
                     }
                 }
 
-                Text(station.facilities.isEmpty ? AppLocalization.localized("Source pending") : AppLocalization.localized("Official city data"))
+                Text(facilities.isEmpty ? AppLocalization.localized("Source pending") : AppLocalization.localized("Official city data"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -678,10 +757,7 @@ private struct FullScreenStationImageView: View {
                 AsyncImage(url: image.url) { phase in
                     switch phase {
                     case .success(let loadedImage):
-                        loadedImage
-                            .resizable()
-                            .scaledToFit()
-                            .padding()
+                        ZoomableStationImage(image: loadedImage)
                     case .failure:
                         ContentUnavailableView(
                             AppLocalization.localized("Station map could not be loaded"),
@@ -714,6 +790,100 @@ private struct FullScreenStationImageView: View {
                 }
             }
         }
+    }
+}
+
+private struct ZoomableStationImage: View {
+    let image: Image
+    @State private var scale: CGFloat = 1
+    @State private var baseScale: CGFloat = 1
+    @State private var offset: CGSize = .zero
+    @State private var baseOffset: CGSize = .zero
+
+    private let minScale: CGFloat = 1
+    private let maxScale: CGFloat = 5
+
+    var body: some View {
+        image
+            .resizable()
+            .scaledToFit()
+            .padding()
+            .scaleEffect(scale)
+            .offset(offset)
+            .gesture(pinchGesture.simultaneously(with: dragGesture))
+            .onTapGesture(count: 2) {
+                resetZoom()
+            }
+            .accessibilityAddTraits(.isImage)
+    }
+
+    private var pinchGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                scale = clamp(baseScale * value, minScale, maxScale)
+                if scale == minScale {
+                    offset = .zero
+                    baseOffset = .zero
+                }
+            }
+            .onEnded { _ in
+                baseScale = scale
+                if scale == minScale {
+                    resetZoom()
+                }
+            }
+    }
+
+    private var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                guard scale > minScale else { return }
+                offset = CGSize(
+                    width: baseOffset.width + value.translation.width,
+                    height: baseOffset.height + value.translation.height
+                )
+            }
+            .onEnded { _ in
+                baseOffset = offset
+            }
+    }
+
+    private func resetZoom() {
+        scale = minScale
+        baseScale = minScale
+        offset = .zero
+        baseOffset = .zero
+    }
+
+    private func clamp(_ value: CGFloat, _ lower: CGFloat, _ upper: CGFloat) -> CGFloat {
+        min(max(value, lower), upper)
+    }
+}
+
+private extension Array where Element == StationFacility {
+    func deduplicatedForDisplay() -> [StationFacility] {
+        var seen = Set<String>()
+        return filter { facility in
+            let key = [
+                facility.type.rawValue,
+                facility.name.normalizedFacilityText,
+                (facility.locationText ?? "").normalizedFacilityText,
+                facility.source.rawValue,
+                facility.verification.rawValue
+            ].joined(separator: "|")
+            return seen.insert(key).inserted
+        }
+    }
+}
+
+private extension String {
+    var normalizedFacilityText: String {
+        replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "，", with: ",")
+            .replacingOccurrences(of: "。", with: ".")
+            .replacingOccurrences(of: "（", with: "(")
+            .replacingOccurrences(of: "）", with: ")")
+            .lowercased()
     }
 }
 

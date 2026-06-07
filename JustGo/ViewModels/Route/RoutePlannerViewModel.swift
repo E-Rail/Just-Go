@@ -21,7 +21,7 @@ final class RoutePlannerViewModel {
     var pendingQuickPlaceKind: QuickPlaceKind?
     var isLoading = false
     var errorMessage: String?
-    var sortStrategy: RouteSortStrategy = .metroFirst
+    var sortStrategy: RoutePreference = .metroFirst
 
     private var suggestionTask: Task<Void, Never>?
 
@@ -184,8 +184,10 @@ final class RoutePlannerViewModel {
         requiresWheelchairAccess = savedTrip.accessibilityFilter.requiresWheelchairAccess
         requiresElevator = savedTrip.accessibilityFilter.requiresElevator
         avoidStairs = savedTrip.accessibilityFilter.avoidStairs
-        if let preferredStrategy = savedTrip.preferredStrategy {
-            sortStrategy = RouteSortStrategy(routeStrategy: preferredStrategy)
+        if let preferredPreference = savedTrip.preferredRoutePreference {
+            sortStrategy = preferredPreference
+        } else if let preferredStrategy = savedTrip.preferredStrategy {
+            sortStrategy = RoutePreference(routeStrategy: preferredStrategy)
         }
         clearSuggestions()
     }

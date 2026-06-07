@@ -30,9 +30,6 @@
 		A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* Components/Transit/LineColorIndicator.swift */; };
 		A100001B /* Map/AMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* Map/AMapService.swift */; };
 		A100001C /* Map/AMapConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* Map/AMapConfiguration.swift */; };
-		A100004A /* Map/AMapResponseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Map/AMapResponseModels.swift */; };
-		A100004B /* Map/AMapDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Map/AMapDecoding.swift */; };
-		A100004C /* Map/AMapTransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004C /* Map/AMapTransitFormatting.swift */; };
 		A100001D /* Transit/RoutePlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* Transit/RoutePlanningService.swift */; };
 		A100001E /* Transit/StationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* Transit/StationSearchService.swift */; };
 		A1000020 /* Location/LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* Location/LocationService.swift */; };
@@ -47,13 +44,16 @@
 		A100002D /* User/AccessibilityPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002D /* User/AccessibilityPreference.swift */; };
 		A100002F /* User/SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002F /* User/SearchHistory.swift */; };
 		A1000033 /* Extensions/Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* Extensions/Color+Hex.swift */; };
-		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100003C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200003C /* Assets.xcassets */; };
 		A100003D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000012 /* Localizable.strings */; };
 		A100003E /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200003E /* Localization.swift */; };
 		A100003F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000013 /* InfoPlist.strings */; };
 		A1000040 /* Map/TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* Map/TransitMapView.swift */; };
 		A1000041 /* SubwayData in Resources */ = {isa = PBXBuildFile; fileRef = A2000046 /* SubwayData */; };
+		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
+		A100004A /* Map/AMapResponseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Map/AMapResponseModels.swift */; };
+		A100004B /* Map/AMapDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Map/AMapDecoding.swift */; };
+		A100004C /* Map/AMapTransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004C /* Map/AMapTransitFormatting.swift */; };
 		A1000050 /* Station/StationFacility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000050 /* Station/StationFacility.swift */; };
 		A1000051 /* User/TripMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000051 /* User/TripMemory.swift */; };
 		A1000052 /* User/AccessibilityReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000052 /* User/AccessibilityReport.swift */; };
@@ -89,9 +89,6 @@
 		A2000019 /* Components/Transit/LineColorIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/LineColorIndicator.swift; sourceTree = "<group>"; };
 		A200001B /* Map/AMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapService.swift; sourceTree = "<group>"; };
 		A200001C /* Map/AMapConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapConfiguration.swift; sourceTree = "<group>"; };
-		A200004A /* Map/AMapResponseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapResponseModels.swift; sourceTree = "<group>"; };
-		A200004B /* Map/AMapDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapDecoding.swift; sourceTree = "<group>"; };
-		A200004C /* Map/AMapTransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapTransitFormatting.swift; sourceTree = "<group>"; };
 		A200001D /* Transit/RoutePlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RoutePlanningService.swift; sourceTree = "<group>"; };
 		A200001E /* Transit/StationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/StationSearchService.swift; sourceTree = "<group>"; };
 		A2000020 /* Location/LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location/LocationService.swift; sourceTree = "<group>"; };
@@ -106,7 +103,6 @@
 		A200002D /* User/AccessibilityPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityPreference.swift; sourceTree = "<group>"; };
 		A200002F /* User/SearchHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/SearchHistory.swift; sourceTree = "<group>"; };
 		A2000033 /* Extensions/Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Color+Hex.swift"; sourceTree = "<group>"; };
-		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A200003C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A200003D /* JustGo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "JustGo-Info.plist"; sourceTree = "<group>"; };
 		A200003E /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
@@ -118,8 +114,12 @@
 		A2000044 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000045 /* Map/TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/TransitMapView.swift; sourceTree = "<group>"; };
 		A2000046 /* SubwayData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SubwayData; sourceTree = "<group>"; };
+		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		A200004A /* Map/AMapResponseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapResponseModels.swift; sourceTree = "<group>"; };
+		A200004B /* Map/AMapDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapDecoding.swift; sourceTree = "<group>"; };
+		A200004C /* Map/AMapTransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapTransitFormatting.swift; sourceTree = "<group>"; };
 		A2000050 /* Station/StationFacility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationFacility.swift; sourceTree = "<group>"; };
 		A2000051 /* User/TripMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/TripMemory.swift; sourceTree = "<group>"; };
 		A2000052 /* User/AccessibilityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityReport.swift; sourceTree = "<group>"; };
@@ -529,7 +529,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.justgo.app;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.justgo-cn.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -563,7 +563,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.justgo.app;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.justgo-cn.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

@@ -289,46 +289,69 @@ struct CityPickerView: View {
     @Binding var selectedCity: City?
     @Environment(\.dismiss) private var dismiss
     @Environment(DIContainer.self) private var container
+    @State private var searchText = ""
 
     private var cities: [City] {
         container.cityService.getAllCities()
     }
 
+    private var filteredCities: [City] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return cities }
+        return cities.filter { city in
+            [
+                city.id,
+                city.name,
+                city.nameEn,
+                city.localizedName,
+                city.alternateLocalizedName
+            ]
+            .compactMap { $0?.lowercased() }
+            .contains { $0.contains(query) }
+        }
+    }
+
     var body: some View {
         NavigationStack {
-            List(cities) { city in
+            List(filteredCities) { city in
                 Button(action: {
                     selectedCity = city
                     dismiss()
                 }) {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(city.localizedName)
-                                .font(.headline)
-                            if let alternateName = city.alternateLocalizedName {
-                                Text(alternateName)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(city.localizedName)
+                                    .font(.headline)
+                                if let alternateName = city.alternateLocalizedName {
+                                    Text(alternateName)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
-                            CityCapabilityTags(city: city)
+
+                            Spacer(minLength: 8)
+
+                            if selectedCity?.id == city.id {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(.blue)
+                            }
+
+                            Text(AppLocalization.stationCount(city.stationCount))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
 
-                        Spacer()
-
-                        if selectedCity?.id == city.id {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.blue)
-                        }
-
-                        Text(AppLocalization.stationCount(city.stationCount))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        CityCapabilityTags(city: city)
                     }
+                    .padding(.vertical, 4)
                 }
                 .buttonStyle(.plain)
             }
             .navigationTitle(AppLocalization.localized("Select City"))
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: AppLocalization.localized("Search cities"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(AppLocalization.localized("Cancel")) { dismiss() }

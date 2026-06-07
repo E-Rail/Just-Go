@@ -64,7 +64,7 @@ struct ProfileView: View {
                 }
             }
         } header: {
-            Text(AppLocalization.localized("Accessibility"))
+            Text(AppLocalization.localized("Universal Travel Support"))
         }
     }
 

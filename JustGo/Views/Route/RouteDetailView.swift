@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct RouteDetailView: View {
-    let route: Route
+    private let initialRoute: Route
     let preference: RoutePreference
     let alternatives: [Route]
+    @State private var selectedRouteID: UUID
     @State private var showRouteReport = false
     @State private var showTripNote = false
     @State private var showExpandedRouteMap = false
@@ -18,6 +19,9 @@ struct RouteDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                if alternatives.count > 1 {
+                    RouteTabs(routes: alternatives, selection: $selectedRouteID)
+                }
                 routeSummaryCard
                 tripConfidenceCard
                 routeMapPreview
@@ -46,9 +50,16 @@ struct RouteDetailView: View {
         preference: RoutePreference = .fastest,
         alternatives: [Route] = []
     ) {
-        self.route = route
+        initialRoute = route
         self.preference = preference
-        self.alternatives = alternatives
+        self.alternatives = alternatives.contains(where: { $0.id == route.id })
+            ? alternatives
+            : [route] + alternatives
+        _selectedRouteID = State(initialValue: route.id)
+    }
+
+    private var route: Route {
+        alternatives.first { $0.id == selectedRouteID } ?? initialRoute
     }
 
     private var routeMapPreview: some View {

@@ -5,7 +5,7 @@ struct RouteResultsView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AccessibilityReportService.self) private var accessibilityReportService
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @State private var selectedRoute: Route?
+    @State private var selectedRouteID: UUID?
     @State private var showRouteDetail = false
 
     var body: some View {
@@ -36,6 +36,12 @@ struct RouteResultsView: View {
         }
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            ensureRouteSelection()
+        }
+        .onChange(of: viewModel.routes.map(\.id)) {
+            ensureRouteSelection()
+        }
         .navigationDestination(isPresented: $showRouteDetail) {
             if let route = selectedRoute {
                 RouteDetailView(
@@ -93,37 +99,116 @@ struct RouteResultsView: View {
 
     private var routesSection: some View {
         Section {
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: 12) {
-                    ForEach(viewModel.routes) { route in
-                        let feasibility = container.routeFeasibilityService.feasibility(
+            if !viewModel.routes.isEmpty {
+                RouteTabs(
+                    routes: viewModel.routes,
+                    selection: Binding(
+                        get: { selectedRouteID ?? viewModel.routes[0].id },
+                        set: { selectedRouteID = $0 }
+                    )
+                )
+
+                if let route = selectedRoute {
+                    let feasibility = container.routeFeasibilityService.feasibility(
+                        for: route,
+                        personalReports: accessibilityReportService.reports(affecting: route)
+                    )
+                    RouteCard(
+                        route: route,
+                        confidence: container.routeConfidenceService.confidence(
                             for: route,
-                            personalReports: accessibilityReportService.reports(affecting: route)
+                            feasibility: feasibility,
+                            preference: viewModel.sortStrategy,
+                            alternatives: viewModel.routes
                         )
-                        RouteCard(
+                    ) {
+                        _ = tripMemoryService.recordPlannedTrip(
                             route: route,
-                            confidence: container.routeConfidenceService.confidence(
-                                for: route,
-                                feasibility: feasibility,
-                                preference: viewModel.sortStrategy,
-                                alternatives: viewModel.routes
-                            )
-                        ) {
-                            _ = tripMemoryService.recordPlannedTrip(
-                                route: route,
-                                cityID: viewModel.selectedCity?.id ?? "",
-                                accessibilityFilter: viewModel.accessibilityFilter
-                            )
-                            selectedRoute = route
-                            showRouteDetail = true
-                        }
-                        .frame(width: 320)
+                            cityID: viewModel.selectedCity?.id ?? "",
+                            accessibilityFilter: viewModel.accessibilityFilter
+                        )
+                        showRouteDetail = true
                     }
                 }
-                .padding(.vertical, 4)
             }
         } header: {
-            Text(AppLocalization.localized("Swipe routes"))
+            Text(AppLocalization.localized("Choose a route"))
+        }
+    }
+
+    private var selectedRoute: Route? {
+        guard let selectedRouteID else { return viewModel.routes.first }
+        return viewModel.routes.first { $0.id == selectedRouteID } ?? viewModel.routes.first
+    }
+
+    private func ensureRouteSelection() {
+        guard !viewModel.routes.isEmpty else {
+            selectedRouteID = nil
+            return
+        }
+        if !viewModel.routes.contains(where: { $0.id == selectedRouteID }) {
+            selectedRouteID = viewModel.routes[0].id
+        }
+    }
+}
+
+struct RouteTabs: View {
+    let routes: [Route]
+    @Binding var selection: UUID
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(Array(routes.enumerated()), id: \.element.id) { index, route in
+                    Button {
+                        selection = route.id
+                    } label: {
+                        VStack(spacing: 7) {
+                            Text(AppLocalization.text(
+                                english: "Route \(index + 1) · \(route.formattedDuration)",
+                                chinese: "路线 \(index + 1) · \(route.formattedDuration)"
+                            ))
+                            .font(.subheadline)
+                            .fontWeight(selection == route.id ? .semibold : .regular)
+                            .lineLimit(1)
+
+                            routeColorBar(route)
+                                .frame(height: 3)
+                                .clipShape(Capsule())
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(
+                            selection == route.id ? Color.accentColor.opacity(0.12) : Color(.systemGray6),
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(AppLocalization.text(
+                        english: "Route \(index + 1), \(route.formattedDuration), \(route.formattedTransfers)",
+                        chinese: "路线 \(index + 1)，\(route.formattedDuration)，\(route.formattedTransfers)"
+                    ))
+                    .accessibilityAddTraits(selection == route.id ? .isSelected : [])
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func routeColorBar(_ route: Route) -> some View {
+        HStack(spacing: 1) {
+            let subwaySegments = route.segments.filter { $0.type == .subway }
+            ForEach(subwaySegments) { segment in
+                Color(hex: segment.lineColorHex ?? "#007AFF")
+                    .frame(minWidth: 20)
+            }
+            if subwaySegments.isEmpty {
+                Color.gray.frame(minWidth: 20)
+            }
         }
     }
 }

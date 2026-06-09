@@ -5,7 +5,6 @@ struct MapContainerView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel: MapViewModel?
     @State private var selectedStation: Station?
-    @State private var showStationDetail = false
     @State private var showCityPicker = false
     @State private var isLoadingStationDetail = false
     @FocusState private var isSearchFocused: Bool
@@ -35,11 +34,12 @@ struct MapContainerView: View {
                     .padding(.bottom, 10)
             }
         }
-        .sheet(isPresented: $showStationDetail) {
-            if let station = selectedStation {
-                NavigationStack {
-                    StationDetailView(station: station)
-                }
+        .sheet(item: $selectedStation, onDismiss: {
+            selectedStation = nil
+            isLoadingStationDetail = false
+        }) { station in
+            NavigationStack {
+                StationDetailView(station: station)
             }
         }
         .sheet(isPresented: $showCityPicker) {
@@ -53,7 +53,8 @@ struct MapContainerView: View {
                 viewModel = MapViewModel(
                     locationService: container.locationService,
                     stationSearchService: container.stationSearchService,
-                    aMapService: container.aMapService
+                    aMapService: container.aMapService,
+                    cityService: container.cityService
                 )
             }
 
@@ -80,15 +81,10 @@ struct MapContainerView: View {
             subwayLines: viewModel?.subwayLines ?? [],
             route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
-            onStationSelected: { station in
-                Task {
-                    guard let viewModel else { return }
-                    selectedStation = await viewModel.selectStation(station)
-                    if selectedStation != nil {
-                        showStationDetail = true
-                    }
-                }
-            }
+            onRegionChanged: { region in
+                viewModel?.viewportChanged(to: region)
+            },
+            onStationSelected: openStation
         )
     }
 
@@ -184,7 +180,7 @@ struct MapContainerView: View {
                             }
                         }
                         Spacer()
-                        if let line = station.lines.first {
+                        if let line = station.uniqueLogicalLines.first {
                             Text(line.localizedName)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -279,7 +275,6 @@ struct MapContainerView: View {
             defer { isLoadingStationDetail = false }
 
             selectedStation = await viewModel?.selectStation(station) ?? station
-            showStationDetail = true
         }
     }
 

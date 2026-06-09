@@ -62,7 +62,7 @@ struct StationRow: View {
 
     private var lineIndicators: some View {
         VStack(spacing: 2) {
-            ForEach(station.lines.prefix(3)) { line in
+            ForEach(station.uniqueLogicalLines.prefix(3)) { line in
                 Circle()
                     .fill(Color(hex: line.colorHex))
                     .frame(width: 10, height: 10)

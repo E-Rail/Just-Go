@@ -170,7 +170,7 @@ struct StationDetailView: View {
                 Text(AppLocalization.localized("Lines"))
                     .font(.headline)
 
-                ForEach(station.lines) { line in
+                ForEach(station.uniqueLogicalLines) { line in
                     HStack(spacing: 8) {
                         Circle()
                             .fill(Color(hex: line.colorHex))

@@ -7,6 +7,7 @@ struct TransitMapView: UIViewRepresentable {
     let subwayLines: [SubwayLineMapOverlay]
     let route: Route?
     let showsUserLocation: Bool
+    let onRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -35,6 +36,7 @@ struct TransitMapView: UIViewRepresentable {
         private var contentSignature = ""
         private var annotationStations: [ObjectIdentifier: Station] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
+        private var stationSymbolImages: [String: UIImage] = [:]
 
         init(parent: TransitMapView) {
             self.parent = parent
@@ -165,13 +167,10 @@ struct TransitMapView: UIViewRepresentable {
             guard let stationAnnotation = annotation as? StationAnnotation else { return nil }
 
             let identifier = "station"
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView ??
-                MKMarkerAnnotationView(annotation: stationAnnotation, reuseIdentifier: identifier)
+            let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? StationAnnotationView ??
+                StationAnnotationView(annotation: stationAnnotation, reuseIdentifier: identifier)
             view.annotation = stationAnnotation
-            view.markerTintColor = stationAnnotation.station.isTransferStation ? .systemOrange : .systemBlue
-            view.glyphImage = UIImage(systemName: stationAnnotation.station.isTransferStation ? "arrow.triangle.2.circlepath" : "tram.fill")
-            view.canShowCallout = true
-            view.displayPriority = stationAnnotation.station.isTransferStation ? .required : .defaultHigh
+            configureStationSymbol(view, station: stationAnnotation.station, region: mapView.region)
             return view
         }
 
@@ -180,6 +179,91 @@ struct TransitMapView: UIViewRepresentable {
             if let station = annotationStations[ObjectIdentifier(annotation)] {
                 parent.onStationSelected(station)
             }
+            mapView.deselectAnnotation(annotation, animated: false)
+        }
+
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+            let region = mapView.region
+            let visibleRegion = MapVisibleRegion(
+                center: region.center,
+                latitudeDelta: region.span.latitudeDelta,
+                longitudeDelta: region.span.longitudeDelta
+            )
+            regionSignature = visibleRegion.signature
+            refreshMarkerVisibility(on: mapView)
+            parent.onRegionChanged?(visibleRegion)
+        }
+
+        private func refreshMarkerVisibility(on mapView: MKMapView) {
+            for annotation in mapView.annotations {
+                guard let stationAnnotation = annotation as? StationAnnotation,
+                      let view = mapView.view(for: annotation) else {
+                    continue
+                }
+                configureStationSymbol(view, station: stationAnnotation.station, region: mapView.region)
+            }
+        }
+
+        private func configureStationSymbol(
+            _ view: MKAnnotationView,
+            station: Station,
+            region: MKCoordinateRegion
+        ) {
+            guard let view = view as? StationAnnotationView else { return }
+            view.canShowCallout = false
+            view.displayPriority = station.isTransferStation ? .required : .defaultLow
+            view.collisionMode = .rectangle
+            let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
+            let visibilityLimit = station.isTransferStation ? 0.8 : 0.1
+            guard maxDelta <= visibilityLimit else {
+                view.isHidden = true
+                return
+            }
+
+            let baseSize: CGFloat = maxDelta <= 0.055 ? 18 : (maxDelta <= 0.18 ? 9 : 6)
+            let pointSize = baseSize + (station.isTransferStation ? 3 : 0)
+            let labelSize: CGFloat = maxDelta <= 0.055 ? 12 : (maxDelta <= 0.18 ? 10 : 9)
+            view.configure(
+                station: station,
+                symbol: stationSymbolImage(isTransfer: station.isTransferStation, pointSize: pointSize),
+                symbolSize: pointSize,
+                labelSize: labelSize
+            )
+            view.isHidden = false
+        }
+
+        private func stationSymbolImage(isTransfer: Bool, pointSize: CGFloat) -> UIImage {
+            let key = "\(isTransfer)-\(pointSize)"
+            if let cached = stationSymbolImages[key] {
+                return cached
+            }
+
+            let size = CGSize(width: pointSize, height: pointSize)
+            let image = UIGraphicsImageRenderer(size: size).image { context in
+                let rect = CGRect(origin: .zero, size: size).insetBy(dx: 1, dy: 1)
+                context.cgContext.setFillColor(UIColor.white.cgColor)
+                context.cgContext.fillEllipse(in: rect)
+                context.cgContext.setStrokeColor(UIColor.black.cgColor)
+                context.cgContext.setLineWidth(max(1.5, pointSize * 0.13))
+                context.cgContext.strokeEllipse(in: rect)
+
+                guard isTransfer,
+                      let transfer = UIImage(
+                        systemName: "arrow.triangle.2.circlepath",
+                        withConfiguration: UIImage.SymbolConfiguration(
+                            pointSize: pointSize * 0.52,
+                            weight: .bold
+                        )
+                      )?.withTintColor(.black, renderingMode: .alwaysOriginal) else {
+                    return
+                }
+                transfer.draw(at: CGPoint(
+                    x: (pointSize - transfer.size.width) / 2,
+                    y: (pointSize - transfer.size.height) / 2
+                ))
+            }
+            stationSymbolImages[key] = image
+            return image
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -222,11 +306,70 @@ private final class StationAnnotation: NSObject, MKAnnotation {
     }
 
     var subtitle: String? {
-        station.lines.map(\.localizedName).joined(separator: " / ")
+        station.uniqueLogicalLines.map(\.localizedName).joined(separator: " / ")
     }
 
     init(station: Station) {
         self.station = station
+    }
+}
+
+private final class StationAnnotationView: MKAnnotationView {
+    private let symbolView = UIImageView()
+    private let tagView = UIView()
+    private let chineseLabel = UILabel()
+    private let englishLabel = UILabel()
+
+    override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
+        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+
+        tagView.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.9)
+        tagView.layer.borderColor = UIColor.separator.cgColor
+        tagView.layer.borderWidth = 0.5
+        addSubview(symbolView)
+        addSubview(tagView)
+        tagView.addSubview(chineseLabel)
+        tagView.addSubview(englishLabel)
+    }
+
+    required init?(coder: NSCoder) {
+        nil
+    }
+
+    func configure(station: Station, symbol: UIImage, symbolSize: CGFloat, labelSize: CGFloat) {
+        symbolView.image = symbol
+        symbolView.frame = CGRect(x: 0, y: 0, width: symbolSize, height: symbolSize)
+
+        chineseLabel.text = AppLocalization.chinese(station.name)
+        chineseLabel.font = .systemFont(ofSize: labelSize, weight: .semibold)
+        chineseLabel.textColor = .label
+        chineseLabel.sizeToFit()
+
+        englishLabel.text = station.nameEn ?? station.namePinyin
+        englishLabel.font = .systemFont(ofSize: max(7, labelSize - 3), weight: .regular)
+        englishLabel.textColor = .secondaryLabel
+        englishLabel.isHidden = englishLabel.text?.isEmpty != false
+        englishLabel.sizeToFit()
+
+        let horizontalPadding: CGFloat = 6
+        let verticalPadding: CGFloat = 3
+        let labelWidth = max(chineseLabel.bounds.width, englishLabel.isHidden ? 0 : englishLabel.bounds.width)
+        let labelHeight = chineseLabel.bounds.height + (englishLabel.isHidden ? 0 : englishLabel.bounds.height + 1)
+        let tagSize = CGSize(width: labelWidth + horizontalPadding * 2, height: labelHeight + verticalPadding * 2)
+        let viewHeight = max(symbolSize, tagSize.height)
+        let tagOrigin = CGPoint(x: symbolSize + 4, y: (viewHeight - tagSize.height) / 2)
+
+        bounds = CGRect(x: 0, y: 0, width: symbolSize + 4 + tagSize.width, height: viewHeight)
+        symbolView.center = CGPoint(x: symbolSize / 2, y: viewHeight / 2)
+        tagView.frame = CGRect(origin: tagOrigin, size: tagSize)
+        tagView.layer.cornerRadius = min(8, tagSize.height / 2)
+        chineseLabel.frame.origin = CGPoint(x: horizontalPadding, y: verticalPadding)
+        englishLabel.frame.origin = CGPoint(
+            x: horizontalPadding,
+            y: chineseLabel.frame.maxY + (englishLabel.isHidden ? 0 : 1)
+        )
+        centerOffset = CGPoint(x: bounds.width / 2 - symbolSize / 2, y: 0)
+        accessibilityLabel = station.accessibilityLabel
     }
 }
 

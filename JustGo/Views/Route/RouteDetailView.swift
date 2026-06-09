@@ -69,6 +69,7 @@ struct RouteDetailView: View {
             subwayLines: [],
             route: route,
             showsUserLocation: false,
+            onRegionChanged: nil,
             onStationSelected: { _ in }
         )
         .frame(height: 220)
@@ -248,20 +249,22 @@ struct RouteDetailView: View {
                 Text(AppLocalization.localized("Route Steps"))
                     .font(.headline)
 
-                ForEach(route.segments) { segment in
-                    segmentTimelineRow(segment)
+                ForEach(Array(route.segments.enumerated()), id: \.element.id) { index, segment in
+                    segmentTimelineRow(segment, isLast: index == route.segments.count - 1)
                 }
             }
         }
     }
 
-    private func segmentTimelineRow(_ segment: RouteSegment) -> some View {
+    private func segmentTimelineRow(_ segment: RouteSegment, isLast: Bool) -> some View {
         HStack(alignment: .top, spacing: 12) {
             VStack {
                 segmentIcon(segment)
-                Rectangle()
-                    .fill(segmentColor(segment).opacity(0.65))
-                    .frame(width: 2, height: 20)
+                if !isLast {
+                    Rectangle()
+                        .fill(segmentColor(segment).opacity(0.65))
+                        .frame(width: 2, height: 20)
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -519,6 +522,7 @@ private struct FullScreenRouteMapView: View {
                 subwayLines: [],
                 route: route,
                 showsUserLocation: false,
+                onRegionChanged: nil,
                 onStationSelected: { _ in }
             )
             .ignoresSafeArea(edges: .bottom)

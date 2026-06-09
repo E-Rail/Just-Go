@@ -1066,6 +1066,7 @@ final class AMapService {
         let firstStationID = routeStops.first?.stationID ?? originName
         let lastStationID = routeStops.last?.stationID ?? destinationName
         let totalStops = segments.filter { $0.type == .subway }.reduce(0) { $0 + $1.stops }
+        let criticalStops = criticalRouteStops(routeStops: routeStops, segments: segmentsWithPlaceNames)
         let stepFreeAssessment = stepFreeAssessment(
             for: routeStops,
             segments: segmentsWithPlaceNames,
@@ -1090,7 +1091,7 @@ final class AMapService {
 
         let dataCoverage = await cityPackStore.routeCoverage(
             cityID: system.cityID,
-            stationNames: routeStops.map(\.name)
+            stationNames: criticalStops.map(\.name)
         )
 
         return Route(
@@ -1283,21 +1284,10 @@ final class AMapService {
             return .barrierDetected
         }
 
-        var criticalStops = segments
-            .filter { $0.type == .subway }
-            .flatMap { segment in
-                [segment.stationStops.first, segment.stationStops.last].compactMap { $0 }
-            }
-        if criticalStops.isEmpty {
-            criticalStops = [routeStops.first, routeStops.last].compactMap { $0 }
-        }
+        let criticalStops = criticalRouteStops(routeStops: routeStops, segments: segments)
+        let stations = criticalStops.compactMap { station(for: $0, system: system) }
 
-        var seen: Set<String> = []
-        let stations = criticalStops
-            .filter { seen.insert($0.stationID).inserted }
-            .compactMap { station(for: $0, system: system) }
-
-        guard !criticalStops.isEmpty, stations.count == seen.count else {
+        guard !criticalStops.isEmpty, stations.count == criticalStops.count else {
             return .unknown
         }
 
@@ -1326,6 +1316,23 @@ final class AMapService {
         }
 
         return allConfirmed ? .confirmed : .likely
+    }
+
+    private func criticalRouteStops(
+        routeStops: [RouteStationStop],
+        segments: [RouteSegment]
+    ) -> [RouteStationStop] {
+        var stops = segments
+            .filter { $0.type == .subway }
+            .flatMap { segment in
+                [segment.stationStops.first, segment.stationStops.last].compactMap { $0 }
+            }
+        if stops.isEmpty {
+            stops = [routeStops.first, routeStops.last].compactMap { $0 }
+        }
+
+        var seen: Set<String> = []
+        return stops.filter { seen.insert(normalizeStationKey($0.name)).inserted }
     }
 
     private func walkingAccessibilityNotes(from steps: [WalkingStep], filter: AccessibilityFilter) -> [String] {
@@ -1909,7 +1916,7 @@ private final class SubwayDataStore {
         }
 
         for station in stationByID.values {
-            station.isTransferStation = station.lines.count > 1
+            station.isTransferStation = station.uniqueLogicalLines.count > 1
         }
 
         let stations = stationByID.values.sorted { $0.name < $1.name }
@@ -1972,7 +1979,7 @@ private final class SubwayDataStore {
                 )
                 station.poiIDs = data.poiIDs ?? []
                 station.lines = data.lineIDs.compactMap { lineLookup[$0] }
-                station.isTransferStation = station.lines.count > 1 || Set(data.lineIDs).count > 1
+                station.isTransferStation = station.uniqueLogicalLines.count > 1
                 station.exits = (data.exits ?? []).map { exit in
                     StationExit(
                         exitID: exit.exitID,
@@ -2055,6 +2062,7 @@ private final class SubwayDataStore {
             lineOverlays: []
         )
     }
+
 }
 
 struct SubwayLineMapOverlay: Identifiable, Codable {

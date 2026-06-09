@@ -58,6 +58,22 @@ func normalizeStationKey(_ value: String) -> String {
         .lowercased()
 }
 
+extension SubwayLine {
+    var logicalLineIdentity: String {
+        let normalizedName = normalizeTransitLineName(name)
+        let lineName = normalizedName.isEmpty ? lineID.lowercased() : normalizedName
+        let color = colorHex.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return "\(cityID.lowercased())|\(lineName)|\(color)"
+    }
+}
+
+extension Station {
+    var uniqueLogicalLines: [SubwayLine] {
+        var seen: Set<String> = []
+        return lines.filter { seen.insert($0.logicalLineIdentity).inserted }
+    }
+}
+
 extension SubwayLineData {
     var scheduleCandidateLineIDs: [String] {
         uniqueScheduleValues(

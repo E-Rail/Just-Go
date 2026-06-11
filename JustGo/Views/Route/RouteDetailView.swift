@@ -11,6 +11,7 @@ struct RouteDetailView: View {
     @State private var tripNote = ""
     @State private var routeReportNote = ""
     @State private var routeReportSeverity: AccessibilityReportSeverity = .medium
+    @State private var metroNetworks: [MetroNetwork] = []
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -41,7 +42,16 @@ struct RouteDetailView: View {
             tripNoteSheet
         }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
-            FullScreenRouteMapView(route: route)
+            FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
+        }
+        .task(id: appState.selectedCity?.id) {
+            guard let cityID = appState.selectedCity?.id,
+                  cityID != "automatic",
+                  let network = await container.metroNetworkProvider.network(for: cityID) else {
+                metroNetworks = []
+                return
+            }
+            metroNetworks = [network]
         }
     }
 
@@ -66,7 +76,7 @@ struct RouteDetailView: View {
         TransitMapView(
             visibleRegion: .constant(route.previewRegion),
             stations: [],
-            subwayLines: [],
+            metroNetworks: metroNetworks,
             route: route,
             showsUserLocation: false,
             onRegionChanged: nil,
@@ -82,6 +92,12 @@ struct RouteDetailView: View {
                 .padding(8)
                 .background(.black.opacity(0.55), in: Circle())
                 .padding(10)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if !metroNetworks.isEmpty {
+                MetroGeometryAttributionView()
+                    .padding(8)
+            }
         }
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture {
@@ -314,7 +330,7 @@ struct RouteDetailView: View {
                     .foregroundStyle(segmentColor(segment))
                     .padding(6)
                     .background(Color.gray.opacity(0.2), in: Circle())
-            case .subway:
+            case .subway, .transit:
                 Image(systemName: "tram.fill")
                     .foregroundStyle(segmentColor(segment))
                     .padding(6)
@@ -332,7 +348,7 @@ struct RouteDetailView: View {
         switch segment.type {
         case .walking:
             return .gray
-        case .subway:
+        case .subway, .transit:
             return Color(hex: segment.lineColorHex ?? "#007AFF")
         case .transfer:
             return .orange
@@ -506,11 +522,13 @@ private struct TripConfidenceCard: View {
 
 private struct FullScreenRouteMapView: View {
     let route: Route
+    let metroNetworks: [MetroNetwork]
     @Environment(\.dismiss) private var dismiss
     @State private var visibleRegion: MapVisibleRegion?
 
-    init(route: Route) {
+    init(route: Route, metroNetworks: [MetroNetwork]) {
         self.route = route
+        self.metroNetworks = metroNetworks
         _visibleRegion = State(initialValue: route.previewRegion)
     }
 
@@ -519,13 +537,19 @@ private struct FullScreenRouteMapView: View {
             TransitMapView(
                 visibleRegion: $visibleRegion,
                 stations: [],
-                subwayLines: [],
+                metroNetworks: metroNetworks,
                 route: route,
                 showsUserLocation: false,
                 onRegionChanged: nil,
                 onStationSelected: { _ in }
             )
             .ignoresSafeArea(edges: .bottom)
+            .overlay(alignment: .bottomTrailing) {
+                if !metroNetworks.isEmpty {
+                    MetroGeometryAttributionView()
+                        .padding(8)
+                }
+            }
             .navigationTitle(AppLocalization.localized("Route Map"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

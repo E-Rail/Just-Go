@@ -62,7 +62,7 @@ struct RoutePlannerView: View {
             if viewModel == nil {
                 viewModel = RoutePlannerViewModel(
                     routePlanningService: container.routePlanningService,
-                    aMapService: container.aMapService,
+                    placeSearchProvider: container.placeSearchProvider,
                     locationService: container.locationService
                 )
             }

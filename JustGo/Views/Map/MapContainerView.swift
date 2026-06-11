@@ -7,6 +7,7 @@ struct MapContainerView: View {
     @State private var selectedStation: Station?
     @State private var showCityPicker = false
     @State private var isLoadingStationDetail = false
+    @State private var isNearbyStationsExpanded = true
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -17,9 +18,15 @@ struct MapContainerView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 10) {
                 topControls
-                HStack {
+                HStack(spacing: 8) {
                     Spacer()
+                    if viewModel?.metroNetworks.isEmpty == false {
+                        MetroGeometryAttributionView()
+                            .lineLimit(1)
+                            .layoutPriority(0)
+                    }
                     mapLocateButton
+                        .layoutPriority(1)
                 }
             }
             .padding(.horizontal)
@@ -53,8 +60,8 @@ struct MapContainerView: View {
                 viewModel = MapViewModel(
                     locationService: container.locationService,
                     stationSearchService: container.stationSearchService,
-                    aMapService: container.aMapService,
-                    cityService: container.cityService
+                    cityService: container.cityService,
+                    metroNetworkProvider: container.metroNetworkProvider
                 )
             }
 
@@ -78,7 +85,7 @@ struct MapContainerView: View {
                 set: { viewModel?.visibleRegion = $0 }
             ),
             stations: viewModel?.stations ?? [],
-            subwayLines: viewModel?.subwayLines ?? [],
+            metroNetworks: viewModel?.metroNetworks ?? [],
             route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
             onRegionChanged: { region in
@@ -220,45 +227,64 @@ struct MapContainerView: View {
 
     private func nearbyStationsCard(viewModel: MapViewModel) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(AppLocalization.localized("Nearby Stations"))
-                    .font(.headline)
-                Spacer()
+            Button {
+                withAnimation(.snappy) {
+                    isNearbyStationsExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Text(AppLocalization.localized("Nearby Stations"))
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(isNearbyStationsExpanded ? 0 : -90))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityValue(isNearbyStationsExpanded ? AppLocalization.localized("Expanded") : AppLocalization.localized("Collapsed"))
+
+            if isNearbyStationsExpanded {
                 if !viewModel.nearbyStations.isEmpty {
-                    Button(viewModel.isShowingAllNearbyStations ? AppLocalization.localized("Show Less") : AppLocalization.localized("See All")) {
-                        withAnimation {
-                            viewModel.toggleNearbyList()
+                    HStack {
+                        Spacer()
+                        Button(viewModel.isShowingAllNearbyStations ? AppLocalization.localized("Show Less") : AppLocalization.localized("See All")) {
+                            withAnimation {
+                                viewModel.toggleNearbyList()
+                            }
+                        }
+                        .font(.subheadline)
+                    }
+                }
+
+                if viewModel.nearbyStations.isEmpty && !viewModel.isLocationAuthorized {
+                    Button {
+                        Task {
+                            await viewModel.requestLocationAccess()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "location.slash")
+                                .foregroundStyle(.secondary)
+                            Text(AppLocalization.localized("Enable location to see nearby stations"))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                     }
-                    .font(.subheadline)
-                }
-            }
-
-            if viewModel.nearbyStations.isEmpty && !viewModel.isLocationAuthorized {
-                Button {
-                Task {
-                    await viewModel.requestLocationAccess()
-                }
-                } label: {
-                    HStack {
-                        Image(systemName: "location.slash")
-                            .foregroundStyle(.secondary)
-                        Text(AppLocalization.localized("Enable location to see nearby stations"))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-                .padding(.vertical, 8)
-            } else if viewModel.nearbyStations.isEmpty {
-                Text(AppLocalization.localized("No nearby stations found"))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .buttonStyle(.plain)
                     .padding(.vertical, 8)
-            } else {
-                ForEach(viewModel.nearbyStations.prefix(viewModel.isShowingAllNearbyStations ? 10 : 3)) { station in
-                    StationRow(station: station) {
-                        openStation(station)
+                } else if viewModel.nearbyStations.isEmpty {
+                    Text(AppLocalization.localized("No nearby stations found"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(viewModel.nearbyStations.prefix(viewModel.isShowingAllNearbyStations ? 10 : 3)) { station in
+                        StationRow(station: station) {
+                            openStation(station)
+                        }
                     }
                 }
             }

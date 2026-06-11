@@ -28,8 +28,7 @@
 		A1000017 /* Components/Transit/StationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* Components/Transit/StationRow.swift */; };
 		A1000018 /* Components/Glass/GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* Components/Glass/GlassCard.swift */; };
 		A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* Components/Transit/LineColorIndicator.swift */; };
-		A100001B /* Map/AMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* Map/AMapService.swift */; };
-		A100001C /* Map/AMapConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001C /* Map/AMapConfiguration.swift */; };
+		A100001B /* Map/MapKitProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* Map/MapKitProviders.swift */; };
 		A100001D /* Transit/RoutePlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* Transit/RoutePlanningService.swift */; };
 		A100001E /* Transit/StationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* Transit/StationSearchService.swift */; };
 		A1000020 /* Location/LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* Location/LocationService.swift */; };
@@ -49,11 +48,9 @@
 		A100003E /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200003E /* Localization.swift */; };
 		A100003F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000013 /* InfoPlist.strings */; };
 		A1000040 /* Map/TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* Map/TransitMapView.swift */; };
-		A1000041 /* SubwayData in Resources */ = {isa = PBXBuildFile; fileRef = A2000046 /* SubwayData */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
-		A100004A /* Map/AMapResponseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Map/AMapResponseModels.swift */; };
-		A100004B /* Map/AMapDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Map/AMapDecoding.swift */; };
-		A100004C /* Map/AMapTransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004C /* Map/AMapTransitFormatting.swift */; };
+		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
+		A100004B /* Transit/TransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Transit/TransitFormatting.swift */; };
 		A1000050 /* Station/StationFacility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000050 /* Station/StationFacility.swift */; };
 		A1000051 /* User/TripMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000051 /* User/TripMemory.swift */; };
 		A1000052 /* User/AccessibilityReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000052 /* User/AccessibilityReport.swift */; };
@@ -63,6 +60,9 @@
 		A1000056 /* Transit/RouteFeasibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000056 /* Transit/RouteFeasibilityService.swift */; };
 		A1000057 /* Profile/TripMemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000057 /* Profile/TripMemoryView.swift */; };
 		A1000058 /* Profile/AccessibilityReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000058 /* Profile/AccessibilityReportsView.swift */; };
+		A1000059 /* MetroNetworks in Resources */ = {isa = PBXBuildFile; fileRef = A2000059 /* MetroNetworks */; };
+		A100005A /* Data/BundledMetroNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005A /* Data/BundledMetroNetworkService.swift */; };
+		A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005B /* Transit/BundledMetroRouteProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,8 +87,7 @@
 		A2000017 /* Components/Transit/StationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StationRow.swift; sourceTree = "<group>"; };
 		A2000018 /* Components/Glass/GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Glass/GlassCard.swift; sourceTree = "<group>"; };
 		A2000019 /* Components/Transit/LineColorIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/LineColorIndicator.swift; sourceTree = "<group>"; };
-		A200001B /* Map/AMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapService.swift; sourceTree = "<group>"; };
-		A200001C /* Map/AMapConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapConfiguration.swift; sourceTree = "<group>"; };
+		A200001B /* Map/MapKitProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapKitProviders.swift; sourceTree = "<group>"; };
 		A200001D /* Transit/RoutePlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RoutePlanningService.swift; sourceTree = "<group>"; };
 		A200001E /* Transit/StationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/StationSearchService.swift; sourceTree = "<group>"; };
 		A2000020 /* Location/LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location/LocationService.swift; sourceTree = "<group>"; };
@@ -113,13 +112,11 @@
 		A2000043 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000044 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000045 /* Map/TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/TransitMapView.swift; sourceTree = "<group>"; };
-		A2000046 /* SubwayData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SubwayData; sourceTree = "<group>"; };
 		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
-		A200004A /* Map/AMapResponseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapResponseModels.swift; sourceTree = "<group>"; };
-		A200004B /* Map/AMapDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapDecoding.swift; sourceTree = "<group>"; };
-		A200004C /* Map/AMapTransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/AMapTransitFormatting.swift; sourceTree = "<group>"; };
+		A200004A /* Data/OfficialCityPackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/OfficialCityPackService.swift; sourceTree = "<group>"; };
+		A200004B /* Transit/TransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransitFormatting.swift; sourceTree = "<group>"; };
 		A2000050 /* Station/StationFacility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationFacility.swift; sourceTree = "<group>"; };
 		A2000051 /* User/TripMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/TripMemory.swift; sourceTree = "<group>"; };
 		A2000052 /* User/AccessibilityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityReport.swift; sourceTree = "<group>"; };
@@ -129,6 +126,9 @@
 		A2000056 /* Transit/RouteFeasibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibilityService.swift; sourceTree = "<group>"; };
 		A2000057 /* Profile/TripMemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/TripMemoryView.swift; sourceTree = "<group>"; };
 		A2000058 /* Profile/AccessibilityReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/AccessibilityReportsView.swift; sourceTree = "<group>"; };
+		A2000059 /* MetroNetworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MetroNetworks; sourceTree = "<group>"; };
+		A200005A /* Data/BundledMetroNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/BundledMetroNetworkService.swift; sourceTree = "<group>"; };
+		A200005B /* Transit/BundledMetroRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BundledMetroRouteProvider.swift; sourceTree = "<group>"; };
 		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -211,11 +211,11 @@
 		A5000006 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				A200001B /* Map/AMapService.swift */,
-				A200001C /* Map/AMapConfiguration.swift */,
-				A200004A /* Map/AMapResponseModels.swift */,
-				A200004B /* Map/AMapDecoding.swift */,
-				A200004C /* Map/AMapTransitFormatting.swift */,
+				A200001B /* Map/MapKitProviders.swift */,
+				A200004A /* Data/OfficialCityPackService.swift */,
+				A200005A /* Data/BundledMetroNetworkService.swift */,
+				A200005B /* Transit/BundledMetroRouteProvider.swift */,
+				A200004B /* Transit/TransitFormatting.swift */,
 				A200001D /* Transit/RoutePlanningService.swift */,
 				A200001E /* Transit/StationSearchService.swift */,
 				A2000056 /* Transit/RouteFeasibilityService.swift */,
@@ -265,7 +265,7 @@
 			isa = PBXGroup;
 			children = (
 				A200003C /* Assets.xcassets */,
-				A2000046 /* SubwayData */,
+				A2000059 /* MetroNetworks */,
 				A5000012 /* Localizable.strings */,
 				A5000013 /* InfoPlist.strings */,
 			);
@@ -349,8 +349,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1000041 /* SubwayData in Resources */,
 				A100003C /* Assets.xcassets in Resources */,
+				A1000059 /* MetroNetworks in Resources */,
 				A100003D /* Localizable.strings in Resources */,
 				A100003F /* InfoPlist.strings in Resources */,
 			);
@@ -385,11 +385,11 @@
 				A1000017 /* Components/Transit/StationRow.swift in Sources */,
 				A1000018 /* Components/Glass/GlassCard.swift in Sources */,
 				A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */,
-				A100001B /* Map/AMapService.swift in Sources */,
-				A100001C /* Map/AMapConfiguration.swift in Sources */,
-				A100004A /* Map/AMapResponseModels.swift in Sources */,
-				A100004B /* Map/AMapDecoding.swift in Sources */,
-				A100004C /* Map/AMapTransitFormatting.swift in Sources */,
+				A100001B /* Map/MapKitProviders.swift in Sources */,
+				A100004A /* Data/OfficialCityPackService.swift in Sources */,
+				A100005A /* Data/BundledMetroNetworkService.swift in Sources */,
+				A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */,
+				A100004B /* Transit/TransitFormatting.swift in Sources */,
 				A100001D /* Transit/RoutePlanningService.swift in Sources */,
 				A100001E /* Transit/StationSearchService.swift in Sources */,
 				A1000020 /* Location/LocationService.swift in Sources */,

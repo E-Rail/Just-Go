@@ -1,10 +1,27 @@
 import MapKit
 import SwiftUI
 
+struct MetroGeometryAttributionView: View {
+    var body: some View {
+        Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+            Text(AppLocalization.localized("Metro geometry © OpenStreetMap contributors"))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 4)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(AppLocalization.localized("Metro geometry © OpenStreetMap contributors"))
+    }
+}
+
 struct TransitMapView: UIViewRepresentable {
     @Binding var visibleRegion: MapVisibleRegion?
     let stations: [Station]
-    let subwayLines: [SubwayLineMapOverlay]
+    let metroNetworks: [MetroNetwork]
     let route: Route?
     let showsUserLocation: Bool
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
@@ -33,9 +50,14 @@ struct TransitMapView: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate {
         private var parent: TransitMapView
         private var regionSignature = ""
-        private var contentSignature = ""
+        private var networkSignature = ""
+        private var stationSignature = ""
+        private var routeSignature = ""
         private var annotationStations: [ObjectIdentifier: Station] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
+        private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
+        private var networkOverlays: [MKOverlay] = []
+        private var routeOverlays: [MKOverlay] = []
         private var stationSymbolImages: [String: UIImage] = [:]
 
         init(parent: TransitMapView) {
@@ -46,7 +68,9 @@ struct TransitMapView: UIViewRepresentable {
             self.parent = parent
             mapView.showsUserLocation = parent.showsUserLocation
             syncRegion(on: mapView)
-            syncContent(on: mapView)
+            syncNetworks(on: mapView)
+            syncStations(on: mapView)
+            syncRoute(on: mapView)
         }
 
         private func syncRegion(on mapView: MKMapView) {
@@ -57,28 +81,27 @@ struct TransitMapView: UIViewRepresentable {
             regionSignature = nextSignature
         }
 
-        private func syncContent(on mapView: MKMapView) {
-            let nextSignature = [
-                parent.stations.map(\.stationID).joined(separator: ","),
-                parent.subwayLines.map(\.renderSignature).joined(separator: ","),
-                parent.route?.id.uuidString ?? "no-route"
-            ].joined(separator: "|")
+        private func syncNetworks(on mapView: MKMapView) {
+            let nextSignature = parent.metroNetworks
+                .map { "\($0.cityID):\($0.version)" }
+                .joined(separator: ",")
+            guard nextSignature != networkSignature else { return }
+            networkSignature = nextSignature
+            mapView.removeOverlays(networkOverlays)
+            clearOverlayMetadata(networkOverlays)
+            networkOverlays = []
 
-            guard nextSignature != contentSignature else { return }
-            contentSignature = nextSignature
+            for network in parent.metroNetworks {
+                addNetwork(network, to: mapView)
+            }
+        }
+
+        private func syncStations(on mapView: MKMapView) {
+            let nextSignature = parent.stations.map(\.stationID).joined(separator: ",")
+            guard nextSignature != stationSignature else { return }
+            stationSignature = nextSignature
             annotationStations.removeAll()
-            overlayColors.removeAll()
-
             mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
-            mapView.removeOverlays(mapView.overlays)
-
-            for overlay in parent.subwayLines {
-                addPolyline(overlay.polylineCoordinates, colorHex: overlay.colorHex, to: mapView)
-            }
-
-            if let route = parent.route {
-                addRoute(route, to: mapView)
-            }
 
             let annotations = parent.stations.map { station in
                 let annotation = StationAnnotation(station: station)
@@ -86,6 +109,41 @@ struct TransitMapView: UIViewRepresentable {
                 return annotation
             }
             mapView.addAnnotations(annotations)
+        }
+
+        private func syncRoute(on mapView: MKMapView) {
+            let nextSignature = parent.route?.id.uuidString ?? "no-route"
+            guard nextSignature != routeSignature else { return }
+            routeSignature = nextSignature
+            mapView.removeOverlays(routeOverlays)
+            clearOverlayMetadata(routeOverlays)
+            routeOverlays = []
+            if let route = parent.route {
+                addRoute(route, to: mapView)
+            }
+        }
+
+        private func clearOverlayMetadata(_ overlays: [MKOverlay]) {
+            for overlay in overlays {
+                overlayColors.removeValue(forKey: ObjectIdentifier(overlay))
+                overlayWidths.removeValue(forKey: ObjectIdentifier(overlay))
+            }
+        }
+
+        private func addNetwork(_ network: MetroNetwork, to mapView: MKMapView) {
+            for line in network.lines {
+                for path in line.paths where path.count >= 2 {
+                    addPolyline(
+                        path.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) },
+                        colorHex: line.colorHex,
+                        lineWidth: 4,
+                        level: .aboveRoads,
+                        simplify: false,
+                        collection: &networkOverlays,
+                        to: mapView
+                    )
+                }
+            }
         }
 
         private func addRoute(_ route: Route, to mapView: MKMapView) {
@@ -101,6 +159,10 @@ struct TransitMapView: UIViewRepresentable {
                 addPolyline(
                     coordinates,
                     colorHex: routeColorHex(for: segment),
+                    lineWidth: 6,
+                    level: .aboveLabels,
+                    simplify: true,
+                    collection: &routeOverlays,
                     to: mapView
                 )
             }
@@ -110,19 +172,29 @@ struct TransitMapView: UIViewRepresentable {
             switch segment.type {
             case .walking:
                 return "#8E8E93"
-            case .subway:
+            case .subway, .transit:
                 return segment.lineColorHex ?? "#007AFF"
             case .transfer:
                 return "#FF9500"
             }
         }
 
-        private func addPolyline(_ coordinates: [CLLocationCoordinate2D], colorHex: String, to mapView: MKMapView) {
+        private func addPolyline(
+            _ coordinates: [CLLocationCoordinate2D],
+            colorHex: String,
+            lineWidth: CGFloat,
+            level: MKOverlayLevel,
+            simplify: Bool,
+            collection: inout [MKOverlay],
+            to mapView: MKMapView
+        ) {
             guard coordinates.count >= 2 else { return }
-            let displayCoordinates = simplifiedCoordinates(coordinates)
+            let displayCoordinates = simplify ? simplifiedCoordinates(coordinates) : coordinates
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))
-            mapView.addOverlay(polyline, level: .aboveRoads)
+            overlayWidths[ObjectIdentifier(polyline)] = lineWidth
+            collection.append(polyline)
+            mapView.addOverlay(polyline, level: level)
         }
 
         private func simplifiedCoordinates(
@@ -273,24 +345,11 @@ struct TransitMapView: UIViewRepresentable {
 
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
-            renderer.lineWidth = 5
+            renderer.lineWidth = overlayWidths[ObjectIdentifier(polyline)] ?? 5
             renderer.lineCap = .round
             renderer.lineJoin = .round
             return renderer
         }
-    }
-}
-
-private extension SubwayLineMapOverlay {
-    var renderSignature: String {
-        let first = coordinates.first
-        let last = coordinates.last
-        return [
-            id,
-            "\(coordinates.count)",
-            first.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) } ?? "no-first",
-            last.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) } ?? "no-last"
-        ].joined(separator: ":")
     }
 }
 

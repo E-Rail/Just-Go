@@ -76,7 +76,7 @@ struct ProfileView: View {
                         .foregroundStyle(.green)
                     Text(AppLocalization.localized("Transit Data"))
                     Spacer()
-                    Text(AppLocalization.localized("AMap + official packs"))
+                    Text(AppLocalization.localized("Apple Maps + official packs"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Image(systemName: "chevron.right")
@@ -87,7 +87,7 @@ struct ProfileView: View {
         } header: {
             Text(AppLocalization.localized("Data Source"))
         } footer: {
-            Text(AppLocalization.localized("Routes use AMap; station accessibility, schedules, and official images use downloadable city packs where available."))
+            Text(AppLocalization.localized("Routes use Apple Maps; station facts use downloadable official city packs where available."))
         }
     }
 

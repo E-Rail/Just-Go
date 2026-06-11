@@ -23,7 +23,6 @@ struct MapVisibleRegion {
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
-    var subwayLines: [SubwayLineMapOverlay] = []
     var nearbyStations: [Station] = []
     var isShowingAllNearbyStations = false
     var searchText = ""
@@ -31,30 +30,28 @@ final class MapViewModel {
     var isLoading = false
     var errorMessage: String?
     var visibleRegion: MapVisibleRegion?
+    var metroNetworks: [MetroNetwork] = []
     var isLocationAuthorized: Bool {
         locationService.isAuthorized
     }
 
     private let locationService: LocationService
     private let stationSearchService: StationSearchService
-    private let aMapService: AMapService
     private let cityService: CityService
-    private var loadedCityID: String?
-    private var loadingCityID: String?
-    private var mapContentByCityID: [String: MetroMapContent] = [:]
+    private let metroNetworkProvider: MetroNetworkProviding
     private var viewportLoadTask: Task<Void, Never>?
-    private let metroDetailThreshold: CLLocationDegrees = 2.4
+    private var cityLoadTask: Task<Void, Never>?
 
     init(
         locationService: LocationService,
         stationSearchService: StationSearchService,
-        aMapService: AMapService,
-        cityService: CityService
+        cityService: CityService,
+        metroNetworkProvider: MetroNetworkProviding
     ) {
         self.locationService = locationService
         self.stationSearchService = stationSearchService
-        self.aMapService = aMapService
         self.cityService = cityService
+        self.metroNetworkProvider = metroNetworkProvider
     }
 
     var userLocation: CLLocationCoordinate2D? {
@@ -62,36 +59,25 @@ final class MapViewModel {
     }
 
     func loadStations(for city: City) async {
-        guard loadedCityID != city.id, loadingCityID != city.id else {
-            updateCamera(to: city.coordinate, spanDelta: 0.22)
+        viewportLoadTask?.cancel()
+        cityLoadTask?.cancel()
+        guard city.id != "automatic" else {
+            stations = []
+            metroNetworks = []
             return
         }
-
-        let cityID = city.id
-        loadingCityID = cityID
-        isLoading = true
         updateCamera(to: city.coordinate, spanDelta: 0.22)
-        defer {
-            if loadingCityID == cityID {
-                loadingCityID = nil
-                isLoading = false
-            }
-        }
-
-        let content = await mapContent(for: city)
-        guard loadingCityID == cityID else { return }
-        if !content.isEmpty {
-            stations = content.stations
-            subwayLines = content.subwayLines
-            loadedCityID = cityID
+        metroNetworks = []
+        stations = []
+        cityLoadTask = Task { [weak self] in
+            await self?.loadNetworks(cityIDs: [city.id])
         }
     }
 
     func loadNearbyStations() async {
-        guard let location = userLocation else { return }
-
         do {
-            nearbyStations = try await stationSearchService.searchNearby(location: location)
+            let location = try await locationService.requestCurrentLocation()
+            nearbyStations = try await stationSearchService.searchNearby(location: location.coordinate, radius: 10_000)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -132,10 +118,25 @@ final class MapViewModel {
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
         viewportLoadTask?.cancel()
+        refreshVisibleStations()
+
+        guard region.maxDelta <= 2 else {
+            metroNetworks = []
+            stations = []
+            return
+        }
+
         viewportLoadTask = Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(220))
-            guard !Task.isCancelled else { return }
-            await self?.loadVisibleMapContent(for: region)
+            try? await Task.sleep(for: .milliseconds(350))
+            guard !Task.isCancelled, let self else { return }
+            let centerCityIDs = cityService.getAllCities()
+                .filter { $0.id != "automatic" && region.contains($0.coordinate, paddingFactor: 0.8) }
+                .map(\.id)
+            let intersectingLoadedCityIDs = metroNetworks
+                .filter { $0.bounds.intersects(region) }
+                .map(\.cityID)
+            let visibleCityIDs = Array(Set(centerCityIDs + intersectingLoadedCityIDs))
+            await loadNetworks(cityIDs: visibleCityIDs)
         }
     }
 
@@ -151,7 +152,7 @@ final class MapViewModel {
 
         do {
             let detailedStation = try await stationSearchService.stationDetails(
-                stationID: station.stationID,
+                stationID: station.name,
                 city: station.cityID
             )
             return detailedStation
@@ -180,60 +181,42 @@ final class MapViewModel {
         updateCamera(to: location)
     }
 
-    private func loadVisibleMapContent(for region: MapVisibleRegion) async {
-        guard region.maxDelta <= metroDetailThreshold else { return }
+    private func loadNetworks(cityIDs: [String]) async {
+        let requested = Set(cityIDs)
+        let retained = metroNetworks.filter { requested.contains($0.cityID) }
+        var loadedByCity = Dictionary(uniqueKeysWithValues: retained.map { ($0.cityID, $0) })
 
-        let visibleCities = cityService.getAllCities()
-            .filter { region.contains($0.coordinate) }
+        await withTaskGroup(of: MetroNetwork?.self) { group in
+            for cityID in requested where loadedByCity[cityID] == nil {
+                group.addTask { [metroNetworkProvider] in
+                    await metroNetworkProvider.network(for: cityID)
+                }
+            }
+            for await network in group {
+                if let network {
+                    loadedByCity[network.cityID] = network
+                }
+            }
+        }
 
-        if visibleCities.count == 1, visibleCities.first?.id == loadingCityID {
+        guard !Task.isCancelled else { return }
+        metroNetworks = loadedByCity.values.sorted { $0.cityID < $1.cityID }
+        refreshVisibleStations()
+    }
+
+    private func refreshVisibleStations() {
+        guard let region = visibleRegion, region.maxDelta <= 0.8 else {
+            stations = []
             return
         }
 
-        guard !visibleCities.isEmpty else { return }
-
-        let contents = await visibleCities.asyncMap { city in
-            await self.mapContent(for: city)
-        }
-        if contents.contains(where: { !$0.isEmpty }) {
-            stations = contents.flatMap(\.stations)
-            subwayLines = contents.flatMap(\.subwayLines)
-        }
+        let showsNormalStations = region.maxDelta <= 0.12
+        stations = metroNetworks
+            .flatMap(\.displayStations)
+            .filter { station in
+                region.contains(station.coordinate, paddingFactor: 0.2) &&
+                    (showsNormalStations || station.isTransferStation)
+            }
     }
 
-    private func mapContent(for city: City) async -> MetroMapContent {
-        if let cached = mapContentByCityID[city.id] {
-            return cached
-        }
-
-        async let nextStations = try? stationSearchService.search(keyword: "", city: city.id)
-        async let nextSubwayLines = try? aMapService.getSubwayLines(city: city.id)
-        let content = MetroMapContent(
-            stations: await nextStations ?? [],
-            subwayLines: await nextSubwayLines ?? []
-        )
-        if !content.isEmpty {
-            mapContentByCityID[city.id] = content
-        }
-        return content
-    }
-}
-
-private struct MetroMapContent {
-    let stations: [Station]
-    let subwayLines: [SubwayLineMapOverlay]
-
-    var isEmpty: Bool {
-        stations.isEmpty && subwayLines.isEmpty
-    }
-}
-
-private extension Sequence {
-    func asyncMap<T>(_ transform: (Element) async -> T) async -> [T] {
-        var values: [T] = []
-        for element in self {
-            values.append(await transform(element))
-        }
-        return values
-    }
 }

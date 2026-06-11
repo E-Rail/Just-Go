@@ -118,12 +118,6 @@ extension City {
     }
 }
 
-extension SubwayLineData {
-    var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
-    }
-}
-
 extension Station {
     var localizedName: String {
         AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
@@ -177,8 +171,8 @@ extension RouteSegment {
                 english: "Walk \(AppLocalization.distance(distance))",
                 chinese: "步行 \(AppLocalization.distance(distance))"
             )
-        case .subway:
-            return "\(lineName ?? AppLocalization.localized("Subway")) • \(AppLocalization.stops(stops))"
+        case .subway, .transit:
+            return "\(lineName ?? AppLocalization.localized("Transit")) • \(AppLocalization.stops(stops))"
         case .transfer:
             return AppLocalization.localized("Transfer")
         }
@@ -196,8 +190,8 @@ extension RouteSegment {
             }
             let station = toStationName ?? fromStationName ?? AppLocalization.localized("station")
             return AppLocalization.text(english: "Walk to \(station)", chinese: "步行至 \(station)")
-        case .subway:
-            let line = lineName ?? AppLocalization.localized("Subway")
+        case .subway, .transit:
+            let line = lineName ?? AppLocalization.localized("Transit")
             let direction = toStationName ?? ""
             return AppLocalization.text(english: "\(line) toward \(direction)", chinese: "\(line) 开往 \(direction)")
         case .transfer:

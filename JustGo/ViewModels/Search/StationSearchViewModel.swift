@@ -16,6 +16,7 @@ final class StationSearchViewModel {
     private let locationService: LocationService
     private let recentSearchesKey = "recentStationSearches"
     private var hasRequestedSearchLocation = false
+    private var stationLoadID = UUID()
 
     init(
         stationSearchService: StationSearchService,
@@ -27,16 +28,28 @@ final class StationSearchViewModel {
     }
 
     func loadInitialStations(city: String) async {
+        let loadID = UUID()
+        stationLoadID = loadID
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard !city.isEmpty else { return }
         await refreshLocationIfAlreadyAllowed()
-
-        do {
-            unfilteredResults = try await stationSearchService.search(keyword: "", city: city)
-            applyFilters()
-        } catch {
-            errorMessage = error.localizedDescription
+        guard let browseCityID = stationSearchService.browseCityID(
+            requestedCityID: city,
+            near: locationService.currentLocation?.coordinate
+        ) else {
+            unfilteredResults = []
+            searchResults = []
+            errorMessage = AppLocalization.localized("Choose a city to browse stations")
+            return
         }
+
+        errorMessage = nil
+        unfilteredResults = await stationSearchService.stations(in: browseCityID)
+        guard stationLoadID == loadID else { return }
+        applyFilters()
+        unfilteredResults = await stationSearchService.enrichStations(unfilteredResults)
+        guard stationLoadID == loadID else { return }
+        applyFilters()
     }
 
     func search(city: String) async {

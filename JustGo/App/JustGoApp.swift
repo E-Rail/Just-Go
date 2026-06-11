@@ -8,7 +8,7 @@ struct JustGoApp: App {
     init() {
         let container = DIContainer.configure()
         _container = State(initialValue: container)
-        AMapConfiguration.configure()
+        Self.removeObsoleteRouteCaches()
     }
 
     var body: some Scene {
@@ -22,5 +22,13 @@ struct JustGoApp: App {
                     await appState.initialize(container: container)
                 }
         }
+    }
+
+    private static func removeObsoleteRouteCaches() {
+        let fileManager = FileManager.default
+        if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("LineOverlays", isDirectory: true))
+        }
+        UserDefaults.standard.removeObject(forKey: "recentStationSearches")
     }
 }

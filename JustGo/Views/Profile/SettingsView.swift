@@ -38,12 +38,12 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         Section {
-            LabeledContent(AppLocalization.localized("Route and Search Provider"), value: AppLocalization.localized("AMap"))
+            LabeledContent(AppLocalization.localized("Route and Search Provider"), value: AppLocalization.localized("Apple Maps"))
             LabeledContent(AppLocalization.localized("Official Station Details"), value: AppLocalization.localized("City Packs"))
         } header: {
             Text(AppLocalization.localized("Transit Data"))
         } footer: {
-            Text(AppLocalization.localized("Route planning and search use AMap. Accessibility, schedules, and station images use official city packs when available."))
+            Text(AppLocalization.localized("Route planning and place search use Apple Maps. Station facts use official city packs when available."))
         }
     }
 

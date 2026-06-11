@@ -42,6 +42,8 @@ final class AppState {
             nearestCity = nil
         }
 
-        selectedCity = nearestCity ?? container.cityService.getCity(byID: "1100") ?? container.cityService.getAllCities().first
+        selectedCity = nearestCity
+            ?? container.cityService.getCity(byID: "1100")
+            ?? container.cityService.getAllCities().first
     }
 }

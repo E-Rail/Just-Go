@@ -5,7 +5,6 @@ struct StationSearchView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel: StationSearchViewModel?
     @State private var selectedStation: Station?
-    @State private var showStationDetail = false
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -26,8 +25,8 @@ struct StationSearchView: View {
             }
             .navigationTitle(AppLocalization.localized("Search"))
             .navigationBarTitleDisplayMode(.large)
-            .navigationDestination(isPresented: $showStationDetail) {
-                if let station = selectedStation {
+            .sheet(item: $selectedStation) { station in
+                NavigationStack {
                     StationDetailView(station: station)
                 }
             }
@@ -89,7 +88,6 @@ struct StationSearchView: View {
                     isSearchFocused = false
                     viewModel?.selectStation(station)
                     selectedStation = station
-                    showStationDetail = true
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
@@ -173,7 +171,6 @@ struct StationSearchView: View {
                     ) {
                         viewModel?.selectStation(station)
                         selectedStation = station
-                        showStationDetail = true
                     }
                 }
             } else if !(viewModel?.searchText.isEmpty ?? true) {
@@ -181,6 +178,12 @@ struct StationSearchView: View {
                     Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
                 } description: {
                     Text(AppLocalization.localized("Try a different search term"))
+                }
+            } else if let message = viewModel?.errorMessage {
+                ContentUnavailableView {
+                    Label(AppLocalization.localized("Choose City"), systemImage: "building.2")
+                } description: {
+                    Text(message)
                 }
             } else if viewModel?.recentSearches.isEmpty == false {
                 recentSearchesSection

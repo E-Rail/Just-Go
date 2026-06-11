@@ -6,7 +6,6 @@ require "json"
 require "time"
 
 ROOT = File.expand_path("..", __dir__)
-CITIES_PATH = File.join(ROOT, "JustGo/Resources/SubwayData/cities.json")
 DATA_PACKS_DIR = File.join(ROOT, "DataPacks")
 OUTPUT_PATH = File.join(DATA_PACKS_DIR, "manifest.json")
 PRIMARY_HOST = nil
@@ -24,6 +23,7 @@ def city_pack_entry(city_id)
   data = File.binread(pack_path)
   pack = JSON.parse(data)
   version = File.basename(latest_dir)
+  capabilities = pack.fetch("capabilities")
   {
     "cityID" => city_id,
     "version" => version,
@@ -31,18 +31,24 @@ def city_pack_entry(city_id)
     "sha256" => Digest::SHA256.hexdigest(data),
     "downloadURL" => "packs/#{city_id}/#{version}/city_pack.json",
     "sourceURLs" => pack.fetch("sourceURLs", []),
-    "capabilities" => pack.fetch("capabilities")
+    "capabilities" => capabilities
   }
 end
 
-cities = JSON.parse(File.read(CITIES_PATH)).fetch("cities")
+existing_ids = if File.exist?(OUTPUT_PATH)
+  JSON.parse(File.read(OUTPUT_PATH)).fetch("cities", []).map { |city| city.fetch("cityID") }
+else
+  []
+end
+pack_ids = Dir.glob(File.join(DATA_PACKS_DIR, "packs", "*")).select { |path| File.directory?(path) }.map { |path| File.basename(path) }
+city_ids = existing_ids + (pack_ids - existing_ids).sort
 manifest = {
   "schemaVersion" => 1,
   "generatedAt" => Time.now.utc.iso8601,
   "primaryHost" => PRIMARY_HOST,
-  "cities" => cities.map do |city|
-    city_pack_entry(city.fetch("id")) || {
-      "cityID" => city.fetch("id"),
+  "cities" => city_ids.map do |city_id|
+    city_pack_entry(city_id) || {
+      "cityID" => city_id,
       "version" => "source-pending",
       "sizeBytes" => 0,
       "sha256" => nil,

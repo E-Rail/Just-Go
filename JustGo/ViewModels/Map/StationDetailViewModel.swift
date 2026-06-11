@@ -14,10 +14,10 @@ final class StationDetailViewModel {
     var serviceStatus: CityPackServiceStatus?
     var cityPackLoadStatus: CityPackLoadStatus?
 
-    private let aMapService: AMapService
+    private let officialStationData: OfficialStationDataProviding
 
-    init(aMapService: AMapService) {
-        self.aMapService = aMapService
+    init(officialStationData: OfficialStationDataProviding) {
+        self.officialStationData = officialStationData
     }
 
     func loadStation(_ station: Station) {
@@ -36,26 +36,14 @@ final class StationDetailViewModel {
         errorMessage = nil
         defer { isLoading = false }
 
-        var lookupErrors: [Error] = []
-
-        for line in station.lines {
-            do {
-                let lineArrivals = try await aMapService.getTrainTimes(
-                    lineID: line.lineID,
-                    stationID: station.stationID
-                )
-                arrivals.append(contentsOf: lineArrivals)
-            } catch {
-                lookupErrors.append(error)
-            }
-        }
+        arrivals = await officialStationData.trainTimes(for: station)
 
         arrivals.sort {
             ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
         }
 
         if arrivals.isEmpty {
-            errorMessage = preferredTrainTimeError(from: lookupErrors)
+            errorMessage = AppLocalization.localized("Official schedule pending for this city/station")
         }
     }
 
@@ -69,14 +57,14 @@ final class StationDetailViewModel {
         serviceStatus = nil
         defer { isLoadingCityPack = false }
 
-        let status = await aMapService.loadCityPack(for: station.cityID)
+        let status = await officialStationData.loadCityPack(for: station.cityID)
         cityPackLoadStatus = status
         switch status {
         case .loaded:
-            self.station = await aMapService.enrichStationFromCityPack(station)
-            stationMap = await aMapService.stationMapFromCityPack(for: station)
-            timetableAssets = await aMapService.timetableAssetsFromCityPack(for: station)
-            serviceStatus = await aMapService.stationServiceStatusFromCityPack(for: station)
+            self.station = await officialStationData.enrichStation(station)
+            stationMap = await officialStationData.stationMap(for: station)
+            timetableAssets = await officialStationData.timetableAssets(for: station)
+            serviceStatus = await officialStationData.serviceStatus(for: station)
             cityPackStatusMessage = AppLocalization.localized("Official city data available")
             if stationMap != nil {
                 stationMapStatusMessage = AppLocalization.localized("Official station map available")
@@ -188,17 +176,6 @@ final class StationDetailViewModel {
         }
 
         return badges
-    }
-
-    private func preferredTrainTimeError(from errors: [Error]) -> String {
-        if errors.contains(where: { error in
-            guard case .trainScheduleUnavailable? = error as? RoutePlanningError else { return false }
-            return true
-        }) {
-            return AppLocalization.localized("Official schedule pending for this city/station")
-        }
-
-        return AppLocalization.localized("Official schedule pending for this city/station")
     }
 
     private var cityPackPendingConfidence: DataConfidence {

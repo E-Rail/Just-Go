@@ -57,7 +57,7 @@ final class RouteFeasibilityService {
         if walkingSteps.contains(where: \.hasStairs) {
             hasAccessibilityRisk = true
             level = max(level, .risky)
-            reasons.append(AppLocalization.localized("AMap walking hints include stairs."))
+            reasons.append(AppLocalization.localized("Apple Maps walking directions mention stairs."))
             estimatedExtraMinutes += 8
             bottleneck = bottleneck ?? RouteBottleneck(
                 segmentTitle: AppLocalization.localized("Walking segment"),
@@ -66,13 +66,13 @@ final class RouteFeasibilityService {
             )
         }
         if walkingSteps.contains(where: \.hasElevator) {
-            reasons.append(AppLocalization.localized("AMap walking hints include an elevator."))
+            reasons.append(AppLocalization.localized("Apple Maps walking directions mention an elevator."))
         }
         if walkingSteps.contains(where: \.hasRamp) {
-            reasons.append(AppLocalization.localized("AMap walking hints include a ramp."))
+            reasons.append(AppLocalization.localized("Apple Maps walking directions mention a ramp."))
         }
         if walkingSteps.contains(where: \.hasEscalator) {
-            reasons.append(AppLocalization.localized("AMap walking hints include an escalator."))
+            reasons.append(AppLocalization.localized("Apple Maps walking directions mention an escalator."))
         }
 
         let problemReports = personalReports.filter { $0.status.isProblem || $0.severity >= .high }

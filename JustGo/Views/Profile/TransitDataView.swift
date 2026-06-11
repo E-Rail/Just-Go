@@ -18,7 +18,7 @@ struct TransitDataView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(AppLocalization.localized("Transit Data Sources"))
                                 .font(.headline)
-                            Text(AppLocalization.localized("AMap powers search, route planning, line geometry, and POIs. Official city packs add verified station details where available."))
+                            Text(AppLocalization.localized("Apple Maps powers place search, transit routes, and route geometry. Official city packs add verified station details where available."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -30,7 +30,12 @@ struct TransitDataView: View {
                     dataCapabilityRow(
                         icon: "map.fill",
                         title: "Map, station search, and routes",
-                        detail: "AMap plus bundled subway data"
+                        detail: "Apple Maps transit routes"
+                    )
+                    dataCapabilityRow(
+                        icon: "point.bottomleft.forward.to.point.topright.scurvepath",
+                        title: "Metro track geometry",
+                        detail: "OpenStreetMap physical track geometry"
                     )
                     dataCapabilityRow(
                         icon: "accessibility",

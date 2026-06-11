@@ -162,7 +162,6 @@ enum StationFacilityType: String, Codable, CaseIterable {
 enum StationFacilitySource: String, Codable {
     case officialCityPack
     case personalReport
-    case amapHint
     case unknown
 
     var label: String {
@@ -171,8 +170,6 @@ enum StationFacilitySource: String, Codable {
             return AppLocalization.localized("Official city data")
         case .personalReport:
             return AppLocalization.localized("Personal report")
-        case .amapHint:
-            return AppLocalization.localized("AMap route hint")
         case .unknown:
             return AppLocalization.localized("Unknown source")
         }

@@ -7,7 +7,7 @@ enum AppLocalization {
     }
 
     static var isChinese: Bool {
-        languageCode.hasPrefix("zh")
+        true
     }
 
     static var isTraditionalChinese: Bool {

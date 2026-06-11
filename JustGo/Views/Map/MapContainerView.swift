@@ -101,7 +101,7 @@ struct MapContainerView: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 20)
 
-                    TextField("Search stations...", text: Binding(
+                    TextField(AppLocalization.localized("Search stations..."), text: Binding(
                         get: { viewModel?.searchText ?? "" },
                         set: { viewModel?.searchText = $0 }
                     ))

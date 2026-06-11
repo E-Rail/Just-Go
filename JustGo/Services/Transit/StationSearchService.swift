@@ -74,10 +74,17 @@ final class StationSearchService {
     }
 
     func searchNearby(location: CLLocationCoordinate2D, radius: Double = 2000) async throws -> [Station] {
-        let networks = await metroNetworkProvider.networks()
-        let stations = networks.flatMap(\.displayStations)
+        let searchRadius = max(radius, 10_000)
+        let networks = await metroNetworkProvider.networks().filter {
+            $0.bounds.distance(to: location) <= searchRadius
+        }
+        var bundledStations: [Station] = []
+        for network in networks {
+            bundledStations.append(contentsOf: await metroNetworkProvider.stations(in: network.cityID))
+        }
+        let stations = bundledStations
             .map { ($0, location.distance(to: $0.coordinate)) }
-            .filter { $0.1 <= max(radius, 10_000) }
+            .filter { $0.1 <= searchRadius }
             .sorted { $0.1 < $1.1 }
             .prefix(5)
             .map(\.0)

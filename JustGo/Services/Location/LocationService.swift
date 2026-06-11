@@ -5,6 +5,7 @@ import CoreLocation
 final class LocationService: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     private var pendingLocationContinuations: [CheckedContinuation<CLLocation, Error>] = []
+    private var locationRequestGeneration = UUID()
 
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
@@ -48,7 +49,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         }
 
         return try await withCheckedThrowingContinuation { continuation in
+            let shouldScheduleTimeout = pendingLocationContinuations.isEmpty
             pendingLocationContinuations.append(continuation)
+            if shouldScheduleTimeout {
+                scheduleLocationRequestTimeout()
+            }
 
             switch authorizationStatus {
             case .notDetermined:
@@ -80,10 +85,14 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
+        guard let location = locations.max(by: { $0.timestamp < $1.timestamp }) else { return }
         currentLocation = location
         locationErrorMessage = nil
-        finishPendingLocationRequests(with: .success(location))
+        if location.horizontalAccuracy >= 0,
+           location.horizontalAccuracy <= 100,
+           abs(location.timestamp.timeIntervalSinceNow) <= 30 {
+            finishPendingLocationRequests(with: .success(location))
+        }
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -131,6 +140,21 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             case let .failure(error):
                 continuation.resume(throwing: error)
             }
+        }
+    }
+
+    private func scheduleLocationRequestTimeout() {
+        let generation = UUID()
+        locationRequestGeneration = generation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+            guard let self,
+                  self.locationRequestGeneration == generation,
+                  !self.pendingLocationContinuations.isEmpty else {
+                return
+            }
+            let error = LocationServiceError.unavailable
+            self.locationErrorMessage = error.localizedDescription
+            self.finishPendingLocationRequests(with: .failure(error))
         }
     }
 }

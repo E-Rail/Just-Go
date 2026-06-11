@@ -57,23 +57,29 @@ final class RoutePlanningService {
         var enrichedRoutes: [Route] = []
         for route in routes {
             var route = route
+            let routeCityID = route.networkCityID ?? city
             let criticalStops = criticalStops(for: route)
             route.dataCoverage = await officialStationData.routeCoverage(
-                cityID: city,
+                cityID: routeCityID,
                 stationNames: criticalStops.map(\.name)
             )
-            let criticalStations: [Station] = await criticalStops.asyncCompactMap { stop -> Station? in
-                guard let coordinate = stop.coordinate else { return nil }
-                return await officialStationData.matchingStation(
-                    place: TransitPlace(
+            let criticalStations = await officialStationData.enrichStations(
+                criticalStops.compactMap { stop in
+                    guard let coordinate = stop.coordinate else { return nil }
+                    return Station(
+                        stationID: stop.stationID,
                         name: stop.name,
-                        coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude),
-                        source: .localStationData
-                    ),
-                    cityID: city
-                )
-            }
-            route.stepFreeAssessment = stepFreeAssessment(route: route, criticalStations: criticalStations)
+                        latitude: coordinate.latitude,
+                        longitude: coordinate.longitude,
+                        cityID: routeCityID
+                    )
+                }
+            )
+            route.stepFreeAssessment = stepFreeAssessment(
+                route: route,
+                criticalStations: criticalStations,
+                expectedStationCount: criticalStops.count
+            )
             route.isFullyAccessible = route.stepFreeAssessment == .confirmed
             route.warnings.removeAll { $0.type == .stepFreeAccessUnconfirmed }
             if route.stepFreeAssessment == .unknown,
@@ -91,20 +97,28 @@ final class RoutePlanningService {
 
     private func criticalStops(for route: Route) -> [RouteStationStop] {
         var result: [RouteStationStop] = []
+        var seen = Set<String>()
         for segment in route.segments where segment.type.isTransit {
             for stop in [segment.stationStops.first, segment.stationStops.last].compactMap({ $0 })
-                where result.last?.stationID != stop.stationID {
+                where seen.insert(stop.stationID).inserted {
                 result.append(stop)
             }
         }
         return result
     }
 
-    private func stepFreeAssessment(route: Route, criticalStations: [Station]) -> RouteStepFreeAssessment {
+    private func stepFreeAssessment(
+        route: Route,
+        criticalStations: [Station],
+        expectedStationCount: Int
+    ) -> RouteStepFreeAssessment {
         if route.warnings.contains(where: { $0.type == .stairsDetected }) {
             return .barrierDetected
         }
-        guard criticalStations.count >= 2 else { return .unknown }
+        guard expectedStationCount >= 2,
+              criticalStations.count == expectedStationCount else {
+            return .unknown
+        }
         let access = criticalStations.compactMap(\.accessibility)
         guard access.count == criticalStations.count else { return .unknown }
         if access.allSatisfy(\.isFullyAccessible) { return .confirmed }
@@ -236,13 +250,11 @@ final class RoutePlanningService {
     }
 }
 
-private extension Sequence {
-    func asyncCompactMap<T>(_ transform: (Element) async -> T?) async -> [T] {
-        var result: [T] = []
-        for item in self {
-            if let value = await transform(item) { result.append(value) }
-        }
-        return result
+extension Route {
+    var networkCityID: String? {
+        let prefix = "network-"
+        guard originStationID.hasPrefix(prefix) else { return nil }
+        return originStationID.dropFirst(prefix.count).split(separator: "-", maxSplits: 1).first.map(String.init)
     }
 }
 
@@ -250,8 +262,6 @@ enum RoutePlanningError: Error {
     case stationNotFound
     case noRouteFound
     case networkError
-    case realTimeDataUnavailable
-    case trainScheduleUnavailable
     case outsideSubwayCoverage
     case placeSearchUnavailable
 }
@@ -265,10 +275,6 @@ extension RoutePlanningError: LocalizedError {
             return AppLocalization.localized("No route found between these stations.")
         case .networkError:
             return AppLocalization.localized("Network connection failed. Try again later.")
-        case .realTimeDataUnavailable:
-            return AppLocalization.localized("Live countdown unavailable")
-        case .trainScheduleUnavailable:
-            return AppLocalization.localized("Schedule unavailable")
         case .outsideSubwayCoverage:
             return AppLocalization.localized("Journey is outside supported subway coverage")
         case .placeSearchUnavailable:

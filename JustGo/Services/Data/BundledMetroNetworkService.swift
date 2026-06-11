@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 struct MetroCoordinate: Codable, Equatable {
@@ -18,6 +19,14 @@ struct MetroBounds: Codable, Equatable {
             maxLatitude >= region.center.latitude - halfLatitude &&
             minLongitude <= region.center.longitude + halfLongitude &&
             maxLongitude >= region.center.longitude - halfLongitude
+    }
+
+    func distance(to coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
+        let nearest = CLLocationCoordinate2D(
+            latitude: min(max(coordinate.latitude, minLatitude), maxLatitude),
+            longitude: min(max(coordinate.longitude, minLongitude), maxLongitude)
+        )
+        return coordinate.distance(to: nearest)
     }
 }
 
@@ -105,6 +114,7 @@ extension MetroNetworkProviding {
 actor BundledMetroNetworkService: MetroNetworkProviding {
     private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301"]
     private var networks: [String: MetroNetwork] = [:]
+    private var stationsByCity: [String: [Station]] = [:]
     private var missingCityIDs: Set<String> = []
 
     func network(for cityID: String) async -> MetroNetwork? {
@@ -136,5 +146,15 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             }
         }
         return result
+    }
+
+    func stations(in cityID: String) async -> [Station] {
+        if let stations = stationsByCity[cityID] {
+            return stations
+        }
+        guard let network = await network(for: cityID) else { return [] }
+        let stations = network.displayStations
+        stationsByCity[cityID] = stations
+        return stations
     }
 }

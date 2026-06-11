@@ -2,7 +2,7 @@ import Foundation
 import CoreLocation
 
 final class CityService {
-    private var cachedCities: [City]
+    private let cities = CityService.seedCities
 
     private static let seedCities: [City] = [
         City(id: "automatic", name: "自动", nameEn: "Automatic", namePinyin: "automatic", latitude: 0, longitude: 0, stationCount: 0, lineCount: 0),
@@ -14,24 +14,16 @@ final class CityService {
         City(id: "3301", name: "杭州", nameEn: "Hangzhou", namePinyin: "hangzhou", latitude: 30.2741, longitude: 120.1551, stationCount: 250, lineCount: 12)
     ]
 
-    init() {
-        self.cachedCities = Self.seedCities
-    }
-
     func getAllCities() -> [City] {
-        cachedCities
+        cities
     }
 
     func getCity(byID id: String) -> City? {
-        cachedCities.first { $0.id == id }
+        cities.first { $0.id == id }
     }
 
-    func refreshCities() async {
-        cachedCities = Self.seedCities
-    }
-
-    func findNearestCity(to location: CLLocation) async -> City? {
-        cachedCities.min { city1, city2 in
+    func findNearestCity(to location: CLLocation) -> City? {
+        cities.min { city1, city2 in
             let loc1 = CLLocation(latitude: city1.latitude, longitude: city1.longitude)
             let loc2 = CLLocation(latitude: city2.latitude, longitude: city2.longitude)
             return location.distance(from: loc1) < location.distance(from: loc2)

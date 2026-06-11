@@ -10,12 +10,8 @@ final class Station: Identifiable {
     var longitude: Double
     var cityID: String
     var isTransferStation: Bool
-    var floorCount: Int
-    var sortOrder: Int
-    var poiIDs: [String]
     var lines: [SubwayLine]
     var accessibility: StationAccessibility?
-    var exits: [StationExit]
     var facilities: [StationFacility]
 
     var coordinate: CLLocationCoordinate2D {
@@ -30,9 +26,7 @@ final class Station: Identifiable {
         latitude: Double,
         longitude: Double,
         cityID: String,
-        isTransferStation: Bool = false,
-        floorCount: Int = 1,
-        sortOrder: Int = 0
+        isTransferStation: Bool = false
     ) {
         self.stationID = stationID
         self.name = name
@@ -42,11 +36,7 @@ final class Station: Identifiable {
         self.longitude = longitude
         self.cityID = cityID
         self.isTransferStation = isTransferStation
-        self.floorCount = floorCount
-        self.sortOrder = sortOrder
-        self.poiIDs = []
         self.lines = []
-        self.exits = []
         self.facilities = []
     }
 }

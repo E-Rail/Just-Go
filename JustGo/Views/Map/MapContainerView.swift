@@ -72,9 +72,7 @@ struct MapContainerView: View {
             }
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
-            Task {
-                await viewModel?.searchStations(in: appState.selectedCity)
-            }
+            viewModel?.scheduleStationSearch(in: appState.selectedCity)
         }
     }
 
@@ -211,8 +209,9 @@ struct MapContainerView: View {
     private var mapLocateButton: some View {
         Button {
             Task {
-                await viewModel?.requestLocationAccess()
-                viewModel?.centerOnUser()
+                if await viewModel?.requestLocationAccess() == true {
+                    viewModel?.centerOnUser()
+                }
             }
         } label: {
             Image(systemName: "location.fill")
@@ -276,7 +275,7 @@ struct MapContainerView: View {
                     .buttonStyle(.plain)
                     .padding(.vertical, 8)
                 } else if viewModel.nearbyStations.isEmpty {
-                    Text(AppLocalization.localized("No nearby stations found"))
+                    Text(viewModel.errorMessage ?? AppLocalization.localized("No nearby stations found"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.vertical, 8)

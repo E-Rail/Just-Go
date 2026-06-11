@@ -153,16 +153,6 @@ extension SubwayLine {
     }
 }
 
-extension StationExit {
-    var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
-    }
-
-    var alternateLocalizedName: String? {
-        AppLocalization.isChinese ? nameEn : name
-    }
-}
-
 extension RouteSegment {
     var summaryLabel: String {
         switch type {

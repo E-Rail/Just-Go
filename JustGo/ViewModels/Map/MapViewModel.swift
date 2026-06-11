@@ -27,7 +27,6 @@ final class MapViewModel {
     var isShowingAllNearbyStations = false
     var searchText = ""
     var searchResults: [Station] = []
-    var isLoading = false
     var errorMessage: String?
     var visibleRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
@@ -39,8 +38,10 @@ final class MapViewModel {
     private let stationSearchService: StationSearchService
     private let cityService: CityService
     private let metroNetworkProvider: MetroNetworkProviding
+    private var stationsByCity: [String: [Station]] = [:]
     private var viewportLoadTask: Task<Void, Never>?
     private var cityLoadTask: Task<Void, Never>?
+    private var searchTask: Task<Void, Never>?
 
     init(
         locationService: LocationService,
@@ -78,17 +79,23 @@ final class MapViewModel {
         do {
             let location = try await locationService.requestCurrentLocation()
             nearbyStations = try await stationSearchService.searchNearby(location: location.coordinate, radius: 10_000)
+            errorMessage = nil
         } catch {
+            nearbyStations = []
             errorMessage = error.localizedDescription
         }
     }
 
-    func requestLocationAccess() async {
+    @discardableResult
+    func requestLocationAccess() async -> Bool {
         do {
             _ = try await locationService.requestCurrentLocation()
             await loadNearbyStations()
+            return true
         } catch {
+            nearbyStations = []
             errorMessage = error.localizedDescription
+            return false
         }
     }
 
@@ -110,7 +117,17 @@ final class MapViewModel {
         }
     }
 
+    func scheduleStationSearch(in city: City?) {
+        searchTask?.cancel()
+        searchTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled else { return }
+            await self?.searchStations(in: city)
+        }
+    }
+
     func clearSearch() {
+        searchTask?.cancel()
         searchText = ""
         searchResults = []
     }
@@ -121,8 +138,8 @@ final class MapViewModel {
         refreshVisibleStations()
 
         guard region.maxDelta <= 2 else {
-            metroNetworks = []
-            stations = []
+            if !metroNetworks.isEmpty { metroNetworks = [] }
+            if !stations.isEmpty { stations = [] }
             return
         }
 
@@ -186,37 +203,50 @@ final class MapViewModel {
         let retained = metroNetworks.filter { requested.contains($0.cityID) }
         var loadedByCity = Dictionary(uniqueKeysWithValues: retained.map { ($0.cityID, $0) })
 
-        await withTaskGroup(of: MetroNetwork?.self) { group in
+        await withTaskGroup(of: (MetroNetwork?, [Station]).self) { group in
             for cityID in requested where loadedByCity[cityID] == nil {
                 group.addTask { [metroNetworkProvider] in
-                    await metroNetworkProvider.network(for: cityID)
+                    async let network = metroNetworkProvider.network(for: cityID)
+                    async let stations = metroNetworkProvider.stations(in: cityID)
+                    return await (network, stations)
                 }
             }
-            for await network in group {
+            for await (network, stations) in group {
                 if let network {
                     loadedByCity[network.cityID] = network
+                    stationsByCity[network.cityID] = stations
                 }
             }
         }
 
         guard !Task.isCancelled else { return }
-        metroNetworks = loadedByCity.values.sorted { $0.cityID < $1.cityID }
+        guard let region = visibleRegion, region.maxDelta <= 2 else {
+            if !metroNetworks.isEmpty { metroNetworks = [] }
+            if !stations.isEmpty { stations = [] }
+            return
+        }
+        metroNetworks = loadedByCity.values
+            .filter { $0.bounds.intersects(region) }
+            .sorted { $0.cityID < $1.cityID }
         refreshVisibleStations()
     }
 
     private func refreshVisibleStations() {
         guard let region = visibleRegion, region.maxDelta <= 0.8 else {
-            stations = []
+            if !stations.isEmpty { stations = [] }
             return
         }
 
         let showsNormalStations = region.maxDelta <= 0.12
-        stations = metroNetworks
-            .flatMap(\.displayStations)
+        let visibleStations = metroNetworks
+            .flatMap { stationsByCity[$0.cityID] ?? [] }
             .filter { station in
                 region.contains(station.coordinate, paddingFactor: 0.2) &&
                     (showsNormalStations || station.isTransferStation)
             }
+        if visibleStations.map(\.stationID) != stations.map(\.stationID) {
+            stations = visibleStations
+        }
     }
 
 }

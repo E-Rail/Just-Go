@@ -44,8 +44,8 @@ struct RouteDetailView: View {
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
         }
-        .task(id: appState.selectedCity?.id) {
-            guard let cityID = appState.selectedCity?.id,
+        .task(id: route.networkCityID ?? appState.selectedCity?.id) {
+            guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
                   cityID != "automatic",
                   let network = await container.metroNetworkProvider.network(for: cityID) else {
                 metroNetworks = []
@@ -408,7 +408,7 @@ struct RouteDetailView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(AppLocalization.localized("Save")) {
                         accessibilityReportService.createRouteReport(
-                            cityID: appState.selectedCity?.id ?? "",
+                            cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
                             route: route,
                             status: .note,
                             severity: routeReportSeverity,
@@ -444,7 +444,7 @@ struct RouteDetailView: View {
                     Button(AppLocalization.localized("Save")) {
                         tripMemoryService.markTripComplete(
                             route: route,
-                            cityID: appState.selectedCity?.id ?? "",
+                            cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
                             note: tripNote
                         )
                         showTripNote = false
@@ -611,16 +611,6 @@ private extension RouteFeasibilityLevel {
             return "xmark.octagon.fill"
         case .unknown:
             return "questionmark.circle.fill"
-        }
-    }
-}
-
-private extension RouteConfidenceLevel {
-    var color: Color {
-        switch self {
-        case .high: return .green
-        case .medium: return .orange
-        case .low: return .red
         }
     }
 }

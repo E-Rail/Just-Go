@@ -17,6 +17,7 @@ final class StationSearchViewModel {
     private let recentSearchesKey = "recentStationSearches"
     private var hasRequestedSearchLocation = false
     private var stationLoadID = UUID()
+    private var searchTask: Task<Void, Never>?
 
     init(
         stationSearchService: StationSearchService,
@@ -72,7 +73,17 @@ final class StationSearchViewModel {
         }
     }
 
+    func scheduleSearch(city: String) {
+        searchTask?.cancel()
+        searchTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled else { return }
+            await self?.search(city: city)
+        }
+    }
+
     func clearSearch() {
+        searchTask?.cancel()
         searchText = ""
         unfilteredResults = []
         searchResults = []

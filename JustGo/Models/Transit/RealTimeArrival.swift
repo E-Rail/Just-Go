@@ -3,7 +3,6 @@ import Foundation
 enum TrainTimeSource: String, Codable {
     case liveCountdown
     case officialSchedule
-    case amapSchedule
     case bundledSchedule
 
     var statusLabel: String {
@@ -12,8 +11,6 @@ enum TrainTimeSource: String, Codable {
             return AppLocalization.localized("Live countdown")
         case .officialSchedule:
             return AppLocalization.localized("Official scheduled time")
-        case .amapSchedule:
-            return AppLocalization.localized("First/last train from AMap")
         case .bundledSchedule:
             return AppLocalization.localized("Bundled schedule")
         }

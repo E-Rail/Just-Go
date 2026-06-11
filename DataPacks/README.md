@@ -20,3 +20,5 @@ CITY_PACK_FALLBACK_BASE_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/JustGo@main/
 ```
 
 The app also accepts a full manifest URL through `CITY_PACK_SECRET_MANIFEST_URL` for backward compatibility, but the preferred setup is the base folder URL.
+
+Metro track geometry is not part of official station-data packs. The app bundles separately attributed OpenStreetMap physical-track geometry.

@@ -73,53 +73,6 @@ enum CityDataCapabilityStatus: String, Codable {
     }
 }
 
-struct CitySubwaySystem: Codable {
-    let cityID: String
-    let version: String
-    let lastUpdated: Date
-    let lines: [SubwayLineData]
-    let stations: [StationData]
-}
-
-struct SubwayLineData: Codable {
-    let lineID: String
-    let name: String
-    let nameEn: String?
-    let colorHex: String
-    let stationIDs: [String]
-    let amapLineIDs: [String]?
-    let polyline: [CodableCoordinate]?
-}
-
-struct StationData: Codable {
-    let stationID: String
-    let name: String
-    let nameEn: String?
-    let namePinyin: String?
-    let latitude: Double
-    let longitude: Double
-    let isTransferStation: Bool
-    let floorCount: Int
-    let lineIDs: [String]
-    let poiIDs: [String]?
-    let exits: [StationExitData]?
-    let accessibility: AccessibilityData?
-    let platformCount: Int?
-    let firstTrainTime: String?
-    let lastTrainTime: String?
-}
-
-struct StationExitData: Codable {
-    let exitID: String
-    let name: String
-    let nameEn: String?
-    let hasElevator: Bool
-    let hasEscalator: Bool
-    let hasWheelchairRamp: Bool
-    let isAccessible: Bool
-    let nearbyLandmarks: [String]?
-}
-
 struct AccessibilityData: Codable {
     let source: String?
     let hasElevator: Bool?

@@ -1,6 +1,18 @@
 import Foundation
 import CoreLocation
 
+struct AccessibilityFilter {
+    var requiresWheelchairAccess: Bool
+    var requiresElevator: Bool
+    var avoidStairs: Bool
+
+    static let none = AccessibilityFilter(
+        requiresWheelchairAccess: false,
+        requiresElevator: false,
+        avoidStairs: false
+    )
+}
+
 struct Route: Identifiable, Codable {
     let id: UUID
     let origin: String
@@ -14,9 +26,9 @@ struct Route: Identifiable, Codable {
     let totalStops: Int
     let transferCount: Int
     let accessibilityScore: Double
-    let isFullyAccessible: Bool
+    var isFullyAccessible: Bool
     var stepFreeAssessment: RouteStepFreeAssessment = .unknown
-    let warnings: [RouteWarning]
+    var warnings: [RouteWarning]
     let accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
 
@@ -147,7 +159,7 @@ struct RouteDataCoverage: Codable, Equatable {
 
 enum DataConfidence: String, Codable, Equatable {
     case official
-    case amap
+    case mapKit
     case communityVerified
     case personal
     case estimated
@@ -158,7 +170,7 @@ enum DataConfidence: String, Codable, Equatable {
     var label: String {
         switch self {
         case .official: return AppLocalization.localized("Official")
-        case .amap: return AppLocalization.localized("AMap route data")
+        case .mapKit: return AppLocalization.localized("Apple Maps route data")
         case .communityVerified: return AppLocalization.localized("Community verified")
         case .personal: return AppLocalization.localized("Personal report")
         case .estimated: return AppLocalization.localized("Estimated")
@@ -204,32 +216,10 @@ enum RouteStrategy: String, Codable, CaseIterable {
     case fastest
     case leastWalking
 
-    var amapV5StrategyValue: String {
-        switch self {
-        case .metroFirst:
-            return "7"
-        case .fastest:
-            return "8"
-        case .leastWalking:
-            return "3"
-        }
-    }
-
-    var amapV3StrategyValue: String {
-        switch self {
-        case .metroFirst:
-            return "2"
-        case .fastest:
-            return "0"
-        case .leastWalking:
-            return "3"
-        }
-    }
-
     var localizedName: String {
         switch self {
         case .metroFirst:
-            return AppLocalization.localized("Metro First")
+            return AppLocalization.localized("Transit First")
         case .fastest:
             return AppLocalization.localized("Fastest")
         case .leastWalking:
@@ -322,9 +312,12 @@ struct RouteAccessPoint: Identifiable, Codable {
 }
 
 enum RouteAccessPointSource: String, Codable {
-    case amap
+    case mapKit
     case localStationData
     case inferred
+    case specificEntrance
+    case stationPOI
+    case routeBoundary
 }
 
 struct RouteStationStop: Identifiable, Codable {
@@ -349,6 +342,7 @@ struct CodableCoordinate: Codable, Equatable {
 enum TransitPlaceSource: String, Codable {
     case inputTip
     case poiSearch
+    case mapKit
     case reverseGeocode
     case currentLocation
     case quickPlace
@@ -438,7 +432,12 @@ struct QuickPlace: Identifiable, Codable {
 enum SegmentType: String, Codable {
     case walking
     case subway
+    case transit
     case transfer
+
+    var isTransit: Bool {
+        self == .transit || self == .subway
+    }
 }
 
 struct WalkingStep: Codable {

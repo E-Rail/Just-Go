@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import MapKit
 
 enum RouteInputField: Hashable {
     case origin
@@ -31,18 +32,18 @@ final class RoutePlannerViewModel {
     var avoidStairs = false
 
     private let routePlanningService: RoutePlanningService
-    private let aMapService: AMapService
+    private let placeSearchProvider: PlaceSearchProviding
     private let locationService: LocationService
     private let recentRoutesKey = "recentRoutes"
     private let quickPlacesKey = "quickPlaces"
 
     init(
         routePlanningService: RoutePlanningService,
-        aMapService: AMapService,
+        placeSearchProvider: PlaceSearchProviding,
         locationService: LocationService
     ) {
         self.routePlanningService = routePlanningService
-        self.aMapService = aMapService
+        self.placeSearchProvider = placeSearchProvider
         self.locationService = locationService
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
         quickPlaces = UserDefaults.standard.codableValue(forKey: quickPlacesKey, as: [QuickPlace].self, default: [])
@@ -104,7 +105,7 @@ final class RoutePlannerViewModel {
         do {
             let location = try await locationService.requestCurrentLocation()
             let coordinate = location.coordinate
-            let place = try await aMapService.reverseGeocode(
+            let place = try await placeSearchProvider.reverseGeocode(
                 location: coordinate,
                 name: AppLocalization.localized("Current Location")
             ).withSource(.currentLocation)
@@ -235,10 +236,15 @@ final class RoutePlannerViewModel {
             return
         }
 
-        suggestionTask = Task { [aMapService] in
+        suggestionTask = Task { [placeSearchProvider] in
             do {
                 try await Task.sleep(for: .milliseconds(120))
-                let suggestions = try await aMapService.inputTips(keyword: keyword, city: city.id, limit: 8)
+                let region = city.id == "automatic" ? nil : MKCoordinateRegion(
+                    center: city.coordinate,
+                    latitudinalMeters: 80_000,
+                    longitudinalMeters: 80_000
+                )
+                let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
                 guard !Task.isCancelled else { return }
                 setSuggestions(suggestions, for: field)
             } catch is CancellationError {
@@ -295,7 +301,7 @@ final class RoutePlannerViewModel {
             originStationName: route.origin,
             destinationStationID: route.destinationStationID,
             destinationStationName: route.destination,
-            lineName: route.segments.first(where: { $0.type == .subway })?.lineName,
+            lineName: route.segments.first(where: { $0.type.isTransit })?.lineName,
             duration: route.formattedDuration
         )
 

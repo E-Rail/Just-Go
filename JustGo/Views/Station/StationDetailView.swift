@@ -4,7 +4,7 @@ private extension DataConfidence {
     var color: Color {
         switch self {
         case .official, .communityVerified: return .green
-        case .amap, .estimated: return .blue
+        case .mapKit, .estimated: return .blue
         case .personal, .sourcePending: return .orange
         case .unavailable, .unknown: return .gray
         }
@@ -40,7 +40,7 @@ struct StationDetailView: View {
         .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            viewModel = StationDetailViewModel(aMapService: container.aMapService)
+            viewModel = StationDetailViewModel(officialStationData: container.officialStationData)
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()
             await viewModel?.loadTrainTimes()
@@ -320,7 +320,7 @@ struct StationDetailView: View {
             Text(AppLocalization.localized("Accessibility not verified"))
                 .font(.subheadline)
                 .fontWeight(.medium)
-            Text(AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available."))
+            Text(AppLocalization.localized("Official accessibility data is not available for this station yet."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -335,7 +335,7 @@ struct StationDetailView: View {
             accessibility.dataSource?.contains("official") == true {
             message = AppLocalization.localized("Accessibility information from official city data.")
         } else {
-            message = AppLocalization.localized("AMap does not provide station accessibility status; no local verification is available.")
+            message = AppLocalization.localized("Official accessibility data is not available for this station yet.")
         }
         return Text(message)
             .font(.caption)

@@ -201,7 +201,7 @@ struct RouteTabs: View {
 
     private func routeColorBar(_ route: Route) -> some View {
         HStack(spacing: 1) {
-            let subwaySegments = route.segments.filter { $0.type == .subway }
+            let subwaySegments = route.segments.filter { $0.type.isTransit }
             ForEach(subwaySegments) { segment in
                 Color(hex: segment.lineColorHex ?? "#007AFF")
                     .frame(minWidth: 20)
@@ -253,7 +253,7 @@ struct RouteCard: View {
                         Text("\(route.strategy.localizedName) • \(route.formattedWalkingDistance)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text(DataConfidence.amap.label)
+                        Text(DataConfidence.mapKit.label)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -307,7 +307,7 @@ struct RouteCard: View {
 
     private var routeColorAccent: some View {
         VStack(spacing: 0) {
-            let subwaySegments = route.segments.filter { $0.type == .subway }
+            let subwaySegments = route.segments.filter { $0.type.isTransit }
             ForEach(subwaySegments) { segment in
                 Color(hex: segment.lineColorHex ?? "#007AFF")
             }
@@ -322,7 +322,7 @@ struct RouteCard: View {
             switch segment.type {
             case .walking:
                 Color.gray
-            case .subway:
+            case .subway, .transit:
                 Color(hex: segment.lineColorHex ?? "#000000")
             case .transfer:
                 Color.orange

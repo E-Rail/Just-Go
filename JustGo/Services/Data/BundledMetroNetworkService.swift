@@ -1,0 +1,140 @@
+import Foundation
+
+struct MetroCoordinate: Codable, Equatable {
+    let latitude: Double
+    let longitude: Double
+}
+
+struct MetroBounds: Codable, Equatable {
+    let minLatitude: Double
+    let minLongitude: Double
+    let maxLatitude: Double
+    let maxLongitude: Double
+
+    func intersects(_ region: MapVisibleRegion) -> Bool {
+        let halfLatitude = region.latitudeDelta / 2
+        let halfLongitude = region.longitudeDelta / 2
+        return minLatitude <= region.center.latitude + halfLatitude &&
+            maxLatitude >= region.center.latitude - halfLatitude &&
+            minLongitude <= region.center.longitude + halfLongitude &&
+            maxLongitude >= region.center.longitude - halfLongitude
+    }
+}
+
+struct MetroLine: Codable, Equatable, Identifiable {
+    let id: String
+    let name: String
+    let nameEn: String?
+    let colorHex: String
+    let stationIDs: [String]
+    let servicePatterns: [[String]]
+    let paths: [[MetroCoordinate]]
+}
+
+struct MetroStation: Codable, Equatable, Identifiable {
+    let id: String
+    let name: String
+    let nameEn: String?
+    let latitude: Double
+    let longitude: Double
+    let lineIDs: [String]
+}
+
+struct MetroNetwork: Codable, Equatable, Identifiable {
+    let cityID: String
+    let version: String
+    let bounds: MetroBounds
+    let geometrySource: String
+    let geometryKind: String
+    let attribution: String
+    let licenseURL: String
+    let sourceSnapshot: String
+    let coordinateSystem: String
+    let sourceURLs: [String]
+    let lines: [MetroLine]
+    let stations: [MetroStation]
+
+    var id: String { cityID }
+
+    var displayStations: [Station] {
+        let linesByID = Dictionary(uniqueKeysWithValues: lines.map { line in
+            (
+                line.id,
+                SubwayLine(
+                    lineID: line.id,
+                    name: line.name,
+                    nameEn: line.nameEn,
+                    colorHex: line.colorHex,
+                    cityID: cityID
+                )
+            )
+        })
+
+        return stations.map { item in
+            let station = Station(
+                stationID: "network-\(cityID)-\(item.id)",
+                name: item.name,
+                nameEn: item.nameEn,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                cityID: cityID,
+                isTransferStation: Set(item.lineIDs).count > 1
+            )
+            station.lines = item.lineIDs.compactMap { linesByID[$0] }
+            return station
+        }
+    }
+}
+
+protocol MetroNetworkProviding {
+    func network(for cityID: String) async -> MetroNetwork?
+    func networks() async -> [MetroNetwork]
+    func stations(in cityID: String) async -> [Station]
+}
+
+extension MetroNetworkProviding {
+    func stations(in cityID: String) async -> [Station] {
+        await network(for: cityID)?.displayStations ?? []
+    }
+
+    func networks() async -> [MetroNetwork] {
+        []
+    }
+}
+
+actor BundledMetroNetworkService: MetroNetworkProviding {
+    private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301"]
+    private var networks: [String: MetroNetwork] = [:]
+    private var missingCityIDs: Set<String> = []
+
+    func network(for cityID: String) async -> MetroNetwork? {
+        if let network = networks[cityID] {
+            return network
+        }
+        guard !missingCityIDs.contains(cityID),
+              let url = Bundle.main.url(
+                forResource: cityID,
+                withExtension: "json",
+                subdirectory: "MetroNetworks"
+              ),
+              let data = try? Data(contentsOf: url),
+              let network = try? JSONDecoder().decode(MetroNetwork.self, from: data),
+              network.cityID == cityID,
+              network.geometryKind == "physicalTrack" else {
+            missingCityIDs.insert(cityID)
+            return nil
+        }
+        networks[cityID] = network
+        return network
+    }
+
+    func networks() async -> [MetroNetwork] {
+        var result: [MetroNetwork] = []
+        for cityID in Self.supportedCityIDs {
+            if let network = await network(for: cityID) {
+                result.append(network)
+            }
+        }
+        return result
+    }
+}

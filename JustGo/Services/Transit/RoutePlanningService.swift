@@ -1,10 +1,23 @@
 import Foundation
+import CoreLocation
+import MapKit
 
 final class RoutePlanningService {
-    private let aMapService: AMapService
+    private let placeSearchProvider: PlaceSearchProviding
+    private let routeProvider: TransitRouteProviding
+    private let officialStationData: OfficialStationDataProviding
+    private let cityService: CityService
 
-    init(aMapService: AMapService) {
-        self.aMapService = aMapService
+    init(
+        placeSearchProvider: PlaceSearchProviding,
+        routeProvider: TransitRouteProviding,
+        officialStationData: OfficialStationDataProviding,
+        cityService: CityService
+    ) {
+        self.placeSearchProvider = placeSearchProvider
+        self.routeProvider = routeProvider
+        self.officialStationData = officialStationData
+        self.cityService = cityService
     }
 
     func planRoute(
@@ -13,8 +26,11 @@ final class RoutePlanningService {
         city: String,
         accessibilityFilter: AccessibilityFilter = .none
     ) async throws -> [Route] {
-        async let originPlaces = aMapService.searchPlaces(keyword: originName, city: city, limit: 8)
-        async let destinationPlaces = aMapService.searchPlaces(keyword: destinationName, city: city, limit: 8)
+        let region = cityService.getCity(byID: city).flatMap { $0.id == "automatic" ? nil : $0 }.map {
+            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 120_000, longitudinalMeters: 120_000)
+        }
+        async let originPlaces = placeSearchProvider.searchPlaces(keyword: originName, region: region, limit: 8)
+        async let destinationPlaces = placeSearchProvider.searchPlaces(keyword: destinationName, region: region, limit: 8)
 
         let originPlace = try await originPlaces.first
         let destinationPlace = try await destinationPlaces.first
@@ -24,12 +40,7 @@ final class RoutePlanningService {
             throw RoutePlanningError.stationNotFound
         }
 
-        return try await aMapService.planTransitRoute(
-            from: origin,
-            to: destination,
-            city: city,
-            accessibilityFilter: accessibilityFilter
-        )
+        return try await planRoute(from: origin, to: destination, city: city, accessibilityFilter: accessibilityFilter)
     }
 
     func planRoute(
@@ -38,12 +49,67 @@ final class RoutePlanningService {
         city: String,
         accessibilityFilter: AccessibilityFilter = .none
     ) async throws -> [Route] {
-        try await aMapService.planTransitRoute(
+        let routes = try await routeProvider.routes(
             from: origin,
             to: destination,
-            city: city,
             accessibilityFilter: accessibilityFilter
         )
+        var enrichedRoutes: [Route] = []
+        for route in routes {
+            var route = route
+            let criticalStops = criticalStops(for: route)
+            route.dataCoverage = await officialStationData.routeCoverage(
+                cityID: city,
+                stationNames: criticalStops.map(\.name)
+            )
+            let criticalStations: [Station] = await criticalStops.asyncCompactMap { stop -> Station? in
+                guard let coordinate = stop.coordinate else { return nil }
+                return await officialStationData.matchingStation(
+                    place: TransitPlace(
+                        name: stop.name,
+                        coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude),
+                        source: .localStationData
+                    ),
+                    cityID: city
+                )
+            }
+            route.stepFreeAssessment = stepFreeAssessment(route: route, criticalStations: criticalStations)
+            route.isFullyAccessible = route.stepFreeAssessment == .confirmed
+            route.warnings.removeAll { $0.type == .stepFreeAccessUnconfirmed }
+            if route.stepFreeAssessment == .unknown,
+               accessibilityFilter.requiresWheelchairAccess || accessibilityFilter.requiresElevator {
+                route.warnings.append(RouteWarning(
+                    type: .stepFreeAccessUnconfirmed,
+                    message: AppLocalization.localized("Step-free access is not confirmed for the boarding and arrival points."),
+                    affectedStationID: nil
+                ))
+            }
+            enrichedRoutes.append(route)
+        }
+        return enrichedRoutes
+    }
+
+    private func criticalStops(for route: Route) -> [RouteStationStop] {
+        var result: [RouteStationStop] = []
+        for segment in route.segments where segment.type.isTransit {
+            for stop in [segment.stationStops.first, segment.stationStops.last].compactMap({ $0 })
+                where result.last?.stationID != stop.stationID {
+                result.append(stop)
+            }
+        }
+        return result
+    }
+
+    private func stepFreeAssessment(route: Route, criticalStations: [Station]) -> RouteStepFreeAssessment {
+        if route.warnings.contains(where: { $0.type == .stairsDetected }) {
+            return .barrierDetected
+        }
+        guard criticalStations.count >= 2 else { return .unknown }
+        let access = criticalStations.compactMap(\.accessibility)
+        guard access.count == criticalStations.count else { return .unknown }
+        if access.allSatisfy(\.isFullyAccessible) { return .confirmed }
+        if access.allSatisfy({ $0.hasElevator || $0.hasWheelchairRamp }) { return .likely }
+        return .unknown
     }
 
     private func accessibilityScore(for route: Route, preferences: AccessibilityPreference) -> Double {
@@ -170,16 +236,24 @@ final class RoutePlanningService {
     }
 }
 
+private extension Sequence {
+    func asyncCompactMap<T>(_ transform: (Element) async -> T?) async -> [T] {
+        var result: [T] = []
+        for item in self {
+            if let value = await transform(item) { result.append(value) }
+        }
+        return result
+    }
+}
+
 enum RoutePlanningError: Error {
     case stationNotFound
     case noRouteFound
     case networkError
     case realTimeDataUnavailable
     case trainScheduleUnavailable
-    case amapScheduleLookupNotEnabled
-    case amapServiceDiagnostic(AMapResponseDiagnostic)
-    case amapNoScheduleForLine(AMapResponseDiagnostic)
-    case amapAPIKeyMissing
+    case outsideSubwayCoverage
+    case placeSearchUnavailable
 }
 
 extension RoutePlanningError: LocalizedError {
@@ -195,14 +269,10 @@ extension RoutePlanningError: LocalizedError {
             return AppLocalization.localized("Live countdown unavailable")
         case .trainScheduleUnavailable:
             return AppLocalization.localized("Schedule unavailable")
-        case .amapScheduleLookupNotEnabled:
-            return AppLocalization.localized("AMap schedule lookup is not enabled")
-        case .amapServiceDiagnostic(let diagnostic):
-            return diagnostic.userMessage
-        case .amapNoScheduleForLine(let diagnostic):
-            return diagnostic.userMessage
-        case .amapAPIKeyMissing:
-            return AppLocalization.localized("Add an AMap Web API key to enable public transit routing and place search.")
+        case .outsideSubwayCoverage:
+            return AppLocalization.localized("Journey is outside supported subway coverage")
+        case .placeSearchUnavailable:
+            return AppLocalization.localized("Place search requires a network connection")
         }
     }
 }
@@ -223,7 +293,7 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .metroFirst:
-            return "Metro First"
+            return "Transit First"
         case .fastest:
             return "Fastest"
         case .leastWalking:
@@ -240,7 +310,7 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .metroFirst:
-            return "tram.fill"
+            return "bus.fill"
         case .fastest:
             return "clock"
         case .leastWalking:

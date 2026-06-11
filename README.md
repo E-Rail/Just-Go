@@ -11,10 +11,10 @@ Accessibility is not a separate mode. It is the design standard that makes the a
 - **Subway Confidence Planning**: See whether a route is likely to be smooth, confusing, walking-heavy, or data-limited before you travel
 - **Human-Centered Route Modes**: Fastest, least walking, fewest transfers, least confusing, luggage friendly, elderly friendly, step-free support, and official-data-focused choices
 - **Station Intelligence**: Entrances, exits, station maps, schedules, accessibility details, and useful station context
-- **Transparent Data Confidence**: Clear labels for official data, AMap route data, estimates, source-pending fields, and unavailable live data
+- **Transparent Data Confidence**: Clear labels for official data, Apple Maps route data, estimates, source-pending fields, and unavailable live data
 - **Universal Travel Support**: Step-free information, VoiceOver support, clear guidance, and readable UI patterns designed to help everyone
-- **AMap Integration**: China subway routing, place search, and walking-step hints through AMap Web APIs
-- **Apple Map Rendering**: Native MapKit display with AMap transit overlays
+- **MapKit Integration**: Native place search, place-to-place transit routing, walking steps, and exact route geometry
+- **Apple Map Rendering**: Native MapKit display with route overlays
 - **Official City Packs**: Downloadable city-level official station data where public sources exist
 
 ## Requirements
@@ -28,14 +28,11 @@ Accessibility is not a separate mode. It is the design standard that makes the a
 
 1. Clone the repository
 2. Open `JustGo.xcworkspace` in Xcode
-3. Add your AMap Web Service API key to a local, untracked `JustGo/Config/Secrets.xcconfig` file:
-   `AMAP_SECRET_API_KEY = your_web_service_key`
-4. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
-5. The app falls back to jsDelivr's GitHub CDN for development and beta testing
-6. Build and run
+3. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
+4. The app falls back to jsDelivr's GitHub CDN for development and beta testing
+5. Build and run
 
-The app uses AMap Web APIs, not the native AMap iOS SDK, so it works on iOS simulators without vendor frameworks.
-If `AMAP_API_KEY` is empty, bundled subway data still loads, but live place search and route planning are disabled.
+The app uses native MapKit for place search and transit routing, so no paid routing API key is required.
 Rich station accessibility, official schedules, and station-map assets are downloaded per city pack when a city is opened; they are not bundled into the app binary.
 See `DataPacks/README.md` for the city-pack hosting contract.
 
@@ -44,13 +41,13 @@ See `DataPacks/README.md` for the city-pack hosting contract.
 The app follows Clean Architecture with MVVM:
 
 - **Models**: SwiftData models for stations, routes, and accessibility data
-- **Services**: AMap Web API integration, location, accessibility, transit data
+- **Services**: MapKit providers, official city packs, location, accessibility, and transit confidence
 - **ViewModels**: Business logic and state management
 - **Views**: SwiftUI with glass UI components
 
 ## Supported Cities
 
-JustGo bundles baseline subway data for every city exposed by AMap's subway feed, currently 58 cities and more than 7,000 stations. Rich official data lives in downloadable city packs with explicit capability states per city, so unsupported cities show a clear source-pending state instead of blank station detail cards.
+MapKit supports place-to-place transit planning wherever Apple Maps provides transit directions. Six cities currently have explicit official-pack choices for richer station facts: Beijing, Shanghai, Guangzhou, Shenzhen, Chengdu, and Hangzhou.
 
 ## Universal Travel Support
 

@@ -39,7 +39,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func requestCurrentLocation() async throws -> CLLocation {
         locationErrorMessage = nil
 
-        if let currentLocation, isAuthorized {
+        if let currentLocation,
+           isAuthorized,
+           currentLocation.horizontalAccuracy >= 0,
+           currentLocation.horizontalAccuracy <= 100,
+           abs(currentLocation.timestamp.timeIntervalSinceNow) <= 30 {
             return currentLocation
         }
 

@@ -52,7 +52,7 @@ struct StationSearchView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
 
-            TextField("Search stations...", text: Binding(
+            TextField(AppLocalization.localized("Search stations..."), text: Binding(
                 get: { viewModel?.searchText ?? "" },
                 set: { newValue in
                     viewModel?.searchText = newValue

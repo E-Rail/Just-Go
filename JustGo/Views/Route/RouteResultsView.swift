@@ -124,7 +124,7 @@ struct RouteResultsView: View {
                     ) {
                         _ = tripMemoryService.recordPlannedTrip(
                             route: route,
-                            cityID: viewModel.selectedCity?.id ?? "",
+                            cityID: route.networkCityID ?? viewModel.selectedCity?.id ?? "",
                             accessibilityFilter: viewModel.accessibilityFilter
                         )
                         showRouteDetail = true
@@ -361,7 +361,7 @@ struct RouteCard: View {
 
 }
 
-private extension RouteConfidenceLevel {
+extension RouteConfidenceLevel {
     var color: Color {
         switch self {
         case .high: return .green
@@ -375,38 +375,6 @@ private extension RouteConfidenceLevel {
         case .high: return "checkmark.seal.fill"
         case .medium: return "exclamationmark.triangle.fill"
         case .low: return "xmark.octagon.fill"
-        }
-    }
-}
-
-private extension RouteFeasibilityLevel {
-    var color: Color {
-        switch self {
-        case .good:
-            return .green
-        case .caution:
-            return .orange
-        case .risky:
-            return .red
-        case .unknown:
-            return .gray
-        }
-    }
-
-    var warningColor: Color {
-        self == .risky ? .red : .orange
-    }
-
-    var iconName: String {
-        switch self {
-        case .good:
-            return "checkmark.circle.fill"
-        case .caution:
-            return "exclamationmark.triangle.fill"
-        case .risky:
-            return "xmark.octagon.fill"
-        case .unknown:
-            return "questionmark.circle.fill"
         }
     }
 }

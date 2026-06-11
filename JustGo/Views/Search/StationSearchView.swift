@@ -56,9 +56,7 @@ struct StationSearchView: View {
                 get: { viewModel?.searchText ?? "" },
                 set: { newValue in
                     viewModel?.searchText = newValue
-                    Task {
-                        await viewModel?.search(city: appState.selectedCity?.id ?? "")
-                    }
+                    viewModel?.scheduleSearch(city: appState.selectedCity?.id ?? "")
                 }
             ))
             .textFieldStyle(.plain)

@@ -25,7 +25,6 @@ struct Route: Identifiable, Codable {
     let walkingDistance: Double
     let totalStops: Int
     let transferCount: Int
-    let accessibilityScore: Double
     var isFullyAccessible: Bool
     var stepFreeAssessment: RouteStepFreeAssessment = .unknown
     var warnings: [RouteWarning]
@@ -35,10 +34,6 @@ struct Route: Identifiable, Codable {
     var formattedDuration: String {
         let minutes = Int(totalDuration / 60)
         return AppLocalization.minutes(minutes)
-    }
-
-    var formattedStops: String {
-        AppLocalization.stops(totalStops)
     }
 
     var formattedWalkingDistance: String {
@@ -385,10 +380,6 @@ struct QuickPlace: Identifiable, Codable {
     let kind: QuickPlaceKind
     let name: String
     let coordinate: CodableCoordinate
-    let uid: String?
-    let cityCode: String?
-    let adCode: String?
-    let naviPOIID: String?
     let entranceCoordinate: CodableCoordinate?
     let address: String?
 
@@ -400,13 +391,8 @@ struct QuickPlace: Identifiable, Codable {
         TransitPlace(
             name: name,
             coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude),
-            uid: uid,
             type: kind.title,
-            typeCode: nil,
             address: address,
-            cityCode: cityCode,
-            adCode: adCode,
-            naviPOIID: naviPOIID,
             entranceCoordinate: entranceCoordinate.map {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
             },
@@ -418,10 +404,6 @@ struct QuickPlace: Identifiable, Codable {
         self.kind = kind
         name = place.name
         coordinate = CodableCoordinate(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
-        uid = place.uid
-        cityCode = place.cityCode
-        adCode = place.adCode
-        naviPOIID = place.naviPOIID
         entranceCoordinate = place.entranceCoordinate.map {
             CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude)
         }

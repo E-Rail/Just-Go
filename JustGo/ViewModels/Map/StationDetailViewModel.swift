@@ -7,7 +7,6 @@ final class StationDetailViewModel {
     var isLoading = false
     var isLoadingCityPack = false
     var errorMessage: String?
-    var cityPackStatusMessage: String?
     var stationMapStatusMessage: String?
     var stationMap: CityPackStationMap?
     var timetableAssets: [CityPackStationAsset] = []
@@ -22,10 +21,6 @@ final class StationDetailViewModel {
 
     func loadStation(_ station: Station) {
         self.station = station
-    }
-
-    func loadRealTimeArrivals() async {
-        await loadTrainTimes()
     }
 
     func loadTrainTimes() async {
@@ -51,7 +46,6 @@ final class StationDetailViewModel {
         guard let station else { return }
 
         isLoadingCityPack = true
-        cityPackStatusMessage = nil
         stationMapStatusMessage = nil
         timetableAssets = []
         serviceStatus = nil
@@ -65,24 +59,19 @@ final class StationDetailViewModel {
             stationMap = await officialStationData.stationMap(for: station)
             timetableAssets = await officialStationData.timetableAssets(for: station)
             serviceStatus = await officialStationData.serviceStatus(for: station)
-            cityPackStatusMessage = AppLocalization.localized("Official city data available")
             if stationMap != nil {
                 stationMapStatusMessage = AppLocalization.localized("Official station map available")
             } else {
                 stationMapStatusMessage = AppLocalization.localized("Official 3D station map not collected for this station")
             }
         case .notConfigured:
-            cityPackStatusMessage = AppLocalization.localized("Official city data is not configured; basic station data still works.")
-            stationMapStatusMessage = cityPackStatusMessage
+            stationMapStatusMessage = AppLocalization.localized("Official city data is not configured; basic station data still works.")
         case .sourcePending:
-            cityPackStatusMessage = AppLocalization.localized("Official city data is pending for this city.")
-            stationMapStatusMessage = cityPackStatusMessage
+            stationMapStatusMessage = AppLocalization.localized("Official city data is pending for this city.")
         case .notAvailable:
-            cityPackStatusMessage = AppLocalization.localized("Official city data is not available for this city yet.")
-            stationMapStatusMessage = cityPackStatusMessage
+            stationMapStatusMessage = AppLocalization.localized("Official city data is not available for this city yet.")
         case .failed:
-            cityPackStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
-            stationMapStatusMessage = cityPackStatusMessage
+            stationMapStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
         }
     }
 
@@ -114,70 +103,6 @@ final class StationDetailViewModel {
         arrivals.contains(where: \.hasLiveCountdown) ? .official : .unavailable
     }
 
-    var isAccessible: Bool {
-        accessibilityInfo?.isFullyAccessible ?? false
-    }
-
-    var hasElevator: Bool {
-        accessibilityInfo?.hasElevator ?? false
-    }
-
-    var hasEscalator: Bool {
-        accessibilityInfo?.hasEscalator ?? false
-    }
-
-    var elevatorStatus: ElevatorStatus {
-        accessibilityInfo?.elevatorStatusEnum ?? .unknown
-    }
-
-    var accessibilityBadges: [AccessibilityBadge] {
-        guard let info = accessibilityInfo else { return [] }
-
-        var badges: [AccessibilityBadge] = []
-
-        if info.hasElevator {
-            badges.append(AccessibilityBadge(
-                icon: "arrow.up.arrow.down.circle.fill",
-                label: "Elevator",
-                status: info.elevatorStatusEnum == .operational ? .available : .unavailable
-            ))
-        }
-
-        if info.hasWheelchairRamp {
-            badges.append(AccessibilityBadge(
-                icon: "figure.roll",
-                label: "Wheelchair Access",
-                status: .available
-            ))
-        }
-
-        if info.hasTactilePath {
-            badges.append(AccessibilityBadge(
-                icon: "hand.raised.fill",
-                label: "Tactile Path",
-                status: .available
-            ))
-        }
-
-        if info.hasAudioAnnouncement {
-            badges.append(AccessibilityBadge(
-                icon: "speaker.wave.2.fill",
-                label: "Audio",
-                status: .available
-            ))
-        }
-
-        if info.hasVisualAnnouncement {
-            badges.append(AccessibilityBadge(
-                icon: "eye.fill",
-                label: "Visual Display",
-                status: .available
-            ))
-        }
-
-        return badges
-    }
-
     private var cityPackPendingConfidence: DataConfidence {
         switch cityPackLoadStatus {
         case .loaded:
@@ -188,27 +113,6 @@ final class StationDetailViewModel {
             return .unavailable
         case nil:
             return .unknown
-        }
-    }
-}
-
-struct AccessibilityBadge: Identifiable {
-    let id = UUID()
-    let icon: String
-    let label: String
-    let status: BadgeStatus
-
-    enum BadgeStatus {
-        case available
-        case unavailable
-        case unknown
-
-        var color: String {
-            switch self {
-            case .available: return "green"
-            case .unavailable: return "red"
-            case .unknown: return "gray"
-            }
         }
     }
 }

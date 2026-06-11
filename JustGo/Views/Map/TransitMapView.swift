@@ -77,8 +77,8 @@ struct TransitMapView: UIViewRepresentable {
             guard let visibleRegion = parent.visibleRegion else { return }
             let nextSignature = visibleRegion.signature
             guard nextSignature != regionSignature else { return }
-            mapView.setRegion(visibleRegion.mkCoordinateRegion, animated: true)
             regionSignature = nextSignature
+            mapView.setRegion(visibleRegion.mkCoordinateRegion, animated: true)
         }
 
         private func syncNetworks(on mapView: MKMapView) {
@@ -255,6 +255,7 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+            guard parent.visibleRegion != nil else { return }
             let region = mapView.region
             let visibleRegion = MapVisibleRegion(
                 center: region.center,
@@ -285,21 +286,16 @@ struct TransitMapView: UIViewRepresentable {
             view.canShowCallout = false
             view.displayPriority = station.isTransferStation ? .required : .defaultLow
             view.collisionMode = .rectangle
-            let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
-            let visibilityLimit = station.isTransferStation ? 0.8 : 0.1
-            guard maxDelta <= visibilityLimit else {
+            let style = StationAnnotationStyle(region: region, isTransfer: station.isTransferStation)
+            guard style.isVisible else {
                 view.isHidden = true
                 return
             }
 
-            let baseSize: CGFloat = maxDelta <= 0.055 ? 18 : (maxDelta <= 0.18 ? 9 : 6)
-            let pointSize = baseSize + (station.isTransferStation ? 3 : 0)
-            let labelSize: CGFloat = maxDelta <= 0.055 ? 12 : (maxDelta <= 0.18 ? 10 : 9)
             view.configure(
                 station: station,
-                symbol: stationSymbolImage(isTransfer: station.isTransferStation, pointSize: pointSize),
-                symbolSize: pointSize,
-                labelSize: labelSize
+                style: style,
+                symbol: stationSymbolImage(isTransfer: station.isTransferStation, pointSize: style.symbolSize)
             )
             view.isHidden = false
         }
@@ -378,6 +374,7 @@ private final class StationAnnotationView: MKAnnotationView {
     private let tagView = UIView()
     private let chineseLabel = UILabel()
     private let englishLabel = UILabel()
+    private var configurationKey = ""
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
@@ -395,7 +392,13 @@ private final class StationAnnotationView: MKAnnotationView {
         nil
     }
 
-    func configure(station: Station, symbol: UIImage, symbolSize: CGFloat, labelSize: CGFloat) {
+    func configure(station: Station, style: StationAnnotationStyle, symbol: UIImage) {
+        let nextKey = "\(station.stationID):\(style.id)"
+        guard nextKey != configurationKey else { return }
+        configurationKey = nextKey
+
+        let symbolSize = style.symbolSize
+        let labelSize = style.labelSize
         symbolView.image = symbol
         symbolView.frame = CGRect(x: 0, y: 0, width: symbolSize, height: symbolSize)
 
@@ -429,6 +432,23 @@ private final class StationAnnotationView: MKAnnotationView {
         )
         centerOffset = CGPoint(x: bounds.width / 2 - symbolSize / 2, y: 0)
         accessibilityLabel = station.accessibilityLabel
+    }
+}
+
+private struct StationAnnotationStyle {
+    let isVisible: Bool
+    let symbolSize: CGFloat
+    let labelSize: CGFloat
+    let id: String
+
+    init(region: MKCoordinateRegion, isTransfer: Bool) {
+        let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
+        isVisible = maxDelta <= (isTransfer ? 0.8 : 0.1)
+        let bucket = maxDelta <= 0.055 ? 0 : (maxDelta <= 0.18 ? 1 : 2)
+        let baseSize: CGFloat = bucket == 0 ? 18 : (bucket == 1 ? 9 : 6)
+        symbolSize = baseSize + (isTransfer ? 3 : 0)
+        labelSize = bucket == 0 ? 12 : (bucket == 1 ? 10 : 9)
+        id = "\(isTransfer)-\(bucket)"
     }
 }
 

@@ -24,7 +24,7 @@ final class AppState {
         )
     }
 
-    func initialize(container: DIContainer) async {
+    func initialize(container: DIContainer) {
         guard !isInitializing, !hasInitialized else { return }
 
         isInitializing = true
@@ -33,11 +33,9 @@ final class AppState {
             hasInitialized = true
         }
 
-        await container.cityService.refreshCities()
-
         let nearestCity: City?
         if let location = container.locationService.currentLocation {
-            nearestCity = await container.cityService.findNearestCity(to: location)
+            nearestCity = container.cityService.findNearestCity(to: location)
         } else {
             nearestCity = nil
         }

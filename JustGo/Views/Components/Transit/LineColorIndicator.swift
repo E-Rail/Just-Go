@@ -29,21 +29,6 @@ struct LineColorIndicator: View {
     }
 }
 
-struct TransferIndicator: View {
-    let fromLineColor: String
-    let toLineColor: String
-
-    var body: some View {
-        HStack(spacing: 4) {
-            LineColorIndicator(colorHex: fromLineColor, size: 8)
-            Image(systemName: "arrow.right")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            LineColorIndicator(colorHex: toLineColor, size: 8)
-        }
-    }
-}
-
 struct ArrivalCountdown: View {
     let arrival: RealTimeArrival
 

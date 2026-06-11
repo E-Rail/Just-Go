@@ -5,7 +5,7 @@ This folder is the cloud-upload root for official city data. It is a source arti
 The current beta setup serves this folder from GitHub/jsDelivr. If you later choose a different static host, upload the contents of this folder so these URLs work:
 
 - `{CITY_PACK_BASE_URL}/manifest.json`
-- `{CITY_PACK_BASE_URL}/packs/1100/beijing-official-20260519/city_pack.json`
+- `{CITY_PACK_BASE_URL}/packs/1100/beijing-official-20260527/city_pack.json`
 
 Use the public folder URL in your local `JustGo/Config/Secrets.xcconfig`:
 

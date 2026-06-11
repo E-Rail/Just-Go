@@ -70,6 +70,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
     private var manifests: [URL: OfficialManifest] = [:]
     private var packs: [String: LoadedPack] = [:]
+    private var loadStatuses: [String: CityPackLoadStatus] = [:]
 
     init(session: URLSession = .shared) {
         self.session = session
@@ -78,6 +79,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus {
         if let pack = packs[cityID] {
             return .loaded(version: pack.data.version)
+        }
+        if let status = loadStatuses[cityID] {
+            return status
         }
         guard !Self.manifestURLs.isEmpty else { return .notConfigured }
 
@@ -94,12 +98,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 let decoded = try JSONDecoder().decode(OfficialPack.self, from: data)
                 guard decoded.cityID == cityID, decoded.version == entry.version else { continue }
                 packs[cityID] = LoadedPack(data: decoded, assetBaseURL: downloadURL.deletingLastPathComponent())
-                return .loaded(version: decoded.version)
+                let status = CityPackLoadStatus.loaded(version: decoded.version)
+                loadStatuses[cityID] = status
+                return status
             } catch {
                 continue
             }
         }
-        return pendingStatus ?? .failed
+        let status = pendingStatus ?? .failed
+        loadStatuses[cityID] = status
+        return status
     }
 
     func enrichStation(_ station: Station) async -> Station {

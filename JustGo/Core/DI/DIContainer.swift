@@ -4,7 +4,6 @@ import Foundation
 final class DIContainer {
     let locationService: LocationService
     let placeSearchProvider: PlaceSearchProviding
-    let transitRouteProvider: TransitRouteProviding
     let officialStationData: OfficialStationDataProviding
     let metroNetworkProvider: MetroNetworkProviding
     let routePlanningService: RoutePlanningService
@@ -18,7 +17,6 @@ final class DIContainer {
     init(
         locationService: LocationService,
         placeSearchProvider: PlaceSearchProviding,
-        transitRouteProvider: TransitRouteProviding,
         officialStationData: OfficialStationDataProviding,
         metroNetworkProvider: MetroNetworkProviding,
         routePlanningService: RoutePlanningService,
@@ -31,7 +29,6 @@ final class DIContainer {
     ) {
         self.locationService = locationService
         self.placeSearchProvider = placeSearchProvider
-        self.transitRouteProvider = transitRouteProvider
         self.officialStationData = officialStationData
         self.metroNetworkProvider = metroNetworkProvider
         self.routePlanningService = routePlanningService
@@ -71,7 +68,6 @@ final class DIContainer {
         return DIContainer(
             locationService: locationService,
             placeSearchProvider: placeSearchProvider,
-            transitRouteProvider: transitRouteProvider,
             officialStationData: officialStationData,
             metroNetworkProvider: metroNetworkProvider,
             routePlanningService: routePlanningService,

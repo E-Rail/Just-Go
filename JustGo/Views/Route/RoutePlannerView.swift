@@ -195,11 +195,6 @@ struct RoutePlannerView: View {
                             }
                         }
                         Spacer()
-                        if let type = place.typeCode {
-                            Text(type)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 9)

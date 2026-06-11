@@ -5,26 +5,17 @@ struct TransitPlaceSnapshot: Codable, Equatable {
     let name: String
     let latitude: Double
     let longitude: Double
-    let uid: String?
-    let cityCode: String?
-    let adCode: String?
     let address: String?
 
     init(
         name: String,
         latitude: Double,
         longitude: Double,
-        uid: String? = nil,
-        cityCode: String? = nil,
-        adCode: String? = nil,
         address: String? = nil
     ) {
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
-        self.uid = uid
-        self.cityCode = cityCode
-        self.adCode = adCode
         self.address = address
     }
 
@@ -32,9 +23,6 @@ struct TransitPlaceSnapshot: Codable, Equatable {
         name = place.name
         latitude = place.coordinate.latitude
         longitude = place.coordinate.longitude
-        uid = place.uid
-        cityCode = place.cityCode
-        adCode = place.adCode
         address = place.address
     }
 
@@ -42,9 +30,6 @@ struct TransitPlaceSnapshot: Codable, Equatable {
         self.name = name
         latitude = 0
         longitude = 0
-        uid = nil
-        cityCode = nil
-        adCode = nil
         address = nil
     }
 }
@@ -54,16 +39,13 @@ extension TransitPlaceSnapshot {
         TransitPlace(
             name: name,
             coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-            uid: uid,
             address: address,
-            cityCode: cityCode,
-            adCode: adCode,
             source: .quickPlace
         )
     }
 
     var hasUsableRouteCoordinate: Bool {
-        uid != nil || abs(latitude) > 0.000001 || abs(longitude) > 0.000001
+        abs(latitude) > 0.000001 || abs(longitude) > 0.000001
     }
 }
 

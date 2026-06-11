@@ -32,8 +32,7 @@ struct SettingsView: View {
     }
 
     private var systemLanguageName: String {
-        Locale.autoupdatingCurrent.localizedString(forIdentifier: Locale.autoupdatingCurrent.identifier)
-            ?? Locale.autoupdatingCurrent.identifier
+        AppLocalization.isTraditionalChinese ? "繁體中文" : "简体中文"
     }
 
     private var dataSection: some View {

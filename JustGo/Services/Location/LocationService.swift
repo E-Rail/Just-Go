@@ -146,7 +146,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private func scheduleLocationRequestTimeout() {
         let generation = UUID()
         locationRequestGeneration = generation
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(15))
             guard let self,
                   self.locationRequestGeneration == generation,
                   !self.pendingLocationContinuations.isEmpty else {

@@ -42,9 +42,8 @@ final class StationSearchService {
                 cityID: city == "automatic" ? "" : city
             )
         }
-        var seen = Set<String>()
-        return (bundledMatches + mapKitMatches).filter {
-            seen.insert("\($0.cityID)|\(normalizedStationSearchName($0.name))").inserted
+        return (bundledMatches + mapKitMatches).uniqued {
+            "\($0.cityID)|\(normalizedStationName($0.name))"
         }
     }
 
@@ -128,14 +127,6 @@ private func stationSearchText(_ station: Station) -> String {
         .joined(separator: " ")
 }
 
-private func normalizedStationSearchName(_ value: String) -> String {
-    value
-        .replacingOccurrences(of: "地铁站", with: "")
-        .replacingOccurrences(of: "站", with: "")
-        .replacingOccurrences(of: " ", with: "")
-        .lowercased()
-}
-
 private extension Sequence {
     func asyncMap<T>(_ transform: (Element) async -> T) async -> [T] {
         var result: [T] = []
@@ -150,14 +141,4 @@ struct StationFilter {
     var accessibleOnly: Bool = false
     var elevatorOnly: Bool = false
     var transferOnly: Bool = false
-}
-
-// MARK: - CLLocationCoordinate2D Extension
-
-extension CLLocationCoordinate2D {
-    func distance(to other: CLLocationCoordinate2D) -> Double {
-        let from = CLLocation(latitude: latitude, longitude: longitude)
-        let to = CLLocation(latitude: other.latitude, longitude: other.longitude)
-        return from.distance(from: to)
-    }
 }

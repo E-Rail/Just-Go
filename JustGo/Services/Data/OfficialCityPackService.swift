@@ -325,9 +325,8 @@ private struct OfficialStation: Decodable {
                 name: $0
             )
         }
-        var seen = Set<String>()
-        return (explicit.isEmpty ? fallback : explicit).filter {
-            seen.insert("\($0.type.rawValue)|\($0.name)|\($0.locationText ?? "")").inserted
+        return (explicit.isEmpty ? fallback : explicit).uniqued {
+            "\($0.type.rawValue)|\($0.name)|\($0.locationText ?? "")"
         }
     }
 }
@@ -391,12 +390,4 @@ private struct OfficialAccessibility: Decodable {
             hasPictograms: true
         )
     }
-}
-
-private func normalizedStationName(_ value: String) -> String {
-    value
-        .replacingOccurrences(of: "地铁站", with: "")
-        .replacingOccurrences(of: "站", with: "")
-        .replacingOccurrences(of: " ", with: "")
-        .lowercased()
 }

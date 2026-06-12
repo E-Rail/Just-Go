@@ -62,6 +62,12 @@
 		A1000059 /* MetroNetworks in Resources */ = {isa = PBXBuildFile; fileRef = A2000059 /* MetroNetworks */; };
 		A100005A /* Data/BundledMetroNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005A /* Data/BundledMetroNetworkService.swift */; };
 		A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005B /* Transit/BundledMetroRouteProvider.swift */; };
+		A100005C /* Extensions/CLLocationCoordinate2D+Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005C /* Extensions/CLLocationCoordinate2D+Distance.swift */; };
+		A100005D /* Extensions/Sequence+Uniqued.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005D /* Extensions/Sequence+Uniqued.swift */; };
+		A100005E /* Transit/MetroRoutingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005E /* Transit/MetroRoutingTypes.swift */; };
+		A100005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift */; };
+		A1000060 /* Transit/RouteConfidenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000060 /* Transit/RouteConfidenceService.swift */; };
+		A1000061 /* Transit/RoutePreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000061 /* Transit/RoutePreference.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -127,6 +133,12 @@
 		A2000059 /* MetroNetworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MetroNetworks; sourceTree = "<group>"; };
 		A200005A /* Data/BundledMetroNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/BundledMetroNetworkService.swift; sourceTree = "<group>"; };
 		A200005B /* Transit/BundledMetroRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BundledMetroRouteProvider.swift; sourceTree = "<group>"; };
+		A200005C /* Extensions/CLLocationCoordinate2D+Distance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/CLLocationCoordinate2D+Distance.swift"; sourceTree = "<group>"; };
+		A200005D /* Extensions/Sequence+Uniqued.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Sequence+Uniqued.swift"; sourceTree = "<group>"; };
+		A200005E /* Transit/MetroRoutingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/MetroRoutingTypes.swift; sourceTree = "<group>"; };
+		A200005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transit/BundledMetroRouteProvider+RouteAssembly.swift"; sourceTree = "<group>"; };
+		A2000060 /* Transit/RouteConfidenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteConfidenceService.swift; sourceTree = "<group>"; };
+		A2000061 /* Transit/RoutePreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RoutePreference.swift; sourceTree = "<group>"; };
 		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -180,6 +192,8 @@
 			children = (
 				A2000004 /* DI/DIContainer.swift */,
 				A2000033 /* Extensions/Color+Hex.swift */,
+				A200005C /* Extensions/CLLocationCoordinate2D+Distance.swift */,
+				A200005D /* Extensions/Sequence+Uniqued.swift */,
 				A2000047 /* Extensions/UserDefaults+Codable.swift */,
 				A200003E /* Localization.swift */,
 			);
@@ -196,6 +210,7 @@
 				A2000028 /* Transit/Route.swift */,
 				A2000029 /* Transit/RealTimeArrival.swift */,
 				A2000053 /* Transit/RouteFeasibility.swift */,
+				A2000061 /* Transit/RoutePreference.swift */,
 				A200002B /* City/City.swift */,
 				A200002D /* User/AccessibilityPreference.swift */,
 				A200002F /* User/SearchHistory.swift */,
@@ -212,8 +227,11 @@
 				A200004A /* Data/OfficialCityPackService.swift */,
 				A200005A /* Data/BundledMetroNetworkService.swift */,
 				A200005B /* Transit/BundledMetroRouteProvider.swift */,
+				A200005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift */,
+				A200005E /* Transit/MetroRoutingTypes.swift */,
 				A200004B /* Transit/TransitFormatting.swift */,
 				A200001D /* Transit/RoutePlanningService.swift */,
+				A2000060 /* Transit/RouteConfidenceService.swift */,
 				A200001E /* Transit/StationSearchService.swift */,
 				A2000056 /* Transit/RouteFeasibilityService.swift */,
 				A2000020 /* Location/LocationService.swift */,
@@ -386,8 +404,11 @@
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,
 				A100005A /* Data/BundledMetroNetworkService.swift in Sources */,
 				A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */,
+				A100005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift in Sources */,
+				A100005E /* Transit/MetroRoutingTypes.swift in Sources */,
 				A100004B /* Transit/TransitFormatting.swift in Sources */,
 				A100001D /* Transit/RoutePlanningService.swift in Sources */,
+				A1000060 /* Transit/RouteConfidenceService.swift in Sources */,
 				A100001E /* Transit/StationSearchService.swift in Sources */,
 				A1000020 /* Location/LocationService.swift in Sources */,
 				A1000055 /* Accessibility/AccessibilityReportService.swift in Sources */,
@@ -401,6 +422,7 @@
 				A1000028 /* Transit/Route.swift in Sources */,
 				A1000029 /* Transit/RealTimeArrival.swift in Sources */,
 				A1000053 /* Transit/RouteFeasibility.swift in Sources */,
+				A1000061 /* Transit/RoutePreference.swift in Sources */,
 				A100002B /* City/City.swift in Sources */,
 				A100002D /* User/AccessibilityPreference.swift in Sources */,
 				A100002F /* User/SearchHistory.swift in Sources */,
@@ -409,6 +431,8 @@
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000058 /* Profile/AccessibilityReportsView.swift in Sources */,
 				A1000033 /* Extensions/Color+Hex.swift in Sources */,
+				A100005C /* Extensions/CLLocationCoordinate2D+Distance.swift in Sources */,
+				A100005D /* Extensions/Sequence+Uniqued.swift in Sources */,
 				A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */,
 				A100003E /* Localization.swift in Sources */,
 			);

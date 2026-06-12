@@ -40,7 +40,7 @@ struct StationDetailView: View {
         .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            viewModel = StationDetailViewModel(officialStationData: container.officialStationData)
+            viewModel = container.makeStationDetailViewModel()
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()
             await viewModel?.loadTrainTimes()

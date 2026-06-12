@@ -60,11 +60,7 @@ struct RoutePlannerView: View {
         }
         .task {
             if viewModel == nil {
-                viewModel = RoutePlannerViewModel(
-                    routePlanningService: container.routePlanningService,
-                    placeSearchProvider: container.placeSearchProvider,
-                    locationService: container.locationService
-                )
+                viewModel = container.makeRoutePlannerViewModel()
             }
             viewModel?.cityChanged(to: appState.selectedCity)
         }

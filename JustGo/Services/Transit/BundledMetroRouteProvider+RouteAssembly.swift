@@ -149,7 +149,13 @@ extension BundledMetroRouteProvider {
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to))
         request.transportType = .walking
-        let mapRoute = try? await MKDirections(request: request).calculate().routes.first
+        let mapRoute: MKRoute?
+        do {
+            mapRoute = try await MKDirections(request: request).calculate().routes.first
+        } catch {
+            AppLog.routing.info("Walking directions unavailable, using straight-line estimate: \(error)")
+            mapRoute = nil
+        }
         let distance = mapRoute?.distance ?? directDistance
         let duration = mapRoute?.expectedTravelTime ?? distance / 1.25
         let steps = mapRoute?.steps.filter { $0.distance >= 10 || !$0.instructions.isEmpty }.map {

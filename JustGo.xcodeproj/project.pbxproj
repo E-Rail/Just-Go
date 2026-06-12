@@ -78,6 +78,7 @@
 		A1000069 /* Components/Transit/RouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000069 /* Components/Transit/RouteCard.swift */; };
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006B /* Components/Transit/RouteStationTimeline.swift */; };
+		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +160,7 @@
 		A2000069 /* Components/Transit/RouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteCard.swift; sourceTree = "<group>"; };
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A200006B /* Components/Transit/RouteStationTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteStationTimeline.swift; sourceTree = "<group>"; };
+		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -216,6 +218,7 @@
 				A200005D /* Extensions/Sequence+Uniqued.swift */,
 				A2000047 /* Extensions/UserDefaults+Codable.swift */,
 				A200003E /* Localization.swift */,
+				A200006C /* Logging.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -475,6 +478,7 @@
 				A100005D /* Extensions/Sequence+Uniqued.swift in Sources */,
 				A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */,
 				A100003E /* Localization.swift in Sources */,
+				A100006C /* Logging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

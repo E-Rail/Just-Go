@@ -102,6 +102,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 loadStatuses[cityID] = status
                 return status
             } catch {
+                AppLog.data.warning("City pack load failed for \(cityID, privacy: .public) via \(manifestURL.absoluteString, privacy: .public): \(error)")
                 continue
             }
         }

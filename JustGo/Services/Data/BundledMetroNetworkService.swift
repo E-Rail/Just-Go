@@ -121,21 +121,30 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         if let network = networks[cityID] {
             return network
         }
-        guard !missingCityIDs.contains(cityID),
-              let url = Bundle.main.url(
-                forResource: cityID,
-                withExtension: "json",
-                subdirectory: "MetroNetworks"
-              ),
-              let data = try? Data(contentsOf: url),
-              let network = try? JSONDecoder().decode(MetroNetwork.self, from: data),
-              network.cityID == cityID,
-              network.geometryKind == "physicalTrack" else {
+        guard !missingCityIDs.contains(cityID) else { return nil }
+        guard let url = Bundle.main.url(
+            forResource: cityID,
+            withExtension: "json",
+            subdirectory: "MetroNetworks"
+        ) else {
             missingCityIDs.insert(cityID)
             return nil
         }
-        networks[cityID] = network
-        return network
+        do {
+            let data = try Data(contentsOf: url)
+            let network = try JSONDecoder().decode(MetroNetwork.self, from: data)
+            guard network.cityID == cityID, network.geometryKind == "physicalTrack" else {
+                AppLog.data.error("Bundled metro network \(cityID, privacy: .public) failed validation (cityID or geometryKind mismatch)")
+                missingCityIDs.insert(cityID)
+                return nil
+            }
+            networks[cityID] = network
+            return network
+        } catch {
+            AppLog.data.error("Failed to load bundled metro network \(cityID, privacy: .public): \(error)")
+            missingCityIDs.insert(cityID)
+            return nil
+        }
     }
 
     func networks() async -> [MetroNetwork] {

@@ -2,15 +2,20 @@ import Foundation
 
 extension UserDefaults {
     func codableValue<Value: Decodable>(forKey key: String, as type: Value.Type, default defaultValue: Value) -> Value {
-        guard let data = data(forKey: key),
-              let value = try? JSONDecoder().decode(type, from: data) else {
+        guard let data = data(forKey: key) else { return defaultValue }
+        do {
+            return try JSONDecoder().decode(type, from: data)
+        } catch {
+            AppLog.persistence.error("Failed to decode value for key \(key, privacy: .public): \(error)")
             return defaultValue
         }
-        return value
     }
 
     func setCodable<Value: Encodable>(_ value: Value, forKey key: String) {
-        guard let data = try? JSONEncoder().encode(value) else { return }
-        set(data, forKey: key)
+        do {
+            set(try JSONEncoder().encode(value), forKey: key)
+        } catch {
+            AppLog.persistence.error("Failed to encode value for key \(key, privacy: .public): \(error)")
+        }
     }
 }

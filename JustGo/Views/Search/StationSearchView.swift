@@ -33,10 +33,7 @@ struct StationSearchView: View {
         }
         .task {
             if viewModel == nil {
-                viewModel = StationSearchViewModel(
-                    stationSearchService: container.stationSearchService,
-                    locationService: container.locationService
-                )
+                viewModel = container.makeStationSearchViewModel()
             }
             await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
         }

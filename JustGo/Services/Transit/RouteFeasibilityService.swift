@@ -109,16 +109,11 @@ final class RouteFeasibilityService {
         return RouteFeasibility(
             level: level,
             title: title,
-            reasons: Array(unique(reasons)),
-            unknowns: Array(unique(unknowns)),
+            reasons: reasons.uniqued(),
+            unknowns: unknowns.uniqued(),
             personalReports: personalReports,
             bottleneck: bottleneck,
             estimatedExtraMinutes: estimatedExtraMinutes
         )
-    }
-
-    private func unique(_ values: [String]) -> [String] {
-        var seen: Set<String> = []
-        return values.filter { seen.insert($0).inserted }
     }
 }

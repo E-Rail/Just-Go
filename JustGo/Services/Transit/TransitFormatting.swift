@@ -35,6 +35,14 @@ func normalizeStationKey(_ value: String) -> String {
         .lowercased()
 }
 
+func normalizedStationName(_ value: String) -> String {
+    value
+        .replacingOccurrences(of: "地铁站", with: "")
+        .replacingOccurrences(of: "站", with: "")
+        .replacingOccurrences(of: " ", with: "")
+        .lowercased()
+}
+
 extension SubwayLine {
     var logicalLineIdentity: String {
         "\(cityID.lowercased())|\(lineID.lowercased())"
@@ -43,8 +51,7 @@ extension SubwayLine {
 
 extension Station {
     var uniqueLogicalLines: [SubwayLine] {
-        var seen = Set<String>()
-        return lines.filter { seen.insert($0.logicalLineIdentity).inserted }
+        lines.uniqued(by: \.logicalLineIdentity)
     }
 }
 

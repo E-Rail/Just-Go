@@ -1,0 +1,357 @@
+import SwiftUI
+
+extension StationDetailView {
+    var arrivalsSection: some View {
+        let arrivals = viewModel?.arrivals ?? []
+        let timetableAssets = viewModel?.timetableAssets ?? []
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.localized("Train Times"))
+                    .font(.headline)
+
+                if viewModel?.isLoading == true {
+                    ProgressView()
+                } else if arrivals.isEmpty && timetableAssets.isEmpty {
+                    Text(viewModel?.errorMessage ?? AppLocalization.localized("Schedule unavailable"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(arrivals) { arrival in
+                        ArrivalCountdown(arrival: arrival)
+                    }
+
+                    if timetableAssets.isEmpty == false {
+                        Text(AppLocalization.localized("Official Timetable Images"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        ForEach(timetableAssets, id: \.assetURL) { asset in
+                            stationAssetContent(
+                                asset,
+                                defaultTitle: AppLocalization.localized("Official timetable image")
+                            )
+                        }
+                    }
+
+                    if let statusMessage = viewModel?.trainTimeStatusMessage {
+                        Text(statusMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if arrivals.contains(where: \.hasLiveCountdown) == false {
+                        Text(AppLocalization.localized("Shows first/last train times, not live arrival countdowns."))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    var stationEssentialsSection: some View {
+        let station = displayedStation
+        let facilities = station.facilities.deduplicatedForDisplay()
+        let personalReports = accessibilityReportService.reports(for: station)
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text(AppLocalization.localized("Station Essentials"))
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        reportItemType = .elevator
+                        reportStatus = .outOfService
+                        reportSeverity = .medium
+                        reportNote = ""
+                        showStationReport = true
+                    } label: {
+                        Image(systemName: "exclamationmark.bubble")
+                            .imageScale(.medium)
+                    }
+                    .accessibilityLabel(AppLocalization.localized("Report station issue"))
+                }
+
+                if !facilities.isEmpty {
+                    ForEach(facilities) { facility in
+                        facilityRow(facility)
+                    }
+                } else {
+                    Text(AppLocalization.localized("Official station facilities are pending for this station."))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                if !personalReports.isEmpty {
+                    Divider()
+                    Text(AppLocalization.localized("Your Reports"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    ForEach(personalReports.prefix(3)) { report in
+                        Label("\(report.itemType.title): \(report.displayNote)", systemImage: "person.crop.circle.badge.exclamationmark")
+                            .font(.caption)
+                            .foregroundStyle(report.status.isProblem ? .orange : .secondary)
+                    }
+                }
+
+                Text(facilities.isEmpty ? AppLocalization.localized("Source pending") : AppLocalization.localized("Official city data"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func facilityRow(_ facility: StationFacility) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: facility.type.iconName)
+                .foregroundStyle(facility.type.isAccessibilityCritical ? .green : .blue)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(facility.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                if let location = facility.locationText, !location.isEmpty {
+                    Text(location)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("\(facility.source.label) • \(facility.verification.label)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+    }
+
+    var stationMapSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.localized("Station Map"))
+                    .font(.headline)
+
+                if viewModel?.isLoadingCityPack == true {
+                    ProgressView()
+                } else if let stationMap = viewModel?.stationMap {
+                    stationMapContent(stationMap)
+                } else {
+                    Text(AppLocalization.localized("Official 3D station map not collected yet"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let statusMessage = viewModel?.stationMapStatusMessage {
+                    Text(statusMessage)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var serviceStatusSection: some View {
+        if let status = viewModel?.serviceStatus, status.hasDisplayableStatus {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(AppLocalization.localized("Station Status"))
+                        .font(.headline)
+
+                    if let statusColor = status.statusColor, statusColor.isEmpty == false {
+                        Text(AppLocalization.text(
+                            english: "Official live station status: \(statusColor)",
+                            chinese: "官方实时车站状态：\(localizedStatusColor(statusColor))"
+                        ))
+                        .font(.subheadline)
+                    }
+
+                    ForEach(status.crowdControlWindows, id: \.self) { window in
+                        Text(AppLocalization.text(
+                            english: "Crowd-control window: \(window)",
+                            chinese: "限流时段：\(window)"
+                        ))
+                        .font(.subheadline)
+                    }
+
+                    Text(AppLocalization.localized("Status data is from Beijing Subway official web map, not train arrival countdowns."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
+        if stationMap.isImage, let url = stationMap.resolvedURL {
+            remoteImage(
+                url: url,
+                title: stationMap.title ?? AppLocalization.localized("Station Map")
+            )
+
+            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
+                .font(.caption)
+                .foregroundStyle(.blue)
+        } else if let url = stationMap.resolvedURL {
+            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
+                .font(.subheadline)
+        } else {
+            Text(AppLocalization.localized("Station map could not be loaded"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func stationAssetContent(_ asset: CityPackStationAsset, defaultTitle: String) -> some View {
+        if asset.isImage, let url = asset.resolvedURL {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(asset.title ?? defaultTitle)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                remoteImage(
+                    url: url,
+                    title: asset.title ?? defaultTitle
+                )
+                Link(AppLocalization.localized("Open official timetable image"), destination: url)
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func remoteImage(url: URL, title: String) -> some View {
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .success(let image):
+                Button {
+                    selectedStationImage = FullScreenStationImage(url: url, title: title)
+                } label: {
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 160)
+                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .padding(8)
+                                .background(.black.opacity(0.55), in: Circle())
+                                .padding(8)
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                        }
+                    }
+                .buttonStyle(.plain)
+                .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
+            case .failure:
+                Text(AppLocalization.localized("Station map could not be loaded"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            case .empty:
+                ProgressView()
+                    .frame(maxWidth: .infinity, minHeight: 160)
+            @unknown default:
+                EmptyView()
+            }
+        }
+    }
+
+    private func localizedStatusColor(_ color: String) -> String {
+        switch color.lowercased() {
+        case "green":
+            return AppLocalization.text(english: "green", chinese: "绿色")
+        case "yellow":
+            return AppLocalization.text(english: "yellow", chinese: "黄色")
+        case "red":
+            return AppLocalization.text(english: "red", chinese: "红色")
+        case "black":
+            return AppLocalization.text(english: "black", chinese: "黑色")
+        default:
+            return color
+        }
+    }
+
+    var stationReportSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker(AppLocalization.localized("Facility"), selection: $reportItemType) {
+                        ForEach(VerificationItemType.allCases.filter { $0 != .routeConcern }, id: \.self) { item in
+                            Text(item.title).tag(item)
+                        }
+                    }
+                    Picker(AppLocalization.localized("Status"), selection: $reportStatus) {
+                        ForEach(VerificationStatus.allCases.filter { $0 != .note }, id: \.self) { status in
+                            Text(status.title).tag(status)
+                        }
+                    }
+                    Picker(AppLocalization.localized("Severity"), selection: $reportSeverity) {
+                        ForEach(AccessibilityReportSeverity.allCases, id: \.self) { severity in
+                            Text(severity.title).tag(severity)
+                        }
+                    }
+                    TextEditor(text: $reportNote)
+                        .frame(minHeight: 120)
+                } header: {
+                    Text(AppLocalization.localized("Personal Station Report"))
+                } footer: {
+                    Text(AppLocalization.localized("This stays on your device and is not shown as official data."))
+                }
+            }
+            .navigationTitle(AppLocalization.localized("Report Station Issue"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) { showStationReport = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(AppLocalization.localized("Save")) {
+                        accessibilityReportService.createStationReport(
+                            cityID: displayedStation.cityID,
+                            station: displayedStation,
+                            itemType: reportItemType,
+                            status: reportStatus,
+                            severity: reportSeverity,
+                            note: reportNote
+                        )
+                        showStationReport = false
+                    }
+                }
+            }
+        }
+    }
+}
+
+private extension Array where Element == StationFacility {
+    func deduplicatedForDisplay() -> [StationFacility] {
+        uniqued { facility in
+            [
+                facility.type.rawValue,
+                facility.name.normalizedFacilityText,
+                (facility.locationText ?? "").normalizedFacilityText,
+                facility.source.rawValue,
+                facility.verification.rawValue
+            ].joined(separator: "|")
+        }
+    }
+}
+
+private extension String {
+    var normalizedFacilityText: String {
+        replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "，", with: ",")
+            .replacingOccurrences(of: "。", with: ".")
+            .replacingOccurrences(of: "（", with: "(")
+            .replacingOccurrences(of: "）", with: ")")
+            .lowercased()
+    }
+}

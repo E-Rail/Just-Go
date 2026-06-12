@@ -41,6 +41,38 @@ final class DIContainer {
     }
 
     @MainActor
+    func makeRoutePlannerViewModel() -> RoutePlannerViewModel {
+        RoutePlannerViewModel(
+            routePlanningService: routePlanningService,
+            placeSearchProvider: placeSearchProvider,
+            locationService: locationService
+        )
+    }
+
+    @MainActor
+    func makeStationSearchViewModel() -> StationSearchViewModel {
+        StationSearchViewModel(
+            stationSearchService: stationSearchService,
+            locationService: locationService
+        )
+    }
+
+    @MainActor
+    func makeMapViewModel() -> MapViewModel {
+        MapViewModel(
+            locationService: locationService,
+            stationSearchService: stationSearchService,
+            cityService: cityService,
+            metroNetworkProvider: metroNetworkProvider
+        )
+    }
+
+    @MainActor
+    func makeStationDetailViewModel() -> StationDetailViewModel {
+        StationDetailViewModel(officialStationData: officialStationData)
+    }
+
+    @MainActor
     static func configure() -> DIContainer {
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()

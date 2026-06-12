@@ -57,12 +57,7 @@ struct MapContainerView: View {
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
-                viewModel = MapViewModel(
-                    locationService: container.locationService,
-                    stationSearchService: container.stationSearchService,
-                    cityService: container.cityService,
-                    metroNetworkProvider: container.metroNetworkProvider
-                )
+                viewModel = container.makeMapViewModel()
             }
 
             guard let city = appState.selectedCity else { return }

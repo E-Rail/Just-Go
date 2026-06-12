@@ -7,9 +7,9 @@ enum AccessibilityAvailability: String, Codable {
 
     init(_ value: Bool?) {
         switch value {
-        case true:
+        case true?:
             self = .available
-        case false:
+        case false?:
             self = .unavailable
         case nil:
             self = .unknown

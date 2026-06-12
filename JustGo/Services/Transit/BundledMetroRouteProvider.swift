@@ -3,7 +3,7 @@ import MapKit
 
 actor BundledMetroRouteProvider: TransitRouteProviding {
     private let metroNetworks: MetroNetworkProviding
-    private var graphs: [String: RoutingGraph] = [:]
+    private var graphs: [String: MetroRoutingGraph] = [:]
 
     init(metroNetworks: MetroNetworkProviding) {
         self.metroNetworks = metroNetworks
@@ -26,7 +26,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         }
         let graph = routingGraph(for: context.network)
 
-        let preferences: [SearchPreference] = [.fastest, .fewestTransfers, .leastWalking]
+        let preferences: [MetroSearchPreference] = [.fastest, .fewestTransfers, .leastWalking]
         var seen = Set<String>()
         var results: [Route] = []
         for preference in preferences {
@@ -51,7 +51,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         network: MetroNetwork,
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D
-    ) -> RouteContext? {
+    ) -> MetroRouteContext? {
         let originStations = nearestStations(to: origin, in: network)
         let destinationStations = nearestStations(to: destination, in: network)
         guard let originDistance = originStations.first?.distance,
@@ -60,7 +60,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
               destinationDistance <= 25_000 else {
             return nil
         }
-        return RouteContext(
+        return MetroRouteContext(
             network: network,
             originStations: originStations,
             destinationStations: destinationStations,
@@ -68,9 +68,9 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         )
     }
 
-    private func nearestStations(to coordinate: CLLocationCoordinate2D, in network: MetroNetwork) -> [StationCandidate] {
+    private func nearestStations(to coordinate: CLLocationCoordinate2D, in network: MetroNetwork) -> [MetroStationCandidate] {
         network.stations.map {
-            StationCandidate(
+            MetroStationCandidate(
                 station: $0,
                 distance: coordinate.distance(to: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude))
             )
@@ -80,22 +80,22 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         .map { $0 }
     }
 
-    private func routingGraph(for network: MetroNetwork) -> RoutingGraph {
+    private func routingGraph(for network: MetroNetwork) -> MetroRoutingGraph {
         let key = "\(network.cityID):\(network.version)"
         if let graph = graphs[key] {
             return graph
         }
         let stationsByID = Dictionary(uniqueKeysWithValues: network.stations.map { ($0.id, $0) })
         let linesByID = Dictionary(uniqueKeysWithValues: network.lines.map { ($0.id, $0) })
-        var adjacency: [String: [GraphEdge]] = [:]
-        var edgeGeometries: [GraphEdgeKey: [CodableCoordinate]] = [:]
-        var seenEdges = Set<GraphEdgeKey>()
+        var adjacency: [String: [MetroGraphEdge]] = [:]
+        var edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]] = [:]
+        var seenEdges = Set<MetroGraphEdgeKey>()
         for line in network.lines {
             for pattern in line.servicePatterns {
                 for pair in pattern.adjacentPairs {
                     guard let from = stationsByID[pair.0], let to = stationsByID[pair.1] else { continue }
                     let distance = from.coordinate.distance(to: to.coordinate)
-                    let edge = GraphEdge(fromStationID: from.id, toStationID: to.id, lineID: line.id, distance: distance)
+                    let edge = MetroGraphEdge(fromStationID: from.id, toStationID: to.id, lineID: line.id, distance: distance)
                     guard seenEdges.insert(edge.key).inserted else { continue }
                     let reversed = edge.reversed
                     seenEdges.insert(reversed.key)
@@ -108,7 +108,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 }
             }
         }
-        let graph = RoutingGraph(
+        let graph = MetroRoutingGraph(
             stationsByID: stationsByID,
             linesByID: linesByID,
             adjacency: adjacency,
@@ -118,27 +118,27 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return graph
     }
 
-    private func shortestPath(in context: RouteContext, graph: RoutingGraph, preference: SearchPreference) -> MetroPath? {
-        var distances: [SearchState: Double] = [:]
-        var previous: [SearchState: PreviousStep] = [:]
-        var heap = MinHeap()
+    private func shortestPath(in context: MetroRouteContext, graph: MetroRoutingGraph, preference: MetroSearchPreference) -> MetroPath? {
+        var distances: [MetroSearchState: Double] = [:]
+        var previous: [MetroSearchState: MetroPreviousStep] = [:]
+        var heap = MetroMinHeap()
         for candidate in context.originStations {
-            let state = SearchState(stationID: candidate.station.id, lineID: nil)
+            let state = MetroSearchState(stationID: candidate.station.id, lineID: nil)
             let cost = walkingCost(candidate.distance, preference: preference)
             distances[state] = cost
-            heap.insert(QueueItem(state: state, cost: cost))
+            heap.insert(MetroQueueItem(state: state, cost: cost))
         }
 
         let destinationsByID = Dictionary(
             uniqueKeysWithValues: context.destinationStations.map { ($0.station.id, $0) }
         )
-        var best: (state: SearchState, destination: StationCandidate, cost: Double)?
+        var best: (state: MetroSearchState, destination: MetroStationCandidate, cost: Double)?
         while let item = heap.removeMin() {
             guard item.cost <= distances[item.state, default: .infinity] else { continue }
 
             if item.state.lineID != nil, let destination = destinationsByID[item.state.stationID] {
                 let total = item.cost + walkingCost(destination.distance, preference: preference)
-                if best == nil || total < best!.cost {
+                if total < (best?.cost ?? .infinity) {
                     best = (item.state, destination, total)
                 }
             }
@@ -146,19 +146,19 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
 
             for edge in graph.adjacency[item.state.stationID, default: []] {
                 let transfer = item.state.lineID != nil && item.state.lineID != edge.lineID
-                let next = SearchState(stationID: edge.toStationID, lineID: edge.lineID)
+                let next = MetroSearchState(stationID: edge.toStationID, lineID: edge.lineID)
                 let cost = item.cost + trainCost(edge.distance) + (transfer ? preference.transferPenalty : 0)
                 if cost < distances[next, default: .infinity] {
                     distances[next] = cost
-                    previous[next] = PreviousStep(state: item.state, edge: edge)
-                    heap.insert(QueueItem(state: next, cost: cost))
+                    previous[next] = MetroPreviousStep(state: item.state, edge: edge)
+                    heap.insert(MetroQueueItem(state: next, cost: cost))
                 }
             }
         }
 
         guard let best else { return nil }
 
-        var edges: [GraphEdge] = []
+        var edges: [MetroGraphEdge] = []
         var state = best.state
         while let step = previous[state] {
             edges.append(step.edge)
@@ -172,150 +172,15 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return MetroPath(origin: originCandidate, destination: best.destination, edges: edges)
     }
 
-    private func walkingCost(_ distance: Double, preference: SearchPreference) -> Double {
+    func walkingCost(_ distance: Double, preference: MetroSearchPreference) -> Double {
         distance / 1.25 * preference.walkingWeight
     }
 
-    private func trainCost(_ distance: Double) -> Double {
+    func trainCost(_ distance: Double) -> Double {
         max(60, distance / 9.7 + 30)
     }
 
-    private func makeRoute(
-        path: MetroPath,
-        context: RouteContext,
-        graph: RoutingGraph,
-        origin: TransitPlace,
-        destination: TransitPlace,
-        preference: SearchPreference,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> Route {
-        let originStation = path.origin.station
-        let destinationStation = path.destination.station
-        async let originWalk = walkingSegment(
-            from: origin.routeCoordinate,
-            to: originStation.coordinate,
-            fromName: origin.name,
-            toName: originStation.name
-        )
-        async let destinationWalk = walkingSegment(
-            from: destinationStation.coordinate,
-            to: destination.routeCoordinate,
-            fromName: destinationStation.name,
-            toName: destination.name
-        )
-
-        var segments: [RouteSegment] = []
-        if let walk = await originWalk { segments.append(walk) }
-        segments.append(contentsOf: transitSegments(
-            path.edges,
-            cityID: context.network.cityID,
-            graph: graph
-        ))
-        if let walk = await destinationWalk { segments.append(walk) }
-
-        let walkingDistance = segments.filter { $0.type == .walking }.reduce(0) { $0 + $1.distance }
-        var warnings: [RouteWarning] = []
-        if walkingDistance >= 800 {
-            warnings.append(RouteWarning(type: .longWalk, message: AppLocalization.localized("Long walking segment"), affectedStationID: nil))
-        }
-        let hasStairs = segments.flatMap { $0.walkingDirections ?? [] }.contains(where: \.hasStairs)
-        if hasStairs {
-            warnings.append(RouteWarning(type: .stairsDetected, message: AppLocalization.localized("Stairs mentioned in Apple Maps directions"), affectedStationID: nil))
-        }
-
-        return Route(
-            id: UUID(),
-            origin: origin.name,
-            destination: destination.name,
-            originStationID: "network-\(context.network.cityID)-\(originStation.id)",
-            destinationStationID: "network-\(context.network.cityID)-\(destinationStation.id)",
-            strategy: preference.strategy,
-            segments: segments,
-            totalDuration: segments.reduce(0) { $0 + $1.duration },
-            walkingDistance: walkingDistance,
-            totalStops: path.edges.count,
-            transferCount: max(0, path.edges.map(\.lineID).consecutiveUnique.count - 1),
-            isFullyAccessible: false,
-            stepFreeAssessment: hasStairs ? .barrierDetected : .unknown,
-            warnings: warnings,
-            accessGuidance: [
-                accessGuide(kind: .origin, place: origin, station: originStation, walk: segments.first?.type == .walking ? segments.first : nil),
-                accessGuide(kind: .destination, place: destination, station: destinationStation, walk: segments.last?.type == .walking ? segments.last : nil)
-            ],
-            dataCoverage: .unknown
-        )
-    }
-
-    private func transitSegments(
-        _ edges: [GraphEdge],
-        cityID: String,
-        graph: RoutingGraph
-    ) -> [RouteSegment] {
-        var segments: [RouteSegment] = []
-        let groups = edges.chunked { $0.lineID == $1.lineID }
-        for (index, group) in groups.enumerated() {
-            guard let first = group.first,
-                  let last = group.last,
-                  let line = graph.linesByID[first.lineID],
-                  let from = graph.stationsByID[first.fromStationID],
-                  let to = graph.stationsByID[last.toStationID] else {
-                continue
-            }
-            if index > 0 {
-                segments.append(RouteSegment(
-                    id: UUID(),
-                    type: .transfer,
-                    lineName: line.name,
-                    lineColorHex: line.colorHex,
-                    fromStationName: from.name,
-                    toStationName: from.name,
-                    fromStationID: "network-\(cityID)-\(from.id)",
-                    toStationID: "network-\(cityID)-\(from.id)",
-                    duration: 300,
-                    distance: 0,
-                    stops: 0,
-                    stationStops: [],
-                    polylineCoordinates: [],
-                    walkingDirections: nil,
-                    accessibilityNotes: []
-                ))
-            }
-            let stationIDs = [first.fromStationID] + group.map(\.toStationID)
-            let stops = stationIDs.compactMap { id -> RouteStationStop? in
-                guard let station = graph.stationsByID[id] else { return nil }
-                return RouteStationStop(
-                    stationID: "network-\(cityID)-\(station.id)",
-                    name: station.name,
-                    lineName: line.name,
-                    lineColorHex: line.colorHex,
-                    coordinate: CodableCoordinate(latitude: station.latitude, longitude: station.longitude),
-                    arrivalTimeText: nil,
-                    isTransfer: Set(station.lineIDs).count > 1
-                )
-            }
-            let coordinates = group.flatMap { graph.edgeGeometries[$0.key] ?? [] }.deduplicatedCoordinates
-            segments.append(RouteSegment(
-                id: UUID(),
-                type: .subway,
-                lineName: line.name,
-                lineColorHex: line.colorHex,
-                fromStationName: from.name,
-                toStationName: to.name,
-                fromStationID: "network-\(cityID)-\(from.id)",
-                toStationID: "network-\(cityID)-\(to.id)",
-                duration: group.reduce(0) { $0 + trainCost($1.distance) },
-                distance: group.reduce(0) { $0 + $1.distance },
-                stops: group.count,
-                stationStops: stops,
-                polylineCoordinates: coordinates,
-                walkingDirections: nil,
-                accessibilityNotes: []
-            ))
-        }
-        return segments
-    }
-
-    private func edgeGeometry(_ edge: GraphEdge, stations: [String: MetroStation], line: MetroLine) -> [CodableCoordinate] {
+    private func edgeGeometry(_ edge: MetroGraphEdge, stations: [String: MetroStation], line: MetroLine) -> [CodableCoordinate] {
         guard let from = stations[edge.fromStationID], let to = stations[edge.toStationID] else { return [] }
         let fromCoordinate = from.coordinate
         let toCoordinate = to.coordinate
@@ -335,257 +200,5 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             ? Array(match.path[match.from...match.to])
             : Array(match.path[match.to...match.from].reversed())
         return slice.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
-    }
-
-    private func walkingSegment(
-        from: CLLocationCoordinate2D,
-        to: CLLocationCoordinate2D,
-        fromName: String,
-        toName: String
-    ) async -> RouteSegment? {
-        let directDistance = from.distance(to: to)
-        guard directDistance >= 10 else { return nil }
-        let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to))
-        request.transportType = .walking
-        let mapRoute = try? await MKDirections(request: request).calculate().routes.first
-        let distance = mapRoute?.distance ?? directDistance
-        let duration = mapRoute?.expectedTravelTime ?? distance / 1.25
-        let steps = mapRoute?.steps.filter { $0.distance >= 10 || !$0.instructions.isEmpty }.map {
-            WalkingStep(
-                instruction: $0.instructions,
-                distance: $0.distance,
-                duration: max(1, duration * ($0.distance / max(distance, 1))),
-                isAccessible: !$0.instructions.localizedCaseInsensitiveContains("stairs"),
-                road: nil,
-                action: nil,
-                assistantAction: nil,
-                walkType: nil
-            )
-        } ?? [WalkingStep(
-            instruction: AppLocalization.text(
-                english: "Walk from \(fromName) to \(toName)",
-                simplified: "从\(fromName)步行至\(toName)",
-                traditional: "從\(fromName)步行至\(toName)"
-            ),
-            distance: distance,
-            duration: duration,
-            isAccessible: true,
-            road: nil,
-            action: nil,
-            assistantAction: nil,
-            walkType: nil
-        )]
-        return RouteSegment(
-            id: UUID(),
-            type: .walking,
-            lineName: nil,
-            lineColorHex: nil,
-            fromStationName: fromName,
-            toStationName: toName,
-            fromStationID: nil,
-            toStationID: nil,
-            duration: duration,
-            distance: distance,
-            stops: 0,
-            stationStops: [],
-            polylineCoordinates: mapRoute?.polyline.routeCoordinates.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) } ?? [],
-            walkingDirections: steps,
-            accessibilityNotes: mapRoute == nil ? [AppLocalization.localized("Walking distance is estimated")] : []
-        )
-    }
-
-    private func accessGuide(kind: RouteAccessKind, place: TransitPlace, station: MetroStation, walk: RouteSegment?) -> RouteAccessGuide {
-        RouteAccessGuide(
-            id: UUID(),
-            kind: kind,
-            placeName: place.name,
-            stationName: station.name,
-            accessPoint: RouteAccessPoint(
-                id: station.id,
-                name: station.name,
-                coordinate: CodableCoordinate(latitude: station.latitude, longitude: station.longitude),
-                isWheelchairLikely: false,
-                hasElevatorHint: false,
-                source: .stationPOI
-            ),
-            walkingDistance: walk?.distance ?? 0,
-            walkingDuration: walk?.duration ?? 0,
-            walkingSteps: walk?.walkingDirections ?? [],
-            accessibilityNotes: [AppLocalization.localized("Specific entrance or exit is unavailable")]
-        )
-    }
-}
-
-private struct RouteContext {
-    let network: MetroNetwork
-    let originStations: [StationCandidate]
-    let destinationStations: [StationCandidate]
-    let accessDistance: Double
-}
-
-private struct RoutingGraph {
-    let stationsByID: [String: MetroStation]
-    let linesByID: [String: MetroLine]
-    let adjacency: [String: [GraphEdge]]
-    let edgeGeometries: [GraphEdgeKey: [CodableCoordinate]]
-}
-
-private struct StationCandidate {
-    let station: MetroStation
-    let distance: Double
-}
-
-private struct GraphEdge {
-    let fromStationID: String
-    let toStationID: String
-    let lineID: String
-    let distance: Double
-
-    var reversed: GraphEdge {
-        GraphEdge(fromStationID: toStationID, toStationID: fromStationID, lineID: lineID, distance: distance)
-    }
-
-    var key: GraphEdgeKey {
-        GraphEdgeKey(fromStationID: fromStationID, toStationID: toStationID, lineID: lineID)
-    }
-}
-
-private struct GraphEdgeKey: Hashable {
-    let fromStationID: String
-    let toStationID: String
-    let lineID: String
-}
-
-private struct MetroPath {
-    let origin: StationCandidate
-    let destination: StationCandidate
-    let edges: [GraphEdge]
-}
-
-private struct SearchState: Hashable {
-    let stationID: String
-    let lineID: String?
-}
-
-private struct PreviousStep {
-    let state: SearchState
-    let edge: GraphEdge
-}
-
-private enum SearchPreference {
-    case fastest
-    case fewestTransfers
-    case leastWalking
-
-    var transferPenalty: Double {
-        self == .fewestTransfers ? 1_200 : 300
-    }
-
-    var walkingWeight: Double {
-        self == .leastWalking ? 3 : 1
-    }
-
-    var strategy: RouteStrategy {
-        switch self {
-        case .fastest, .fewestTransfers: return .fastest
-        case .leastWalking: return .leastWalking
-        }
-    }
-}
-
-private struct QueueItem {
-    let state: SearchState
-    let cost: Double
-}
-
-private struct MinHeap {
-    private var values: [QueueItem] = []
-
-    mutating func insert(_ value: QueueItem) {
-        values.append(value)
-        var index = values.count - 1
-        while index > 0 {
-            let parent = (index - 1) / 2
-            guard values[index].cost < values[parent].cost else { break }
-            values.swapAt(index, parent)
-            index = parent
-        }
-    }
-
-    mutating func removeMin() -> QueueItem? {
-        guard !values.isEmpty else { return nil }
-        if values.count == 1 { return values.removeLast() }
-        let result = values[0]
-        values[0] = values.removeLast()
-        var index = 0
-        while true {
-            let left = index * 2 + 1
-            let right = left + 1
-            var smallest = index
-            if left < values.count && values[left].cost < values[smallest].cost { smallest = left }
-            if right < values.count && values[right].cost < values[smallest].cost { smallest = right }
-            guard smallest != index else { break }
-            values.swapAt(index, smallest)
-            index = smallest
-        }
-        return result
-    }
-}
-
-private extension MetroStation {
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-}
-
-private extension MetroCoordinate {
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-}
-
-private extension Array {
-    var adjacentPairs: [(Element, Element)] {
-        guard count >= 2 else { return [] }
-        return zip(self, dropFirst()).map { ($0, $1) }
-    }
-
-    func chunked(where belongsTogether: (Element, Element) -> Bool) -> [[Element]] {
-        guard let first else { return [] }
-        var chunks = [[first]]
-        for item in dropFirst() {
-            if let previous = chunks.last?.last, belongsTogether(previous, item) {
-                chunks[chunks.count - 1].append(item)
-            } else {
-                chunks.append([item])
-            }
-        }
-        return chunks
-    }
-}
-
-private extension Array where Element: Equatable {
-    var consecutiveUnique: [Element] {
-        reduce(into: []) { result, item in
-            if result.last != item { result.append(item) }
-        }
-    }
-}
-
-private extension Array where Element == CodableCoordinate {
-    var deduplicatedCoordinates: [CodableCoordinate] {
-        reduce(into: []) { result, coordinate in
-            if result.last != coordinate { result.append(coordinate) }
-        }
-    }
-}
-
-private extension MKPolyline {
-    var routeCoordinates: [CLLocationCoordinate2D] {
-        var values = Array(repeating: kCLLocationCoordinate2DInvalid, count: pointCount)
-        getCoordinates(&values, range: NSRange(location: 0, length: pointCount))
-        return values
     }
 }

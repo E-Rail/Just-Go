@@ -20,6 +20,8 @@ OVERPASS_URLS = [
 ATTRIBUTION = "© OpenStreetMap contributors"
 LICENSE_URL = "https://www.openstreetmap.org/copyright"
 SOURCE_URL = "https://www.openstreetmap.org"
+URBAN_ROUTE_MODES = %w[subway light_rail monorail tram].freeze
+SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 
 CITIES = {
   "1100" => { name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90] },
@@ -66,7 +68,9 @@ end
 
 def passenger_line_name(tags)
   value = tags["name:zh"] || tags["name"] || tags["ref"] || "Metro"
-  value.split(/[:：→]/, 2).first.strip.gsub(/\A地铁\s*/, "")
+  value = value.split(/[:：]/, 2).first
+  value = value.gsub(/\s*[\(（][^()（）]*(?:→|=>|->)[^()（）]*[\)）]\s*\z/, "")
+  value.split(/(?:→|=>|->)/, 2).first.strip.gsub(/\A地铁\s*/, "")
 end
 
 def line_name_tokens(value)
@@ -86,6 +90,18 @@ end
 
 def service_identity(tags)
   normalized(tags["wikidata"])
+end
+
+def supported_route_relation?(relation)
+  tags = relation.fetch("tags", {})
+  mode = tags["route"]
+  return true if URBAN_ROUTE_MODES.include?(mode)
+
+  mode == "train" && (
+    !network_identity(tags).empty? ||
+    %w[urban suburban].include?(tags["passenger"]) ||
+    (!normalized(tags["operator"]).empty? && !service_identity(tags).empty?)
+  )
 end
 
 def ratio(numerator, denominator)
@@ -293,7 +309,12 @@ def overpass_query(bbox)
   south, west, north, east = bbox
   <<~QUERY
     [out:json][timeout:180];
-    relation["route"="subway"](#{south},#{west},#{north},#{east});
+    (
+      relation["route"~"^(subway|light_rail|monorail|tram)$"](#{south},#{west},#{north},#{east});
+      relation["route"="train"]["network"](#{south},#{west},#{north},#{east});
+      relation["route"="train"]["passenger"~"^(urban|suburban)$"](#{south},#{west},#{north},#{east});
+      relation["route"="train"]["operator"]["wikidata"](#{south},#{west},#{north},#{east});
+    );
     (._;>>;);
     out body;
   QUERY
@@ -465,6 +486,12 @@ def service_pattern_key(relation, elements_by_key)
   names.join("|")
 end
 
+def service_terminal_key(relation)
+  tags = relation.fetch("tags", {})
+  terminals = [normalized_station_name(tags["from"]), normalized_station_name(tags["to"])].reject(&:empty?).sort
+  terminals.length == 2 ? terminals.join("|") : nil
+end
+
 def relation_track_ways(relation, ways)
   relation.fetch("members", [])
     .select { |member| member["type"] == "way" && !member["role"].to_s.match?(/platform|stop/) }
@@ -538,12 +565,26 @@ end
 def passenger_service_patterns(relations, elements_by_key)
   exact_patterns = relations.group_by { |relation| service_pattern_key(relation, elements_by_key) }
   patterns = exact_patterns.map do |key, candidates|
-    { key: key, stations: relation_station_names(candidates.first, elements_by_key).to_set, candidates: candidates }
+    {
+      key: key,
+      stations: relation_station_names(candidates.first, elements_by_key).to_set,
+      terminal_keys: candidates.map { |relation| service_terminal_key(relation) }.compact.to_set,
+      candidates: candidates
+    }
   end
   patterns.sort_by { |pattern| -pattern[:stations].length }.each_with_object([]) do |pattern, merged|
-    containing = merged.find { |candidate| pattern[:stations].subset?(candidate[:stations]) }
+    containing = merged.find do |candidate|
+      shared_stations = pattern[:stations] & candidate[:stations]
+      same_terminals = !(pattern[:terminal_keys] & candidate[:terminal_keys]).empty?
+      station_containment = [
+        ratio(shared_stations.length, pattern[:stations].length),
+        ratio(shared_stations.length, candidate[:stations].length)
+      ].max
+      pattern[:stations].subset?(candidate[:stations]) || (same_terminals && station_containment >= 0.8)
+    end
     if containing
       containing[:candidates].concat(pattern[:candidates])
+      containing[:terminal_keys].merge(pattern[:terminal_keys])
     else
       merged << pattern
     end
@@ -596,7 +637,7 @@ def build_network(city_id, city, source)
   elements_by_key = elements.to_h { |item| ["#{item["type"]}:#{item["id"]}", item] }
   ways = elements.select { |item| item["type"] == "way" }.to_h { |way| [way["id"], way] }
   station_nodes = physical_station_nodes(elements)
-  relations = elements.select { |item| item["type"] == "relation" && item.dig("tags", "route") == "subway" }
+  relations = elements.select { |item| item["type"] == "relation" && supported_route_relation?(item) }
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
   end
@@ -693,6 +734,14 @@ def build_network(city_id, city, source)
   station_ids_by_line = Hash.new { |hash, key| hash[key] = [] }
   stations.each { |station| station["lineIDs"].each { |id| station_ids_by_line[id] << station["id"] } }
   lines.each { |line| line["stationIDs"] = station_ids_by_line[line["id"]] }
+  emitted_source_relation_ids = lines.flat_map { |line| line["sourceRelationIDs"] }.to_set
+  missing_passenger_relations = passenger_relations.reject do |relation|
+    emitted_source_relation_ids.include?(relation["id"].to_s)
+  end
+  fail_with(
+    "#{city[:name]} omitted passenger-bearing relations: " \
+    "#{missing_passenger_relations.map { |relation| relation["id"] }.sort.join(", ")}"
+  ) unless missing_passenger_relations.empty?
   empty_lines = lines.select { |line| line["stationIDs"].empty? }
   fail_with("#{city[:name]} emitted lines without passenger stations") unless empty_lines.empty?
   structured_line_keys = lines.map do |line|
@@ -750,6 +799,9 @@ def build_network(city_id, city, source)
 end
 
 def self_test
+  fail_with("direction suffix line-name test failed") unless passenger_line_name(
+    "name" => "Light Rail 505 (A → B)"
+  ) == "Light Rail 505"
   joined = join_way_paths([
     { "id" => 1, "nodes" => [1, 2, 3] },
     { "id" => 2, "nodes" => [5, 4, 3] },
@@ -871,6 +923,21 @@ def self_test
     "tags" => { "route" => "subway", "name" => "Line 20 Direction", "network" => "Metro A", "ref" => "20" }
   )
   fail_with("evidence-only relation classification test failed") unless passenger_station_members(evidence_only, fixture_elements).empty?
+  fail_with("light-rail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "light_rail" })
+  fail_with("monorail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "monorail" })
+  fail_with("tram eligibility test failed") unless supported_route_relation?("tags" => { "route" => "tram" })
+  fail_with("networked urban train eligibility test failed") unless supported_route_relation?(
+    "tags" => { "route" => "train", "network" => "Regional Rail" }
+  )
+  fail_with("passenger-class urban train eligibility test failed") unless supported_route_relation?(
+    "tags" => { "route" => "train", "passenger" => "suburban" }
+  )
+  fail_with("stable operator-backed train eligibility test failed") unless supported_route_relation?(
+    "tags" => { "route" => "train", "operator" => "Regional Operator", "wikidata" => "Q1" }
+  )
+  fail_with("unstructured train exclusion test failed") if supported_route_relation?(
+    "tags" => { "route" => "train", "name" => "Intercity Train" }
+  )
   track_stations = physical_station_nodes([
     { "type" => "node", "id" => 1, "tags" => { "name" => "A", "railway" => "stop", "subway" => "yes" } },
     { "type" => "node", "id" => 2, "tags" => { "name" => "Reopened", "railway" => "stop", "subway" => "yes" } },
@@ -882,6 +949,18 @@ def self_test
   merged_patterns = unique_service_patterns([%w[a c], %w[a reopened c], %w[a branch]])
   fail_with("physical topology did not supersede stale relation stops") unless merged_patterns.include?(%w[a reopened c]) && !merged_patterns.include?(%w[a c])
   fail_with("physical topology collapsed a genuine branch") unless merged_patterns.include?(%w[a branch])
+  directional_pair = [
+    fixture_relation.call(31, [1, 2, 3], [100]).merge(
+      "tags" => { "route" => "train", "network" => "Regional Rail", "from" => "A", "to" => "C" }
+    ),
+    fixture_relation.call(32, [3, 2], [101]).merge(
+      "tags" => { "route" => "train", "network" => "Regional Rail", "from" => "C", "to" => "A" }
+    )
+  ]
+  fail_with("terminal-based direction pairing test failed") unless passenger_service_patterns(
+    directional_pair,
+    fixture_elements
+  ).length == 1
   puts "OSM metro importer self-test ok"
 end
 

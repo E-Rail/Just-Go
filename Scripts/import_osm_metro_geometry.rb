@@ -477,6 +477,38 @@ def relation_node_set(relation, ways)
   relation_track_ways(relation, ways).flat_map { |way| way["nodes"] }.to_set
 end
 
+def physical_station_nodes(elements)
+  elements.each_with_object({}) do |element, result|
+    next unless element["type"] == "node"
+    tags = element.fetch("tags", {})
+    name = tags["name:zh"] || tags["name"]
+    next if name.to_s.empty?
+    next unless tags["railway"] == "stop" || tags["public_transport"] == "stop_position"
+    next unless tags["subway"] == "yes" || tags["railway"] == "stop"
+
+    result[element["id"]] = [element, name]
+  end
+end
+
+def physical_station_patterns(node_paths, station_nodes)
+  node_paths.map do |path|
+    pattern = path.map { |node_id| station_nodes[node_id]&.last }.compact
+      .map { |name| normalized_station_name(name) }
+      .reject(&:empty?)
+      .chunk_while { |left, right| left == right }
+      .map(&:first)
+    pattern if pattern.length >= 2
+  end.compact
+end
+
+def unique_service_patterns(patterns)
+  unique = patterns.uniq { |pattern| [pattern, pattern.reverse].min.join("|") }
+  unique.reject do |pattern|
+    station_set = pattern.to_set
+    unique.any? { |candidate| candidate.length > pattern.length && station_set.subset?(candidate.to_set) }
+  end
+end
+
 def validate_selected_corridors!(relations, elements_by_key, ways)
   relations.combination(2) do |left, right|
     left_stations = relation_station_names(left, elements_by_key).to_set
@@ -563,6 +595,7 @@ def build_network(city_id, city, source)
   end
   elements_by_key = elements.to_h { |item| ["#{item["type"]}:#{item["id"]}", item] }
   ways = elements.select { |item| item["type"] == "way" }.to_h { |way| [way["id"], way] }
+  station_nodes = physical_station_nodes(elements)
   relations = elements.select { |item| item["type"] == "relation" && item.dig("tags", "route") == "subway" }
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
@@ -585,6 +618,7 @@ def build_network(city_id, city, source)
       .uniq { |way| way["id"] }
     seen_paths = Set.new
     node_paths = join_way_paths(member_ways).select { |path| seen_paths.add?(canonical_path_key(path)) }
+    track_station_patterns = physical_station_patterns(node_paths, station_nodes)
     coordinate_paths = node_paths.map do |path|
       coordinates = path.map { |node_id| nodes[node_id] }.compact.map { |coordinate| wgs84_to_gcj02(*coordinate) }
       next if coordinates.length < 2
@@ -606,6 +640,22 @@ def build_network(city_id, city, source)
         station["lineIDs"] << id
       end
     end
+    member_ways.flat_map { |way| way.fetch("nodes", []) }.uniq.each do |node_id|
+      element, name = station_nodes[node_id]
+      next unless element && name
+
+      station = station_groups[normalized_station_name(name)] ||= {
+        "name" => name,
+        "nameEn" => element.dig("tags", "name:en"),
+        "coordinates" => [],
+        "lineIDs" => Set.new
+      }
+      station["coordinates"] << [element["lat"], element["lon"]]
+      station["lineIDs"] << id
+    end
+
+    relation_patterns = selected_relations.map { |relation| ordered_relation_station_names(relation, elements_by_key) }
+    service_patterns = unique_service_patterns(track_station_patterns + relation_patterns)
 
     {
       "id" => id,
@@ -616,10 +666,9 @@ def build_network(city_id, city, source)
       "nameEn" => canonical[:relation].dig("tags", "name:en")&.split(/[:→]/, 2)&.first&.strip,
       "colorHex" => canonical_color(profiles, canonical),
       "stationIDs" => [],
-      "servicePatterns" => selected_relations.map do |relation|
-        ordered_relation_station_names(relation, elements_by_key)
-          .map { |name| Digest::SHA256.hexdigest("#{city_id}|#{name}")[0, 16] }
-      end.select { |pattern| pattern.length >= 2 }.uniq,
+      "servicePatterns" => service_patterns.map do |pattern|
+        pattern.map { |name| Digest::SHA256.hexdigest("#{city_id}|#{name}")[0, 16] }
+      end,
       "paths" => coordinate_paths,
       "sourceRelationIDs" => direction_relations.map { |relation| relation["id"].to_s }.sort,
       "selectedSourceRelationIDs" => selected_relations.map { |relation| relation["id"].to_s }.sort,
@@ -822,6 +871,17 @@ def self_test
     "tags" => { "route" => "subway", "name" => "Line 20 Direction", "network" => "Metro A", "ref" => "20" }
   )
   fail_with("evidence-only relation classification test failed") unless passenger_station_members(evidence_only, fixture_elements).empty?
+  track_stations = physical_station_nodes([
+    { "type" => "node", "id" => 1, "tags" => { "name" => "A", "railway" => "stop", "subway" => "yes" } },
+    { "type" => "node", "id" => 2, "tags" => { "name" => "Reopened", "railway" => "stop", "subway" => "yes" } },
+    { "type" => "node", "id" => 3, "tags" => { "name" => "C", "public_transport" => "stop_position", "subway" => "yes" } },
+    { "type" => "node", "id" => 4, "tags" => { "name" => "Nearby but not on track", "railway" => "stop", "subway" => "yes" } }
+  ])
+  inferred_patterns = physical_station_patterns([[1, 2, 3]], track_stations)
+  fail_with("physical-track station topology test failed") unless inferred_patterns == [%w[a reopened c]]
+  merged_patterns = unique_service_patterns([%w[a c], %w[a reopened c], %w[a branch]])
+  fail_with("physical topology did not supersede stale relation stops") unless merged_patterns.include?(%w[a reopened c]) && !merged_patterns.include?(%w[a c])
+  fail_with("physical topology collapsed a genuine branch") unless merged_patterns.include?(%w[a branch])
   puts "OSM metro importer self-test ok"
 end
 

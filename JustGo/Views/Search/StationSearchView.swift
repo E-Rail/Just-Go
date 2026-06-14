@@ -31,16 +31,11 @@ struct StationSearchView: View {
                 }
             }
         }
-        .task {
+        .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
                 viewModel = container.makeStationSearchViewModel()
             }
             await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
-        }
-        .onChange(of: appState.selectedCity?.id) { _, cityID in
-            Task {
-                await viewModel?.loadInitialStations(city: cityID ?? "")
-            }
         }
     }
 
@@ -65,7 +60,12 @@ struct StationSearchView: View {
             }
 
             if !(viewModel?.searchText.isEmpty ?? true) {
-                Button(action: { viewModel?.clearSearch() }) {
+                Button {
+                    viewModel?.clearSearch()
+                    Task {
+                        await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
+                    }
+                } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
                 }

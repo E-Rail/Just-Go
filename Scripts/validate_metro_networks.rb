@@ -22,6 +22,14 @@ def point_segment_distance(point, start_point, end_point)
   Math.sqrt((px - projection * ex)**2 + (py - projection * ey)**2)
 end
 
+def normalized_station_name(name)
+  name.to_s
+    .unicode_normalize(:nfkc)
+    .downcase
+    .gsub(/[[:space:]·・]/, "")
+    .gsub(/[（(](?:地铁|metro|line|线路|站台|platform)[^）)]*[）)]/i, "")
+end
+
 paths.each do |path|
   network = JSON.parse(File.read(path))
   city = network.fetch("cityID")
@@ -32,7 +40,11 @@ paths.each do |path|
   abort "#{city}: snapshot missing" if network["sourceSnapshot"].to_s.empty?
   abort "#{city}: coordinate system must be gcj02" unless network["coordinateSystem"] == "gcj02"
 
-  station_ids = network.fetch("stations").map { |station| station.fetch("id") }.to_set
+  stations = network.fetch("stations")
+  station_ids = stations.map { |station| station.fetch("id") }.to_set
+  station_names = stations.map { |station| normalized_station_name(station.fetch("name")) }
+  abort "#{city}: passenger station name missing" if station_names.any?(&:empty?)
+  abort "#{city}: duplicate normalized passenger station" unless station_names.uniq.length == station_names.length
   line_ids = network.fetch("lines").map { |line| line.fetch("id") }.to_set
   logical_line_ids = network.fetch("lines").map { |line| line.fetch("logicalLineID") }
   abort "#{city}: duplicate canonical logical-line ID" unless logical_line_ids.uniq.length == logical_line_ids.length
@@ -48,7 +60,8 @@ paths.each do |path|
   abort "#{city}: duplicate structured logical-line identity" unless structured_line_keys.uniq.length == structured_line_keys.length
   source_relation_ids = network.fetch("lines").flat_map { |line| line.fetch("sourceRelationIDs") }
   abort "#{city}: raw source relation belongs to multiple logical lines" unless source_relation_ids.uniq.length == source_relation_ids.length
-  network.fetch("stations").each do |station|
+  stations.each do |station|
+    abort "#{city}: station has no canonical line membership" if station.fetch("lineIDs").empty?
     abort "#{city}: station references unknown line" unless station.fetch("lineIDs").all? { |id| line_ids.include?(id) }
     abort "#{city}: station has duplicate canonical line membership" unless station.fetch("lineIDs").uniq.length == station.fetch("lineIDs").length
   end
@@ -60,6 +73,7 @@ paths.each do |path|
     patterns = line.fetch("servicePatterns")
     abort "#{city}: line has no routable service pattern" if patterns.empty?
     abort "#{city}: service pattern contains unknown station" unless patterns.flatten.all? { |id| station_ids.include?(id) }
+    abort "#{city}: service pattern contains station outside canonical line" unless patterns.flatten.all? { |id| line.fetch("stationIDs").include?(id) }
     abort "#{city}: service pattern contains adjacent duplicate station" if patterns.any? { |pattern| pattern.each_cons(2).any? { |left, right| left == right } }
     abort "#{city}: line has no physical paths" unless line.fetch("paths").any? { |path_points| path_points.length >= 2 }
     relation_ids = line.fetch("selectedSourceRelationIDs")

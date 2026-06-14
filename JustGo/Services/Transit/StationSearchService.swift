@@ -29,7 +29,13 @@ final class StationSearchService {
         let region = cityService.getCity(byID: city).flatMap { $0.id == "automatic" ? nil : $0 }.map {
             MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
         }
-        let places = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 20)
+        let places: [TransitPlace]
+        do {
+            places = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 20)
+        } catch {
+            guard bundledMatches.isEmpty else { return bundledMatches }
+            throw error
+        }
         let mapKitMatches = await places.asyncMap { place in
             if let official = await self.officialStationData.matchingStation(place: place, cityID: city) {
                 return official

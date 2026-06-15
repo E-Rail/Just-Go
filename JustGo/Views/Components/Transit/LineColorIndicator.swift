@@ -3,29 +3,11 @@ import SwiftUI
 struct LineColorIndicator: View {
     let colorHex: String
     var size: CGFloat = 10
-    var shape: IndicatorShape = .circle
-
-    enum IndicatorShape {
-        case circle
-        case roundedRectangle
-        case capsule
-    }
 
     var body: some View {
-        Group {
-            switch shape {
-            case .circle:
-                Circle()
-                    .fill(Color(hex: colorHex))
-            case .roundedRectangle:
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color(hex: colorHex))
-            case .capsule:
-                Capsule()
-                    .fill(Color(hex: colorHex))
-            }
-        }
-        .frame(width: size, height: size)
+        Circle()
+            .fill(Color(hex: colorHex))
+            .frame(width: size, height: size)
     }
 }
 

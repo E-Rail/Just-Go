@@ -34,7 +34,6 @@ struct TransitMapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
         mapView.delegate = context.coordinator
-        mapView.showsUserLocation = showsUserLocation
         mapView.showsCompass = true
         mapView.showsScale = true
         mapView.pointOfInterestFilter = .includingAll
@@ -188,7 +187,6 @@ struct TransitMapView: UIViewRepresentable {
             collection: inout [MKOverlay],
             to mapView: MKMapView
         ) {
-            guard coordinates.count >= 2 else { return }
             let displayCoordinates = simplify ? simplifiedCoordinates(coordinates) : coordinates
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))

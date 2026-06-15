@@ -90,10 +90,6 @@ final class RoutePlannerViewModel {
         pendingQuickPlaceKind = kind
     }
 
-    func clearPendingQuickPlace() {
-        pendingQuickPlaceKind = nil
-    }
-
     func useQuickPlace(_ quickPlace: QuickPlace, for field: RouteInputField) {
         pendingQuickPlaceKind = nil
         assignPlace(quickPlace.transitPlace, for: field)

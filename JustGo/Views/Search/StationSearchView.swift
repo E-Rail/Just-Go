@@ -77,8 +77,9 @@ struct StationSearchView: View {
     }
 
     private var searchDropdown: some View {
-        VStack(spacing: 0) {
-            ForEach(viewModel?.searchResults.prefix(8) ?? []) { station in
+        let topResults = Array(viewModel?.searchResults.prefix(8) ?? [])
+        return VStack(spacing: 0) {
+            ForEach(topResults) { station in
                 Button {
                     isSearchFocused = false
                     viewModel?.selectStation(station)
@@ -107,7 +108,7 @@ struct StationSearchView: View {
                 }
                 .buttonStyle(.plain)
 
-                if station.id != viewModel?.searchResults.prefix(8).last?.id {
+                if station.id != topResults.last?.id {
                     Divider()
                         .padding(.leading, 12)
                 }

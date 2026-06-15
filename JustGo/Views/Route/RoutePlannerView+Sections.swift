@@ -45,14 +45,7 @@ extension RoutePlannerView {
     }
 
     private var quickTagTargetField: RouteInputField {
-        switch focusedField {
-        case .origin:
-            return .origin
-        case .destination:
-            return .destination
-        case nil:
-            return (viewModel?.originName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) ? .origin : .destination
-        }
+        focusedField ?? ((viewModel?.originName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) ? .origin : .destination)
     }
 
     private func quickTagButton(title: String, icon: String, isSaved: Bool, action: @escaping () -> Void) -> some View {

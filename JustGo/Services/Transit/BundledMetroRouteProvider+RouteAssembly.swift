@@ -8,8 +8,7 @@ extension BundledMetroRouteProvider {
         graph: MetroRoutingGraph,
         origin: TransitPlace,
         destination: TransitPlace,
-        preference: MetroSearchPreference,
-        accessibilityFilter: AccessibilityFilter
+        preference: MetroSearchPreference
     ) async -> Route {
         let originStation = path.origin.station
         let destinationStation = path.destination.station

@@ -10,7 +10,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
-    var isUpdatingLocation = false
 
     override init() {
         super.init()
@@ -18,23 +17,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         authorizationStatus = manager.authorizationStatus
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.distanceFilter = 10
-    }
-
-    func requestPermission() async {
-        locationErrorMessage = nil
-
-        switch authorizationStatus {
-        case .notDetermined:
-            manager.requestWhenInUseAuthorization()
-        case .authorizedAlways, .authorizedWhenInUse:
-            startUpdatingLocation()
-        case .denied, .restricted:
-            isUpdatingLocation = false
-            break
-        @unknown default:
-            isUpdatingLocation = false
-            break
-        }
     }
 
     func requestCurrentLocation() async throws -> CLLocation {
@@ -74,13 +56,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     func startUpdatingLocation() {
-        guard isAuthorized else {
-            isUpdatingLocation = false
-            return
-        }
+        guard isAuthorized else { return }
 
         locationErrorMessage = nil
-        isUpdatingLocation = true
         manager.startUpdatingLocation()
     }
 
@@ -104,7 +82,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
                 manager.requestLocation()
             }
         } else {
-            isUpdatingLocation = false
             manager.stopUpdatingLocation()
             if authorizationStatus == .denied || authorizationStatus == .restricted {
                 let error = LocationServiceError.permissionDenied
@@ -116,7 +93,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         locationErrorMessage = error.localizedDescription
-        isUpdatingLocation = false
         finishPendingLocationRequests(with: .failure(error))
 
         if (error as? CLError)?.code == .denied {

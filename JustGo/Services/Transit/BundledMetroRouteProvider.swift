@@ -39,8 +39,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 graph: graph,
                 origin: origin,
                 destination: destination,
-                preference: preference,
-                accessibilityFilter: accessibilityFilter
+                preference: preference
             ))
         }
         guard !results.isEmpty else { throw RoutePlanningError.noRouteFound }
@@ -69,15 +68,16 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     }
 
     private func nearestStations(to coordinate: CLLocationCoordinate2D, in network: MetroNetwork) -> [MetroStationCandidate] {
-        network.stations.map {
-            MetroStationCandidate(
-                station: $0,
-                distance: coordinate.distance(to: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude))
-            )
-        }
-        .sorted { $0.distance < $1.distance }
-        .prefix(4)
-        .map { $0 }
+        Array(
+            network.stations.map {
+                MetroStationCandidate(
+                    station: $0,
+                    distance: coordinate.distance(to: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude))
+                )
+            }
+            .sorted { $0.distance < $1.distance }
+            .prefix(4)
+        )
     }
 
     private func routingGraph(for network: MetroNetwork) -> MetroRoutingGraph {
@@ -172,7 +172,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return MetroPath(origin: originCandidate, destination: best.destination, edges: edges)
     }
 
-    func walkingCost(_ distance: Double, preference: MetroSearchPreference) -> Double {
+    private func walkingCost(_ distance: Double, preference: MetroSearchPreference) -> Double {
         distance / 1.25 * preference.walkingWeight
     }
 

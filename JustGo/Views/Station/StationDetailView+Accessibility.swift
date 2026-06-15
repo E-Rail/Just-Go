@@ -144,8 +144,7 @@ extension StationDetailView {
         let message: String
         if accessibility.dataSource == "beijing_official" {
             message = AppLocalization.localized("Accessibility information from official Beijing Subway data.")
-        } else if accessibility.dataSource?.contains("_official") == true ||
-            accessibility.dataSource?.contains("official") == true {
+        } else if accessibility.dataSource?.contains("official") == true {
             message = AppLocalization.localized("Accessibility information from official city data.")
         } else {
             message = AppLocalization.localized("Official accessibility data is not available for this station yet.")

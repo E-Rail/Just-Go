@@ -14,7 +14,7 @@ struct RouteFeasibility: Equatable {
     }
 }
 
-enum RouteFeasibilityLevel: Comparable, Equatable {
+enum RouteFeasibilityLevel: Comparable {
     case good
     case caution
     case risky

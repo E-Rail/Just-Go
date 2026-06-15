@@ -1,50 +1,77 @@
 import Foundation
 
-enum AppLocalization {
-    private static var languageCode: String {
-        (Bundle.main.preferredLocalizations.first ?? Locale.autoupdatingCurrent.identifier)
-            .lowercased()
+enum AppLanguagePreference: String, CaseIterable, Identifiable {
+    case system
+    case english
+    case simplifiedChinese
+    case traditionalChinese
+
+    var id: String { rawValue }
+
+    var localizedName: String {
+        switch self {
+        case .system:
+            return AppLocalization.localized("System Default")
+        case .english:
+            return AppLocalization.localized("English")
+        case .simplifiedChinese:
+            return AppLocalization.localized("Simplified Chinese")
+        case .traditionalChinese:
+            return AppLocalization.localized("Traditional Chinese")
+        }
     }
 
+    fileprivate var localizationIdentifier: String? {
+        switch self {
+        case .system:
+            return nil
+        case .english:
+            return "en"
+        case .simplifiedChinese:
+            return "zh-Hans"
+        case .traditionalChinese:
+            return "zh-Hant"
+        }
+    }
+}
+
+enum AppLocalization {
+    static let preferenceKey = "appLanguagePreference"
+    static let launchPreference = AppLanguagePreference(
+        rawValue: UserDefaults.standard.string(forKey: preferenceKey) ?? ""
+    ) ?? .system
+
+    private static let activeLanguage: AppLanguagePreference = {
+        guard launchPreference == .system else { return launchPreference }
+        let languageCode = Bundle.main.preferredLocalizations.first
+            ?? Locale.autoupdatingCurrent.identifier
+        return supportedLanguage(for: languageCode)
+    }()
+
+    private static let localizationBundle: Bundle = {
+        guard let identifier = activeLanguage.localizationIdentifier,
+              let path = Bundle.main.path(forResource: identifier, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
+            return .main
+        }
+        return bundle
+    }()
+
     static var isChinese: Bool {
-        true
+        activeLanguage == .simplifiedChinese || activeLanguage == .traditionalChinese
     }
 
     static var isTraditionalChinese: Bool {
-        languageCode.hasPrefix("zh-hant") ||
-        languageCode.hasPrefix("zh_tw") ||
-        languageCode.hasPrefix("zh-hk") ||
-        languageCode.hasPrefix("zh_hk") ||
-        languageCode.hasPrefix("zh-mo") ||
-        languageCode.hasPrefix("zh_mo")
+        activeLanguage == .traditionalChinese
     }
 
     static func localized(_ key: String) -> String {
-        Bundle.main.localizedString(forKey: key, value: key, table: nil)
+        localizationBundle.localizedString(forKey: key, value: key, table: nil)
     }
 
     static func chinese(_ simplified: String) -> String {
         guard isTraditionalChinese else { return simplified }
         return simplified.applyingTransform(StringTransform("Hans-Hant"), reverse: false) ?? simplified
-    }
-
-    static func searchVariants(for text: String) -> Set<String> {
-        let base = normalizedSearchText(text)
-        guard !base.isEmpty else { return [] }
-
-        var variants: Set<String> = [base]
-        if let simplified = base.applyingTransform(StringTransform("Hant-Hans"), reverse: false) {
-            variants.insert(normalizedSearchText(simplified))
-        }
-        if let traditional = base.applyingTransform(StringTransform("Hans-Hant"), reverse: false) {
-            variants.insert(normalizedSearchText(traditional))
-        }
-        if let latin = text.applyingTransform(.toLatin, reverse: false) {
-            let normalizedLatin = normalizedSearchText(latin)
-            variants.insert(normalizedLatin)
-            variants.insert(normalizedLatin.replacingOccurrences(of: " ", with: ""))
-        }
-        return variants.filter { !$0.isEmpty }
     }
 
     static func text(english: String, chinese: String) -> String {
@@ -77,10 +104,6 @@ enum AppLocalization {
         )
     }
 
-    static func stopsLeft(_ count: Int) -> String {
-        text(english: "\(count) stop\(count == 1 ? "" : "s") left", simplified: "还剩\(count)站", traditional: "還剩\(count)站")
-    }
-
     static func transfers(_ count: Int) -> String {
         if count == 0 {
             return localized("Direct")
@@ -100,11 +123,18 @@ enum AppLocalization {
         "\(stationCount(stations)) • \(lineCount(lines))"
     }
 
-    private static func normalizedSearchText(_ text: String) -> String {
-        text
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: .current)
-            .lowercased()
+    private static func supportedLanguage(for languageCode: String) -> AppLanguagePreference {
+        let normalized = languageCode.replacingOccurrences(of: "_", with: "-").lowercased()
+        guard normalized.hasPrefix("zh") else {
+            return .english
+        }
+        if normalized.contains("hant") ||
+            normalized.hasPrefix("zh-tw") ||
+            normalized.hasPrefix("zh-hk") ||
+            normalized.hasPrefix("zh-mo") {
+            return .traditionalChinese
+        }
+        return .simplifiedChinese
     }
 }
 
@@ -165,28 +195,6 @@ extension RouteSegment {
             return "\(lineName ?? AppLocalization.localized("Transit")) • \(AppLocalization.stops(stops))"
         case .transfer:
             return AppLocalization.localized("Transfer")
-        }
-    }
-
-    var navigationLabel: String {
-        switch type {
-        case .walking:
-            if let fromStationName, let toStationName {
-                return AppLocalization.text(
-                    english: "Walk from \(fromStationName) to \(toStationName)",
-                    simplified: "从 \(fromStationName) 步行至 \(toStationName)",
-                    traditional: "從 \(fromStationName) 步行至 \(toStationName)"
-                )
-            }
-            let station = toStationName ?? fromStationName ?? AppLocalization.localized("station")
-            return AppLocalization.text(english: "Walk to \(station)", chinese: "步行至 \(station)")
-        case .subway, .transit:
-            let line = lineName ?? AppLocalization.localized("Transit")
-            let direction = toStationName ?? ""
-            return AppLocalization.text(english: "\(line) toward \(direction)", chinese: "\(line) 开往 \(direction)")
-        case .transfer:
-            let line = lineName ?? AppLocalization.localized("next line")
-            return AppLocalization.text(english: "Transfer to \(line)", chinese: "换乘至 \(line)")
         }
     }
 }

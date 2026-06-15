@@ -80,10 +80,6 @@ final class StationDetailViewModel {
         return arrivals.contains(where: \.hasLiveCountdown) ? nil : AppLocalization.localized("Live countdown unavailable")
     }
 
-    var accessibilityInfo: StationAccessibility? {
-        station?.accessibility
-    }
-
     var scheduleConfidence: DataConfidence {
         if arrivals.contains(where: { $0.source == .officialSchedule || $0.source == .bundledSchedule }) {
             return .official
@@ -96,7 +92,7 @@ final class StationDetailViewModel {
     }
 
     var accessibilityConfidence: DataConfidence {
-        accessibilityInfo?.hasVerifiedAccessibilityData == true ? .official : cityPackPendingConfidence
+        station?.accessibility?.hasVerifiedAccessibilityData == true ? .official : cityPackPendingConfidence
     }
 
     var liveArrivalConfidence: DataConfidence {
@@ -105,9 +101,7 @@ final class StationDetailViewModel {
 
     private var cityPackPendingConfidence: DataConfidence {
         switch cityPackLoadStatus {
-        case .loaded:
-            return .sourcePending
-        case .sourcePending:
+        case .loaded, .sourcePending:
             return .sourcePending
         case .notConfigured, .notAvailable, .failed:
             return .unavailable

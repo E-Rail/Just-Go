@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("showAccessibilityBadges") private var showBadges = true
+    @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
 
     var body: some View {
         NavigationStack {
@@ -23,16 +24,26 @@ struct SettingsView: View {
 
     private var languageSection: some View {
         Section {
-            LabeledContent(AppLocalization.localized("App Language"), value: systemLanguageName)
+            Picker(AppLocalization.localized("App Language"), selection: $languagePreference) {
+                ForEach(AppLanguagePreference.allCases) { preference in
+                    Text(preference.localizedName).tag(preference.rawValue)
+                }
+            }
         } header: {
             Text(AppLocalization.localized("Language"))
         } footer: {
-            Text(AppLocalization.localized("JustGo follows the system language configured in iOS Settings."))
+            Text(languageFooter)
         }
     }
 
-    private var systemLanguageName: String {
-        AppLocalization.isTraditionalChinese ? "繁體中文" : "简体中文"
+    private var languageFooter: String {
+        if languagePreference != AppLocalization.launchPreference.rawValue {
+            return AppLocalization.localized("Language changes take effect after restarting JustGo.")
+        }
+        if languagePreference == AppLanguagePreference.system.rawValue {
+            return AppLocalization.localized("System Default follows the language configured in iOS Settings.")
+        }
+        return AppLocalization.localized("JustGo uses the selected language instead of the system language.")
     }
 
     private var dataSection: some View {

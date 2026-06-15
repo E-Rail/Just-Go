@@ -68,22 +68,22 @@ struct StationDetailView: View {
                     .foregroundStyle(.secondary)
 
                 confidenceRow(
-                    title: "Schedule",
+                    title: AppLocalization.localized("Schedule"),
                     confidence: viewModel?.scheduleConfidence ?? .unknown,
                     icon: "clock"
                 )
                 confidenceRow(
-                    title: "Station Map",
+                    title: AppLocalization.localized("Station Map"),
                     confidence: viewModel?.stationMapConfidence ?? .unknown,
                     icon: "map"
                 )
                 confidenceRow(
-                    title: "Accessibility",
+                    title: AppLocalization.localized("Accessibility"),
                     confidence: viewModel?.accessibilityConfidence ?? .unknown,
                     icon: "accessibility"
                 )
                 confidenceRow(
-                    title: "Live arrivals",
+                    title: AppLocalization.localized("Live arrivals"),
                     confidence: viewModel?.liveArrivalConfidence ?? .unknown,
                     icon: "wave.3.right"
                 )
@@ -111,7 +111,7 @@ struct StationDetailView: View {
     private func confidenceRow(title: String, confidence: DataConfidence, icon: String) -> some View {
         Label {
             HStack {
-                Text(AppLocalization.localized(title))
+                Text(title)
                 Spacer()
                 Text(confidence.label)
                     .foregroundStyle(.secondary)

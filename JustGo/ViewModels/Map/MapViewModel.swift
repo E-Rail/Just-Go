@@ -82,7 +82,7 @@ final class MapViewModel {
             errorMessage = nil
         } catch {
             nearbyStations = []
-            errorMessage = error.localizedDescription
+            errorMessage = locationErrorMessage(for: error)
         }
     }
 
@@ -94,7 +94,7 @@ final class MapViewModel {
             return true
         } catch {
             nearbyStations = []
-            errorMessage = error.localizedDescription
+            errorMessage = locationErrorMessage(for: error)
             return false
         }
     }
@@ -113,7 +113,7 @@ final class MapViewModel {
         do {
             searchResults = try await stationSearchService.suggestions(keyword: searchText, city: city.id, limit: 8)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }
 
@@ -173,7 +173,7 @@ final class MapViewModel {
             )
             return detailedStation
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = AppLocalization.localized("Station details are temporarily unavailable")
             return station
         }
     }
@@ -228,6 +228,11 @@ final class MapViewModel {
             .filter { $0.bounds.intersects(region) }
             .sorted { $0.cityID < $1.cityID }
         refreshVisibleStations()
+    }
+
+    private func locationErrorMessage(for error: Error) -> String {
+        (error as? LocationServiceError)?.errorDescription ??
+            AppLocalization.localized("Current location unavailable")
     }
 
     private func refreshVisibleStations() {

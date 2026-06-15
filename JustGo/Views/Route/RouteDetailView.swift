@@ -138,9 +138,9 @@ struct RouteDetailView: View {
                 Divider()
 
                 HStack(spacing: 20) {
-                    StatItem(title: "Duration", value: route.formattedDuration, icon: "clock")
-                    StatItem(title: "Stops", value: "\(route.totalStops)", icon: "tram")
-                    StatItem(title: "Transfers", value: "\(route.transferCount)", icon: "arrow.triangle.2.circlepath")
+                    StatItem(title: AppLocalization.localized("Duration"), value: route.formattedDuration, icon: "clock")
+                    StatItem(title: AppLocalization.localized("Stops"), value: "\(route.totalStops)", icon: "tram")
+                    StatItem(title: AppLocalization.localized("Transfers"), value: "\(route.transferCount)", icon: "arrow.triangle.2.circlepath")
                 }
 
                 if route.isFullyAccessible {

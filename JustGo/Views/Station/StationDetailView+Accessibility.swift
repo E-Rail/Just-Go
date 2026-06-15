@@ -43,7 +43,7 @@ extension StationDetailView {
                 if accessibility.elevatorAvailability != .unknown || !accessibility.elevatorLocations.isEmpty {
                     accessibilityRow(
                         icon: "arrow.up.arrow.down.circle.fill",
-                        title: "Elevator",
+                        title: AppLocalization.localized("Elevator"),
                         subtitle: detailText(accessibility.elevatorLocations, fallback: accessibility.elevatorAvailability.localizedStatusText),
                         status: AccessibilityStatus(accessibility.elevatorAvailability)
                     )
@@ -52,7 +52,7 @@ extension StationDetailView {
                 if accessibility.wheelchairRampAvailability != .unknown || !accessibility.accessibleEntrances.isEmpty {
                     accessibilityRow(
                         icon: "figure.roll",
-                        title: "Wheelchair Ramp",
+                        title: AppLocalization.localized("Wheelchair Ramp"),
                         subtitle: detailText(accessibility.accessibleEntrances, fallback: accessibility.wheelchairRampAvailability.localizedStatusText),
                         status: AccessibilityStatus(accessibility.wheelchairRampAvailability)
                     )
@@ -61,7 +61,7 @@ extension StationDetailView {
                 if accessibility.escalatorAvailability != .unknown {
                     accessibilityRow(
                         icon: "arrow.up.to.line",
-                        title: "Escalator",
+                        title: AppLocalization.localized("Escalator"),
                         subtitle: accessibility.escalatorAvailability.localizedStatusText,
                         status: AccessibilityStatus(accessibility.escalatorAvailability)
                     )
@@ -78,7 +78,7 @@ extension StationDetailView {
                 if accessibility.tactilePathAvailability != .unknown {
                     accessibilityRow(
                         icon: "hand.raised.fill",
-                        title: "Tactile Path",
+                        title: AppLocalization.localized("Tactile Path"),
                         subtitle: tactilePathDetail(accessibility),
                         status: AccessibilityStatus(accessibility.tactilePathAvailability)
                     )
@@ -87,7 +87,7 @@ extension StationDetailView {
                 if accessibility.audioAnnouncementAvailability != .unknown {
                     accessibilityRow(
                         icon: "speaker.wave.2.fill",
-                        title: "Audio Announcement",
+                        title: AppLocalization.localized("Audio Announcement"),
                         subtitle: accessibility.audioAnnouncementAvailability.localizedStatusText,
                         status: AccessibilityStatus(accessibility.audioAnnouncementAvailability)
                     )
@@ -103,7 +103,7 @@ extension StationDetailView {
 
                 accessibilityRow(
                     icon: "figure.roll",
-                    title: "Accessible Restroom",
+                    title: AppLocalization.localized("Accessible Restroom"),
                     subtitle: accessibility.accessibleRestroomAvailability.localizedStatusText,
                     status: AccessibilityStatus(accessibility.accessibleRestroomAvailability)
                 )
@@ -119,7 +119,7 @@ extension StationDetailView {
                 if accessibility.visualAnnouncementAvailability != .unknown {
                     accessibilityRow(
                         icon: "eye.fill",
-                        title: "Visual Display",
+                        title: AppLocalization.localized("Visual Display"),
                         subtitle: accessibility.visualAnnouncementAvailability.localizedStatusText,
                         status: AccessibilityStatus(accessibility.visualAnnouncementAvailability)
                     )
@@ -162,10 +162,10 @@ extension StationDetailView {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(AppLocalization.localized(accessibility.summary.titleKey))
+                Text(accessibility.summary.title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text(AppLocalization.localized(accessibility.summary.descriptionKey))
+                Text(accessibility.summary.description)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -180,10 +180,10 @@ extension StationDetailView {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(AppLocalization.localized(title))
+                Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text(AppLocalization.localized(subtitle))
+                Text(subtitle)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -263,25 +263,25 @@ private extension StationAccessibility {
 }
 
 private extension StationAccessibilitySummary {
-    var titleKey: String {
+    var title: String {
         switch self {
         case .fullyAccessible:
-            return "Fully Accessible"
+            return AppLocalization.localized("Fully Accessible")
         case .partial:
-            return "Partial Accessibility"
+            return AppLocalization.localized("Partial Accessibility")
         case .notVerified:
-            return "Accessibility not verified"
+            return AppLocalization.localized("Accessibility not verified")
         }
     }
 
-    var descriptionKey: String {
+    var description: String {
         switch self {
         case .fullyAccessible:
-            return "Station accessibility data is verified"
+            return AppLocalization.localized("Station accessibility data is verified")
         case .partial:
-            return "Some accessibility features are verified"
+            return AppLocalization.localized("Some accessibility features are verified")
         case .notVerified:
-            return "Station accessibility data is missing"
+            return AppLocalization.localized("Station accessibility data is missing")
         }
     }
 

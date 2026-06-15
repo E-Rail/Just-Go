@@ -16,17 +16,17 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .metroFirst:
-            return "Transit First"
+            return AppLocalization.localized("Transit First")
         case .fastest:
-            return "Fastest"
+            return AppLocalization.localized("Fastest")
         case .leastWalking:
-            return "Least Walking"
-        case .fewestTransfers: return "Fewest Transfers"
-        case .leastConfusing: return "Least Confusing"
-        case .luggageFriendly: return "Luggage Friendly"
-        case .elderlyFriendly: return "Elderly Friendly"
-        case .officialDataOnly: return "Official Data Only"
-        case .stepFreeSupport: return "Step-Free Support"
+            return AppLocalization.localized("Least Walking")
+        case .fewestTransfers: return AppLocalization.localized("Fewest Transfers")
+        case .leastConfusing: return AppLocalization.localized("Least Confusing")
+        case .luggageFriendly: return AppLocalization.localized("Luggage Friendly")
+        case .elderlyFriendly: return AppLocalization.localized("Elderly Friendly")
+        case .officialDataOnly: return AppLocalization.localized("Official Data Only")
+        case .stepFreeSupport: return AppLocalization.localized("Step-Free Support")
         }
     }
 

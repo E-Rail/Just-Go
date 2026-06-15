@@ -70,13 +70,13 @@ struct StationRow: View {
     private var accessibilityBadges: some View {
         HStack(spacing: 8) {
             if station.accessibility?.hasElevator == true {
-                AccessibilityIcon(icon: "arrow.up.arrow.down.circle.fill", label: "Elevator")
+                AccessibilityIcon(icon: "arrow.up.arrow.down.circle.fill", label: AppLocalization.localized("Elevator"))
             }
             if station.accessibility?.hasWheelchairRamp == true {
-                AccessibilityIcon(icon: "figure.roll", label: "Wheelchair")
+                AccessibilityIcon(icon: "figure.roll", label: AppLocalization.localized("Wheelchair"))
             }
             if station.accessibility?.hasTactilePath == true {
-                AccessibilityIcon(icon: "hand.raised.fill", label: "Tactile Path")
+                AccessibilityIcon(icon: "hand.raised.fill", label: AppLocalization.localized("Tactile Path"))
             }
         }
     }
@@ -91,6 +91,6 @@ struct AccessibilityIcon: View {
         Image(systemName: icon)
             .font(.caption)
             .foregroundStyle(.green)
-            .accessibilityLabel(AppLocalization.localized(label))
+            .accessibilityLabel(label)
     }
 }

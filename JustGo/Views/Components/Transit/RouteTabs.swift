@@ -72,7 +72,7 @@ struct SortChip: View {
             HStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
-                Text(AppLocalization.localized(title))
+                Text(title)
                     .font(.caption)
             }
             .padding(.horizontal, 12)

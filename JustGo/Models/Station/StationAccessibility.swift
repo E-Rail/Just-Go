@@ -72,8 +72,6 @@ final class StationAccessibility {
     // Status
     var lastVerifiedDate: Date?
     var elevatorStatus: String
-    var communityRating: Double
-    var reportCount: Int
 
     var elevatorStatusEnum: ElevatorStatus {
         ElevatorStatus(rawValue: elevatorStatus) ?? .unknown
@@ -153,9 +151,7 @@ final class StationAccessibility {
         hasSimplifiedSignage: Bool? = nil,
         hasColorCoding: Bool? = nil,
         hasPictograms: Bool? = nil,
-        elevatorStatus: ElevatorStatus = .unknown,
-        communityRating: Double = 0,
-        reportCount: Int = 0
+        elevatorStatus: ElevatorStatus = .unknown
     ) {
         self.stationID = stationID
         self.dataSource = dataSource
@@ -179,8 +175,6 @@ final class StationAccessibility {
         self.colorCodingAvailability = AccessibilityAvailability(hasColorCoding)
         self.pictogramsAvailability = AccessibilityAvailability(hasPictograms)
         self.elevatorStatus = elevatorStatus.rawValue
-        self.communityRating = communityRating
-        self.reportCount = reportCount
     }
 }
 
@@ -213,9 +207,7 @@ extension StationAccessibility {
             hasSignLanguageDisplay: data.hasSignLanguageDisplay,
             hasSimplifiedSignage: data.hasSimplifiedSignage,
             hasColorCoding: data.hasColorCoding,
-            hasPictograms: data.hasPictograms,
-            communityRating: data.isFullyAccessible == true ? 4.6 : 0,
-            reportCount: data.isFullyAccessible == true ? 18 : 0
+            hasPictograms: data.hasPictograms
         )
     }
 }

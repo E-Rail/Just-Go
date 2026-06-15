@@ -6,6 +6,7 @@ struct StationRow: View {
     var distance: Double?
     var distanceText: String?
     var action: (() -> Void)?
+    @AppStorage("showAccessibilityBadges") private var showAccessibilityBadges = true
 
     var body: some View {
         Button(action: { action?() }) {
@@ -34,7 +35,9 @@ struct StationRow: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    accessibilityBadges
+                    if showAccessibilityBadges {
+                        accessibilityBadges
+                    }
                 }
 
                 Spacer()

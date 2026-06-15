@@ -32,6 +32,9 @@ struct MetroBounds: Codable, Equatable {
 
 struct MetroLine: Codable, Equatable, Identifiable {
     let id: String
+    let logicalLineID: String?
+    let routeReference: String?
+    let networkIdentity: String?
     let name: String
     let nameEn: String?
     let colorHex: String
@@ -66,7 +69,26 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     var id: String { cityID }
 
     var displayStations: [Station] {
-        let linesByID = Dictionary(uniqueKeysWithValues: lines.map { line in
+        let linesByID = displayLinesByID
+        return stations.map { displayStation($0, linesByID: linesByID) }
+    }
+
+    func matchingStation(named name: String, near coordinate: CLLocationCoordinate2D) -> MetroStation? {
+        let key = normalizedStationName(name)
+        return stations
+            .filter { normalizedStationName($0.name) == key || normalizedStationName($0.nameEn ?? "") == key }
+            .min {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: coordinate) <
+                    CLLocationCoordinate2D(latitude: $1.latitude, longitude: $1.longitude).distance(to: coordinate)
+            }
+    }
+
+    func displayStation(_ item: MetroStation) -> Station {
+        displayStation(item, linesByID: displayLinesByID)
+    }
+
+    private var displayLinesByID: [String: SubwayLine] {
+        Dictionary(uniqueKeysWithValues: lines.map { line in
             (
                 line.id,
                 SubwayLine(
@@ -78,20 +100,20 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
                 )
             )
         })
+    }
 
-        return stations.map { item in
-            let station = Station(
-                stationID: "network-\(cityID)-\(item.id)",
-                name: item.name,
-                nameEn: item.nameEn,
-                latitude: item.latitude,
-                longitude: item.longitude,
-                cityID: cityID,
-                isTransferStation: Set(item.lineIDs).count > 1
-            )
-            station.lines = item.lineIDs.compactMap { linesByID[$0] }
-            return station
-        }
+    private func displayStation(_ item: MetroStation, linesByID: [String: SubwayLine]) -> Station {
+        let station = Station(
+            stationID: "network-\(cityID)-\(item.id)",
+            name: item.name,
+            nameEn: item.nameEn,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            cityID: cityID,
+            isTransferStation: Set(item.lineIDs).count > 1
+        )
+        station.lines = item.lineIDs.compactMap { linesByID[$0] }
+        return station
     }
 }
 

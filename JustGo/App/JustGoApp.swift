@@ -29,6 +29,5 @@ struct JustGoApp: App {
         if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("LineOverlays", isDirectory: true))
         }
-        UserDefaults.standard.removeObject(forKey: "recentStationSearches")
     }
 }

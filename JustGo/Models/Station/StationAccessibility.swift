@@ -51,47 +51,19 @@ final class StationAccessibility {
     var elevatorLocations: [String]
     var accessibleEntrances: [String]
     var facilityNotes: [String]
-    var wheelchairBoardingAssistanceAvailability: AccessibilityAvailability
 
     // Visual Impairment
     var tactilePathAvailability: AccessibilityAvailability
-    var brailleSignsAvailability: AccessibilityAvailability
     var audioAnnouncementAvailability: AccessibilityAvailability
     var tactilePathCoverage: Double
 
     // Hearing Impairment
     var visualAnnouncementAvailability: AccessibilityAvailability
-    var hearingLoopAvailability: AccessibilityAvailability
-    var signLanguageDisplayAvailability: AccessibilityAvailability
-
-    // Cognitive
-    var simplifiedSignageAvailability: AccessibilityAvailability
-    var colorCodingAvailability: AccessibilityAvailability
-    var pictogramsAvailability: AccessibilityAvailability
-
-    // Status
-    var lastVerifiedDate: Date?
-    var elevatorStatus: String
-
-    var elevatorStatusEnum: ElevatorStatus {
-        ElevatorStatus(rawValue: elevatorStatus) ?? .unknown
-    }
 
     var hasElevator: Bool { elevatorAvailability.isAvailable }
-    var hasEscalator: Bool { escalatorAvailability.isAvailable }
     var hasWheelchairRamp: Bool { wheelchairRampAvailability.isAvailable }
-    var hasAccessibleRestroom: Bool { accessibleRestroomAvailability.isAvailable }
     var isFullyAccessible: Bool { fullAccessibilityAvailability.isAvailable }
-    var wheelchairBoardingAssistance: Bool { wheelchairBoardingAssistanceAvailability.isAvailable }
     var hasTactilePath: Bool { tactilePathAvailability.isAvailable }
-    var hasBrailleSigns: Bool { brailleSignsAvailability.isAvailable }
-    var hasAudioAnnouncement: Bool { audioAnnouncementAvailability.isAvailable }
-    var hasVisualAnnouncement: Bool { visualAnnouncementAvailability.isAvailable }
-    var hasHearingLoop: Bool { hearingLoopAvailability.isAvailable }
-    var hasSignLanguageDisplay: Bool { signLanguageDisplayAvailability.isAvailable }
-    var hasSimplifiedSignage: Bool { simplifiedSignageAvailability.isAvailable }
-    var hasColorCoding: Bool { colorCodingAvailability.isAvailable }
-    var hasPictograms: Bool { pictogramsAvailability.isAvailable }
 
     var hasVerifiedAccessibilityData: Bool {
         let stationSpecificStates = [
@@ -140,18 +112,10 @@ final class StationAccessibility {
         elevatorLocations: [String] = [],
         accessibleEntrances: [String] = [],
         facilityNotes: [String] = [],
-        wheelchairBoardingAssistance: Bool? = nil,
         hasTactilePath: Bool? = nil,
-        hasBrailleSigns: Bool? = nil,
         hasAudioAnnouncement: Bool? = nil,
         tactilePathCoverage: Double = 0,
-        hasVisualAnnouncement: Bool? = nil,
-        hasHearingLoop: Bool? = nil,
-        hasSignLanguageDisplay: Bool? = nil,
-        hasSimplifiedSignage: Bool? = nil,
-        hasColorCoding: Bool? = nil,
-        hasPictograms: Bool? = nil,
-        elevatorStatus: ElevatorStatus = .unknown
+        hasVisualAnnouncement: Bool? = nil
     ) {
         self.stationID = stationID
         self.dataSource = dataSource
@@ -163,25 +127,11 @@ final class StationAccessibility {
         self.elevatorLocations = elevatorLocations
         self.accessibleEntrances = accessibleEntrances
         self.facilityNotes = facilityNotes
-        self.wheelchairBoardingAssistanceAvailability = AccessibilityAvailability(wheelchairBoardingAssistance)
         self.tactilePathAvailability = AccessibilityAvailability(hasTactilePath)
-        self.brailleSignsAvailability = AccessibilityAvailability(hasBrailleSigns)
         self.audioAnnouncementAvailability = AccessibilityAvailability(hasAudioAnnouncement)
         self.tactilePathCoverage = tactilePathCoverage
         self.visualAnnouncementAvailability = AccessibilityAvailability(hasVisualAnnouncement)
-        self.hearingLoopAvailability = AccessibilityAvailability(hasHearingLoop)
-        self.signLanguageDisplayAvailability = AccessibilityAvailability(hasSignLanguageDisplay)
-        self.simplifiedSignageAvailability = AccessibilityAvailability(hasSimplifiedSignage)
-        self.colorCodingAvailability = AccessibilityAvailability(hasColorCoding)
-        self.pictogramsAvailability = AccessibilityAvailability(hasPictograms)
-        self.elevatorStatus = elevatorStatus.rawValue
     }
-}
-
-enum ElevatorStatus: String, Codable {
-    case operational = "operational"
-    case outOfService = "out_of_service"
-    case unknown = "unknown"
 }
 
 extension StationAccessibility {
@@ -197,17 +147,10 @@ extension StationAccessibility {
             elevatorLocations: data.elevatorLocations ?? [],
             accessibleEntrances: data.accessibleEntrances ?? [],
             facilityNotes: data.facilityNotes ?? [],
-            wheelchairBoardingAssistance: data.wheelchairBoardingAssistance,
             hasTactilePath: data.hasTactilePath,
-            hasBrailleSigns: data.hasBrailleSigns,
             hasAudioAnnouncement: data.hasAudioAnnouncement,
             tactilePathCoverage: data.tactilePathCoverage ?? 0,
-            hasVisualAnnouncement: data.hasVisualAnnouncement,
-            hasHearingLoop: data.hasHearingLoop,
-            hasSignLanguageDisplay: data.hasSignLanguageDisplay,
-            hasSimplifiedSignage: data.hasSimplifiedSignage,
-            hasColorCoding: data.hasColorCoding,
-            hasPictograms: data.hasPictograms
+            hasVisualAnnouncement: data.hasVisualAnnouncement
         )
     }
 }

@@ -56,12 +56,6 @@ final class TripMemoryService {
         persistSavedTrips()
     }
 
-    func updateSavedTrip(_ trip: SavedTrip) {
-        guard let index = savedTrips.firstIndex(where: { $0.id == trip.id }) else { return }
-        savedTrips[index] = trip
-        persistSavedTrips()
-    }
-
     func deleteSavedTrip(id: String) {
         savedTrips.removeAll { $0.id == id }
         persistSavedTrips()
@@ -121,12 +115,6 @@ final class TripMemoryService {
         )
         tripRecords.insert(record, at: 0)
         tripRecords = Array(tripRecords.prefix(maxTripRecords))
-        persistTripRecords()
-    }
-
-    func updateTripNote(id: String, note: String) {
-        guard let index = tripRecords.firstIndex(where: { $0.id == id }) else { return }
-        tripRecords[index].note = note.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         persistTripRecords()
     }
 

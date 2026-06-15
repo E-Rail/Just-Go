@@ -81,7 +81,6 @@ final class RoutePlanningService {
                 expectedStationCount: criticalStops.count
             )
             route.isFullyAccessible = route.stepFreeAssessment == .confirmed
-            route.warnings.removeAll { $0.type == .stepFreeAccessUnconfirmed }
             if route.stepFreeAssessment == .unknown,
                accessibilityFilter.requiresWheelchairAccess || accessibilityFilter.requiresElevator {
                 route.warnings.append(RouteWarning(

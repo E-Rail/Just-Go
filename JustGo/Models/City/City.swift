@@ -33,8 +33,6 @@ struct CityDataCapabilities: Equatable {
             return CityDataCapabilities(accessibility: .available, stationEssentials: .available, stationMap: .pending)
         case "3301":
             return CityDataCapabilities(accessibility: .available, stationEssentials: .partial, stationMap: .pending)
-        case "4403", "5101":
-            return CityDataCapabilities(accessibility: .pending, stationEssentials: .pending, stationMap: .pending)
         default:
             return CityDataCapabilities(accessibility: .pending, stationEssentials: .pending, stationMap: .pending)
         }
@@ -45,10 +43,6 @@ enum CityDataCapabilityStatus: String, Codable {
     case available
     case partial
     case pending
-
-    var isAvailable: Bool {
-        self == .available || self == .partial
-    }
 
     var iconName: String {
         switch self {
@@ -61,16 +55,6 @@ enum CityDataCapabilityStatus: String, Codable {
         }
     }
 
-    var colorName: String {
-        switch self {
-        case .available:
-            return "green"
-        case .partial:
-            return "orange"
-        case .pending:
-            return "gray"
-        }
-    }
 }
 
 struct AccessibilityData: Codable {

@@ -25,7 +25,6 @@ struct LocalAccessibilityReport: Identifiable, Codable, Equatable {
             : note
     }
 }
-
 enum AccessibilityReportEntity: String, Codable {
     case station
     case route
@@ -108,30 +107,6 @@ enum VerificationItemType: String, Codable, CaseIterable {
         }
     }
 
-    var facilityType: StationFacilityType {
-        switch self {
-        case .elevator:
-            return .elevator
-        case .escalator:
-            return .escalator
-        case .ramp:
-            return .ramp
-        case .accessibleRestroom:
-            return .accessibleRestroom
-        case .wheelchairBoarding:
-            return .wheelchairBoarding
-        case .tactilePath:
-            return .tactilePath
-        case .audioAnnouncement:
-            return .audioAnnouncement
-        case .visualDisplay:
-            return .visualDisplay
-        case .staffAssistance:
-            return .staffAssistance
-        case .stepFreeAccess, .routeConcern:
-            return .general
-        }
-    }
 }
 
 enum VerificationStatus: String, Codable, CaseIterable {
@@ -166,82 +141,5 @@ enum VerificationStatus: String, Codable, CaseIterable {
         case .working, .note:
             return false
         }
-    }
-}
-
-struct AccessibilityVerification: Identifiable, Codable, Equatable {
-    let id: String
-    let stationID: String
-    let itemType: VerificationItemType
-    let officialStatus: VerificationStatus?
-    let reports: [VerificationReport]
-
-    var confidence: VerificationConfidence {
-        VerificationConfidence(reports: reports)
-    }
-
-    var displayStatus: VerificationStatus {
-        confidence.status ?? officialStatus ?? .unknown
-    }
-
-    var canDisplayCommunityStatus: Bool {
-        confidence.reportCount >= 3 && confidence.score >= 0.7
-    }
-}
-
-struct VerificationReport: Identifiable, Codable, Equatable {
-    let id: String
-    let stationID: String
-    let itemType: VerificationItemType
-    let reportedStatus: VerificationStatus
-    let reportDate: Date
-    let isReliableReporter: Bool
-    let note: String?
-}
-
-struct VerificationConfidence: Codable, Equatable {
-    let status: VerificationStatus?
-    let score: Double
-    let reportCount: Int
-
-    init(reports: [VerificationReport], now: Date = .now) {
-        reportCount = reports.count
-        guard reports.count >= 3 else {
-            status = nil
-            score = 0
-            return
-        }
-
-        var weightsByStatus: [VerificationStatus: Double] = [:]
-        var totalWeight = 0.0
-
-        for report in reports {
-            let age = now.timeIntervalSince(report.reportDate)
-            let days = age / 86_400
-            guard days <= 60 else { continue }
-
-            var weight = report.isReliableReporter ? 2.0 : 1.0
-            if days > 30 {
-                weight *= 0.3
-            } else if days > 14 {
-                weight *= 0.7
-            } else if days > 7 {
-                weight *= 0.9
-            }
-
-            weightsByStatus[report.reportedStatus, default: 0] += weight
-            totalWeight += weight
-        }
-
-        guard totalWeight > 0,
-              let winner = weightsByStatus.max(by: { $0.value < $1.value }) else {
-            status = nil
-            score = 0
-            return
-        }
-
-        let thresholdPenalty = reports.count < 5 ? 0.8 : 1.0
-        status = winner.key
-        score = min(1.0, max(0, (winner.value / totalWeight) * thresholdPenalty))
     }
 }

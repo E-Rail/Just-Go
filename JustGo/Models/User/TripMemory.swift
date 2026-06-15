@@ -7,18 +7,6 @@ struct TransitPlaceSnapshot: Codable, Equatable {
     let longitude: Double
     let address: String?
 
-    init(
-        name: String,
-        latitude: Double,
-        longitude: Double,
-        address: String? = nil
-    ) {
-        self.name = name
-        self.latitude = latitude
-        self.longitude = longitude
-        self.address = address
-    }
-
     init(place: TransitPlace) {
         name = place.name
         latitude = place.coordinate.latitude
@@ -80,36 +68,10 @@ struct SavedTripAccessibilityFilter: Codable, Equatable {
     var requiresElevator: Bool
     var avoidStairs: Bool
 
-    static var none: SavedTripAccessibilityFilter {
-        SavedTripAccessibilityFilter(
-            requiresWheelchairAccess: false,
-            requiresElevator: false,
-            avoidStairs: false
-        )
-    }
-
     init(filter: AccessibilityFilter) {
         requiresWheelchairAccess = filter.requiresWheelchairAccess
         requiresElevator = filter.requiresElevator
         avoidStairs = filter.avoidStairs
-    }
-
-    init(
-        requiresWheelchairAccess: Bool,
-        requiresElevator: Bool,
-        avoidStairs: Bool
-    ) {
-        self.requiresWheelchairAccess = requiresWheelchairAccess
-        self.requiresElevator = requiresElevator
-        self.avoidStairs = avoidStairs
-    }
-
-    var routeFilter: AccessibilityFilter {
-        AccessibilityFilter(
-            requiresWheelchairAccess: requiresWheelchairAccess,
-            requiresElevator: requiresElevator,
-            avoidStairs: avoidStairs
-        )
     }
 }
 

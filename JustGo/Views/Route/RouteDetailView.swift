@@ -201,7 +201,7 @@ struct RouteDetailView: View {
             for: route,
             feasibility: currentFeasibility,
             preference: preference,
-            alternatives: alternatives.isEmpty ? [route] : alternatives
+            alternatives: alternatives
         )
     }
 }

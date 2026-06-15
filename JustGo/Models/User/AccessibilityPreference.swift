@@ -43,17 +43,6 @@ struct AccessibilityPreference: Codable {
         )
     }
 
-    var isMobilityAssistanceNeeded: Bool {
-        requiresWheelchairAccess || prefersElevator || avoidStairs
-    }
-
-    var isVisionAssistanceNeeded: Bool {
-        voiceOverEnabled || audioNavigation || highContrastMode
-    }
-
-    var isHearingAssistanceNeeded: Bool {
-        visualAnnouncements || vibrationAlerts || flashAlerts
-    }
 }
 
 enum DisabilityCategory: String, Codable, CaseIterable {

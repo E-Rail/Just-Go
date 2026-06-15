@@ -448,18 +448,6 @@ struct WalkingStep: Codable {
         walkType == "8" || combinedText.contains("扶梯") || combinedText.localizedCaseInsensitiveContains("escalator")
     }
 
-    var hasOverpass: Bool {
-        walkType == "18" || combinedText.contains("天桥") || combinedText.localizedCaseInsensitiveContains("overpass")
-    }
-
-    var hasUnderpass: Bool {
-        walkType == "19" || combinedText.contains("地下通道") || combinedText.localizedCaseInsensitiveContains("underpass")
-    }
-
-    var hasBarrierRisk: Bool {
-        hasStairs || hasOverpass || hasUnderpass
-    }
-
     private var combinedText: String {
         [instruction, road, action, assistantAction]
             .compactMap { $0 }

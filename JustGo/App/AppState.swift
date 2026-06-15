@@ -12,7 +12,6 @@ final class AppState {
             userDefaults.setCodable(accessibilityPreference, forKey: accessibilityPreferenceKey)
         }
     }
-    private(set) var isInitializing = false
     private(set) var hasInitialized = false
 
     init(userDefaults: UserDefaults = .standard) {
@@ -25,11 +24,9 @@ final class AppState {
     }
 
     func initialize(container: DIContainer) {
-        guard !isInitializing, !hasInitialized else { return }
+        guard !hasInitialized else { return }
 
-        isInitializing = true
         defer {
-            isInitializing = false
             hasInitialized = true
         }
 

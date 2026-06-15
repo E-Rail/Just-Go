@@ -66,8 +66,9 @@
 "Hearing Impairment" = "聽力障礙";
 "Hearing Loop" = "助聽感應迴路";
 "High Contrast Mode" = "高對比模式";
-"JustGo follows the system language configured in iOS Settings." = "JustGo 介面預設使用中文。";
+"JustGo uses the selected language instead of the system language." = "JustGo 使用所選語言，而不是系統語言。";
 "Language" = "語言";
+"Language changes take effect after restarting JustGo." = "語言更改將在重新啟動 JustGo 後生效。";
 "Large Text" = "大字體";
 "Last Verified" = "上次驗證";
 "Least Walking" = "最少步行";
@@ -387,6 +388,11 @@
 "Step-free likely from available station data." = "根據現有車站資料，可能支援無台階通行。";
 "Step-free not confirmed" = "無台階通行未確認";
 "Supported Cities" = "支援的城市";
+"System Default" = "跟隨系統";
+"System Default follows the language configured in iOS Settings." = "跟隨系統會使用 iOS 設定中配置的語言。";
+"English" = "英文";
+"Simplified Chinese" = "簡體中文";
+"Traditional Chinese" = "繁體中文";
 "These reports stay on this device and are not official data." = "這些回報僅保留在本裝置，不屬於官方資料。";
 "This stays on your device and affects your own route warnings." = "此內容僅保留在你的裝置上，並會影響你的路線提醒。";
 "This stays on your device and is not shown as official data." = "此內容僅保留在你的裝置上，不會顯示為官方資料。";

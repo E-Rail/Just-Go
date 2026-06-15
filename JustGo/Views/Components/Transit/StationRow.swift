@@ -2,8 +2,6 @@ import SwiftUI
 
 struct StationRow: View {
     let station: Station
-    var showDistance: Bool = false
-    var distance: Double?
     var distanceText: String?
     var action: (() -> Void)?
     @AppStorage("showAccessibilityBadges") private var showAccessibilityBadges = true
@@ -46,10 +44,6 @@ struct StationRow: View {
                     Text(distanceText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                } else if showDistance, let distance = distance {
-                    Text(formatDistance(distance))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
 
                 Image(systemName: "chevron.right")
@@ -87,13 +81,6 @@ struct StationRow: View {
         }
     }
 
-    private func formatDistance(_ meters: Double) -> String {
-        if meters < 1000 {
-            return "\(Int(meters))m"
-        } else {
-            return String(format: "%.1fkm", meters / 1000)
-        }
-    }
 }
 
 struct AccessibilityIcon: View {

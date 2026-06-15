@@ -5,7 +5,6 @@ final class SubwayLine: Identifiable {
     var nameEn: String?
     var colorHex: String
     var cityID: String
-    var stations: [Station]
 
     init(
         lineID: String,
@@ -19,6 +18,5 @@ final class SubwayLine: Identifiable {
         self.nameEn = nameEn
         self.colorHex = colorHex
         self.cityID = cityID
-        self.stations = []
     }
 }

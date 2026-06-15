@@ -3,11 +3,11 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: Tab = .map
 
-    enum Tab: String, CaseIterable {
-        case map = "map"
-        case route = "route"
-        case search = "search"
-        case profile = "profile"
+    enum Tab {
+        case map
+        case route
+        case search
+        case profile
     }
 
     var body: some View {

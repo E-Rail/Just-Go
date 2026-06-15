@@ -78,7 +78,7 @@ final class MapViewModel {
     func loadNearbyStations() async {
         do {
             let location = try await locationService.requestCurrentLocation()
-            nearbyStations = try await stationSearchService.searchNearby(location: location.coordinate, radius: 10_000)
+            nearbyStations = try await stationSearchService.searchNearby(location: location.coordinate)
             errorMessage = nil
         } catch {
             nearbyStations = []
@@ -139,7 +139,6 @@ final class MapViewModel {
 
         guard region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
-            if !stations.isEmpty { stations = [] }
             return
         }
 

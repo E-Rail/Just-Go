@@ -78,8 +78,8 @@ final class StationSearchService {
         return Array(try await search(keyword: query, city: city).prefix(limit))
     }
 
-    func searchNearby(location: CLLocationCoordinate2D, radius: Double = 2000) async throws -> [Station] {
-        let searchRadius = max(radius, 10_000)
+    func searchNearby(location: CLLocationCoordinate2D) async throws -> [Station] {
+        let searchRadius = 10_000.0
         let networks = await metroNetworkProvider.networks().filter {
             $0.bounds.distance(to: location) <= searchRadius
         }

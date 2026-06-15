@@ -68,12 +68,14 @@ protocol OfficialStationDataProviding {
 
 actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
+    private let metroNetworks: MetroNetworkProviding
     private var manifests: [URL: OfficialManifest] = [:]
     private var packs: [String: LoadedPack] = [:]
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
 
-    init(session: URLSession = .shared) {
+    init(session: URLSession = .shared, metroNetworks: MetroNetworkProviding) {
         self.session = session
+        self.metroNetworks = metroNetworks
     }
 
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus {
@@ -156,12 +158,18 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     func trainTimes(for station: Station) async -> [RealTimeArrival] {
         _ = await loadCityPack(for: station.cityID)
         guard let item = stationRecord(cityID: station.cityID, stationName: station.name) else { return [] }
+        let network = await metroNetworks.network(for: station.cityID)
+        let stationLineIDs = Set(station.uniqueLogicalLines.map(\.lineID))
         return item.schedules.compactMap { schedule in
             guard let timeText = schedule.formattedTime else { return nil }
             return RealTimeArrival(
                 id: UUID(),
                 lineName: schedule.lineName,
-                lineColorHex: "#007AFF",
+                lineColorHex: lineColorHex(
+                    for: schedule.lineName,
+                    in: network,
+                    preferredLineIDs: stationLineIDs
+                ),
                 destination: schedule.direction,
                 arrivalTime: nil,
                 minutesRemaining: nil,

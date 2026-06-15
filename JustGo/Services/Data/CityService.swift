@@ -23,11 +23,13 @@ final class CityService {
     }
 
     func findNearestCity(to location: CLLocation) -> City? {
-        cities.min { city1, city2 in
-            let loc1 = CLLocation(latitude: city1.latitude, longitude: city1.longitude)
-            let loc2 = CLLocation(latitude: city2.latitude, longitude: city2.longitude)
-            return location.distance(from: loc1) < location.distance(from: loc2)
-        }
+        cities
+            .filter { $0.id != "automatic" }
+            .min { city1, city2 in
+                let loc1 = CLLocation(latitude: city1.latitude, longitude: city1.longitude)
+                let loc2 = CLLocation(latitude: city2.latitude, longitude: city2.longitude)
+                return location.distance(from: loc1) < location.distance(from: loc2)
+            }
     }
 
 }

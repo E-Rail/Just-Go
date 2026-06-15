@@ -1,6 +1,7 @@
 import Foundation
 
 private let chineseLineNumberExpression = try! NSRegularExpression(pattern: "[零〇一二三四五六七八九十百]+(?=号线)")
+private let scheduleUnknownLineColorHex = "#8E8E93"
 
 func formatScheduleText(first: String?, last: String?) -> String? {
     let first = normalizedTime(first)
@@ -22,9 +23,107 @@ func formatScheduleText(first: String?, last: String?) -> String? {
 }
 
 func normalizeTransitLineName(_ value: String) -> String {
+    simplifiedTransitLineName(value)
+}
+
+struct ScheduleLineColorResolver {
+    private struct IndexedLine {
+        let line: MetroLine
+        let fullNames: Set<String>
+        let simplifiedNames: Set<String>
+        let references: Set<String>
+        let logicalIDs: Set<String>
+    }
+
+    private let stationLines: [IndexedLine]
+    private let globalLines: [IndexedLine]
+
+    init(network: MetroNetwork?, stationLineIDs: Set<String>) {
+        let indexedLines = network?.lines.map(Self.index) ?? []
+        stationLines = indexedLines.filter { stationLineIDs.contains($0.line.id) }
+        globalLines = indexedLines
+    }
+
+    func colorHex(for lineName: String) -> String {
+        let target = Self.target(for: lineName)
+        if !stationLines.isEmpty {
+            return resolve(target, in: stationLines, allowFuzzyMatching: true, allowSoleLineFallback: true) ??
+                scheduleUnknownLineColorHex
+        }
+        return resolve(target, in: globalLines, allowFuzzyMatching: false, allowSoleLineFallback: false) ??
+            scheduleUnknownLineColorHex
+    }
+
+    private func resolve(
+        _ target: Target,
+        in lines: [IndexedLine],
+        allowFuzzyMatching: Bool,
+        allowSoleLineFallback: Bool
+    ) -> String? {
+        var matchers: [((IndexedLine) -> Bool)] = [
+            { !$0.fullNames.isDisjoint(with: target.fullNames) },
+            { !$0.references.isDisjoint(with: target.references) },
+            { !$0.logicalIDs.isDisjoint(with: target.logicalIDs) },
+            { !$0.simplifiedNames.isDisjoint(with: target.simplifiedNames) }
+        ]
+        if allowFuzzyMatching {
+            matchers.append { line in
+                line.simplifiedNames.contains { name in
+                    target.simplifiedNames.contains {
+                        compactLineName(name) == compactLineName($0) ||
+                            lineNameTokens(name) == lineNameTokens($0) ||
+                            suffixSafeContains(name, $0) ||
+                            suffixSafeContains($0, name)
+                    }
+                }
+            }
+        }
+
+        for matches in matchers {
+            let colors = Set(lines.filter(matches).map(\.line.colorHex))
+            if colors.count == 1 { return colors.first }
+            if !colors.isEmpty { return nil }
+        }
+        if allowSoleLineFallback, lines.count == 1 {
+            return lines[0].line.colorHex
+        }
+        return nil
+    }
+
+    private struct Target {
+        let fullNames: Set<String>
+        let simplifiedNames: Set<String>
+        let references: Set<String>
+        let logicalIDs: Set<String>
+    }
+
+    private static func target(for value: String) -> Target {
+        let full = fullTransitLineName(value)
+        let simplified = simplifiedTransitLineName(value)
+        return Target(
+            fullNames: Set([full]).filter { !$0.isEmpty },
+            simplifiedNames: Set([simplified]).filter { !$0.isEmpty },
+            references: transitLineReferences(value),
+            logicalIDs: Set([full, simplified]).filter { !$0.isEmpty }
+        )
+    }
+
+    private static func index(_ line: MetroLine) -> IndexedLine {
+        let names = [line.name, line.nameEn].compactMap { $0 }
+        return IndexedLine(
+            line: line,
+            fullNames: Set(names.map(fullTransitLineName)).filter { !$0.isEmpty },
+            simplifiedNames: Set(names.map(simplifiedTransitLineName)).filter { !$0.isEmpty },
+            references: Set(names.flatMap(transitLineReferences))
+                .union(transitLineReferences(line.routeReference ?? "")),
+            logicalIDs: Set([line.id, line.logicalLineID].compactMap { $0 }.map(fullTransitLineName))
+        )
+    }
+}
+
+private func fullTransitLineName(_ value: String) -> String {
     normalizeChineseLineNumber(
         value
-        .replacingOccurrences(of: "（.*?）|\\(.*?\\)", with: "", options: .regularExpression)
         .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
         .replacingOccurrences(of: "地铁", with: "")
         .replacingOccurrences(of: "轨道交通", with: "")
@@ -32,42 +131,19 @@ func normalizeTransitLineName(_ value: String) -> String {
     )
 }
 
-func lineColorHex(for lineName: String, in network: MetroNetwork?, fallback: String = "#007AFF") -> String {
-    lineColorHex(for: lineName, in: network, preferredLineIDs: [], fallback: fallback)
+private func simplifiedTransitLineName(_ value: String) -> String {
+    fullTransitLineName(value)
+        .replacingOccurrences(of: "（.*?）|\\(.*?\\)", with: "", options: .regularExpression)
 }
 
-func lineColorHex(
-    for lineName: String,
-    in network: MetroNetwork?,
-    preferredLineIDs: Set<String>,
-    fallback: String = "#007AFF"
-) -> String {
-    guard let network else { return fallback }
-    let target = normalizeTransitLineName(lineName)
-    guard !target.isEmpty else { return fallback }
-
-    let preferredLines = network.lines.filter { preferredLineIDs.contains($0.id) }
-    let lines = preferredLines.isEmpty ? network.lines : preferredLines
-    let namesByLine = lines.map { line in
-        (line, [line.name, line.nameEn].compactMap { $0 }.map(normalizeTransitLineName))
+private func transitLineReferences(_ value: String) -> Set<String> {
+    let normalized = simplifiedTransitLineName(value)
+    var references = Set<String>()
+    if !normalized.isEmpty { references.insert(normalized) }
+    if let range = normalized.range(of: "[a-z]?\\d+(?=号?线|$)", options: .regularExpression) {
+        references.insert(String(normalized[range]))
     }
-    let matchingPriorities: [((String) -> Bool)] = [
-        { $0 == target },
-        { compactLineName($0) == compactLineName(target) },
-        { lineNameTokens($0) == lineNameTokens(target) },
-        { suffixSafeContains($0, target) || suffixSafeContains(target, $0) }
-    ]
-
-    for matches in matchingPriorities {
-        let matchedColors = Set(namesByLine.compactMap { line, names in
-            names.contains(where: matches) ? line.colorHex : nil
-        })
-        if matchedColors.count == 1, let color = matchedColors.first {
-            return color
-        }
-        if !matchedColors.isEmpty { return fallback }
-    }
-    return fallback
+    return references
 }
 
 func normalizeStationKey(_ value: String) -> String {

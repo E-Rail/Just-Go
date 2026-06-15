@@ -159,17 +159,18 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         _ = await loadCityPack(for: station.cityID)
         guard let item = stationRecord(cityID: station.cityID, stationName: station.name) else { return [] }
         let network = await metroNetworks.network(for: station.cityID)
-        let stationLineIDs = Set(station.uniqueLogicalLines.map(\.lineID))
+        let bundledStation = network?.matchingStation(named: station.name, near: station.coordinate)
+        let stationLineIDs = Set(
+            station.uniqueLogicalLines.map(\.lineID) +
+                (station.lines.isEmpty ? bundledStation?.lineIDs ?? [] : [])
+        )
+        let colorResolver = ScheduleLineColorResolver(network: network, stationLineIDs: stationLineIDs)
         return item.schedules.compactMap { schedule in
             guard let timeText = schedule.formattedTime else { return nil }
             return RealTimeArrival(
                 id: UUID(),
                 lineName: schedule.lineName,
-                lineColorHex: lineColorHex(
-                    for: schedule.lineName,
-                    in: network,
-                    preferredLineIDs: stationLineIDs
-                ),
+                lineColorHex: colorResolver.colorHex(for: schedule.lineName),
                 destination: schedule.direction,
                 arrivalTime: nil,
                 minutesRemaining: nil,
@@ -197,14 +198,18 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     func matchingStation(place: TransitPlace, cityID: String) async -> Station? {
         _ = await loadCityPack(for: cityID)
         guard stationRecord(cityID: cityID, stationName: place.name) != nil else { return nil }
-        let station = Station(
-            stationID: "official-\(cityID)-\(normalizedStationName(place.name))",
-            name: place.name,
-            latitude: place.coordinate.latitude,
-            longitude: place.coordinate.longitude,
-            cityID: cityID
-        )
-        return await enrichStation(station)
+        let network = await metroNetworks.network(for: cityID)
+        let station = network
+            .flatMap { network in
+                network.matchingStation(named: place.name, near: place.coordinate).map(network.displayStation)
+            } ?? Station(
+                stationID: "official-\(cityID)-\(normalizedStationName(place.name))",
+                name: place.name,
+                latitude: place.coordinate.latitude,
+                longitude: place.coordinate.longitude,
+                cityID: cityID
+            )
+        return enrichLoadedStation(station)
     }
 
     private func loadManifest(from url: URL) async throws -> OfficialManifest {

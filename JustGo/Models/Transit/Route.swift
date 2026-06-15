@@ -148,7 +148,7 @@ struct RouteDataCoverage: Codable, Equatable {
         guard stationCount > 0 else { return .unknown }
         if available >= stationCount { return .official }
         if available > 0 { return .sourcePending }
-        return .sourcePending
+        return .unavailable
     }
 }
 

@@ -76,8 +76,8 @@ final class DIContainer {
     static func configure() -> DIContainer {
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()
-        let officialStationData = OfficialCityPackService()
         let metroNetworkProvider = BundledMetroNetworkService()
+        let officialStationData = OfficialCityPackService(metroNetworks: metroNetworkProvider)
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()
         let stationSearchService = StationSearchService(

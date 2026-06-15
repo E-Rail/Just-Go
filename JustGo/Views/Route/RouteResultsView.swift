@@ -74,14 +74,14 @@ struct RouteResultsView: View {
                                 viewModel.sortStrategy = strategy
                                 viewModel.sortRoutes()
                             } label: {
-                                Label(AppLocalization.localized(strategy.title), systemImage: strategy.icon)
+                                Label(strategy.title, systemImage: strategy.icon)
                             }
                         }
                     } label: {
                         Label(
                             viewModel.sortStrategy.isPrimary
                                 ? AppLocalization.localized("More")
-                                : AppLocalization.localized(viewModel.sortStrategy.title),
+                                : viewModel.sortStrategy.title,
                             systemImage: viewModel.sortStrategy.isPrimary ? "ellipsis.circle" : viewModel.sortStrategy.icon
                         )
                         .font(.caption)

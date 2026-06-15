@@ -400,12 +400,12 @@ private final class StationAnnotationView: MKAnnotationView {
         symbolView.image = symbol
         symbolView.frame = CGRect(x: 0, y: 0, width: symbolSize, height: symbolSize)
 
-        chineseLabel.text = AppLocalization.chinese(station.name)
+        chineseLabel.text = station.localizedName
         chineseLabel.font = .systemFont(ofSize: labelSize, weight: .semibold)
         chineseLabel.textColor = .label
         chineseLabel.sizeToFit()
 
-        englishLabel.text = station.nameEn ?? station.namePinyin
+        englishLabel.text = station.alternateLocalizedName
         englishLabel.font = .systemFont(ofSize: max(7, labelSize - 3), weight: .regular)
         englishLabel.textColor = .secondaryLabel
         englishLabel.isHidden = englishLabel.text?.isEmpty != false

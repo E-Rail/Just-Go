@@ -69,7 +69,7 @@ final class StationSearchViewModel {
             unfilteredResults = results
             applyFilters()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }
 

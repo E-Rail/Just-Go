@@ -144,7 +144,7 @@ extension City {
     }
 
     var alternateLocalizedName: String? {
-        AppLocalization.isChinese ? nameEn : name
+        AppLocalization.isChinese ? nil : name
     }
 }
 
@@ -154,7 +154,7 @@ extension Station {
     }
 
     var alternateLocalizedName: String? {
-        AppLocalization.isChinese ? nameEn : name
+        AppLocalization.isChinese ? nil : name
     }
 
     var accessibilityLabel: String {
@@ -179,7 +179,7 @@ extension SubwayLine {
     }
 
     var alternateLocalizedName: String? {
-        AppLocalization.isChinese ? nameEn : name
+        AppLocalization.isChinese ? nil : name
     }
 }
 

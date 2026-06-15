@@ -122,7 +122,7 @@ struct StationSearchView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 FilterChip(
-                    title: "Accessible",
+                    title: AppLocalization.localized("Accessible"),
                     icon: "figure.roll",
                     isSelected: viewModel?.filter.accessibleOnly ?? false
                 ) {
@@ -130,7 +130,7 @@ struct StationSearchView: View {
                 }
 
                 FilterChip(
-                    title: "Elevator",
+                    title: AppLocalization.localized("Elevator"),
                     icon: "arrow.up.arrow.down.circle",
                     isSelected: viewModel?.filter.elevatorOnly ?? false
                 ) {
@@ -138,7 +138,7 @@ struct StationSearchView: View {
                 }
 
                 FilterChip(
-                    title: "Transfer",
+                    title: AppLocalization.localized("Transfer"),
                     icon: "arrow.triangle.2.circlepath",
                     isSelected: viewModel?.filter.transferOnly ?? false
                 ) {
@@ -216,7 +216,7 @@ struct FilterChip: View {
             HStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.caption)
-                Text(AppLocalization.localized(title))
+                Text(title)
                     .font(.caption)
             }
             .padding(.horizontal, 12)

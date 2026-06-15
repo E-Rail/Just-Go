@@ -108,7 +108,7 @@ struct StatItem: View {
                 .foregroundStyle(.secondary)
             Text(value)
                 .font(.headline)
-            Text(AppLocalization.localized(title))
+            Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

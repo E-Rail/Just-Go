@@ -29,28 +29,28 @@ struct TransitDataView: View {
                 Section {
                     dataCapabilityRow(
                         icon: "map.fill",
-                        title: "Map, station search, and routes",
-                        detail: "Apple Maps transit routes"
+                        title: AppLocalization.localized("Map, station search, and routes"),
+                        detail: AppLocalization.localized("Apple Maps transit routes")
                     )
                     dataCapabilityRow(
                         icon: "point.bottomleft.forward.to.point.topright.scurvepath",
-                        title: "Metro track geometry",
-                        detail: "OpenStreetMap physical track geometry"
+                        title: AppLocalization.localized("Metro track geometry"),
+                        detail: AppLocalization.localized("OpenStreetMap physical track geometry")
                     )
                     dataCapabilityRow(
                         icon: "accessibility",
-                        title: "Accessibility and station facilities",
-                        detail: "Official city packs when public sources exist"
+                        title: AppLocalization.localized("Accessibility and station facilities"),
+                        detail: AppLocalization.localized("Official city packs when public sources exist")
                     )
                     dataCapabilityRow(
                         icon: "clock.fill",
-                        title: "Train times",
-                        detail: "Official first/last schedules; live countdown only when an official provider exists"
+                        title: AppLocalization.localized("Train times"),
+                        detail: AppLocalization.localized("Official first/last schedules; live countdown only when an official provider exists")
                     )
                     dataCapabilityRow(
                         icon: "photo.fill",
-                        title: "Station maps and images",
-                        detail: "Official city-pack assets where collected"
+                        title: AppLocalization.localized("Station maps and images"),
+                        detail: AppLocalization.localized("Official city-pack assets where collected")
                     )
                 } header: {
                     Text(AppLocalization.localized("Essential Rider Information"))
@@ -93,10 +93,10 @@ struct TransitDataView: View {
                 .foregroundStyle(.blue)
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 3) {
-                Text(AppLocalization.localized(title))
+                Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text(AppLocalization.localized(detail))
+                Text(detail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -115,16 +115,16 @@ struct CityCapabilityTags: View {
 
     var body: some View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 6) {
-            capabilityTag(title: "Access", status: city.dataCapabilities.accessibility)
-            capabilityTag(title: "Essentials", status: city.dataCapabilities.stationEssentials)
-            capabilityTag(title: "3D Map", status: city.dataCapabilities.stationMap)
+            capabilityTag(title: AppLocalization.localized("Access"), status: city.dataCapabilities.accessibility)
+            capabilityTag(title: AppLocalization.localized("Essentials"), status: city.dataCapabilities.stationEssentials)
+            capabilityTag(title: AppLocalization.localized("3D Map"), status: city.dataCapabilities.stationMap)
         }
         .padding(.top, 2)
     }
 
     private func capabilityTag(title: String, status: CityDataCapabilityStatus) -> some View {
         Label {
-            Text(AppLocalization.localized(title))
+            Text(title)
                 .lineLimit(1)
         } icon: {
             Image(systemName: status.iconName)
@@ -136,7 +136,7 @@ struct CityCapabilityTags: View {
         .padding(.vertical, 3)
         .frame(maxWidth: .infinity, alignment: .center)
         .background(tagColor(for: status).opacity(0.12), in: Capsule())
-        .accessibilityLabel("\(AppLocalization.localized(title)): \(accessibilityText(for: status))")
+        .accessibilityLabel("\(title): \(accessibilityText(for: status))")
     }
 
     private func tagColor(for status: CityDataCapabilityStatus) -> Color {

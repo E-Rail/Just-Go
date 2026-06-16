@@ -7,24 +7,29 @@ final class RoutePlanningService {
     private let routeProvider: TransitRouteProviding
     private let officialStationData: OfficialStationDataProviding
     private let cityService: CityService
+    private let comfortForecastService: ComfortForecastService
+    private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
         placeSearchProvider: PlaceSearchProviding,
         routeProvider: TransitRouteProviding,
         officialStationData: OfficialStationDataProviding,
-        cityService: CityService
+        cityService: CityService,
+        comfortForecastService: ComfortForecastService
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
         self.officialStationData = officialStationData
         self.cityService = cityService
+        self.comfortForecastService = comfortForecastService
     }
 
     func planRoute(
         from originName: String,
         to destinationName: String,
         city: String,
-        accessibilityFilter: AccessibilityFilter = .none
+        accessibilityFilter: AccessibilityFilter = .none,
+        tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
         let region = cityService.getCity(byID: city).flatMap { $0.id == "automatic" ? nil : $0 }.map {
             MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 120_000, longitudinalMeters: 120_000)
@@ -40,14 +45,15 @@ final class RoutePlanningService {
             throw RoutePlanningError.stationNotFound
         }
 
-        return try await planRoute(from: origin, to: destination, city: city, accessibilityFilter: accessibilityFilter)
+        return try await planRoute(from: origin, to: destination, city: city, accessibilityFilter: accessibilityFilter, tripAnchor: tripAnchor)
     }
 
     func planRoute(
         from origin: TransitPlace,
         to destination: TransitPlace,
         city: String,
-        accessibilityFilter: AccessibilityFilter = .none
+        accessibilityFilter: AccessibilityFilter = .none,
+        tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
         let routes = try await routeProvider.routes(
             from: origin,
@@ -89,6 +95,27 @@ final class RoutePlanningService {
                     affectedStationID: nil
                 ))
             }
+
+            if let boarding = route.boardingTransitSegment, let boardingName = boarding.fromStationName {
+                let windows = await officialStationData.serviceWindows(cityID: routeCityID, stationName: boardingName)
+                let boardingMoment = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
+                let status = serviceHoursResolver.status(
+                    boardingLineName: boarding.lineName,
+                    windows: windows,
+                    at: boardingMoment
+                )
+                route.serviceStatus = status
+                if let warningType = status.warningType, let banner = status.bannerText {
+                    route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
+                }
+            }
+            route.crowdControl = RouteCrowdControl(
+                stations: await officialStationData.crowdControlWindows(
+                    cityID: routeCityID,
+                    stationNames: criticalStops.map(\.name)
+                )
+            )
+
             enrichedRoutes.append(route)
         }
         return enrichedRoutes
@@ -161,7 +188,12 @@ final class RoutePlanningService {
         return max(0, min(1, score))
     }
 
-    func sortRoutes(_ routes: [Route], by strategy: RoutePreference, preferences: AccessibilityPreference) -> [Route] {
+    func sortRoutes(
+        _ routes: [Route],
+        by strategy: RoutePreference,
+        preferences: AccessibilityPreference,
+        tripAnchor: TripTimeAnchor = .now
+    ) -> [Route] {
         switch strategy {
         case .metroFirst:
             return routes.sorted {
@@ -192,13 +224,13 @@ final class RoutePlanningService {
                     ($1.transferCount, $1.totalDuration, $1.walkingDistance)
             }
         case .leastConfusing:
-            return routes.sorted { ranked($0, before: $1, score: routeClarityScore) }
+            return routes.sorted { ranked($0, before: $1, score: routeClarityScore, tripAnchor: tripAnchor) }
         case .luggageFriendly:
-            return routes.sorted { ranked($0, before: $1, score: luggageScore) }
+            return routes.sorted { ranked($0, before: $1, score: luggageScore, tripAnchor: tripAnchor) }
         case .elderlyFriendly:
-            return routes.sorted { ranked($0, before: $1, score: elderlyScore) }
+            return routes.sorted { ranked($0, before: $1, score: elderlyScore, tripAnchor: tripAnchor) }
         case .officialDataOnly:
-            return routes.sorted { ranked($0, before: $1, score: officialDataScore) }
+            return routes.sorted { ranked($0, before: $1, score: officialDataScore, tripAnchor: tripAnchor) }
         }
     }
 
@@ -239,13 +271,21 @@ final class RoutePlanningService {
         )
     }
 
-    private func ranked(_ lhs: Route, before rhs: Route, score: (Route) -> Double) -> Bool {
+    private func ranked(_ lhs: Route, before rhs: Route, score: (Route) -> Double, tripAnchor: TripTimeAnchor) -> Bool {
         let lhsScore = score(lhs)
         let rhsScore = score(rhs)
         if lhsScore != rhsScore { return lhsScore > rhsScore }
         if lhs.warnings.count != rhs.warnings.count { return lhs.warnings.count < rhs.warnings.count }
         if lhs.walkingDistance != rhs.walkingDistance { return lhs.walkingDistance < rhs.walkingDistance }
-        return lhs.totalDuration < rhs.totalDuration
+        if lhs.totalDuration != rhs.totalDuration { return lhs.totalDuration < rhs.totalDuration }
+        return comfortPenalty(lhs, tripAnchor: tripAnchor) < comfortPenalty(rhs, tripAnchor: tripAnchor)
+    }
+
+    /// Comfort tie-break (lower is calmer). Applied only after every other ranking key is equal,
+    /// so it never overrides the rider's chosen strategy.
+    private func comfortPenalty(_ route: Route, tripAnchor: TripTimeAnchor) -> Int {
+        let tripTime = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
+        return comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime).level.sortValue
     }
 }
 
@@ -281,4 +321,3 @@ extension RoutePlanningError: LocalizedError {
         }
     }
 }
-

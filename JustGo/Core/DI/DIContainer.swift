@@ -13,6 +13,8 @@ final class DIContainer {
     let accessibilityReportService: AccessibilityReportService
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
+    let comfortForecastService: ComfortForecastService
+    let tripReminderService: TripReminderService
 
     init(
         locationService: LocationService,
@@ -25,7 +27,9 @@ final class DIContainer {
         tripMemoryService: TripMemoryService,
         accessibilityReportService: AccessibilityReportService,
         routeFeasibilityService: RouteFeasibilityService,
-        routeConfidenceService: RouteConfidenceService
+        routeConfidenceService: RouteConfidenceService,
+        comfortForecastService: ComfortForecastService,
+        tripReminderService: TripReminderService
     ) {
         self.locationService = locationService
         self.placeSearchProvider = placeSearchProvider
@@ -38,6 +42,8 @@ final class DIContainer {
         self.accessibilityReportService = accessibilityReportService
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
+        self.comfortForecastService = comfortForecastService
+        self.tripReminderService = tripReminderService
     }
 
     @MainActor
@@ -86,16 +92,19 @@ final class DIContainer {
             metroNetworkProvider: metroNetworkProvider,
             cityService: cityService
         )
+        let comfortForecastService = ComfortForecastService()
         let routePlanningService = RoutePlanningService(
             placeSearchProvider: placeSearchProvider,
             routeProvider: transitRouteProvider,
             officialStationData: officialStationData,
-            cityService: cityService
+            cityService: cityService,
+            comfortForecastService: comfortForecastService
         )
         let tripMemoryService = TripMemoryService()
         let accessibilityReportService = AccessibilityReportService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
+        let tripReminderService = TripReminderService()
 
         return DIContainer(
             locationService: locationService,
@@ -108,7 +117,9 @@ final class DIContainer {
             tripMemoryService: tripMemoryService,
             accessibilityReportService: accessibilityReportService,
             routeFeasibilityService: routeFeasibilityService,
-            routeConfidenceService: routeConfidenceService
+            routeConfidenceService: routeConfidenceService,
+            comfortForecastService: comfortForecastService,
+            tripReminderService: tripReminderService
         )
     }
 }

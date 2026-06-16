@@ -48,50 +48,13 @@ enum StationFacilityType: String, Codable, CaseIterable {
     case wheelchairBoarding
     case general
 
-    var title: String {
-        switch self {
-        case .elevator:
-            return AppLocalization.localized("Elevator")
-        case .escalator:
-            return AppLocalization.localized("Escalator")
-        case .ramp:
-            return AppLocalization.localized("Wheelchair Ramp")
-        case .accessibleRestroom:
-            return AppLocalization.localized("Accessible Restroom")
-        case .tactilePath:
-            return AppLocalization.localized("Tactile Path")
-        case .audioAnnouncement:
-            return AppLocalization.localized("Audio Announcement")
-        case .visualDisplay:
-            return AppLocalization.localized("Visual Display")
-        case .restroom:
-            return AppLocalization.localized("Restroom")
-        case .aed:
-            return AppLocalization.localized("AED")
-        case .serviceCenter:
-            return AppLocalization.localized("Service Center")
-        case .security:
-            return AppLocalization.localized("Security")
-        case .motherBabyRoom:
-            return AppLocalization.localized("Mother and Baby Room")
-        case .staffAssistance:
-            return AppLocalization.localized("Staff Assistance")
-        case .wheelchairBoarding:
-            return AppLocalization.localized("Wheelchair Boarding")
-        case .general:
-            return AppLocalization.localized("Station Facility")
-        }
-    }
-
     var iconName: String {
         switch self {
         case .elevator:
             return "arrow.up.arrow.down.circle.fill"
         case .escalator:
             return "arrow.up.to.line"
-        case .ramp, .wheelchairBoarding:
-            return "figure.roll"
-        case .accessibleRestroom:
+        case .ramp, .wheelchairBoarding, .accessibleRestroom:
             return "figure.roll"
         case .tactilePath:
             return "hand.raised.fill"

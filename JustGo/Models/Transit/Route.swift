@@ -30,6 +30,12 @@ struct Route: Identifiable, Codable {
     var warnings: [RouteWarning]
     let accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
+    var serviceStatus: RouteServiceStatus = .unknown
+    var crowdControl: RouteCrowdControl = .empty
+
+    var boardingTransitSegment: RouteSegment? {
+        segments.first { $0.type.isTransit }
+    }
 
     var formattedDuration: String {
         let minutes = Int(totalDuration / 60)
@@ -472,5 +478,8 @@ struct RouteWarning: Identifiable, Codable {
         case stepFreeAccessUnconfirmed
         case stairsDetected
         case longWalk
+        case lastTrainSoon
+        case serviceEnded
+        case serviceNotStarted
     }
 }

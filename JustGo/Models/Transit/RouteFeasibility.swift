@@ -41,5 +41,4 @@ enum RouteFeasibilityLevel: Comparable {
 struct RouteBottleneck: Equatable {
     let segmentTitle: String
     let reason: String
-    let severity: RouteFeasibilityLevel
 }

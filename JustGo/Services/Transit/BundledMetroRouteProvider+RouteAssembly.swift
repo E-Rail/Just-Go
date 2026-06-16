@@ -39,7 +39,7 @@ extension BundledMetroRouteProvider {
         if walkingDistance >= 800 {
             warnings.append(RouteWarning(type: .longWalk, message: AppLocalization.localized("Long walking segment"), affectedStationID: nil))
         }
-        let hasStairs = segments.flatMap { $0.walkingDirections ?? [] }.contains(where: \.hasStairs)
+        let hasStairs = segments.contains { ($0.walkingDirections ?? []).contains(where: \.hasStairs) }
         if hasStairs {
             warnings.append(RouteWarning(type: .stairsDetected, message: AppLocalization.localized("Stairs mentioned in Apple Maps directions"), affectedStationID: nil))
         }

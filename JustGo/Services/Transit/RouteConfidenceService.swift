@@ -5,7 +5,8 @@ final class RouteConfidenceService {
         for route: Route,
         feasibility: RouteFeasibility,
         preference: RoutePreference,
-        alternatives: [Route]
+        alternatives: [Route],
+        comfort: RouteComfortForecast? = nil
     ) -> RouteConfidence {
         var score = 100
         var positives: [String] = []
@@ -57,6 +58,38 @@ final class RouteConfidenceService {
         if !feasibility.personalReports.isEmpty {
             score -= 15
             warnings.append(AppLocalization.localized("Personal issue reported"))
+        }
+
+        switch route.serviceStatus {
+        case .serviceEndedToday:
+            score -= 40
+            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+        case .notYetStarted:
+            score -= 25
+            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+        case .lastTrainSoon:
+            score -= 12
+            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+        case .running:
+            if coverage.scheduleConfidence == .official {
+                route.serviceStatus.confidenceReason.map { positives.append($0) }
+            }
+        case .unknown:
+            break
+        }
+
+        if let comfort {
+            switch comfort.level {
+            case .busy:
+                score -= 8
+                warnings.append(comfort.summaryTitle)
+            case .moderate:
+                score -= 3
+            case .comfortable:
+                positives.append(comfort.summaryTitle)
+            case .unknown:
+                break
+            }
         }
 
         if let fewestTransfers = alternatives.map(\.transferCount).min(),

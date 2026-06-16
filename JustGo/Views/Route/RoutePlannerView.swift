@@ -23,6 +23,7 @@ struct RoutePlannerView: View {
                             savedTripsSection
                         }
                         accessibilityFiltersSection
+                        departurePlannerSection
                         saveCurrentTripButton
                         searchButton
                         if viewModel?.recentRoutes.isEmpty == false {
@@ -63,6 +64,16 @@ struct RoutePlannerView: View {
                 viewModel = container.makeRoutePlannerViewModel()
             }
             viewModel?.cityChanged(to: appState.selectedCity)
+        }
+    }
+
+    @ViewBuilder
+    private var departurePlannerSection: some View {
+        if let viewModel {
+            DeparturePlannerSection(anchor: Binding(
+                get: { viewModel.tripAnchor },
+                set: { viewModel.tripAnchor = $0 }
+            ))
         }
     }
 

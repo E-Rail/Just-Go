@@ -131,8 +131,7 @@ extension MetroCoordinate {
 
 extension Array {
     var adjacentPairs: [(Element, Element)] {
-        guard count >= 2 else { return [] }
-        return zip(self, dropFirst()).map { ($0, $1) }
+        zip(self, dropFirst()).map { ($0, $1) }
     }
 
     func chunked(where belongsTogether: (Element, Element) -> Bool) -> [[Element]] {

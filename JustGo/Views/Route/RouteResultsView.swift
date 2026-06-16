@@ -47,7 +47,8 @@ struct RouteResultsView: View {
                 RouteDetailView(
                     route: route,
                     preference: viewModel.sortStrategy,
-                    alternatives: viewModel.routes
+                    alternatives: viewModel.routes,
+                    tripAnchor: viewModel.tripAnchor
                 )
             }
         }
@@ -109,9 +110,14 @@ struct RouteResultsView: View {
                 )
 
                 if let route = selectedRoute {
+                    let comfort = container.comfortForecastService.forecast(
+                        for: route.crowdControl,
+                        tripTime: viewModel.tripTimeContext(for: route).departureDate
+                    )
                     let feasibility = container.routeFeasibilityService.feasibility(
                         for: route,
-                        personalReports: accessibilityReportService.reports(affecting: route)
+                        personalReports: accessibilityReportService.reports(affecting: route),
+                        comfort: comfort
                     )
                     RouteCard(
                         route: route,
@@ -119,8 +125,11 @@ struct RouteResultsView: View {
                             for: route,
                             feasibility: feasibility,
                             preference: viewModel.sortStrategy,
-                            alternatives: viewModel.routes
-                        )
+                            alternatives: viewModel.routes,
+                            comfort: comfort
+                        ),
+                        comfort: comfort,
+                        departurePlan: viewModel.departurePlan(for: route)
                     ) {
                         _ = tripMemoryService.recordPlannedTrip(
                             route: route,

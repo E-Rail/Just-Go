@@ -62,6 +62,8 @@ protocol OfficialStationDataProviding {
     func timetableAssets(for station: Station) async -> [CityPackStationAsset]
     func serviceStatus(for station: Station) async -> CityPackServiceStatus?
     func trainTimes(for station: Station) async -> [RealTimeArrival]
+    func serviceWindows(cityID: String, stationName: String) async -> [StationServiceWindow]
+    func crowdControlWindows(cityID: String, stationNames: [String]) async -> [ComfortStationWindows]
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage
     func matchingStation(place: TransitPlace, cityID: String) async -> Station?
 }
@@ -182,9 +184,30 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
     }
 
+    func serviceWindows(cityID: String, stationName: String) async -> [StationServiceWindow] {
+        _ = await loadCityPack(for: cityID)
+        return stationRecord(cityID: cityID, stationName: stationName)?.schedules.map {
+            StationServiceWindow(lineName: $0.lineName, direction: $0.direction, firstTime: $0.firstTime, lastTime: $0.lastTime)
+        } ?? []
+    }
+
+    func crowdControlWindows(cityID: String, stationNames: [String]) async -> [ComfortStationWindows] {
+        _ = await loadCityPack(for: cityID)
+        var seen = Set<String>()
+        var result: [ComfortStationWindows] = []
+        for name in stationNames {
+            let key = normalizedStationName(name)
+            guard seen.insert(key).inserted else { continue }
+            guard let windows = stationRecord(cityID: cityID, normalizedName: key)?.serviceStatus?.crowdControlWindows,
+                  !windows.isEmpty else { continue }
+            result.append(ComfortStationWindows(stationName: name, stationID: nil, windows: windows))
+        }
+        return result
+    }
+
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage {
         _ = await loadCityPack(for: cityID)
-        let names = Array(Set(stationNames.map(normalizedStationName)))
+        let names = Set(stationNames.map(normalizedStationName))
         let stations = names.compactMap { stationRecord(cityID: cityID, normalizedName: $0) }
         return RouteDataCoverage(
             stationCount: names.count,

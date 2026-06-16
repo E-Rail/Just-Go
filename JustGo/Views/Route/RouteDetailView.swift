@@ -4,10 +4,15 @@ struct RouteDetailView: View {
     private let initialRoute: Route
     let preference: RoutePreference
     let alternatives: [Route]
+    let tripAnchor: TripTimeAnchor
     @State var selectedRouteID: UUID
     @State var showRouteReport = false
     @State var showTripNote = false
     @State var showExpandedRouteMap = false
+    @State var showLiveGo = false
+    @State private var reminderScheduled = false
+    @State private var showReminderDenied = false
+    @State private var showReminderTooLate = false
     @State var tripNote = ""
     @State var routeReportNote = ""
     @State var routeReportSeverity: AccessibilityReportSeverity = .medium
@@ -24,11 +29,16 @@ struct RouteDetailView: View {
                     RouteTabs(routes: alternatives, selection: $selectedRouteID)
                 }
                 routeSummaryCard
+                if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
+                ServiceStatusBanner(status: route.serviceStatus)
                 tripConfidenceCard
                 routeMapPreview
                 accessGuidanceCard
+                if comfortForecast.hasSignal { RouteComfortCard(forecast: comfortForecast) }
                 routeFeasibilityCard
                 segmentsTimeline
+                liveGoButton
+                reminderSection
                 riderTrustActions
             }
             .padding()
@@ -44,6 +54,12 @@ struct RouteDetailView: View {
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
         }
+        .fullScreenCover(isPresented: $showLiveGo) {
+            LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
+        }
+        .onChange(of: selectedRouteID) { _, _ in
+            reminderScheduled = false
+        }
         .task(id: route.networkCityID ?? appState.selectedCity?.id) {
             guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
                   cityID != "automatic",
@@ -58,13 +74,15 @@ struct RouteDetailView: View {
     init(
         route: Route,
         preference: RoutePreference = .fastest,
-        alternatives: [Route] = []
+        alternatives: [Route] = [],
+        tripAnchor: TripTimeAnchor = .now
     ) {
         initialRoute = route
         self.preference = preference
         self.alternatives = alternatives.contains(where: { $0.id == route.id })
             ? alternatives
             : [route] + alternatives
+        self.tripAnchor = tripAnchor
         _selectedRouteID = State(initialValue: route.id)
     }
 
@@ -189,10 +207,98 @@ struct RouteDetailView: View {
         }
     }
 
+    private var tripTime: Date {
+        TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
+    }
+
+    private var comfortForecast: RouteComfortForecast {
+        container.comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime)
+    }
+
+    private var departurePlan: DeparturePlan? {
+        route.departurePlan(anchor: tripAnchor)
+    }
+
+    private var liveGoButton: some View {
+        Button {
+            showLiveGo = true
+        } label: {
+            Label(
+                AppLocalization.text(english: "Start step-by-step guide", simplified: "开始分步导航", traditional: "開始分步導航"),
+                systemImage: "figure.walk.circle.fill"
+            )
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.blue, in: RoundedRectangle(cornerRadius: 14))
+            .foregroundStyle(.white)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var reminderSection: some View {
+        if let departurePlan {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(AppLocalization.text(english: "Leave-time reminder", simplified: "出发提醒", traditional: "出發提醒"))
+                        .font(.headline)
+                    Button {
+                        Task { await scheduleReminder(plan: departurePlan) }
+                    } label: {
+                        Label(
+                            reminderScheduled
+                                ? AppLocalization.text(english: "Reminder set", simplified: "提醒已设置", traditional: "提醒已設定")
+                                : AppLocalization.text(english: "Remind me to leave", simplified: "提醒我出发", traditional: "提醒我出發"),
+                            systemImage: reminderScheduled ? "bell.fill" : "bell"
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .disabled(reminderScheduled)
+                }
+            }
+            .alert(
+                AppLocalization.text(english: "Notifications are off", simplified: "通知已关闭", traditional: "通知已關閉"),
+                isPresented: $showReminderDenied
+            ) {
+                Button(AppLocalization.localized("OK"), role: .cancel) {}
+            } message: {
+                Text(AppLocalization.text(
+                    english: "Enable notifications in Settings to get a leave-time reminder.",
+                    simplified: "请在设置中开启通知以接收出发提醒。",
+                    traditional: "請在設定中開啟通知以接收出發提醒。"
+                ))
+            }
+            .alert(
+                AppLocalization.text(english: "Too late to remind", simplified: "已来不及提醒", traditional: "已來不及提醒"),
+                isPresented: $showReminderTooLate
+            ) {
+                Button(AppLocalization.localized("OK"), role: .cancel) {}
+            } message: {
+                Text(AppLocalization.text(
+                    english: "The leave time is already here — no reminder was set.",
+                    simplified: "出发时间已到，未设置提醒。",
+                    traditional: "出發時間已到，未設定提醒。"
+                ))
+            }
+        }
+    }
+
+    private func scheduleReminder(plan: DeparturePlan) async {
+        guard await container.tripReminderService.requestAuthorization() else {
+            showReminderDenied = true
+            return
+        }
+        let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: 5)
+        reminderScheduled = scheduled
+        showReminderTooLate = !scheduled
+    }
+
     var currentFeasibility: RouteFeasibility {
         container.routeFeasibilityService.feasibility(
             for: route,
-            personalReports: accessibilityReportService.reports(affecting: route)
+            personalReports: accessibilityReportService.reports(affecting: route),
+            comfort: comfortForecast
         )
     }
 
@@ -201,7 +307,8 @@ struct RouteDetailView: View {
             for: route,
             feasibility: currentFeasibility,
             preference: preference,
-            alternatives: alternatives
+            alternatives: alternatives,
+            comfort: comfortForecast
         )
     }
 }

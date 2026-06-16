@@ -150,10 +150,11 @@ struct TransitMapView: UIViewRepresentable {
                 let polylineCoordinates = segment.polylineCoordinates.map {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                 }
-                let stopCoordinates = segment.stationStops.compactMap(\.coordinate).map {
-                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                }
-                let coordinates = polylineCoordinates.count >= 2 ? polylineCoordinates : stopCoordinates
+                let coordinates = polylineCoordinates.count >= 2
+                    ? polylineCoordinates
+                    : segment.stationStops.compactMap(\.coordinate).map {
+                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                    }
                 guard coordinates.count >= 2 else { continue }
                 addPolyline(
                     coordinates,

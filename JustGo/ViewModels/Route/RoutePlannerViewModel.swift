@@ -23,6 +23,7 @@ final class RoutePlannerViewModel {
     var isLoading = false
     var errorMessage: String?
     var sortStrategy: RoutePreference = .metroFirst
+    var tripAnchor: TripTimeAnchor = .now
 
     private var suggestionTask: Task<Void, Never>?
 
@@ -133,14 +134,16 @@ final class RoutePlannerViewModel {
                     from: originPlace,
                     to: destinationPlace,
                     city: city.id,
-                    accessibilityFilter: accessibilityFilter
+                    accessibilityFilter: accessibilityFilter,
+                    tripAnchor: tripAnchor
                 )
             } else {
                 routes = try await routePlanningService.planRoute(
                     from: originName,
                     to: destinationName,
                     city: city.id,
-                    accessibilityFilter: accessibilityFilter
+                    accessibilityFilter: accessibilityFilter,
+                    tripAnchor: tripAnchor
                 )
             }
             sortRoutes()
@@ -156,8 +159,19 @@ final class RoutePlannerViewModel {
         routes = routePlanningService.sortRoutes(
             routes,
             by: sortStrategy,
-            preferences: accessibilityPreferences
+            preferences: accessibilityPreferences,
+            tripAnchor: tripAnchor
         )
+    }
+
+    /// "Leave by / arrive by" plan for a route. Derived from the route's plan-time
+    /// `serviceStatus` so the list and the detail screen always show the same verdict.
+    func departurePlan(for route: Route) -> DeparturePlan? {
+        route.departurePlan(anchor: tripAnchor)
+    }
+
+    func tripTimeContext(for route: Route) -> TripTimeContext {
+        TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
     }
 
     func swapOriginDestination() {

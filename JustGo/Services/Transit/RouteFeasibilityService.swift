@@ -1,7 +1,7 @@
 import Foundation
 
 final class RouteFeasibilityService {
-    func feasibility(for route: Route, personalReports: [LocalAccessibilityReport]) -> RouteFeasibility {
+    func feasibility(for route: Route, personalReports: [LocalAccessibilityReport], comfort: RouteComfortForecast? = nil) -> RouteFeasibility {
         var level: RouteFeasibilityLevel = route.stepFreeAssessment.supportsStepFreeTravel ? .good : .unknown
         var reasons: [String] = []
         var unknowns: [String] = []
@@ -30,8 +30,7 @@ final class RouteFeasibilityService {
                 estimatedExtraMinutes += 8
                 bottleneck = bottleneck ?? RouteBottleneck(
                     segmentTitle: AppLocalization.localized("Walking or transfer step"),
-                    reason: warning.message,
-                    severity: .risky
+                    reason: warning.message
                 )
             case .stepFreeAccessUnconfirmed:
                 hasStepFreeUncertainty = true
@@ -39,14 +38,19 @@ final class RouteFeasibilityService {
                 unknowns.append(warning.message)
                 bottleneck = bottleneck ?? RouteBottleneck(
                     segmentTitle: AppLocalization.localized("Station access"),
-                    reason: warning.message,
-                    severity: .caution
+                    reason: warning.message
                 )
             case .longWalk:
                 hasLongWalk = true
                 level = max(level, .caution)
                 reasons.append(warning.message)
                 estimatedExtraMinutes += 5
+            case .serviceEnded, .serviceNotStarted:
+                level = max(level, .risky)
+                reasons.append(warning.message)
+            case .lastTrainSoon:
+                level = max(level, .caution)
+                reasons.append(warning.message)
             case .elevatorOutage, .escalatorOutage, .serviceDisruption, .crowding:
                 level = max(level, .caution)
                 reasons.append(warning.message)
@@ -61,8 +65,7 @@ final class RouteFeasibilityService {
             estimatedExtraMinutes += 8
             bottleneck = bottleneck ?? RouteBottleneck(
                 segmentTitle: AppLocalization.localized("Walking segment"),
-                reason: AppLocalization.localized("Stairs detected"),
-                severity: .risky
+                reason: AppLocalization.localized("Stairs detected")
             )
         }
         if walkingSteps.contains(where: \.hasElevator) {
@@ -86,9 +89,14 @@ final class RouteFeasibilityService {
             ))
             bottleneck = bottleneck ?? RouteBottleneck(
                 segmentTitle: AppLocalization.localized("Personal report"),
-                reason: problemReports.first?.displayNote ?? AppLocalization.localized("You reported an issue"),
-                severity: .risky
+                reason: problemReports.first?.displayNote ?? AppLocalization.localized("You reported an issue")
             )
+        }
+
+        if let comfort, comfort.level >= .busy || !comfort.activeCrowdControl.isEmpty {
+            level = max(level, .caution)
+            estimatedExtraMinutes += 5
+            reasons.append(comfort.summaryTitle)
         }
 
         let title: String

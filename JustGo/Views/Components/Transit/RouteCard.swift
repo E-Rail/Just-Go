@@ -3,6 +3,8 @@ import SwiftUI
 struct RouteCard: View {
     let route: Route
     let confidence: RouteConfidence
+    var comfort: RouteComfortForecast?
+    var departurePlan: DeparturePlan?
     let action: () -> Void
 
     var body: some View {
@@ -55,6 +57,21 @@ struct RouteCard: View {
                         .font(.caption)
                         .foregroundStyle(confidence.level.color)
                         .lineLimit(2)
+                }
+
+                ServiceStatusBanner(status: route.serviceStatus, compact: true)
+
+                if let comfort, comfort.hasSignal {
+                    Label(comfort.summaryTitle, systemImage: comfort.level.iconName)
+                        .font(.caption)
+                        .foregroundStyle(comfort.level.uiColor)
+                }
+
+                if let departurePlan {
+                    Label(departurePlan.leaveByHeadline, systemImage: "clock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
             }
             .padding()

@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
+		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
+		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
+		A1000304 /* Transit/TripStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000304 /* Transit/TripStep.swift */; };
+		A1000305 /* Transit/TripConfidenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000305 /* Transit/TripConfidenceServices.swift */; };
+		A1000306 /* Notifications/TripReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000306 /* Notifications/TripReminderService.swift */; };
+		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
+		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
 		A1000001 /* JustGoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* JustGoApp.swift */; };
 		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* ContentView.swift */; };
 		A1000003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AppState.swift */; };
@@ -82,6 +90,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
+		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
+		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
+		A2000304 /* Transit/TripStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripStep.swift; sourceTree = "<group>"; };
+		A2000305 /* Transit/TripConfidenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripConfidenceServices.swift; sourceTree = "<group>"; };
+		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
+		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
+		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
 		A2000001 /* JustGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustGoApp.swift; sourceTree = "<group>"; };
 		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A2000003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -212,6 +228,7 @@
 		A5000004 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				A2000301 /* Time/ChinaClock.swift */,
 				A2000004 /* DI/DIContainer.swift */,
 				A2000033 /* Extensions/Color+Hex.swift */,
 				A200005C /* Extensions/CLLocationCoordinate2D+Distance.swift */,
@@ -226,6 +243,9 @@
 		A5000005 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A2000302 /* Transit/TripTiming.swift */,
+				A2000303 /* Transit/RouteComfort.swift */,
+				A2000304 /* Transit/TripStep.swift */,
 				A2000024 /* Station/Station.swift */,
 				A2000025 /* Station/StationAccessibility.swift */,
 				A2000050 /* Station/StationFacility.swift */,
@@ -246,6 +266,8 @@
 		A5000006 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				A2000305 /* Transit/TripConfidenceServices.swift */,
+				A2000306 /* Notifications/TripReminderService.swift */,
 				A200001B /* Map/MapKitProviders.swift */,
 				A200004A /* Data/OfficialCityPackService.swift */,
 				A200005A /* Data/BundledMetroNetworkService.swift */,
@@ -279,6 +301,8 @@
 		A5000008 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A2000307 /* Route/ConfidenceFeatureViews.swift */,
+				A2000308 /* Route/LiveGoView.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
@@ -411,6 +435,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000301 /* Time/ChinaClock.swift in Sources */,
+				A1000302 /* Transit/TripTiming.swift in Sources */,
+				A1000303 /* Transit/RouteComfort.swift in Sources */,
+				A1000304 /* Transit/TripStep.swift in Sources */,
+				A1000305 /* Transit/TripConfidenceServices.swift in Sources */,
+				A1000306 /* Notifications/TripReminderService.swift in Sources */,
+				A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */,
+				A1000308 /* Route/LiveGoView.swift in Sources */,
 				A1000001 /* JustGoApp.swift in Sources */,
 				A1000002 /* ContentView.swift in Sources */,
 				A1000003 /* AppState.swift in Sources */,

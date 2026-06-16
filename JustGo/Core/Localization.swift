@@ -92,6 +92,22 @@ enum AppLocalization {
         isChinese ? "\(count)站" : "\(count) stop\(count == 1 ? "" : "s")"
     }
 
+    static func stopsLeft(_ count: Int) -> String {
+        text(
+            english: "\(count) stop\(count == 1 ? "" : "s") left",
+            simplified: "还剩\(count)站",
+            traditional: "還剩\(count)站"
+        )
+    }
+
+    static func stepProgress(current: Int, total: Int) -> String {
+        text(
+            english: "Step \(current) of \(total)",
+            simplified: "第 \(current) / \(total) 步",
+            traditional: "第 \(current) / \(total) 步"
+        )
+    }
+
     static func distance(_ meters: Double) -> String {
         let rounded = max(0, meters)
         if rounded < 1000 {

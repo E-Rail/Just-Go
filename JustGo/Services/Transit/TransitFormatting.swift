@@ -98,7 +98,7 @@ struct ScheduleLineColorResolver {
     }
 }
 
-private func fullTransitLineName(_ value: String) -> String {
+func fullTransitLineName(_ value: String) -> String {
     normalizeChineseLineNumber(
         value
         .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
@@ -108,12 +108,12 @@ private func fullTransitLineName(_ value: String) -> String {
     )
 }
 
-private func simplifiedTransitLineName(_ value: String) -> String {
+func simplifiedTransitLineName(_ value: String) -> String {
     fullTransitLineName(value)
         .replacingOccurrences(of: "（.*?）|\\(.*?\\)", with: "", options: .regularExpression)
 }
 
-private func transitLineReferences(_ value: String) -> Set<String> {
+func transitLineReferences(_ value: String) -> Set<String> {
     let normalized = simplifiedTransitLineName(value)
     var references = Set<String>()
     if !normalized.isEmpty { references.insert(normalized) }

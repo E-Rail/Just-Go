@@ -11,7 +11,7 @@ struct MapVisibleRegion {
         max(latitudeDelta, longitudeDelta)
     }
 
-    func contains(_ coordinate: CLLocationCoordinate2D, paddingFactor: Double = 0.35) -> Bool {
+    func contains(_ coordinate: CLLocationCoordinate2D, paddingFactor: Double) -> Bool {
         let latitudePadding = latitudeDelta * paddingFactor
         let longitudePadding = longitudeDelta * paddingFactor
         let latitudeRange = (center.latitude - latitudeDelta / 2 - latitudePadding)...(center.latitude + latitudeDelta / 2 + latitudePadding)

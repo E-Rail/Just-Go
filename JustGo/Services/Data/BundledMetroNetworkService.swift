@@ -103,6 +103,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 
     private func displayStation(_ item: MetroStation, linesByID: [String: SubwayLine]) -> Station {
+        let displayLines = item.lineIDs.compactMap { linesByID[$0] }
         let station = Station(
             stationID: "network-\(cityID)-\(item.id)",
             name: item.name,
@@ -110,9 +111,9 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
             latitude: item.latitude,
             longitude: item.longitude,
             cityID: cityID,
-            isTransferStation: Set(item.lineIDs).count > 1
+            isTransferStation: Set(displayLines.map(\.lineID)).count > 1
         )
-        station.lines = item.lineIDs.compactMap { linesByID[$0] }
+        station.lines = displayLines
         return station
     }
 }

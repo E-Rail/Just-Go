@@ -23,13 +23,44 @@ SOURCE_URL = "https://www.openstreetmap.org"
 URBAN_ROUTE_MODES = %w[subway light_rail monorail tram].freeze
 SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 
+# Each city's bounding box overlaps neighbouring systems (Shenzhen↔Hong Kong,
+# Guangzhou↔Foshan/Dongguan/intercity, Shanghai↔Suzhou, Hangzhou↔Shaoxing …), so a
+# cross-border transfer station would otherwise pull a different system's line into the
+# wrong city. `networks` is the allowlist of OSM network/operator identities that truly
+# belong to the city — every other route relation in the bbox is dropped. `own_unknown_lines`
+# whitelists the handful of the city's own lines that carry no network/operator tag in OSM
+# (so they would otherwise be indistinguishable from foreign untagged lines).
 CITIES = {
-  "1100" => { name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90] },
-  "3100" => { name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20] },
-  "4401" => { name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20] },
-  "4403" => { name: "Shenzhen", bbox: [22.35, 113.65, 22.95, 114.75] },
-  "5101" => { name: "Chengdu", bbox: [30.20, 103.55, 31.10, 104.65] },
-  "3301" => { name: "Hangzhou", bbox: [29.75, 119.65, 30.85, 120.95] }
+  "1100" => {
+    name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
+    networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
+    own_unknown_lines: ["前门大街有轨电车"]
+  },
+  "3100" => {
+    name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20],
+    networks: ["上海地铁", "上海浦东机场旅客捷运系统", "松江有轨电车", "上海市域铁路", "上海市域轨道交通"],
+    own_unknown_lines: ["磁浮线"]
+  },
+  "4401" => {
+    name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
+    networks: ["广州地铁"],
+    own_unknown_lines: []
+  },
+  "4403" => {
+    name: "Shenzhen", bbox: [22.35, 113.65, 22.95, 114.75],
+    networks: ["深圳地铁", "深圳有轨电车", "坪山云巴"],
+    own_unknown_lines: []
+  },
+  "5101" => {
+    name: "Chengdu", bbox: [30.20, 103.55, 31.10, 104.65],
+    networks: ["成都地铁", "成都有轨电车"],
+    own_unknown_lines: ["天府机场APM"]
+  },
+  "3301" => {
+    name: "Hangzhou", bbox: [29.75, 119.65, 30.85, 120.95],
+    networks: ["杭州地铁"],
+    own_unknown_lines: []
+  }
 }.freeze
 
 EARTH_RADIUS = 6_371_000.0
@@ -90,6 +121,25 @@ end
 
 def service_identity(tags)
   normalized(tags["wikidata"])
+end
+
+# Whether a canonicalized line belongs to the city being imported. `network_identity` is the
+# already-normalized network/operator of the line (or "unknown" when OSM gives neither), so it
+# is matched against the city's normalized allowlist. Lines with no network/operator are kept
+# only if explicitly whitelisted by name (the city's own untagged lines); anything else —
+# a neighbouring city's metro, an intercity service, Hong Kong MTR, etc. — is rejected.
+def city_owns_line?(city, network_identity, name)
+  allowed = (city[:networks] || []).map { |value| normalized(value) }
+  return true if allowed.include?(network_identity)
+  return (city[:own_unknown_lines] || []).include?(name) if network_identity == "unknown"
+
+  false
+end
+
+def relation_owned_by_city?(city, relation)
+  tags = relation.fetch("tags", {})
+  identity = network_identity(tags)
+  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags))
 end
 
 def supported_route_relation?(relation)
@@ -461,9 +511,17 @@ def named_relation_members(relation, elements_by_key, role_prefix)
   end.compact
 end
 
-def passenger_station_members(relation, elements_by_key)
+def passenger_station_members(relation, elements_by_key, include_unbuilt: false)
   stops = named_relation_members(relation, elements_by_key, "stop")
-  stops.empty? ? named_relation_members(relation, elements_by_key, "platform") : stops
+  usable_stops = stops.reject { |_member, _element, name| unbuilt_station_name?(name) }
+  if include_unbuilt
+    return stops unless usable_stops.empty?
+  else
+    return usable_stops unless usable_stops.empty?
+  end
+
+  platforms = named_relation_members(relation, elements_by_key, "platform")
+  include_unbuilt ? platforms : platforms.reject { |_member, _element, name| unbuilt_station_name?(name) }
 end
 
 def relation_station_names(relation, elements_by_key)
@@ -473,12 +531,22 @@ def relation_station_names(relation, elements_by_key)
     .sort
 end
 
-def ordered_relation_station_names(relation, elements_by_key)
-  passenger_station_members(relation, elements_by_key)
-    .map { |_member, _element, name| normalized_station_name(name) }
-    .reject(&:empty?)
-    .chunk_while { |left, right| left == right }
-    .map(&:first)
+def ordered_relation_station_patterns(relation, elements_by_key)
+  patterns = []
+  current = []
+  passenger_station_members(relation, elements_by_key, include_unbuilt: true)
+    .each do |_member, _element, name|
+      if unbuilt_station_name?(name)
+        patterns << current if current.length >= 2
+        current = []
+        next
+      end
+      normalized_name = normalized_station_name(name)
+      next if normalized_name.empty? || current.last == normalized_name
+      current << normalized_name
+    end
+  patterns << current if current.length >= 2
+  patterns
 end
 
 def service_pattern_key(relation, elements_by_key)
@@ -504,12 +572,24 @@ def relation_node_set(relation, ways)
   relation_track_ways(relation, ways).flat_map { |way| way["nodes"] }.to_set
 end
 
-def physical_station_nodes(elements)
+# Markers OSM mappers append in parentheses for stations that are not yet open
+# (under construction / planned / postponed). These stations must not enter the
+# bundled network — the app must only surface stations a rider can actually use.
+UNBUILT_STATION_MARKERS = %w[在建 规划 筹建 未开通 暂缓 停建].freeze
+
+def unbuilt_station_name?(name)
+  name.to_s.scan(/（([^）]*)）|\(([^)]*)\)/).flatten.compact.any? do |content|
+    UNBUILT_STATION_MARKERS.any? { |marker| content.include?(marker) }
+  end
+end
+
+def physical_station_nodes(elements, include_unbuilt: false)
   elements.each_with_object({}) do |element, result|
     next unless element["type"] == "node"
     tags = element.fetch("tags", {})
     name = tags["name:zh"] || tags["name"]
     next if name.to_s.empty?
+    next if !include_unbuilt && unbuilt_station_name?(name)
     next unless tags["railway"] == "stop" || tags["public_transport"] == "stop_position"
     next unless tags["subway"] == "yes" || tags["railway"] == "stop"
 
@@ -518,14 +598,24 @@ def physical_station_nodes(elements)
 end
 
 def physical_station_patterns(node_paths, station_nodes)
-  node_paths.map do |path|
-    pattern = path.map { |node_id| station_nodes[node_id]&.last }.compact
-      .map { |name| normalized_station_name(name) }
-      .reject(&:empty?)
-      .chunk_while { |left, right| left == right }
-      .map(&:first)
-    pattern if pattern.length >= 2
-  end.compact
+  node_paths.flat_map do |path|
+    patterns = []
+    current = []
+    path.each do |node_id|
+      name = station_nodes[node_id]&.last
+      next unless name
+      if unbuilt_station_name?(name)
+        patterns << current if current.length >= 2
+        current = []
+        next
+      end
+      normalized_name = normalized_station_name(name)
+      next if normalized_name.empty? || current.last == normalized_name
+      current << normalized_name
+    end
+    patterns << current if current.length >= 2
+    patterns
+  end
 end
 
 def unique_service_patterns(patterns)
@@ -637,6 +727,7 @@ def build_network(city_id, city, source)
   elements_by_key = elements.to_h { |item| ["#{item["type"]}:#{item["id"]}", item] }
   ways = elements.select { |item| item["type"] == "way" }.to_h { |way| [way["id"], way] }
   station_nodes = physical_station_nodes(elements)
+  pattern_station_nodes = physical_station_nodes(elements, include_unbuilt: true)
   relations = elements.select { |item| item["type"] == "relation" && supported_route_relation?(item) }
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
@@ -649,6 +740,10 @@ def build_network(city_id, city, source)
     canonical = canonical_profile(profiles)
     direction_relations = profiles.map { |profile| profile[:relation] }
     canonical_network = canonical[:network].empty? ? "unknown" : canonical[:network]
+    # Drop lines that belong to another city's system (pulled in via the bbox / a cross-border
+    # transfer station). Skipping the group here means its line and its not-shared stations are
+    # never emitted, and a shared transfer station keeps only this city's line IDs.
+    next unless city_owns_line?(city, canonical_network, canonical[:name])
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
@@ -659,7 +754,7 @@ def build_network(city_id, city, source)
       .uniq { |way| way["id"] }
     seen_paths = Set.new
     node_paths = join_way_paths(member_ways).select { |path| seen_paths.add?(canonical_path_key(path)) }
-    track_station_patterns = physical_station_patterns(node_paths, station_nodes)
+    track_station_patterns = physical_station_patterns(node_paths, pattern_station_nodes)
     coordinate_paths = node_paths.map do |path|
       coordinates = path.map { |node_id| nodes[node_id] }.compact.map { |coordinate| wgs84_to_gcj02(*coordinate) }
       next if coordinates.length < 2
@@ -695,7 +790,7 @@ def build_network(city_id, city, source)
       station["lineIDs"] << id
     end
 
-    relation_patterns = selected_relations.map { |relation| ordered_relation_station_names(relation, elements_by_key) }
+    relation_patterns = selected_relations.flat_map { |relation| ordered_relation_station_patterns(relation, elements_by_key) }
     service_patterns = unique_service_patterns(track_station_patterns + relation_patterns)
 
     {
@@ -735,8 +830,10 @@ def build_network(city_id, city, source)
   stations.each { |station| station["lineIDs"].each { |id| station_ids_by_line[id] << station["id"] } }
   lines.each { |line| line["stationIDs"] = station_ids_by_line[line["id"]] }
   emitted_source_relation_ids = lines.flat_map { |line| line["sourceRelationIDs"] }.to_set
-  missing_passenger_relations = passenger_relations.reject do |relation|
-    emitted_source_relation_ids.include?(relation["id"].to_s)
+  # Only own-city relations are expected to be emitted; relations rejected as belonging to
+  # another city's system (see city_owns_line?) are intentionally absent and must not fail.
+  missing_passenger_relations = passenger_relations.select do |relation|
+    !emitted_source_relation_ids.include?(relation["id"].to_s) && relation_owned_by_city?(city, relation)
   end
   fail_with(
     "#{city[:name]} omitted passenger-bearing relations: " \
@@ -799,6 +896,19 @@ def build_network(city_id, city, source)
 end
 
 def self_test
+  fail_with("unbuilt station filter (在建) test failed") unless unbuilt_station_name?("软件园（在建）")
+  fail_with("unbuilt station filter (规划) test failed") unless unbuilt_station_name?("清华东路西口站（规划）")
+  fail_with("unbuilt station filter (暂缓) test failed") unless unbuilt_station_name?("高家园(暂缓开通)")
+  fail_with("unbuilt station false-positive test failed") if unbuilt_station_name?("城市规划展览馆")
+  fail_with("unbuilt station parenthetical false-positive test failed") if unbuilt_station_name?("城市规划展览馆（A口）")
+  fail_with("unbuilt station normal-name test failed") if unbuilt_station_name?("天通苑")
+  fail_with("own-network line should be kept") unless city_owns_line?(CITIES.fetch("4403"), normalized("深圳地铁"), "地铁 1号线")
+  fail_with("Hong Kong MTR line must not enter Shenzhen") if city_owns_line?(CITIES.fetch("4403"), normalized("港鐵 MTR"), "港鐵東鐵綫")
+  fail_with("Suzhou line must not enter Shanghai") if city_owns_line?(CITIES.fetch("3100"), normalized("苏州轨道交通"), "11号线")
+  fail_with("Shenzhen line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("深圳地铁"), "深圳地铁13号线")
+  fail_with("intercity line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际")
+  fail_with("own untagged line should be kept") unless city_owns_line?(CITIES.fetch("3100"), "unknown", "磁浮线")
+  fail_with("foreign untagged line must be dropped") if city_owns_line?(CITIES.fetch("4401"), "unknown", "华为松山湖有轨电车1号线")
   fail_with("direction suffix line-name test failed") unless passenger_line_name(
     "name" => "Light Rail 505 (A → B)"
   ) == "Light Rail 505"
@@ -816,10 +926,13 @@ def self_test
     "node:11" => { "tags" => { "name" => "B" } },
     "node:12" => { "tags" => { "name" => "C" } },
     "node:13" => { "tags" => { "name" => "D" } },
+    "node:14" => { "tags" => { "name" => "E（规划）" } },
     "way:20" => { "tags" => { "name" => "A Platform 1" } },
     "way:21" => { "tags" => { "name" => "A Platform 2" } },
     "way:22" => { "tags" => { "name" => "Platform Only A" } },
-    "way:23" => { "tags" => { "name" => "Platform Only B" } }
+    "way:23" => { "tags" => { "name" => "Platform Only B" } },
+    "way:24" => { "tags" => { "name" => "F" } },
+    "way:25" => { "tags" => { "name" => "G" } }
   }
   fixture_ways = {
     100 => { "id" => 100, "nodes" => [1, 2, 3] },
@@ -882,7 +995,30 @@ def self_test
     ]
   }
   fail_with("platform-only fallback test failed") unless relation_station_names(platform_only, fixture_elements).length == 2
+  unbuilt_stop_platform_fallback = {
+    "id" => 8,
+    "members" => [
+      { "type" => "node", "ref" => 14, "role" => "stop" },
+      { "type" => "way", "ref" => 24, "role" => "platform" },
+      { "type" => "way", "ref" => 25, "role" => "platform" },
+      { "type" => "way", "ref" => 100, "role" => "" }
+    ]
+  }
+  fail_with("unbuilt-only stops blocked platform fallback") unless relation_station_names(unbuilt_stop_platform_fallback, fixture_elements) == %w[f g]
+  fail_with("unbuilt-only stops blocked ordered platform fallback") unless ordered_relation_station_patterns(unbuilt_stop_platform_fallback, fixture_elements) == [%w[f g]]
   fail_with("stop-first station member test failed") unless relation_station_names(platform_direction.call(5, 20), fixture_elements) == %w[a b c]
+  fail_with("unbuilt relation stop leaked into station pattern") unless relation_station_names(fixture_relation.call(8, [10, 14, 11], [100]), fixture_elements) == %w[a b]
+  fail_with("unbuilt relation stop bridged ordered pattern") unless ordered_relation_station_patterns(fixture_relation.call(8, [10, 14, 11, 12], [100]), fixture_elements) == [%w[b c]]
+  split_track_patterns = physical_station_patterns(
+    [[1, 2, 3, 4]],
+    {
+      1 => [nil, "A"],
+      2 => [nil, "E（规划）"],
+      3 => [nil, "B"],
+      4 => [nil, "C"]
+    }
+  )
+  fail_with("unbuilt physical stop bridged track pattern") unless split_track_patterns == [%w[b c]]
   fail_with("reversed path key test failed") unless canonical_path_key([1, 2, 3]) == canonical_path_key([3, 2, 1])
   canonical_fixture = lambda do |id, name, network, stops, way_ids, color = nil, reference = nil|
     fixture_relation.call(id, stops, way_ids).merge(

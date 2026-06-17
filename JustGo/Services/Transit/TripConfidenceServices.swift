@@ -65,7 +65,9 @@ struct ServiceHoursResolver {
 
     /// Parses a possibly multi-value ("23:45 / 0:06") time field into minutes-of-day.
     private static func times(_ field: String?) -> [Int] {
-        (field ?? "").components(separatedBy: "/").compactMap { ChinaClock.minutesOfDay(from: $0) }
+        (field ?? "")
+            .components(separatedBy: CharacterSet(charactersIn: "/／"))
+            .compactMap { ChinaClock.minutesOfDay(from: $0) }
     }
 
     private func matchingWindows(lineName: String?, windows: [StationServiceWindow]) -> [StationServiceWindow] {
@@ -85,7 +87,8 @@ struct ServiceHoursResolver {
 enum CrowdControlWindow {
     /// All windows contained in a string, splitting the "|" multi-window form first.
     static func parseAll(_ text: String) -> [(start: Int, end: Int)] {
-        text.components(separatedBy: "|").compactMap { parse($0) }
+        text.components(separatedBy: CharacterSet(charactersIn: "|;；"))
+            .compactMap { parse($0) }
     }
 
     static func parse(_ text: String) -> (start: Int, end: Int)? {

@@ -285,6 +285,10 @@ struct RouteDetailView: View {
     }
 
     private func scheduleReminder(plan: DeparturePlan) async {
+        guard plan.leaveByDate.addingTimeInterval(-5 * 60) > Date() else {
+            showReminderTooLate = true
+            return
+        }
         guard await container.tripReminderService.requestAuthorization() else {
             showReminderDenied = true
             return

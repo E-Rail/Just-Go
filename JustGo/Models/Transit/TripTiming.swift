@@ -175,6 +175,7 @@ enum LastTrainStatus: Equatable {
     case ok
     case tight(marginMinutes: Int)
     case missed
+    case notStarted(startsAtText: String?)
 }
 
 /// A computed "leave by / arrive by" plan. Recomputed per render from `TripTimeContext`
@@ -240,6 +241,15 @@ struct DeparturePlan: Equatable {
             )
         case .missed:
             return AppLocalization.text(english: "The last train has already departed", simplified: "末班车已开走", traditional: "末班車已開走")
+        case .notStarted(let startsAt):
+            if let startsAt {
+                return AppLocalization.text(
+                    english: "Service starts at \(startsAt)",
+                    simplified: "运营 \(startsAt) 开始",
+                    traditional: "營運 \(startsAt) 開始"
+                )
+            }
+            return AppLocalization.text(english: "Service has not started yet", simplified: "运营尚未开始", traditional: "營運尚未開始")
         }
     }
 }
@@ -255,7 +265,8 @@ extension Route {
         case .unknown: lastTrain = .unknown
         case .running: lastTrain = .ok
         case .lastTrainSoon(let minutes): lastTrain = .tight(marginMinutes: minutes)
-        case .serviceEndedToday, .notYetStarted: lastTrain = .missed
+        case .serviceEndedToday: lastTrain = .missed
+        case .notYetStarted(let startsAtText): lastTrain = .notStarted(startsAtText: startsAtText)
         }
         return DeparturePlan(
             anchor: anchor,

@@ -116,6 +116,7 @@ struct DeparturePlanBanner: View {
         switch plan.lastTrainStatus {
         case .missed: return .red
         case .tight: return .orange
+        case .notStarted: return .blue
         default: return .secondary
         }
     }

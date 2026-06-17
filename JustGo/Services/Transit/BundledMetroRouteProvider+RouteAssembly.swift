@@ -104,6 +104,7 @@ extension BundledMetroRouteProvider {
             let stationIDs = [first.fromStationID] + group.map(\.toStationID)
             let stops = stationIDs.compactMap { id -> RouteStationStop? in
                 guard let station = graph.stationsByID[id] else { return nil }
+                let lineCount = Set(station.lineIDs.filter { graph.linesByID[$0] != nil }).count
                 return RouteStationStop(
                     stationID: "network-\(cityID)-\(station.id)",
                     name: station.name,
@@ -111,7 +112,7 @@ extension BundledMetroRouteProvider {
                     lineColorHex: line.colorHex,
                     coordinate: CodableCoordinate(latitude: station.latitude, longitude: station.longitude),
                     arrivalTimeText: nil,
-                    isTransfer: Set(station.lineIDs).count > 1
+                    isTransfer: lineCount > 1
                 )
             }
             let coordinates = group.flatMap { graph.edgeGeometries[$0.key] ?? [] }.consecutiveUnique

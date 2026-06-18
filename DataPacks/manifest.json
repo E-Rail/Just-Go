@@ -6,8 +6,8 @@
     {
       "cityID": "1100",
       "version": "beijing-official-20260527",
-      "sizeBytes": 1112023,
-      "sha256": "7570cb617ce059266b0b23feb4acff6ac411ac012e5c12adca72e194900378e3",
+      "sizeBytes": 1093715,
+      "sha256": "b04d6f627e2f8ecbfd3234bd3d55adf896a9882fa79657c80eecee626aef64bb",
       "downloadURL": "packs/1100/beijing-official-20260527/city_pack.json",
       "sourceURLs": [
         "https://www.bjsubway.com/station/wzass/",
@@ -32,8 +32,8 @@
     {
       "cityID": "4401",
       "version": "guangzhou-official-20260601",
-      "sizeBytes": 1625346,
-      "sha256": "980c2ef5ecf8f9cd8f1a4e0707c828a716e9ed6564cdddd9485b79fc0ab5992e",
+      "sizeBytes": 1236277,
+      "sha256": "fb8f5f67ac6ab3dc7851108e471591b6bcd0fc3ee87d1a3d1b29c27cf4e6c838",
       "downloadURL": "packs/4401/guangzhou-official-20260601/city_pack.json",
       "sourceURLs": [
         "https://cs.gzmtr.com/ckfw/stationInfo/index.html",
@@ -52,8 +52,8 @@
     {
       "cityID": "3100",
       "version": "shanghai-official-20260601",
-      "sizeBytes": 1203052,
-      "sha256": "f3885316136d46ee1fb736c5b0251cc8c43a91d6fc6c62278209d3c2f7971762",
+      "sizeBytes": 1201050,
+      "sha256": "3816d8644c3e8f4b515e2c98b41c3f39bf3a01618e498035584c6fd16d492bda",
       "downloadURL": "packs/3100/shanghai-official-20260601/city_pack.json",
       "sourceURLs": [
         "https://service.shmetro.com/hcskb/index.htm",
@@ -152,8 +152,8 @@
     {
       "cityID": "5101",
       "version": "chengdu-official-20260528",
-      "sizeBytes": 290719,
-      "sha256": "b14f9fe3f59d09f4d8866b5ff2537303b24c7ba6d1c7b5362b191c3bb961b3f4",
+      "sizeBytes": 282755,
+      "sha256": "0bf1625637310d7f28c355fe377d3a2268376c6463d1778f0e7c627b0de02d2f",
       "downloadURL": "packs/5101/chengdu-official-20260528/city_pack.json",
       "sourceURLs": [
         "https://www.chengdurail.com/ckfw/smbcskb.htm",
@@ -489,8 +489,8 @@
     {
       "cityID": "3301",
       "version": "hangzhou-official-20260528",
-      "sizeBytes": 226246,
-      "sha256": "c00bdae480db5c959e8a29bb8411eb9347febdcd4e270863e91aeb7c3c5fb8e8",
+      "sizeBytes": 224547,
+      "sha256": "736918580fb7884d9d09a18205a68a84ebf5169a6a835ab3db078e817ceeba87",
       "downloadURL": "packs/3301/hangzhou-official-20260528/city_pack.json",
       "sourceURLs": [
         "https://www.hzmetro.com/service_1.aspx?Line1=6&Site1=184",

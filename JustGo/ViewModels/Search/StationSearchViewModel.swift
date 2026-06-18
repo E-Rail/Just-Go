@@ -32,20 +32,15 @@ final class StationSearchViewModel {
         let loadID = UUID()
         stationLoadID = loadID
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        guard !city.isEmpty else { return }
-        await refreshLocationIfAlreadyAllowed()
-        guard let browseCityID = stationSearchService.browseCityID(
-            requestedCityID: city,
-            near: locationService.currentLocation?.coordinate
-        ) else {
+        guard !city.isEmpty else {
             unfilteredResults = []
             searchResults = []
             errorMessage = AppLocalization.localized("Choose a city to browse stations")
             return
         }
-
+        await refreshLocationIfAlreadyAllowed()
         errorMessage = nil
-        unfilteredResults = await stationSearchService.stations(in: browseCityID)
+        unfilteredResults = await stationSearchService.stations(in: city)
         guard stationLoadID == loadID else { return }
         applyFilters()
         unfilteredResults = await stationSearchService.enrichStations(unfilteredResults)

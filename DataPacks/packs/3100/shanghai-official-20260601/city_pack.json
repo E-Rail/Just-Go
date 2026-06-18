@@ -28808,66 +28808,6 @@
       ]
     },
     {
-      "stationName": "金吉路",
-      "stationID": null,
-      "accessibility": {
-        "source": "shanghai_metro_official",
-        "hasElevator": true,
-        "hasEscalator": null,
-        "hasWheelchairRamp": null,
-        "hasTactilePath": null,
-        "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-          "1#无障碍电梯 地面-站厅——金海路申江路路口，4号口（自助）",
-          "2#无障碍电梯 站厅-站台——站厅中部，站台中部（自助）"
-        ],
-        "accessibleEntrances": [
-
-        ],
-        "facilityNotes": [
-          "无障碍电梯：1#无障碍电梯 地面-站厅——金海路申江路路口，4号口（自助）",
-          "无障碍电梯：2#无障碍电梯 站厅-站台——站厅中部，站台中部（自助）",
-          "无障碍卫生间：费区内 往曹路方向站台车头"
-        ]
-      },
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-        {
-          "type": "elevator",
-          "name": "无障碍电梯",
-          "locationText": "1#无障碍电梯 地面-站厅——金海路申江路路口，4号口（自助）",
-          "source": "officialCityPack",
-          "verification": "verified"
-        },
-        {
-          "type": "elevator",
-          "name": "无障碍电梯",
-          "locationText": "2#无障碍电梯 站厅-站台——站厅中部，站台中部（自助）",
-          "source": "officialCityPack",
-          "verification": "verified"
-        },
-        {
-          "type": "accessibleRestroom",
-          "name": "无障碍卫生间",
-          "locationText": "费区内 往曹路方向站台车头",
-          "source": "officialCityPack",
-          "verification": "verified"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "http://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id=948"
-      ]
-    },
-    {
       "stationName": "金平路",
       "stationID": null,
       "accessibility": {

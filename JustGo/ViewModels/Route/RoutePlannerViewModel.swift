@@ -249,7 +249,7 @@ final class RoutePlannerViewModel {
         suggestionTask = Task { [placeSearchProvider] in
             do {
                 try await Task.sleep(for: .milliseconds(120))
-                let region = city.id == "automatic" ? nil : MKCoordinateRegion(
+                let region = MKCoordinateRegion(
                     center: city.coordinate,
                     latitudinalMeters: 80_000,
                     longitudinalMeters: 80_000

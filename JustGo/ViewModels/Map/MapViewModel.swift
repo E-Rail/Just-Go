@@ -62,11 +62,6 @@ final class MapViewModel {
     func loadStations(for city: City) async {
         viewportLoadTask?.cancel()
         cityLoadTask?.cancel()
-        guard city.id != "automatic" else {
-            stations = []
-            metroNetworks = []
-            return
-        }
         updateCamera(to: city.coordinate, spanDelta: 0.22)
         metroNetworks = []
         stations = []
@@ -146,7 +141,7 @@ final class MapViewModel {
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled, let self else { return }
             let centerCityIDs = cityService.getAllCities()
-                .filter { $0.id != "automatic" && region.contains($0.coordinate, paddingFactor: 0.8) }
+                .filter { region.contains($0.coordinate, paddingFactor: 0.8) }
                 .map(\.id)
             let intersectingLoadedCityIDs = metroNetworks
                 .filter { $0.bounds.intersects(region) }

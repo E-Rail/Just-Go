@@ -804,59 +804,6 @@
       ]
     },
     {
-      "stationName": "中医大省医院",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "2号线",
-          "direction": "犀浦-成都行政学院",
-          "firstTime": "06:14",
-          "lastTime": "23:26"
-        },
-        {
-          "lineName": "2号线",
-          "direction": "成都行政学院-犀浦",
-          "firstTime": "06:25",
-          "lastTime": "23:50"
-        },
-        {
-          "lineName": "4号线",
-          "direction": "万盛-西河",
-          "firstTime": "06:10",
-          "lastTime": "23:39"
-        },
-        {
-          "lineName": "4号线",
-          "direction": "西河-万盛",
-          "firstTime": "06:21",
-          "lastTime": "23:32"
-        },
-        {
-          "lineName": "5号线",
-          "direction": "回龙-华桂路",
-          "firstTime": "06:26",
-          "lastTime": "23:37"
-        },
-        {
-          "lineName": "5号线",
-          "direction": "华桂路-回龙",
-          "firstTime": "06:21",
-          "lastTime": "23:33"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
       "stationName": "中和",
       "stationID": null,
       "accessibility": null,
@@ -2761,35 +2708,6 @@
       ]
     },
     {
-      "stationName": "双流机场2航站楼(出闸换乘)",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "10号线",
-          "direction": "武侯祠-新平",
-          "firstTime": "06:14",
-          "lastTime": "23:28"
-        },
-        {
-          "lineName": "10号线",
-          "direction": "新平-武侯祠",
-          "firstTime": "06:00",
-          "lastTime": "23:12"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
       "stationName": "双流机场2航站楼东",
       "stationID": null,
       "accessibility": null,
@@ -2799,35 +2717,6 @@
           "direction": "双流机场2航站楼东-龙泉驿火车站南",
           "firstTime": "06:10",
           "lastTime": "23:10"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
-      "stationName": "双流机场2航站楼东(出闸换乘)",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "19号线",
-          "direction": "天府机场北-金星",
-          "firstTime": "06:23",
-          "lastTime": "00:16"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "金星-天府机场北",
-          "firstTime": "06:00",
-          "lastTime": "23:30"
         }
       ],
       "stationMaps": [
@@ -3360,35 +3249,6 @@
       ]
     },
     {
-      "stationName": "大同",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:44",
-          "lastTime": "23:44"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:22",
-          "lastTime": "23:22"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
       "stationName": "大源",
       "stationID": null,
       "accessibility": null,
@@ -3819,53 +3679,6 @@
           "direction": "天府机场北-双流机场2航站楼东",
           "firstTime": "06:05",
           "lastTime": "23:35"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
-      "stationName": "天府站(仅换乘)",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "18号线",
-          "direction": "火车南站-天府机场北",
-          "firstTime": "06:24",
-          "lastTime": "23:55"
-        },
-        {
-          "lineName": "18号线",
-          "direction": "天府机场北-火车南站",
-          "firstTime": "06:25",
-          "lastTime": "23:56"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "天府机场北-金星",
-          "firstTime": "06:29",
-          "lastTime": "23:49"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "金星-天府机场北",
-          "firstTime": "06:15",
-          "lastTime": "23:58"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "天府机场北-双流机场2航站楼东",
-          "firstTime": "06:29",
-          "lastTime": "00:01"
         }
       ],
       "stationMaps": [
@@ -4905,35 +4718,6 @@
       ]
     },
     {
-      "stationName": "府城桥",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:32",
-          "lastTime": "23:32"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:34",
-          "lastTime": "23:34"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
       "stationName": "府青路",
       "stationID": null,
       "accessibility": null,
@@ -5695,35 +5479,6 @@
           "direction": "瓦窑滩-龙安",
           "firstTime": "06:32",
           "lastTime": "23:23"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
-      "stationName": "新园大道",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:39",
-          "lastTime": "23:39"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:27",
-          "lastTime": "23:27"
         }
       ],
       "stationMaps": [
@@ -8450,35 +8205,6 @@
       ]
     },
     {
-      "stationName": "益州大道",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:35",
-          "lastTime": "23:35"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:31",
-          "lastTime": "23:31"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
       "stationName": "省体育馆",
       "stationID": null,
       "accessibility": null,
@@ -8669,35 +8395,6 @@
           "direction": "桂龙路-龙港",
           "firstTime": "06:46",
           "lastTime": "23:48"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
-      "stationName": "石羊东",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:41",
-          "lastTime": "23:41"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:25",
-          "lastTime": "23:25"
         }
       ],
       "stationMaps": [
@@ -11181,35 +10878,6 @@
           "direction": "金融城东-黄田坝",
           "firstTime": "06:10",
           "lastTime": "23:00"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.chengdurail.com/op/station-time"
-      ]
-    },
-    {
-      "stationName": "金融城北",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "30号线",
-          "direction": "龙泉驿火车站南-双流机场2航站楼东",
-          "firstTime": "06:33",
-          "lastTime": "23:34"
-        },
-        {
-          "lineName": "30号线",
-          "direction": "双流机场2航站楼东-龙泉驿火车站南",
-          "firstTime": "06:33",
-          "lastTime": "23:33"
         }
       ],
       "stationMaps": [

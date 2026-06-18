@@ -60,7 +60,47 @@ CITIES = {
     name: "Hangzhou", bbox: [29.75, 119.65, 30.85, 120.95],
     networks: ["杭州地铁"],
     own_unknown_lines: []
-  }
+  },
+  "1200" => { name: "Tianjin", bbox: [38.85, 116.80, 39.45, 117.80], networks: ["天津地铁", "天津轨道交通"], own_unknown_lines: [] },
+  "5000" => { name: "Chongqing", bbox: [29.30, 106.20, 29.90, 106.90], networks: ["重庆轨道交通", "重庆地铁"], own_unknown_lines: [] },
+  "4201" => { name: "Wuhan", bbox: [30.35, 113.95, 30.85, 114.65], networks: ["武汉地铁", "武汉轨道交通"], own_unknown_lines: [] },
+  "3201" => { name: "Nanjing", bbox: [31.70, 118.45, 32.30, 119.05], networks: ["南京地铁", "南京轨道交通"], own_unknown_lines: [] },
+  "6101" => { name: "Xian", bbox: [34.05, 108.65, 34.55, 109.25], networks: ["西安地铁", "西安轨道交通"], own_unknown_lines: [] },
+  "3205" => { name: "Suzhou", bbox: [31.10, 120.35, 31.55, 120.95], networks: ["苏州轨道交通", "苏州地铁"], own_unknown_lines: [] },
+  "4101" => { name: "Zhengzhou", bbox: [34.55, 113.30, 34.95, 113.95], networks: ["郑州地铁", "郑州轨道交通"], own_unknown_lines: [] },
+  "4301" => { name: "Changsha", bbox: [28.05, 112.75, 28.45, 113.25], networks: ["长沙地铁", "长沙市轨道交通", "长沙轨道交通"], own_unknown_lines: [] },
+  "2101" => { name: "Shenyang", bbox: [41.60, 123.15, 42.00, 123.75], networks: ["沈阳地铁", "沈阳轨道交通"], own_unknown_lines: [] },
+  "3702" => { name: "Qingdao", bbox: [35.85, 119.95, 36.45, 120.65], networks: ["青岛地铁", "青岛轨道交通"], own_unknown_lines: [] },
+  "2102" => { name: "Dalian", bbox: [38.70, 121.25, 39.15, 122.05], networks: ["大连地铁", "大连轨道交通"], own_unknown_lines: [] },
+  "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"], own_unknown_lines: [] },
+  "3202" => { name: "Wuxi", bbox: [31.35, 120.10, 31.75, 120.60], networks: ["无锡地铁", "无锡轨道交通"], own_unknown_lines: [] },
+  "5301" => { name: "Kunming", bbox: [24.70, 102.50, 25.20, 102.95], networks: ["昆明地铁", "昆明轨道交通"], own_unknown_lines: [] },
+  "3601" => { name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"], own_unknown_lines: [] },
+  "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"], own_unknown_lines: [] },
+  "3502" => { name: "Xiamen", bbox: [24.40, 117.95, 24.80, 118.25], networks: ["厦门地铁", "厦门轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  "3401" => { name: "Hefei", bbox: [31.60, 117.00, 32.05, 117.50], networks: ["合肥轨道交通", "合肥地铁"], own_unknown_lines: [] },
+  "1301" => { name: "Shijiazhuang", bbox: [37.85, 114.30, 38.20, 114.75], networks: ["石家庄地铁", "石家庄市轨道交通", "石家庄轨道交通"], own_unknown_lines: [] },
+  "5201" => { name: "Guiyang", bbox: [26.40, 106.50, 26.85, 106.95], networks: ["贵阳地铁", "贵阳轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  "2301" => { name: "Harbin", bbox: [45.55, 126.40, 45.95, 126.90], networks: ["哈尔滨地铁", "哈尔滨轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  "2201" => { name: "Changchun", bbox: [43.65, 125.10, 44.00, 125.55], networks: ["长春轨道交通", "长春地铁"], own_unknown_lines: [] },
+  "4501" => { name: "Nanning", bbox: [22.65, 108.10, 23.00, 108.55], networks: ["南宁轨道交通", "南宁地铁"], own_unknown_lines: [] },
+  "6201" => { name: "Lanzhou", bbox: [35.95, 103.55, 36.20, 104.05], networks: ["兰州轨道交通", "兰州市轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true, own_unknown_lines: [] },
+  "1501" => { name: "Hohhot", bbox: [40.70, 111.50, 41.00, 112.00], networks: ["呼和浩特地铁", "呼和浩特轨道交通"], own_unknown_lines: [] },
+  "1401" => { name: "Taiyuan", bbox: [37.65, 112.40, 38.05, 112.70], networks: ["太原轨道交通", "太原地铁"], own_unknown_lines: [] },
+  "4419" => { name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00], networks: ["东莞轨道交通", "东莞地铁"], own_unknown_lines: [] },
+  "4406" => { name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35], networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车"], own_unknown_lines: [] },
+  "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"], own_unknown_lines: [] },
+  "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"], own_unknown_lines: [] },
+  "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: [] },
+  "3204" => { name: "Changzhou", bbox: [31.65, 119.80, 31.95, 120.15], networks: ["常州地铁", "常州轨道交通"], own_unknown_lines: [] },
+  "3701" => { name: "Jinan", bbox: [36.45, 116.75, 36.80, 117.30], networks: ["济南地铁", "济南轨道交通"], own_unknown_lines: [] },
+  "4103" => { name: "Luoyang", bbox: [34.50, 112.30, 34.78, 112.65], networks: ["洛阳地铁", "洛阳轨道交通"], own_unknown_lines: [] },
+  "3402" => { name: "Wuhu", bbox: [31.20, 118.25, 31.45, 118.55], networks: ["芜湖轨道交通", "芜湖地铁"], allow_unknown: true, own_unknown_lines: [] },
+  "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
+  "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"], own_unknown_lines: [] },
+  "8100" => { name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [] },
+  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] }
 }.freeze
 
 EARTH_RADIUS = 6_371_000.0
@@ -131,7 +171,12 @@ end
 def city_owns_line?(city, network_identity, name)
   allowed = (city[:networks] || []).map { |value| normalized(value) }
   return true if allowed.include?(network_identity)
-  return (city[:own_unknown_lines] || []).include?(name) if network_identity == "unknown"
+  if network_identity == "unknown"
+    # Isolated systems whose OSM relations carry no network/operator tag: there is no
+    # neighbouring metro inside the bbox to confuse them with, so keep their untagged lines.
+    return true if city[:allow_unknown]
+    return (city[:own_unknown_lines] || []).include?(name)
+  end
 
   false
 end
@@ -811,6 +856,20 @@ def build_network(city_id, city, source)
       "servicePatternCount" => service_pattern_count
     }
   end.compact
+
+  # Merge any lines that canonicalised to the same logical ID (e.g. unmerged direction
+  # relations of an untagged line) so logical-line IDs stay unique — the routing graph keys
+  # lines by ID and a duplicate key would crash it.
+  lines = lines.group_by { |line| line["id"] }.map do |_id, group|
+    next group.first if group.length == 1
+    base = group.first
+    base["servicePatterns"] = group.flat_map { |line| line["servicePatterns"] }.uniq
+    base["paths"] = group.flat_map { |line| line["paths"] }
+    base["sourceRelationIDs"] = group.flat_map { |line| line["sourceRelationIDs"] }.uniq.sort
+    base["selectedSourceRelationIDs"] = group.flat_map { |line| line["selectedSourceRelationIDs"] }.uniq.sort
+    base["servicePatternCount"] = base["selectedSourceRelationIDs"].length
+    base
+  end
 
   stations = station_groups.map do |name_key, station|
     next if station["lineIDs"].empty?

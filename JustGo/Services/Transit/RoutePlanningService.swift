@@ -31,7 +31,7 @@ final class RoutePlanningService {
         accessibilityFilter: AccessibilityFilter = .none,
         tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
-        let region = cityService.getCity(byID: city).flatMap { $0.id == "automatic" ? nil : $0 }.map {
+        let region = cityService.getCity(byID: city).map {
             MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 120_000, longitudinalMeters: 120_000)
         }
         async let originPlaces = placeSearchProvider.searchPlaces(keyword: originName, region: region, limit: 8)

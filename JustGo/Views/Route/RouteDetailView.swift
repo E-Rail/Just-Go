@@ -62,7 +62,6 @@ struct RouteDetailView: View {
         }
         .task(id: route.networkCityID ?? appState.selectedCity?.id) {
             guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
-                  cityID != "automatic",
                   let network = await container.metroNetworkProvider.network(for: cityID) else {
                 metroNetworks = []
                 return

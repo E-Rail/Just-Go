@@ -23,10 +23,10 @@ final class StationSearchService {
     func search(keyword: String, city: String) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return await stations(in: city) }
-        let bundledMatches = city == "automatic" ? [] : await stations(in: city).filter {
+        let bundledMatches = await stations(in: city).filter {
             stationSearchText($0).localizedCaseInsensitiveContains(query)
         }
-        let region = cityService.getCity(byID: city).flatMap { $0.id == "automatic" ? nil : $0 }.map {
+        let region = cityService.getCity(byID: city).map {
             MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
         }
         let places: [TransitPlace]
@@ -45,7 +45,7 @@ final class StationSearchService {
                 name: place.name,
                 latitude: place.coordinate.latitude,
                 longitude: place.coordinate.longitude,
-                cityID: city == "automatic" ? "" : city
+                cityID: city
             )
         }
         return (bundledMatches + mapKitMatches).uniqued {
@@ -54,22 +54,12 @@ final class StationSearchService {
     }
 
     func stations(in cityID: String) async -> [Station] {
-        guard cityID != "automatic", !cityID.isEmpty else { return [] }
+        guard !cityID.isEmpty else { return [] }
         return await metroNetworkProvider.stations(in: cityID)
     }
 
     func enrichStations(_ stations: [Station]) async -> [Station] {
         await officialStationData.enrichStations(stations)
-    }
-
-    func browseCityID(requestedCityID: String, near location: CLLocationCoordinate2D?) -> String? {
-        guard requestedCityID == "automatic" else { return requestedCityID.isEmpty ? nil : requestedCityID }
-        guard let location else { return nil }
-        return cityService.getAllCities()
-            .filter { $0.id != "automatic" }
-            .min {
-                location.distance(to: $0.coordinate) < location.distance(to: $1.coordinate)
-            }?.id
     }
 
     func suggestions(keyword: String, city: String, limit: Int = 6) async throws -> [Station] {

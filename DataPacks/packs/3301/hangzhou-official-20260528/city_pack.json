@@ -1763,24 +1763,6 @@
       ]
     },
     {
-      "stationName": "创明路",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
       "stationName": "创景路",
       "stationID": null,
       "accessibility": null,
@@ -6624,59 +6606,6 @@
           "direction": "往彭埠方向",
           "firstTime": null,
           "lastTime": "23:34"
-        }
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
-      "stationName": "火车东站(东广场)",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-        {
-          "lineName": "6号线（枸桔弄-双浦）",
-          "direction": "往枸桔弄方向",
-          "firstTime": "6:24",
-          "lastTime": "23:51"
-        },
-        {
-          "lineName": "6号线（枸桔弄-双浦）",
-          "direction": "往双浦方向",
-          "firstTime": "6:11",
-          "lastTime": "23:02"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "往火车西站方向",
-          "firstTime": "5:41",
-          "lastTime": "23:36"
-        },
-        {
-          "lineName": "19号线",
-          "direction": "往永盛路方向",
-          "firstTime": "6:07",
-          "lastTime": "23:47"
-        },
-        {
-          "lineName": "6号线（枸桔弄-桂花西路）",
-          "direction": "往桂花西路方向",
-          "firstTime": "6:05",
-          "lastTime": "22:52"
-        },
-        {
-          "lineName": "6号线（枸桔弄-桂花西路）",
-          "direction": "往枸桔弄方向",
-          "firstTime": "6:24",
-          "lastTime": "23:51"
         }
       ],
       "stationMaps": [

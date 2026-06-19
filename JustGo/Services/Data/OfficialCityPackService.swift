@@ -418,7 +418,9 @@ private struct OfficialAccessibility: Decodable {
             hasEscalator: hasEscalator,
             hasWheelchairRamp: hasWheelchairRamp,
             hasAccessibleRestroom: hasAccessibleRestroom,
-            isFullyAccessible: hasElevator == true || hasWheelchairRamp == true ? true : nil,
+            isFullyAccessible: hasElevator == true || hasWheelchairRamp == true ? true
+                : hasElevator == false && hasWheelchairRamp == false ? false
+                : nil,
             elevatorLocations: elevatorLocations,
             accessibleEntrances: accessibleEntrances,
             facilityNotes: facilityNotes,

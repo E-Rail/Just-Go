@@ -63,16 +63,16 @@ final class RouteConfidenceService {
         switch route.serviceStatus {
         case .serviceEndedToday:
             score -= 40
-            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+            if let reason = route.serviceStatus.confidenceReason { warnings.append(reason) }
         case .notYetStarted:
             score -= 25
-            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+            if let reason = route.serviceStatus.confidenceReason { warnings.append(reason) }
         case .lastTrainSoon:
             score -= 12
-            route.serviceStatus.confidenceReason.map { warnings.append($0) }
+            if let reason = route.serviceStatus.confidenceReason { warnings.append(reason) }
         case .running:
             if coverage.scheduleConfidence == .official {
-                route.serviceStatus.confidenceReason.map { positives.append($0) }
+                if let reason = route.serviceStatus.confidenceReason { positives.append(reason) }
             }
         case .unknown:
             break

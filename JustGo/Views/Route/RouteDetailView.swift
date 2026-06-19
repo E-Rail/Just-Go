@@ -17,6 +17,7 @@ struct RouteDetailView: View {
     @State var routeReportNote = ""
     @State var routeReportSeverity: AccessibilityReportSeverity = .medium
     @State var metroNetworks: [MetroNetwork] = []
+    @State var selectedTransferSegment: RouteSegment?
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
@@ -50,6 +51,14 @@ struct RouteDetailView: View {
         }
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
+        }
+        .sheet(item: $selectedTransferSegment) { segment in
+            TransferStationSheet(
+                transferSegment: segment,
+                nextTransitSegment: nextTransitSegment(after: segment),
+                cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                crowdControl: route.crowdControl
+            )
         }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
@@ -87,6 +96,11 @@ struct RouteDetailView: View {
 
     var route: Route {
         alternatives.first { $0.id == selectedRouteID } ?? initialRoute
+    }
+
+    func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
+        guard let idx = route.segments.firstIndex(where: { $0.id == transferSegment.id }) else { return nil }
+        return route.segments[(idx + 1)...].first { $0.type.isTransit }
     }
 
     private var routeMapPreview: some View {

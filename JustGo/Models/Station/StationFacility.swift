@@ -77,6 +77,41 @@ enum StationFacilityType: String, Codable, CaseIterable {
         }
     }
 
+    var localizedName: String {
+        switch self {
+        case .elevator:
+            return AppLocalization.text(english: "Elevator", simplified: "电梯", traditional: "電梯")
+        case .escalator:
+            return AppLocalization.text(english: "Escalator", simplified: "扶梯", traditional: "扶梯")
+        case .ramp:
+            return AppLocalization.text(english: "Ramp", simplified: "坡道", traditional: "坡道")
+        case .accessibleRestroom:
+            return AppLocalization.text(english: "Accessible Restroom", simplified: "无障碍卫生间", traditional: "無障礙廁所")
+        case .tactilePath:
+            return AppLocalization.text(english: "Tactile Path", simplified: "盲道", traditional: "盲道")
+        case .audioAnnouncement:
+            return AppLocalization.text(english: "Audio Announcement", simplified: "语音播报", traditional: "語音播報")
+        case .visualDisplay:
+            return AppLocalization.text(english: "Visual Display", simplified: "视觉显示", traditional: "視覺顯示")
+        case .restroom:
+            return AppLocalization.text(english: "Restroom", simplified: "卫生间", traditional: "廁所")
+        case .aed:
+            return AppLocalization.text(english: "AED", simplified: "自动体外除颤器", traditional: "自動體外除顫器")
+        case .serviceCenter:
+            return AppLocalization.text(english: "Service Center", simplified: "客服中心", traditional: "客服中心")
+        case .security:
+            return AppLocalization.text(english: "Security", simplified: "安保", traditional: "安保")
+        case .motherBabyRoom:
+            return AppLocalization.text(english: "Mother & Baby Room", simplified: "母婴室", traditional: "母嬰室")
+        case .staffAssistance:
+            return AppLocalization.text(english: "Staff Assistance", simplified: "工作人员协助", traditional: "工作人員協助")
+        case .wheelchairBoarding:
+            return AppLocalization.text(english: "Wheelchair Boarding", simplified: "轮椅上车", traditional: "輪椅上車")
+        case .general:
+            return AppLocalization.text(english: "General", simplified: "其他", traditional: "其他")
+        }
+    }
+
     var isAccessibilityCritical: Bool {
         switch self {
         case .elevator, .escalator, .ramp, .accessibleRestroom, .tactilePath, .audioAnnouncement, .visualDisplay, .staffAssistance, .wheelchairBoarding:

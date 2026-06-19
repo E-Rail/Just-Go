@@ -12,6 +12,9 @@ final class StationSearchViewModel {
 
     var filter = StationFilter()
 
+    var isEnrichingForFacility = false
+    private var facilityEnrichmentTask: Task<Void, Never>?
+
     private let stationSearchService: StationSearchService
     private let locationService: LocationService
     private let recentSearchesKey = "recentStationSearches"
@@ -79,6 +82,8 @@ final class StationSearchViewModel {
 
     func clearSearch() {
         searchTask?.cancel()
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
         searchText = ""
         unfilteredResults = []
         searchResults = []
@@ -98,6 +103,27 @@ final class StationSearchViewModel {
     func toggleTransferFilter() {
         filter.transferOnly.toggle()
         applyFilters()
+    }
+
+    func setFacilityFilter(_ type: StationFacilityType?) {
+        filter.facilityType = type
+        if type != nil && unfilteredResults.allSatisfy({ $0.facilities.isEmpty }) {
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = true
+            facilityEnrichmentTask = Task { [weak self] in
+                guard let self else { return }
+                let enriched = await stationSearchService.enrichStations(unfilteredResults)
+                guard !Task.isCancelled else { return }
+                unfilteredResults = enriched
+                applyFilters()
+                isEnrichingForFacility = false
+            }
+        } else {
+            applyFilters()
+            if type == nil && unfilteredResults.isEmpty == false {
+                errorMessage = nil
+            }
+        }
     }
 
     func distanceText(for station: Station) -> String? {

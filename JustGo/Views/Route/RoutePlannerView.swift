@@ -17,6 +17,7 @@ struct RoutePlannerView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         citySelector
+                        smartCommuteSection
                         routeInputSection
                         quickTagsSection
                         if !tripMemoryService.savedTrips.isEmpty {

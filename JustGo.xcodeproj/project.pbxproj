@@ -87,6 +87,9 @@
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006B /* Components/Transit/RouteStationTimeline.swift */; };
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
+		A1000070 /* Route/SmartCommuteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070 /* Route/SmartCommuteCard.swift */; };
+		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
+		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +101,9 @@
 		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
 		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
 		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
+		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
+		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
+		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000001 /* JustGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustGoApp.swift; sourceTree = "<group>"; };
 		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A2000003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -303,8 +309,11 @@
 			children = (
 				A2000307 /* Route/ConfidenceFeatureViews.swift */,
 				A2000308 /* Route/LiveGoView.swift */,
+				A2000070 /* Route/SmartCommuteCard.swift */,
+				A2000072 /* Route/TransferStationSheet.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
+				A2000071 /* Map/NetworkLineStatusView.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
@@ -511,6 +520,9 @@
 				A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */,
 				A100003E /* Localization.swift in Sources */,
 				A100006C /* Logging.swift in Sources */,
+				A1000070 /* Route/SmartCommuteCard.swift in Sources */,
+				A1000071 /* Map/NetworkLineStatusView.swift in Sources */,
+				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

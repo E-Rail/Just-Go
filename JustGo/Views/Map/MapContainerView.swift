@@ -6,6 +6,7 @@ struct MapContainerView: View {
     @State private var viewModel: MapViewModel?
     @State private var selectedStation: Station?
     @State private var showCityPicker = false
+    @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
     @State private var isNearbyStationsExpanded = true
     @FocusState private var isSearchFocused: Bool
@@ -24,6 +25,18 @@ struct MapContainerView: View {
                         MetroGeometryAttributionView()
                             .lineLimit(1)
                             .layoutPriority(0)
+                    }
+                    if appState.selectedCity != nil {
+                        Button {
+                            showNetworkLineStatus = true
+                        } label: {
+                            Image(systemName: "tram.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .padding(8)
+                                .background(.black.opacity(0.55), in: Circle())
+                        }
+                        .layoutPriority(1)
                     }
                     mapLocateButton
                         .layoutPriority(1)
@@ -54,6 +67,9 @@ struct MapContainerView: View {
                 get: { appState.selectedCity },
                 set: { appState.selectedCity = $0 }
             ))
+        }
+        .sheet(isPresented: $showNetworkLineStatus) {
+            NetworkLineStatusView(cityID: appState.selectedCity?.id ?? "")
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {

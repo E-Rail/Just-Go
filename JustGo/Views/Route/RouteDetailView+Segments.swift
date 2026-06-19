@@ -111,7 +111,7 @@ extension RouteDetailView {
     }
 
     private func segmentTimelineRow(_ segment: RouteSegment, isLast: Bool) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        let rowContent = HStack(alignment: .top, spacing: 12) {
             VStack {
                 segmentIcon(segment)
                 if !isLast {
@@ -157,6 +157,20 @@ extension RouteDetailView {
             }
 
             Spacer()
+
+            if segment.type == .transfer {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        return Group {
+            if segment.type == .transfer {
+                Button { selectedTransferSegment = segment } label: { rowContent }
+                    .buttonStyle(.plain)
+            } else {
+                rowContent
+            }
         }
     }
 

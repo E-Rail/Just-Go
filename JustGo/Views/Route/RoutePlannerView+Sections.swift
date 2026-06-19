@@ -1,6 +1,40 @@
 import SwiftUI
 
 extension RoutePlannerView {
+    @ViewBuilder
+    var smartCommuteSection: some View {
+        if let (trip, isEvening) = smartCommuteTrip(for: appState.selectedCity?.id ?? "") {
+            SmartCommuteCard(
+                trip: trip,
+                isEvening: isEvening,
+                cityID: appState.selectedCity?.id ?? ""
+            ) {
+                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                viewModel?.useSavedTrip(trip)
+                if isEvening {
+                    viewModel?.swapOriginDestination()
+                }
+            }
+        }
+    }
+
+    private func smartCommuteTrip(for cityID: String) -> (trip: SavedTrip, isEvening: Bool)? {
+        guard !cityID.isEmpty else { return nil }
+        let nowMin = ChinaClock.minutesOfDay(of: Date())
+        let isMorning = nowMin >= 300 && nowMin < 660
+        let isEvening = nowMin >= 960 && nowMin < 1320
+        guard isMorning || isEvening else { return nil }
+        let trip = tripMemoryService.savedTrips
+            .filter { $0.cityID == cityID }
+            .sorted {
+                if $0.useCount != $1.useCount { return $0.useCount > $1.useCount }
+                return ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast)
+            }
+            .first
+        guard let trip else { return nil }
+        return (trip, isEvening)
+    }
+
     var quickTagsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             ScrollView(.horizontal, showsIndicators: false) {

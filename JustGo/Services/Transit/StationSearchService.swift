@@ -112,6 +112,10 @@ final class StationSearchService {
                 matches = matches && station.isTransferStation
             }
 
+            if let facilityType = filter.facilityType {
+                matches = matches && station.facilities.contains { $0.type == facilityType }
+            }
+
             return matches
         }
     }
@@ -137,4 +141,5 @@ struct StationFilter {
     var accessibleOnly: Bool = false
     var elevatorOnly: Bool = false
     var transferOnly: Bool = false
+    var facilityType: StationFacilityType? = nil
 }

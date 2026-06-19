@@ -5,6 +5,7 @@ struct StationSearchView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel: StationSearchViewModel?
     @State private var selectedStation: Station?
+    @State private var showFacilityPicker = false
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -119,34 +120,66 @@ struct StationSearchView: View {
     }
 
     private var filterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                FilterChip(
-                    title: AppLocalization.localized("Accessible"),
-                    icon: "figure.roll",
-                    isSelected: viewModel?.filter.accessibleOnly ?? false
-                ) {
-                    viewModel?.toggleAccessibleFilter()
-                }
+        ZStack(alignment: .trailing) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    FilterChip(
+                        title: AppLocalization.localized("Accessible"),
+                        icon: "figure.roll",
+                        isSelected: viewModel?.filter.accessibleOnly ?? false
+                    ) {
+                        viewModel?.toggleAccessibleFilter()
+                    }
 
-                FilterChip(
-                    title: AppLocalization.localized("Elevator"),
-                    icon: "arrow.up.arrow.down.circle",
-                    isSelected: viewModel?.filter.elevatorOnly ?? false
-                ) {
-                    viewModel?.toggleElevatorFilter()
-                }
+                    FilterChip(
+                        title: AppLocalization.localized("Elevator"),
+                        icon: "arrow.up.arrow.down.circle",
+                        isSelected: viewModel?.filter.elevatorOnly ?? false
+                    ) {
+                        viewModel?.toggleElevatorFilter()
+                    }
 
-                FilterChip(
-                    title: AppLocalization.localized("Transfer"),
-                    icon: "arrow.triangle.2.circlepath",
-                    isSelected: viewModel?.filter.transferOnly ?? false
-                ) {
-                    viewModel?.toggleTransferFilter()
+                    FilterChip(
+                        title: AppLocalization.localized("Transfer"),
+                        icon: "arrow.triangle.2.circlepath",
+                        isSelected: viewModel?.filter.transferOnly ?? false
+                    ) {
+                        viewModel?.toggleTransferFilter()
+                    }
+
+                    FilterChip(
+                        title: viewModel?.filter.facilityType?.localizedName
+                            ?? AppLocalization.text(english: "Facility", simplified: "设施", traditional: "設施"),
+                        icon: viewModel?.filter.facilityType?.iconName ?? "building.2.crop.circle",
+                        isSelected: viewModel?.filter.facilityType != nil
+                    ) {
+                        showFacilityPicker = true
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+            }
+
+            if viewModel?.isEnrichingForFacility == true {
+                ProgressView()
+                    .padding(.trailing, 12)
+            }
+        }
+        .confirmationDialog(
+            AppLocalization.text(english: "Filter by Facility", simplified: "按设施筛选", traditional: "按設施篩選"),
+            isPresented: $showFacilityPicker,
+            titleVisibility: .visible
+        ) {
+            ForEach(StationFacilityType.allCases.filter { $0 != .general }, id: \.self) { type in
+                Button(type.localizedName) {
+                    viewModel?.setFacilityFilter(type)
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            if viewModel?.filter.facilityType != nil {
+                Button(AppLocalization.text(english: "Clear Filter", simplified: "清除筛选", traditional: "清除篩選"), role: .destructive) {
+                    viewModel?.setFacilityFilter(nil)
+                }
+            }
         }
     }
 
@@ -174,6 +207,19 @@ struct StationSearchView: View {
                     Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
                 } description: {
                     Text(AppLocalization.localized("Try a different search term"))
+                }
+            } else if viewModel?.filter.facilityType != nil && viewModel?.isEnrichingForFacility == false {
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(english: "No Stations Found", simplified: "未找到站点", traditional: "未找到站點"),
+                        systemImage: "building.2"
+                    )
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Facility data requires the city data pack to be loaded.",
+                        simplified: "设施数据需要城市数据包。",
+                        traditional: "設施資料需要城市資料包。"
+                    ))
                 }
             } else if let message = viewModel?.errorMessage {
                 ContentUnavailableView {

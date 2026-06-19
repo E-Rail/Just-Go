@@ -167,7 +167,6 @@ final class ComfortForecastService {
     }
 }
 
-
 /// Stateless builder that turns a `Route` into an ordered Live "Go" plan using
 /// only `route.segments` (no schedule/time data needed).
 struct LiveGoTripBuilder {

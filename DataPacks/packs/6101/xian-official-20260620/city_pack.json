@@ -1,0 +1,6205 @@
+{
+  "schemaVersion": 1,
+  "cityID": "6101",
+  "version": "xian-official-20260620",
+  "generatedAt": "2026-06-20T10:35:06Z",
+  "sourceURLs": [
+    "https://www.xianrail.com/",
+    "https://www.xianrail.com/pas-gateway-api/api-basicdata/lineStation/findLineAndStation",
+    "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+  ],
+  "capabilities": {
+    "accessibility": "source_pending",
+    "schedules": "official_static",
+    "liveArrivals": "schedule_only",
+    "stationMaps": "source_pending"
+  },
+  "liveProvider": "schedule_only",
+  "sourceAttribution": "西安地铁官方数据",
+  "stations": [
+    {
+      "stationName": "万寿南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "万寿路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:35",
+          "lastTime": "00:05"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:09",
+          "lastTime": "23:39"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "丈八一路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "丈八六路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "丈八北路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:13",
+          "lastTime": "23:18"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:58",
+          "lastTime": "23:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "丈八四路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "三桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:02",
+          "lastTime": "23:32"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:41",
+          "lastTime": "00:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "三爻",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:39",
+          "lastTime": "00:29"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:07",
+          "lastTime": "23:57"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "上林路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东三岔",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东仪路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东兆余",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东等驾坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东长安街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:07",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:54",
+          "lastTime": "23:55"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "东马坊",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "中华西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "丰庆公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "五路口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:25",
+          "lastTime": "23:55"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:19",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:33",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:29",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "井上村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "交通大学·兴庆宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "仁村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "体育场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:30",
+          "lastTime": "00:20"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:17",
+          "lastTime": "00:07"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "何家营",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "余家寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:43",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:19",
+          "lastTime": "23:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "保税区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "09:21",
+          "lastTime": "00:16"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "元鼎路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "光化门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "八里村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "公园南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "军庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤凰池",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤城九路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:56",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:06",
+          "lastTime": "23:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤城五路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:09",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:38",
+          "lastTime": "00:28"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤城十二路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:59",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:04",
+          "lastTime": "23:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤城十路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "凤栖原",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:42",
+          "lastTime": "00:32"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:05",
+          "lastTime": "23:55"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "创新港",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "创新港东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "务庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "07:02",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:09",
+          "lastTime": "23:09"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "劳动路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:15",
+          "lastTime": "23:45"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:28",
+          "lastTime": "23:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:23",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:21",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:21",
+          "lastTime": "00:11"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:26",
+          "lastTime": "00:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北槐",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北池头",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:30",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:40",
+          "lastTime": "23:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北苑",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:02",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:45",
+          "lastTime": "00:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北辰",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "北辰东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "半坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:42",
+          "lastTime": "00:12"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:02",
+          "lastTime": "23:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "华清池",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "南稍门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:28",
+          "lastTime": "00:18"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:19",
+          "lastTime": "00:09"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "卫星测控中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "双寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "07:07",
+          "lastTime": "00:12"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:04",
+          "lastTime": "23:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "吉祥村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:23",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:48",
+          "lastTime": "23:48"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "后卫寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "08:17",
+          "lastTime": "00:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "含元殿",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:36",
+          "lastTime": "23:36"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:25",
+          "lastTime": "23:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "和平门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:28",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:34",
+          "lastTime": "23:34"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "咸宁路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:37",
+          "lastTime": "23:42"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:33",
+          "lastTime": "23:33"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "咸阳西站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "团结村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "国际港务区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "07:05",
+          "lastTime": "00:10"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:06",
+          "lastTime": "23:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "土门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "复兴大道北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "复兴大道南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大唐不夜城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大唐芙蓉园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:18",
+          "lastTime": "23:18"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:43",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大唐西市",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大差市",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:30",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:31",
+          "lastTime": "23:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大明宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:41",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:21",
+          "lastTime": "23:22"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:14",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:33",
+          "lastTime": "00:23"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:38",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:23",
+          "lastTime": "23:24"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大明宫北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:41",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:21",
+          "lastTime": "23:22"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大明宫西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:14",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:33",
+          "lastTime": "00:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大雁塔",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:22",
+          "lastTime": "23:22"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:40",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:28",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:43",
+          "lastTime": "23:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "大风阁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "太乙路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "太白南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:20",
+          "lastTime": "23:25"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:50",
+          "lastTime": "23:50"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "奥体中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "安化门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "安定门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "安谷",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "安远门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:18",
+          "lastTime": "00:08"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:29",
+          "lastTime": "00:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "宝泉路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "寒窑",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "小寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:25",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:46",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:32",
+          "lastTime": "00:22"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:15",
+          "lastTime": "00:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "山门口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "崇皇",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "市中医医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:50",
+          "lastTime": "23:50"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:12",
+          "lastTime": "23:13"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "市第三医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "常宁宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "常青路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:47",
+          "lastTime": "23:47"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:15",
+          "lastTime": "23:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "帽珥冢",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "幸福林带北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "广泰门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:51",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:19",
+          "lastTime": "23:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "广济街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "府君庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "康复路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:30",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:14",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "延兴门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:36",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:35",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "延平门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:15",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:55",
+          "lastTime": "23:55"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "建筑科技大学·李家村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:26",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:36",
+          "lastTime": "23:36"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "开远门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:13",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:31",
+          "lastTime": "00:01"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "户县",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "摆旗寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "文教园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "文景山公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "文景路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:54",
+          "lastTime": "23:54"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:08",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "文艺路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "斗门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "新寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "新开门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "新筑",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "07:09",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:02",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "昭慧广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "景家堡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "景曜门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "曲江池西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:16",
+          "lastTime": "23:16"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:46",
+          "lastTime": "23:46"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "月登阁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "朝阳门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:27",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:16",
+          "lastTime": "23:46"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "木塔寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "木塔寺西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "未央湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "机场(T5)",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "机场西(T1、T2、T3)",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "杏王",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "杨官寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "枣园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:08",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:36",
+          "lastTime": "00:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "桃花潭",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:54",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:16",
+          "lastTime": "23:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "桥梓口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "植物园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "榆楚",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "樱花广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "欢乐谷",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "水流",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "永宁门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:26",
+          "lastTime": "00:16"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:21",
+          "lastTime": "00:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "汉城南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "汉城路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:10",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:34",
+          "lastTime": "00:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "沣东城市广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "沣东自贸园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "沣河森林公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "沣西文化公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "泾渭半岛",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "洒金桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:20",
+          "lastTime": "23:50"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:24",
+          "lastTime": "23:54"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "洪庆",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "浐河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:40",
+          "lastTime": "00:10"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:04",
+          "lastTime": "23:34"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "浐灞中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:56",
+          "lastTime": "00:01"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:14",
+          "lastTime": "23:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "渭河南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "港务大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "灞柳二路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "玉祥门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:18",
+          "lastTime": "23:48"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:26",
+          "lastTime": "23:56"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "王寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "理工大曲江校区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "甘家寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "田家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "田王",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "电视塔",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "白家口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "白马河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "百花村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:45",
+          "lastTime": "23:45"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:17",
+          "lastTime": "23:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "皂河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:05",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:38",
+          "lastTime": "00:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "皇子坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "省人民医院·黄雁村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "省体育馆",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "石家街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:46",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:25",
+          "lastTime": "23:25"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "石桥立交",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "祝村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "祝村西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "神舟大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "科技二路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "科技路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:18",
+          "lastTime": "23:23"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:53",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "秦创原中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "秦宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "秦汉新城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "秦陵西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "穆将王",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "空港新城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "米家崖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "紫霞三路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "红会医院北区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "红庙坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "红旗厂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "纺二路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "纺六路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "纺织城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "09:38",
+          "lastTime": "00:15"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "细柳",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "细柳营",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "缪家寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "翱翔小镇",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "胡家庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:44",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:27",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "航天东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:02",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:59",
+          "lastTime": "00:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "航天城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:44",
+          "lastTime": "00:34"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:03",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "航天大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:11",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:50",
+          "lastTime": "23:51"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "航天新城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "07:02",
+          "lastTime": "00:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "艺术中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "芷阳广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "草滩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "行政中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:07",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:40",
+          "lastTime": "00:30"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:52",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:10",
+          "lastTime": "23:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西北工业大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西咸大厦",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西堡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安东站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安北站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安南站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安国际医学中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安国际足球中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安工大·武德路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安科技大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:24",
+          "lastTime": "23:24"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:38",
+          "lastTime": "23:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西安站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西工程大·西科大",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西电科大南校区·未来之瞳",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西窑头",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西等驾坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西花园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "西部大道(西太路口)",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "诗经里",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "贺韶",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "辛家庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:48",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:22",
+          "lastTime": "23:22"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "边家村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "通化门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:32",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:12",
+          "lastTime": "23:42"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:42",
+          "lastTime": "23:47"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:29",
+          "lastTime": "23:29"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "造字台",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "邮电大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "郭杜",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "郭杜西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "金光门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "金滹沱",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:13",
+          "lastTime": "23:13"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:48",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "钓台",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "钟楼",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:23",
+          "lastTime": "00:13"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:24",
+          "lastTime": "00:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "银桥大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "镐京",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "长乐公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:40",
+          "lastTime": "23:45"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:31",
+          "lastTime": "23:31"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "长乐坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "01号线",
+          "direction": "纺织城方向",
+          "firstTime": "06:37",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "01号线",
+          "direction": "咸阳西站方向",
+          "firstTime": "06:07",
+          "lastTime": "23:37"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "长乐门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "长安广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "长陵",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "阿房宫南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "陈杨寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "陕西中医药大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "雁翔路北口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "雁鸣湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "霸城门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "青少年中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "青龙寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:33",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:38",
+          "lastTime": "23:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "韦曲南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "09:00",
+          "lastTime": "00:38"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:00",
+          "lastTime": "23:50"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "韩森寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "飞天路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "04号线",
+          "direction": "西安北站方向",
+          "firstTime": "06:09",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "04号线",
+          "direction": "航天新城方向",
+          "firstTime": "06:52",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "香湖湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:59",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "06:12",
+          "lastTime": "23:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "香王",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "马腾空",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "高桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "鱼化寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "03号线",
+          "direction": "保税区方向",
+          "firstTime": "06:10",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "03号线",
+          "direction": "鱼化寨方向",
+          "firstTime": "08:05",
+          "lastTime": "00:01"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "鹦鹉寺公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "鹿苑大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "黄渠头",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    },
+    {
+      "stationName": "龙首原",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "02号线",
+          "direction": "常宁宫方向",
+          "firstTime": "06:16",
+          "lastTime": "00:06"
+        },
+        {
+          "lineName": "02号线",
+          "direction": "草滩方向",
+          "firstTime": "06:31",
+          "lastTime": "00:21"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+      ]
+    }
+  ]
+}

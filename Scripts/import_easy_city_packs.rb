@@ -63,6 +63,25 @@ GUANGZHOU_SOURCE_URLS = [
   "#{GUANGZHOU_API_BASE}/app-map/station/getDevice/体育西路"
 ].freeze
 
+XIAN_LINE_STATION_URL = "https://www.xianrail.com/pas-gateway-api/api-basicdata/lineStation/findLineAndStation"
+XIAN_STATION_INFO_URL = "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
+XIAN_LINE_IDS = %w[01 02 03 04 05 06 08 09 10 14 15 16 50].freeze
+XIAN_SOURCE_URLS = [
+  "https://www.xianrail.com/",
+  XIAN_LINE_STATION_URL,
+  XIAN_STATION_INFO_URL
+].freeze
+
+SUZHOU_STATION_INFO_URL = "https://www.sz-mtr.com/service/guide/map/javascript/stationInfo_zh.js"
+SUZHOU_TIME_URL = "https://www.sz-mtr.com/service/guide/map/javascript/szmtrTime.js"
+SUZHOU_SOURCE_URLS = [
+  "https://www.sz-mtr.com/",
+  SUZHOU_STATION_INFO_URL,
+  SUZHOU_TIME_URL
+].freeze
+
+CHONGQING_SCHEDULE_URL = "https://www.cqmetro.cn/smbsj/json/data.json"
+
 def http_request(uri, request)
   attempts = 0
   begin
@@ -132,6 +151,18 @@ def post_guangzhou_api(path)
   raise "Guangzhou API failed #{path}" if json.key?("success") && !json["success"]
 
   json["businessObject"]
+end
+
+def post_json_bare(url, payload)
+  uri = URI(url)
+  request = Net::HTTP::Post.new(uri)
+  request["User-Agent"] = "Mozilla/5.0"
+  request["Content-Type"] = "application/json"
+  request.body = JSON.generate(payload)
+  response = http_request(uri, request)
+  raise "Fetch failed #{url}: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+  JSON.parse(response.body.force_encoding("UTF-8"))
 end
 
 def extract_js_object(script, variable_name)
@@ -618,10 +649,189 @@ def import_guangzhou
   )
 end
 
+def import_xian
+  records = {}
+  fetched_ids = {}
+
+  # The API returns all lines regardless of lineId; one call is sufficient.
+  line_data = post_json_bare(XIAN_LINE_STATION_URL, { "lineId" => "01" })
+  Array(line_data).each do |line|
+    line_name = line["label"].to_s.strip
+    Array(line["children"]).each do |child|
+      station_id = child["value"].to_s
+      next if fetched_ids.key?(station_id)
+
+      fetched_ids[station_id] = true
+      station_name = normalize_station_name(child["label"])
+      record = station_record(records, station_name)
+      add_source(record, XIAN_STATION_INFO_URL)
+
+      begin
+        info = JSON.parse(fetch_utf8("#{XIAN_STATION_INFO_URL}?stationId=#{station_id}"))
+        Array(info["trainTime"]).each do |train|
+          info_line_name = train["lineName"].to_s.strip
+          info_line_name = line_name if info_line_name.empty?
+          Array(train["timeList"]).each do |schedule|
+            add_schedule(record, info_line_name, schedule["direction"], schedule["start"], schedule["end"])
+          end
+        end
+      rescue StandardError => error
+        warn "Skipping Xi'an station #{station_name} #{station_id}: #{error.message}"
+      end
+    end
+  end
+
+  write_pack(
+    city_id: "6101",
+    version: "xian-official-#{VERSION_DATE}",
+    source_urls: XIAN_SOURCE_URLS,
+    capabilities: {
+      "accessibility" => "source_pending",
+      "schedules" => "official_static",
+      "liveArrivals" => "schedule_only",
+      "stationMaps" => "source_pending"
+    },
+    live_provider: "schedule_only",
+    source_attribution: "西安地铁官方数据",
+    records: records
+  )
+end
+
+def parse_suzhou_time(value)
+  return nil if blank_value?(value)
+
+  t = value.to_s.split("#").first.strip
+  usable_time?(t) ? t : nil
+end
+
+def import_suzhou
+  records = {}
+
+  station_js = fetch_utf8(SUZHOU_STATION_INFO_URL)
+  station_names = {}
+  station_js.scan(/szmtr\.stations\["([^"]+)"\]\s*=\s*\{[^}]*?name:\s*"([^"]+)"/) do |id, name|
+    next if name.empty?
+    normalized = normalize_station_name(name)
+    station_names[id] = normalized
+    # Prefixed IDs like "s23_0272" are used as direction endpoints via the bare numeric form "0272"
+    if (numeric_id = id.sub(/\As\d+_/, "")) != id
+      station_names[numeric_id] ||= normalized
+    end
+  end
+
+  time_js = fetch_utf8(SUZHOU_TIME_URL)
+  time_js.each_line do |line|
+    m = line.match(/szmtr\.metroTimeArray\['([^']+)'\]\s*=\s*new Array\((.+)\);/)
+    next unless m
+
+    station_id = m[1]
+    array_content = m[2]
+    station_name = station_names[station_id]
+    next if blank_value?(station_name)
+
+    begin
+      entries = JSON.parse("[#{array_content}]")
+    rescue JSON::ParserError => error
+      warn "Skipping Suzhou station #{station_id}: #{error.message}"
+      next
+    end
+
+    record = station_record(records, station_name)
+    add_source(record, SUZHOU_TIME_URL)
+
+    Array(entries).each do |entry|
+      time = entry["Time"]
+      next unless time
+
+      line_name = "#{entry["lineID"].to_s.to_i}号线"
+      down_dir_name = station_names[time["downDirectionID"]] || time["downDirectionID"]
+      up_dir_name = station_names[time["upDirectionID"]] || time["upDirectionID"]
+
+      add_schedule(record, line_name, "开往#{down_dir_name}",
+                   parse_suzhou_time(time["down_begintime"]),
+                   parse_suzhou_time(time["down_endtime"]))
+      add_schedule(record, line_name, "开往#{up_dir_name}",
+                   parse_suzhou_time(time["up_begintime"]),
+                   parse_suzhou_time(time["up_endtime"]))
+    end
+  end
+
+  write_pack(
+    city_id: "3205",
+    version: "suzhou-official-#{VERSION_DATE}",
+    source_urls: SUZHOU_SOURCE_URLS,
+    capabilities: {
+      "accessibility" => "source_pending",
+      "schedules" => "official_static",
+      "liveArrivals" => "schedule_only",
+      "stationMaps" => "source_pending"
+    },
+    live_provider: "schedule_only",
+    source_attribution: "苏州轨道交通官方数据",
+    records: records
+  )
+end
+
+def extract_cq_cell(cell_value)
+  cell_value.to_s
+    .sub(/\(\d+,\s*\d+\)\s*$/, "")
+    .gsub(/[↓↑]/, "")
+    .strip
+end
+
+def import_chongqing
+  records = {}
+  data = JSON.parse(fetch_utf8(CHONGQING_SCHEDULE_URL))
+
+  Array(data).each do |line|
+    line_name = line["lineName"].to_s.strip
+    rows = Array(line["scheduls"])
+    next if rows.length < 4
+
+    # Row index 2 contains direction terminal names in col2 (↓) and col3 (↑)
+    dir_row = rows[2]
+    dir1 = extract_cq_cell(dir_row["col2"]).sub(/\A开?往/, "")
+    dir2 = extract_cq_cell(dir_row["col3"]).sub(/\A开?往/, "")
+
+    rows[3..].each do |row|
+      station_name = extract_cq_cell(row["col1"])
+      next if blank_value?(station_name) || station_name.include?("站点")
+
+      first_down = extract_cq_cell(row["col2"])
+      first_up   = extract_cq_cell(row["col3"])
+      last_down  = extract_cq_cell(row["col4"])
+      last_up    = extract_cq_cell(row["col5"])
+
+      record = station_record(records, station_name)
+      add_source(record, CHONGQING_SCHEDULE_URL)
+      add_schedule(record, line_name, "开往#{dir1}", first_down, last_down) unless blank_value?(dir1)
+      add_schedule(record, line_name, "开往#{dir2}", first_up,   last_up)   unless blank_value?(dir2)
+    end
+  end
+
+  write_pack(
+    city_id: "5000",
+    version: "chongqing-official-#{VERSION_DATE}",
+    source_urls: [CHONGQING_SCHEDULE_URL],
+    capabilities: {
+      "accessibility" => "source_pending",
+      "schedules" => "official_static",
+      "liveArrivals" => "schedule_only",
+      "stationMaps" => "source_pending"
+    },
+    live_provider: "schedule_only",
+    source_attribution: "重庆轨道交通官方数据",
+    records: records
+  )
+end
+
 import_shanghai
 import_guangzhou
 import_shenzhen
 import_chengdu
 import_hangzhou
+import_xian
+import_suzhou
+import_chongqing
 
 system("ruby", File.join(__dir__, "generate_city_pack_manifest.rb"), exception: true)

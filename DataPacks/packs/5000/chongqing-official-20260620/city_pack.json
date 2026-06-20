@@ -1,0 +1,9197 @@
+{
+  "schemaVersion": 1,
+  "cityID": "5000",
+  "version": "chongqing-official-20260620",
+  "generatedAt": "2026-06-20T10:35:08Z",
+  "sourceURLs": [
+    "https://www.cqmetro.cn/smbsj/json/data.json"
+  ],
+  "capabilities": {
+    "accessibility": "source_pending",
+    "schedules": "official_static",
+    "liveArrivals": "schedule_only",
+    "stationMaps": "source_pending"
+  },
+  "liveProvider": "schedule_only",
+  "sourceAttribution": "重庆轨道交通官方数据",
+  "stations": [
+    {
+      "stationName": "2026年端午假期首末班时刻表",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "七星岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:09",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "00:01"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:34",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:34",
+          "lastTime": "00:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "万寿路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:34",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:33",
+          "lastTime": "00:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "三亚湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:33",
+          "lastTime": "23:34"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:34"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "三板溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:14",
+          "lastTime": "00:09"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:08",
+          "lastTime": "23:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "上新街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:05",
+          "lastTime": "23:17"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:02",
+          "lastTime": "00:12"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:20",
+          "lastTime": "23:47"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:12",
+          "lastTime": "00:25"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "上桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:17",
+          "lastTime": "00:24"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "上浩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:10",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "00:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "上湾路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:43",
+          "lastTime": "23:48"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": "00:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "两路口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:11",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:06",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:09",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "中央公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:34",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:33",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "中央公园东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:34",
+          "lastTime": "00:03"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:31",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:35",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "中央公园西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:36",
+          "lastTime": "23:06"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "00:17"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:31",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "中梁山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:31",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:33",
+          "lastTime": "23:09"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "临江门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "00:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "丹鹤",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:38",
+          "lastTime": "00:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "举人坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:08",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "九公里",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:09",
+          "lastTime": "22:50"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:14",
+          "lastTime": "23:52"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "九曲河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:07",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:09",
+          "lastTime": "23:31"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "九龙园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "江跳线(市郊铁路)",
+          "direction": "开往06:30",
+          "firstTime": "06:38",
+          "lastTime": "22:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "二郎",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:14",
+          "lastTime": "00:16"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:18",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "五里店",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:34",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:07",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:14",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "享堂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "江跳线(市郊铁路)",
+          "direction": "开往06:30",
+          "firstTime": "06:48",
+          "lastTime": "22:48"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "人和",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:35",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "仁济",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:17",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "00:22"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "从岩寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:37",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "伏牛溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:33",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:30",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "体育公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:19",
+          "lastTime": "23:17"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:12",
+          "lastTime": "23:56"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "何家梁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:38",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "佛图关",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:35",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:47"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "保税港",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:35",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:29"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:17",
+          "lastTime": "23:29"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:03",
+          "lastTime": "23:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "光电园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:01",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:04",
+          "lastTime": "23:42"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "八公里",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:02",
+          "lastTime": "22:55"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:09",
+          "lastTime": "23:47"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "六公里",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:07",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:04",
+          "lastTime": "23:42"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "兰桂大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "00:01"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:33",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "兰花路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": null,
+          "lastTime": "00:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "兴科大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:35",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:13"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "冉家坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:31",
+          "lastTime": "23:36"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "23:47"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:05",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:01",
+          "lastTime": "23:45"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:11",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "23:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "凤西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:34",
+          "lastTime": "23:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "凤鸣山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:19",
+          "lastTime": "00:27"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:15",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "刘家台",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:41"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "刘家坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:54"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:40",
+          "lastTime": "23:10"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "刘家坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:01",
+          "lastTime": "00:17"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:15",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "刘家院子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:32",
+          "lastTime": "22:54"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:30",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "动步公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:13",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:13",
+          "lastTime": "00:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "动物园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:29"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:33",
+          "lastTime": "23:33"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "化龙桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:35",
+          "lastTime": "23:16"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:36",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "北碚",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:03",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "半山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:40",
+          "lastTime": "00:11"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "华岩中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:34",
+          "lastTime": "00:20"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:33",
+          "lastTime": "23:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "华岩寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:35",
+          "lastTime": "00:06"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:35",
+          "lastTime": "23:17"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "华成路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:38",
+          "lastTime": "00:09"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "23:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "华新街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:02",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:07",
+          "lastTime": "23:22"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "华龙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:11",
+          "lastTime": "00:19"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:15",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "南坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:02",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "南桥寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:16",
+          "lastTime": "23:14"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:15",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "南湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:12",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:12",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "双凤桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:18",
+          "lastTime": "23:03"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:03",
+          "lastTime": "23:13"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "双碑",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:04",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "23:24"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "双福",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "江跳线(市郊铁路)",
+          "direction": "开往06:30",
+          "firstTime": "06:43",
+          "lastTime": "22:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "双龙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:06",
+          "lastTime": "00:03"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "22:36"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "后堡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:31",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "向家岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:09",
+          "lastTime": "00:12"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:01",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "和睦路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:27"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:56"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "唐家沱",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:00",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:00",
+          "lastTime": "23:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "唐家院子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:15",
+          "lastTime": "23:32"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:10"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "嘉州路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:04",
+          "lastTime": "23:16"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:16",
+          "lastTime": "00:11"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:10",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "四公里",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:10",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:15",
+          "lastTime": null
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "四川美术学院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:19",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:10",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "回兴",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:03",
+          "lastTime": "00:01"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "22:39"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "园博中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:16"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "00:07"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "园博园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:05",
+          "lastTime": "22:48"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "国博中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:33",
+          "lastTime": "22:43"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:32",
+          "lastTime": "22:51"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "土湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:39",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:34",
+          "lastTime": "00:01"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "圣泉寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "复兴",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:34",
+          "lastTime": "22:34"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "复盛",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:12",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:10",
+          "lastTime": "23:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大剧院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "23:23"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:04",
+          "lastTime": "00:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:17",
+          "lastTime": "23:14"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:18"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大堰村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:32",
+          "lastTime": "23:32"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:37",
+          "lastTime": "23:31"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大学城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:10",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:05",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大山村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "22:41"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:23",
+          "lastTime": "00:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大庆村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:09",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:23",
+          "lastTime": "00:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大江",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:38",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大渡口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大溪沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:36",
+          "lastTime": "23:06"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:34",
+          "lastTime": "23:56"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大石坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:36",
+          "lastTime": "23:42"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:07",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:25",
+          "lastTime": "00:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大礼堂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:13"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": "00:13"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大竹林",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:50"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:15",
+          "lastTime": "23:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:22",
+          "lastTime": "22:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "大龙山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:33",
+          "lastTime": "23:39"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "23:47"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "天堂堡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:36",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "天星桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:12",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:16",
+          "lastTime": "23:41"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "天梨路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "00:07"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "太平冲",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:08",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:02",
+          "lastTime": "23:46"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "头塘",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:35",
+          "lastTime": "23:32"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:14",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:06",
+          "lastTime": "00:01"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "奥体中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:06",
+          "lastTime": "23:06"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:24",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:10",
+          "lastTime": "00:08"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:15",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "学堂湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:03",
+          "lastTime": "22:39"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:26",
+          "lastTime": "00:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "宝圣湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:33",
+          "lastTime": "23:54"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "富华路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "23:13"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:57"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "寸滩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:21",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:00",
+          "lastTime": "23:54"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "小什字",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:04",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:05",
+          "lastTime": "00:06"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "00:09"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "小龙坎",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:37",
+          "lastTime": "23:06"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:36",
+          "lastTime": "00:03"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:06",
+          "lastTime": "23:28"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:05",
+          "lastTime": "23:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "尖顶坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:00",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:02",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "岔路口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:06",
+          "lastTime": "22:48"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:17",
+          "lastTime": "23:54"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "工贸",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:04",
+          "lastTime": "23:10"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:33"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "巴山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:35",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:31",
+          "lastTime": "23:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "巴滨路湿地公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:33",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:32",
+          "lastTime": "23:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "平安",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:38",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "幸福广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:36",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "23:50"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "庆隆",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:29",
+          "lastTime": "22:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "康庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:13",
+          "lastTime": "23:36"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "建桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:50"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "弹子石",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:19",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "00:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "彩云湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:11",
+          "lastTime": "00:13"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:21",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "微电园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:03",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:12",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "忠恕沱",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:39"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "思源",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:36",
+          "lastTime": "22:57"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:37",
+          "lastTime": "22:37"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "悦来",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:35",
+          "lastTime": "22:45"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:30",
+          "lastTime": "22:49"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:33",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "悦港北路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "悦港大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "00:21"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "新山村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:33",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:21"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "春华大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:59"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:10"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "普福",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:24",
+          "lastTime": "00:20"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:09",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "曹家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:06",
+          "lastTime": "23:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "曾家岩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:15"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:38",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:54"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "朝天门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:02",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "李子坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:33",
+          "lastTime": "23:13"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "李家坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:38",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:33",
+          "lastTime": "23:50"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "李家沱大桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:25",
+          "lastTime": "23:25"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:05",
+          "lastTime": "23:24"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "杨公桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:02",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "杨家坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:11",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:18",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:35",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:35",
+          "lastTime": "23:36"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "果园物流枢纽",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:00",
+          "lastTime": "23:55"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:22",
+          "lastTime": "23:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "桃花桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:28",
+          "lastTime": "23:03"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:20",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "桐梓林",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:27",
+          "lastTime": "00:22"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:05",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "椿萱大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:34",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "00:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "欢乐谷",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:32",
+          "lastTime": "22:32"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:33",
+          "lastTime": "23:01"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "歇台子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:03",
+          "lastTime": "23:03"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:26",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:35",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:32",
+          "lastTime": "23:34"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:21",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:05",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "民安大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:07",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:13",
+          "lastTime": "00:08"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:18",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:13",
+          "lastTime": "00:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "民心佳园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:33",
+          "lastTime": "00:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "江北城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "23:31"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:34",
+          "lastTime": "23:39"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:04",
+          "lastTime": "23:25"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:02",
+          "lastTime": "00:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "江北机场T2航站楼",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:38",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": null
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "江北机场T3航站楼",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:35",
+          "lastTime": "23:48"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:48"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "江津高铁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "江跳线(市郊铁路)",
+          "direction": "开往06:30",
+          "firstTime": "06:35",
+          "lastTime": "22:52"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "沙坪坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:34",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "00:05"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:03",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:14",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:13",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "沙河坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:30",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "河边",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:16",
+          "lastTime": "22:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "洪湖东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:16",
+          "lastTime": "23:24"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "00:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "海峡路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:14",
+          "lastTime": "00:01"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "海棠溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:12",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:12",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "涂山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:21",
+          "lastTime": "23:42"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:13",
+          "lastTime": "00:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "清溪河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:30",
+          "lastTime": "22:51"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:32",
+          "lastTime": "22:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "渝北广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "渝鲁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:11",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:17",
+          "lastTime": "00:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "港城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:26",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:06",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "湖霞街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:35",
+          "lastTime": "00:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "溉澜溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "滩子口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:14",
+          "lastTime": "23:14"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:15",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "烈士墓",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:04",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:08",
+          "lastTime": "23:33"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "牛角沱",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:31",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:18"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:25"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "状元碑",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "00:22"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:03",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "狮子坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:17",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:07"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "玉带山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:02",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:31",
+          "lastTime": "00:26"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:13",
+          "lastTime": "23:10"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:18",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "玉河沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:13"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:33",
+          "lastTime": "00:10"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "王家庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:38",
+          "lastTime": "22:48"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:35",
+          "lastTime": "22:46"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "环山公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:40"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "璧城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:13",
+          "lastTime": "22:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "璧山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:03",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "甘悦大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:36",
+          "lastTime": "00:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "电厂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:21",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:08",
+          "lastTime": "23:28"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "白居寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:38",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:32",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:32",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:37",
+          "lastTime": "23:07"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "百乐园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:31",
+          "lastTime": "23:06"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:17",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "盘溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:04",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:28",
+          "lastTime": "00:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石井坡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:00",
+          "lastTime": "23:39"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:03",
+          "lastTime": "23:28"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石坪桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:09",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:21",
+          "lastTime": "23:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石新路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:55"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:33",
+          "lastTime": "23:28"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石林寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "江跳线(市郊铁路)",
+          "direction": "开往06:30",
+          "firstTime": "06:32",
+          "lastTime": "22:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石桥铺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:30",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:31"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:24",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:03",
+          "lastTime": "23:47"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石河清",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:09",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:13",
+          "lastTime": "23:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石油路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:19",
+          "lastTime": "23:17"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:07",
+          "lastTime": "23:51"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石盘河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:40",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:33",
+          "lastTime": "23:24"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石船",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:30",
+          "lastTime": "00:26"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:02",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "石马河立交",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "碧津",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "00:07"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "22:32"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:15",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "磁器口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:06",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:06",
+          "lastTime": "23:31"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "礼嘉",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:30",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:10",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:05",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "科创新城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:33",
+          "lastTime": "22:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "空港广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:20",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:01",
+          "lastTime": "23:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "童家院子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:41"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "端午假期首末班时刻表",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "红土地",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:04",
+          "lastTime": "23:58"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "红岩坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:32",
+          "lastTime": "22:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "红岩村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:35",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:11"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:59"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "红旗河沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:04",
+          "lastTime": "23:36"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:07",
+          "lastTime": "23:25"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:17"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "罗家坝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:15",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "翠云",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:03",
+          "lastTime": "23:54"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "22:46"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "花卉园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:00",
+          "lastTime": "23:12"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:20",
+          "lastTime": "00:15"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:38"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:02",
+          "lastTime": "23:50"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "花溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:03",
+          "lastTime": "22:45"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:20",
+          "lastTime": "23:57"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "花溪工业园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:30",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:00",
+          "lastTime": "23:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "花石沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "茄子溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:35",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:30",
+          "lastTime": "23:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "茶园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "莲花",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:17",
+          "lastTime": "23:14"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:10",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "蔡家",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:07",
+          "lastTime": "00:10"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:04",
+          "lastTime": "23:17"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "蚂蝗梁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:40",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:48"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "袁家岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:21"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:32",
+          "lastTime": "23:41"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "西南大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:03",
+          "lastTime": "00:25"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "23:02"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "观月路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:15",
+          "lastTime": "23:12"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:04"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "观音桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:23"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:30",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:04",
+          "lastTime": "23:22"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:04",
+          "lastTime": "23:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "谢家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:11",
+          "lastTime": "00:05"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:18",
+          "lastTime": null
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:32",
+          "lastTime": "23:24"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:38"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "赖家桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:00",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "23:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "跳磴",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:40",
+          "lastTime": "23:47"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:32",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "跳磴南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "较场口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:07",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:02",
+          "lastTime": "00:03"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "邮轮母港",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "邱家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "23:03"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:02",
+          "lastTime": "00:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "郑家院子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:12",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:04",
+          "lastTime": "23:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重光",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:32",
+          "lastTime": "23:24"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:33",
+          "lastTime": "23:59"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆东站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:25",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆交通大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:05",
+          "lastTime": "22:58"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:06",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆北站北广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:10",
+          "lastTime": "23:23"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:09",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:27"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:30",
+          "lastTime": "00:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆北站南广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:25"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": "00:25"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:21",
+          "lastTime": "23:30"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "00:08"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:19",
+          "lastTime": "23:37"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆图书馆",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:10",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:12",
+          "lastTime": "23:39"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:10",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:10",
+          "lastTime": "23:46"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆工商大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:10",
+          "lastTime": "23:02"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "23:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆理工大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:27",
+          "lastTime": "23:27"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:02",
+          "lastTime": "23:22"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "重庆西站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:33",
+          "lastTime": "00:04"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:31",
+          "lastTime": "23:19"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:14",
+          "lastTime": "00:21"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:13",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:32",
+          "lastTime": "23:52"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金山寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:13",
+          "lastTime": "00:02"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:03",
+          "lastTime": "23:25"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金建路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:34",
+          "lastTime": "00:17"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:30",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金渝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "22:57"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金童路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:02",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:11",
+          "lastTime": "22:55"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金竹",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:03",
+          "lastTime": "22:33"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:02",
+          "lastTime": "00:09"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "金鳌山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:36",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "铁山坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:02",
+          "lastTime": "23:46"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:31",
+          "lastTime": "23:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "铜元局",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:06",
+          "lastTime": "23:12"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "铜梁西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "铜梁龙城天街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "璧铜线(市郊铁路)",
+          "direction": "开往06:10",
+          "firstTime": "06:37",
+          "lastTime": "22:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "长河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:43"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:35",
+          "lastTime": "00:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "长生桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:04",
+          "lastTime": "23:07"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "00:20"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "长福路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "22:43"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "陈家坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "环线",
+          "direction": "开往沙坪坝→冉家坝→四公里方向（内环）",
+          "firstTime": "06:12",
+          "lastTime": "00:10"
+        },
+        {
+          "lineName": "环线",
+          "direction": "开往四公里→上新街→冉家坝方向（外环）",
+          "firstTime": "06:24",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "陈家桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:07",
+          "lastTime": "23:56"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:07",
+          "lastTime": "23:11"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "雁坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:05",
+          "lastTime": "00:00"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:16",
+          "lastTime": "23:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "青岗坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:35",
+          "lastTime": "23:19"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "青龙湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "马家岩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:04",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:07",
+          "lastTime": "23:42"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "马王场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:35",
+          "lastTime": "23:34"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:34",
+          "lastTime": "23:28"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "高义口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:30",
+          "lastTime": "22:39"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:35",
+          "lastTime": "22:54"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "高堡湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:23",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:03",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "高庙村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:26",
+          "lastTime": "23:24"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:00",
+          "lastTime": "23:44"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "高滩岩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "高石塔",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:22",
+          "lastTime": "00:17"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:00",
+          "lastTime": "23:10"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鱼嘴",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:03",
+          "lastTime": "23:58"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:18",
+          "lastTime": "23:29"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鱼洞",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鱼胡路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "22:36"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "00:06"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鲁家沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往跳磴",
+          "firstTime": "06:39",
+          "lastTime": "23:09"
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往悦港北路",
+          "firstTime": "06:38",
+          "lastTime": "00:14"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鲤鱼池",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "9号线",
+          "direction": "开往花石沟",
+          "firstTime": "06:32",
+          "lastTime": "23:26"
+        },
+        {
+          "lineName": "9号线",
+          "direction": "开往高滩岩",
+          "firstTime": "06:32",
+          "lastTime": "23:44"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:34",
+          "lastTime": "23:18"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:32",
+          "lastTime": "00:18"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鸳鸯",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:05",
+          "lastTime": "23:49"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:08",
+          "lastTime": "22:51"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鹅岭",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往璧山",
+          "firstTime": "06:14",
+          "lastTime": "23:12"
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往朝天门",
+          "firstTime": "06:03",
+          "lastTime": "23:56"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鹿山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:30",
+          "lastTime": "23:57"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:38",
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "鹿栖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:07",
+          "lastTime": "23:51"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:25",
+          "lastTime": "23:35"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "麒龙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:00",
+          "lastTime": "22:53"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:11",
+          "lastTime": "23:49"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黄岭",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黄桷坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往跳磴南",
+          "firstTime": "06:16",
+          "lastTime": "23:16"
+        },
+        {
+          "lineName": "18号线",
+          "direction": "开往富华路",
+          "firstTime": "06:13",
+          "lastTime": "23:32"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黄泥塝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:02",
+          "lastTime": "23:33"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:02",
+          "lastTime": "23:55"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黄花园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:34",
+          "lastTime": "23:04"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往较场口",
+          "firstTime": "06:30",
+          "lastTime": "23:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黄茅坪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "国博线",
+          "direction": "开往沙河坝",
+          "firstTime": "06:36",
+          "lastTime": "22:36"
+        },
+        {
+          "lineName": "国博线",
+          "direction": "开往礼嘉",
+          "firstTime": "06:30",
+          "lastTime": "22:58"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "黑石子",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:24",
+          "lastTime": "23:35"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:09",
+          "lastTime": "23:52"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙兴",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:20",
+          "lastTime": "00:15"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:02",
+          "lastTime": "23:12"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙凤溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "6号线",
+          "direction": "开往北碚",
+          "firstTime": "06:04",
+          "lastTime": "00:20"
+        },
+        {
+          "lineName": "6号线",
+          "direction": "开往茶园",
+          "firstTime": "06:00",
+          "lastTime": "23:08"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙头寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "3号线",
+          "direction": "开往江北机场",
+          "firstTime": "06:04",
+          "lastTime": "23:39"
+        },
+        {
+          "lineName": "3号线",
+          "direction": "开往鱼洞",
+          "firstTime": "06:00",
+          "lastTime": "23:03"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙头寺公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往王家庄",
+          "firstTime": "06:32",
+          "lastTime": "23:23"
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往兰花路",
+          "firstTime": "06:34",
+          "lastTime": "00:23"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙溪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:02",
+          "lastTime": "23:14"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:18",
+          "lastTime": "00:13"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    },
+    {
+      "stationName": "龙驿大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往黄岭",
+          "firstTime": "06:17",
+          "lastTime": "00:12"
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往石马河立交",
+          "firstTime": "06:04",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.cqmetro.cn/smbsj/json/data.json"
+      ]
+    }
+  ]
+}

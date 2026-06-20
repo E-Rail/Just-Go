@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-10T05:36:48Z",
+  "generatedAt": "2026-06-20T10:35:08Z",
   "primaryHost": null,
   "cities": [
     {
@@ -87,17 +87,17 @@
     },
     {
       "cityID": "5000",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "chongqing-official-20260620",
+      "sizeBytes": 196196,
+      "sha256": "f0124316b818e2c08a6583d97a73ef438010d67770f980f49475e5b8ce0e1d13",
+      "downloadURL": "packs/5000/chongqing-official-20260620/city_pack.json",
       "sourceURLs": [
-
+        "https://www.cqmetro.cn/smbsj/json/data.json"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
@@ -168,17 +168,19 @@
     },
     {
       "cityID": "6101",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "xian-official-20260620",
+      "sizeBytes": 123990,
+      "sha256": "5b2dc84378f39e9d1fcd6b0efc9855f0efb4e4ead156dd9966dbbfad05abaa4a",
+      "downloadURL": "packs/6101/xian-official-20260620/city_pack.json",
       "sourceURLs": [
-
+        "https://www.xianrail.com/",
+        "https://www.xianrail.com/pas-gateway-api/api-basicdata/lineStation/findLineAndStation",
+        "https://www.xianrail.com/pas-gateway-api/api-web/aroundSite/getStationInfo"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
@@ -360,17 +362,19 @@
     },
     {
       "cityID": "3205",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "suzhou-official-20260620",
+      "sizeBytes": 172567,
+      "sha256": "8516dfff884de30589304743150ee0e8f45c3f6531426bfd05543416d81cf540",
+      "downloadURL": "packs/3205/suzhou-official-20260620/city_pack.json",
       "sourceURLs": [
-
+        "https://www.sz-mtr.com/",
+        "https://www.sz-mtr.com/service/guide/map/javascript/stationInfo_zh.js",
+        "https://www.sz-mtr.com/service/guide/map/javascript/szmtrTime.js"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "official_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },

@@ -64,6 +64,9 @@ struct RoutePlannerView: View {
             .onChange(of: viewModel?.routes.isEmpty) { _, isEmpty in
                 if isEmpty == false { hasSeenWelcome = true }
             }
+            .onChange(of: appState.pendingRouteInput) { _, pending in
+                applyPendingRouteInput(pending)
+            }
             .sheet(isPresented: $showSaveCurrentTrip) {
                 saveCurrentTripSheet
             }
@@ -73,6 +76,7 @@ struct RoutePlannerView: View {
                 viewModel = container.makeRoutePlannerViewModel()
             }
             viewModel?.cityChanged(to: appState.selectedCity)
+            applyPendingRouteInput(appState.pendingRouteInput)
         }
     }
 
@@ -103,6 +107,12 @@ struct RoutePlannerView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+    }
+
+    private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
+        guard let pending, let vm = viewModel else { return }
+        vm.selectPlace(pending.place, for: pending.role)
+        appState.pendingRouteInput = nil
     }
 
     private var searchHint: String? {

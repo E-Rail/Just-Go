@@ -1,40 +1,34 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab: Tab = .map
-
-    enum Tab {
-        case map
-        case route
-        case search
-        case profile
-    }
+    @Environment(AppState.self) private var appState
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        @Bindable var appState = appState
+        TabView(selection: $appState.selectedTab) {
             MapContainerView()
                 .tabItem {
                     Label(AppLocalization.localized("Map"), systemImage: "map.fill")
                 }
-                .tag(Tab.map)
+                .tag(0)
 
             RoutePlannerView()
                 .tabItem {
                     Label(AppLocalization.localized("Route"), systemImage: "arrow.triangle.branch")
                 }
-                .tag(Tab.route)
+                .tag(1)
 
             StationSearchView()
                 .tabItem {
                     Label(AppLocalization.localized("Search"), systemImage: "magnifyingglass")
                 }
-                .tag(Tab.search)
+                .tag(2)
 
             ProfileView()
                 .tabItem {
                     Label(AppLocalization.localized("Profile"), systemImage: "person.fill")
                 }
-                .tag(Tab.profile)
+                .tag(3)
         }
         .tint(.blue)
     }

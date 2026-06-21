@@ -8,8 +8,20 @@ struct FavoriteStationsView: View {
         NavigationStack {
             List {
                 if tripMemoryService.favoriteStations.isEmpty {
-                    Text(AppLocalization.localized("No favorite stations yet"))
-                        .foregroundStyle(.secondary)
+                    VStack(spacing: 8) {
+                        Image(systemName: "star.circle")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                        Text(AppLocalization.localized("No favorite stations yet"))
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        Text(AppLocalization.localized("Find a station in Search or Map, then tap the star to save it here."))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 32)
                 } else {
                     ForEach(tripMemoryService.favoriteStations) { favorite in
                         NavigationLink(destination: StationDetailView(station: favorite.toStation())) {

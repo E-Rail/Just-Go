@@ -18,7 +18,9 @@ struct RouteCard: View {
                         Text("\(route.strategy.localizedName) • \(route.formattedWalkingDistance)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text(DataConfidence.mapKit.label)
+                        Text(route.dataCoverage.scheduleConfidence == .official
+                            ? DataConfidence.official.label
+                            : DataConfidence.mapKit.label)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }

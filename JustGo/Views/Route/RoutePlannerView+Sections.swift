@@ -37,6 +37,56 @@ extension RoutePlannerView {
 
     var quickTagsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if viewModel?.canQuickRouteHome == true || viewModel?.canQuickRouteWork == true {
+                HStack(spacing: 10) {
+                    if viewModel?.canQuickRouteHome == true {
+                        Button {
+                            Task {
+                                await viewModel?.quickRoute(to: .home)
+                                showResults = viewModel?.routes.isEmpty == false
+                            }
+                        } label: {
+                            Label(
+                                AppLocalization.text(english: "Route Home", simplified: "回家路线", traditional: "回家路線"),
+                                systemImage: "house.fill"
+                            )
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(.white)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(viewModel?.isLoading == true)
+                    }
+
+                    if viewModel?.canQuickRouteWork == true {
+                        Button {
+                            Task {
+                                await viewModel?.quickRoute(to: .company)
+                                showResults = viewModel?.routes.isEmpty == false
+                            }
+                        } label: {
+                            Label(
+                                AppLocalization.text(english: "Route to Work", simplified: "去公司路线", traditional: "去公司路線"),
+                                systemImage: "building.2.fill"
+                            )
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(.primary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(viewModel?.isLoading == true)
+                    }
+                }
+            }
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     quickTagButton(
@@ -103,11 +153,46 @@ extension RoutePlannerView {
         .foregroundStyle(isSaved ? .blue : .primary)
     }
 
+    private var anyFilterActive: Bool {
+        (viewModel?.requiresWheelchairAccess ?? false)
+            || (viewModel?.requiresElevator ?? false)
+            || (viewModel?.avoidStairs ?? false)
+    }
+
+    private var needsFiltersExpanded: Bool {
+        appState.accessibilityPreference.primaryCategory != .none || anyFilterActive
+    }
+
+    @ViewBuilder
+    var accessibilityFiltersWrapper: some View {
+        if needsFiltersExpanded || showAccessibilityFilters {
+            accessibilityFiltersSection
+        } else {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showAccessibilityFilters = true
+                }
+            } label: {
+                Label(
+                    AppLocalization.localized("Accessibility filters"),
+                    systemImage: "accessibility"
+                )
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     var accessibilityFiltersSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-            Text(AppLocalization.localized("Travel Support"))
-                .font(.headline)
+                Text(AppLocalization.localized("Travel Support"))
+                    .font(.headline)
 
                 Toggle(isOn: Binding(
                     get: { viewModel?.requiresWheelchairAccess ?? false },

@@ -122,7 +122,12 @@ struct NetworkLineStatusView: View {
             }
         }
 
-        results.sort { $0.line.name < $1.line.name }
+        results.sort {
+            let n0 = $0.line.name.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Int.init).first ?? 0
+            let n1 = $1.line.name.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Int.init).first ?? 0
+            if n0 != n1 { return n0 < n1 }
+            return $0.line.name < $1.line.name
+        }
         lineStatuses = results
         asOfText = ChinaClock.clockText(Date())
     }

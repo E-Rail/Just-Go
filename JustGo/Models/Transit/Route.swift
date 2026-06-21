@@ -215,6 +215,7 @@ enum RouteConfidenceLevel: Equatable {
 enum RouteStrategy: String, Codable, CaseIterable {
     case metroFirst
     case fastest
+    case fewestTransfers
     case leastWalking
 
     var localizedName: String {
@@ -223,6 +224,8 @@ enum RouteStrategy: String, Codable, CaseIterable {
             return AppLocalization.localized("Transit First")
         case .fastest:
             return AppLocalization.localized("Fastest")
+        case .fewestTransfers:
+            return AppLocalization.localized("Fewest Transfers")
         case .leastWalking:
             return AppLocalization.localized("Least Walking")
         }

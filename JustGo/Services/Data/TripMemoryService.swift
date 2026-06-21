@@ -6,16 +6,20 @@ final class TripMemoryService {
     private let userDefaults: UserDefaults
     private let savedTripsKey = "savedTrips"
     private let tripRecordsKey = "tripRecords"
+    private let favoriteStationsKey = "favoriteStations"
     private let maxSavedTrips = 50
     private let maxTripRecords = 300
+    private let maxFavoriteStations = 50
 
     private(set) var savedTrips: [SavedTrip]
     private(set) var tripRecords: [TripRecord]
+    private(set) var favoriteStations: [FavoriteStation]
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         savedTrips = userDefaults.codableValue(forKey: savedTripsKey, as: [SavedTrip].self, default: [])
         tripRecords = userDefaults.codableValue(forKey: tripRecordsKey, as: [TripRecord].self, default: [])
+        favoriteStations = userDefaults.codableValue(forKey: favoriteStationsKey, as: [FavoriteStation].self, default: [])
     }
 
     func createSavedTrip(
@@ -129,6 +133,23 @@ final class TripMemoryService {
 
     private func persistTripRecords() {
         userDefaults.setCodable(tripRecords, forKey: tripRecordsKey)
+    }
+
+    func addFavorite(station: Station, cityName: String) {
+        let favorite = FavoriteStation(station: station, cityName: cityName)
+        favoriteStations.removeAll { $0.id == favorite.id }
+        favoriteStations.insert(favorite, at: 0)
+        favoriteStations = Array(favoriteStations.prefix(maxFavoriteStations))
+        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+    }
+
+    func removeFavorite(id: String) {
+        favoriteStations.removeAll { $0.id == id }
+        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+    }
+
+    func isFavorite(stationID: String, cityID: String) -> Bool {
+        favoriteStations.contains { $0.stationID == stationID && $0.cityID == cityID }
     }
 }
 

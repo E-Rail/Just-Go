@@ -4,9 +4,90 @@ struct TripMemoryView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
 
+    private var thisMonthRecords: [TripRecord] {
+        let cal = Calendar.current
+        let now = Date()
+        return tripMemoryService.tripRecords.filter {
+            cal.isDate($0.createdAt, equalTo: now, toGranularity: .month)
+        }
+    }
+
+    private var mostUsedTrip: SavedTrip? {
+        tripMemoryService.savedTrips.max(by: { $0.useCount < $1.useCount })
+    }
+
+    private var avgMonthlyDuration: Int? {
+        let durations = thisMonthRecords.map(\.plannedDuration)
+        guard !durations.isEmpty else { return nil }
+        return Int(durations.reduce(0, +) / Double(durations.count) / 60)
+    }
+
+    @ViewBuilder
+    private var statisticsCard: some View {
+        let monthCount = thisMonthRecords.count
+        let totalCount = tripMemoryService.tripRecords.count
+        if totalCount > 0 {
+            Section {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(totalCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text(AppLocalization.localized("Total trips"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Divider()
+                            .frame(height: 36)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(monthCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text(AppLocalization.localized("This month"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        if let avg = avgMonthlyDuration {
+                            Divider()
+                                .frame(height: 36)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(avg) min")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                Text(AppLocalization.localized("Avg duration"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    if let top = mostUsedTrip, top.useCount > 0 {
+                        Divider()
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.trianglehead.clockwise")
+                                .font(.caption)
+                                .foregroundStyle(.blue)
+                            Text(AppLocalization.text(
+                                english: "Most used: \(top.name) (\(top.useCount)×)",
+                                simplified: "最常用：\(top.name)（\(top.useCount)次）",
+                                traditional: "最常用：\(top.name)（\(top.useCount)次）"
+                            ))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            } header: {
+                Text(AppLocalization.localized("Your stats"))
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             List {
+                statisticsCard
                 Section {
                     if tripMemoryService.savedTrips.isEmpty {
                         Text(AppLocalization.localized("No saved trips yet"))

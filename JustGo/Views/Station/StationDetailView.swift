@@ -14,6 +14,9 @@ private extension DataConfidence {
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
+    @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(AccessibilityReportService.self) var accessibilityReportService
     @State var viewModel: StationDetailViewModel?
     @State var selectedStationImage: FullScreenStationImage?
     @State var showStationReport = false
@@ -21,7 +24,10 @@ struct StationDetailView: View {
     @State var reportStatus: VerificationStatus = .outOfService
     @State var reportSeverity: AccessibilityReportSeverity = .medium
     @State var reportNote = ""
-    @Environment(AccessibilityReportService.self) var accessibilityReportService
+
+    private var isFavorited: Bool {
+        tripMemoryService.isFavorite(stationID: displayedStation.stationID, cityID: displayedStation.cityID)
+    }
 
     var body: some View {
         ScrollView {
@@ -39,6 +45,26 @@ struct StationDetailView: View {
         }
         .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    let s = displayedStation
+                    if isFavorited {
+                        tripMemoryService.removeFavorite(id: "\(s.cityID)|\(s.stationID)")
+                    } else {
+                        let cityName = appState.selectedCity?.localizedName ?? s.cityID
+                        tripMemoryService.addFavorite(station: s, cityName: cityName)
+                    }
+                } label: {
+                    Image(systemName: isFavorited ? "star.fill" : "star")
+                        .foregroundStyle(isFavorited ? .yellow : .primary)
+                }
+                .accessibilityLabel(isFavorited
+                    ? AppLocalization.localized("Remove from favorites")
+                    : AppLocalization.localized("Add to favorites")
+                )
+            }
+        }
         .task {
             viewModel = container.makeStationDetailViewModel()
             viewModel?.loadStation(station)

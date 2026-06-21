@@ -2,11 +2,13 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var showAccessibilitySettings = false
     @State private var showTransitData = false
     @State private var showTripMemory = false
     @State private var showReports = false
     @State private var showSettings = false
+    @State private var showFavoriteStations = false
 
     var body: some View {
         NavigationStack {
@@ -33,6 +35,9 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showFavoriteStations) {
+                FavoriteStationsView()
             }
         }
     }
@@ -93,6 +98,23 @@ struct ProfileView: View {
 
     private var riderTrustSection: some View {
         Section {
+            Button(action: { showFavoriteStations = true }) {
+                HStack {
+                    Image(systemName: "star.fill")
+                        .foregroundStyle(.yellow)
+                    Text(AppLocalization.localized("My Stations"))
+                    Spacer()
+                    if !tripMemoryService.favoriteStations.isEmpty {
+                        Text("\(tripMemoryService.favoriteStations.count)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Button(action: { showTripMemory = true }) {
                 HStack {
                     Image(systemName: "bookmark.fill")
@@ -119,7 +141,7 @@ struct ProfileView: View {
         } header: {
             Text(AppLocalization.localized("Rider Trust"))
         } footer: {
-            Text(AppLocalization.localized("Saved trips, history, and reports stay on this device."))
+            Text(AppLocalization.localized("Saved trips, history, reports, and favorite stations stay on this device."))
         }
     }
 

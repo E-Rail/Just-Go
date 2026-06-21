@@ -22,12 +22,16 @@ struct FavoriteStation: Identifiable, Codable {
     }
 
     func toStation() -> Station {
-        Station(
+        let station = Station(
             stationID: stationID,
             name: name,
             latitude: latitude,
             longitude: longitude,
             cityID: cityID
         )
+        station.lines = lineNames.map { lineName in
+            SubwayLine(lineID: "", name: lineName, colorHex: "#8E8E93", cityID: cityID)
+        }
+        return station
     }
 }

@@ -1,6 +1,47 @@
 import SwiftUI
 
 extension RoutePlannerView {
+    var welcomeCard: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Image(systemName: "tram.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.blue)
+                    Text(AppLocalization.text(english: "Welcome to JustGo", simplified: "欢迎使用 JustGo", traditional: "歡迎使用 JustGo"))
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) { hasSeenWelcome = true }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+                Text(AppLocalization.text(
+                    english: "Plan metro routes across 46+ Chinese cities. Select your city above, then enter your starting station and destination.",
+                    simplified: "规划中国46+城市地铁路线。选择城市，输入出发站和目的站，即可开始。",
+                    traditional: "規劃中國46+城市地鐵路線。選擇城市，輸入出發站和目的站，即可開始。"
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                Button {
+                    withAnimation(.easeOut(duration: 0.2)) { hasSeenWelcome = true }
+                } label: {
+                    Text(AppLocalization.text(english: "Got it", simplified: "明白了", traditional: "明白了"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.blue, in: RoundedRectangle(cornerRadius: 10))
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     @ViewBuilder
     var smartCommuteSection: some View {
         if let (trip, isEvening) = smartCommuteTrip(for: appState.selectedCity?.id ?? "") {
@@ -223,33 +264,46 @@ extension RoutePlannerView {
             Text(AppLocalization.localized("Saved Trips"))
                 .font(.headline)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
-                        Button {
-                            _ = tripMemoryService.markSavedTripUsed(id: trip.id)
-                            viewModel?.useSavedTrip(trip)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(trip.name)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .lineLimit(1)
-                                Text(trip.routeTitle)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(2)
-                                if trip.hasAccessibilityOverrides {
-                                    Label(AppLocalization.localized("Accessibility overrides"), systemImage: "accessibility")
-                                        .font(.caption2)
-                                        .foregroundStyle(.blue)
+            if tripMemoryService.savedTrips.isEmpty {
+                HStack(spacing: 12) {
+                    Image(systemName: "bookmark")
+                        .foregroundStyle(.secondary)
+                    Text(AppLocalization.localized("Search a route, then tap 'Save this trip' to reuse it quickly"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10))
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
+                            Button {
+                                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                viewModel?.useSavedTrip(trip)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(trip.name)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .lineLimit(1)
+                                    Text(trip.routeTitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+                                    if trip.hasAccessibilityOverrides {
+                                        Label(AppLocalization.localized("Accessibility overrides"), systemImage: "accessibility")
+                                            .font(.caption2)
+                                            .foregroundStyle(.blue)
+                                    }
                                 }
+                                .frame(width: 180, alignment: .leading)
+                                .padding()
+                                .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
                             }
-                            .frame(width: 180, alignment: .leading)
-                            .padding()
-                            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -277,33 +331,46 @@ extension RoutePlannerView {
             Text(AppLocalization.localized("Recent Routes"))
                 .font(.headline)
 
-            List {
-                ForEach(viewModel?.recentRoutes ?? []) { route in
-                    Button {
-                        viewModel?.useRecentRoute(route)
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(route.originStationName) → \(route.destinationStationName)")
-                                    .font(.body)
-                                Text([route.lineName, route.duration].compactMap { $0 }.joined(separator: " • "))
-                                    .font(.caption)
+            if (viewModel?.recentRoutes ?? []).isEmpty {
+                HStack(spacing: 12) {
+                    Image(systemName: "clock")
+                        .foregroundStyle(.secondary)
+                    Text(AppLocalization.localized("Your last 10 routes will appear here for quick access"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10))
+            } else {
+                List {
+                    ForEach(viewModel?.recentRoutes ?? []) { route in
+                        Button {
+                            viewModel?.useRecentRoute(route)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("\(route.originStationName) → \(route.destinationStationName)")
+                                        .font(.body)
+                                    Text([route.lineName, route.duration].compactMap { $0 }.joined(separator: " • "))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "clock.arrow.circlepath")
                                     .foregroundStyle(.secondary)
                             }
-                            Spacer()
-                            Image(systemName: "clock.arrow.circlepath")
-                                .foregroundStyle(.secondary)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                    .onDelete { offsets in
+                        viewModel?.deleteRecentRoutes(at: offsets)
+                    }
                 }
-                .onDelete { offsets in
-                    viewModel?.deleteRecentRoutes(at: offsets)
-                }
+                .listStyle(.plain)
+                .frame(minHeight: 80, maxHeight: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .listStyle(.plain)
-            .frame(minHeight: 80, maxHeight: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 

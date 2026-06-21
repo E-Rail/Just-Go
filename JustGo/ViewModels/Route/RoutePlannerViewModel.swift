@@ -182,6 +182,7 @@ final class RoutePlannerViewModel {
     func quickRoute(to kind: QuickPlaceKind) async {
         guard let destination = quickPlace(for: kind) else { return }
         await useCurrentLocation(for: .origin)
+        guard originPlace != nil else { return }
         useQuickPlace(destination, for: .destination)
         await searchRoutes()
     }

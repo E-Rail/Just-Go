@@ -33,6 +33,7 @@ struct StationDetailView: View {
         ScrollView {
             VStack(spacing: 20) {
                 stationHeader
+                planRouteSection
                 linesSection
                 beforeYouGoSection
                 accessibilitySection
@@ -190,6 +191,50 @@ struct StationDetailView: View {
                     .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
                 }
             }
+        }
+    }
+
+    private var planRouteSection: some View {
+        let station = displayedStation
+        let place = TransitPlace(
+            name: station.localizedName,
+            coordinate: station.coordinate,
+            source: .mapKit
+        )
+        return HStack(spacing: 10) {
+            Button {
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin)
+                appState.selectedTab = 1
+            } label: {
+                Label(
+                    AppLocalization.text(english: "From here", simplified: "从此出发", traditional: "從此出發"),
+                    systemImage: "arrow.up.circle.fill"
+                )
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.white)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination)
+                appState.selectedTab = 1
+            } label: {
+                Label(
+                    AppLocalization.text(english: "To here", simplified: "到此到达", traditional: "到此到達"),
+                    systemImage: "arrow.down.circle.fill"
+                )
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.primary)
+            }
+            .buttonStyle(.plain)
         }
     }
 

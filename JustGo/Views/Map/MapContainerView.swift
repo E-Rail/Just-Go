@@ -30,11 +30,16 @@ struct MapContainerView: View {
                         Button {
                             showNetworkLineStatus = true
                         } label: {
-                            Image(systemName: "tram.circle.fill")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .padding(8)
-                                .background(.black.opacity(0.55), in: Circle())
+                            VStack(spacing: 2) {
+                                Image(systemName: "tram.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.white)
+                                Text(AppLocalization.localized("Lines"))
+                                    .font(.system(size: 9, weight: .medium))
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(8)
+                            .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 10))
                         }
                         .layoutPriority(1)
                     }

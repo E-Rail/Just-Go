@@ -7,6 +7,14 @@ final class AppState {
     private let accessibilityPreferenceKey = "accessibilityPreference"
 
     var selectedCity: City?
+    var selectedTab: Int = 1
+
+    struct PendingRouteInput: Equatable {
+        let place: TransitPlace
+        let role: RouteInputField
+    }
+    var pendingRouteInput: PendingRouteInput?
+
     var accessibilityPreference: AccessibilityPreference {
         didSet {
             userDefaults.setCodable(accessibilityPreference, forKey: accessibilityPreferenceKey)

@@ -67,6 +67,8 @@
 		A1000056 /* Transit/RouteFeasibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000056 /* Transit/RouteFeasibilityService.swift */; };
 		A1000057 /* Profile/TripMemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000057 /* Profile/TripMemoryView.swift */; };
 		A1000058 /* Profile/AccessibilityReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000058 /* Profile/AccessibilityReportsView.swift */; };
+		A1000309 /* User/FavoriteStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/FavoriteStation.swift */; };
+		A1000310 /* Profile/FavoriteStationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/FavoriteStationsView.swift */; };
 		A1000059 /* MetroNetworks in Resources */ = {isa = PBXBuildFile; fileRef = A2000059 /* MetroNetworks */; };
 		A100005A /* Data/BundledMetroNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005A /* Data/BundledMetroNetworkService.swift */; };
 		A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005B /* Transit/BundledMetroRouteProvider.swift */; };
@@ -157,12 +159,14 @@
 		A2000050 /* Station/StationFacility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationFacility.swift; sourceTree = "<group>"; };
 		A2000051 /* User/TripMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/TripMemory.swift; sourceTree = "<group>"; };
 		A2000052 /* User/AccessibilityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityReport.swift; sourceTree = "<group>"; };
+		A2000309 /* User/FavoriteStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/FavoriteStation.swift; sourceTree = "<group>"; };
 		A2000053 /* Transit/RouteFeasibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibility.swift; sourceTree = "<group>"; };
 		A2000054 /* Data/TripMemoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TripMemoryService.swift; sourceTree = "<group>"; };
 		A2000055 /* Accessibility/AccessibilityReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/AccessibilityReportService.swift; sourceTree = "<group>"; };
 		A2000056 /* Transit/RouteFeasibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibilityService.swift; sourceTree = "<group>"; };
 		A2000057 /* Profile/TripMemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/TripMemoryView.swift; sourceTree = "<group>"; };
 		A2000058 /* Profile/AccessibilityReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/AccessibilityReportsView.swift; sourceTree = "<group>"; };
+		A2000310 /* Profile/FavoriteStationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/FavoriteStationsView.swift; sourceTree = "<group>"; };
 		A2000059 /* MetroNetworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MetroNetworks; sourceTree = "<group>"; };
 		A200005A /* Data/BundledMetroNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/BundledMetroNetworkService.swift; sourceTree = "<group>"; };
 		A200005B /* Transit/BundledMetroRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BundledMetroRouteProvider.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 				A200002F /* User/SearchHistory.swift */,
 				A2000051 /* User/TripMemory.swift */,
 				A2000052 /* User/AccessibilityReport.swift */,
+				A2000309 /* User/FavoriteStation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -331,6 +336,7 @@
 				A2000014 /* Profile/TransitDataView.swift */,
 				A2000057 /* Profile/TripMemoryView.swift */,
 				A2000058 /* Profile/AccessibilityReportsView.swift */,
+				A2000310 /* Profile/FavoriteStationsView.swift */,
 				A2000015 /* Accessibility/AccessibilitySettingsView.swift */,
 				A2000017 /* Components/Transit/StationRow.swift */,
 				A2000018 /* Components/Glass/GlassCard.swift */,
@@ -512,8 +518,10 @@
 				A100002F /* User/SearchHistory.swift in Sources */,
 				A1000051 /* User/TripMemory.swift in Sources */,
 				A1000052 /* User/AccessibilityReport.swift in Sources */,
+				A1000309 /* User/FavoriteStation.swift in Sources */,
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000058 /* Profile/AccessibilityReportsView.swift in Sources */,
+				A1000310 /* Profile/FavoriteStationsView.swift in Sources */,
 				A1000033 /* Extensions/Color+Hex.swift in Sources */,
 				A100005C /* Extensions/CLLocationCoordinate2D+Distance.swift in Sources */,
 				A100005D /* Extensions/Sequence+Uniqued.swift in Sources */,

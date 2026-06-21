@@ -74,6 +74,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private var manifests: [URL: OfficialManifest] = [:]
     private var packs: [String: LoadedPack] = [:]
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
+    private var inFlightLoads: [String: Task<CityPackLoadStatus, Never>] = [:]
 
     init(session: URLSession = .shared, metroNetworks: MetroNetworkProviding) {
         self.session = session
@@ -87,8 +88,25 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         if let status = loadStatuses[cityID] {
             return status
         }
+        // Coalesce concurrent requests for the same city so only one download runs at a time.
+        // Actor re-entrancy at each await point would otherwise let multiple callers bypass the
+        // packs/loadStatuses checks simultaneously and trigger redundant parallel downloads.
+        if let existing = inFlightLoads[cityID] {
+            return await existing.value
+        }
         guard !Self.manifestURLs.isEmpty else { return .notConfigured }
 
+        let task = Task { [self] in await self.performDownload(for: cityID) }
+        inFlightLoads[cityID] = task
+        let status = await task.value
+        inFlightLoads.removeValue(forKey: cityID)
+        if status != .failed {
+            loadStatuses[cityID] = status
+        }
+        return status
+    }
+
+    private func performDownload(for cityID: String) async -> CityPackLoadStatus {
         var pendingStatus: CityPackLoadStatus?
         for manifestURL in Self.manifestURLs {
             do {
@@ -102,17 +120,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 let decoded = try JSONDecoder().decode(OfficialPack.self, from: data)
                 guard decoded.cityID == cityID, decoded.version == entry.version else { continue }
                 packs[cityID] = LoadedPack(data: decoded, assetBaseURL: downloadURL.deletingLastPathComponent())
-                let status = CityPackLoadStatus.loaded(version: decoded.version)
-                loadStatuses[cityID] = status
-                return status
+                return .loaded(version: decoded.version)
             } catch {
                 AppLog.data.warning("City pack load failed for \(cityID, privacy: .public) via \(manifestURL.absoluteString, privacy: .public): \(error)")
                 continue
             }
         }
-        let status = pendingStatus ?? .failed
-        loadStatuses[cityID] = status
-        return status
+        return pendingStatus ?? .failed
     }
 
     func enrichStation(_ station: Station) async -> Station {
@@ -394,7 +408,7 @@ private struct OfficialSchedule: Decodable {
     var formattedTime: String? {
         let values = [
             firstTime.map { "\(AppLocalization.localized("First")) \($0)" },
-            lastTime.map { "\(AppLocalization.localized("last")) \($0)" }
+            lastTime.map { "\(AppLocalization.localized("Last")) \($0)" }
         ].compactMap { $0 }
         return values.isEmpty ? nil : values.joined(separator: ", ")
     }

@@ -22,7 +22,9 @@ final class RoutePlannerViewModel {
     var pendingQuickPlaceKind: QuickPlaceKind?
     var isLoading = false
     var errorMessage: String?
-    var sortStrategy: RoutePreference = .metroFirst
+    var sortStrategy: RoutePreference = UserDefaults.standard.codableValue(forKey: "sortStrategy", as: RoutePreference.self, default: .metroFirst) {
+        didSet { UserDefaults.standard.setCodable(sortStrategy, forKey: "sortStrategy") }
+    }
     var tripAnchor: TripTimeAnchor = .now
 
     private var suggestionTask: Task<Void, Never>?

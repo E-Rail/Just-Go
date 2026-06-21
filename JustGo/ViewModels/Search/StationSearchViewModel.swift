@@ -119,6 +119,8 @@ final class StationSearchViewModel {
                 isEnrichingForFacility = false
             }
         } else {
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
             applyFilters()
             if type == nil && unfilteredResults.isEmpty == false {
                 errorMessage = nil

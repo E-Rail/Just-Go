@@ -53,6 +53,8 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
             self = .metroFirst
         case .fastest:
             self = .fastest
+        case .fewestTransfers:
+            self = .fewestTransfers
         case .leastWalking:
             self = .leastWalking
         }

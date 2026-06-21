@@ -22,6 +22,7 @@ struct RouteDetailView: View {
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
     @Environment(AccessibilityReportService.self) var accessibilityReportService
+    @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
 
     var body: some View {
         ScrollView {
@@ -262,7 +263,11 @@ struct RouteDetailView: View {
                         Label(
                             reminderScheduled
                                 ? AppLocalization.text(english: "Reminder set", simplified: "提醒已设置", traditional: "提醒已設定")
-                                : AppLocalization.text(english: "Remind me to leave", simplified: "提醒我出发", traditional: "提醒我出發"),
+                                : AppLocalization.text(
+                                    english: "Remind me \(reminderLeadMinutes) min before departure",
+                                    simplified: "出发前\(reminderLeadMinutes)分钟提醒我",
+                                    traditional: "出發前\(reminderLeadMinutes)分鐘提醒我"
+                                ),
                             systemImage: reminderScheduled ? "bell.fill" : "bell"
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -298,7 +303,7 @@ struct RouteDetailView: View {
     }
 
     private func scheduleReminder(plan: DeparturePlan) async {
-        guard plan.leaveByDate.addingTimeInterval(-5 * 60) > Date() else {
+        guard plan.leaveByDate.addingTimeInterval(-Double(reminderLeadMinutes) * 60) > Date() else {
             showReminderTooLate = true
             return
         }
@@ -306,7 +311,7 @@ struct RouteDetailView: View {
             showReminderDenied = true
             return
         }
-        let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: 5)
+        let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: reminderLeadMinutes)
         reminderScheduled = scheduled
         showReminderTooLate = !scheduled
     }

@@ -52,11 +52,14 @@ struct ServiceHoursResolver {
         }
 
         // Distinguish "service ended" from "not yet started" for both window shapes.
-        // Non-wrap [first, last]: ended once past last. Wrap window (last < first, i.e.
-        // last train is past midnight): the off-service gap is (last, first).
+        // Non-wrap [first, last]: ended once past last.
+        // Wrap window (last < first, last train past midnight): the off-service gap is
+        // (last, first). Split at the gap midpoint so the early half is "ended" and the
+        // late half is "not yet started" — otherwise notYetStarted is unreachable for all
+        // midnight-wrap services (e.g. at 4:55 AM before a 5:00 first train).
         let ended = firstMin <= lastMin
             ? nowMin > lastMin
-            : nowMin > lastMin && nowMin < firstMin
+            : nowMin > lastMin && nowMin < (lastMin + firstMin) / 2
         if ended {
             return .serviceEndedToday
         }

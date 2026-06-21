@@ -139,7 +139,7 @@ struct ProfileView: View {
                 }
             }
         } header: {
-            Text(AppLocalization.localized("Rider Trust"))
+            Text(AppLocalization.localized("My Activity"))
         } footer: {
             Text(AppLocalization.localized("Saved trips, history, reports, and favorite stations stay on this device."))
         }

@@ -11,26 +11,30 @@ struct RoutePlannerView: View {
     @State var showSaveCurrentTrip = false
     @State var savedTripName = ""
     @State var showAccessibilityFilters = false
+    @AppStorage("hasSeenWelcome") var hasSeenWelcome = false
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
                 ScrollView {
                     VStack(spacing: 20) {
+                        if !hasSeenWelcome { welcomeCard }
                         citySelector
                         smartCommuteSection
                         routeInputSection
                         quickTagsSection
-                        if !tripMemoryService.savedTrips.isEmpty {
-                            savedTripsSection
-                        }
+                        savedTripsSection
                         accessibilityFiltersWrapper
                         departurePlannerSection
                         saveCurrentTripButton
                         searchButton
-                        if viewModel?.recentRoutes.isEmpty == false {
-                            recentRoutesSection
+                        if let hint = searchHint {
+                            Text(hint)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
+                        recentRoutesSection
                     }
                     .padding()
                 }
@@ -56,6 +60,9 @@ struct RoutePlannerView: View {
                 if let viewModel = viewModel {
                     RouteResultsView(viewModel: viewModel)
                 }
+            }
+            .onChange(of: viewModel?.routes.isEmpty) { _, isEmpty in
+                if isEmpty == false { hasSeenWelcome = true }
             }
             .sheet(isPresented: $showSaveCurrentTrip) {
                 saveCurrentTripSheet
@@ -96,6 +103,14 @@ struct RoutePlannerView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+    }
+
+    private var searchHint: String? {
+        guard viewModel?.canSearch != true, let vm = viewModel else { return nil }
+        if vm.selectedCity == nil {
+            return AppLocalization.localized("Select a city above to search routes")
+        }
+        return AppLocalization.localized("Enter a starting station and destination to search")
     }
 
     private var errorAlertIsPresented: Binding<Bool> {

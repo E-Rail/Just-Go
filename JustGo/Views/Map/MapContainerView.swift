@@ -48,7 +48,11 @@ struct MapContainerView: View {
             .zIndex(2)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let viewModel = viewModel {
+            if appState.selectedCity == nil {
+                noCityGuidanceCard
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+            } else if let viewModel = viewModel {
                 nearbyStationsCard(viewModel: viewModel)
                     .padding(.horizontal)
                     .padding(.bottom, 10)
@@ -299,6 +303,31 @@ struct MapContainerView: View {
                 }
             }
         }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var noCityGuidanceCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "tram.circle")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+            Text(AppLocalization.localized("Select a city to explore stations and metro lines"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Button(action: { showCityPicker = true }) {
+                Text(AppLocalization.localized("Select City"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color.blue, in: Capsule())
+                    .foregroundStyle(.white)
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }

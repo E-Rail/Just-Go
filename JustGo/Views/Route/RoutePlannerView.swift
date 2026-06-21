@@ -5,11 +5,12 @@ struct RoutePlannerView: View {
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
     @State var viewModel: RoutePlannerViewModel?
-    @State private var showResults = false
+    @State var showResults = false
     @FocusState var focusedField: RouteInputField?
     @State private var showCityPicker = false
     @State var showSaveCurrentTrip = false
     @State var savedTripName = ""
+    @State var showAccessibilityFilters = false
 
     var body: some View {
         NavigationStack {
@@ -23,7 +24,7 @@ struct RoutePlannerView: View {
                         if !tripMemoryService.savedTrips.isEmpty {
                             savedTripsSection
                         }
-                        accessibilityFiltersSection
+                        accessibilityFiltersWrapper
                         departurePlannerSection
                         saveCurrentTripButton
                         searchButton

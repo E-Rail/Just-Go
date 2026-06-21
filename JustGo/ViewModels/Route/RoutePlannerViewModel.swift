@@ -176,6 +176,16 @@ final class RoutePlannerViewModel {
         TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
     }
 
+    var canQuickRouteHome: Bool { quickPlace(for: .home) != nil }
+    var canQuickRouteWork: Bool { quickPlace(for: .company) != nil }
+
+    func quickRoute(to kind: QuickPlaceKind) async {
+        guard let destination = quickPlace(for: kind) else { return }
+        await useCurrentLocation(for: .origin)
+        useQuickPlace(destination, for: .destination)
+        await searchRoutes()
+    }
+
     func swapOriginDestination() {
         swap(&originName, &destinationName)
         swap(&originPlace, &destinationPlace)

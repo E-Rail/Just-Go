@@ -31,6 +31,7 @@ struct RouteDetailView: View {
                     RouteTabs(routes: alternatives, selection: $selectedRouteID)
                 }
                 routeSummaryCard
+                liveGoButton
                 if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
                 ServiceStatusBanner(status: route.serviceStatus)
                 tripConfidenceCard
@@ -39,7 +40,6 @@ struct RouteDetailView: View {
                 if comfortForecast.hasSignal { RouteComfortCard(forecast: comfortForecast) }
                 routeFeasibilityCard
                 segmentsTimeline
-                liveGoButton
                 reminderSection
                 riderTrustActions
             }
@@ -238,7 +238,7 @@ struct RouteDetailView: View {
             showLiveGo = true
         } label: {
             Label(
-                AppLocalization.text(english: "Start step-by-step guide", simplified: "开始分步导航", traditional: "開始分步導航"),
+                AppLocalization.text(english: "Navigate step-by-step", simplified: "开始分步导航", traditional: "開始分步導航"),
                 systemImage: "figure.walk.circle.fill"
             )
             .font(.headline)

@@ -46,7 +46,8 @@ enum ChinaClock {
         } else {
             return nil
         }
-        guard (0...23).contains(hour), (0...59).contains(minute) else { return nil }
+        guard (0...24).contains(hour), (0...59).contains(minute) else { return nil }
+        guard hour < 24 || minute == 0 else { return nil }
         return hour * 60 + minute
     }
 

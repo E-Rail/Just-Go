@@ -70,6 +70,7 @@ struct RouteDetailView: View {
         }
         .onChange(of: selectedRouteID) { _, _ in
             reminderScheduled = false
+            tripLoggedConfirmation = false
         }
         .task(id: route.networkCityID ?? appState.selectedCity?.id) {
             guard let cityID = route.networkCityID ?? appState.selectedCity?.id,

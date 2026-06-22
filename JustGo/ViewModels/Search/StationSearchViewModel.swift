@@ -105,6 +105,13 @@ final class StationSearchViewModel {
         applyFilters()
     }
 
+    func clearFilters() {
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
+        filter = StationFilter()
+        applyFilters()
+    }
+
     func setFacilityFilter(_ type: StationFacilityType?) {
         filter.facilityType = type
         if type != nil && unfilteredResults.allSatisfy({ $0.facilities.isEmpty }) {

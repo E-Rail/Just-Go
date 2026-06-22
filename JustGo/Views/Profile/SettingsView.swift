@@ -89,7 +89,11 @@ struct SettingsView: View {
         } header: {
             Text(AppLocalization.localized("Accessibility"))
         } footer: {
-            Text(AppLocalization.localized("Show accessibility indicators on station annotations and lists"))
+            Text(AppLocalization.text(
+                english: "Shows elevator, ramp, and wheelchair icons on station pins in the map and on station rows in search results.",
+                simplified: "在地图站点标注和搜索结果中显示电梯、坡道和轮椅图标。",
+                traditional: "在地圖站點標註和搜尋結果中顯示電梯、坡道和輪椅圖示。"
+            ))
         }
     }
 }

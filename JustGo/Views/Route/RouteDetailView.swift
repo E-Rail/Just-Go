@@ -11,6 +11,7 @@ struct RouteDetailView: View {
     @State var showExpandedRouteMap = false
     @State var showLiveGo = false
     @State private var reminderScheduled = false
+    @State var tripLoggedConfirmation = false
     @State private var showReminderDenied = false
     @State private var showReminderTooLate = false
     @State var tripNote = ""
@@ -201,12 +202,31 @@ struct RouteDetailView: View {
                 Text(AppLocalization.localized("Rider Notes"))
                     .font(.headline)
 
-                Button {
-                    tripNote = ""
-                    showTripNote = true
-                } label: {
-                    Label(AppLocalization.localized("Mark complete or add trip note"), systemImage: "checkmark.circle")
+                if tripLoggedConfirmation {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label(
+                            AppLocalization.text(english: "Trip logged", simplified: "行程已记录", traditional: "行程已記錄"),
+                            systemImage: "checkmark.circle.fill"
+                        )
+                        .foregroundStyle(.green)
+                        .font(.subheadline)
+                        if !tripNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text(String(tripNote.prefix(60)))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } else {
+                    Button {
+                        tripNote = ""
+                        showTripNote = true
+                    } label: {
+                        Label(
+                            AppLocalization.text(english: "Log this trip", simplified: "记录这次行程", traditional: "記錄這次行程"),
+                            systemImage: "checkmark.circle"
+                        )
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
 
                 Button {

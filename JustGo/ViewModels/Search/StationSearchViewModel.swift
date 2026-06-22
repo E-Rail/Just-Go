@@ -21,6 +21,7 @@ final class StationSearchViewModel {
     private var hasRequestedSearchLocation = false
     private var stationLoadID = UUID()
     private var searchTask: Task<Void, Never>?
+    private var currentCityID: String?
 
     init(
         stationSearchService: StationSearchService,
@@ -34,6 +35,12 @@ final class StationSearchViewModel {
     func loadInitialStations(city: String) async {
         let loadID = UUID()
         stationLoadID = loadID
+        if city != currentCityID {
+            currentCityID = city
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
+            filter = StationFilter()
+        }
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard !city.isEmpty else {
             unfilteredResults = []

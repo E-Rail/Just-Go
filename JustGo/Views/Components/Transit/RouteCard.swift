@@ -27,7 +27,12 @@ struct RouteCard: View {
 
                     Spacer()
 
-                    confidenceBadge
+                    VStack(alignment: .trailing, spacing: 8) {
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        confidenceBadge
+                    }
                 }
 
                 // Route segments preview

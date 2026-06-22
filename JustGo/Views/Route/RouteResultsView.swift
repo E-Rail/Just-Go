@@ -54,8 +54,59 @@ struct RouteResultsView: View {
         }
     }
 
+    private var activeTimeChip: some View {
+        Group {
+            switch viewModel.tripAnchor {
+            case .departBy(let date):
+                timeChip(
+                    label: AppLocalization.text(
+                        english: "Departing \(date.formatted(.dateTime.hour().minute()))",
+                        simplified: "\(date.formatted(.dateTime.hour().minute()))出发",
+                        traditional: "\(date.formatted(.dateTime.hour().minute()))出發"
+                    )
+                )
+            case .arriveBy(let date):
+                timeChip(
+                    label: AppLocalization.text(
+                        english: "Arriving by \(date.formatted(.dateTime.hour().minute()))",
+                        simplified: "\(date.formatted(.dateTime.hour().minute()))前到达",
+                        traditional: "\(date.formatted(.dateTime.hour().minute()))前到達"
+                    )
+                )
+            case .now:
+                EmptyView()
+            }
+        }
+    }
+
+    private func timeChip(label: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "clock.fill")
+                .font(.caption2)
+            Text(label)
+                .font(.caption)
+                .fontWeight(.medium)
+            Button {
+                viewModel.tripAnchor = .now
+                viewModel.sortRoutes()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(Color.blue, in: Capsule())
+        .foregroundStyle(.white)
+    }
+
     private var sortOptionsSection: some View {
         Section {
+            if viewModel.tripAnchor.isExplicit {
+                activeTimeChip
+            }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(RoutePreference.primary) { strategy in
@@ -141,7 +192,9 @@ struct RouteResultsView: View {
                 }
             }
         } header: {
-            Text(AppLocalization.localized("Choose a route"))
+            Text(viewModel.routes.count == 1
+                ? AppLocalization.localized("1 route found")
+                : "\(viewModel.routes.count) \(AppLocalization.localized("routes found"))")
         }
     }
 

@@ -11,7 +11,7 @@ struct AccessibilityReportsView: View {
                     ContentUnavailableView(
                         AppLocalization.localized("No Personal Reports"),
                         systemImage: "person.crop.circle.badge.exclamationmark",
-                        description: Text(AppLocalization.localized("Station and route reports you add will appear here."))
+                        description: Text(AppLocalization.localized("When viewing a route, tap 'Report route issue' to add accessibility notes. Reports stay on your device."))
                     )
                 } else {
                     Section {

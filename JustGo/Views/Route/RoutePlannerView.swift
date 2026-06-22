@@ -23,9 +23,9 @@ struct RoutePlannerView: View {
                         smartCommuteSection
                         routeInputSection
                         quickTagsSection
+                        departurePlannerSection
                         savedTripsSection
                         accessibilityFiltersWrapper
-                        departurePlannerSection
                         saveCurrentTripButton
                         searchButton
                         if let hint = searchHint {

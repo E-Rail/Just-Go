@@ -98,7 +98,7 @@ struct NetworkLineStatusView: View {
 
         guard let network = await container.metroNetworkProvider.network(for: cityID) else { return }
 
-        let stationsByID = Dictionary(uniqueKeysWithValues: network.stations.map { ($0.id, $0) })
+        let stationsByID = Dictionary(network.stations.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
         var results: [LineStatus] = []
         await withTaskGroup(of: LineStatus?.self) { group in

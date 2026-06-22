@@ -22,7 +22,7 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
         case .leastWalking:
             return AppLocalization.localized("Least Walking")
         case .fewestTransfers: return AppLocalization.localized("Fewest Transfers")
-        case .leastConfusing: return AppLocalization.localized("Least Confusing")
+        case .leastConfusing: return AppLocalization.localized("Easiest Route")
         case .luggageFriendly: return AppLocalization.localized("Luggage Friendly")
         case .elderlyFriendly: return AppLocalization.localized("Elderly Friendly")
         case .officialDataOnly: return AppLocalization.localized("Official Data Only")

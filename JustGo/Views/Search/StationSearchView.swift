@@ -119,50 +119,78 @@ struct StationSearchView: View {
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
+    private var isAnyFilterActive: Bool {
+        viewModel?.filter.accessibleOnly == true ||
+        viewModel?.filter.elevatorOnly == true ||
+        viewModel?.filter.transferOnly == true ||
+        viewModel?.filter.facilityType != nil
+    }
+
     private var filterBar: some View {
-        ZStack(alignment: .trailing) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    FilterChip(
-                        title: AppLocalization.localized("Accessible"),
-                        icon: "figure.roll",
-                        isSelected: viewModel?.filter.accessibleOnly ?? false
-                    ) {
-                        viewModel?.toggleAccessibleFilter()
-                    }
-
-                    FilterChip(
-                        title: AppLocalization.localized("Elevator"),
-                        icon: "arrow.up.arrow.down.circle",
-                        isSelected: viewModel?.filter.elevatorOnly ?? false
-                    ) {
-                        viewModel?.toggleElevatorFilter()
-                    }
-
-                    FilterChip(
-                        title: AppLocalization.localized("Transfer"),
-                        icon: "arrow.triangle.2.circlepath",
-                        isSelected: viewModel?.filter.transferOnly ?? false
-                    ) {
-                        viewModel?.toggleTransferFilter()
-                    }
-
-                    FilterChip(
-                        title: viewModel?.filter.facilityType?.localizedName
-                            ?? AppLocalization.text(english: "Facility", simplified: "设施", traditional: "設施"),
-                        icon: viewModel?.filter.facilityType?.iconName ?? "building.2.crop.circle",
-                        isSelected: viewModel?.filter.facilityType != nil
-                    ) {
-                        showFacilityPicker = true
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text(AppLocalization.localized("Filter by:"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
             }
+            .padding(.horizontal)
 
-            if viewModel?.isEnrichingForFacility == true {
-                ProgressView()
-                    .padding(.trailing, 12)
+            ZStack(alignment: .trailing) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        FilterChip(
+                            title: AppLocalization.localized("Accessible"),
+                            icon: "figure.roll",
+                            isSelected: viewModel?.filter.accessibleOnly ?? false
+                        ) {
+                            viewModel?.toggleAccessibleFilter()
+                        }
+
+                        FilterChip(
+                            title: AppLocalization.localized("Elevator"),
+                            icon: "arrow.up.arrow.down.circle",
+                            isSelected: viewModel?.filter.elevatorOnly ?? false
+                        ) {
+                            viewModel?.toggleElevatorFilter()
+                        }
+
+                        FilterChip(
+                            title: AppLocalization.localized("Transfer"),
+                            icon: "arrow.triangle.2.circlepath",
+                            isSelected: viewModel?.filter.transferOnly ?? false
+                        ) {
+                            viewModel?.toggleTransferFilter()
+                        }
+
+                        FilterChip(
+                            title: viewModel?.filter.facilityType?.localizedName
+                                ?? AppLocalization.text(english: "Facility", simplified: "设施", traditional: "設施"),
+                            icon: viewModel?.filter.facilityType?.iconName ?? "building.2.crop.circle",
+                            isSelected: viewModel?.filter.facilityType != nil
+                        ) {
+                            showFacilityPicker = true
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                }
+
+                if viewModel?.isEnrichingForFacility == true {
+                    ProgressView()
+                        .padding(.trailing, 12)
+                } else if isAnyFilterActive {
+                    Button(AppLocalization.localized("Clear")) {
+                        viewModel?.clearFilters()
+                    }
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.blue)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.regularMaterial, in: Capsule())
+                    .padding(.trailing, 8)
+                }
             }
         }
         .confirmationDialog(

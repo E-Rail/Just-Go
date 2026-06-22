@@ -67,6 +67,7 @@ extension RouteDetailView {
                             cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
                             note: tripNote
                         )
+                        tripLoggedConfirmation = true
                         showTripNote = false
                     }
                 }

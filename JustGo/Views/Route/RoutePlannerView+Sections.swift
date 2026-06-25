@@ -343,7 +343,7 @@ extension RoutePlannerView {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10))
             } else {
-                List {
+                VStack(spacing: 0) {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
                         Button {
                             viewModel?.useRecentRoute(route)
@@ -360,16 +360,18 @@ extension RoutePlannerView {
                                 Image(systemName: "clock.arrow.circlepath")
                                     .foregroundStyle(.secondary)
                             }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
                         .buttonStyle(.plain)
-                    }
-                    .onDelete { offsets in
-                        viewModel?.deleteRecentRoutes(at: offsets)
+
+                        if route.id != (viewModel?.recentRoutes.last?.id) {
+                            Divider()
+                                .padding(.leading, 16)
+                        }
                     }
                 }
-                .listStyle(.plain)
-                .frame(minHeight: 80, maxHeight: 220)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }

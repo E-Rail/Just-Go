@@ -160,7 +160,7 @@ extension BundledMetroRouteProvider {
         let duration = mapRoute?.expectedTravelTime ?? distance / 1.25
         let steps = mapRoute?.steps.filter { $0.distance >= 10 || !$0.instructions.isEmpty }.map {
             WalkingStep(
-                instruction: $0.instructions,
+                instruction: AppLocalization.isChinese ? "" : $0.instructions,
                 distance: $0.distance,
                 duration: max(1, duration * ($0.distance / max(distance, 1))),
                 isAccessible: !$0.instructions.localizedCaseInsensitiveContains("stairs"),

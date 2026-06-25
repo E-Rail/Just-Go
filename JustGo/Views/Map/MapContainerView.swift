@@ -52,21 +52,7 @@ struct MapContainerView: View {
             .padding(.bottom, 10)
             .zIndex(2)
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            Group {
-                if appState.selectedCity == nil {
-                    noCityGuidanceCard
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                } else if let viewModel = viewModel {
-                    nearbyStationsCard(viewModel: viewModel)
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .background(.regularMaterial)
-        }
+        .toolbarBackground(.visible, for: .tabBar)
         .sheet(item: $selectedStation, onDismiss: {
             selectedStation = nil
             isLoadingStationDetail = false

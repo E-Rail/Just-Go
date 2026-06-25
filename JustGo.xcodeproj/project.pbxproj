@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
-		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
-		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
-		A1000304 /* Transit/TripStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000304 /* Transit/TripStep.swift */; };
-		A1000305 /* Transit/TripConfidenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000305 /* Transit/TripConfidenceServices.swift */; };
-		A1000306 /* Notifications/TripReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000306 /* Notifications/TripReminderService.swift */; };
-		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
-		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
 		A1000001 /* JustGoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* JustGoApp.swift */; };
 		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* ContentView.swift */; };
 		A1000003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AppState.swift */; };
@@ -67,8 +59,6 @@
 		A1000056 /* Transit/RouteFeasibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000056 /* Transit/RouteFeasibilityService.swift */; };
 		A1000057 /* Profile/TripMemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000057 /* Profile/TripMemoryView.swift */; };
 		A1000058 /* Profile/AccessibilityReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000058 /* Profile/AccessibilityReportsView.swift */; };
-		A1000309 /* User/FavoriteStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/FavoriteStation.swift */; };
-		A1000310 /* Profile/FavoriteStationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/FavoriteStationsView.swift */; };
 		A1000059 /* MetroNetworks in Resources */ = {isa = PBXBuildFile; fileRef = A2000059 /* MetroNetworks */; };
 		A100005A /* Data/BundledMetroNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005A /* Data/BundledMetroNetworkService.swift */; };
 		A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200005B /* Transit/BundledMetroRouteProvider.swift */; };
@@ -92,20 +82,20 @@
 		A1000070 /* Route/SmartCommuteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070 /* Route/SmartCommuteCard.swift */; };
 		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
+		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
+		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
+		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
+		A1000304 /* Transit/TripStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000304 /* Transit/TripStep.swift */; };
+		A1000305 /* Transit/TripConfidenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000305 /* Transit/TripConfidenceServices.swift */; };
+		A1000306 /* Notifications/TripReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000306 /* Notifications/TripReminderService.swift */; };
+		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
+		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
+		A1000309 /* User/FavoriteStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/FavoriteStation.swift */; };
+		A1000310 /* Profile/FavoriteStationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/FavoriteStationsView.swift */; };
+		A1000311 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000311 /* manifest.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
-		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
-		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
-		A2000304 /* Transit/TripStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripStep.swift; sourceTree = "<group>"; };
-		A2000305 /* Transit/TripConfidenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripConfidenceServices.swift; sourceTree = "<group>"; };
-		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
-		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
-		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
-		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
-		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
-		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000001 /* JustGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustGoApp.swift; sourceTree = "<group>"; };
 		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A2000003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -159,14 +149,12 @@
 		A2000050 /* Station/StationFacility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationFacility.swift; sourceTree = "<group>"; };
 		A2000051 /* User/TripMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/TripMemory.swift; sourceTree = "<group>"; };
 		A2000052 /* User/AccessibilityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityReport.swift; sourceTree = "<group>"; };
-		A2000309 /* User/FavoriteStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/FavoriteStation.swift; sourceTree = "<group>"; };
 		A2000053 /* Transit/RouteFeasibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibility.swift; sourceTree = "<group>"; };
 		A2000054 /* Data/TripMemoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TripMemoryService.swift; sourceTree = "<group>"; };
 		A2000055 /* Accessibility/AccessibilityReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/AccessibilityReportService.swift; sourceTree = "<group>"; };
 		A2000056 /* Transit/RouteFeasibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibilityService.swift; sourceTree = "<group>"; };
 		A2000057 /* Profile/TripMemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/TripMemoryView.swift; sourceTree = "<group>"; };
 		A2000058 /* Profile/AccessibilityReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/AccessibilityReportsView.swift; sourceTree = "<group>"; };
-		A2000310 /* Profile/FavoriteStationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/FavoriteStationsView.swift; sourceTree = "<group>"; };
 		A2000059 /* MetroNetworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MetroNetworks; sourceTree = "<group>"; };
 		A200005A /* Data/BundledMetroNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/BundledMetroNetworkService.swift; sourceTree = "<group>"; };
 		A200005B /* Transit/BundledMetroRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BundledMetroRouteProvider.swift; sourceTree = "<group>"; };
@@ -187,6 +175,20 @@
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A200006B /* Components/Transit/RouteStationTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteStationTimeline.swift; sourceTree = "<group>"; };
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
+		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
+		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
+		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
+		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
+		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
+		A2000304 /* Transit/TripStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripStep.swift; sourceTree = "<group>"; };
+		A2000305 /* Transit/TripConfidenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripConfidenceServices.swift; sourceTree = "<group>"; };
+		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
+		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
+		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
+		A2000309 /* User/FavoriteStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/FavoriteStation.swift; sourceTree = "<group>"; };
+		A2000310 /* Profile/FavoriteStationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/FavoriteStationsView.swift; sourceTree = "<group>"; };
+		A2000311 /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = manifest.json; path = DataPacks/manifest.json; sourceTree = SOURCE_ROOT; };
 		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -353,6 +355,7 @@
 			children = (
 				A200003C /* Assets.xcassets */,
 				A2000059 /* MetroNetworks */,
+				A2000311 /* manifest.json */,
 				A5000012 /* Localizable.strings */,
 				A5000013 /* InfoPlist.strings */,
 			);
@@ -404,7 +407,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					A6000001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -438,6 +441,7 @@
 			files = (
 				A100003C /* Assets.xcassets in Resources */,
 				A1000059 /* MetroNetworks in Resources */,
+				A1000311 /* manifest.json in Resources */,
 				A100003D /* Localizable.strings in Resources */,
 				A100003F /* InfoPlist.strings in Resources */,
 			);
@@ -564,16 +568,38 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 376LB43J9M;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -589,6 +615,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -598,15 +625,37 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 376LB43J9M;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -616,6 +665,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -625,7 +675,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A2000048 /* Debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -659,7 +708,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A2000049 /* Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
 				CODE_SIGN_STYLE = Automatic;

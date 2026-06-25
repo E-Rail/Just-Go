@@ -26,17 +26,25 @@ struct CityDataCapabilities: Equatable {
     let stationMap: CityDataCapabilityStatus
 
     static func forCity(_ cityID: String) -> CityDataCapabilities {
-        switch cityID {
-        case "1100":
-            return CityDataCapabilities(accessibility: .available, stationEssentials: .available, stationMap: .available)
-        case "3100", "4401":
-            return CityDataCapabilities(accessibility: .available, stationEssentials: .available, stationMap: .pending)
-        case "3301":
-            return CityDataCapabilities(accessibility: .available, stationEssentials: .partial, stationMap: .pending)
-        default:
-            return CityDataCapabilities(accessibility: .pending, stationEssentials: .pending, stationMap: .pending)
-        }
+        manifestCapabilities[cityID] ?? CityDataCapabilities(
+            accessibility: .pending, stationEssentials: .pending, stationMap: .pending
+        )
     }
+
+    private static let manifestCapabilities: [String: CityDataCapabilities] = {
+        guard let url = Bundle.main.url(forResource: "manifest", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let manifest = try? JSONDecoder().decode(PackManifest.self, from: data) else {
+            return [:]
+        }
+        return Dictionary(uniqueKeysWithValues: manifest.cities.map { city in
+            (city.cityID, CityDataCapabilities(
+                accessibility: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility),
+                stationEssentials: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules),
+                stationMap: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
+            ))
+        })
+    }()
 }
 
 enum CityDataCapabilityStatus: String, Codable {
@@ -55,6 +63,28 @@ enum CityDataCapabilityStatus: String, Codable {
         }
     }
 
+    fileprivate init(manifestValue: String) {
+        switch manifestValue {
+        case "official_static": self = .available
+        case "partial_static": self = .partial
+        default: self = .pending
+        }
+    }
+}
+
+private struct PackManifest: Decodable {
+    let cities: [PackManifestCity]
+}
+
+private struct PackManifestCity: Decodable {
+    let cityID: String
+    let capabilities: PackCapabilities
+}
+
+private struct PackCapabilities: Decodable {
+    let accessibility: String
+    let schedules: String
+    let stationMaps: String
 }
 
 struct AccessibilityData: Codable {

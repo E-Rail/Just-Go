@@ -304,7 +304,7 @@ extension RoutePlannerView {
                                 }
                                 .frame(width: 180, alignment: .leading)
                                 .padding()
-                                .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+                                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
                             }
                             .buttonStyle(.plain)
                         }
@@ -376,7 +376,7 @@ extension RoutePlannerView {
                         }
                     }
                 }
-                .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }

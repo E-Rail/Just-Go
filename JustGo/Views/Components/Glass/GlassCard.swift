@@ -11,7 +11,7 @@ struct GlassCard<Content: View>: View {
         content
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
     }
 }

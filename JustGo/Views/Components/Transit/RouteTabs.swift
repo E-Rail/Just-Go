@@ -75,11 +75,11 @@ struct SortChip: View {
                 Text(title)
                     .font(.caption)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color.appAccent : Color(.systemGray5))
-            .foregroundStyle(isSelected ? .white : .primary)
-            .clipShape(Capsule())
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .background(isSelected ? Color.appAccent : Color.appSurface, in: Capsule())
+            .foregroundStyle(isSelected ? Color.white : Color.primary)
+            .overlay(Capsule().stroke(isSelected ? Color.clear : Color(.separator), lineWidth: 1))
         }
         .buttonStyle(.plain)
     }

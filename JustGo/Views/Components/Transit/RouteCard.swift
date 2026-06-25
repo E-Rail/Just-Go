@@ -10,7 +10,7 @@ struct RouteCard: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
+                HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(route.formattedDuration)
                             .font(.title2)
@@ -35,7 +35,7 @@ struct RouteCard: View {
                     }
                 }
 
-                routeLinePills
+                routeSegmentRows
 
                 RouteStationTimeline(stops: route.stationTimelineStops)
 
@@ -75,103 +75,95 @@ struct RouteCard: View {
                 }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .overlay(alignment: .leading) {
-                routeColorAccent
-                    .frame(width: 5)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
         }
         .buttonStyle(.plain)
     }
 
-    private var routeColorAccent: some View {
-        VStack(spacing: 0) {
-            let subwaySegments = route.segments.filter { $0.type.isTransit }
-            ForEach(subwaySegments) { segment in
-                Color(hex: segment.lineColorHex ?? "#007AFF")
-            }
-            if subwaySegments.isEmpty {
-                Color.gray
+    // MARK: - Segment Rows
+
+    private var routeSegmentRows: some View {
+        VStack(spacing: 6) {
+            ForEach(route.segments) { segment in
+                if segment.type != .transfer {
+                    segmentRow(segment)
+                }
             }
         }
     }
 
-    private var routeLinePills: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
-                ForEach(Array(route.segments.enumerated()), id: \.element.id) { idx, segment in
-                    pillItem(for: segment, at: idx)
-                }
+    private func segmentRow(_ segment: RouteSegment) -> some View {
+        HStack(spacing: 12) {
+            badgeCircle(for: segment)
+                .frame(width: 36, height: 36)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(segment.summaryLabel)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(segmentDetail(segment))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding(.vertical, 2)
+            Spacer()
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
     }
 
     @ViewBuilder
-    private func pillItem(for segment: RouteSegment, at idx: Int) -> some View {
-        let prev: RouteSegment? = idx > 0 ? route.segments[idx - 1] : nil
+    private func badgeCircle(for segment: RouteSegment) -> some View {
         switch segment.type {
-        case .transfer:
-            HStack(spacing: 3) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.caption2)
-                Text(AppLocalization.localized("Transfer"))
-                    .font(.caption2)
-                    .fontWeight(.medium)
-            }
-            .foregroundStyle(.orange)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(Color.orange.opacity(0.12), in: Capsule())
-
         case .walking:
-            HStack(spacing: 4) {
-                if let prev, prev.type != .transfer {
-                    Image(systemName: "arrow.right")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 3) {
-                    Image(systemName: "figure.walk")
-                        .font(.caption2)
-                    Text(AppLocalization.distance(segment.distance))
-                        .font(.caption2)
-                }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(Color(.systemGray5), in: Capsule())
-                .foregroundStyle(.secondary)
+            ZStack {
+                Circle().fill(Color(.systemGray3))
+                Image(systemName: "figure.walk")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
             }
-
         case .subway, .transit:
-            HStack(spacing: 4) {
-                if let prev, prev.type == .walking {
-                    Image(systemName: "arrow.right")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-                let color = Color(hex: segment.lineColorHex ?? "#007AFF")
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(color)
-                        .frame(width: 7, height: 7)
-                    Text(segment.lineName ?? AppLocalization.localized("Transit"))
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                    if segment.stops > 0 {
-                        Text(AppLocalization.stops(segment.stops))
-                            .font(.caption2)
-                            .foregroundStyle(color.opacity(0.7))
-                    }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(color.opacity(0.14), in: Capsule())
-                .foregroundStyle(color)
+            let color = Color(hex: segment.lineColorHex ?? "#007AFF")
+            ZStack {
+                Circle().fill(color)
+                Text(lineShortCode(from: segment.lineName))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+        case .transfer:
+            ZStack {
+                Circle().fill(Color.orange)
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
             }
         }
     }
+
+    private func lineShortCode(from name: String?) -> String {
+        guard let name else { return "?" }
+        let nums = name.filter(\.isNumber)
+        if !nums.isEmpty { return String(nums.prefix(2)) }
+        let letters = name.filter { $0.isLetter && $0.isASCII }
+        let code = String(letters.prefix(2)).uppercased()
+        return code.isEmpty ? "?" : code
+    }
+
+    private func segmentDetail(_ segment: RouteSegment) -> String {
+        switch segment.type {
+        case .walking:
+            return "\(segment.formattedDuration) • \(AppLocalization.distance(segment.distance))"
+        case .subway, .transit:
+            return segment.formattedDuration
+        case .transfer:
+            return ""
+        }
+    }
+
+    // MARK: - Other views
 
     private func accessPreviewRow(guide: RouteAccessGuide, icon: String) -> some View {
         Label {

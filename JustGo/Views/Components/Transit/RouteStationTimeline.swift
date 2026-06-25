@@ -19,7 +19,7 @@ struct RouteStationTimeline: View {
                         if index < stops.count - 1 {
                             Rectangle()
                                 .fill(Color(hex: stop.lineColorHex ?? "#007AFF"))
-                                .frame(width: 4, height: 22)
+                                .frame(width: 10, height: 22)
                         }
                     }
                     .frame(width: 18)

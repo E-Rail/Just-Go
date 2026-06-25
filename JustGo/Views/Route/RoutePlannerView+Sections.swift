@@ -411,7 +411,7 @@ extension RoutePlannerView {
     private var defaultSavedTripName: String {
         let origin = viewModel?.originSnapshot()?.name ?? AppLocalization.localized("Origin")
         let destination = viewModel?.destinationSnapshot()?.name ?? AppLocalization.localized("Destination")
-        return "\(origin) -> \(destination)"
+        return "\(origin) → \(destination)"
     }
 
     private func saveCurrentTrip() {

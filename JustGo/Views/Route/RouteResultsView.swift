@@ -193,8 +193,12 @@ struct RouteResultsView: View {
             }
         } header: {
             Text(viewModel.routes.count == 1
-                ? AppLocalization.localized("1 route found")
-                : "\(viewModel.routes.count) \(AppLocalization.localized("routes found"))")
+                ? AppLocalization.text(english: "1 route found", simplified: "找到 1 条路线", traditional: "找到 1 條路線")
+                : AppLocalization.text(
+                    english: "\(viewModel.routes.count) routes found",
+                    simplified: "找到 \(viewModel.routes.count) 条路线",
+                    traditional: "找到 \(viewModel.routes.count) 條路線"
+                ))
         }
     }
 

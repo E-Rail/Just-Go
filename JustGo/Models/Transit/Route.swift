@@ -171,13 +171,13 @@ enum DataConfidence: String, Codable, Equatable {
     var label: String {
         switch self {
         case .official: return AppLocalization.localized("Official")
-        case .mapKit: return AppLocalization.localized("Estimated from maps")
+        case .mapKit: return AppLocalization.text(english: "Estimated from maps", simplified: "来自地图估算", traditional: "來自地圖估算")
         case .communityVerified: return AppLocalization.localized("Community verified")
         case .personal: return AppLocalization.localized("Personal report")
         case .estimated: return AppLocalization.localized("Estimated")
-        case .sourcePending: return AppLocalization.localized("Loading…")
+        case .sourcePending: return AppLocalization.localized("Loading...")
         case .unavailable: return AppLocalization.localized("Not available")
-        case .unknown: return AppLocalization.localized("No data")
+        case .unknown: return AppLocalization.text(english: "No data", simplified: "暂无数据", traditional: "暫無數據")
         }
     }
 }

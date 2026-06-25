@@ -176,7 +176,7 @@ struct StationSearchView: View {
                     }
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.appAccent)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(.regularMaterial, in: Capsule())
@@ -285,7 +285,7 @@ struct FilterChip: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.blue : Color(.systemGray5))
+            .background(isSelected ? Color.appAccent : Color(.systemGray5))
             .foregroundStyle(isSelected ? .white : .primary)
             .clipShape(Capsule())
         }

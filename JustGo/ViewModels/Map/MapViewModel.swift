@@ -187,9 +187,11 @@ final class MapViewModel {
         }
     }
 
-    func centerOnUser() {
-        guard let location = userLocation else { return }
-        updateCamera(to: location)
+    func centerOnUser() async {
+        do {
+            let location = try await locationService.requestCurrentLocation()
+            updateCamera(to: location.coordinate)
+        } catch { }
     }
 
     private func loadNetworks(cityIDs: [String]) async {

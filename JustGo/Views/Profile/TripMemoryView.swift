@@ -66,7 +66,7 @@ struct TripMemoryView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "arrow.trianglehead.clockwise")
                                 .font(.caption)
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Color.appAccent)
                             Text(AppLocalization.text(
                                 english: "Most used: \(top.name) (\(top.useCount)×)",
                                 simplified: "最常用：\(top.name)（\(top.useCount)次）",
@@ -96,7 +96,7 @@ struct TripMemoryView: View {
                         ForEach(tripMemoryService.savedTrips) { trip in
                             HStack(alignment: .top, spacing: 12) {
                                 Image(systemName: "bookmark.fill")
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(Color.appAccent)
                                     .frame(width: 24)
 
                                 VStack(alignment: .leading, spacing: 6) {

@@ -12,31 +12,38 @@ struct RoutePlannerView: View {
     @State var savedTripName = ""
     @State var showAccessibilityFilters = false
     @AppStorage("hasSeenWelcome") var hasSeenWelcome = false
+    @State var scrollToTopTrigger = false
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        if !hasSeenWelcome { welcomeCard }
-                        citySelector
-                        smartCommuteSection
-                        routeInputSection
-                        quickTagsSection
-                        departurePlannerSection
-                        savedTripsSection
-                        accessibilityFiltersWrapper
-                        saveCurrentTripButton
-                        searchButton
-                        if let hint = searchHint {
-                            Text(hint)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            Color.clear.frame(height: 0).id("plannerTop")
+                            if !hasSeenWelcome { welcomeCard }
+                            citySelector
+                            smartCommuteSection
+                            routeInputSection
+                            quickTagsSection
+                            departurePlannerSection
+                            savedTripsSection
+                            accessibilityFiltersWrapper
+                            saveCurrentTripButton
+                            searchButton
+                            if let hint = searchHint {
+                                Text(hint)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            recentRoutesSection
                         }
-                        recentRoutesSection
+                        .padding()
                     }
-                    .padding()
+                    .onChange(of: scrollToTopTrigger) { _, _ in
+                        withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
+                    }
                 }
 
                 activeSuggestionDropdown
@@ -46,7 +53,7 @@ struct RoutePlannerView: View {
             }
             .navigationTitle(AppLocalization.localized("Route Planner"))
             .navigationBarTitleDisplayMode(.large)
-            .background(Color(.systemGroupedBackground))
+            .background(Color.appBackground)
             .sheet(isPresented: $showCityPicker) {
                 CityPickerView(selectedCity: Binding(
                     get: { appState.selectedCity },
@@ -94,7 +101,7 @@ struct RoutePlannerView: View {
         Button(action: { showCityPicker = true }) {
             HStack {
                 Image(systemName: "building.2.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.appAccent)
                 Text(AppLocalization.localized("City"))
                 Spacer()
                 Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("Select City"))
@@ -164,7 +171,7 @@ struct RoutePlannerView: View {
                     Button(action: { viewModel?.swapOriginDestination() }) {
                         Image(systemName: "arrow.up.arrow.down")
                             .font(.title3)
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Color.appAccent)
                             .padding(8)
                             .background(.ultraThinMaterial, in: Circle())
                     }
@@ -264,7 +271,7 @@ struct RoutePlannerView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(viewModel?.canSearch == true ? Color.blue : Color.gray)
+            .background(viewModel?.canSearch == true ? Color.appAccent : Color.gray)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }

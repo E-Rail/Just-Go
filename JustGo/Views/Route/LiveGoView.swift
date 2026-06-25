@@ -93,7 +93,7 @@ struct LiveGoView: View {
             if let stopsLeft = step.rideStopsRemainingText {
                 Text(stopsLeft)
                     .font(.headline)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.appAccent)
             }
         }
         .frame(maxWidth: .infinity)
@@ -130,7 +130,7 @@ struct LiveGoView: View {
                 )
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.blue, in: RoundedRectangle(cornerRadius: 14))
+                .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 14))
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

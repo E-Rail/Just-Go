@@ -7,7 +7,7 @@ extension RoutePlannerView {
                 HStack {
                     Image(systemName: "tram.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.appAccent)
                     Text(AppLocalization.text(english: "Welcome to JustGo", simplified: "欢迎使用 JustGo", traditional: "歡迎使用 JustGo"))
                         .font(.headline)
                     Spacer()
@@ -34,7 +34,7 @@ extension RoutePlannerView {
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(Color.blue, in: RoundedRectangle(cornerRadius: 10))
+                        .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 10))
                         .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
@@ -96,7 +96,7 @@ extension RoutePlannerView {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .frame(maxWidth: .infinity)
-                            .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                            .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 12))
                             .foregroundStyle(.white)
                         }
                         .buttonStyle(.plain)
@@ -190,7 +190,7 @@ extension RoutePlannerView {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(isSaved ? Color.blue.opacity(0.12) : Color(.systemGray5), in: Capsule())
+        .background(isSaved ? Color.appAccent.opacity(0.12) : Color(.systemGray5), in: Capsule())
         .foregroundStyle(isSaved ? .blue : .primary)
     }
 
@@ -282,6 +282,10 @@ extension RoutePlannerView {
                             Button {
                                 _ = tripMemoryService.markSavedTripUsed(id: trip.id)
                                 viewModel?.useSavedTrip(trip)
+                                Task {
+                                    await viewModel?.searchRoutes()
+                                    showResults = viewModel?.routes.isEmpty == false
+                                }
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(trip.name)
@@ -295,7 +299,7 @@ extension RoutePlannerView {
                                     if trip.hasAccessibilityOverrides {
                                         Label(AppLocalization.localized("Accessibility overrides"), systemImage: "accessibility")
                                             .font(.caption2)
-                                            .foregroundStyle(.blue)
+                                            .foregroundStyle(Color.appAccent)
                                     }
                                 }
                                 .frame(width: 180, alignment: .leading)
@@ -347,6 +351,7 @@ extension RoutePlannerView {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
                         Button {
                             viewModel?.useRecentRoute(route)
+                            scrollToTopTrigger.toggle()
                         } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {

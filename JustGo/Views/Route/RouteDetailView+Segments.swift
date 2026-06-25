@@ -59,7 +59,7 @@ extension RouteDetailView {
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: guide.kind == .origin ? "arrow.down.forward.circle.fill" : "arrow.up.forward.circle.fill")
                                     .font(.title3)
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(Color.appAccent)
                                     .frame(width: 26)
 
                                 VStack(alignment: .leading, spacing: 3) {
@@ -77,7 +77,7 @@ extension RouteDetailView {
                             ForEach(guide.accessibilityNotes, id: \.self) { note in
                                 Label(note, systemImage: "info.circle")
                                     .font(.caption)
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(Color.appAccent)
                             }
 
                             if let firstStep = guide.walkingSteps.first,
@@ -154,7 +154,7 @@ extension RouteDetailView {
                         Text(note)
                             .font(.caption)
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.appAccent)
                 }
             }
 

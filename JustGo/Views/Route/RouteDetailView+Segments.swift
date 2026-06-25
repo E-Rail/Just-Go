@@ -80,7 +80,8 @@ extension RouteDetailView {
                                     .foregroundStyle(.blue)
                             }
 
-                            if let firstStep = guide.walkingSteps.first {
+                            if let firstStep = guide.walkingSteps.first,
+                               !firstStep.instruction.isEmpty {
                                 Text(firstStep.instruction)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -139,6 +140,7 @@ extension RouteDetailView {
                 }
 
                 if let firstDirection = segment.walkingDirections?.first?.instruction,
+                   !firstDirection.isEmpty,
                    segment.type == .walking {
                     Text(firstDirection)
                         .font(.caption)

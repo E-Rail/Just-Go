@@ -127,16 +127,7 @@ struct StationSearchView: View {
     }
 
     private var filterBar: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text(AppLocalization.localized("Filter by:"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-            }
-            .padding(.horizontal)
-
-            ZStack(alignment: .trailing) {
+        ZStack(alignment: .trailing) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         FilterChip(
@@ -191,7 +182,6 @@ struct StationSearchView: View {
                     .background(.regularMaterial, in: Capsule())
                     .padding(.trailing, 8)
                 }
-            }
         }
         .confirmationDialog(
             AppLocalization.text(english: "Filter by Facility", simplified: "按设施筛选", traditional: "按設施篩選"),

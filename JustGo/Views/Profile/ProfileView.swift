@@ -47,7 +47,7 @@ struct ProfileView: View {
             Button(action: { showAccessibilitySettings = true }) {
                 HStack {
                     Image(systemName: "accessibility")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.appAccent)
                     Text(AppLocalization.localized("Accessibility Settings"))
                     Spacer()
                     Image(systemName: "chevron.right")
@@ -63,7 +63,7 @@ struct ProfileView: View {
 
                 HStack {
                     Image(systemName: appState.accessibilityPreference.primaryCategory.icon)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.appAccent)
                     Text(appState.accessibilityPreference.primaryCategory.displayName)
                         .font(.subheadline)
                 }
@@ -118,7 +118,7 @@ struct ProfileView: View {
             Button(action: { showTripMemory = true }) {
                 HStack {
                     Image(systemName: "bookmark.fill")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.appAccent)
                     Text(AppLocalization.localized("My Trips"))
                     Spacer()
                     Image(systemName: "chevron.right")

@@ -35,14 +35,7 @@ struct RouteCard: View {
                     }
                 }
 
-                // Route segments preview
-                HStack(spacing: 2) {
-                    ForEach(route.segments) { segment in
-                        segmentBar(segment)
-                    }
-                }
-                .frame(height: 4)
-                .clipShape(Capsule())
+                routeLinePills
 
                 RouteStationTimeline(stops: route.stationTimelineStops)
 
@@ -104,18 +97,80 @@ struct RouteCard: View {
         }
     }
 
-    private func segmentBar(_ segment: RouteSegment) -> some View {
-        Group {
-            switch segment.type {
-            case .walking:
-                Color.gray
-            case .subway, .transit:
-                Color(hex: segment.lineColorHex ?? "#000000")
-            case .transfer:
-                Color.orange
+    private var routeLinePills: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                ForEach(Array(route.segments.enumerated()), id: \.element.id) { idx, segment in
+                    pillItem(for: segment, at: idx)
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    @ViewBuilder
+    private func pillItem(for segment: RouteSegment, at idx: Int) -> some View {
+        let prev: RouteSegment? = idx > 0 ? route.segments[idx - 1] : nil
+        switch segment.type {
+        case .transfer:
+            HStack(spacing: 3) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.caption2)
+                Text(AppLocalization.localized("Transfer"))
+                    .font(.caption2)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(.orange)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(Color.orange.opacity(0.12), in: Capsule())
+
+        case .walking:
+            HStack(spacing: 4) {
+                if let prev, prev.type != .transfer {
+                    Image(systemName: "arrow.right")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                HStack(spacing: 3) {
+                    Image(systemName: "figure.walk")
+                        .font(.caption2)
+                    Text(AppLocalization.distance(segment.distance))
+                        .font(.caption2)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color(.systemGray5), in: Capsule())
+                .foregroundStyle(.secondary)
+            }
+
+        case .subway, .transit:
+            HStack(spacing: 4) {
+                if let prev, prev.type == .walking {
+                    Image(systemName: "arrow.right")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                let color = Color(hex: segment.lineColorHex ?? "#007AFF")
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(color)
+                        .frame(width: 7, height: 7)
+                    Text(segment.lineName ?? AppLocalization.localized("Transit"))
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    if segment.stops > 0 {
+                        Text(AppLocalization.stops(segment.stops))
+                            .font(.caption2)
+                            .foregroundStyle(color.opacity(0.7))
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(color.opacity(0.14), in: Capsule())
+                .foregroundStyle(color)
             }
         }
-        .frame(minWidth: segment.type == .walking ? 20 : 40)
     }
 
     private func accessPreviewRow(guide: RouteAccessGuide, icon: String) -> some View {

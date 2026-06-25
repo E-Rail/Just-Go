@@ -219,14 +219,12 @@ struct MapContainerView: View {
     private var mapLocateButton: some View {
         Button {
             Task {
-                if await viewModel?.requestLocationAccess() == true {
-                    viewModel?.centerOnUser()
-                }
+                await viewModel?.centerOnUser()
             }
         } label: {
             Image(systemName: "location.fill")
                 .font(.headline)
-                .foregroundStyle(viewModel?.isLocationAuthorized == true ? .blue : .primary)
+                .foregroundStyle(viewModel?.isLocationAuthorized == true ? Color.appAccent : Color.primary)
                 .frame(width: 44, height: 44)
                 .background(.regularMaterial, in: Circle())
         }
@@ -317,7 +315,7 @@ struct MapContainerView: View {
                     .fontWeight(.medium)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
-                    .background(Color.blue, in: Capsule())
+                    .background(Color.appAccent, in: Capsule())
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
@@ -389,7 +387,7 @@ struct CityPickerView: View {
 
                             if selectedCity?.id == city.id {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(Color.appAccent)
                             }
 
                             Text(AppLocalization.stationCount(city.stationCount))

@@ -2,6 +2,9 @@ import SwiftUI
 import Foundation
 
 extension Color {
+    static let appAccent = Color(hex: "#2D7055")
+    static let appBackground = Color(hex: "#EBF5EC")
+
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
         let scanner = Scanner(string: hex)

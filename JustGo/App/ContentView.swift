@@ -30,6 +30,6 @@ struct ContentView: View {
                 }
                 .tag(3)
         }
-        .tint(.blue)
+        .tint(.appAccent)
     }
 }

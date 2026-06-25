@@ -98,7 +98,7 @@ struct RouteResultsView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
-        .background(Color.blue, in: Capsule())
+        .background(Color.appAccent, in: Capsule())
         .foregroundStyle(.white)
     }
 
@@ -143,7 +143,7 @@ struct RouteResultsView: View {
                         .font(.caption)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(viewModel.sortStrategy.isPrimary ? Color(.systemGray5) : Color.blue)
+                        .background(viewModel.sortStrategy.isPrimary ? Color(.systemGray5) : Color.appAccent)
                         .foregroundStyle(viewModel.sortStrategy.isPrimary ? Color.primary : Color.white)
                         .clipShape(Capsule())
                     }

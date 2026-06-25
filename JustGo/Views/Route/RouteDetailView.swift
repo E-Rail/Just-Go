@@ -110,7 +110,7 @@ struct RouteDetailView: View {
         TransitMapView(
             visibleRegion: .constant(route.previewRegion),
             stations: [],
-            metroNetworks: metroNetworks,
+            metroNetworks: [],
             route: route,
             showsUserLocation: false,
             onRegionChanged: nil,
@@ -126,12 +126,6 @@ struct RouteDetailView: View {
                 .padding(8)
                 .background(.black.opacity(0.55), in: Circle())
                 .padding(10)
-        }
-        .overlay(alignment: .bottomTrailing) {
-            if !metroNetworks.isEmpty {
-                MetroGeometryAttributionView()
-                    .padding(8)
-            }
         }
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .onTapGesture {

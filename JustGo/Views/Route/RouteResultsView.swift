@@ -115,16 +115,20 @@ struct RouteResultsView: View {
                             icon: strategy.icon,
                             isSelected: viewModel.sortStrategy == strategy
                         ) {
-                            viewModel.sortStrategy = strategy
-                            viewModel.sortRoutes()
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.sortStrategy = strategy
+                                viewModel.sortRoutes()
+                            }
                         }
                     }
 
                     Menu {
                         ForEach(RoutePreference.allCases.filter { !$0.isPrimary }) { strategy in
                             Button {
-                                viewModel.sortStrategy = strategy
-                                viewModel.sortRoutes()
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    viewModel.sortStrategy = strategy
+                                    viewModel.sortRoutes()
+                                }
                             } label: {
                                 Label(strategy.title, systemImage: strategy.icon)
                             }

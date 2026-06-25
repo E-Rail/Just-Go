@@ -50,20 +50,22 @@ struct MapContainerView: View {
             .padding(.horizontal)
             .padding(.top, 14)
             .padding(.bottom, 10)
-            .frame(maxWidth: .infinity)
-            .background(.regularMaterial)
             .zIndex(2)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if appState.selectedCity == nil {
-                noCityGuidanceCard
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
-            } else if let viewModel = viewModel {
-                nearbyStationsCard(viewModel: viewModel)
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
+            Group {
+                if appState.selectedCity == nil {
+                    noCityGuidanceCard
+                        .padding(.horizontal)
+                        .padding(.bottom, 10)
+                } else if let viewModel = viewModel {
+                    nearbyStationsCard(viewModel: viewModel)
+                        .padding(.horizontal)
+                        .padding(.bottom, 10)
+                }
             }
+            .frame(maxWidth: .infinity)
+            .background(.regularMaterial)
         }
         .sheet(item: $selectedStation, onDismiss: {
             selectedStation = nil

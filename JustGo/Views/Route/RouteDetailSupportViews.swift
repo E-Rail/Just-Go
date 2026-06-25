@@ -62,34 +62,39 @@ struct FullScreenRouteMapView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        ZStack {
             TransitMapView(
                 visibleRegion: $visibleRegion,
                 stations: [],
                 metroNetworks: metroNetworks,
                 route: route,
                 showsUserLocation: false,
-                onRegionChanged: nil,
+                onRegionChanged: { visibleRegion = $0 },
                 onStationSelected: { _ in }
             )
-            .ignoresSafeArea(edges: .bottom)
-            .overlay(alignment: .bottomTrailing) {
-                if !metroNetworks.isEmpty {
-                    MetroGeometryAttributionView()
-                        .padding(8)
-                }
-            }
-            .navigationTitle(AppLocalization.localized("Route Map"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+            .ignoresSafeArea()
+
+            VStack {
+                HStack {
+                    Spacer()
                     Button {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.title3)
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                            .shadow(color: .black.opacity(0.4), radius: 3)
                     }
                     .accessibilityLabel(AppLocalization.localized("Close route map"))
+                    .padding(16)
+                }
+                Spacer()
+                if !metroNetworks.isEmpty {
+                    HStack {
+                        Spacer()
+                        MetroGeometryAttributionView()
+                            .padding(8)
+                    }
                 }
             }
         }

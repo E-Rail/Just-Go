@@ -109,15 +109,12 @@ struct TransitDataView: View {
 struct CityCapabilityTags: View {
     let city: City
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 106), spacing: 6, alignment: .leading)
-    ]
-
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 6) {
+        HStack(spacing: 6) {
             capabilityTag(title: AppLocalization.localized("Access"), status: city.dataCapabilities.accessibility)
             capabilityTag(title: AppLocalization.localized("Essentials"), status: city.dataCapabilities.stationEssentials)
             capabilityTag(title: AppLocalization.localized("3D Map"), status: city.dataCapabilities.stationMap)
+            Spacer(minLength: 0)
         }
         .padding(.top, 2)
     }
@@ -134,7 +131,6 @@ struct CityCapabilityTags: View {
         .foregroundStyle(tagColor(for: status))
         .padding(.horizontal, 7)
         .padding(.vertical, 3)
-        .frame(maxWidth: .infinity, alignment: .center)
         .background(tagColor(for: status).opacity(0.12), in: Capsule())
         .accessibilityLabel("\(title): \(accessibilityText(for: status))")
     }

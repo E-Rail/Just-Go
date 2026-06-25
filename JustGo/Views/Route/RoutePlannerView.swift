@@ -148,12 +148,12 @@ struct RoutePlannerView: View {
 
                     VStack(spacing: 12) {
                         stationField(
-                            placeholder: "From",
+                            placeholder: LocalizedStringKey(AppLocalization.localized("From")),
                             field: .origin
                         )
 
                         stationField(
-                            placeholder: "To",
+                            placeholder: LocalizedStringKey(AppLocalization.localized("To")),
                             field: .destination
                         )
                     }

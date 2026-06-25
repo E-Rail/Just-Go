@@ -52,7 +52,7 @@ struct TripMemoryView: View {
                             Divider()
                                 .frame(height: 36)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("\(avg) min")
+                                Text(AppLocalization.minutes(avg))
                                     .font(.title2)
                                     .fontWeight(.bold)
                                 Text(AppLocalization.localized("Avg duration"))

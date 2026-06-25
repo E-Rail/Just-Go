@@ -212,7 +212,7 @@ struct RoutePlannerView: View {
             .autocorrectionDisabled()
             .textFieldStyle(.plain)
             .padding(12)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
     }
 
     private func suggestionDropdown(

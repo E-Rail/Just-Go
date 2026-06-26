@@ -224,7 +224,7 @@ struct MapContainerView: View {
         } label: {
             Image(systemName: "location.fill")
                 .font(.headline)
-                .foregroundStyle(viewModel?.isLocationAuthorized == true ? Color.appAccent : Color.primary)
+                .foregroundStyle(viewModel?.isLocationAuthorized == true ? Color.accentColor : Color.primary)
                 .frame(width: 44, height: 44)
                 .background(.regularMaterial, in: Circle())
         }
@@ -315,7 +315,7 @@ struct MapContainerView: View {
                     .fontWeight(.medium)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
-                    .background(Color.appAccent, in: Capsule())
+                    .background(Color.accentColor, in: Capsule())
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
@@ -387,7 +387,7 @@ struct CityPickerView: View {
 
                             if selectedCity?.id == city.id {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.appAccent)
+                                    .foregroundStyle(Color.accentColor)
                             }
 
                             Text(AppLocalization.stationCount(city.stationCount))

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
     var body: some View {
         @Bindable var appState = appState
@@ -30,6 +31,6 @@ struct ContentView: View {
                 }
                 .tag(3)
         }
-        .tint(.appAccent)
+        .tint(Color(hex: selectedThemeHex))
     }
 }

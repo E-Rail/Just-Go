@@ -214,7 +214,7 @@ struct StationDetailView: View {
                 .fontWeight(.medium)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

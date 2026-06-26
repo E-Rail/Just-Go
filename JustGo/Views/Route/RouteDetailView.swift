@@ -259,7 +259,7 @@ struct RouteDetailView: View {
             .font(.headline)
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 14))
+            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
             .foregroundStyle(.white)
         }
         .buttonStyle(.plain)

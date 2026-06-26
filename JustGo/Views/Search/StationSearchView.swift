@@ -26,6 +26,7 @@ struct StationSearchView: View {
             }
             .navigationTitle(AppLocalization.localized("Search"))
             .navigationBarTitleDisplayMode(.large)
+            .background(Color.appBackground)
             .sheet(item: $selectedStation) { station in
                 NavigationStack {
                     StationDetailView(station: station)
@@ -176,7 +177,7 @@ struct StationSearchView: View {
                     }
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(Color.appAccent)
+                    .foregroundStyle(Color.accentColor)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(.regularMaterial, in: Capsule())
@@ -285,7 +286,7 @@ struct FilterChip: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.appAccent : Color(.systemGray5))
+            .background(isSelected ? Color.accentColor : Color(.systemGray5))
             .foregroundStyle(isSelected ? .white : .primary)
             .clipShape(Capsule())
         }

@@ -192,7 +192,7 @@ extension StationDetailView {
 
             Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
                 .font(.caption)
-                .foregroundStyle(Color.appAccent)
+                .foregroundStyle(Color.accentColor)
         } else if let url = stationMap.resolvedURL {
             Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
                 .font(.subheadline)
@@ -216,7 +216,7 @@ extension StationDetailView {
                 )
                 Link(AppLocalization.localized("Open official timetable image"), destination: url)
                     .font(.caption)
-                    .foregroundStyle(Color.appAccent)
+                    .foregroundStyle(Color.accentColor)
             }
         }
     }

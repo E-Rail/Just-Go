@@ -90,7 +90,7 @@ struct TransitDataView: View {
     private func dataCapabilityRow(icon: String, title: String, detail: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .foregroundStyle(Color.appAccent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)

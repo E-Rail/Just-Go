@@ -54,7 +54,7 @@ struct TransferStationSheet: View {
         HStack(spacing: 10) {
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.title2)
-                .foregroundStyle(Color.appAccent)
+                .foregroundStyle(Color.accentColor)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(stationName)

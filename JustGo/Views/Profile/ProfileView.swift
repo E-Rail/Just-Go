@@ -21,6 +21,8 @@ struct ProfileView: View {
             }
             .navigationTitle(AppLocalization.localized("Profile"))
             .navigationBarTitleDisplayMode(.large)
+            .scrollContentBackground(.hidden)
+            .background(Color.appBackground)
             .sheet(isPresented: $showAccessibilitySettings) {
                 AccessibilitySettingsView()
             }
@@ -47,7 +49,7 @@ struct ProfileView: View {
             Button(action: { showAccessibilitySettings = true }) {
                 HStack {
                     Image(systemName: "accessibility")
-                        .foregroundStyle(Color.appAccent)
+                        .foregroundStyle(Color.accentColor)
                     Text(AppLocalization.localized("Accessibility Settings"))
                     Spacer()
                     Image(systemName: "chevron.right")
@@ -63,7 +65,7 @@ struct ProfileView: View {
 
                 HStack {
                     Image(systemName: appState.accessibilityPreference.primaryCategory.icon)
-                        .foregroundStyle(Color.appAccent)
+                        .foregroundStyle(Color.accentColor)
                     Text(appState.accessibilityPreference.primaryCategory.displayName)
                         .font(.subheadline)
                 }
@@ -118,7 +120,7 @@ struct ProfileView: View {
             Button(action: { showTripMemory = true }) {
                 HStack {
                     Image(systemName: "bookmark.fill")
-                        .foregroundStyle(Color.appAccent)
+                        .foregroundStyle(Color.accentColor)
                     Text(AppLocalization.localized("My Trips"))
                     Spacer()
                     Image(systemName: "chevron.right")

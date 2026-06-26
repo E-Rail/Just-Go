@@ -77,7 +77,7 @@ struct SortChip: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
-            .background(isSelected ? Color.appAccent : Color.appSurface, in: Capsule())
+            .background(isSelected ? Color.accentColor : Color.appSurface, in: Capsule())
             .foregroundStyle(isSelected ? Color.white : Color.primary)
             .overlay(Capsule().stroke(isSelected ? Color.clear : Color(.separator), lineWidth: 1))
         }

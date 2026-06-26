@@ -52,8 +52,8 @@ struct SmartCommuteCard: View {
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(Color.appAccent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-                        .foregroundStyle(Color.appAccent)
+                        .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                        .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.plain)
             }

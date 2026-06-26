@@ -101,7 +101,7 @@ struct RoutePlannerView: View {
         Button(action: { showCityPicker = true }) {
             HStack {
                 Image(systemName: "building.2.fill")
-                    .foregroundStyle(Color.appAccent)
+                    .foregroundStyle(Color.accentColor)
                 Text(AppLocalization.localized("City"))
                 Spacer()
                 Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("Select City"))
@@ -171,7 +171,7 @@ struct RoutePlannerView: View {
                     Button(action: { viewModel?.swapOriginDestination() }) {
                         Image(systemName: "arrow.up.arrow.down")
                             .font(.title3)
-                            .foregroundStyle(Color.appAccent)
+                            .foregroundStyle(Color.accentColor)
                             .padding(8)
                             .background(.ultraThinMaterial, in: Circle())
                     }
@@ -271,7 +271,7 @@ struct RoutePlannerView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(viewModel?.canSearch == true ? Color.appAccent : Color.gray)
+            .background(viewModel?.canSearch == true ? Color.accentColor : Color.gray)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }

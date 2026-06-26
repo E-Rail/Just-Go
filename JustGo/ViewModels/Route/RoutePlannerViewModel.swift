@@ -50,6 +50,19 @@ final class RoutePlannerViewModel {
         self.locationService = locationService
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
         quickPlaces = UserDefaults.standard.codableValue(forKey: quickPlacesKey, as: [QuickPlace].self, default: [])
+        NotificationCenter.default.addObserver(forName: .quickPlacesDidReset, object: nil, queue: .main) { [weak self] notification in
+            guard let self else { return }
+            if let kind = notification.object as? QuickPlaceKind {
+                self.quickPlaces.removeAll { $0.kind == kind }
+            } else {
+                self.quickPlaces = []
+            }
+        }
+    }
+
+    func removeQuickPlace(_ kind: QuickPlaceKind) {
+        quickPlaces.removeAll { $0.kind == kind }
+        UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
     }
 
     var accessibilityFilter: AccessibilityFilter {

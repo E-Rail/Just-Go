@@ -12,7 +12,7 @@ struct TransferStationSheet: View {
     @State private var isLoadingStation = false
 
     private var stationName: String {
-        transferSegment.fromStationName ?? AppLocalization.localized("Transfer Station")
+        transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
     }
 
     private var crowdWindows: [String] {

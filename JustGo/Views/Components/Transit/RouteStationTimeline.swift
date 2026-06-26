@@ -6,19 +6,24 @@ struct RouteStationTimeline: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(stops.enumerated()), id: \.element.id) { index, stop in
+                let lineColor = Color(hex: stop.lineColorHex ?? "#007AFF")
+                let isLast = index == stops.count - 1
                 HStack(alignment: .top, spacing: 10) {
+                    // Left rail: fixed circle on top, flexible connector below.
+                    // The connector uses maxHeight: .infinity so it stretches to the
+                    // full row height — which is driven by the text column (definite
+                    // height via .padding, NOT a Spacer, so the row never collapses).
                     VStack(spacing: 0) {
                         Circle()
-                            .fill(Color(.systemBackground))
+                            // Fill with the card surface (adaptive light/dark) so the dot
+                            // reads as a hollow ring in both modes — Color(.systemBackground)
+                            // would be black on the dark-green card in dark mode.
+                            .fill(Color.appSurface)
                             .frame(width: 10, height: 10)
-                            .overlay {
-                                Circle()
-                                    .stroke(Color(hex: stop.lineColorHex ?? "#007AFF"), lineWidth: 2.5)
-                            }
-
-                        if index < stops.count - 1 {
+                            .overlay { Circle().stroke(lineColor, lineWidth: 2.5) }
+                        if !isLast {
                             Rectangle()
-                                .fill(Color(hex: stop.lineColorHex ?? "#007AFF"))
+                                .fill(lineColor)
                                 .frame(width: 3)
                                 .frame(maxHeight: .infinity)
                         }
@@ -28,10 +33,10 @@ struct RouteStationTimeline: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(stop.name)
                             .font(.subheadline)
-                            .fontWeight(index == 0 || index == stops.count - 1 ? .semibold : .regular)
+                            .fontWeight(index == 0 || isLast ? .semibold : .regular)
                         HStack(spacing: 6) {
-                            if let lineColor = stop.lineColorHex {
-                                LineColorIndicator(colorHex: lineColor, size: 8)
+                            if let colorHex = stop.lineColorHex {
+                                LineColorIndicator(colorHex: colorHex, size: 8)
                             }
                             if let lineName = stop.lineName {
                                 Text(lineName)
@@ -44,10 +49,8 @@ struct RouteStationTimeline: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        if index < stops.count - 1 {
-                            Spacer(minLength: 8)
-                        }
                     }
+                    .padding(.bottom, isLast ? 0 : 14)
 
                     Spacer()
                 }

@@ -3,6 +3,7 @@
 "About" = "About";
 "Accessibility" = "Accessibility";
 "Accessibility Info" = "Accessibility Info";
+"Accessibility filters" = "Accessibility filters";
 "Access Guidance" = "Access Guidance";
 "Accessibility Settings" = "Accessibility Settings";
 "Accessible" = "Accessible";
@@ -133,6 +134,8 @@
 "Search stations..." = "Search stations...";
 "See All" = "See All";
 "Select City" = "Select City";
+"Select a city above to search routes" = "Select a city above to search routes";
+"Enter a starting station and destination to search" = "Enter a starting station and destination to search";
 "Settings" = "Settings";
 "Shanghai" = "Shanghai";
 "Shenzhen" = "Shenzhen";
@@ -428,3 +431,14 @@
 "Total trips" = "Total trips";
 "This month" = "This month";
 "Your stats" = "Your stats";
+"Search a route, then tap 'Save this trip' to reuse it quickly" = "Search a route, then tap 'Save this trip' to reuse it quickly";
+"Your last 10 routes will appear here for quick access" = "Your last 10 routes will appear here for quick access";
+"Clear" = "Clear";
+"Select a city to explore stations and metro lines" = "Select a city to explore stations and metro lines";
+"When viewing a route, tap 'Report route issue' to add accessibility notes. Reports stay on your device." = "When viewing a route, tap 'Report route issue' to add accessibility notes. Reports stay on your device.";
+"No favorite stations yet" = "No favorite stations yet";
+"Find a station in Search or Map, then tap the star to save it here." = "Find a station in Search or Map, then tap the star to save it here.";
+"Remove" = "Remove";
+"Remove from favorites" = "Remove from favorites";
+"Add to favorites" = "Add to favorites";
+"Last" = "Last";

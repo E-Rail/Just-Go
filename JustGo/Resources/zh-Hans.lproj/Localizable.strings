@@ -3,6 +3,7 @@
 "About" = "关于";
 "Accessibility" = "无障碍";
 "Accessibility Info" = "无障碍信息";
+"Accessibility filters" = "无障碍筛选";
 "Access Guidance" = "进出站指引";
 "Accessibility Settings" = "无障碍设置";
 "Accessible" = "无障碍";
@@ -133,6 +134,8 @@
 "Search stations..." = "搜索车站…";
 "See All" = "查看全部";
 "Select City" = "选择城市";
+"Select a city above to search routes" = "请先在上方选择城市再搜索路线";
+"Enter a starting station and destination to search" = "输入出发站和目的站后即可搜索";
 "Settings" = "设置";
 "Shanghai" = "上海";
 "Shenzhen" = "深圳";
@@ -428,3 +431,14 @@
 "Total trips" = "总行程";
 "This month" = "本月";
 "Your stats" = "我的统计";
+"Search a route, then tap 'Save this trip' to reuse it quickly" = "搜索路线后，点击“保存此行程”即可快速复用";
+"Your last 10 routes will appear here for quick access" = "最近 10 条路线会显示在这里，方便快速访问";
+"Clear" = "清除";
+"Select a city to explore stations and metro lines" = "选择城市以浏览车站和地铁线路";
+"When viewing a route, tap 'Report route issue' to add accessibility notes. Reports stay on your device." = "查看路线时，点击“报告路线问题”即可添加无障碍备注。报告仅保存在本设备。";
+"No favorite stations yet" = "还没有收藏车站";
+"Find a station in Search or Map, then tap the star to save it here." = "在搜索或地图中找到车站，然后点击星标保存到这里。";
+"Remove" = "移除";
+"Remove from favorites" = "从收藏中移除";
+"Add to favorites" = "添加到收藏";
+"Last" = "末班";

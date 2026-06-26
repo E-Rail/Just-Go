@@ -55,8 +55,12 @@ final class RoutePlannerViewModel {
             guard let self else { return }
             if let kind = notification.object as? QuickPlaceKind {
                 self.quickPlaces.removeAll { $0.kind == kind }
+                if self.pendingQuickPlaceKind == kind {
+                    self.pendingQuickPlaceKind = nil
+                }
             } else {
                 self.quickPlaces = []
+                self.pendingQuickPlaceKind = nil
             }
         }
     }
@@ -147,6 +151,8 @@ final class RoutePlannerViewModel {
         selectedCity = city
         originPlace = nil
         destinationPlace = nil
+        suggestionTask?.cancel()
+        suggestionTask = nil
         clearSuggestions()
     }
 
@@ -159,7 +165,8 @@ final class RoutePlannerViewModel {
         defer { isLoading = false }
 
         do {
-            if let originPlace, let destinationPlace {
+            switch (originPlace, destinationPlace) {
+            case let (originPlace?, destinationPlace?):
                 routes = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destinationPlace,
@@ -167,7 +174,25 @@ final class RoutePlannerViewModel {
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor
                 )
-            } else {
+            case let (originPlace?, nil):
+                let destination = try await resolveTypedPlace(destinationName, city: city)
+                routes = try await routePlanningService.planRoute(
+                    from: originPlace,
+                    to: destination,
+                    city: city.id,
+                    accessibilityFilter: accessibilityFilter,
+                    tripAnchor: tripAnchor
+                )
+            case let (nil, destinationPlace?):
+                let origin = try await resolveTypedPlace(originName, city: city)
+                routes = try await routePlanningService.planRoute(
+                    from: origin,
+                    to: destinationPlace,
+                    city: city.id,
+                    accessibilityFilter: accessibilityFilter,
+                    tripAnchor: tripAnchor
+                )
+            case (nil, nil):
                 routes = try await routePlanningService.planRoute(
                     from: originName,
                     to: destinationName,
@@ -286,6 +311,7 @@ final class RoutePlannerViewModel {
             clearSuggestions(for: field)
             return
         }
+        let cityID = city.id
 
         suggestionTask = Task { [placeSearchProvider] in
             do {
@@ -296,7 +322,10 @@ final class RoutePlannerViewModel {
                     longitudinalMeters: 80_000
                 )
                 let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled,
+                      selectedCity?.id == cityID,
+                      name(for: field) == keyword,
+                      place(for: field) == nil else { return }
                 setSuggestions(suggestions, for: field)
             } catch is CancellationError {
                 return
@@ -316,7 +345,23 @@ final class RoutePlannerViewModel {
         destinationSuggestions = []
     }
 
+    private func resolveTypedPlace(_ name: String, city: City) async throws -> TransitPlace {
+        let query = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { throw RoutePlanningError.stationNotFound }
+        let region = MKCoordinateRegion(
+            center: city.coordinate,
+            latitudinalMeters: 120_000,
+            longitudinalMeters: 120_000
+        )
+        guard let place = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 8).first else {
+            throw RoutePlanningError.stationNotFound
+        }
+        return place
+    }
+
     private func assignPlace(_ place: TransitPlace, for field: RouteInputField) {
+        suggestionTask?.cancel()
+        suggestionTask = nil
         setPlace(place, for: field)
         setName(place.name, for: field)
         clearSuggestions(for: field)
@@ -336,6 +381,10 @@ final class RoutePlannerViewModel {
         } else {
             destinationPlace = place
         }
+    }
+
+    private func place(for field: RouteInputField) -> TransitPlace? {
+        field == .origin ? originPlace : destinationPlace
     }
 
     private func setSuggestions(_ suggestions: [TransitPlace], for field: RouteInputField) {

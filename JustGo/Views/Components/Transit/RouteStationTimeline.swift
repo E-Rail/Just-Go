@@ -10,16 +10,17 @@ struct RouteStationTimeline: View {
                     VStack(spacing: 0) {
                         Circle()
                             .fill(Color(.systemBackground))
-                            .frame(width: stop.isTransfer ? 14 : 10, height: stop.isTransfer ? 14 : 10)
+                            .frame(width: 10, height: 10)
                             .overlay {
                                 Circle()
-                                    .stroke(Color(hex: stop.lineColorHex ?? "#007AFF"), lineWidth: stop.isTransfer ? 4 : 3)
+                                    .stroke(Color(hex: stop.lineColorHex ?? "#007AFF"), lineWidth: 2.5)
                             }
 
                         if index < stops.count - 1 {
                             Rectangle()
                                 .fill(Color(hex: stop.lineColorHex ?? "#007AFF"))
-                                .frame(width: 10, height: 22)
+                                .frame(width: 3)
+                                .frame(maxHeight: .infinity)
                         }
                     }
                     .frame(width: 18)
@@ -37,23 +38,19 @@ struct RouteStationTimeline: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-                            if stop.isTransfer {
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.caption)
-                                    .foregroundStyle(.orange)
-                                    .accessibilityLabel(AppLocalization.localized("Transfer"))
-                            }
                             if let arrivalTimeText = stop.arrivalTimeText {
                                 Text(arrivalTimeText)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        if index < stops.count - 1 {
+                            Spacer(minLength: 8)
+                        }
                     }
 
                     Spacer()
                 }
-                .padding(.vertical, 2)
             }
         }
         .padding(.top, 4)

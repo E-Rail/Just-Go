@@ -39,6 +39,7 @@ final class RoutePlannerViewModel {
     private let locationService: LocationService
     private let recentRoutesKey = "recentRoutes"
     private let quickPlacesKey = "quickPlaces"
+    private var quickPlacesResetObserver: NSObjectProtocol?
 
     init(
         routePlanningService: RoutePlanningService,
@@ -50,13 +51,19 @@ final class RoutePlannerViewModel {
         self.locationService = locationService
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
         quickPlaces = UserDefaults.standard.codableValue(forKey: quickPlacesKey, as: [QuickPlace].self, default: [])
-        NotificationCenter.default.addObserver(forName: .quickPlacesDidReset, object: nil, queue: .main) { [weak self] notification in
+        quickPlacesResetObserver = NotificationCenter.default.addObserver(forName: .quickPlacesDidReset, object: nil, queue: .main) { [weak self] notification in
             guard let self else { return }
             if let kind = notification.object as? QuickPlaceKind {
                 self.quickPlaces.removeAll { $0.kind == kind }
             } else {
                 self.quickPlaces = []
             }
+        }
+    }
+
+    deinit {
+        if let observer = quickPlacesResetObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
 
@@ -117,11 +124,19 @@ final class RoutePlannerViewModel {
         do {
             let location = try await locationService.requestCurrentLocation()
             let coordinate = location.coordinate
-            let place = try await placeSearchProvider.reverseGeocode(
-                location: coordinate,
-                name: AppLocalization.localized("Current Location")
-            ).withSource(.currentLocation)
-
+            let place: TransitPlace
+            do {
+                place = try await placeSearchProvider.reverseGeocode(
+                    location: coordinate,
+                    name: AppLocalization.localized("Current Location")
+                ).withSource(.currentLocation)
+            } catch {
+                place = TransitPlace(
+                    name: AppLocalization.localized("Current Location"),
+                    coordinate: coordinate,
+                    source: .currentLocation
+                )
+            }
             assignPlace(place, for: field)
         } catch {
             errorMessage = userFacingErrorMessage(for: error)

@@ -43,6 +43,7 @@ struct RouteDetailView: View {
                 if comfortForecast.hasSignal { RouteComfortCard(forecast: comfortForecast) }
                 routeFeasibilityCard
                 segmentsTimeline
+                stationsCard
                 reminderSection
                 riderTrustActions
             }
@@ -306,6 +307,16 @@ struct RouteDetailView: View {
             boardingServiceWindows = matched.isEmpty ? windows : matched
         } else {
             boardingServiceWindows = windows
+        }
+    }
+
+    private var stationsCard: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.text(english: "Stations", simplified: "途经车站", traditional: "途經車站"))
+                    .font(.headline)
+                RouteStationTimeline(stops: route.stationTimelineStops)
+            }
         }
     }
 

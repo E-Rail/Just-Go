@@ -203,7 +203,7 @@ extension RouteDetailView {
         case .walking:
             return .gray
         case .subway, .transit:
-            return Color(hex: segment.lineColorHex ?? "#007AFF")
+            return Color.adaptive(hex: segment.lineColorHex ?? "#007AFF")
         case .transfer:
             return .orange
         }

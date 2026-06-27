@@ -24,13 +24,39 @@ extension Color {
     })
 
     init(hex: String) {
+        let (r, g, b) = Color.rgbComponents(hex: hex)
+        self.init(red: Double(r), green: Double(g), blue: Double(b))
+    }
+
+    static func rgbComponents(hex: String) -> (CGFloat, CGFloat, CGFloat) {
         let hex = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
         let scanner = Scanner(string: hex)
-        var rgbValue: UInt64 = 0
-        scanner.scanHexInt64(&rgbValue)
-        let r = Double((rgbValue & 0xFF0000) >> 16) / 255
-        let g = Double((rgbValue & 0x00FF00) >> 8) / 255
-        let b = Double(rgbValue & 0x0000FF) / 255
-        self.init(red: r, green: g, blue: b)
+        var value: UInt64 = 0
+        scanner.scanHexInt64(&value)
+        return (
+            CGFloat((value & 0xFF0000) >> 16) / 255,
+            CGFloat((value & 0x00FF00) >> 8) / 255,
+            CGFloat(value & 0x0000FF) / 255
+        )
+    }
+
+    /// Theme accent that adapts to dark mode by lightening the color, so accent-tinted
+    /// text, icons, and controls stay legible on the dark background. Light mode uses the
+    /// exact hex; dark mode raises brightness and eases saturation for contrast.
+    static func adaptiveAccent(hex: String) -> Color {
+        let (r, g, b) = Color.rgbComponents(hex: hex)
+        let base = UIColor(red: r, green: g, blue: b, alpha: 1)
+        let dark = base.lightenedForDarkMode()
+        return Color(UIColor { $0.userInterfaceStyle == .dark ? dark : base })
+    }
+}
+
+private extension UIColor {
+    func lightenedForDarkMode() -> UIColor {
+        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return self }
+        let brightened = min(1.0, b + (1.0 - b) * 0.55)
+        let eased = max(0.0, s * 0.82)
+        return UIColor(hue: h, saturation: eased, brightness: brightened, alpha: a)
     }
 }

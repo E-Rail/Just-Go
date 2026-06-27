@@ -14,7 +14,7 @@ struct RouteCard: View {
     }
 
     private var lineColor: Color {
-        Color(hex: route.boardingTransitSegment?.lineColorHex ?? "#FF3B30")
+        Color.adaptive(hex: route.boardingTransitSegment?.lineColorHex ?? "#FF3B30")
     }
 
     var body: some View {

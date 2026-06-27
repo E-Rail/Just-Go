@@ -40,23 +40,36 @@ extension Color {
         )
     }
 
-    /// Theme accent that adapts to dark mode by lightening the color, so accent-tinted
-    /// text, icons, and controls stay legible on the dark background. Light mode uses the
-    /// exact hex; dark mode raises brightness and eases saturation for contrast.
-    static func adaptiveAccent(hex: String) -> Color {
+    /// Universal adaptive brand color: any hex used for foreground (text, icons, strokes,
+    /// thin lines) should pass through this so it stays legible in both appearances.
+    /// Light mode uses the exact hex. Dark mode lightens the color toward white only as
+    /// much as needed to clear a legibility threshold against the dark background — so a
+    /// dark forest green lifts a lot, while an already-bright color is left untouched.
+    /// Works for any hue, so every theme and line color is handled by one rule. Use the
+    /// raw `Color(hex:)` for solid fills/badges/map overlays where the true brand color
+    /// is required.
+    static func adaptive(hex: String) -> Color {
         let (r, g, b) = Color.rgbComponents(hex: hex)
         let base = UIColor(red: r, green: g, blue: b, alpha: 1)
-        let dark = base.lightenedForDarkMode()
+        let dark = base.legibleOnDarkBackground()
         return Color(UIColor { $0.userInterfaceStyle == .dark ? dark : base })
     }
 }
 
 private extension UIColor {
-    func lightenedForDarkMode() -> UIColor {
-        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        guard getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return self }
-        let brightened = min(1.0, b + (1.0 - b) * 0.55)
-        let eased = max(0.0, s * 0.82)
-        return UIColor(hue: h, saturation: eased, brightness: brightened, alpha: a)
+    /// Blends the color toward white just enough to reach `targetLuminance`, leaving
+    /// already-light colors unchanged. Perceptual luma keeps the lift even across hues.
+    func legibleOnDarkBackground(targetLuminance: CGFloat = 0.62) -> UIColor {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard getRed(&r, green: &g, blue: &b, alpha: &a) else { return self }
+        let luma = 0.299 * r + 0.587 * g + 0.114 * b
+        guard luma < targetLuminance else { return self }
+        let t = (targetLuminance - luma) / (1 - luma) // blend factor toward white, 0...1
+        return UIColor(
+            red: r + (1 - r) * t,
+            green: g + (1 - g) * t,
+            blue: b + (1 - b) * t,
+            alpha: a
+        )
     }
 }

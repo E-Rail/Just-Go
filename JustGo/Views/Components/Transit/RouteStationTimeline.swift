@@ -7,7 +7,7 @@ struct RouteStationTimeline: View {
         if !stops.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(stops.enumerated()), id: \.element.id) { index, stop in
-                    let lineColor = Color(hex: stop.lineColorHex ?? "#007AFF")
+                    let lineColor = Color.adaptive(hex: stop.lineColorHex ?? "#007AFF")
                     let isLast = index == stops.count - 1
                     HStack(alignment: .top, spacing: 10) {
                         // Left rail: fixed circle on top, flexible connector below.

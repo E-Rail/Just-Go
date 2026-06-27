@@ -31,6 +31,6 @@ struct ContentView: View {
                 }
                 .tag(3)
         }
-        .tint(Color(hex: selectedThemeHex))
+        .tint(Color.adaptiveAccent(hex: selectedThemeHex))
     }
 }

@@ -14,7 +14,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
     case roseGold     = "#A8336A"
 
     var id: String { rawValue }
-    var accent: Color { Color(hex: rawValue) }
+    var accent: Color { Color.adaptiveAccent(hex: rawValue) }
 
     var name: String {
         switch self {

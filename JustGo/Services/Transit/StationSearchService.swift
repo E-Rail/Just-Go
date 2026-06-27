@@ -68,22 +68,10 @@ final class StationSearchService {
         return Array(try await search(keyword: query, city: city).prefix(limit))
     }
 
-    func searchNearby(location: CLLocationCoordinate2D) async throws -> [Station] {
-        let searchRadius = 10_000.0
-        let networks = await metroNetworkProvider.networks().filter {
-            $0.bounds.distance(to: location) <= searchRadius
-        }
-        var bundledStations: [Station] = []
-        for network in networks {
-            bundledStations.append(contentsOf: await metroNetworkProvider.stations(in: network.cityID))
-        }
-        let stations = bundledStations
-            .map { ($0, location.distance(to: $0.coordinate)) }
-            .filter { $0.1 <= searchRadius }
-            .sorted { $0.1 < $1.1 }
-            .prefix(5)
-            .map(\.0)
-        return await officialStationData.enrichStations(stations)
+    /// Enrich an already-resolved station with official accessibility/facility data,
+    /// without a keyword round-trip (avoids matching the wrong similarly-named station).
+    func enrichStation(_ station: Station) async -> Station {
+        await officialStationData.enrichStation(station)
     }
 
     func stationDetails(stationID: String, city: String) async throws -> Station {

@@ -55,6 +55,10 @@ extension RoutePlannerView {
                 if isEvening {
                     viewModel?.swapOriginDestination()
                 }
+                Task {
+                    await viewModel?.searchRoutes()
+                    showResults = viewModel?.routes.isEmpty == false
+                }
             }
         }
     }

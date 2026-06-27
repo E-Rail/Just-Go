@@ -42,7 +42,7 @@ struct NetworkLineStatusView: View {
                                     .fill(Color(hex: item.line.colorHex))
                                     .frame(width: 14, height: 14)
 
-                                Text(item.line.name)
+                                Text(item.line.localizedName)
                                     .font(.body)
 
                                 Spacer()

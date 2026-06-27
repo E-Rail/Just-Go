@@ -26,6 +26,7 @@ struct TransitMapView: UIViewRepresentable {
     let showsUserLocation: Bool
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
+    var onPlaceSelected: ((MKMapItem) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -37,6 +38,7 @@ struct TransitMapView: UIViewRepresentable {
         mapView.showsCompass = true
         mapView.showsScale = true
         mapView.pointOfInterestFilter = .includingAll
+        mapView.selectableMapFeatures = [.pointsOfInterest]
         mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
         context.coordinator.sync(parent: self, on: mapView)
         return mapView
@@ -58,6 +60,7 @@ struct TransitMapView: UIViewRepresentable {
         private var networkOverlays: [MKOverlay] = []
         private var routeOverlays: [MKOverlay] = []
         private var stationSymbolImages: [String: UIImage] = [:]
+        private var poiTask: Task<Void, Never>?
 
         init(parent: TransitMapView) {
             self.parent = parent
@@ -249,8 +252,18 @@ struct TransitMapView: UIViewRepresentable {
             guard let annotation = view.annotation else { return }
             if let station = annotationStations[ObjectIdentifier(annotation)] {
                 parent.onStationSelected(station)
+                mapView.deselectAnnotation(annotation, animated: false)
+            } else if let feature = annotation as? MKMapFeatureAnnotation,
+                      feature.featureType == .pointOfInterest {
+                // Resolve the tapped Apple POI to an MKMapItem, then surface it.
+                // Deselect only after the async resolve so the feature stays valid.
+                poiTask?.cancel()
+                poiTask = Task { @MainActor [weak mapView] in
+                    let mapItem = try? await MKMapItemRequest(mapFeatureAnnotation: feature).mapItem
+                    if let mapItem { self.parent.onPlaceSelected?(mapItem) }
+                    mapView?.deselectAnnotation(feature, animated: false)
+                }
             }
-            mapView.deselectAnnotation(annotation, animated: false)
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

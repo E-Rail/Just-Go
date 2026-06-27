@@ -148,9 +148,15 @@ final class RoutePlannerViewModel {
     }
 
     func cityChanged(to city: City?) {
+        let cityActuallyChanged = city?.id != selectedCity?.id
         selectedCity = city
         originPlace = nil
         destinationPlace = nil
+        if cityActuallyChanged {
+            // Clear stale station names so they aren't searched against the new city.
+            originName = ""
+            destinationName = ""
+        }
         suggestionTask?.cancel()
         suggestionTask = nil
         clearSuggestions()

@@ -207,7 +207,7 @@ enum DataConfidence: String, Codable, Equatable {
         case .communityVerified: return AppLocalization.localized("Community verified")
         case .personal: return AppLocalization.localized("Personal report")
         case .estimated: return AppLocalization.localized("Estimated")
-        case .sourcePending: return AppLocalization.localized("Loading...")
+        case .sourcePending: return AppLocalization.localized("Source pending")
         case .unavailable: return AppLocalization.localized("Not available")
         case .unknown: return AppLocalization.text(english: "No data", simplified: "暂无数据", traditional: "暫無數據")
         }

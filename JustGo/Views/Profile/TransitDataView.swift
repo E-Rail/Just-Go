@@ -77,12 +77,16 @@ struct TransitDataView: View {
                         }
                     }
                 } header: {
-                    Text(AppLocalization.localized("Supported Cities"))
+                    Text(AppLocalization.text(
+                        english: "City Data Packs",
+                        simplified: "城市数据包",
+                        traditional: "城市資料包"
+                    ))
                 } footer: {
                     Text(AppLocalization.text(
-                        english: "Download a city's official pack to add verified station details offline.",
-                        simplified: "下载城市官方数据包，离线获取经核实的车站详情。",
-                        traditional: "下載城市官方資料包，離線取得經核實的車站詳情。"
+                        english: "Download appears only for cities with an official pack in the current manifest.",
+                        simplified: "仅当前清单中已有官方数据包的城市会显示下载。",
+                        traditional: "只有目前清單中已有官方資料包的城市會顯示下載。"
                     ))
                 }
             }
@@ -93,6 +97,9 @@ struct TransitDataView: View {
                     Button(AppLocalization.localized("Done")) { dismiss() }
                 }
             }
+            .task {
+                await refreshPackStatuses()
+            }
         }
     }
 
@@ -102,6 +109,12 @@ struct TransitDataView: View {
             ProgressView()
         } else if let status = packStatus[city.id] {
             switch status {
+            case .available:
+                Button(AppLocalization.text(english: "Download", simplified: "下载", traditional: "下載")) {
+                    Task { await downloadPack(city) }
+                }
+                .font(.caption)
+                .buttonStyle(.borderless)
             case .loaded(let version):
                 Label("v\(version)", systemImage: "checkmark.circle.fill")
                     .labelStyle(.titleAndIcon)
@@ -119,11 +132,15 @@ struct TransitDataView: View {
                     .foregroundStyle(.secondary)
             }
         } else {
-            Button(AppLocalization.text(english: "Download", simplified: "下载", traditional: "下載")) {
-                Task { await downloadPack(city) }
-            }
-            .font(.caption)
-            .buttonStyle(.borderless)
+            EmptyView()
+        }
+    }
+
+    private func refreshPackStatuses() async {
+        let cityIDs = cities.map(\.id)
+        let statuses = await container.officialStationData.cityPackStatuses(for: cityIDs)
+        await MainActor.run {
+            packStatus = statuses
         }
     }
 

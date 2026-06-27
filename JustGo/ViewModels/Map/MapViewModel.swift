@@ -23,8 +23,6 @@ struct MapVisibleRegion {
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
-    var nearbyStations: [Station] = []
-    var isShowingAllNearbyStations = false
     var searchText = ""
     var searchResults: [Station] = []
     var errorMessage: String?
@@ -68,34 +66,6 @@ final class MapViewModel {
         cityLoadTask = Task { [weak self] in
             await self?.loadNetworks(cityIDs: [city.id])
         }
-    }
-
-    func loadNearbyStations() async {
-        do {
-            let location = try await locationService.requestCurrentLocation()
-            nearbyStations = try await stationSearchService.searchNearby(location: location.coordinate)
-            errorMessage = nil
-        } catch {
-            nearbyStations = []
-            errorMessage = locationErrorMessage(for: error)
-        }
-    }
-
-    @discardableResult
-    func requestLocationAccess() async -> Bool {
-        do {
-            _ = try await locationService.requestCurrentLocation()
-            await loadNearbyStations()
-            return true
-        } catch {
-            nearbyStations = []
-            errorMessage = locationErrorMessage(for: error)
-            return false
-        }
-    }
-
-    func toggleNearbyList() {
-        isShowingAllNearbyStations.toggle()
     }
 
     func searchStations(in city: City?) async {
@@ -161,16 +131,7 @@ final class MapViewModel {
             )
         }
 
-        do {
-            let detailedStation = try await stationSearchService.stationDetails(
-                stationID: station.name,
-                city: station.cityID
-            )
-            return detailedStation
-        } catch {
-            errorMessage = AppLocalization.localized("Station details are temporarily unavailable")
-            return station
-        }
+        return await stationSearchService.enrichStation(station)
     }
 
     func updateCamera(to coordinate: CLLocationCoordinate2D) {
@@ -225,11 +186,6 @@ final class MapViewModel {
             .filter { $0.bounds.intersects(region) }
             .sorted { $0.cityID < $1.cityID }
         refreshVisibleStations()
-    }
-
-    private func locationErrorMessage(for error: Error) -> String {
-        (error as? LocationServiceError)?.errorDescription ??
-            AppLocalization.localized("Current location unavailable")
     }
 
     private func refreshVisibleStations() {

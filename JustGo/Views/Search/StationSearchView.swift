@@ -256,12 +256,23 @@ struct StationSearchView: View {
     private var recentSearchesSection: some View {
         Section(AppLocalization.localized("Recent Searches")) {
             ForEach(viewModel?.recentSearches ?? []) { search in
-                HStack {
-                    Image(systemName: "clock")
-                        .foregroundStyle(.secondary)
-                    Text(search.stationName)
-                    Spacer()
+                Button {
+                    isSearchFocused = false
+                    viewModel?.searchText = search.stationName
+                    Task { await viewModel?.search(city: appState.selectedCity?.id ?? "") }
+                } label: {
+                    HStack {
+                        Image(systemName: "clock")
+                            .foregroundStyle(.secondary)
+                        Text(search.stationName)
+                        Spacer()
+                        Image(systemName: "arrow.up.left")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
             .onDelete { offsets in
                 viewModel?.deleteRecentSearches(at: offsets)

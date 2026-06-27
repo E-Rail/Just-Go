@@ -82,6 +82,7 @@
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
 		A1000070 /* Route/SmartCommuteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070 /* Route/SmartCommuteCard.swift */; };
 		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
+		A1000313 /* Map/MapItemDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000313 /* Map/MapItemDetailSheet.swift */; };
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
 		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
@@ -179,6 +180,7 @@
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
 		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
+		A2000313 /* Map/MapItemDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapItemDetailSheet.swift; sourceTree = "<group>"; };
 		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
@@ -324,6 +326,7 @@
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
 				A2000071 /* Map/NetworkLineStatusView.swift */,
+				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
@@ -538,6 +541,7 @@
 				A1000312 /* AppTheme.swift in Sources */,
 				A1000070 /* Route/SmartCommuteCard.swift in Sources */,
 				A1000071 /* Map/NetworkLineStatusView.swift in Sources */,
+				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -692,7 +696,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -725,7 +729,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

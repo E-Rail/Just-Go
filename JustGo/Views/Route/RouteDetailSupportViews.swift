@@ -16,7 +16,11 @@ struct TripConfidenceCard: View {
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("\(confidence.score) / 100")
+                        Text(AppLocalization.text(
+                            english: "\(confidence.score) / 100",
+                            simplified: "\(confidence.score)分",
+                            traditional: "\(confidence.score)分"
+                        ))
                             .font(.title3)
                             .fontWeight(.bold)
                         Text(confidence.level.title)

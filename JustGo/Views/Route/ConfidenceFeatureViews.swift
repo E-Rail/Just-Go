@@ -151,10 +151,12 @@ struct DeparturePlannerSection: View {
                 ForEach(Mode.allCases) { Text($0.title).tag($0) }
             }
             .pickerStyle(.segmented)
+            .accessibilityLabel(AppLocalization.text(english: "When are you traveling?", simplified: "何时出行？", traditional: "何時出行？"))
 
             if mode != .now {
                 DatePicker(
                     selection: $date,
+                    in: Date()...,
                     displayedComponents: [.date, .hourAndMinute]
                 ) {
                     Text(mode.title)

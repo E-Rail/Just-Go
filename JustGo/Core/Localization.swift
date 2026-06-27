@@ -199,6 +199,12 @@ extension SubwayLine {
     }
 }
 
+extension MetroLine {
+    var localizedName: String {
+        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
+    }
+}
+
 extension RouteSegment {
     var summaryLabel: String {
         switch type {

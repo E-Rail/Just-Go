@@ -1,14 +1,20 @@
 import SwiftUI
+import MapKit
+
+private struct IdentifiableMapItem: Identifiable {
+    let id = UUID()
+    let mapItem: MKMapItem
+}
 
 struct MapContainerView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
     @State private var viewModel: MapViewModel?
     @State private var selectedStation: Station?
+    @State private var selectedMapItem: IdentifiableMapItem?
     @State private var showCityPicker = false
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
-    @State private var isNearbyStationsExpanded = true
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -61,6 +67,13 @@ struct MapContainerView: View {
                 StationDetailView(station: station)
             }
         }
+        .sheet(item: $selectedMapItem) { item in
+            MapItemDetailSheet(mapItem: item.mapItem) {
+                selectedMapItem = nil
+            }
+            .ignoresSafeArea()
+            .presentationDetents([.medium, .large])
+        }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: Binding(
                 get: { appState.selectedCity },
@@ -77,9 +90,6 @@ struct MapContainerView: View {
 
             guard let city = appState.selectedCity else { return }
             await viewModel?.loadStations(for: city)
-            if viewModel?.isLocationAuthorized == true {
-                await viewModel?.loadNearbyStations()
-            }
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
             viewModel?.scheduleStationSearch(in: appState.selectedCity)
@@ -99,7 +109,8 @@ struct MapContainerView: View {
             onRegionChanged: { region in
                 viewModel?.viewportChanged(to: region)
             },
-            onStationSelected: openStation
+            onStationSelected: openStation,
+            onPlaceSelected: { selectedMapItem = IdentifiableMapItem(mapItem: $0) }
         )
     }
 
@@ -229,100 +240,7 @@ struct MapContainerView: View {
                 .background(.regularMaterial, in: Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(AppLocalization.localized("Nearest Station"))
-    }
-
-    private func nearbyStationsCard(viewModel: MapViewModel) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Button {
-                withAnimation(.snappy) {
-                    isNearbyStationsExpanded.toggle()
-                }
-            } label: {
-                HStack {
-                    Text(AppLocalization.localized("Nearby Stations"))
-                        .font(.headline)
-                    Spacer()
-                    Image(systemName: "chevron.down")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .rotationEffect(.degrees(isNearbyStationsExpanded ? 0 : -90))
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityValue(isNearbyStationsExpanded ? AppLocalization.localized("Expanded") : AppLocalization.localized("Collapsed"))
-
-            if isNearbyStationsExpanded {
-                if !viewModel.nearbyStations.isEmpty {
-                    HStack {
-                        Spacer()
-                        Button(viewModel.isShowingAllNearbyStations ? AppLocalization.localized("Show Less") : AppLocalization.localized("See All")) {
-                            withAnimation {
-                                viewModel.toggleNearbyList()
-                            }
-                        }
-                        .font(.subheadline)
-                    }
-                }
-
-                if viewModel.nearbyStations.isEmpty && !viewModel.isLocationAuthorized {
-                    Button {
-                        Task {
-                            await viewModel.requestLocationAccess()
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "location.slash")
-                                .foregroundStyle(.secondary)
-                            Text(AppLocalization.localized("Enable location to see nearby stations"))
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.vertical, 8)
-                } else if viewModel.nearbyStations.isEmpty {
-                    Text(viewModel.errorMessage ?? AppLocalization.localized("No nearby stations found"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 8)
-                } else {
-                    ForEach(viewModel.nearbyStations.prefix(viewModel.isShowingAllNearbyStations ? 10 : 3)) { station in
-                        StationRow(station: station) {
-                            openStation(station)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-    }
-
-    private var noCityGuidanceCard: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "tram.circle")
-                .font(.largeTitle)
-                .foregroundStyle(.secondary)
-            Text(AppLocalization.localized("Select a city to explore stations and metro lines"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Button(action: { showCityPicker = true }) {
-                Text(AppLocalization.localized("Select City"))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(Color.accentColor, in: Capsule())
-                    .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityLabel(AppLocalization.localized("Center map on my location"))
     }
 
     private func openStation(_ station: Station) {

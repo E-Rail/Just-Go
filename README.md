@@ -1,5 +1,16 @@
 # JustGo
 
+[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
+[![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
+[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-0071e3?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/E-Rail/JustGo?style=flat&logo=github)](https://github.com/E-Rail/JustGo/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/E-Rail/JustGo?logo=git&logoColor=white)](https://github.com/E-Rail/JustGo/commits)
+
+**Website:** [e-rail.github.io/justgo](https://e-rail.github.io/justgo)
+
 JustGo is a subway confidence app for China. It helps riders understand not only which route to take, but whether that trip will be smooth, understandable, and reliable before they enter the station. JustGo combines routing, official schedules, station maps, accessibility information, exit guidance, and transparent data-source labels so every rider can travel with fewer surprises.
 
 Accessibility is not a separate mode. It is the design standard that makes the app better for everyone: wheelchair users, elderly riders, tourists, people carrying luggage, families, first-time subway users, and daily commuters.
@@ -19,8 +30,8 @@ Accessibility is not a separate mode. It is the design standard that makes the a
 
 ## Requirements
 
-- iOS 17.0+
-- iPadOS 17.0+
+- iOS 18.0+
+- iPadOS 18.0+
 - Xcode 16.0+
 - Swift 5.9+
 

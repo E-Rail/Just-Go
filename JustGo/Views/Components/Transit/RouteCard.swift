@@ -1,146 +1,162 @@
 import SwiftUI
 
+/// Transit summary card shown for every route in the results list:
+/// a trip-confidence ring, the boarding line badge with trip stats, and a
+/// departure → arrival timeline with a dot per transfer.
 struct RouteCard: View {
     let route: Route
     let confidence: RouteConfidence
-    var comfort: RouteComfortForecast?
-    var departurePlan: DeparturePlan?
+    let departureDate: Date
     let action: () -> Void
+
+    private var arrivalDate: Date {
+        departureDate.addingTimeInterval(route.totalDuration)
+    }
+
+    private var lineColor: Color {
+        Color(hex: route.boardingTransitSegment?.lineColorHex ?? "#FF3B30")
+    }
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(route.formattedDuration)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        Text("\(route.strategy.localizedName) • \(route.formattedWalkingDistance)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text(route.dataCoverage.scheduleConfidence == .official
-                            ? DataConfidence.official.label
-                            : DataConfidence.mapKit.label)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer()
-
-                    VStack(alignment: .trailing, spacing: 8) {
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                        confidenceBadge
-                    }
-                }
-
-                routeSegmentRows
-
-                RouteStationTimeline(stops: route.stationTimelineStops)
-
-                if let originGuide = route.originAccessGuide,
-                   let destinationGuide = route.destinationAccessGuide {
-                    VStack(alignment: .leading, spacing: 6) {
-                        accessPreviewRow(guide: originGuide, icon: "arrow.down.forward.circle")
-                        accessPreviewRow(guide: destinationGuide, icon: "arrow.up.forward.circle")
-                    }
-                }
-
-                Text(confidence.explanation)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-
+            VStack(alignment: .leading, spacing: 16) {
+                confidenceHeader
+                boardingBadge
                 if let warning = confidence.warnings.first {
                     Label(warning, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
                         .foregroundStyle(confidence.level.color)
                         .lineLimit(2)
                 }
+                journeyTimeline
+            }
+            .padding(16)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18))
+            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilitySummary)
+    }
 
-                ServiceStatusBanner(status: route.serviceStatus, compact: true)
+    // MARK: - Confidence header
 
-                if let comfort, comfort.hasSignal {
-                    Label(comfort.summaryTitle, systemImage: comfort.level.iconName)
-                        .font(.caption)
-                        .foregroundStyle(comfort.level.uiColor)
-                }
-
-                if let departurePlan {
-                    Label(departurePlan.leaveByHeadline, systemImage: "clock")
-                        .font(.caption)
+    private var confidenceHeader: some View {
+        HStack(spacing: 16) {
+            confidenceRing
+            VStack(alignment: .leading, spacing: 3) {
+                Text(AppLocalization.localized("Trip Confidence"))
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .tracking(0.8)
+                    .textCase(.uppercase)
+                    .foregroundStyle(.secondary)
+                Text(confidence.level.summary)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                if !confidence.positiveReasons.isEmpty {
+                    Text(confidence.positiveReasons.prefix(2).joined(separator: " · "))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
             }
-            .padding()
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
+            Spacer(minLength: 0)
         }
-        .buttonStyle(.plain)
     }
 
-    // MARK: - Segment Rows
-
-    private var routeSegmentRows: some View {
-        VStack(spacing: 6) {
-            ForEach(route.segments) { segment in
-                if segment.type != .transfer {
-                    segmentRow(segment)
-                }
+    private var confidenceRing: some View {
+        ZStack {
+            Circle()
+                .stroke(Color(.systemGray5), lineWidth: 7)
+            Circle()
+                .trim(from: 0, to: CGFloat(min(100, max(0, confidence.score))) / 100)
+                .stroke(confidence.level.color, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: -1) {
+                Text("\(confidence.score)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                Text("/100")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
         }
+        .frame(width: 76, height: 76)
     }
 
-    private func segmentRow(_ segment: RouteSegment) -> some View {
-        HStack(spacing: 12) {
-            badgeCircle(for: segment)
-                .frame(width: 36, height: 36)
+    // MARK: - Boarding line badge
 
+    private var boardingBadge: some View {
+        HStack(spacing: 12) {
+            badgeCircle
+                .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 2) {
-                Text(segment.summaryLabel)
+                Text(badgeTitle)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                Text(segmentDetail(segment))
+                    .foregroundStyle(.primary)
+                Text(badgeMeta)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
+        .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 12))
     }
 
     @ViewBuilder
-    private func badgeCircle(for segment: RouteSegment) -> some View {
-        switch segment.type {
-        case .walking:
+    private var badgeCircle: some View {
+        if let segment = route.boardingTransitSegment {
             ZStack {
-                Circle().fill(Color(.systemGray3))
-                Image(systemName: "figure.walk")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-        case .subway, .transit:
-            let color = Color(hex: segment.lineColorHex ?? "#007AFF")
-            ZStack {
-                Circle().fill(color)
+                Circle().fill(Color(hex: segment.lineColorHex ?? "#007AFF"))
                 Text(lineShortCode(from: segment.lineName))
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
-        case .transfer:
+        } else {
             ZStack {
-                Circle().fill(Color.orange)
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 13, weight: .semibold))
+                Circle().fill(Color(.systemGray3))
+                Image(systemName: "figure.walk")
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
             }
         }
+    }
+
+    private var badgeTitle: String {
+        guard let segment = route.boardingTransitSegment, let lineName = segment.lineName else {
+            return AppLocalization.text(english: "Walking route", simplified: "步行路线", traditional: "步行路線")
+        }
+        let lineDescriptor: String
+        if route.transferCount > 0 {
+            lineDescriptor = "\(lineName) +\(route.transferCount)"
+        } else {
+            lineDescriptor = lineName
+        }
+        return "\(lineDescriptor) · \(AppLocalization.stops(route.totalStops))"
+    }
+
+    private var badgeMeta: String {
+        var parts = [route.formattedDuration]
+        if let fare = route.estimatedFare {
+            parts.append(fare.formatted)
+        }
+        parts.append(AppLocalization.distance(totalDistanceMeters))
+        return parts.joined(separator: " · ")
+    }
+
+    private var totalDistanceMeters: Double {
+        route.segments.reduce(0.0) { $0 + $1.distance }
     }
 
     private func lineShortCode(from name: String?) -> String {
@@ -152,45 +168,58 @@ struct RouteCard: View {
         return code.isEmpty ? "?" : code
     }
 
-    private func segmentDetail(_ segment: RouteSegment) -> String {
-        switch segment.type {
-        case .walking:
-            return "\(segment.formattedDuration) • \(AppLocalization.distance(segment.distance))"
-        case .subway, .transit:
-            return segment.formattedDuration
-        case .transfer:
-            return ""
-        }
-    }
+    // MARK: - Departure → arrival timeline
 
-    // MARK: - Other views
-
-    private func accessPreviewRow(guide: RouteAccessGuide, icon: String) -> some View {
-        Label {
-            Text(guide.primaryInstruction)
+    private var journeyTimeline: some View {
+        HStack(spacing: 8) {
+            Text(Self.clock.string(from: departureDate))
                 .font(.caption)
-                .lineLimit(2)
-        } icon: {
-            Image(systemName: icon)
+                .fontWeight(.medium)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+
+            timelineTrack
+
+            Text(Self.clock.string(from: arrivalDate))
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
-        .foregroundStyle(.secondary)
     }
 
-    private var confidenceBadge: some View {
-        VStack(spacing: 2) {
-            Image(systemName: confidence.level.iconName)
-            Text("\(confidence.score)")
-                .fontWeight(.semibold)
-            Text(confidence.level.title)
-                .font(.caption2)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+    private var timelineTrack: some View {
+        let pointCount = route.transferCount + 2 // start + transfers + end
+        return HStack(spacing: 0) {
+            ForEach(0..<pointCount, id: \.self) { index in
+                let isEndpoint = index == 0 || index == pointCount - 1
+                Circle()
+                    .fill(isEndpoint ? lineColor : Color.appSurface)
+                    .frame(width: 9, height: 9)
+                    .overlay(Circle().stroke(lineColor, lineWidth: isEndpoint ? 0 : 2))
+                if index < pointCount - 1 {
+                    Rectangle()
+                        .fill(lineColor)
+                        .frame(height: 3)
+                        .frame(maxWidth: .infinity)
+                }
+            }
         }
-        .font(.caption)
-        .frame(minWidth: 74)
-        .padding(.vertical, 6)
-        .foregroundStyle(confidence.level.color)
-        .accessibilityLabel("\(confidence.level.title), \(confidence.score) \(AppLocalization.localized("out of 100"))")
+        .frame(maxWidth: .infinity)
+    }
+
+    private static let clock: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+
+    private var accessibilitySummary: String {
+        [
+            "\(confidence.level.title), \(confidence.score) \(AppLocalization.localized("out of 100"))",
+            badgeTitle,
+            badgeMeta,
+        ].joined(separator: ", ")
     }
 }
 

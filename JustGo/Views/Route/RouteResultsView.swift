@@ -183,8 +183,7 @@ struct RouteResultsView: View {
                             alternatives: viewModel.routes,
                             comfort: comfort
                         ),
-                        comfort: comfort,
-                        departurePlan: viewModel.departurePlan(for: route)
+                        departureDate: viewModel.tripTimeContext(for: route).departureDate
                     ) {
                         _ = tripMemoryService.recordPlannedTrip(
                             route: route,

@@ -54,6 +54,12 @@ final class StationDetailViewModel {
         let status = await officialStationData.loadCityPack(for: station.cityID)
         cityPackLoadStatus = status
         switch status {
+        case .available:
+            stationMapStatusMessage = AppLocalization.text(
+                english: "Official city data is not loaded yet.",
+                simplified: "官方城市数据尚未加载。",
+                traditional: "官方城市資料尚未載入。"
+            )
         case .loaded:
             self.station = await officialStationData.enrichStation(station)
             stationMap = await officialStationData.stationMap(for: station)
@@ -101,6 +107,8 @@ final class StationDetailViewModel {
 
     private var cityPackPendingConfidence: DataConfidence {
         switch cityPackLoadStatus {
+        case .available:
+            return .unknown
         case .loaded, .sourcePending:
             return .sourcePending
         case .notConfigured, .notAvailable, .failed:

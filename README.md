@@ -58,7 +58,7 @@ The app follows Clean Architecture with MVVM:
 
 ## Supported Cities
 
-MapKit supports place-to-place transit planning wherever Apple Maps provides transit directions. Six cities currently have explicit official-pack choices for richer station facts: Beijing, Shanghai, Guangzhou, Shenzhen, Chengdu, and Hangzhou.
+MapKit supports place-to-place transit planning wherever Apple Maps provides transit directions. The current manifest has official-pack downloads for nine cities: Beijing, Shanghai, Guangzhou, Shenzhen, Chengdu, Chongqing, Xian, Suzhou, and Hangzhou.
 
 ## Universal Travel Support
 

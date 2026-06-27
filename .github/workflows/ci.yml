@@ -1,6 +1,9 @@
 name: iOS CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
 
 concurrency:
@@ -23,7 +26,7 @@ jobs:
       - name: Build for iOS Simulator
         run: |
           xcodebuild build \
-            -workspace JustGo.xcworkspace \
+            -project JustGo.xcodeproj \
             -scheme JustGo \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \

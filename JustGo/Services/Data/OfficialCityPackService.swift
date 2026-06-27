@@ -1,6 +1,7 @@
 import Foundation
 
 enum CityPackLoadStatus: Equatable {
+    case available(version: String)
     case loaded(version: String)
     case notConfigured
     case sourcePending
@@ -55,6 +56,7 @@ struct CityPackServiceStatus: Codable, Equatable {
 }
 
 protocol OfficialStationDataProviding {
+    func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus
     func enrichStation(_ station: Station) async -> Station
     func enrichStations(_ stations: [Station]) async -> [Station]
@@ -79,6 +81,48 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     init(session: URLSession = .shared, metroNetworks: MetroNetworkProviding) {
         self.session = session
         self.metroNetworks = metroNetworks
+    }
+
+    func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus] {
+        var statuses: [String: CityPackLoadStatus] = [:]
+        for cityID in Set(cityIDs) {
+            statuses[cityID] = await cityPackStatus(for: cityID)
+        }
+        return statuses
+    }
+
+    private func cityPackStatus(for cityID: String) async -> CityPackLoadStatus {
+        if let pack = packs[cityID] {
+            return .loaded(version: pack.data.version)
+        }
+        if let status = loadStatuses[cityID] {
+            return status
+        }
+        if let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }) {
+            return status(for: entry)
+        }
+        guard !Self.manifestURLs.isEmpty else { return .notConfigured }
+
+        var foundManifest = false
+        for manifestURL in Self.manifestURLs {
+            do {
+                let manifest = try await loadManifest(from: manifestURL)
+                foundManifest = true
+                guard let entry = manifest.cities.first(where: { $0.cityID == cityID }) else { continue }
+                return status(for: entry)
+            } catch {
+                AppLog.data.warning("City pack manifest status failed for \(cityID, privacy: .public) via \(manifestURL.absoluteString, privacy: .public): \(error)")
+                continue
+            }
+        }
+        return foundManifest ? .notAvailable : .failed
+    }
+
+    private func status(for entry: OfficialManifestCity) -> CityPackLoadStatus {
+        guard entry.hasDownload else {
+            return entry.hasPendingData ? .sourcePending : .notAvailable
+        }
+        return .available(version: entry.version)
     }
 
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus {
@@ -257,6 +301,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return decoded
     }
 
+    private func bundledManifest() -> OfficialManifest? {
+        guard let url = Bundle.main.url(forResource: "manifest", withExtension: "json") else { return nil }
+        if let manifest = manifests[url] { return manifest }
+        guard let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode(OfficialManifest.self, from: data) else { return nil }
+        manifests[url] = decoded
+        return decoded
+    }
+
     private func download(from url: URL) async throws -> Data {
         let (data, response) = try await session.data(from: url)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw RoutePlanningError.networkError }
@@ -322,6 +375,10 @@ private struct OfficialManifestCity: Decodable {
     let version: String
     let downloadURL: String?
     let capabilities: OfficialCapabilities
+
+    var hasDownload: Bool {
+        downloadURL?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+    }
 
     var hasPendingData: Bool {
         capabilities.accessibility == "source_pending" ||

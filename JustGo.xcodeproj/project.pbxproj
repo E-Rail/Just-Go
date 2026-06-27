@@ -56,6 +56,7 @@
 		A1000052 /* User/AccessibilityReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000052 /* User/AccessibilityReport.swift */; };
 		A1000053 /* Transit/RouteFeasibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000053 /* Transit/RouteFeasibility.swift */; };
 		A1000054 /* Data/TripMemoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000054 /* Data/TripMemoryService.swift */; };
+		A1000314 /* Data/ActiveTripStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000314 /* Data/ActiveTripStore.swift */; };
 		A1000055 /* Accessibility/AccessibilityReportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000055 /* Accessibility/AccessibilityReportService.swift */; };
 		A1000056 /* Transit/RouteFeasibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000056 /* Transit/RouteFeasibilityService.swift */; };
 		A1000057 /* Profile/TripMemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000057 /* Profile/TripMemoryView.swift */; };
@@ -154,6 +155,7 @@
 		A2000052 /* User/AccessibilityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityReport.swift; sourceTree = "<group>"; };
 		A2000053 /* Transit/RouteFeasibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibility.swift; sourceTree = "<group>"; };
 		A2000054 /* Data/TripMemoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TripMemoryService.swift; sourceTree = "<group>"; };
+		A2000314 /* Data/ActiveTripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/ActiveTripStore.swift; sourceTree = "<group>"; };
 		A2000055 /* Accessibility/AccessibilityReportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/AccessibilityReportService.swift; sourceTree = "<group>"; };
 		A2000056 /* Transit/RouteFeasibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteFeasibilityService.swift; sourceTree = "<group>"; };
 		A2000057 /* Profile/TripMemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/TripMemoryView.swift; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 				A2000055 /* Accessibility/AccessibilityReportService.swift */,
 				A2000023 /* Data/CityService.swift */,
 				A2000054 /* Data/TripMemoryService.swift */,
+				A2000314 /* Data/ActiveTripStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -514,6 +517,7 @@
 				A1000055 /* Accessibility/AccessibilityReportService.swift in Sources */,
 				A1000023 /* Data/CityService.swift in Sources */,
 				A1000054 /* Data/TripMemoryService.swift in Sources */,
+				A1000314 /* Data/ActiveTripStore.swift in Sources */,
 				A1000056 /* Transit/RouteFeasibilityService.swift in Sources */,
 				A1000024 /* Station/Station.swift in Sources */,
 				A1000025 /* Station/StationAccessibility.swift in Sources */,

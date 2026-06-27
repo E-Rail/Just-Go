@@ -19,6 +19,7 @@ struct RouteDetailView: View {
     @State var routeReportSeverity: AccessibilityReportSeverity = .medium
     @State var metroNetworks: [MetroNetwork] = []
     @State var selectedTransferSegment: RouteSegment?
+    @State private var boardingServiceWindows: [StationServiceWindow] = []
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
@@ -35,6 +36,7 @@ struct RouteDetailView: View {
                 liveGoButton
                 if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
                 ServiceStatusBanner(status: route.serviceStatus)
+                serviceHoursRow
                 tripConfidenceCard
                 routeMapPreview
                 accessGuidanceCard
@@ -65,7 +67,7 @@ struct RouteDetailView: View {
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
         }
-        .fullScreenCover(isPresented: $showLiveGo) {
+        .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
             LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
         }
         .onChange(of: selectedRouteID) { _, _ in
@@ -79,6 +81,7 @@ struct RouteDetailView: View {
                 return
             }
             metroNetworks = [network]
+            await loadServiceHours(cityID: cityID)
         }
     }
 
@@ -169,6 +172,13 @@ struct RouteDetailView: View {
                     StatItem(title: AppLocalization.localized("Duration"), value: route.formattedDuration, icon: "clock")
                     StatItem(title: AppLocalization.localized("Stops"), value: "\(route.totalStops)", icon: "tram")
                     StatItem(title: AppLocalization.localized("Transfers"), value: "\(route.transferCount)", icon: "arrow.triangle.2.circlepath")
+                    if let fare = route.estimatedFare {
+                        StatItem(
+                            title: AppLocalization.text(english: "Fare (est.)", simplified: "票价(估)", traditional: "票價(估)"),
+                            value: fare.formatted,
+                            icon: "yensign.circle"
+                        )
+                    }
                 }
 
                 if route.isFullyAccessible {
@@ -248,8 +258,60 @@ struct RouteDetailView: View {
         route.departurePlan(anchor: tripAnchor)
     }
 
+    /// Scheduled first/last train times for the boarding line (official city-pack data).
+    /// This is NOT a live countdown — the data sources have no real-time arrival feed.
+    private var boardingServiceHours: (first: String, last: String)? {
+        let firsts = boardingServiceWindows.compactMap(\.firstTime).filter { !$0.isEmpty }
+        let lasts = boardingServiceWindows.compactMap(\.lastTime).filter { !$0.isEmpty }
+        guard let first = firsts.min(), let last = lasts.max() else { return nil }
+        return (first, last)
+    }
+
+    @ViewBuilder
+    private var serviceHoursRow: some View {
+        if let hours = boardingServiceHours {
+            HStack(spacing: 10) {
+                Image(systemName: "clock.badge.checkmark")
+                    .foregroundStyle(Color.accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(AppLocalization.text(english: "Service hours", simplified: "运营时间", traditional: "營運時間"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text(AppLocalization.text(
+                        english: "First \(hours.first) · Last \(hours.last) (scheduled)",
+                        simplified: "首班 \(hours.first) · 末班 \(hours.last)（时刻表）",
+                        traditional: "首班 \(hours.first) · 末班 \(hours.last)（時刻表）"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    private func loadServiceHours(cityID: String) async {
+        guard let stationName = route.boardingTransitSegment?.fromStationName else {
+            boardingServiceWindows = []
+            return
+        }
+        let windows = await container.officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
+        if let lineName = route.boardingTransitSegment?.lineName {
+            let matched = windows.filter {
+                $0.lineName == lineName || $0.lineName.contains(lineName) || lineName.contains($0.lineName)
+            }
+            boardingServiceWindows = matched.isEmpty ? windows : matched
+        } else {
+            boardingServiceWindows = windows
+        }
+    }
+
     private var liveGoButton: some View {
         Button {
+            ActiveTripStore.save(route)
             showLiveGo = true
         } label: {
             Label(

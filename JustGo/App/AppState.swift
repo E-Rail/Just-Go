@@ -15,6 +15,9 @@ final class AppState {
     }
     var pendingRouteInput: PendingRouteInput?
 
+    /// Set from Settings to deep-link into the planner and begin saving a quick place.
+    var pendingQuickPlaceSetup: QuickPlaceKind?
+
     var accessibilityPreference: AccessibilityPreference {
         didSet {
             userDefaults.setCodable(accessibilityPreference, forKey: accessibilityPreferenceKey)

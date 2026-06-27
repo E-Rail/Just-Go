@@ -13,6 +13,27 @@ struct AccessibilityFilter {
     )
 }
 
+/// A rough single-journey metro fare estimate derived from total transit distance,
+/// using the common mainland tiered model (¥3 ≤6km, ¥4 ≤12km, ¥5 ≤22km, ¥6 ≤32km,
+/// then +¥1 per additional 20km). Presented to the user as an estimate only.
+struct FareEstimate {
+    let amountCNY: Int
+
+    init(transitMeters: Double) {
+        let km = transitMeters / 1000
+        switch km {
+        case ..<6: amountCNY = 3
+        case ..<12: amountCNY = 4
+        case ..<22: amountCNY = 5
+        case ..<32: amountCNY = 6
+        default: amountCNY = 6 + Int((km - 32) / 20) + 1
+        }
+    }
+
+    /// e.g. "¥5" — pair with an "estimate" label in the UI.
+    var formatted: String { "¥\(amountCNY)" }
+}
+
 struct Route: Identifiable, Codable {
     let id: UUID
     let origin: String
@@ -48,6 +69,17 @@ struct Route: Identifiable, Codable {
 
     var formattedTransfers: String {
         AppLocalization.transfers(transferCount)
+    }
+
+    /// Rough distance-based single-journey metro fare estimate using the common
+    /// mainland tiered model. Labeled as an estimate in the UI — actual fares vary
+    /// by city. Nil for walking-only routes (no transit distance).
+    var estimatedFare: FareEstimate? {
+        let transitMeters = segments
+            .filter { $0.type.isTransit }
+            .reduce(0.0) { $0 + $1.distance }
+        guard transitMeters > 0 else { return nil }
+        return FareEstimate(transitMeters: transitMeters)
     }
 
     var stationTimelineStops: [RouteStationStop] {

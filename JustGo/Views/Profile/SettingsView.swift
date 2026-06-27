@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppState.self) private var appState
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
@@ -131,6 +132,13 @@ struct SettingsView: View {
                 }
             }
             Spacer()
+            Button(saved == nil
+                   ? AppLocalization.text(english: "Set", simplified: "设置", traditional: "設置")
+                   : AppLocalization.text(english: "Change", simplified: "更改", traditional: "更改")) {
+                startQuickPlaceSetup(kind)
+            }
+            .font(.caption)
+            .buttonStyle(.borderless)
             if saved != nil {
                 Button {
                     removeQuickPlace(kind)
@@ -141,6 +149,12 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    private func startQuickPlaceSetup(_ kind: QuickPlaceKind) {
+        appState.pendingQuickPlaceSetup = kind
+        appState.selectedTab = 1 // Route planner tab
+        dismiss()
     }
 
     // MARK: - Language

@@ -13,6 +13,8 @@ struct RoutePlannerView: View {
     @State var showAccessibilityFilters = false
     @AppStorage("hasSeenWelcome") var hasSeenWelcome = false
     @State var scrollToTopTrigger = false
+    @State private var resumableTrip: Route?
+    @State private var showResumeLiveGo = false
 
     var body: some View {
         NavigationStack {
@@ -21,6 +23,7 @@ struct RoutePlannerView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             Color.clear.frame(height: 0).id("plannerTop")
+                            if let resumableTrip { resumeTripBanner(resumableTrip) }
                             if !hasSeenWelcome { welcomeCard }
                             citySelector
                             smartCommuteSection
@@ -74,8 +77,19 @@ struct RoutePlannerView: View {
             .onChange(of: appState.pendingRouteInput) { _, pending in
                 applyPendingRouteInput(pending)
             }
+            .onChange(of: appState.pendingQuickPlaceSetup) { _, kind in
+                applyPendingQuickPlaceSetup(kind)
+            }
             .sheet(isPresented: $showSaveCurrentTrip) {
                 saveCurrentTripSheet
+            }
+            .fullScreenCover(isPresented: $showResumeLiveGo, onDismiss: {
+                ActiveTripStore.clear()
+                resumableTrip = nil
+            }) {
+                if let resumableTrip {
+                    LiveGoView(plan: LiveGoTripBuilder().plan(for: resumableTrip))
+                }
             }
         }
         .task {
@@ -84,6 +98,8 @@ struct RoutePlannerView: View {
             }
             viewModel?.cityChanged(to: appState.selectedCity)
             applyPendingRouteInput(appState.pendingRouteInput)
+            applyPendingQuickPlaceSetup(appState.pendingQuickPlaceSetup)
+            resumableTrip = ActiveTripStore.load()
         }
     }
 
@@ -120,6 +136,53 @@ struct RoutePlannerView: View {
         guard let pending, let vm = viewModel else { return }
         vm.selectPlace(pending.place, for: pending.role)
         appState.pendingRouteInput = nil
+    }
+
+    private func resumeTripBanner(_ route: Route) -> some View {
+        HStack(spacing: 12) {
+            Button {
+                showResumeLiveGo = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "figure.walk.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(AppLocalization.text(english: "Resume your trip", simplified: "继续您的行程", traditional: "繼續您的行程"))
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                        Text("\(route.origin) → \(route.destination)")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.85))
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                ActiveTripStore.clear()
+                resumableTrip = nil
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalization.text(english: "Dismiss", simplified: "关闭", traditional: "關閉"))
+        }
+        .padding()
+        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func applyPendingQuickPlaceSetup(_ kind: QuickPlaceKind?) {
+        guard let kind, let vm = viewModel else { return }
+        vm.beginSavingQuickPlace(kind)
+        scrollToTopTrigger.toggle()
+        focusedField = .origin
+        appState.pendingQuickPlaceSetup = nil
     }
 
     private var searchHint: String? {

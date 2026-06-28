@@ -125,10 +125,14 @@ func transitLineReferences(_ value: String) -> Set<String> {
 
 func normalizedStationName(_ value: String) -> String {
     value
-        .replacingOccurrences(of: "地铁站", with: "")
-        .replacingOccurrences(of: "站", with: "")
-        .replacingOccurrences(of: " ", with: "")
         .lowercased()
+        .replacingOccurrences(of: "地铁站", with: "")
+        .replacingOccurrences(of: "地铁", with: "")
+        .replacingOccurrences(of: "站", with: "")
+        .replacingOccurrences(of: "metro station", with: "")
+        .replacingOccurrences(of: "subway station", with: "")
+        .replacingOccurrences(of: "station", with: "")
+        .replacingOccurrences(of: " ", with: "")
 }
 
 extension SubwayLine {

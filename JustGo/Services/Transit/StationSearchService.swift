@@ -74,6 +74,28 @@ final class StationSearchService {
         await officialStationData.enrichStation(station)
     }
 
+    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps — not just metro
+    /// stations. Biased to `region` (the visible map area) when provided, else the city.
+    func searchPlaces(keyword: String, city: String, region: MKCoordinateRegion?) async throws -> [TransitPlace] {
+        let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return [] }
+        let searchRegion = region ?? cityService.getCity(byID: city).map {
+            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
+        }
+        return try await placeSearchProvider.searchPlaces(keyword: query, region: searchRegion, limit: 12)
+    }
+
+    /// The programmed metro station a place corresponds to, if any — matched by name
+    /// against the bundled network first, then the official city pack. Returns nil for
+    /// non-station places (e.g. a shop), so only true stations resolve to a station.
+    func station(matching place: TransitPlace, city: String) async -> Station? {
+        if let network = await metroNetworkProvider.network(for: city),
+           let match = network.matchingStation(named: place.name, near: place.coordinate) {
+            return await enrichStation(network.displayStation(match))
+        }
+        return await officialStationData.matchingStation(place: place, cityID: city)
+    }
+
     func stationDetails(stationID: String, city: String) async throws -> Station {
         guard let station = try await search(keyword: stationID, city: city).first else {
             throw RoutePlanningError.stationNotFound

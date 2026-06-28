@@ -92,7 +92,7 @@ struct MapContainerView: View {
             await viewModel?.loadStations(for: city)
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
-            viewModel?.scheduleStationSearch(in: appState.selectedCity)
+            viewModel?.scheduleSearch(in: appState.selectedCity)
         }
     }
 
@@ -110,7 +110,7 @@ struct MapContainerView: View {
                 viewModel?.viewportChanged(to: region)
             },
             onStationSelected: openStation,
-            onPlaceSelected: { selectedMapItem = IdentifiableMapItem(mapItem: $0) }
+            onPlaceSelected: handleTappedPlace
         )
     }
 
@@ -122,7 +122,7 @@ struct MapContainerView: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 20)
 
-                    TextField(AppLocalization.localized("Search stations..."), text: Binding(
+                    TextField(AppLocalization.text(english: "Search places...", simplified: "搜索地点...", traditional: "搜尋地點..."), text: Binding(
                         get: { viewModel?.searchText ?? "" },
                         set: { viewModel?.searchText = $0 }
                     ))
@@ -188,36 +188,34 @@ struct MapContainerView: View {
 
     private var searchResultsDropdown: some View {
         VStack(spacing: 0) {
-            ForEach(viewModel?.searchResults ?? []) { station in
+            ForEach(viewModel?.searchResults ?? []) { place in
                 Button {
-                    isSearchFocused = false
-                    viewModel?.clearSearch()
-                    openStation(station)
+                    selectSearchResult(place)
                 } label: {
-                    HStack {
+                    HStack(spacing: 10) {
+                        Image(systemName: "mappin.circle.fill")
+                            .foregroundStyle(.secondary)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(station.localizedName)
+                            Text(place.name)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            if let alternateName = station.alternateLocalizedName {
-                                Text(alternateName)
+                                .lineLimit(1)
+                            if let address = place.address, !address.isEmpty {
+                                Text(address)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                    .lineLimit(1)
                             }
                         }
                         Spacer()
-                        if let line = station.uniqueLogicalLines.first {
-                            Text(line.localizedName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
 
-                if station.id != viewModel?.searchResults.last?.id {
+                if place.id != viewModel?.searchResults.last?.id {
                     Divider()
                         .padding(.leading, 12)
                 }
@@ -251,6 +249,33 @@ struct MapContainerView: View {
             defer { isLoadingStationDetail = false }
 
             selectedStation = await viewModel?.selectStation(station) ?? station
+        }
+    }
+
+    /// A search result that is a programmed station opens the station detail; any other
+    /// place just recenters the map on it.
+    private func selectSearchResult(_ place: TransitPlace) {
+        isSearchFocused = false
+        viewModel?.clearSearch()
+        Task {
+            if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
+                openStation(station)
+            } else {
+                viewModel?.updateCamera(to: place.coordinate, spanDelta: 0.02)
+            }
+        }
+    }
+
+    /// A tapped Apple POI that *is* a programmed station opens the station detail;
+    /// otherwise it shows Apple's native place card.
+    private func handleTappedPlace(_ mapItem: MKMapItem) {
+        let place = TransitPlace(mapItem: mapItem)
+        Task {
+            if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
+                openStation(station)
+            } else {
+                selectedMapItem = IdentifiableMapItem(mapItem: mapItem)
+            }
         }
     }
 

@@ -24,7 +24,7 @@ struct MapVisibleRegion {
 final class MapViewModel {
     var stations: [Station] = []
     var searchText = ""
-    var searchResults: [Station] = []
+    var searchResults: [TransitPlace] = []
     var errorMessage: String?
     var visibleRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
@@ -68,7 +68,7 @@ final class MapViewModel {
         }
     }
 
-    func searchStations(in city: City?) async {
+    func searchEverywhere(in city: City?) async {
         guard let city else { return }
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             searchResults = []
@@ -76,19 +76,30 @@ final class MapViewModel {
         }
 
         do {
-            searchResults = try await stationSearchService.suggestions(keyword: searchText, city: city.id, limit: 8)
+            searchResults = try await stationSearchService.searchPlaces(
+                keyword: searchText,
+                city: city.id,
+                region: visibleRegion?.mkCoordinateRegion
+            )
         } catch {
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }
 
-    func scheduleStationSearch(in city: City?) {
+    func scheduleSearch(in city: City?) {
         searchTask?.cancel()
         searchTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(180))
             guard !Task.isCancelled else { return }
-            await self?.searchStations(in: city)
+            await self?.searchEverywhere(in: city)
         }
+    }
+
+    /// The programmed station a place/POI corresponds to, if any (so a searched or tapped
+    /// place that *is* a station opens the station detail instead of the Apple place card).
+    func matchingStation(for place: TransitPlace, city: City?) async -> Station? {
+        guard let city else { return nil }
+        return await stationSearchService.station(matching: place, city: city.id)
     }
 
     func clearSearch() {

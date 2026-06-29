@@ -232,11 +232,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 lineName: schedule.lineName,
                 lineColorHex: colorResolver.colorHex(for: schedule.lineName),
                 destination: schedule.direction,
-                arrivalTime: nil,
                 minutesRemaining: nil,
                 timeText: timeText,
-                isAccessible: item.accessibility?.data.isFullyAccessible == true,
-                platformNumber: nil,
                 source: .officialSchedule
             )
         }
@@ -495,9 +492,7 @@ private struct OfficialAccessibility: Decodable {
             elevatorLocations: elevatorLocations,
             accessibleEntrances: accessibleEntrances,
             facilityNotes: facilityNotes,
-            hasTactilePath: hasTactilePath,
-            hasColorCoding: true,
-            hasPictograms: true
+            hasTactilePath: hasTactilePath
         )
     }
 }

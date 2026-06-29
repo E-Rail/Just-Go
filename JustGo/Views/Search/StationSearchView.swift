@@ -222,10 +222,21 @@ struct StationSearchView: View {
                     }
                 }
             } else if !(viewModel?.searchText.isEmpty ?? true) {
-                ContentUnavailableView {
-                    Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
-                } description: {
-                    Text(AppLocalization.localized("Try a different search term"))
+                if let message = viewModel?.errorMessage {
+                    ContentUnavailableView {
+                        Label(
+                            AppLocalization.text(english: "Search Unavailable", simplified: "无法搜索", traditional: "無法搜尋"),
+                            systemImage: "wifi.exclamationmark"
+                        )
+                    } description: {
+                        Text(message)
+                    }
+                } else {
+                    ContentUnavailableView {
+                        Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
+                    } description: {
+                        Text(AppLocalization.localized("Try a different search term"))
+                    }
                 }
             } else if viewModel?.filter.facilityType != nil && viewModel?.isEnrichingForFacility == false {
                 ContentUnavailableView {

@@ -16,8 +16,6 @@ protocol TransitRouteProviding {
 
 @MainActor
 final class MapKitPlaceSearchProvider: PlaceSearchProviding {
-    private let geocoder = CLGeocoder()
-
     func searchPlaces(keyword: String, region: MKCoordinateRegion?, limit: Int) async throws -> [TransitPlace] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return [] }
@@ -40,7 +38,11 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
     }
 
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace {
-        let placemarks = try await geocoder.reverseGeocodeLocation(
+        // A fresh CLGeocoder per call: CLGeocoder allows only one in-flight request per
+        // instance and cancels a prior request when a new one starts, so a shared instance
+        // would make overlapping reverse-geocodes (e.g. quick Current-Location taps across
+        // fields) cancel each other. Reverse-geocode is one-shot, not a hot path.
+        let placemarks = try await CLGeocoder().reverseGeocodeLocation(
             CLLocation(latitude: location.latitude, longitude: location.longitude)
         )
         let placemark = placemarks.first

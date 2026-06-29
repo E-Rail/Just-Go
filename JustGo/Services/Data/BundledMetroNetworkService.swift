@@ -34,7 +34,6 @@ struct MetroLine: Codable, Equatable, Identifiable {
     let id: String
     let logicalLineID: String?
     let routeReference: String?
-    let networkIdentity: String?
     let name: String
     let nameEn: String?
     let colorHex: String
@@ -56,13 +55,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     let cityID: String
     let version: String
     let bounds: MetroBounds
-    let geometrySource: String
     let geometryKind: String
-    let attribution: String
-    let licenseURL: String
-    let sourceSnapshot: String
-    let coordinateSystem: String
-    let sourceURLs: [String]
     let lines: [MetroLine]
     let stations: [MetroStation]
 
@@ -75,12 +68,11 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
 
     func matchingStation(named name: String, near coordinate: CLLocationCoordinate2D) -> MetroStation? {
         let key = normalizedStationName(name)
-        return stations
-            .filter { normalizedStationName($0.name) == key || normalizedStationName($0.nameEn ?? "") == key }
-            .min {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: coordinate) <
-                    CLLocationCoordinate2D(latitude: $1.latitude, longitude: $1.longitude).distance(to: coordinate)
-            }
+        let candidates = Self.normalizedIndex(for: self)[key] ?? []
+        return candidates.min {
+            CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: coordinate) <
+                CLLocationCoordinate2D(latitude: $1.latitude, longitude: $1.longitude).distance(to: coordinate)
+        }
     }
 
     func displayStation(_ item: MetroStation) -> Station {
@@ -116,6 +108,36 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
         station.lines = displayLines
         return station
     }
+
+    // Normalized-name → stations index, built once per (cityID, version) and cached, so
+    // repeated `matchingStation` lookups become O(1) instead of re-normalizing every station
+    // name (7 string replacements each) on every call. NSCache is thread-safe.
+    private static let normalizedIndexCache = NSCache<NSString, NormalizedStationIndexBox>()
+
+    private static func normalizedIndex(for network: MetroNetwork) -> [String: [MetroStation]] {
+        let key = "\(network.cityID):\(network.version)" as NSString
+        if let cached = normalizedIndexCache.object(forKey: key) {
+            return cached.value
+        }
+        var index: [String: [MetroStation]] = [:]
+        for station in network.stations {
+            let primary = normalizedStationName(station.name)
+            index[primary, default: []].append(station)
+            if let nameEn = station.nameEn, !nameEn.isEmpty {
+                let secondary = normalizedStationName(nameEn)
+                if secondary != primary {
+                    index[secondary, default: []].append(station)
+                }
+            }
+        }
+        normalizedIndexCache.setObject(NormalizedStationIndexBox(index), forKey: key)
+        return index
+    }
+}
+
+private final class NormalizedStationIndexBox {
+    let value: [String: [MetroStation]]
+    init(_ value: [String: [MetroStation]]) { self.value = value }
 }
 
 protocol MetroNetworkProviding {
@@ -154,8 +176,9 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             return nil
         }
         do {
-            let data = try Data(contentsOf: url)
-            let network = try JSONDecoder().decode(MetroNetwork.self, from: data)
+            // Decode off the actor's cooperative-pool thread so the blocking file read +
+            // JSON parse doesn't pin the actor (lets concurrent city loads run in parallel).
+            let network = try await Self.decodeNetwork(at: url)
             guard network.cityID == cityID, network.geometryKind == "physicalTrack" else {
                 AppLog.data.error("Bundled metro network \(cityID, privacy: .public) failed validation (cityID or geometryKind mismatch)")
                 missingCityIDs.insert(cityID)
@@ -171,13 +194,16 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     }
 
     func networks() async -> [MetroNetwork] {
-        var result: [MetroNetwork] = []
-        for cityID in Self.supportedCityIDs {
-            if let network = await network(for: cityID) {
-                result.append(network)
+        await withTaskGroup(of: MetroNetwork?.self) { group in
+            for cityID in Self.supportedCityIDs {
+                group.addTask { await self.network(for: cityID) }
             }
+            var result: [MetroNetwork] = []
+            for await network in group {
+                if let network { result.append(network) }
+            }
+            return result
         }
-        return result
     }
 
     func stations(in cityID: String) async -> [Station] {
@@ -188,5 +214,12 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         let stations = network.displayStations
         stationsByCity[cityID] = stations
         return stations
+    }
+
+    private static func decodeNetwork(at url: URL) async throws -> MetroNetwork {
+        try await Task.detached(priority: .utility) {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(MetroNetwork.self, from: data)
+        }.value
     }
 }

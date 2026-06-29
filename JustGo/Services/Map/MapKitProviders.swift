@@ -16,6 +16,8 @@ protocol TransitRouteProviding {
 
 @MainActor
 final class MapKitPlaceSearchProvider: PlaceSearchProviding {
+    private let geocoder = CLGeocoder()
+
     func searchPlaces(keyword: String, region: MKCoordinateRegion?, limit: Int) async throws -> [TransitPlace] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return [] }
@@ -38,7 +40,7 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
     }
 
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace {
-        let placemarks = try await CLGeocoder().reverseGeocodeLocation(
+        let placemarks = try await geocoder.reverseGeocodeLocation(
             CLLocation(latitude: location.latitude, longitude: location.longitude)
         )
         let placemark = placemarks.first

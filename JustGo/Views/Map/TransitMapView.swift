@@ -54,7 +54,9 @@ struct TransitMapView: UIViewRepresentable {
         private var networkSignature = ""
         private var stationSignature = ""
         private var routeSignature = ""
+        private var markerVisibilityBand = -1
         private var annotationStations: [ObjectIdentifier: Station] = [:]
+        private var stationAnnotationsByID: [String: StationAnnotation] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
         private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
         private var networkOverlays: [MKOverlay] = []
@@ -99,18 +101,38 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         private func syncStations(on mapView: MKMapView) {
-            let nextSignature = parent.stations.map(\.stationID).joined(separator: ",")
+            // O(1)-ish change check via a hash of the desired station IDs, instead of building a
+            // multi-KB joined string on every SwiftUI invalidation.
+            var hasher = Hasher()
+            hasher.combine(parent.stations.count)
+            for station in parent.stations { hasher.combine(station.stationID) }
+            let nextSignature = String(hasher.finalize())
             guard nextSignature != stationSignature else { return }
             stationSignature = nextSignature
-            annotationStations.removeAll()
-            mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
 
-            let annotations = parent.stations.map { station in
-                let annotation = StationAnnotation(station: station)
-                annotationStations[ObjectIdentifier(annotation)] = station
-                return annotation
+            let desiredByID = Dictionary(parent.stations.map { ($0.stationID, $0) }, uniquingKeysWith: { first, _ in first })
+            let desiredIDs = Set(desiredByID.keys)
+            let currentIDs = Set(stationAnnotationsByID.keys)
+
+            // Remove only the annotations that are gone; keep (and preserve the dequeued views of)
+            // the ones that remain, instead of clearing and re-adding everything.
+            let removedIDs = currentIDs.subtracting(desiredIDs)
+            if !removedIDs.isEmpty {
+                let removed = removedIDs.compactMap { stationAnnotationsByID.removeValue(forKey: $0) }
+                for annotation in removed { annotationStations.removeValue(forKey: ObjectIdentifier(annotation)) }
+                mapView.removeAnnotations(removed)
             }
-            mapView.addAnnotations(annotations)
+
+            let addedIDs = desiredIDs.subtracting(currentIDs)
+            if !addedIDs.isEmpty {
+                let added = addedIDs.compactMap { desiredByID[$0] }.map { station -> StationAnnotation in
+                    let annotation = StationAnnotation(station: station)
+                    annotationStations[ObjectIdentifier(annotation)] = station
+                    stationAnnotationsByID[station.stationID] = annotation
+                    return annotation
+                }
+                mapView.addAnnotations(added)
+            }
         }
 
         private func syncRoute(on mapView: MKMapView) {
@@ -275,8 +297,25 @@ struct TransitMapView: UIViewRepresentable {
                 longitudeDelta: region.span.longitudeDelta
             )
             regionSignature = visibleRegion.signature
-            refreshMarkerVisibility(on: mapView)
+            // Marker size/visibility only changes when maxDelta crosses one of the style or
+            // visibility thresholds; within a band every annotation reconfigures identically, so
+            // skip the O(N) sweep while panning at a fixed zoom.
+            let band = markerBand(for: max(region.span.latitudeDelta, region.span.longitudeDelta))
+            if band != markerVisibilityBand {
+                markerVisibilityBand = band
+                refreshMarkerVisibility(on: mapView)
+            }
             parent.onRegionChanged?(visibleRegion)
+        }
+
+        private func markerBand(for maxDelta: CLLocationDegrees) -> Int {
+            // Breakpoints = union of StationAnnotationStyle size buckets (0.055, 0.18) and the
+            // visibility thresholds (normal ≤ 0.1, transfer ≤ 0.8).
+            if maxDelta <= 0.055 { return 0 }
+            if maxDelta <= 0.1 { return 1 }
+            if maxDelta <= 0.18 { return 2 }
+            if maxDelta <= 0.8 { return 3 }
+            return 4
         }
 
         private func refreshMarkerVisibility(on mapView: MKMapView) {
@@ -363,21 +402,20 @@ struct TransitMapView: UIViewRepresentable {
 
 private final class StationAnnotation: NSObject, MKAnnotation {
     let station: Station
+    // Localized strings resolved once at creation (each involves a Hans→Hant StringTransform in
+    // zh-Hant); MapKit reads title/subtitle repeatedly for accessibility and search.
+    let title: String?
+    let subtitle: String?
 
     var coordinate: CLLocationCoordinate2D {
         station.coordinate
     }
 
-    var title: String? {
-        station.localizedName
-    }
-
-    var subtitle: String? {
-        station.uniqueLogicalLines.map(\.localizedName).joined(separator: " / ")
-    }
-
     init(station: Station) {
         self.station = station
+        self.title = station.localizedName
+        self.subtitle = station.uniqueLogicalLines.map(\.localizedName).joined(separator: " / ")
+        super.init()
     }
 }
 

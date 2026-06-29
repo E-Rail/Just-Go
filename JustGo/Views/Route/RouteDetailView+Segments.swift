@@ -1,9 +1,8 @@
 import SwiftUI
 
 extension RouteDetailView {
-    var routeFeasibilityCard: some View {
-        let feasibility = currentFeasibility
-        return GlassCard {
+    func routeFeasibilityCard(_ feasibility: RouteFeasibility) -> some View {
+        GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Label(feasibility.title, systemImage: feasibility.level.iconName)

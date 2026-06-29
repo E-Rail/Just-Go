@@ -169,13 +169,22 @@ final class StationSearchViewModel {
     }
 
     private func applyFilters() {
-        searchResults = stationSearchService.filterStations(unfilteredResults, by: filter)
+        let filtered = stationSearchService.filterStations(unfilteredResults, by: filter)
         if let location = locationService.currentLocation {
-            searchResults.sort {
-                $0.coordinate.distance(to: location.coordinate) < $1.coordinate.distance(to: location.coordinate)
-            }
+            // Compute each distance once (Haversine is trig-heavy) rather than recomputing it
+            // inside every comparator call.
+            let origin = location.coordinate
+            searchResults = filtered
+                .map { (station: $0, distance: $0.coordinate.distance(to: origin)) }
+                .sorted { $0.distance < $1.distance }
+                .map(\.station)
         } else {
-            searchResults.sort { $0.localizedName < $1.localizedName }
+            // Transform the localized name (a Hans→Hant StringTransform in zh-Hant) once per
+            // element instead of on every comparison.
+            searchResults = filtered
+                .map { (station: $0, key: $0.localizedName) }
+                .sorted { $0.key < $1.key }
+                .map(\.station)
         }
     }
 

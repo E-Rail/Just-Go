@@ -64,18 +64,25 @@ final class StationSearchViewModel {
             return
         }
 
+        // Generation token so a superseded query — or one that returns after the field is
+        // cleared — can't stomp the current results. MKLocalSearch ignores Swift task
+        // cancellation, so the in-flight network call still completes; the token discards it.
+        let loadID = UUID()
+        stationLoadID = loadID
         isSearching = true
         errorMessage = nil
-        defer { isSearching = false }
         await refreshLocationIfAlreadyAllowed()
 
         do {
             let results = try await stationSearchService.search(keyword: searchText, city: city)
+            guard stationLoadID == loadID else { return }
             unfilteredResults = results
             applyFilters()
         } catch {
+            guard stationLoadID == loadID else { return }
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
+        isSearching = false
     }
 
     func scheduleSearch(city: String) {
@@ -91,6 +98,8 @@ final class StationSearchViewModel {
         searchTask?.cancel()
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
+        // Invalidate any in-flight search so a late network result can't repopulate the list.
+        stationLoadID = UUID()
         searchText = ""
         unfilteredResults = []
         searchResults = []

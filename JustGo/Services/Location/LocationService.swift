@@ -41,8 +41,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             case .notDetermined:
                 manager.requestWhenInUseAuthorization()
             case .authorizedAlways, .authorizedWhenInUse:
+                // Acquire via the continuous stream (more forgiving than a single shot) and
+                // stop it the moment a fix passes the gate — see finishPendingLocationRequests.
                 startUpdatingLocation()
-                manager.requestLocation()
             case .denied, .restricted:
                 let error = LocationServiceError.permissionDenied
                 locationErrorMessage = error.localizedDescription
@@ -88,9 +89,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         authorizationStatus = manager.authorizationStatus
 
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            startUpdatingLocation()
+            // Only start acquiring when a request is actually waiting — granting permission
+            // alone shouldn't leave a continuous stream running for the app's lifetime.
             if !pendingLocationContinuations.isEmpty {
-                manager.requestLocation()
+                startUpdatingLocation()
             }
         } else {
             manager.stopUpdatingLocation()
@@ -117,6 +119,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     private func finishPendingLocationRequests(with result: Result<CLLocation, Error>) {
+        // Tear down the continuous stream once the request(s) it was acquiring for resolve —
+        // success, failure, or timeout — so GPS doesn't keep running for the app's lifetime.
+        manager.stopUpdatingLocation()
+
         let continuations = pendingLocationContinuations
         pendingLocationContinuations.removeAll()
 

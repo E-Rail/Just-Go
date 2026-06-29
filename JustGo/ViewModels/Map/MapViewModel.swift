@@ -40,6 +40,7 @@ final class MapViewModel {
     private var viewportLoadTask: Task<Void, Never>?
     private var cityLoadTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
+    private var markerRefreshTask: Task<Void, Never>?
 
     init(
         locationService: LocationService,
@@ -118,7 +119,7 @@ final class MapViewModel {
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
         viewportLoadTask?.cancel()
-        refreshVisibleStations()
+        scheduleVisibleStationsRefresh()
 
         guard region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
@@ -206,6 +207,18 @@ final class MapViewModel {
         refreshVisibleStations()
     }
 
+    /// Debounce the viewport-driven refresh so it runs once panning briefly settles instead of
+    /// on every 30–60 Hz region-change frame (the O(N) flatMap/filter over all stations was the
+    /// dominant map-interaction CPU cost).
+    private func scheduleVisibleStationsRefresh() {
+        markerRefreshTask?.cancel()
+        markerRefreshTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(50))
+            guard !Task.isCancelled, let self else { return }
+            self.refreshVisibleStations()
+        }
+    }
+
     private func refreshVisibleStations() {
         guard let region = visibleRegion, region.maxDelta <= 0.8 else {
             if !stations.isEmpty { stations = [] }
@@ -219,9 +232,14 @@ final class MapViewModel {
                 region.contains(station.coordinate, paddingFactor: 0.2) &&
                     (showsNormalStations || station.isTransferStation)
             }
-        if visibleStations.map(\.stationID) != stations.map(\.stationID) {
+        // Cheap identity comparison (short-circuits, no temporary arrays) before publishing.
+        if !sameStations(visibleStations, stations) {
             stations = visibleStations
         }
+    }
+
+    private func sameStations(_ lhs: [Station], _ rhs: [Station]) -> Bool {
+        lhs.count == rhs.count && zip(lhs, rhs).allSatisfy { $0.stationID == $1.stationID }
     }
 
 }

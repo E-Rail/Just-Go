@@ -22,11 +22,8 @@ struct RealTimeArrival: Identifiable, Codable {
     let lineName: String
     let lineColorHex: String
     let destination: String
-    let arrivalTime: Date?
     let minutesRemaining: Int?
     let timeText: String?
-    let isAccessible: Bool
-    let platformNumber: String?
     let source: TrainTimeSource
 
     var formattedArrival: String {

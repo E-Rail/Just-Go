@@ -8,13 +8,20 @@ struct RouteCard: View {
     let confidence: RouteConfidence
     let departureDate: Date
     let action: () -> Void
+    // Parsed once at construction rather than re-parsing the hex on each of the several
+    // `lineColor` reads in the per-point timeline on every body evaluation.
+    private let lineColor: Color
+
+    init(route: Route, confidence: RouteConfidence, departureDate: Date, action: @escaping () -> Void) {
+        self.route = route
+        self.confidence = confidence
+        self.departureDate = departureDate
+        self.action = action
+        self.lineColor = Color.adaptive(hex: route.boardingTransitSegment?.lineColorHex ?? "#FF3B30")
+    }
 
     private var arrivalDate: Date {
         departureDate.addingTimeInterval(route.totalDuration)
-    }
-
-    private var lineColor: Color {
-        Color.adaptive(hex: route.boardingTransitSegment?.lineColorHex ?? "#FF3B30")
     }
 
     var body: some View {

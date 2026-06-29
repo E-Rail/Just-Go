@@ -36,17 +36,25 @@ final class StationSearchService {
             guard bundledMatches.isEmpty else { return bundledMatches }
             throw error
         }
-        let mapKitMatches = await places.asyncMap { place in
-            if let official = await self.officialStationData.matchingStation(place: place, cityID: city) {
-                return official
+        // Resolve all places to stations concurrently, preserving input order by index.
+        let mapKitMatches = await withTaskGroup(of: (Int, Station).self) { group in
+            for (index, place) in places.enumerated() {
+                group.addTask { [officialStationData] in
+                    if let official = await officialStationData.matchingStation(place: place, cityID: city) {
+                        return (index, official)
+                    }
+                    return (index, Station(
+                        stationID: place.id,
+                        name: place.name,
+                        latitude: place.coordinate.latitude,
+                        longitude: place.coordinate.longitude,
+                        cityID: city
+                    ))
+                }
             }
-            return Station(
-                stationID: place.id,
-                name: place.name,
-                latitude: place.coordinate.latitude,
-                longitude: place.coordinate.longitude,
-                cityID: city
-            )
+            var indexed: [(Int, Station)] = []
+            for await pair in group { indexed.append(pair) }
+            return indexed.sorted { $0.0 < $1.0 }.map(\.1)
         }
         return (bundledMatches + mapKitMatches).uniqued {
             "\($0.cityID)|\(normalizedStationName($0.name))"
@@ -135,16 +143,6 @@ private func stationSearchText(_ station: Station) -> String {
     [station.name, station.nameEn, station.namePinyin]
         .compactMap { $0 }
         .joined(separator: " ")
-}
-
-private extension Sequence {
-    func asyncMap<T>(_ transform: (Element) async -> T) async -> [T] {
-        var result: [T] = []
-        for element in self {
-            result.append(await transform(element))
-        }
-        return result
-    }
 }
 
 struct StationFilter {

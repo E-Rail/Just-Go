@@ -100,17 +100,10 @@ struct AccessibilityData: Codable {
     let elevatorLocations: [String]?
     let accessibleEntrances: [String]?
     let facilityNotes: [String]?
-    let wheelchairBoardingAssistance: Bool?
     let hasTactilePath: Bool?
-    let hasBrailleSigns: Bool?
     let hasAudioAnnouncement: Bool?
     let tactilePathCoverage: Double?
     let hasVisualAnnouncement: Bool?
-    let hasHearingLoop: Bool?
-    let hasSignLanguageDisplay: Bool?
-    let hasSimplifiedSignage: Bool?
-    let hasColorCoding: Bool?
-    let hasPictograms: Bool?
 
     init(
         source: String? = nil,
@@ -122,17 +115,10 @@ struct AccessibilityData: Codable {
         elevatorLocations: [String]? = nil,
         accessibleEntrances: [String]? = nil,
         facilityNotes: [String]? = nil,
-        wheelchairBoardingAssistance: Bool? = nil,
         hasTactilePath: Bool? = nil,
-        hasBrailleSigns: Bool? = nil,
         hasAudioAnnouncement: Bool? = nil,
         tactilePathCoverage: Double? = nil,
-        hasVisualAnnouncement: Bool? = nil,
-        hasHearingLoop: Bool? = nil,
-        hasSignLanguageDisplay: Bool? = nil,
-        hasSimplifiedSignage: Bool? = nil,
-        hasColorCoding: Bool? = nil,
-        hasPictograms: Bool? = nil
+        hasVisualAnnouncement: Bool? = nil
     ) {
         self.source = source
         self.hasElevator = hasElevator
@@ -143,16 +129,9 @@ struct AccessibilityData: Codable {
         self.elevatorLocations = elevatorLocations
         self.accessibleEntrances = accessibleEntrances
         self.facilityNotes = facilityNotes
-        self.wheelchairBoardingAssistance = wheelchairBoardingAssistance
         self.hasTactilePath = hasTactilePath
-        self.hasBrailleSigns = hasBrailleSigns
         self.hasAudioAnnouncement = hasAudioAnnouncement
         self.tactilePathCoverage = tactilePathCoverage
         self.hasVisualAnnouncement = hasVisualAnnouncement
-        self.hasHearingLoop = hasHearingLoop
-        self.hasSignLanguageDisplay = hasSignLanguageDisplay
-        self.hasSimplifiedSignage = hasSimplifiedSignage
-        self.hasColorCoding = hasColorCoding
-        self.hasPictograms = hasPictograms
     }
 }

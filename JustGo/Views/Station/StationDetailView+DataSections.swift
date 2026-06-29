@@ -347,7 +347,7 @@ private extension Array where Element == StationFacility {
 
 private extension String {
     var normalizedFacilityText: String {
-        replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
+        String(filter { !$0.isWhitespace })
             .replacingOccurrences(of: "，", with: ",")
             .replacingOccurrences(of: "。", with: ".")
             .replacingOccurrences(of: "（", with: "(")

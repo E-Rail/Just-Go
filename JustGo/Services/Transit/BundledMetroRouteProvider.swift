@@ -68,16 +68,19 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     }
 
     private func nearestStations(to coordinate: CLLocationCoordinate2D, in network: MetroNetwork) -> [MetroStationCandidate] {
-        Array(
-            network.stations.map {
-                MetroStationCandidate(
-                    station: $0,
-                    distance: coordinate.distance(to: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude))
-                )
-            }
-            .sorted { $0.distance < $1.distance }
-            .prefix(4)
-        )
+        // Keep only the 4 nearest in a single linear pass (sorted ascending) instead of
+        // sorting every station (O(N) vs O(N log N)); ties preserve input order to match
+        // the previous stable-sort behaviour.
+        var nearest: [MetroStationCandidate] = []
+        nearest.reserveCapacity(5)
+        for station in network.stations {
+            let distance = coordinate.distance(to: CLLocationCoordinate2D(latitude: station.latitude, longitude: station.longitude))
+            if nearest.count == 4, distance >= nearest[3].distance { continue }
+            let insertionIndex = nearest.firstIndex { distance < $0.distance } ?? nearest.count
+            nearest.insert(MetroStationCandidate(station: station, distance: distance), at: insertionIndex)
+            if nearest.count > 4 { nearest.removeLast() }
+        }
+        return nearest
     }
 
     private func routingGraph(for network: MetroNetwork) -> MetroRoutingGraph {

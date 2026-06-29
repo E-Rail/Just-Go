@@ -39,7 +39,9 @@ struct RouteResultsView: View {
         .onAppear {
             ensureRouteSelection()
         }
-        .onChange(of: viewModel.routes.map(\.id)) {
+        // `first?.id` changes on a new search (fresh Route UUIDs) and on re-sort — enough to
+        // re-validate selection — without allocating a `[UUID]` on every render.
+        .onChange(of: viewModel.routes.first?.id) {
             ensureRouteSelection()
         }
         .navigationDestination(isPresented: $showRouteDetail) {

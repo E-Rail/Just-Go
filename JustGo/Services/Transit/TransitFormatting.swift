@@ -3,6 +3,27 @@ import Foundation
 private let chineseLineNumberExpression = try! NSRegularExpression(pattern: "[零〇一二三四五六七八九十百]+(?=号线)")
 private let scheduleUnknownLineColorHex = "#8E8E93"
 
+// Pre-compiled once instead of recompiling the pattern on every call. NSRegularExpression is
+// immutable and thread-safe.
+private let whitespaceExpression = try! NSRegularExpression(pattern: "\\s+")
+private let parentheticalExpression = try! NSRegularExpression(pattern: "（.*?）|\\(.*?\\)")
+private let lineReferenceExpression = try! NSRegularExpression(pattern: "[a-z]?\\d+(?=号?线|$)")
+private let lineSeparatorExpression = try! NSRegularExpression(pattern: "[/／、+＋&＆]")
+
+private extension String {
+    func removingMatches(of expression: NSRegularExpression) -> String {
+        let range = NSRange(startIndex..., in: self)
+        return expression.stringByReplacingMatches(in: self, range: range, withTemplate: "")
+    }
+
+    func firstMatch(of expression: NSRegularExpression) -> String? {
+        let range = NSRange(startIndex..., in: self)
+        guard let match = expression.firstMatch(in: self, range: range),
+              let matchRange = Range(match.range, in: self) else { return nil }
+        return String(self[matchRange])
+    }
+}
+
 struct ScheduleLineColorResolver {
     private struct IndexedLine {
         let line: MetroLine
@@ -101,7 +122,7 @@ struct ScheduleLineColorResolver {
 func fullTransitLineName(_ value: String) -> String {
     normalizeChineseLineNumber(
         value
-        .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
+        .removingMatches(of: whitespaceExpression)
         .replacingOccurrences(of: "地铁", with: "")
         .replacingOccurrences(of: "轨道交通", with: "")
         .lowercased()
@@ -110,15 +131,15 @@ func fullTransitLineName(_ value: String) -> String {
 
 func simplifiedTransitLineName(_ value: String) -> String {
     fullTransitLineName(value)
-        .replacingOccurrences(of: "（.*?）|\\(.*?\\)", with: "", options: .regularExpression)
+        .removingMatches(of: parentheticalExpression)
 }
 
 func transitLineReferences(_ value: String) -> Set<String> {
     let normalized = simplifiedTransitLineName(value)
     var references = Set<String>()
     if !normalized.isEmpty { references.insert(normalized) }
-    if let range = normalized.range(of: "[a-z]?\\d+(?=号?线|$)", options: .regularExpression) {
-        references.insert(String(normalized[range]))
+    if let reference = normalized.firstMatch(of: lineReferenceExpression) {
+        references.insert(reference)
     }
     return references
 }
@@ -148,7 +169,7 @@ extension Station {
 }
 
 private func compactLineName(_ value: String) -> String {
-    value.replacingOccurrences(of: "[/／、+＋&＆]", with: "", options: .regularExpression)
+    value.removingMatches(of: lineSeparatorExpression)
 }
 
 private func lineNameTokens(_ value: String) -> Set<String> {

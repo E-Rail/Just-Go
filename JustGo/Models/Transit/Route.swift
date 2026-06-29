@@ -22,11 +22,11 @@ struct FareEstimate {
     init(transitMeters: Double) {
         let km = transitMeters / 1000
         switch km {
-        case ..<6: amountCNY = 3
-        case ..<12: amountCNY = 4
-        case ..<22: amountCNY = 5
-        case ..<32: amountCNY = 6
-        default: amountCNY = 6 + Int((km - 32) / 20) + 1
+        case ...6: amountCNY = 3
+        case ...12: amountCNY = 4
+        case ...22: amountCNY = 5
+        case ...32: amountCNY = 6
+        default: amountCNY = 6 + Int(ceil((km - 32) / 20.0))
         }
     }
 

@@ -65,12 +65,16 @@ final class RoutePlanningService {
             var route = route
             let routeCityID = route.networkCityID ?? city
             let criticalStops = criticalStops(for: route)
-            route.dataCoverage = await officialStationData.routeCoverage(
+            let criticalStopNames = criticalStops.map(\.name)
+
+            // These three official-data lookups are independent of one another — kick them
+            // off concurrently and await results in the order their side effects are applied.
+            async let dataCoverage = officialStationData.routeCoverage(
                 cityID: routeCityID,
-                stationNames: criticalStops.map(\.name)
+                stationNames: criticalStopNames
             )
-            let criticalStations = await officialStationData.enrichStations(
-                criticalStops.compactMap { stop in
+            async let criticalStationsResult = officialStationData.enrichStations(
+                criticalStops.compactMap { stop -> Station? in
                     guard let coordinate = stop.coordinate else { return nil }
                     return Station(
                         stationID: stop.stationID,
@@ -81,6 +85,13 @@ final class RoutePlanningService {
                     )
                 }
             )
+            async let crowdControlStations = officialStationData.crowdControlWindows(
+                cityID: routeCityID,
+                stationNames: criticalStopNames
+            )
+
+            route.dataCoverage = await dataCoverage
+            let criticalStations = await criticalStationsResult
             route.stepFreeAssessment = stepFreeAssessment(
                 route: route,
                 criticalStations: criticalStations,
@@ -109,12 +120,7 @@ final class RoutePlanningService {
                     route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
                 }
             }
-            route.crowdControl = RouteCrowdControl(
-                stations: await officialStationData.crowdControlWindows(
-                    cityID: routeCityID,
-                    stationNames: criticalStops.map(\.name)
-                )
-            )
+            route.crowdControl = RouteCrowdControl(stations: await crowdControlStations)
 
             enrichedRoutes.append(route)
         }

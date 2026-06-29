@@ -97,6 +97,7 @@ struct RoutePlannerView: View {
                 viewModel = container.makeRoutePlannerViewModel()
             }
             viewModel?.cityChanged(to: appState.selectedCity)
+            viewModel?.prewarmLocation()
             applyPendingRouteInput(appState.pendingRouteInput)
             applyPendingQuickPlaceSetup(appState.pendingQuickPlaceSetup)
             resumableTrip = ActiveTripStore.load()

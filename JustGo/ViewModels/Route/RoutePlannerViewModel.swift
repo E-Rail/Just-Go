@@ -125,26 +125,55 @@ final class RoutePlannerViewModel {
     func useCurrentLocation(for field: RouteInputField) async {
         pendingQuickPlaceKind = nil
 
-        do {
-            let location = try await locationService.requestCurrentLocation()
-            let coordinate = location.coordinate
-            let place: TransitPlace
+        let coordinate: CLLocationCoordinate2D
+        if let recent = locationService.currentLocation,
+           recent.horizontalAccuracy >= 0,
+           recent.horizontalAccuracy <= 100,
+           abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
+            // A recent, sufficiently accurate fix (e.g. from pre-warming when the planner
+            // appeared) is good enough for a route origin — use it immediately instead of
+            // waiting on a fresh fix that can stall indoors / on weak GPS / in the simulator.
+            // The ≤120s window is intentionally looser than requestCurrentLocation's 30s so a
+            // just-prewarmed fix fills instantly; the accuracy gate is what keeps it safe.
+            coordinate = recent.coordinate
+        } else {
             do {
-                place = try await placeSearchProvider.reverseGeocode(
-                    location: coordinate,
-                    name: AppLocalization.localized("Current Location")
-                ).withSource(.currentLocation)
+                coordinate = try await locationService.requestCurrentLocation().coordinate
             } catch {
-                place = TransitPlace(
-                    name: AppLocalization.localized("Current Location"),
-                    coordinate: coordinate,
-                    source: .currentLocation
-                )
+                // Last resort once the strict request fails: fall back to a last-known fix so
+                // the field still fills, but reject an obviously coarse one (accuracy-relaxed
+                // to a city-level bound) rather than seed routing with a km-off origin.
+                guard let lastKnown = locationService.currentLocation,
+                      lastKnown.horizontalAccuracy >= 0,
+                      lastKnown.horizontalAccuracy <= 1000 else {
+                    errorMessage = userFacingErrorMessage(for: error)
+                    return
+                }
+                coordinate = lastKnown.coordinate
             }
-            assignPlace(place, for: field)
-        } catch {
-            errorMessage = userFacingErrorMessage(for: error)
         }
+
+        let place: TransitPlace
+        do {
+            place = try await placeSearchProvider.reverseGeocode(
+                location: coordinate,
+                name: AppLocalization.localized("Current Location")
+            ).withSource(.currentLocation)
+        } catch {
+            place = TransitPlace(
+                name: AppLocalization.localized("Current Location"),
+                coordinate: coordinate,
+                source: .currentLocation
+            )
+        }
+        assignPlace(place, for: field)
+    }
+
+    /// Begin populating the device location in the background when already authorized, so a
+    /// later "Current Location" tap fills the field instantly instead of waiting on a fix.
+    /// No-op (and no permission prompt) when location access hasn't been granted yet.
+    func prewarmLocation() {
+        locationService.prewarmLocation()
     }
 
     func cityChanged(to city: City?) {

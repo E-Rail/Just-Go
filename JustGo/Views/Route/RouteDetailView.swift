@@ -75,7 +75,7 @@ struct RouteDetailView: View {
             reminderScheduled = false
             tripLoggedConfirmation = false
         }
-        .task(id: route.networkCityID ?? appState.selectedCity?.id) {
+        .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
             guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
                   let network = await container.metroNetworkProvider.network(for: cityID) else {
                 metroNetworks = []

@@ -185,10 +185,13 @@ struct DeparturePlannerSection: View {
     }
 
     private func syncToAnchor() {
+        // `date` is seeded once at view creation, so by the time the rider switches out of
+        // "Leave now" it may already be in the past — clamp it forward before committing.
+        let planned = max(date, Date())
         switch mode {
         case .now: anchor = .now
-        case .departBy: anchor = .departBy(date)
-        case .arriveBy: anchor = .arriveBy(date)
+        case .departBy: anchor = .departBy(planned)
+        case .arriveBy: anchor = .arriveBy(planned)
         }
     }
 }

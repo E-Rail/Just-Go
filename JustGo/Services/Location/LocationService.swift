@@ -62,6 +62,17 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
     }
 
+    /// Warm the location cache with a single fix without leaving continuous updates running.
+    /// `requestLocation()` delivers one update (via `didUpdateLocations`) then auto-stops, so
+    /// opening a screen that pre-warms doesn't drain the battery. No-op (and no permission
+    /// prompt) when location access hasn't been granted yet.
+    func prewarmLocation() {
+        guard isAuthorized else { return }
+
+        locationErrorMessage = nil
+        manager.requestLocation()
+    }
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.max(by: { $0.timestamp < $1.timestamp }) else { return }
         currentLocation = location

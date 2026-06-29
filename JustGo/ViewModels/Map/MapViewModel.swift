@@ -58,6 +58,7 @@ final class MapViewModel {
     }
 
     func loadStations(for city: City) async {
+        clearSearch()
         viewportLoadTask?.cancel()
         cityLoadTask?.cancel()
         updateCamera(to: city.coordinate, spanDelta: 0.22)
@@ -76,12 +77,18 @@ final class MapViewModel {
         }
 
         do {
-            searchResults = try await stationSearchService.searchPlaces(
+            let results = try await stationSearchService.searchPlaces(
                 keyword: searchText,
                 city: city.id,
                 region: visibleRegion?.mkCoordinateRegion
             )
+            // MKLocalSearch ignores Swift task cancellation, so a superseded query can return
+            // after a newer one — drop it instead of stomping the current results.
+            guard !Task.isCancelled else { return }
+            searchResults = results
         } catch {
+            guard !Task.isCancelled else { return }
+            searchResults = []
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }

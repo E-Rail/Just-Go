@@ -37,13 +37,16 @@ struct CityDataCapabilities: Equatable {
               let manifest = try? JSONDecoder().decode(PackManifest.self, from: data) else {
             return [:]
         }
-        return Dictionary(uniqueKeysWithValues: manifest.cities.map { city in
-            (city.cityID, CityDataCapabilities(
-                accessibility: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility),
-                stationEssentials: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules),
-                stationMap: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
-            ))
-        })
+        return Dictionary(
+            manifest.cities.map { city in
+                (city.cityID, CityDataCapabilities(
+                    accessibility: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility),
+                    stationEssentials: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules),
+                    stationMap: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
+                ))
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
     }()
 }
 

@@ -10,7 +10,7 @@ struct RouteDetailView: View {
     @State var showTripNote = false
     @State var showExpandedRouteMap = false
     @State var showLiveGo = false
-    @State private var reminderScheduled = false
+    @State private var scheduledReminderRouteID: UUID?
     @State var tripLoggedConfirmation = false
     @State private var showReminderDenied = false
     @State private var showReminderTooLate = false
@@ -78,7 +78,6 @@ struct RouteDetailView: View {
             LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
         }
         .onChange(of: selectedRouteID) { _, _ in
-            reminderScheduled = false
             tripLoggedConfirmation = false
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
@@ -110,6 +109,12 @@ struct RouteDetailView: View {
 
     var route: Route {
         alternatives.first { $0.id == selectedRouteID } ?? initialRoute
+    }
+
+    /// Derived from the single tracked route id so switching tabs to browse never silently
+    /// drops a reminder the user set; "set" shows again when they return to that route.
+    private var reminderScheduled: Bool {
+        scheduledReminderRouteID == selectedRouteID
     }
 
     func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
@@ -407,7 +412,14 @@ struct RouteDetailView: View {
             return
         }
         let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: reminderLeadMinutes)
-        reminderScheduled = scheduled
+        if scheduled {
+            // Enforce a single active reminder: drop the one from a previously-reminded route
+            // so scheduling on route A then route B can't leave two notifications pending.
+            if let previous = scheduledReminderRouteID, previous != route.id {
+                container.tripReminderService.cancelReminder(routeID: previous)
+            }
+            scheduledReminderRouteID = route.id
+        }
         showReminderTooLate = !scheduled
     }
 

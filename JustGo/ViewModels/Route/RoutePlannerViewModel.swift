@@ -28,6 +28,7 @@ final class RoutePlannerViewModel {
     var tripAnchor: TripTimeAnchor = .now
 
     private var suggestionTask: Task<Void, Never>?
+    private var routeSearchGeneration = 0
 
     // Accessibility filters
     var requiresWheelchairAccess = false
@@ -184,10 +185,13 @@ final class RoutePlannerViewModel {
     func cityChanged(to city: City?) {
         let cityActuallyChanged = city?.id != selectedCity?.id
         selectedCity = city
-        originPlace = nil
-        destinationPlace = nil
         if cityActuallyChanged {
-            // Clear stale station names so they aren't searched against the new city.
+            // Only reset the resolved places + typed names when the city truly changes. This
+            // runs on every planner re-appearance (tab switch); wiping the places unconditionally
+            // would silently drop a station the user already picked and force a redundant
+            // geocode (which fails offline) on the next search.
+            originPlace = nil
+            destinationPlace = nil
             originName = ""
             destinationName = ""
         }
@@ -199,15 +203,21 @@ final class RoutePlannerViewModel {
     func searchRoutes() async {
         guard let city = selectedCity else { return }
 
+        // Generation guard: a second search (e.g. a stray tap during a quick-route location
+        // fetch, while isLoading is still false) must not let a slower, superseded result
+        // overwrite the newest one or flip the spinner off mid-search.
+        routeSearchGeneration += 1
+        let generation = routeSearchGeneration
         isLoading = true
         errorMessage = nil
         routes = []
-        defer { isLoading = false }
+        defer { if generation == routeSearchGeneration { isLoading = false } }
 
         do {
+            let planned: [Route]
             switch (originPlace, destinationPlace) {
             case let (originPlace?, destinationPlace?):
-                routes = try await routePlanningService.planRoute(
+                planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destinationPlace,
                     city: city.id,
@@ -216,7 +226,7 @@ final class RoutePlannerViewModel {
                 )
             case let (originPlace?, nil):
                 let destination = try await resolveTypedPlace(destinationName, city: city)
-                routes = try await routePlanningService.planRoute(
+                planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destination,
                     city: city.id,
@@ -225,7 +235,7 @@ final class RoutePlannerViewModel {
                 )
             case let (nil, destinationPlace?):
                 let origin = try await resolveTypedPlace(originName, city: city)
-                routes = try await routePlanningService.planRoute(
+                planned = try await routePlanningService.planRoute(
                     from: origin,
                     to: destinationPlace,
                     city: city.id,
@@ -233,7 +243,7 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             case (nil, nil):
-                routes = try await routePlanningService.planRoute(
+                planned = try await routePlanningService.planRoute(
                     from: originName,
                     to: destinationName,
                     city: city.id,
@@ -241,11 +251,14 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             }
+            guard generation == routeSearchGeneration else { return }
+            routes = planned
             sortRoutes()
             if let firstRoute = routes.first {
                 saveRecentRoute(firstRoute)
             }
         } catch {
+            guard generation == routeSearchGeneration else { return }
             errorMessage = userFacingErrorMessage(for: error)
         }
     }
@@ -442,7 +455,8 @@ final class RoutePlannerViewModel {
             destinationStationID: route.destinationStationID,
             destinationStationName: route.destination,
             lineName: route.segments.first(where: { $0.type.isTransit })?.lineName,
-            duration: route.formattedDuration
+            duration: route.formattedDuration,
+            plannedDuration: route.totalDuration
         )
 
         var routes = recentRoutes.filter {
@@ -489,4 +503,12 @@ struct RecentRoute: Identifiable, Codable {
     let destinationStationName: String
     let lineName: String?
     let duration: String
+    let plannedDuration: TimeInterval?
+
+    /// Localized at display time from the raw duration so it follows a language switch;
+    /// falls back to the legacy stored string for records saved before plannedDuration existed.
+    var displayDuration: String {
+        if let plannedDuration { return AppLocalization.minutes(Int(plannedDuration / 60)) }
+        return duration
+    }
 }

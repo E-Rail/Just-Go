@@ -361,7 +361,7 @@ extension RoutePlannerView {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("\(route.originStationName) → \(route.destinationStationName)")
                                         .font(.body)
-                                    Text([route.lineName, route.duration].compactMap { $0 }.joined(separator: " • "))
+                                    Text([route.lineName, route.displayDuration].compactMap { $0 }.joined(separator: " • "))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }

@@ -70,6 +70,10 @@ final class StationSearchViewModel {
         let loadID = UUID()
         stationLoadID = loadID
         isSearching = true
+        // defer guarantees the spinner clears on EVERY exit, including the stale-token early
+        // returns below — otherwise a cleared/superseded search leaves isSearching stuck true
+        // and the results list spins forever even after loadInitialStations repopulates it.
+        defer { isSearching = false }
         errorMessage = nil
         await refreshLocationIfAlreadyAllowed()
 
@@ -82,7 +86,6 @@ final class StationSearchViewModel {
             guard stationLoadID == loadID else { return }
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
-        isSearching = false
     }
 
     func scheduleSearch(city: String) {
@@ -98,6 +101,7 @@ final class StationSearchViewModel {
         searchTask?.cancel()
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
+        isSearching = false
         // Invalidate any in-flight search so a late network result can't repopulate the list.
         stationLoadID = UUID()
         searchText = ""

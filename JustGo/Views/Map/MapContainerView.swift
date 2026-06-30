@@ -15,6 +15,7 @@ struct MapContainerView: View {
     @State private var showCityPicker = false
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
+    @State private var placeMatchTask: Task<Void, Never>?
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -257,10 +258,15 @@ struct MapContainerView: View {
     private func selectSearchResult(_ place: TransitPlace) {
         isSearchFocused = false
         viewModel?.clearSearch()
-        Task {
+        // Track + cancel so rapidly tapping results can't stack matchingStation calls whose
+        // out-of-order completion would open the wrong station detail.
+        placeMatchTask?.cancel()
+        placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
+                guard !Task.isCancelled else { return }
                 openStation(station)
             } else {
+                guard !Task.isCancelled else { return }
                 viewModel?.updateCamera(to: place.coordinate, spanDelta: 0.02)
             }
         }
@@ -270,10 +276,13 @@ struct MapContainerView: View {
     /// otherwise it shows Apple's native place card.
     private func handleTappedPlace(_ mapItem: MKMapItem) {
         let place = TransitPlace(mapItem: mapItem)
-        Task {
+        placeMatchTask?.cancel()
+        placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
+                guard !Task.isCancelled else { return }
                 openStation(station)
             } else {
+                guard !Task.isCancelled else { return }
                 selectedMapItem = IdentifiableMapItem(mapItem: mapItem)
             }
         }

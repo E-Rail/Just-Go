@@ -154,7 +154,10 @@ struct TripMemoryView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
 
-                                Text([record.routeSummary, record.strategy.localizedName].joined(separator: " • "))
+                                // routeSummary is a frozen, locale-stamped duration string and
+                                // duplicates the localized duration already shown above; show the
+                                // strategy alone so it follows the current language.
+                                Text(record.strategy.localizedName)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                 if !record.warningMessages.isEmpty {

@@ -56,9 +56,9 @@ struct StationSearchView: View {
             .textFieldStyle(.plain)
             .focused($isSearchFocused)
             .onSubmit {
-                Task {
-                    await viewModel?.search(city: appState.selectedCity?.id ?? "")
-                }
+                // Route through the single debounced searchTask slot rather than spawning an
+                // untracked Task that races the in-flight debounced search on stationLoadID.
+                viewModel?.scheduleSearch(city: appState.selectedCity?.id ?? "")
             }
 
             if !(viewModel?.searchText.isEmpty ?? true) {

@@ -280,10 +280,14 @@ struct TransitMapView: UIViewRepresentable {
                 // Resolve the tapped Apple POI to an MKMapItem, then surface it.
                 // Deselect only after the async resolve so the feature stays valid.
                 poiTask?.cancel()
-                poiTask = Task { @MainActor [weak mapView] in
+                poiTask = Task { @MainActor [weak self, weak mapView] in
                     let mapItem = try? await MKMapItemRequest(mapFeatureAnnotation: feature).mapItem
-                    if let mapItem { self.parent.onPlaceSelected?(mapItem) }
                     mapView?.deselectAnnotation(feature, animated: false)
+                    // MKMapItemRequest, like MKLocalSearch, ignores task cancellation — so guard
+                    // explicitly to avoid a superseded tap firing onPlaceSelected with a stale
+                    // item; weak self prevents the cancelled task from retaining the Coordinator.
+                    guard !Task.isCancelled, let self, let mapItem else { return }
+                    self.parent.onPlaceSelected?(mapItem)
                 }
             }
         }

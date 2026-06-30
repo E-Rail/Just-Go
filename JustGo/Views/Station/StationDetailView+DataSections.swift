@@ -64,6 +64,26 @@ extension StationDetailView {
                 ))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+
+                Divider()
+
+                Button {
+                    reportItemType = .exit
+                    reportStatus = .notPresent
+                    reportSeverity = .low
+                    reportNote = ""
+                    showStationReport = true
+                } label: {
+                    Label(
+                        AppLocalization.text(
+                            english: "Report wrong exit or station issue",
+                            simplified: "反馈出入口或车站问题",
+                            traditional: "回報出入口或車站問題"
+                        ),
+                        systemImage: "exclamationmark.bubble"
+                    )
+                    .font(.caption)
+                }
             }
         }
     }

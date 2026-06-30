@@ -187,7 +187,8 @@ struct LiveGoTripBuilder {
                     fromStationName: segment.fromStationName,
                     toStationName: isOrigin ? segment.toStationName : route.destination,
                     stopCount: 0,
-                    walkingDistance: segment.distance
+                    walkingDistance: segment.distance,
+                    duration: segment.duration
                 ))
             case .transfer:
                 steps.append(TripStep(
@@ -198,7 +199,8 @@ struct LiveGoTripBuilder {
                     fromStationName: segment.fromStationName,
                     toStationName: nil,
                     stopCount: 0,
-                    walkingDistance: 0
+                    walkingDistance: 0,
+                    duration: segment.duration
                 ))
             case .subway, .transit:
                 steps.append(TripStep(
@@ -209,7 +211,9 @@ struct LiveGoTripBuilder {
                     fromStationName: segment.fromStationName,
                     toStationName: segment.toStationName,
                     stopCount: segment.stops,
-                    walkingDistance: 0
+                    walkingDistance: 0,
+                    duration: segment.duration,
+                    exitHint: arrivalExit(for: segment.toStationName, in: route)
                 ))
             }
         }
@@ -226,5 +230,13 @@ struct LiveGoTripBuilder {
             ))
         }
         return LiveTripPlan(steps: steps, origin: route.origin, destination: route.destination)
+    }
+
+    /// The recommended exit at a ride step's alight station, from the route's per-station guidance.
+    private func arrivalExit(for stationName: String?, in route: Route) -> String? {
+        guard let stationName else { return nil }
+        return route.stationGuidance.first {
+            $0.stationName == stationName && ($0.role == .arrival || $0.role == .transfer)
+        }?.exit?.name
     }
 }

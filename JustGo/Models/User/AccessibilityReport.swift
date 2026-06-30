@@ -78,6 +78,7 @@ enum VerificationItemType: String, Codable, CaseIterable {
     case visualDisplay
     case staffAssistance
     case stepFreeAccess
+    case exit
     case routeConcern
 
     var title: String {
@@ -102,6 +103,8 @@ enum VerificationItemType: String, Codable, CaseIterable {
             return AppLocalization.localized("Staff Assistance")
         case .stepFreeAccess:
             return AppLocalization.localized("Step-free Access")
+        case .exit:
+            return AppLocalization.text(english: "Exit / Entrance", simplified: "出入口", traditional: "出入口")
         case .routeConcern:
             return AppLocalization.localized("Route Concern")
         }

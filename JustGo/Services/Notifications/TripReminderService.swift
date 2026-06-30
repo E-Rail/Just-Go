@@ -7,8 +7,16 @@ import UserNotifications
 @MainActor
 final class TripReminderService {
     private let center = UNUserNotificationCenter.current()
+    private let foregroundPresenter = ForegroundNotificationPresenter()
+
+    init() {
+        // Show scheduled local notifications as a banner even while the app is foregrounded, so
+        // an estimated "get off" alert is visible if the rider still has Live Go open.
+        center.delegate = foregroundPresenter
+    }
 
     private func identifier(for routeID: UUID) -> String { "trip-leave-\(routeID.uuidString)" }
+    private func arrivalIdentifier(for stationID: String) -> String { "station-arrive-\(stationID)" }
 
     func authorizationStatus() async -> UNAuthorizationStatus {
         await center.notificationSettings().authorizationStatus
@@ -45,5 +53,53 @@ final class TripReminderService {
 
     func cancelReminder(routeID: UUID) {
         center.removePendingNotificationRequests(withIdentifiers: [identifier(for: routeID)])
+    }
+
+    /// Schedules an estimated "get off" alert to fire at `fireDate`. Timing is derived from the
+    /// route's segment durations — there is NO live train-position feed, so the copy says so.
+    /// Returns false if the fire time is already in the past.
+    @discardableResult
+    func scheduleArrivalReminder(stationID: String, stationName: String, exitHint: String?, fireDate: Date) async -> Bool {
+        cancelArrivalReminder(stationID: stationID)
+        let interval = fireDate.timeIntervalSinceNow
+        guard interval >= 1 else { return false }
+
+        let content = UNMutableNotificationContent()
+        content.title = AppLocalization.text(english: "Get ready to get off", simplified: "准备下车", traditional: "準備下車")
+        if let exitHint, !exitHint.isEmpty {
+            content.body = AppLocalization.text(
+                english: "Approaching \(stationName) — get off and head to \(exitHint). (estimated from route time)",
+                simplified: "即将到达\(stationName)，请下车前往\(exitHint)。（根据线路时间估算）",
+                traditional: "即將抵達\(stationName)，請下車前往\(exitHint)。（根據路線時間估算）"
+            )
+        } else {
+            content.body = AppLocalization.text(
+                english: "Approaching \(stationName) — get ready to get off. (estimated from route time)",
+                simplified: "即将到达\(stationName)，请准备下车。（根据线路时间估算）",
+                traditional: "即將抵達\(stationName)，請準備下車。（根據路線時間估算）"
+            )
+        }
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let request = UNNotificationRequest(identifier: arrivalIdentifier(for: stationID), content: content, trigger: trigger)
+        try? await center.add(request)
+        return true
+    }
+
+    func cancelArrivalReminder(stationID: String) {
+        center.removePendingNotificationRequests(withIdentifiers: [arrivalIdentifier(for: stationID)])
+    }
+}
+
+/// Presents scheduled local notifications as a banner while the app is foregrounded.
+/// (Without a delegate iOS suppresses foreground notifications.) Kept off the main actor so it can
+/// satisfy the non-isolated `UNUserNotificationCenterDelegate` requirement cleanly.
+final class ForegroundNotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
     }
 }

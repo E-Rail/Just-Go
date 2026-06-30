@@ -135,8 +135,8 @@ final class TripMemoryService {
         userDefaults.setCodable(tripRecords, forKey: tripRecordsKey)
     }
 
-    func addFavorite(station: Station, cityName: String) {
-        let favorite = FavoriteStation(station: station, cityName: cityName)
+    func addFavorite(station: Station, cityName: String, cityNameEn: String? = nil) {
+        let favorite = FavoriteStation(station: station, cityName: cityName, cityNameEn: cityNameEn)
         favoriteStations.removeAll { $0.id == favorite.id }
         favoriteStations.insert(favorite, at: 0)
         favoriteStations = Array(favoriteStations.prefix(maxFavoriteStations))

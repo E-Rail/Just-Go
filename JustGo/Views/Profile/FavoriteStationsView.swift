@@ -33,7 +33,7 @@ struct FavoriteStationsView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(favorite.displayName)
                                         .font(.headline)
-                                    Text(favorite.cityName)
+                                    Text(favorite.displayCityName)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                     if !favorite.lineNames.isEmpty {

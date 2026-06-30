@@ -140,6 +140,11 @@ final class RoutePlannerViewModel {
             do {
                 coordinate = try await locationService.requestCurrentLocation().coordinate
             } catch {
+                if let locationError = error as? LocationServiceError,
+                   locationError == .permissionDenied {
+                    errorMessage = userFacingErrorMessage(for: error)
+                    return
+                }
                 // Last resort once the strict request fails: fall back to a last-known fix so
                 // the field still fills, but reject an obviously coarse one (accuracy-relaxed
                 // to a city-level bound) rather than seed routing with a km-off origin.

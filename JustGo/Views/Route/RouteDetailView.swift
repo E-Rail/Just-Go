@@ -82,6 +82,7 @@ struct RouteDetailView: View {
             tripLoggedConfirmation = false
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
+            boardingServiceWindows = []
             guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
                   let network = await container.metroNetworkProvider.network(for: cityID) else {
                 metroNetworks = []

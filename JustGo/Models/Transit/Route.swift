@@ -20,7 +20,13 @@ struct FareEstimate {
     let amountCNY: Int
 
     init(transitMeters: Double) {
-        let km = transitMeters / 1000
+        // A non-finite distance only arises from corrupted route data; fall back to the base
+        // fare rather than trapping in Int(...) below.
+        guard transitMeters.isFinite else { amountCNY = 3; return }
+        // Exclusive-above tier boundaries (≤6km ¥3, ≤12km ¥4, …) per the published table.
+        // Compare the fractional kilometre value directly — rounding to whole metres first
+        // would pull a route just past a boundary (e.g. 6000.3 m) back into the cheaper tier.
+        let km = max(0, transitMeters) / 1000
         switch km {
         case ...6: amountCNY = 3
         case ...12: amountCNY = 4
@@ -49,10 +55,11 @@ struct Route: Identifiable, Codable {
     var isFullyAccessible: Bool
     var stepFreeAssessment: RouteStepFreeAssessment = .unknown
     var warnings: [RouteWarning]
-    let accessGuidance: [RouteAccessGuide]
+    var accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
     var serviceStatus: RouteServiceStatus = .unknown
     var crowdControl: RouteCrowdControl = .empty
+    var stationGuidance: [RouteStationGuidance] = []
 
     var boardingTransitSegment: RouteSegment? {
         segments.first { $0.type.isTransit }
@@ -367,6 +374,100 @@ struct RouteStationStop: Identifiable, Codable {
 
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"
+    }
+}
+
+// MARK: - Transit guidance (entrance/exit, platform, interchange)
+
+enum AccessPointKind: String, Codable {
+    case entrance
+    case exit
+    case elevator
+    case escalator
+    case unknown
+}
+
+/// A specific station entrance/exit (or vertical-access point). Either authored in a city pack
+/// (`source == .specificEntrance`/`.localStationData`, `confidence == .official`) or best-effort
+/// extracted from accessibility text (`source == .inferred`, `confidence == .estimated`).
+struct StationAccessPoint: Identifiable, Codable {
+    let id: String
+    let name: String
+    let kind: AccessPointKind
+    let coordinate: CodableCoordinate?
+    let isAccessible: Bool
+    let notes: [String]
+    let source: RouteAccessPointSource
+    let confidence: DataConfidence
+}
+
+/// Boarding tips for a platform (which car, which door side). Authored-only; absent in packs today.
+struct StationPlatformHint: Codable {
+    let lineName: String?
+    let directionText: String?
+    let boardingCarText: String?
+    let doorSideText: String?
+    let notes: [String]
+}
+
+/// Transfer-corridor hint between two lines at an interchange. Authored-only; absent today.
+struct StationInterchangeHint: Codable {
+    let fromLineName: String?
+    let toLineName: String?
+    let walkingMeters: Double?
+    let walkingMinutes: Double?
+    let notes: [String]
+}
+
+/// Per-route, per-station guidance attached during route enrichment (boarding/transfer/arrival).
+struct RouteStationGuidance: Identifiable, Codable {
+    enum Role: String, Codable {
+        case boarding
+        case transfer
+        case arrival
+        case passthrough
+    }
+
+    let stationID: String
+    let stationName: String
+    let role: Role
+    let exit: StationAccessPoint?
+    let interchange: StationInterchangeHint?
+    let confidence: DataConfidence
+
+    var id: String { "\(stationID)-\(role.rawValue)" }
+}
+
+/// Render-ready comparison metrics for one route, computed across all alternatives.
+struct RouteComparisonMetrics: Identifiable {
+    let id: UUID
+    let rank: Int
+    let durationText: String
+    let transferText: String
+    let walkingText: String
+    let transferEffort: String
+    let exitConfidence: DataConfidence
+    let bestForReason: String
+}
+
+/// Per-station access guidance returned by the city-pack service: best-available exits/entrances,
+/// optional platform/interchange hints, and a confidence describing the data source.
+struct StationAccessGuidance {
+    let accessPoints: [StationAccessPoint]
+    let platformHints: [StationPlatformHint]
+    let interchangeHints: [StationInterchangeHint]
+    let confidence: DataConfidence
+
+    static let empty = StationAccessGuidance(
+        accessPoints: [],
+        platformHints: [],
+        interchangeHints: [],
+        confidence: .unavailable
+    )
+
+    /// The recommended exit/entrance to surface (prefers an explicit exit, then any point).
+    var primaryAccessPoint: StationAccessPoint? {
+        accessPoints.first { $0.kind == .exit } ?? accessPoints.first
     }
 }
 

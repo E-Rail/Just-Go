@@ -1,9 +1,15 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
-private struct IdentifiableMapItem: Identifiable {
+/// A tapped Apple POI. `id` is stable for the lifetime of the tap so that flipping
+/// `resolvedItem` from nil → the resolved `MKMapItem` updates the already-presented sheet
+/// in place (loading shell → Apple card) instead of dismissing and re-presenting it.
+private struct TappedPlace: Identifiable {
     let id = UUID()
-    let mapItem: MKMapItem
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+    var resolvedItem: MKMapItem?
 }
 
 struct MapContainerView: View {
@@ -11,7 +17,7 @@ struct MapContainerView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel: MapViewModel?
     @State private var selectedStation: Station?
-    @State private var selectedMapItem: IdentifiableMapItem?
+    @State private var tappedPlace: TappedPlace?
     @State private var showCityPicker = false
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
@@ -68,11 +74,26 @@ struct MapContainerView: View {
                 StationDetailView(station: station)
             }
         }
-        .sheet(item: $selectedMapItem) { item in
-            MapItemDetailSheet(mapItem: item.mapItem) {
-                selectedMapItem = nil
+        .sheet(item: $tappedPlace, onDismiss: { tappedPlace = nil }) { place in
+            Group {
+                if let item = place.resolvedItem {
+                    MapItemDetailSheet(mapItem: item) {
+                        tappedPlace = nil
+                    }
+                    .ignoresSafeArea()
+                } else {
+                    PlaceLoadingView(name: place.name)
+                }
             }
-            .ignoresSafeArea()
+            .safeAreaInset(edge: .bottom) {
+                PlanRouteButtons(
+                    place: TransitPlace(name: place.name, coordinate: place.coordinate, source: .mapKit),
+                    onSelected: { tappedPlace = nil }
+                )
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+                .background(.regularMaterial)
+            }
             .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showCityPicker) {
@@ -111,7 +132,8 @@ struct MapContainerView: View {
                 viewModel?.viewportChanged(to: region)
             },
             onStationSelected: openStation,
-            onPlaceSelected: handleTappedPlace
+            onPlaceTapped: handlePlaceTapped,
+            onPlaceResolved: handlePlaceResolved
         )
     }
 
@@ -243,6 +265,9 @@ struct MapContainerView: View {
     }
 
     private func openStation(_ station: Station) {
+        // Opening a station always wins over a place card — dismiss any place sheet (e.g. one still
+        // loading from a prior POI tap) so the two `.sheet` presentations can't contend.
+        tappedPlace = nil
         Task {
             guard !isLoadingStationDetail else { return }
 
@@ -272,23 +297,61 @@ struct MapContainerView: View {
         }
     }
 
-    /// A tapped Apple POI that *is* a programmed station opens the station detail;
-    /// otherwise it shows Apple's native place card.
-    private func handleTappedPlace(_ mapItem: MKMapItem) {
-        let place = TransitPlace(mapItem: mapItem)
+    /// Phase 1 of a POI tap: fires synchronously with the feature's name + coordinate. Runs the
+    /// fast in-memory station match — a tapped POI that *is* a programmed station opens the
+    /// station detail with no network wait; anything else immediately presents the place sheet in
+    /// a loading state, which `handlePlaceResolved` fills once Apple's resolve completes.
+    private func handlePlaceTapped(_ name: String?, _ coordinate: CLLocationCoordinate2D) {
+        let displayName = name ?? AppLocalization.text(english: "Selected place", simplified: "所选地点", traditional: "所選地點")
+        let place = TransitPlace(name: displayName, coordinate: coordinate, source: .mapKit)
         placeMatchTask?.cancel()
         placeMatchTask = Task {
-            if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
-                guard !Task.isCancelled else { return }
+            let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
+            guard !Task.isCancelled else { return }
+            if let station {
+                tappedPlace = nil
                 openStation(station)
             } else {
-                guard !Task.isCancelled else { return }
-                selectedMapItem = IdentifiableMapItem(mapItem: mapItem)
+                tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: nil)
             }
         }
     }
 
+    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Fill the already-presented
+    /// sheet. Both `poiTask` (in the map coordinator) and `placeMatchTask` are cancelled on every
+    /// new tap, so this only ever fires for the latest tap — a non-nil `tappedPlace` therefore
+    /// always corresponds to this resolve. A nil `tappedPlace` means the tap resolved to a station
+    /// (sheet never shown) or the user dismissed it, so the late resolve is simply discarded.
+    private func handlePlaceResolved(_ mapItem: MKMapItem) {
+        guard tappedPlace != nil else { return }
+        tappedPlace?.resolvedItem = mapItem
+    }
+
 }
+
+/// The place sheet's loading state: shows the tapped POI's name + a spinner immediately, before
+/// Apple's native card (which needs a fully-resolved MKMapItem) is ready.
+private struct PlaceLoadingView: View {
+    let name: String
+    var body: some View {
+        VStack(spacing: 14) {
+            Text(name)
+                .font(.headline)
+                .multilineTextAlignment(.center)
+            ProgressView()
+            Text(AppLocalization.text(
+                english: "Loading details…",
+                simplified: "正在加载详情…",
+                traditional: "正在載入詳情…"
+            ))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
 
 struct CityPickerView: View {
     @Binding var selectedCity: City?

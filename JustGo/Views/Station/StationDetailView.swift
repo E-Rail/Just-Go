@@ -15,6 +15,7 @@ struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(AccessibilityReportService.self) var accessibilityReportService
     @State var viewModel: StationDetailViewModel?
@@ -38,12 +39,14 @@ struct StationDetailView: View {
                 beforeYouGoSection
                 accessibilitySection
                 stationEssentialsSection
+                stationGuideSection
                 arrivalsSection
                 serviceStatusSection
                 stationMapSection
             }
             .padding()
         }
+        .background(Color.appBackground)
         .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -205,41 +208,7 @@ struct StationDetailView: View {
             coordinate: station.coordinate,
             source: .mapKit
         )
-        return HStack(spacing: 10) {
-            Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin)
-                appState.selectedTab = 1
-            } label: {
-                Label(
-                    AppLocalization.text(english: "From here", simplified: "从此出发", traditional: "從此出發"),
-                    systemImage: "arrow.up.circle.fill"
-                )
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination)
-                appState.selectedTab = 1
-            } label: {
-                Label(
-                    AppLocalization.text(english: "To here", simplified: "到此到达", traditional: "到此到達"),
-                    systemImage: "arrow.down.circle.fill"
-                )
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.primary)
-            }
-            .buttonStyle(.plain)
-        }
+        return PlanRouteButtons(place: place, onSelected: { dismiss() })
     }
 
     private var linesSection: some View {
@@ -264,6 +233,70 @@ struct StationDetailView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+/// The "From here" / "To here" route-planning pair shown on a station or place popup.
+/// Tapping a button pre-fills the route planner (origin/destination), switches to the Route tab,
+/// and calls `onSelected` so the presenting popup can dismiss itself.
+///
+/// Colors use `Color.adaptive(hex: selectedThemeHex)` directly rather than the semantic
+/// `Color.accentColor`: the latter resolves from the environment `.tint`, which hasn't propagated
+/// on a freshly-presented sheet's first frame and momentarily flashes system blue. The adaptive
+/// color is a concrete dynamic color with no environment dependency, so it never flashes and still
+/// matches the app accent (and lifts for legibility in dark mode).
+struct PlanRouteButtons: View {
+    let place: TransitPlace
+    var onSelected: () -> Void = {}
+
+    @Environment(AppState.self) private var appState
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // "From here" — white (themed surface) with green text + outline.
+            Button {
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin)
+                appState.selectedTab = 1
+                onSelected()
+            } label: {
+                Label(
+                    AppLocalization.text(english: "From here", simplified: "从此出发", traditional: "從此出發"),
+                    systemImage: "arrow.up.circle.fill"
+                )
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(themeColor.opacity(0.4), lineWidth: 1)
+                )
+                .foregroundStyle(themeColor)
+            }
+            .buttonStyle(.plain)
+
+            // "To here" — solid theme green with white text.
+            Button {
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination)
+                appState.selectedTab = 1
+                onSelected()
+            } label: {
+                Label(
+                    AppLocalization.text(english: "To here", simplified: "到此到达", traditional: "到此到達"),
+                    systemImage: "arrow.down.circle.fill"
+                )
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(themeColor, in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.white)
+            }
+            .buttonStyle(.plain)
         }
     }
 }

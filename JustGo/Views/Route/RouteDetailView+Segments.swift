@@ -46,6 +46,105 @@ extension RouteDetailView {
     }
 
     @ViewBuilder
+    var tripEssentialsCard: some View {
+        let boarding = route.stationGuidance.first { $0.role == .boarding }
+        let arrival = route.stationGuidance.first { $0.role == .arrival }
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppLocalization.text(english: "Trip Essentials", simplified: "出行要点", traditional: "出行要點"))
+                    .font(.headline)
+
+                essentialRow(
+                    icon: "arrow.down.forward.circle.fill",
+                    title: AppLocalization.text(english: "Enter", simplified: "进站", traditional: "進站"),
+                    detail: accessSummary(route.originAccessGuide),
+                    confidence: boarding?.confidence
+                )
+                Divider()
+                essentialRow(
+                    icon: "arrow.triangle.2.circlepath",
+                    title: AppLocalization.text(english: "Transfer", simplified: "换乘", traditional: "換乘"),
+                    detail: transferEssentialDetail,
+                    confidence: nil
+                )
+                Divider()
+                essentialRow(
+                    icon: "arrow.up.forward.circle.fill",
+                    title: AppLocalization.text(english: "Exit", simplified: "出站", traditional: "出站"),
+                    detail: accessSummary(route.destinationAccessGuide),
+                    confidence: arrival?.confidence
+                )
+                Divider()
+                essentialRow(
+                    icon: "bell",
+                    title: AppLocalization.text(english: "Alert", simplified: "提醒", traditional: "提醒"),
+                    detail: AppLocalization.text(
+                        english: "Arrival reminder available in step-by-step navigation",
+                        simplified: "分步导航中可设置到站提醒",
+                        traditional: "分步導航中可設定到站提醒"
+                    ),
+                    confidence: nil
+                )
+            }
+        }
+    }
+
+    private func essentialRow(icon: String, title: String, detail: String, confidence: DataConfidence?) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Spacer()
+                    if let confidence, confidence != .unknown {
+                        DataConfidenceChip(confidence: confidence, compact: true)
+                    }
+                }
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    /// Station name plus a specific exit/entrance when one is known; just the station otherwise.
+    private func accessSummary(_ guide: RouteAccessGuide?) -> String {
+        guard let guide else { return AppLocalization.localized("Not available") }
+        if let point = guide.accessPoint, point.source != .stationPOI {
+            return "\(guide.stationName) · \(point.name)"
+        }
+        return guide.stationName
+    }
+
+    private var transferEssentialDetail: String {
+        if route.transferCount == 0 {
+            return AppLocalization.text(english: "Direct — no transfers", simplified: "直达，无需换乘", traditional: "直達，無需換乘")
+        }
+        let minutes = route.stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
+        let base = AppLocalization.transfers(route.transferCount)
+        if minutes > 0 {
+            return "\(base) · \(AppLocalization.minutes(Int(minutes)))"
+        }
+        return base
+    }
+
+    /// Maps an access-point source to a confidence label for the access guidance card.
+    /// Returns nil for the generic placeholder so the chip is hidden when no specific exit exists.
+    func accessConfidence(for guide: RouteAccessGuide) -> DataConfidence? {
+        guard let source = guide.accessPoint?.source else { return nil }
+        switch source {
+        case .specificEntrance, .localStationData: return .official
+        case .inferred, .mapKit: return .estimated
+        case .stationPOI, .routeBoundary: return nil
+        }
+    }
+
+    @ViewBuilder
     var accessGuidanceCard: some View {
         if !route.accessGuidance.isEmpty {
             GlassCard {
@@ -62,15 +161,22 @@ extension RouteDetailView {
                                     .frame(width: 26)
 
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(guide.title)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
+                                    HStack {
+                                        Text(guide.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                        Spacer()
+                                        if let confidence = accessConfidence(for: guide) {
+                                            DataConfidenceChip(confidence: confidence, compact: true)
+                                        }
+                                    }
                                     Text(guide.primaryInstruction)
                                         .font(.subheadline)
                                     Text(guide.formattedWalk)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
 
                             ForEach(guide.accessibilityNotes, id: \.self) { note in

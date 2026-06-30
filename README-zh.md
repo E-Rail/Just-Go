@@ -9,6 +9,8 @@
 [![Stars](https://img.shields.io/github/stars/E-Rail/JustGo?style=flat&logo=github)](https://github.com/E-Rail/JustGo/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/E-Rail/JustGo?logo=git&logoColor=white)](https://github.com/E-Rail/JustGo/commits)
 
+[English](https://github.com/E-Rail/JustGo/blob/main/README.md) | 中文
+
 **网站：** [e-rail.github.io/justgo](https://e-rail.github.io/justgo)
 
 JustGo 是一款面向中国城市轨道交通的“出行信心”应用。它不只告诉你该坐哪条路线，还会在进站前帮助你判断这趟行程是否顺畅、是否容易理解、是否可靠。JustGo 将路线规划、官方时刻表、车站地图、无障碍信息、出入口指引和透明的数据来源标签结合在一起，让每一次出行少一点意外。

@@ -9,6 +9,8 @@
 [![Stars](https://img.shields.io/github/stars/E-Rail/JustGo?style=flat&logo=github)](https://github.com/E-Rail/JustGo/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/E-Rail/JustGo?logo=git&logoColor=white)](https://github.com/E-Rail/JustGo/commits)
 
+English | [中文](https://github.com/E-Rail/JustGo/blob/main/README-zh.md)
+
 **Website:** [e-rail.github.io/justgo](https://e-rail.github.io/justgo)
 
 JustGo is a subway confidence app for China. It helps riders understand not only which route to take, but whether that trip will be smooth, understandable, and reliable before they enter the station. JustGo combines routing, official schedules, station maps, accessibility information, exit guidance, and transparent data-source labels so every rider can travel with fewer surprises.

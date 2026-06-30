@@ -96,6 +96,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             }
         } else {
             manager.stopUpdatingLocation()
+            currentLocation = nil
             if authorizationStatus == .denied || authorizationStatus == .restricted {
                 let error = LocationServiceError.permissionDenied
                 locationErrorMessage = error.localizedDescription
@@ -111,6 +112,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         if (error as? CLError)?.code == .denied {
             authorizationStatus = manager.authorizationStatus
             manager.stopUpdatingLocation()
+            currentLocation = nil
         }
     }
 

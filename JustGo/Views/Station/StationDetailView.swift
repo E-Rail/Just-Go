@@ -53,8 +53,12 @@ struct StationDetailView: View {
                     if isFavorited {
                         tripMemoryService.removeFavorite(id: "\(s.cityID)|\(s.stationID)")
                     } else {
-                        let cityName = appState.selectedCity?.localizedName ?? s.cityID
-                        tripMemoryService.addFavorite(station: s, cityName: cityName)
+                        let city = appState.selectedCity ?? container.cityService.getCity(byID: s.cityID)
+                        tripMemoryService.addFavorite(
+                            station: s,
+                            cityName: city?.name ?? s.cityID,
+                            cityNameEn: city?.nameEn
+                        )
                     }
                 } label: {
                     Image(systemName: isFavorited ? "star.fill" : "star")

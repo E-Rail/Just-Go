@@ -9,10 +9,13 @@ struct FavoriteStation: Identifiable, Codable {
     let longitude: Double
     let cityID: String
     let cityName: String
+    let cityNameEn: String?
     let lineNames: [String]
     let lineNamesEn: [String]?
+    let lineIDs: [String]?
+    let lineColorsHex: [String]?
 
-    init(station: Station, cityName: String) {
+    init(station: Station, cityName: String, cityNameEn: String? = nil) {
         self.id = "\(station.cityID)|\(station.stationID)"
         self.stationID = station.stationID
         // Store the raw, stable source names — these are the keys the city-pack enrichment
@@ -23,8 +26,11 @@ struct FavoriteStation: Identifiable, Codable {
         self.longitude = station.longitude
         self.cityID = station.cityID
         self.cityName = cityName
+        self.cityNameEn = cityNameEn
         self.lineNames = station.lines.map(\.name)
         self.lineNamesEn = station.lines.map { $0.nameEn ?? $0.name }
+        self.lineIDs = station.lines.map(\.lineID)
+        self.lineColorsHex = station.lines.map(\.colorHex)
     }
 
     /// Station name localized for display, derived from the stored raw identifiers so the
@@ -44,6 +50,10 @@ struct FavoriteStation: Identifiable, Codable {
         return lineNames
     }
 
+    var displayCityName: String {
+        AppLocalization.isChinese ? AppLocalization.chinese(cityName) : (cityNameEn ?? cityName)
+    }
+
     func toStation() -> Station {
         let station = Station(
             stationID: stationID,
@@ -56,10 +66,10 @@ struct FavoriteStation: Identifiable, Codable {
         let englishLineNames = lineNamesEn?.count == lineNames.count ? lineNamesEn : nil
         station.lines = lineNames.indices.map { index in
             SubwayLine(
-                lineID: "",
+                lineID: lineIDs?.indices.contains(index) == true ? (lineIDs?[index] ?? "") : "",
                 name: lineNames[index],
                 nameEn: englishLineNames?[index],
-                colorHex: "#8E8E93",
+                colorHex: lineColorsHex?.indices.contains(index) == true ? (lineColorsHex?[index] ?? "#8E8E93") : "#8E8E93",
                 cityID: cityID
             )
         }

@@ -62,6 +62,7 @@ final class MapViewModel {
         clearSearch()
         viewportLoadTask?.cancel()
         cityLoadTask?.cancel()
+        markerRefreshTask?.cancel()
         updateCamera(to: city.coordinate, spanDelta: 0.22)
         metroNetworks = []
         stations = []
@@ -112,6 +113,7 @@ final class MapViewModel {
 
     func clearSearch() {
         searchTask?.cancel()
+        markerRefreshTask?.cancel()
         searchText = ""
         searchResults = []
     }
@@ -196,6 +198,7 @@ final class MapViewModel {
         }
 
         guard !Task.isCancelled else { return }
+        stationsByCity = stationsByCity.filter { requested.contains($0.key) }
         guard let region = visibleRegion, region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
             if !stations.isEmpty { stations = [] }

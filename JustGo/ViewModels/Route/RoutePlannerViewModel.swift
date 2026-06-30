@@ -225,7 +225,7 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             case let (originPlace?, nil):
-                let destination = try await resolveTypedPlace(destinationName, city: city)
+                let destination = try await resolveTypedPlace(destinationName, city: city, field: .destination, generation: generation)
                 planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destination,
@@ -234,7 +234,7 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             case let (nil, destinationPlace?):
-                let origin = try await resolveTypedPlace(originName, city: city)
+                let origin = try await resolveTypedPlace(originName, city: city, field: .origin, generation: generation)
                 planned = try await routePlanningService.planRoute(
                     from: origin,
                     to: destinationPlace,
@@ -257,6 +257,8 @@ final class RoutePlannerViewModel {
             if let firstRoute = routes.first {
                 saveRecentRoute(firstRoute)
             }
+        } catch is CancellationError {
+            return
         } catch {
             guard generation == routeSearchGeneration else { return }
             errorMessage = userFacingErrorMessage(for: error)
@@ -398,7 +400,7 @@ final class RoutePlannerViewModel {
         destinationSuggestions = []
     }
 
-    private func resolveTypedPlace(_ name: String, city: City) async throws -> TransitPlace {
+    private func resolveTypedPlace(_ name: String, city: City, field: RouteInputField, generation: Int) async throws -> TransitPlace {
         let query = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { throw RoutePlanningError.stationNotFound }
         let region = MKCoordinateRegion(
@@ -408,6 +410,12 @@ final class RoutePlannerViewModel {
         )
         guard let place = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 8).first else {
             throw RoutePlanningError.stationNotFound
+        }
+        guard routeSearchGeneration == generation,
+              selectedCity?.id == city.id,
+              self.name(for: field).trimmingCharacters(in: .whitespacesAndNewlines) == query,
+              self.place(for: field) == nil else {
+            throw CancellationError()
         }
         return place
     }

@@ -19,6 +19,11 @@ struct TripStep: Identifiable, Equatable {
     let toStationName: String?
     let stopCount: Int
     let walkingDistance: Double
+    /// Estimated duration of this step (from the underlying route segment). Used to schedule an
+    /// estimated "get off" alert when a ride step starts. There is no live train-position feed.
+    var duration: TimeInterval = 0
+    /// Recommended exit/entrance at the step's end station, when known (best-available).
+    var exitHint: String? = nil
 
     var title: String {
         switch kind {

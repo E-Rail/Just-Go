@@ -124,3 +124,43 @@ struct StatItem: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+/// Compact capsule labeling the data source behind a piece of guidance:
+/// official (green) / estimated (orange) / not available (red) / no data (gray).
+/// Colors are fixed semantic indicators — intentionally not theme-tinted.
+struct DataConfidenceChip: View {
+    let confidence: DataConfidence
+    var compact = false
+
+    private var color: Color {
+        switch confidence {
+        case .official, .communityVerified: return .green
+        case .estimated, .mapKit, .sourcePending, .personal: return .orange
+        case .unavailable: return .red
+        case .unknown: return .gray
+        }
+    }
+
+    private var icon: String {
+        switch confidence {
+        case .official, .communityVerified: return "checkmark.seal.fill"
+        case .estimated, .mapKit, .sourcePending, .personal: return "exclamationmark.circle.fill"
+        case .unavailable: return "xmark.circle.fill"
+        case .unknown: return "questionmark.circle.fill"
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption2)
+            Text(confidence.label)
+                .font(.caption2)
+                .fontWeight(.medium)
+        }
+        .padding(.horizontal, compact ? 6 : 8)
+        .padding(.vertical, compact ? 2 : 4)
+        .background(color, in: Capsule())
+        .foregroundStyle(.white)
+    }
+}

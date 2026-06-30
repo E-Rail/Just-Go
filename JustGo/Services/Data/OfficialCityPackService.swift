@@ -68,6 +68,10 @@ protocol OfficialStationDataProviding {
     func crowdControlWindows(cityID: String, stationNames: [String]) async -> [ComfortStationWindows]
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage
     func matchingStation(place: TransitPlace, cityID: String) async -> Station?
+    /// Best-available entrance/exit (+ optional platform/interchange) guidance per station,
+    /// keyed by the original station name passed in. Official when authored in the pack,
+    /// otherwise text-extracted at `.estimated` confidence, otherwise `.empty`/`.unavailable`.
+    func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance]
 }
 
 actor OfficialCityPackService: OfficialStationDataProviding {
@@ -290,6 +294,82 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return enrichLoadedStation(station)
     }
 
+    func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance] {
+        _ = await loadCityPack(for: cityID)
+        var result: [String: StationAccessGuidance] = [:]
+        for name in stationNames where result[name] == nil {
+            guard let record = stationRecord(cityID: cityID, normalizedName: normalizedStationName(name)) else {
+                result[name] = .empty
+                continue
+            }
+            let platformHints = (record.platformHints ?? []).map(\.value)
+            let interchangeHints = (record.interchangeHints ?? []).map(\.value)
+            if let structured = record.stationAccessPoints, !structured.isEmpty {
+                result[name] = StationAccessGuidance(
+                    accessPoints: structured.map(\.value),
+                    platformHints: platformHints,
+                    interchangeHints: interchangeHints,
+                    confidence: .official
+                )
+            } else {
+                let extracted = Self.extractAccessPoints(from: record.accessibility)
+                result[name] = StationAccessGuidance(
+                    accessPoints: extracted,
+                    platformHints: platformHints,
+                    interchangeHints: interchangeHints,
+                    confidence: extracted.isEmpty ? .unavailable : .estimated
+                )
+            }
+        }
+        return result
+    }
+
+    /// Best-effort exit/entrance extraction from accessibility free text (`.estimated` confidence).
+    /// Surfaces letter/number tokens that precede a 口 / 出口 / 出入口 marker, e.g. "A口 C口" or
+    /// "A、C口直梯" → exits A, C. Marks a point accessible when it also appears in the station's
+    /// `accessibleEntrances` list. Returns [] when nothing parseable exists.
+    nonisolated private static func extractAccessPoints(from accessibility: OfficialAccessibility?) -> [StationAccessPoint] {
+        guard let accessibility else { return [] }
+        let accessibleTokens = Set(exitTokens(in: accessibility.accessibleEntrances ?? []))
+        let allText = (accessibility.accessibleEntrances ?? [])
+            + (accessibility.elevatorLocations ?? [])
+            + (accessibility.facilityNotes ?? [])
+        var seen = Set<String>()
+        var points: [StationAccessPoint] = []
+        for token in exitTokens(in: allText) where seen.insert(token).inserted {
+            points.append(StationAccessPoint(
+                id: token,
+                name: "\(token)口",
+                kind: .exit,
+                coordinate: nil,
+                isAccessible: accessibleTokens.contains(token),
+                notes: [],
+                source: .inferred,
+                confidence: .estimated
+            ))
+        }
+        return points.sorted { $0.id < $1.id }
+    }
+
+    nonisolated private static func exitTokens(in strings: [String]) -> [String] {
+        let pattern = "([A-Za-z0-9]+(?:[、，,/\\s][A-Za-z0-9]+)*)\\s*[出入]?口"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let separators = CharacterSet(charactersIn: "、，,/ \t")
+        var result: [String] = []
+        for string in strings {
+            let ns = string as NSString
+            for match in regex.matches(in: string, range: NSRange(location: 0, length: ns.length))
+                where match.numberOfRanges > 1 {
+                let run = ns.substring(with: match.range(at: 1))
+                for part in run.components(separatedBy: separators) {
+                    let token = part.uppercased()
+                    if !token.isEmpty, token.count <= 3 { result.append(token) }
+                }
+            }
+        }
+        return result
+    }
+
     private func loadManifest(from url: URL) async throws -> OfficialManifest {
         if let manifest = manifests[url] { return manifest }
         let data = try await download(from: url)
@@ -398,26 +478,36 @@ private struct OfficialPack: Decodable {
 
 private struct OfficialStation: Decodable {
     let stationName: String
+    let stationID: String?
     let accessibility: OfficialAccessibility?
     let schedules: [OfficialSchedule]
     let stationMaps: [CityPackStationMap]
     let stationAssets: [CityPackStationAsset]
     let stationFacilities: [OfficialFacility]
     let serviceStatus: CityPackServiceStatus?
+    // Optional, backward-compatible transit-guidance fields (absent in current packs).
+    let stationAccessPoints: [OfficialAccessPoint]?
+    let platformHints: [OfficialPlatformHint]?
+    let interchangeHints: [OfficialInterchangeHint]?
 
     enum CodingKeys: String, CodingKey {
-        case stationName, accessibility, schedules, stationMaps, stationAssets, stationFacilities, serviceStatus
+        case stationName, stationID, accessibility, schedules, stationMaps, stationAssets,
+             stationFacilities, serviceStatus, stationAccessPoints, platformHints, interchangeHints
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         stationName = try values.decode(String.self, forKey: .stationName)
+        stationID = try values.decodeIfPresent(String.self, forKey: .stationID)
         accessibility = try values.decodeIfPresent(OfficialAccessibility.self, forKey: .accessibility)
         schedules = try values.decodeIfPresent([OfficialSchedule].self, forKey: .schedules) ?? []
         stationMaps = try values.decodeIfPresent([CityPackStationMap].self, forKey: .stationMaps) ?? []
         stationAssets = try values.decodeIfPresent([CityPackStationAsset].self, forKey: .stationAssets) ?? []
         stationFacilities = try values.decodeIfPresent([OfficialFacility].self, forKey: .stationFacilities) ?? []
         serviceStatus = try values.decodeIfPresent(CityPackServiceStatus.self, forKey: .serviceStatus)
+        stationAccessPoints = try values.decodeIfPresent([OfficialAccessPoint].self, forKey: .stationAccessPoints)
+        platformHints = try values.decodeIfPresent([OfficialPlatformHint].self, forKey: .platformHints)
+        interchangeHints = try values.decodeIfPresent([OfficialInterchangeHint].self, forKey: .interchangeHints)
     }
 
     func facilities(for stationID: String) -> [StationFacility] {
@@ -493,6 +583,67 @@ private struct OfficialAccessibility: Decodable {
             accessibleEntrances: accessibleEntrances,
             facilityNotes: facilityNotes,
             hasTactilePath: hasTactilePath
+        )
+    }
+}
+
+private struct OfficialAccessPoint: Decodable {
+    let id: String?
+    let name: String
+    let kind: String?
+    let latitude: Double?
+    let longitude: Double?
+    let isAccessible: Bool?
+    let notes: [String]?
+    let source: String?
+
+    var value: StationAccessPoint {
+        let coordinate = latitude.flatMap { lat in longitude.map { CodableCoordinate(latitude: lat, longitude: $0) } }
+        return StationAccessPoint(
+            id: id ?? name,
+            name: name,
+            kind: AccessPointKind(rawValue: kind ?? "") ?? .exit,
+            coordinate: coordinate,
+            isAccessible: isAccessible ?? false,
+            notes: notes ?? [],
+            source: RouteAccessPointSource(rawValue: source ?? "") ?? .specificEntrance,
+            confidence: .official
+        )
+    }
+}
+
+private struct OfficialPlatformHint: Decodable {
+    let lineName: String?
+    let directionText: String?
+    let boardingCarText: String?
+    let doorSideText: String?
+    let notes: [String]?
+
+    var value: StationPlatformHint {
+        StationPlatformHint(
+            lineName: lineName,
+            directionText: directionText,
+            boardingCarText: boardingCarText,
+            doorSideText: doorSideText,
+            notes: notes ?? []
+        )
+    }
+}
+
+private struct OfficialInterchangeHint: Decodable {
+    let fromLineName: String?
+    let toLineName: String?
+    let walkingMeters: Double?
+    let walkingMinutes: Double?
+    let notes: [String]?
+
+    var value: StationInterchangeHint {
+        StationInterchangeHint(
+            fromLineName: fromLineName,
+            toLineName: toLineName,
+            walkingMeters: walkingMeters,
+            walkingMinutes: walkingMinutes,
+            notes: notes ?? []
         )
     }
 }

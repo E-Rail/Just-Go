@@ -12,6 +12,7 @@ final class StationDetailViewModel {
     var timetableAssets: [CityPackStationAsset] = []
     var serviceStatus: CityPackServiceStatus?
     var cityPackLoadStatus: CityPackLoadStatus?
+    var accessGuidance: StationAccessGuidance?
 
     private let officialStationData: OfficialStationDataProviding
 
@@ -49,6 +50,7 @@ final class StationDetailViewModel {
         stationMapStatusMessage = nil
         timetableAssets = []
         serviceStatus = nil
+        accessGuidance = nil
         defer { isLoadingCityPack = false }
 
         let status = await officialStationData.loadCityPack(for: station.cityID)
@@ -65,6 +67,10 @@ final class StationDetailViewModel {
             stationMap = await officialStationData.stationMap(for: station)
             timetableAssets = await officialStationData.timetableAssets(for: station)
             serviceStatus = await officialStationData.serviceStatus(for: station)
+            accessGuidance = (await officialStationData.stationGuidance(
+                cityID: station.cityID,
+                stationNames: [station.name]
+            ))[station.name]
             if stationMap != nil {
                 stationMapStatusMessage = AppLocalization.localized("Official station map available")
             } else {
@@ -103,6 +109,24 @@ final class StationDetailViewModel {
 
     var liveArrivalConfidence: DataConfidence {
         arrivals.contains(where: \.hasLiveCountdown) ? .official : .unavailable
+    }
+
+    /// Best-available exits/entrances for the Station Guide section (official or text-estimated).
+    var accessPoints: [StationAccessPoint] {
+        accessGuidance?.accessPoints ?? []
+    }
+
+    var platformHints: [StationPlatformHint] {
+        accessGuidance?.platformHints ?? []
+    }
+
+    /// Source label for the Station Guide header: the exit-data confidence when present,
+    /// otherwise the broader accessibility-data confidence.
+    var guideConfidence: DataConfidence {
+        if let confidence = accessGuidance?.confidence, confidence == .official || confidence == .estimated {
+            return confidence
+        }
+        return accessibilityConfidence
     }
 
     private var cityPackPendingConfidence: DataConfidence {

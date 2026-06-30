@@ -1,6 +1,97 @@
 import SwiftUI
 
 extension StationDetailView {
+    /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
+    /// platform hints, labeled with a confidence chip. Sits above Train Times.
+    var stationGuideSection: some View {
+        let exits = viewModel?.accessPoints ?? []
+        let platformHints = viewModel?.platformHints ?? []
+        return GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text(AppLocalization.text(english: "Station Guide", simplified: "进出站指引", traditional: "進出站指引"))
+                        .font(.headline)
+                    Spacer()
+                    DataConfidenceChip(confidence: viewModel?.guideConfidence ?? .unknown, compact: true)
+                }
+
+                Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if viewModel?.isLoadingCityPack == true {
+                    ProgressView()
+                } else if exits.isEmpty {
+                    Text(AppLocalization.text(
+                        english: "Specific exit data is not available yet — see the station map below.",
+                        simplified: "暂无具体出入口数据，请参考下方站内图。",
+                        traditional: "暫無具體出入口資料，請參考下方站內圖。"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } else {
+                    ForEach(exits) { exit in
+                        HStack(spacing: 8) {
+                            Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
+                                .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
+                                .frame(width: 22)
+                            Text(exit.name)
+                                .font(.subheadline)
+                            if exit.isAccessible {
+                                Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
+                                    .font(.caption2)
+                                    .foregroundStyle(.green)
+                            }
+                            Spacer()
+                        }
+                    }
+                }
+
+                if !platformHints.isEmpty {
+                    Divider()
+                    Text(AppLocalization.text(english: "On the platform", simplified: "站台提示", traditional: "月台提示"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
+                        platformHintRow(hint)
+                    }
+                }
+
+                Text(AppLocalization.text(
+                    english: "Tap the station map below for the full layout.",
+                    simplified: "点按下方站内图查看完整布局。",
+                    traditional: "點按下方站內圖查看完整佈局。"
+                ))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func platformHintRow(_ hint: StationPlatformHint) -> some View {
+        let parts = [hint.lineName, hint.directionText, hint.boardingCarText, hint.doorSideText]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+        return HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "tram.fill")
+                .font(.caption)
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 2) {
+                if !parts.isEmpty {
+                    Text(parts.joined(separator: " · "))
+                        .font(.subheadline)
+                }
+                ForEach(hint.notes, id: \.self) { note in
+                    Text(note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+        }
+    }
+
     var arrivalsSection: some View {
         let arrivals = viewModel?.arrivals ?? []
         let timetableAssets = viewModel?.timetableAssets ?? []

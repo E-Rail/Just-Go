@@ -73,23 +73,28 @@ final class MapViewModel {
 
     func searchEverywhere(in city: City?) async {
         guard let city else { return }
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
             searchResults = []
             return
         }
 
+        errorMessage = nil
         do {
             let results = try await stationSearchService.searchPlaces(
-                keyword: searchText,
+                keyword: query,
                 city: city.id,
                 region: visibleRegion?.mkCoordinateRegion
             )
             // MKLocalSearch ignores Swift task cancellation, so a superseded query can return
             // after a newer one — drop it instead of stomping the current results.
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled,
+                  searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
+            errorMessage = nil
             searchResults = results
         } catch {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled,
+                  searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
             searchResults = []
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
@@ -116,6 +121,7 @@ final class MapViewModel {
         markerRefreshTask?.cancel()
         searchText = ""
         searchResults = []
+        errorMessage = nil
     }
 
     func viewportChanged(to region: MapVisibleRegion) {

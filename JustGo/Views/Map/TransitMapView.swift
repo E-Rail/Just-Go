@@ -26,7 +26,11 @@ struct TransitMapView: UIViewRepresentable {
     let showsUserLocation: Bool
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
-    var onPlaceSelected: ((MKMapItem) -> Void)?
+    // Two-phase POI tap: `onPlaceTapped` fires synchronously with the feature's name +
+    // coordinate so the UI can react instantly; `onPlaceResolved` fires later once the
+    // (slow, server-side) MKMapItemRequest has produced the full place card item.
+    var onPlaceTapped: ((_ name: String?, _ coordinate: CLLocationCoordinate2D) -> Void)?
+    var onPlaceResolved: ((MKMapItem) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -277,17 +281,20 @@ struct TransitMapView: UIViewRepresentable {
                 mapView.deselectAnnotation(annotation, animated: false)
             } else if let feature = annotation as? MKMapFeatureAnnotation,
                       feature.featureType == .pointOfInterest {
-                // Resolve the tapped Apple POI to an MKMapItem, then surface it.
-                // Deselect only after the async resolve so the feature stays valid.
+                // Surface the tap immediately from the feature's synchronous title/coordinate so
+                // the UI can present (or open a station) without waiting on the network resolve.
+                parent.onPlaceTapped?(feature.title, feature.coordinate)
+                // Resolve the tapped Apple POI to a full MKMapItem in the background, then surface
+                // it. Deselect only after the async resolve so the feature stays valid.
                 poiTask?.cancel()
                 poiTask = Task { @MainActor [weak self, weak mapView] in
                     let mapItem = try? await MKMapItemRequest(mapFeatureAnnotation: feature).mapItem
                     mapView?.deselectAnnotation(feature, animated: false)
                     // MKMapItemRequest, like MKLocalSearch, ignores task cancellation — so guard
-                    // explicitly to avoid a superseded tap firing onPlaceSelected with a stale
+                    // explicitly to avoid a superseded tap firing onPlaceResolved with a stale
                     // item; weak self prevents the cancelled task from retaining the Coordinator.
                     guard !Task.isCancelled, let self, let mapItem else { return }
-                    self.parent.onPlaceSelected?(mapItem)
+                    self.parent.onPlaceResolved?(mapItem)
                 }
             }
         }

@@ -39,9 +39,7 @@ struct RouteResultsView: View {
         .onAppear {
             ensureRouteSelection()
         }
-        // `first?.id` changes on a new search (fresh Route UUIDs) and on re-sort — enough to
-        // re-validate selection — without allocating a `[UUID]` on every render.
-        .onChange(of: viewModel.routes.first?.id) {
+        .onChange(of: routeSelectionSignature) {
             ensureRouteSelection()
         }
         .navigationDestination(isPresented: $showRouteDetail) {
@@ -157,44 +155,8 @@ struct RouteResultsView: View {
 
     private var routesSection: some View {
         Section {
-            if !viewModel.routes.isEmpty {
-                RouteTabs(
-                    routes: viewModel.routes,
-                    selection: Binding(
-                        get: { selectedRouteID ?? viewModel.routes[0].id },
-                        set: { selectedRouteID = $0 }
-                    )
-                )
-
-                if let route = selectedRoute {
-                    let comfort = container.comfortForecastService.forecast(
-                        for: route.crowdControl,
-                        tripTime: viewModel.tripTimeContext(for: route).departureDate
-                    )
-                    let feasibility = container.routeFeasibilityService.feasibility(
-                        for: route,
-                        personalReports: accessibilityReportService.reports(affecting: route),
-                        comfort: comfort
-                    )
-                    RouteCard(
-                        route: route,
-                        confidence: container.routeConfidenceService.confidence(
-                            for: route,
-                            feasibility: feasibility,
-                            preference: viewModel.sortStrategy,
-                            alternatives: viewModel.routes,
-                            comfort: comfort
-                        ),
-                        departureDate: viewModel.tripTimeContext(for: route).departureDate
-                    ) {
-                        _ = tripMemoryService.recordPlannedTrip(
-                            route: route,
-                            cityID: route.networkCityID ?? viewModel.selectedCity?.id ?? "",
-                            accessibilityFilter: viewModel.accessibilityFilter
-                        )
-                        showRouteDetail = true
-                    }
-                }
+            ForEach(Array(viewModel.routes.enumerated()), id: \.element.id) { index, route in
+                comparisonRow(route, rank: index + 1)
             }
         } header: {
             Text(viewModel.routes.count == 1
@@ -207,9 +169,127 @@ struct RouteResultsView: View {
         }
     }
 
+    /// One comparison row per alternative — duration, walking, transfer effort, exit confidence,
+    /// and a cross-route "best for" reason. Tapping records the planned trip and opens the detail.
+    private func comparisonRow(_ route: Route, rank: Int) -> some View {
+        let metrics = comparisonMetrics(for: route, rank: rank)
+        let isSelected = route.id == (selectedRouteID ?? viewModel.routes.first?.id)
+        return Button {
+            selectedRouteID = route.id
+            _ = tripMemoryService.recordPlannedTrip(
+                route: route,
+                cityID: route.networkCityID ?? viewModel.selectedCity?.id ?? "",
+                accessibilityFilter: viewModel.accessibilityFilter
+            )
+            showRouteDetail = true
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Text(AppLocalization.text(
+                        english: "Route \(metrics.rank)",
+                        simplified: "路线 \(metrics.rank)",
+                        traditional: "路線 \(metrics.rank)"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    if let line = route.boardingTransitSegment?.lineName {
+                        LineColorIndicator(colorHex: route.boardingTransitSegment?.lineColorHex ?? "#007AFF", size: 8)
+                        Text(line)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                    Text(metrics.durationText)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                }
+                HStack(spacing: 10) {
+                    Label(metrics.walkingText, systemImage: "figure.walk")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Label(metrics.transferEffort, systemImage: "arrow.triangle.2.circlepath")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
+                }
+                Text(AppLocalization.text(
+                    english: "Best for: \(metrics.bestForReason)",
+                    simplified: "适合：\(metrics.bestForReason)",
+                    traditional: "適合：\(metrics.bestForReason)"
+                ))
+                .font(.caption)
+                .foregroundStyle(Color.accentColor)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
+            )
+        }
+        .buttonStyle(.plain)
+        .listRowSeparator(.hidden)
+        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+    }
+
+    private func comparisonMetrics(for route: Route, rank: Int) -> RouteComparisonMetrics {
+        RouteComparisonMetrics(
+            id: route.id,
+            rank: rank,
+            durationText: route.formattedDuration,
+            transferText: route.formattedTransfers,
+            walkingText: route.formattedWalkingDistance,
+            transferEffort: transferEffort(for: route),
+            exitConfidence: exitConfidence(for: route),
+            bestForReason: bestForReason(for: route, in: viewModel.routes)
+        )
+    }
+
+    private func transferEffort(for route: Route) -> String {
+        if route.transferCount == 0 {
+            return AppLocalization.text(english: "Direct", simplified: "直达", traditional: "直達")
+        }
+        let minutes = route.stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
+        if minutes > 0 {
+            return "\(route.formattedTransfers) · \(AppLocalization.minutes(Int(minutes)))"
+        }
+        return route.formattedTransfers
+    }
+
+    private func exitConfidence(for route: Route) -> DataConfidence {
+        route.stationGuidance.first { $0.role == .arrival }?.confidence ?? .unknown
+    }
+
+    /// The single most salient reason this route leads its alternatives.
+    private func bestForReason(for route: Route, in routes: [Route]) -> String {
+        guard routes.count > 1 else {
+            return AppLocalization.text(english: "Recommended", simplified: "推荐", traditional: "推薦")
+        }
+        if route.totalDuration == routes.map(\.totalDuration).min() {
+            return AppLocalization.localized("Fastest")
+        }
+        if route.transferCount == routes.map(\.transferCount).min() {
+            return AppLocalization.text(english: "Fewest transfers", simplified: "换乘最少", traditional: "換乘最少")
+        }
+        if route.walkingDistance == routes.map(\.walkingDistance).min() {
+            return AppLocalization.text(english: "Least walking", simplified: "步行最少", traditional: "步行最少")
+        }
+        if route.stepFreeAssessment == .confirmed {
+            return AppLocalization.text(english: "Most accessible", simplified: "最无障碍", traditional: "最無障礙")
+        }
+        return AppLocalization.text(english: "Balanced", simplified: "均衡", traditional: "均衡")
+    }
+
     private var selectedRoute: Route? {
         guard let selectedRouteID else { return viewModel.routes.first }
         return viewModel.routes.first { $0.id == selectedRouteID } ?? viewModel.routes.first
+    }
+
+    private var routeSelectionSignature: String {
+        viewModel.routes.map(\.id.uuidString).joined(separator: "|")
     }
 
     private func ensureRouteSelection() {

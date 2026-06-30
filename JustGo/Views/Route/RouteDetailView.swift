@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 struct RouteDetailView: View {
     private let initialRoute: Route
@@ -19,6 +20,7 @@ struct RouteDetailView: View {
     @State var routeReportSeverity: AccessibilityReportSeverity = .medium
     @State var metroNetworks: [MetroNetwork] = []
     @State var selectedTransferSegment: RouteSegment?
+    @State private var selectedTimelineStation: RouteStationStop?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
@@ -40,6 +42,7 @@ struct RouteDetailView: View {
                 }
                 routeSummaryCard
                 liveGoButton
+                tripEssentialsCard
                 if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
                 ServiceStatusBanner(status: route.serviceStatus)
                 serviceHoursRow
@@ -71,6 +74,12 @@ struct RouteDetailView: View {
                 crowdControl: route.crowdControl
             )
         }
+        .sheet(item: $selectedTimelineStation) { stop in
+            RouteStationGuideSheet(
+                stop: stop,
+                cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
+            )
+        }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
         }
@@ -79,6 +88,9 @@ struct RouteDetailView: View {
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false
+        }
+        .onChange(of: routeSelectionSignature) {
+            ensureSelectedRouteIsCurrent()
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
             boardingServiceWindows = []
@@ -111,10 +123,20 @@ struct RouteDetailView: View {
         alternatives.first { $0.id == selectedRouteID } ?? initialRoute
     }
 
+    private var routeSelectionSignature: String {
+        alternatives.map(\.id.uuidString).joined(separator: "|")
+    }
+
     /// Derived from the single tracked route id so switching tabs to browse never silently
     /// drops a reminder the user set; "set" shows again when they return to that route.
     private var reminderScheduled: Bool {
         scheduledReminderRouteID == selectedRouteID
+    }
+
+    private func ensureSelectedRouteIsCurrent() {
+        guard !alternatives.contains(where: { $0.id == selectedRouteID }),
+              let firstRoute = alternatives.first else { return }
+        selectedRouteID = firstRoute.id
     }
 
     func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
@@ -327,7 +349,16 @@ struct RouteDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.text(english: "Stations", simplified: "途经车站", traditional: "途經車站"))
                     .font(.headline)
-                RouteStationTimeline(stops: route.stationTimelineStops)
+                Text(AppLocalization.text(
+                    english: "Tap a station for its exits, facilities and map.",
+                    simplified: "点按车站查看出入口、设施和站内图。",
+                    traditional: "點按車站查看出入口、設施和站內圖。"
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                RouteStationTimeline(stops: route.stationTimelineStops) { stop in
+                    selectedTimelineStation = stop
+                }
             }
         }
     }
@@ -438,6 +469,60 @@ struct RouteDetailView: View {
             preference: preference,
             alternatives: alternatives,
             comfort: comfort
+        )
+    }
+}
+
+/// Lightweight wrapper presented when a route's station timeline row is tapped. It resolves the
+/// tapped stop to a full `Station` (loading city-pack data for that one station only) and shows
+/// the standard `StationDetailView` — which lazy-loads exits/facilities/map via its own `.task`.
+private struct RouteStationGuideSheet: View {
+    let stop: RouteStationStop
+    let cityID: String
+    @Environment(DIContainer.self) private var container
+    @State private var station: Station?
+    @State private var didResolve = false
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if let station {
+                    StationDetailView(station: station)
+                } else if didResolve {
+                    StationDetailView(station: fallbackStation)
+                } else {
+                    VStack(spacing: 14) {
+                        Text(stop.name)
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                        ProgressView()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.appBackground)
+                }
+            }
+        }
+        .task {
+            let place = TransitPlace(
+                name: stop.name,
+                coordinate: CLLocationCoordinate2D(
+                    latitude: stop.coordinate?.latitude ?? 0,
+                    longitude: stop.coordinate?.longitude ?? 0
+                ),
+                source: .localStationData
+            )
+            station = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            didResolve = true
+        }
+    }
+
+    private var fallbackStation: Station {
+        Station(
+            stationID: stop.stationID,
+            name: stop.name,
+            latitude: stop.coordinate?.latitude ?? 0,
+            longitude: stop.coordinate?.longitude ?? 0,
+            cityID: cityID
         )
     }
 }

@@ -122,9 +122,102 @@ final class RoutePlanningService {
             }
             route.crowdControl = RouteCrowdControl(stations: await crowdControlStations)
 
+            // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
+            let guidanceByStation = await officialStationData.stationGuidance(
+                cityID: routeCityID,
+                stationNames: criticalStopNames
+            )
+            route.stationGuidance = buildStationGuidance(route: route, guidance: guidanceByStation)
+            route.accessGuidance = upgradeAccessGuidance(route.accessGuidance, guidance: guidanceByStation)
+
             enrichedRoutes.append(route)
         }
         return enrichedRoutes
+    }
+
+    /// Tags the boarding, transfer, and arrival stations of a route with the best-available
+    /// access-point + confidence (and a transfer-corridor hint, when one is authored).
+    private func buildStationGuidance(
+        route: Route,
+        guidance: [String: StationAccessGuidance]
+    ) -> [RouteStationGuidance] {
+        let transitSegments = route.segments.filter { $0.type.isTransit }
+        guard !transitSegments.isEmpty else { return [] }
+        var result: [RouteStationGuidance] = []
+        var seen = Set<String>()
+
+        func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role, interchange: StationInterchangeHint? = nil) {
+            guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
+            let access = guidance[stop.name] ?? .empty
+            result.append(RouteStationGuidance(
+                stationID: stop.stationID,
+                stationName: stop.name,
+                role: role,
+                exit: role == .transfer ? nil : access.primaryAccessPoint,
+                interchange: interchange,
+                confidence: access.confidence
+            ))
+        }
+
+        for (index, segment) in transitSegments.enumerated() {
+            if index == 0, let boarding = segment.stationStops.first {
+                add(boarding, role: .boarding)
+            }
+            guard let alight = segment.stationStops.last else { continue }
+            if index == transitSegments.count - 1 {
+                add(alight, role: .arrival)
+            } else {
+                let next = transitSegments[index + 1]
+                let interchange = (guidance[alight.name] ?? .empty).interchangeHints.first {
+                    $0.fromLineName == segment.lineName && $0.toLineName == next.lineName
+                }
+                add(alight, role: .transfer, interchange: interchange)
+            }
+        }
+        return result
+    }
+
+    /// Replaces the placeholder origin/destination access guides with a specific exit + confidence
+    /// when station data provides one; otherwise leaves the honest "unavailable" guide untouched.
+    private func upgradeAccessGuidance(
+        _ guides: [RouteAccessGuide],
+        guidance: [String: StationAccessGuidance]
+    ) -> [RouteAccessGuide] {
+        guides.map { guide in
+            let access = guidance[guide.stationName] ?? .empty
+            guard let point = access.primaryAccessPoint else { return guide }
+            let upgradedPoint = RouteAccessPoint(
+                id: point.id,
+                name: point.name,
+                coordinate: point.coordinate ?? guide.accessPoint?.coordinate,
+                isWheelchairLikely: point.isAccessible,
+                hasElevatorHint: point.kind == .elevator || point.isAccessible,
+                source: point.source
+            )
+            let notes: [String]
+            if access.confidence == .official {
+                notes = guide.accessibilityNotes.filter {
+                    $0 != AppLocalization.localized("Specific entrance or exit is unavailable")
+                }
+            } else {
+                notes = [AppLocalization.text(
+                    english: "Exit \(point.name) is estimated from station data — confirm on site.",
+                    simplified: "出入口 \(point.name) 根据车站数据估算，请到现场确认。",
+                    traditional: "出入口 \(point.name) 根據車站資料估算，請到現場確認。"
+                )]
+            }
+            return RouteAccessGuide(
+                id: guide.id,
+                kind: guide.kind,
+                placeName: guide.placeName,
+                stationName: guide.stationName,
+                accessPoint: upgradedPoint,
+                walkingDistance: guide.walkingDistance,
+                walkingDuration: guide.walkingDuration,
+                walkingSteps: guide.walkingSteps,
+                accessibilityNotes: notes
+            )
+        }
     }
 
     private func criticalStops(for route: Route) -> [RouteStationStop] {

@@ -151,7 +151,9 @@ extension BundledMetroRouteProvider {
         request.transportType = .walking
         let mapRoute: MKRoute?
         do {
-            mapRoute = try await MKDirections(request: request).calculate().routes.first
+            mapRoute = try await withMapKitTimeout {
+                try await MKDirections(request: request).calculate().routes.first
+            }
         } catch {
             AppLog.routing.info("Walking directions unavailable, using straight-line estimate: \(error)")
             mapRoute = nil

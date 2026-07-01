@@ -1,5 +1,9 @@
 import Foundation
 
+// Pre-compiled once instead of recompiling on every exitTokens(in:) call — stationGuidance
+// calls it per station per route, so this pattern was being rebuilt dozens of times per search.
+private let exitTokenExpression = try! NSRegularExpression(pattern: "([A-Za-z0-9]+(?:[、，,/\\s][A-Za-z0-9]+)*)\\s*[出入]?口")
+
 enum CityPackLoadStatus: Equatable {
     case available(version: String)
     case loaded(version: String)
@@ -80,7 +84,28 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private var manifests: [URL: OfficialManifest] = [:]
     private var packs: [String: LoadedPack] = [:]
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
+    // A .failed status used to be excluded from loadStatuses entirely, so every caller that
+    // touches a city with no signal/no pack (enrichStation, stationMap, stationGuidance, etc.
+    // all start with `_ = await loadCityPack(...)`) re-ran the full multi-URL network download
+    // attempt on every single call — exactly the "underground, no signal" case this app targets.
+    // Cache .failed too, but only for a cooldown window, so it fails fast on repeat touches
+    // while still retrying periodically in case connectivity comes back.
+    private var failedCooldownUntil: [String: Date] = [:]
+    private static let failureCooldown: TimeInterval = 45
     private var inFlightLoads: [String: Task<CityPackLoadStatus, Never>] = [:]
+
+    private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
+        guard let status = loadStatuses[cityID] else { return nil }
+        if let cooldownUntil = failedCooldownUntil[cityID], Date() >= cooldownUntil {
+            return nil
+        }
+        return status
+    }
+
+    private func cacheStatus(_ status: CityPackLoadStatus, for cityID: String) {
+        loadStatuses[cityID] = status
+        failedCooldownUntil[cityID] = status == .failed ? Date().addingTimeInterval(Self.failureCooldown) : nil
+    }
 
     init(session: URLSession = .shared, metroNetworks: MetroNetworkProviding) {
         self.session = session
@@ -99,7 +124,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         if let pack = packs[cityID] {
             return .loaded(version: pack.data.version)
         }
-        if let status = loadStatuses[cityID] {
+        if let status = cachedStatus(for: cityID) {
             return status
         }
         if let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }) {
@@ -133,7 +158,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         if let pack = packs[cityID] {
             return .loaded(version: pack.data.version)
         }
-        if let status = loadStatuses[cityID] {
+        if let status = cachedStatus(for: cityID) {
             return status
         }
         // Coalesce concurrent requests for the same city so only one download runs at a time.
@@ -148,9 +173,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         inFlightLoads[cityID] = task
         let status = await task.value
         inFlightLoads.removeValue(forKey: cityID)
-        if status != .failed {
-            loadStatuses[cityID] = status
-        }
+        cacheStatus(status, for: cityID)
         return status
     }
 
@@ -352,13 +375,11 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     nonisolated private static func exitTokens(in strings: [String]) -> [String] {
-        let pattern = "([A-Za-z0-9]+(?:[、，,/\\s][A-Za-z0-9]+)*)\\s*[出入]?口"
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         let separators = CharacterSet(charactersIn: "、，,/ \t")
         var result: [String] = []
         for string in strings {
             let ns = string as NSString
-            for match in regex.matches(in: string, range: NSRange(location: 0, length: ns.length))
+            for match in exitTokenExpression.matches(in: string, range: NSRange(location: 0, length: ns.length))
                 where match.numberOfRanges > 1 {
                 let run = ns.substring(with: match.range(at: 1))
                 for part in run.components(separatedBy: separators) {

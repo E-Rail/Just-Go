@@ -252,7 +252,7 @@ struct RouteResultsView: View {
         if route.transferCount == 0 {
             return AppLocalization.text(english: "Direct", simplified: "直达", traditional: "直達")
         }
-        let minutes = route.stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
+        let minutes = route.transferWalkingMinutes
         if minutes > 0 {
             return "\(route.formattedTransfers) · \(AppLocalization.minutes(Int(minutes)))"
         }
@@ -260,7 +260,7 @@ struct RouteResultsView: View {
     }
 
     private func exitConfidence(for route: Route) -> DataConfidence {
-        route.stationGuidance.first { $0.role == .arrival }?.confidence ?? .unknown
+        route.arrivalGuidance?.confidence ?? .unknown
     }
 
     /// The single most salient reason this route leads its alternatives.

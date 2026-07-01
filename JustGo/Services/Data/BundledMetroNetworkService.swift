@@ -181,18 +181,14 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             return network
         }
         guard !missingCityIDs.contains(cityID) else { return nil }
-        guard let url = Bundle.main.url(
-            forResource: cityID,
-            withExtension: "json",
-            subdirectory: "MetroNetworks"
-        ) else {
+        guard let url = bundledNetworkURL(for: cityID) else {
             missingCityIDs.insert(cityID)
             return nil
         }
         do {
             // Decode off the actor's cooperative-pool thread so the blocking file read +
             // JSON parse doesn't pin the actor (lets concurrent city loads run in parallel).
-            let network = try await Self.decodeNetwork(at: url)
+            let network = try await Self.decode(MetroNetwork.self, at: url)
             guard network.cityID == cityID, network.geometryKind == "physicalTrack" else {
                 AppLog.data.error("Bundled metro network \(cityID, privacy: .public) failed validation (cityID or geometryKind mismatch)")
                 missingCityIDs.insert(cityID)
@@ -208,16 +204,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     }
 
     func networks() async -> [MetroNetwork] {
-        await withTaskGroup(of: MetroNetwork?.self) { group in
-            for cityID in Self.supportedCityIDs {
-                group.addTask { await self.network(for: cityID) }
-            }
-            var result: [MetroNetwork] = []
-            for await network in group {
-                if let network { result.append(network) }
-            }
-            return result
-        }
+        await fanOut { await self.network(for: $0) }
     }
 
     func stations(in cityID: String) async -> [Station] {
@@ -234,13 +221,18 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     /// to find the nearest matching network without paying to decode-and-permanently-cache all
     /// 46 cities' full station/line/polyline data just to compare bounding boxes.
     func networkSummaries() async -> [MetroNetworkSummary] {
-        await withTaskGroup(of: MetroNetworkSummary?.self) { group in
+        await fanOut { await self.networkSummary(for: $0) }
+    }
+
+    /// Fans `work` out over every supported city concurrently and collects the non-nil results.
+    private func fanOut<T: Sendable>(_ work: @escaping (String) async -> T?) async -> [T] {
+        await withTaskGroup(of: T?.self) { group in
             for cityID in Self.supportedCityIDs {
-                group.addTask { await self.networkSummary(for: cityID) }
+                group.addTask { await work(cityID) }
             }
-            var result: [MetroNetworkSummary] = []
-            for await summary in group {
-                if let summary { result.append(summary) }
+            var result: [T] = []
+            for await item in group {
+                if let item { result.append(item) }
             }
             return result
         }
@@ -253,16 +245,12 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             return MetroNetworkSummary(cityID: network.cityID, bounds: network.bounds, geometryKind: network.geometryKind)
         }
         guard !missingCityIDs.contains(cityID) else { return nil }
-        guard let url = Bundle.main.url(
-            forResource: cityID,
-            withExtension: "json",
-            subdirectory: "MetroNetworks"
-        ) else {
+        guard let url = bundledNetworkURL(for: cityID) else {
             missingCityIDs.insert(cityID)
             return nil
         }
         do {
-            let summary = try await Self.decodeSummary(at: url)
+            let summary = try await Self.decode(MetroNetworkSummary.self, at: url)
             guard summary.cityID == cityID, summary.geometryKind == "physicalTrack" else {
                 missingCityIDs.insert(cityID)
                 return nil
@@ -275,17 +263,14 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         }
     }
 
-    private static func decodeNetwork(at url: URL) async throws -> MetroNetwork {
-        try await Task.detached(priority: .utility) {
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode(MetroNetwork.self, from: data)
-        }.value
+    private func bundledNetworkURL(for cityID: String) -> URL? {
+        Bundle.main.url(forResource: cityID, withExtension: "json", subdirectory: "MetroNetworks")
     }
 
-    private static func decodeSummary(at url: URL) async throws -> MetroNetworkSummary {
+    private static func decode<T: Decodable>(_ type: T.Type, at url: URL) async throws -> T {
         try await Task.detached(priority: .utility) {
             let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode(MetroNetworkSummary.self, from: data)
+            return try JSONDecoder().decode(T.self, from: data)
         }.value
     }
 }

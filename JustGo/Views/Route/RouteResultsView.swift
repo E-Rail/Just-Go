@@ -34,6 +34,7 @@ struct RouteResultsView: View {
                 routesSection
             }
         }
+        .listStyle(.plain)
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -224,13 +225,14 @@ struct RouteResultsView: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 14))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(.plain)
+        .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
     }

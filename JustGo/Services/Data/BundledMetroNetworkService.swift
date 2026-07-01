@@ -51,6 +51,15 @@ struct MetroStation: Codable, Equatable, Identifiable {
     let lineIDs: [String]
 }
 
+/// Just enough of a network file to run the bounds-distance city match — decoding this instead
+/// of the full `MetroNetwork` skips allocating every candidate city's station/line/polyline
+/// arrays (the bulk of the file) for the ~44 cities that don't end up matching a given search.
+struct MetroNetworkSummary: Decodable {
+    let cityID: String
+    let bounds: MetroBounds
+    let geometryKind: String
+}
+
 struct MetroNetwork: Codable, Equatable, Identifiable {
     let cityID: String
     let version: String
@@ -143,6 +152,7 @@ private final class NormalizedStationIndexBox {
 protocol MetroNetworkProviding {
     func network(for cityID: String) async -> MetroNetwork?
     func networks() async -> [MetroNetwork]
+    func networkSummaries() async -> [MetroNetworkSummary]
     func stations(in cityID: String) async -> [Station]
 }
 
@@ -152,6 +162,10 @@ extension MetroNetworkProviding {
     }
 
     func networks() async -> [MetroNetwork] {
+        []
+    }
+
+    func networkSummaries() async -> [MetroNetworkSummary] {
         []
     }
 }
@@ -216,10 +230,62 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         return stations
     }
 
+    /// Cheap bounds-only pass over every supported city, for callers (route search) that need
+    /// to find the nearest matching network without paying to decode-and-permanently-cache all
+    /// 46 cities' full station/line/polyline data just to compare bounding boxes.
+    func networkSummaries() async -> [MetroNetworkSummary] {
+        await withTaskGroup(of: MetroNetworkSummary?.self) { group in
+            for cityID in Self.supportedCityIDs {
+                group.addTask { await self.networkSummary(for: cityID) }
+            }
+            var result: [MetroNetworkSummary] = []
+            for await summary in group {
+                if let summary { result.append(summary) }
+            }
+            return result
+        }
+    }
+
+    private func networkSummary(for cityID: String) async -> MetroNetworkSummary? {
+        // A full network already cached (e.g. the user's current city) has the same bounds —
+        // reuse it instead of re-reading and re-parsing the file a second time.
+        if let network = networks[cityID] {
+            return MetroNetworkSummary(cityID: network.cityID, bounds: network.bounds, geometryKind: network.geometryKind)
+        }
+        guard !missingCityIDs.contains(cityID) else { return nil }
+        guard let url = Bundle.main.url(
+            forResource: cityID,
+            withExtension: "json",
+            subdirectory: "MetroNetworks"
+        ) else {
+            missingCityIDs.insert(cityID)
+            return nil
+        }
+        do {
+            let summary = try await Self.decodeSummary(at: url)
+            guard summary.cityID == cityID, summary.geometryKind == "physicalTrack" else {
+                missingCityIDs.insert(cityID)
+                return nil
+            }
+            return summary
+        } catch {
+            AppLog.data.error("Failed to load bundled metro network summary \(cityID, privacy: .public): \(error)")
+            missingCityIDs.insert(cityID)
+            return nil
+        }
+    }
+
     private static func decodeNetwork(at url: URL) async throws -> MetroNetwork {
         try await Task.detached(priority: .utility) {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(MetroNetwork.self, from: data)
+        }.value
+    }
+
+    private static func decodeSummary(at url: URL) async throws -> MetroNetworkSummary {
+        try await Task.detached(priority: .utility) {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(MetroNetworkSummary.self, from: data)
         }.value
     }
 }

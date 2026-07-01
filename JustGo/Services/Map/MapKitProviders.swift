@@ -1,6 +1,30 @@
 import CoreLocation
 import MapKit
 
+struct MapKitTimeoutError: Error {}
+
+/// Races `operation` against a deadline so a stalled MapKit call (MKLocalSearch, MKDirections)
+/// can't hang a user-facing spinner indefinitely. MapKit calls are known elsewhere in this
+/// codebase to ignore Swift task cancellation, so the abandoned call may keep running in the
+/// background after this throws — but the caller (and its loading UI) is unblocked either way.
+func withMapKitTimeout<T: Sendable>(
+    seconds: TimeInterval = 12,
+    operation: @escaping @Sendable () async throws -> T
+) async throws -> T {
+    try await withThrowingTaskGroup(of: T.self) { group in
+        group.addTask { try await operation() }
+        group.addTask {
+            try await Task.sleep(for: .seconds(seconds))
+            throw MapKitTimeoutError()
+        }
+        defer { group.cancelAll() }
+        guard let result = try await group.next() else {
+            throw MapKitTimeoutError()
+        }
+        return result
+    }
+}
+
 protocol PlaceSearchProviding {
     func searchPlaces(keyword: String, region: MKCoordinateRegion?, limit: Int) async throws -> [TransitPlace]
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace
@@ -28,7 +52,9 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
         }
 
         do {
-            let response = try await MKLocalSearch(request: request).start()
+            let response = try await withMapKitTimeout {
+                try await MKLocalSearch(request: request).start()
+            }
             return response.mapItems.prefix(limit).map {
                 TransitPlace(mapItem: $0, source: .mapKit)
             }

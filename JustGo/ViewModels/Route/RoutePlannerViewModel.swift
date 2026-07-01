@@ -368,7 +368,11 @@ final class RoutePlannerViewModel {
         }
         let cityID = city.id
 
-        suggestionTask = Task { [placeSearchProvider] in
+        // [weak self]: MKLocalSearch (behind placeSearchProvider) is known to ignore Swift
+        // task cancellation elsewhere in this codebase, so a superseded keystroke's search
+        // keeps running in the background — a strong self capture here would pin the whole
+        // view model alive for as long as that stale network call takes to resolve.
+        suggestionTask = Task { [weak self, placeSearchProvider] in
             do {
                 try await Task.sleep(for: .milliseconds(120))
                 let region = MKCoordinateRegion(
@@ -377,7 +381,8 @@ final class RoutePlannerViewModel {
                     longitudinalMeters: 80_000
                 )
                 let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
-                guard !Task.isCancelled,
+                guard let self,
+                      !Task.isCancelled,
                       selectedCity?.id == cityID,
                       name(for: field) == keyword,
                       place(for: field) == nil else { return }
@@ -385,7 +390,7 @@ final class RoutePlannerViewModel {
             } catch is CancellationError {
                 return
             } catch {
-                guard !Task.isCancelled else { return }
+                guard let self, !Task.isCancelled else { return }
                 errorMessage = userFacingErrorMessage(for: error)
             }
         }

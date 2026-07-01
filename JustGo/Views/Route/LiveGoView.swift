@@ -36,12 +36,13 @@ struct LiveGoView: View {
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
     @AppStorage("arrivalAlertLeadMinutes") private var arrivalAlertLeadMinutes = 2
-    // Read directly rather than via themeColor: this view is presented in a
+    // Read directly rather than via Color.accentColor: this view is presented in a
     // .fullScreenCover, whose first rendered frame doesn't yet have the root .tint(...)
     // environment value propagated and would otherwise flash system blue.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?
+    @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
@@ -252,15 +253,19 @@ struct LiveGoView: View {
 
         let stationName = step.toStationName ?? ""
         let exitHint = step.exitHint
-        Task {
-            if await container.tripReminderService.requestAuthorization() {
-                await container.tripReminderService.scheduleArrivalReminder(
-                    stationID: key,
-                    stationName: stationName,
-                    exitHint: exitHint,
-                    fireDate: fireDate
-                )
-            }
+        reminderRegistrationTask = Task { @MainActor in
+            guard await container.tripReminderService.requestAuthorization() else { return }
+            // requestAuthorization can take a while (first-run system prompt). If the rider
+            // advanced past this step while it was pending, cancelArrivalAlert() already ran
+            // with the OLD scheduledStationKey and found nothing registered yet to cancel —
+            // registering now would leave a stale "get off" alert for an already-passed stop.
+            guard !Task.isCancelled, scheduledStationKey == key else { return }
+            await container.tripReminderService.scheduleArrivalReminder(
+                stationID: key,
+                stationName: stationName,
+                exitHint: exitHint,
+                fireDate: fireDate
+            )
         }
 
         alertTask = Task { @MainActor in
@@ -279,6 +284,8 @@ struct LiveGoView: View {
     private func cancelArrivalAlert() {
         alertTask?.cancel()
         alertTask = nil
+        reminderRegistrationTask?.cancel()
+        reminderRegistrationTask = nil
         showGetOffBanner = false
         if let key = scheduledStationKey {
             container.tripReminderService.cancelArrivalReminder(stationID: key)

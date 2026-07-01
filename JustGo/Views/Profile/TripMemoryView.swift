@@ -16,15 +16,19 @@ struct TripMemoryView: View {
         tripMemoryService.savedTrips.max(by: { $0.useCount < $1.useCount })
     }
 
-    private var avgMonthlyDuration: Int? {
-        let durations = thisMonthRecords.map(\.plannedDuration)
+    private func avgMonthlyDuration(for records: [TripRecord]) -> Int? {
+        let durations = records.map(\.plannedDuration)
         guard !durations.isEmpty else { return nil }
         return Int(durations.reduce(0, +) / Double(durations.count) / 60)
     }
 
     @ViewBuilder
     private var statisticsCard: some View {
-        let monthCount = thisMonthRecords.count
+        // Computed once and reused below instead of letting thisMonthRecords (a full filter
+        // pass over tripRecords) run twice per render — once for the count, once inside what
+        // was a second computed property re-deriving the average from the same filter.
+        let monthRecords = thisMonthRecords
+        let monthCount = monthRecords.count
         let totalCount = tripMemoryService.tripRecords.count
         if totalCount > 0 {
             Section {
@@ -48,7 +52,7 @@ struct TripMemoryView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        if let avg = avgMonthlyDuration {
+                        if let avg = avgMonthlyDuration(for: monthRecords) {
                             Divider()
                                 .frame(height: 36)
                             VStack(alignment: .leading, spacing: 2) {

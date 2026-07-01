@@ -36,9 +36,16 @@ struct LiveGoView: View {
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
     @AppStorage("arrivalAlertLeadMinutes") private var arrivalAlertLeadMinutes = 2
+    // Read directly rather than via Color.accentColor: this view is presented in a
+    // .fullScreenCover, whose first rendered frame doesn't yet have the root .tint(...)
+    // environment value propagated and would otherwise flash system blue.
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?
+    @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
+
+    private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
     init(plan: LiveTripPlan) {
         _viewModel = State(initialValue: LiveGoViewModel(plan: plan))
@@ -48,7 +55,7 @@ struct LiveGoView: View {
         NavigationStack {
             VStack(spacing: 20) {
                 ProgressView(value: viewModel.progressFraction)
-                    .tint(.blue)
+                    .tint(themeColor)
 
                 Text(viewModel.progressText)
                     .font(.subheadline)
@@ -113,7 +120,7 @@ struct LiveGoView: View {
             if let stopsLeft = step.rideStopsRemainingText {
                 Text(stopsLeft)
                     .font(.headline)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(themeColor)
             }
 
             if step.kind == .ride, let exit = step.exitHint, !exit.isEmpty {
@@ -122,7 +129,7 @@ struct LiveGoView: View {
                     systemImage: "arrow.up.forward.circle.fill"
                 )
                 .font(.headline)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(themeColor)
             }
 
             if step.kind == .ride {
@@ -134,7 +141,7 @@ struct LiveGoView: View {
                         )
                         .font(.subheadline)
                     }
-                    .tint(Color.accentColor)
+                    .tint(themeColor)
                     Text(AppLocalization.text(
                         english: "Estimated from route time, not a live train position.",
                         simplified: "根据线路时间估算，非实时列车位置。",
@@ -181,7 +188,7 @@ struct LiveGoView: View {
                 )
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+                .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
@@ -222,7 +229,7 @@ struct LiveGoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
         .padding(.horizontal)
@@ -246,15 +253,19 @@ struct LiveGoView: View {
 
         let stationName = step.toStationName ?? ""
         let exitHint = step.exitHint
-        Task {
-            if await container.tripReminderService.requestAuthorization() {
-                await container.tripReminderService.scheduleArrivalReminder(
-                    stationID: key,
-                    stationName: stationName,
-                    exitHint: exitHint,
-                    fireDate: fireDate
-                )
-            }
+        reminderRegistrationTask = Task { @MainActor in
+            guard await container.tripReminderService.requestAuthorization() else { return }
+            // requestAuthorization can take a while (first-run system prompt). If the rider
+            // advanced past this step while it was pending, cancelArrivalAlert() already ran
+            // with the OLD scheduledStationKey and found nothing registered yet to cancel —
+            // registering now would leave a stale "get off" alert for an already-passed stop.
+            guard !Task.isCancelled, scheduledStationKey == key else { return }
+            await container.tripReminderService.scheduleArrivalReminder(
+                stationID: key,
+                stationName: stationName,
+                exitHint: exitHint,
+                fireDate: fireDate
+            )
         }
 
         alertTask = Task { @MainActor in
@@ -273,6 +284,8 @@ struct LiveGoView: View {
     private func cancelArrivalAlert() {
         alertTask?.cancel()
         alertTask = nil
+        reminderRegistrationTask?.cancel()
+        reminderRegistrationTask = nil
         showGetOffBanner = false
         if let key = scheduledStationKey {
             container.tripReminderService.cancelArrivalReminder(stationID: key)

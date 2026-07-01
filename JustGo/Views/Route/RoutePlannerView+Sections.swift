@@ -195,7 +195,7 @@ extension RoutePlannerView {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(isSaved ? Color.accentColor.opacity(0.12) : Color(.systemGray5), in: Capsule())
-        .foregroundStyle(isSaved ? .blue : .primary)
+        .foregroundStyle(isSaved ? Color.accentColor : Color.primary)
     }
 
     private var anyFilterActive: Bool {

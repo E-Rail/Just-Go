@@ -1,16 +1,5 @@
 import SwiftUI
 
-private extension DataConfidence {
-    var color: Color {
-        switch self {
-        case .official, .communityVerified: return .green
-        case .mapKit, .estimated: return .blue
-        case .personal, .sourcePending: return .orange
-        case .unavailable, .unknown: return .gray
-        }
-    }
-}
-
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container

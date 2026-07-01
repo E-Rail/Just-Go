@@ -1,5 +1,15 @@
 import SwiftUI
 
+extension RouteConfidenceLevel {
+    var color: Color {
+        switch self {
+        case .high: return .green
+        case .medium: return .orange
+        case .low: return .red
+        }
+    }
+}
+
 struct TripConfidenceCard: View {
     let confidence: RouteConfidence
 
@@ -125,21 +135,26 @@ struct StatItem: View {
     }
 }
 
-/// Compact capsule labeling the data source behind a piece of guidance:
-/// official (green) / estimated (orange) / not available (red) / no data (gray).
-/// Colors are fixed semantic indicators — intentionally not theme-tinted.
-struct DataConfidenceChip: View {
-    let confidence: DataConfidence
-    var compact = false
-
-    private var color: Color {
-        switch confidence {
+/// Single source of truth for how a `DataConfidence` reads visually — fixed semantic
+/// indicators (official/verified = green, anything estimated/pending/personal = orange,
+/// unavailable = red, unknown = gray), intentionally not theme-tinted. Shared by
+/// `DataConfidenceChip` below and `StationDetailView`'s confidence rows.
+extension DataConfidence {
+    var color: Color {
+        switch self {
         case .official, .communityVerified: return .green
         case .estimated, .mapKit, .sourcePending, .personal: return .orange
         case .unavailable: return .red
         case .unknown: return .gray
         }
     }
+}
+
+/// Compact capsule labeling the data source behind a piece of guidance:
+/// official (green) / estimated (orange) / not available (red) / no data (gray).
+struct DataConfidenceChip: View {
+    let confidence: DataConfidence
+    var compact = false
 
     private var icon: String {
         switch confidence {
@@ -160,7 +175,7 @@ struct DataConfidenceChip: View {
         }
         .padding(.horizontal, compact ? 6 : 8)
         .padding(.vertical, compact ? 2 : 4)
-        .background(color, in: Capsule())
+        .background(confidence.color, in: Capsule())
         .foregroundStyle(.white)
     }
 }

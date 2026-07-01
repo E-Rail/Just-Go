@@ -47,8 +47,8 @@ extension RouteDetailView {
 
     @ViewBuilder
     var tripEssentialsCard: some View {
-        let boarding = route.stationGuidance.first { $0.role == .boarding }
-        let arrival = route.stationGuidance.first { $0.role == .arrival }
+        let boarding = route.boardingGuidance
+        let arrival = route.arrivalGuidance
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.text(english: "Trip Essentials", simplified: "出行要点", traditional: "出行要點"))
@@ -125,7 +125,7 @@ extension RouteDetailView {
         if route.transferCount == 0 {
             return AppLocalization.text(english: "Direct — no transfers", simplified: "直达，无需换乘", traditional: "直達，無需換乘")
         }
-        let minutes = route.stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
+        let minutes = route.transferWalkingMinutes
         let base = AppLocalization.transfers(route.transferCount)
         if minutes > 0 {
             return "\(base) · \(AppLocalization.minutes(Int(minutes)))"

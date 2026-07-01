@@ -22,6 +22,7 @@ struct MapContainerView: View {
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
     @State private var placeMatchTask: Task<Void, Never>?
+    @State private var placeCardDetent: PresentationDetent = .large
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -94,7 +95,13 @@ struct MapContainerView: View {
                 .padding(.vertical, 10)
                 .background(.regularMaterial)
             }
-            .presentationDetents([.medium, .large])
+            // No selection binding here defaults to the SMALLEST detent (.medium, half
+            // screen) on every presentation and requires a manual drag to reach .large —
+            // that drag can get eaten by the embedded MKMapItemDetailViewController's own
+            // scroll content. Binding + resetting to .large in handlePlaceTapped makes the
+            // card open already expanded instead of relying on that drag succeeding.
+            .presentationDetents([.medium, .large], selection: $placeCardDetent)
+            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: Binding(
@@ -304,6 +311,7 @@ struct MapContainerView: View {
     private func handlePlaceTapped(_ name: String?, _ coordinate: CLLocationCoordinate2D) {
         let displayName = name ?? AppLocalization.text(english: "Selected place", simplified: "所选地点", traditional: "所選地點")
         let place = TransitPlace(name: displayName, coordinate: coordinate, source: .mapKit)
+        placeCardDetent = .large
         placeMatchTask?.cancel()
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)

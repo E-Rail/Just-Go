@@ -67,7 +67,7 @@ struct MapContainerView: View {
             .zIndex(2)
         }
         .toolbarBackground(.visible, for: .tabBar)
-        .sheet(item: $selectedStation, onDismiss: {
+        .rightSidePanel(item: $selectedStation, onDismiss: {
             selectedStation = nil
             isLoadingStationDetail = false
         }) { station in

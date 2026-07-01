@@ -66,7 +66,7 @@ struct RouteDetailView: View {
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
         }
-        .sheet(item: $selectedTransferSegment) { segment in
+        .rightSidePanel(item: $selectedTransferSegment) { segment in
             TransferStationSheet(
                 transferSegment: segment,
                 nextTransitSegment: nextTransitSegment(after: segment),
@@ -74,7 +74,7 @@ struct RouteDetailView: View {
                 crowdControl: route.crowdControl
             )
         }
-        .sheet(item: $selectedTimelineStation) { stop in
+        .rightSidePanel(item: $selectedTimelineStation) { stop in
             RouteStationGuideSheet(
                 stop: stop,
                 cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""

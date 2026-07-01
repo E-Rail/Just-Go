@@ -105,6 +105,20 @@ struct Route: Identifiable, Codable {
         accessGuidance.first { $0.kind == .destination }
     }
 
+    var boardingGuidance: RouteStationGuidance? {
+        stationGuidance.first { $0.role == .boarding }
+    }
+
+    var arrivalGuidance: RouteStationGuidance? {
+        stationGuidance.first { $0.role == .arrival }
+    }
+
+    /// Total estimated walking time across every transfer this route requires, from whichever
+    /// interchange hints are authored (0 when none are).
+    var transferWalkingMinutes: Double {
+        stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
+    }
+
     var previewRegion: MapVisibleRegion? {
         let coordinates = segments.flatMap { segment -> [CodableCoordinate] in
             if !segment.polylineCoordinates.isEmpty {
@@ -425,7 +439,6 @@ struct RouteStationGuidance: Identifiable, Codable {
         case boarding
         case transfer
         case arrival
-        case passthrough
     }
 
     let stationID: String

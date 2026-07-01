@@ -77,7 +77,6 @@
 		A1000066 /* Route/RouteDetailView+Sheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000066 /* Route/RouteDetailView+Sheets.swift */; };
 		A1000067 /* Route/RouteDetailSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000067 /* Route/RouteDetailSupportViews.swift */; };
 		A1000068 /* Route/RoutePlannerView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000068 /* Route/RoutePlannerView+Sections.swift */; };
-		A1000069 /* Components/Transit/RouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000069 /* Components/Transit/RouteCard.swift */; };
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006B /* Components/Transit/RouteStationTimeline.swift */; };
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
@@ -176,7 +175,6 @@
 		A2000066 /* Route/RouteDetailView+Sheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteDetailView+Sheets.swift"; sourceTree = "<group>"; };
 		A2000067 /* Route/RouteDetailSupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RouteDetailSupportViews.swift; sourceTree = "<group>"; };
 		A2000068 /* Route/RoutePlannerView+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RoutePlannerView+Sections.swift"; sourceTree = "<group>"; };
-		A2000069 /* Components/Transit/RouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteCard.swift; sourceTree = "<group>"; };
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A200006B /* Components/Transit/RouteStationTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteStationTimeline.swift; sourceTree = "<group>"; };
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
@@ -352,7 +350,6 @@
 				A2000017 /* Components/Transit/StationRow.swift */,
 				A2000018 /* Components/Glass/GlassCard.swift */,
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
-				A2000069 /* Components/Transit/RouteCard.swift */,
 				A200006A /* Components/Transit/RouteTabs.swift */,
 				A200006B /* Components/Transit/RouteStationTimeline.swift */,
 			);
@@ -500,7 +497,6 @@
 				A1000017 /* Components/Transit/StationRow.swift in Sources */,
 				A1000018 /* Components/Glass/GlassCard.swift in Sources */,
 				A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */,
-				A1000069 /* Components/Transit/RouteCard.swift in Sources */,
 				A100006A /* Components/Transit/RouteTabs.swift in Sources */,
 				A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */,
 				A100001B /* Map/MapKitProviders.swift in Sources */,

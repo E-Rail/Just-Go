@@ -14,12 +14,23 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         to destination: TransitPlace,
         accessibilityFilter: AccessibilityFilter
     ) async throws -> [Route] {
-        let networks = await metroNetworks.networks()
-        let candidates = networks.filter {
+        // Bounds-only pass first — decoding and permanently caching all ~46 supported cities'
+        // full station/line/polyline data on every search (via networks()) just to compare
+        // bounding boxes was the dominant cost of a cold route search. Only the (typically 0-2)
+        // cities that actually pass the bounds check get their full network loaded below.
+        let summaries = await metroNetworks.networkSummaries()
+        let candidateCityIDs = summaries.filter {
             $0.bounds.distance(to: origin.routeCoordinate) <= 25_000 &&
                 $0.bounds.distance(to: destination.routeCoordinate) <= 25_000
-        }.compactMap {
-            routeContext(network: $0, origin: origin.routeCoordinate, destination: destination.routeCoordinate)
+        }.map(\.cityID)
+
+        var candidates: [MetroRouteContext] = []
+        for cityID in candidateCityIDs {
+            guard let network = await metroNetworks.network(for: cityID),
+                  let context = routeContext(network: network, origin: origin.routeCoordinate, destination: destination.routeCoordinate) else {
+                continue
+            }
+            candidates.append(context)
         }
         guard let context = candidates.min(by: { $0.accessDistance < $1.accessDistance }) else {
             throw RoutePlanningError.outsideSubwayCoverage
@@ -28,21 +39,38 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
 
         let preferences: [MetroSearchPreference] = [.fastest, .fewestTransfers, .leastWalking]
         var seen = Set<String>()
-        var results: [Route] = []
+        var uniquePaths: [(order: Int, path: MetroPath, preference: MetroSearchPreference)] = []
         for preference in preferences {
             guard let path = shortestPath(in: context, graph: graph, preference: preference) else { continue }
             let key = path.edges.map { "\($0.fromStationID)>\($0.toStationID)@\($0.lineID)" }.joined(separator: "|")
             guard seen.insert(key).inserted else { continue }
-            results.append(await makeRoute(
-                path: path,
-                context: context,
-                graph: graph,
-                origin: origin,
-                destination: destination,
-                preference: preference
-            ))
+            uniquePaths.append((uniquePaths.count, path, preference))
         }
-        guard !results.isEmpty else { throw RoutePlanningError.noRouteFound }
+        guard !uniquePaths.isEmpty else { throw RoutePlanningError.noRouteFound }
+
+        // Each makeRoute call fetches its own walking directions over the network — running
+        // the (up to 3) candidates one after another multiplied route-search latency by the
+        // number of alternatives. They're independent, so fetch them concurrently instead.
+        let results: [Route] = await withTaskGroup(of: (Int, Route).self) { group in
+            for entry in uniquePaths {
+                group.addTask {
+                    let route = await self.makeRoute(
+                        path: entry.path,
+                        context: context,
+                        graph: graph,
+                        origin: origin,
+                        destination: destination,
+                        preference: entry.preference
+                    )
+                    return (entry.order, route)
+                }
+            }
+            var collected: [(Int, Route)] = []
+            for await result in group {
+                collected.append(result)
+            }
+            return collected.sorted { $0.0 < $1.0 }.map(\.1)
+        }
         return results
     }
 

@@ -27,7 +27,6 @@
 		A1000015 /* Accessibility/AccessibilitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015 /* Accessibility/AccessibilitySettingsView.swift */; };
 		A1000017 /* Components/Transit/StationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* Components/Transit/StationRow.swift */; };
 		A1000018 /* Components/Glass/GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* Components/Glass/GlassCard.swift */; };
-		A1000315 /* Components/Common/RightSidePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000315 /* Components/Common/RightSidePanel.swift */; };
 		A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* Components/Transit/LineColorIndicator.swift */; };
 		A100001B /* Map/MapKitProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001B /* Map/MapKitProviders.swift */; };
 		A100001D /* Transit/RoutePlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200001D /* Transit/RoutePlanningService.swift */; };
@@ -119,7 +118,6 @@
 		A2000015 /* Accessibility/AccessibilitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/AccessibilitySettingsView.swift; sourceTree = "<group>"; };
 		A2000017 /* Components/Transit/StationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StationRow.swift; sourceTree = "<group>"; };
 		A2000018 /* Components/Glass/GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Glass/GlassCard.swift; sourceTree = "<group>"; };
-		A2000315 /* Components/Common/RightSidePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Common/RightSidePanel.swift; sourceTree = "<group>"; };
 		A2000019 /* Components/Transit/LineColorIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/LineColorIndicator.swift; sourceTree = "<group>"; };
 		A200001B /* Map/MapKitProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapKitProviders.swift; sourceTree = "<group>"; };
 		A200001D /* Transit/RoutePlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RoutePlanningService.swift; sourceTree = "<group>"; };
@@ -354,7 +352,6 @@
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
 				A200006A /* Components/Transit/RouteTabs.swift */,
 				A200006B /* Components/Transit/RouteStationTimeline.swift */,
-				A2000315 /* Components/Common/RightSidePanel.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -545,7 +542,6 @@
 				A1000070 /* Route/SmartCommuteCard.swift in Sources */,
 				A1000071 /* Map/NetworkLineStatusView.swift in Sources */,
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
-				A1000315 /* Components/Common/RightSidePanel.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

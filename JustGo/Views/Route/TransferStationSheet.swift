@@ -20,24 +20,22 @@ struct TransferStationSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    headerSection
-                    transferTimeSection
-                    accessibilitySection
-                    if !crowdWindows.isEmpty {
-                        crowdControlSection
-                    }
-                    if let nextSegment = nextTransitSegment {
-                        directionSection(nextSegment: nextSegment)
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                headerSection
+                transferTimeSection
+                accessibilitySection
+                if !crowdWindows.isEmpty {
+                    crowdControlSection
                 }
-                .padding()
+                if let nextSegment = nextTransitSegment {
+                    directionSection(nextSegment: nextSegment)
+                }
             }
-            .navigationTitle(stationName)
-            .navigationBarTitleDisplayMode(.inline)
+            .padding()
         }
+        .navigationTitle(stationName)
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }

@@ -308,6 +308,11 @@ struct RouteSegment: Identifiable, Codable {
     }
 }
 
+extension RouteSegment: Hashable {
+    static func == (lhs: RouteSegment, rhs: RouteSegment) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
 struct RouteAccessGuide: Identifiable, Codable {
     let id: UUID
     let kind: RouteAccessKind
@@ -389,6 +394,11 @@ struct RouteStationStop: Identifiable, Codable {
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"
     }
+}
+
+extension RouteStationStop: Hashable {
+    static func == (lhs: RouteStationStop, rhs: RouteStationStop) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
 // MARK: - Transit guidance (entrance/exit, platform, interchange)

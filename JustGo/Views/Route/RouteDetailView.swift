@@ -66,7 +66,7 @@ struct RouteDetailView: View {
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
         }
-        .rightSidePanel(item: $selectedTransferSegment) { segment in
+        .navigationDestination(item: $selectedTransferSegment) { segment in
             TransferStationSheet(
                 transferSegment: segment,
                 nextTransitSegment: nextTransitSegment(after: segment),
@@ -74,7 +74,7 @@ struct RouteDetailView: View {
                 crowdControl: route.crowdControl
             )
         }
-        .rightSidePanel(item: $selectedTimelineStation) { stop in
+        .navigationDestination(item: $selectedTimelineStation) { stop in
             RouteStationGuideSheet(
                 stop: stop,
                 cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
@@ -488,22 +488,20 @@ private struct RouteStationGuideSheet: View {
     @State private var didResolve = false
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if let station {
-                    StationDetailView(station: station)
-                } else if didResolve {
-                    StationDetailView(station: fallbackStation)
-                } else {
-                    VStack(spacing: 14) {
-                        Text(stop.name)
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                        ProgressView()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.appBackground)
+        Group {
+            if let station {
+                StationDetailView(station: station)
+            } else if didResolve {
+                StationDetailView(station: fallbackStation)
+            } else {
+                VStack(spacing: 14) {
+                    Text(stop.name)
+                        .font(.headline)
+                        .multilineTextAlignment(.center)
+                    ProgressView()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.appBackground)
             }
         }
         .task {

@@ -334,6 +334,10 @@ struct RouteDetailView: View {
             return
         }
         let windows = await container.officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
+        // .task(id:) cancelled this load because the rider switched route tabs — without this
+        // guard a slow (e.g. network-bound) load for the OLD route lands after the new route's
+        // cached one and shows the wrong service hours.
+        guard !Task.isCancelled else { return }
         if let lineName = route.boardingTransitSegment?.lineName {
             let matched = windows.filter {
                 $0.lineName == lineName || $0.lineName.contains(lineName) || lineName.contains($0.lineName)

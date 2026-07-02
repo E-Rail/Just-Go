@@ -83,6 +83,7 @@ struct MapContainerView: View {
             .padding(.bottom, 10)
             .zIndex(2)
         }
+        .navigationTitle(AppLocalization.localized("Map"))
         .toolbar(.hidden, for: .navigationBar)
         .toolbarBackground(.visible, for: .tabBar)
         .navigationDestination(item: $selectedStation) { station in

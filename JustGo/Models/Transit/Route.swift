@@ -401,6 +401,22 @@ extension RouteStationStop: Hashable {
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
+extension RouteStationStop {
+    /// A lightweight `Station` built from this stop's own fields, for contexts (map markers,
+    /// a resolve-failure fallback) that need a `Station` but only have route-stop data, not a
+    /// full city-pack lookup.
+    func asStation(cityID: String) -> Station {
+        Station(
+            stationID: stationID,
+            name: name,
+            latitude: coordinate?.latitude ?? 0,
+            longitude: coordinate?.longitude ?? 0,
+            cityID: cityID,
+            isTransferStation: isTransfer
+        )
+    }
+}
+
 // MARK: - Transit guidance (entrance/exit, platform, interchange)
 
 enum AccessPointKind: String, Codable {

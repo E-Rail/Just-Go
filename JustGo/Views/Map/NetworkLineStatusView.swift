@@ -73,6 +73,7 @@ struct NetworkLineStatusView: View {
                     .listStyle(.plain)
                 }
             }
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.text(english: "Line Status", simplified: "线路状态", traditional: "線路狀態"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -58,6 +58,7 @@ struct RouteDetailView: View {
             }
             .padding()
         }
+        .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showRouteReport) {
@@ -81,7 +82,7 @@ struct RouteDetailView: View {
             )
         }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
-            FullScreenRouteMapView(route: route, metroNetworks: metroNetworks)
+            FullScreenRouteMapView(route: route, metroNetworks: routeLineNetworks)
         }
         .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
             LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
@@ -142,6 +143,23 @@ struct RouteDetailView: View {
     func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
         guard let idx = route.segments.firstIndex(where: { $0.id == transferSegment.id }) else { return nil }
         return route.segments[(idx + 1)...].first { $0.type.isTransit }
+    }
+
+    /// `metroNetworks` holds the whole city network (fetched once for the service-hours lookup);
+    /// the expanded map should only trace the line(s) this route actually rides, not every line
+    /// in the city.
+    private var routeLineNetworks: [MetroNetwork] {
+        let routeLineNames = Set(route.segments.compactMap(\.lineName))
+        return metroNetworks.map { network in
+            MetroNetwork(
+                cityID: network.cityID,
+                version: network.version,
+                bounds: network.bounds,
+                geometryKind: network.geometryKind,
+                lines: network.lines.filter { routeLineNames.contains($0.name) },
+                stations: network.stations
+            )
+        }
     }
 
     private var routeMapPreview: some View {
@@ -519,12 +537,6 @@ private struct RouteStationGuideSheet: View {
     }
 
     private var fallbackStation: Station {
-        Station(
-            stationID: stop.stationID,
-            name: stop.name,
-            latitude: stop.coordinate?.latitude ?? 0,
-            longitude: stop.coordinate?.longitude ?? 0,
-            cityID: cityID
-        )
+        stop.asStation(cityID: cityID)
     }
 }

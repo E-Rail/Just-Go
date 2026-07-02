@@ -35,6 +35,7 @@ struct RouteResultsView: View {
             }
         }
         .listStyle(.plain)
+        .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

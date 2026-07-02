@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import MapKit
 
 struct TransferStationSheet: View {
     let transferSegment: RouteSegment
@@ -10,6 +11,7 @@ struct TransferStationSheet: View {
     @Environment(DIContainer.self) private var container
     @State private var enrichedStation: Station?
     @State private var isLoadingStation = false
+    @State private var lookAroundScene: MKLookAroundScene?
 
     private var stationName: String {
         transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
@@ -23,6 +25,7 @@ struct TransferStationSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 headerSection
+                lookAroundSection
                 transferTimeSection
                 accessibilitySection
                 if !crowdWindows.isEmpty {
@@ -34,6 +37,7 @@ struct TransferStationSheet: View {
             }
             .padding()
         }
+        .background(Color.appBackground)
         .navigationTitle(stationName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -45,6 +49,30 @@ struct TransferStationSheet: View {
                 source: .localStationData
             )
             enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            if let coordinate = enrichedStation?.coordinate {
+                lookAroundScene = try? await MKLookAroundSceneRequest(coordinate: coordinate).scene
+            }
+        }
+    }
+
+    /// Apple's Look Around has no coverage underground, so this can only ever show the
+    /// station's street-level entrance, not the platform itself — the caption makes that
+    /// explicit. Renders nothing when no coverage exists for the coordinate.
+    @ViewBuilder
+    private var lookAroundSection: some View {
+        if let lookAroundScene {
+            VStack(alignment: .leading, spacing: 6) {
+                LookAroundPreview(initialScene: lookAroundScene)
+                    .frame(height: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                Text(AppLocalization.text(
+                    english: "Station entrance (street view)",
+                    simplified: "车站入口（街景）",
+                    traditional: "車站入口（街景）"
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
         }
     }
 

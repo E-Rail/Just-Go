@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-20T10:35:08Z",
+  "generatedAt": "2026-07-02T15:37:45Z",
   "primaryHost": null,
   "cities": [
     {
       "cityID": "1100",
       "version": "beijing-official-20260527",
-      "sizeBytes": 1093715,
-      "sha256": "b04d6f627e2f8ecbfd3234bd3d55adf896a9882fa79657c80eecee626aef64bb",
+      "sizeBytes": 1105155,
+      "sha256": "fe9f719a3dfe8da0fef4d1d9bd2cfdae722fe5922c9143c129ec424c52f2562a",
       "downloadURL": "packs/1100/beijing-official-20260527/city_pack.json",
       "sourceURLs": [
         "https://www.bjsubway.com/station/wzass/",
@@ -32,8 +32,8 @@
     {
       "cityID": "4401",
       "version": "guangzhou-official-20260601",
-      "sizeBytes": 1236277,
-      "sha256": "fb8f5f67ac6ab3dc7851108e471591b6bcd0fc3ee87d1a3d1b29c27cf4e6c838",
+      "sizeBytes": 1241310,
+      "sha256": "c7b32954339a531da07903cf7064c9ba3f2982e0bc1c595c6cf73ccd0bd83278",
       "downloadURL": "packs/4401/guangzhou-official-20260601/city_pack.json",
       "sourceURLs": [
         "https://cs.gzmtr.com/ckfw/stationInfo/index.html",
@@ -52,8 +52,8 @@
     {
       "cityID": "3100",
       "version": "shanghai-official-20260601",
-      "sizeBytes": 1201050,
-      "sha256": "3816d8644c3e8f4b515e2c98b41c3f39bf3a01618e498035584c6fd16d492bda",
+      "sizeBytes": 1203653,
+      "sha256": "7e85379c1c141b81c74d7a3237a7d5ba4c367d3c2f6f5522fbc6fedb2da89029",
       "downloadURL": "packs/3100/shanghai-official-20260601/city_pack.json",
       "sourceURLs": [
         "https://service.shmetro.com/hcskb/index.htm",
@@ -75,9 +75,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -88,8 +86,8 @@
     {
       "cityID": "5000",
       "version": "chongqing-official-20260620",
-      "sizeBytes": 196196,
-      "sha256": "f0124316b818e2c08a6583d97a73ef438010d67770f980f49475e5b8ce0e1d13",
+      "sizeBytes": 188859,
+      "sha256": "c046867fd984f52b7a26963b42b09a1a08bb821ebc7275e91d82cf018fa46395",
       "downloadURL": "packs/5000/chongqing-official-20260620/city_pack.json",
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -107,9 +105,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -119,41 +115,55 @@
     },
     {
       "cityID": "3201",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "nanjing-official-20260702",
+      "sizeBytes": 167848,
+      "sha256": "ff8d21782ca76a601cb5ed908f0312534dbbb1d64f10b152b4518ad13bdcbf9e",
+      "downloadURL": "packs/3201/nanjing-official-20260702/city_pack.json",
       "sourceURLs": [
-
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm",
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "partial_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
     {
       "cityID": "4201",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "wuhan-official-20260702",
+      "sizeBytes": 217483,
+      "sha256": "e9aa535bc4fc230ba62240c9dcd62ff04115f4e6c34d39cc898cef01e221cdbe",
+      "downloadURL": "packs/4201/wuhan-official-20260702/city_pack.json",
       "sourceURLs": [
-
+        "https://whmetro.com/",
+        "http://wh.bendibao.com/traffic/2019429/98467.shtm",
+        "https://m.wh.bendibao.com/traffic/135056.shtm",
+        "https://jtj.wuhan.gov.cn/jtzx/zwdt/202604/t20260430_2759804_slhxq.shtml",
+        "https://jtj.wuhan.gov.cn/jtzx/zwdt/202601/t20260126_2718573_slhxq.shtml",
+        "https://www.news.cn/politics/20260429/1faf9fab724f4f5e95c38449e4e6c273/c.html"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "partial_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
     {
       "cityID": "5101",
       "version": "chengdu-official-20260528",
-      "sizeBytes": 282755,
-      "sha256": "0bf1625637310d7f28c355fe377d3a2268376c6463d1778f0e7c627b0de02d2f",
+      "sizeBytes": 290997,
+      "sha256": "5a5c64a66ed5d51e29d44c0ff69e80cf9920d80e6c04f75ce4f21a0b7c5366a2",
       "downloadURL": "packs/5101/chengdu-official-20260528/city_pack.json",
       "sourceURLs": [
         "https://www.chengdurail.com/ckfw/smbcskb.htm",
@@ -169,8 +179,8 @@
     {
       "cityID": "6101",
       "version": "xian-official-20260620",
-      "sizeBytes": 123990,
-      "sha256": "5b2dc84378f39e9d1fcd6b0efc9855f0efb4e4ead156dd9966dbbfad05abaa4a",
+      "sizeBytes": 124032,
+      "sha256": "dda234c3ae42ea296128d58b20595c89981c9f8201f0de3d3c5a8d16e9bddf43",
       "downloadURL": "packs/6101/xian-official-20260620/city_pack.json",
       "sourceURLs": [
         "https://www.xianrail.com/",
@@ -190,9 +200,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -206,9 +214,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -218,17 +224,32 @@
     },
     {
       "cityID": "4101",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "zhengzhou-official-20260702",
+      "sizeBytes": 113835,
+      "sha256": "e9bca99f0b9ef4df8d0bd3c3554bc22ebe8330d9a8b7320587abec88d0f795bf",
+      "downloadURL": "packs/4101/zhengzhou-official-20260702/city_pack.json",
       "sourceURLs": [
-
+        "https://www.zzmetro.com/",
+        "https://www.zhengzhou.gov.cn/news1/9825560.jhtml",
+        "https://m.zz.bendibao.com/traffic/151074.shtm",
+        "https://news.qq.com/rain/a/20260205A0430Y00",
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm",
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
       ],
       "capabilities": {
         "accessibility": "source_pending",
-        "schedules": "source_pending",
-        "liveArrivals": "source_pending",
+        "schedules": "partial_static",
+        "liveArrivals": "schedule_only",
         "stationMaps": "source_pending"
       }
     },
@@ -238,9 +259,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -254,9 +273,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -270,9 +287,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -286,9 +301,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -302,9 +315,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -318,9 +329,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -334,9 +343,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -350,9 +357,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -363,8 +368,8 @@
     {
       "cityID": "3205",
       "version": "suzhou-official-20260620",
-      "sizeBytes": 172567,
-      "sha256": "8516dfff884de30589304743150ee0e8f45c3f6531426bfd05543416d81cf540",
+      "sizeBytes": 172565,
+      "sha256": "3972c06c6bd6ad28b2faf7a88bb7ae73b80ad083f1179bcf0fe26086cc1d719a",
       "downloadURL": "packs/3205/suzhou-official-20260620/city_pack.json",
       "sourceURLs": [
         "https://www.sz-mtr.com/",
@@ -384,9 +389,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -400,9 +403,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -416,9 +417,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -428,15 +427,16 @@
     },
     {
       "cityID": "3702",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "downloadURL": null,
+      "version": "qingdao-official-20260702",
+      "sizeBytes": 1306279,
+      "sha256": "7dc1674f0d804a38c87bdcc4b2f2a5af348f8b331f23e9d1e0a3b6b4e2d9057e",
+      "downloadURL": "packs/3702/qingdao-official-20260702/city_pack.json",
       "sourceURLs": [
-
+        "http://www.qd-metro.com/operate.php",
+        "http://www.qd-metro.com/data/execute.php"
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "official_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending"
@@ -448,9 +448,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -464,9 +462,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -480,9 +476,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -513,9 +507,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -529,9 +521,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -545,9 +535,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -561,9 +549,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -577,9 +563,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -593,9 +577,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -609,9 +591,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -625,9 +605,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -641,9 +619,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -657,9 +633,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -670,8 +644,8 @@
     {
       "cityID": "4403",
       "version": "shenzhen-official-20260528",
-      "sizeBytes": 225281,
-      "sha256": "65b2d66d327b78331c6fb0fea0ed557919646a8368227bf1859d15b1d955be3d",
+      "sizeBytes": 229457,
+      "sha256": "74bfbcc52ef3e195b3e9d1d2694f078fff1c8998980b27627fdf1b3ae7b515ea",
       "downloadURL": "packs/4403/shenzhen-official-20260528/city_pack.json",
       "sourceURLs": [
         "https://www.szmc.net/szmc_m/styles/index/zdWeb/luohu.html",
@@ -691,9 +665,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -707,9 +679,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -723,9 +693,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -739,9 +707,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -755,9 +721,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -771,9 +735,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -787,9 +749,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -803,9 +763,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -819,9 +777,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -835,9 +791,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -851,9 +805,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -867,9 +819,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -883,9 +833,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -899,9 +847,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -915,9 +861,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -931,9 +875,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",
@@ -947,9 +889,7 @@
       "sizeBytes": 0,
       "sha256": null,
       "downloadURL": null,
-      "sourceURLs": [
-
-      ],
+      "sourceURLs": [],
       "capabilities": {
         "accessibility": "source_pending",
         "schedules": "source_pending",

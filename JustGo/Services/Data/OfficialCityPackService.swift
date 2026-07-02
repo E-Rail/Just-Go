@@ -409,7 +409,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private func download(from url: URL) async throws -> Data {
-        let (data, response) = try await session.data(from: url)
+        // Cap how long a single fetch can sit with no response. URLSession's default is 60s,
+        // and the pack CDNs are black-holed (stall, not refuse) on some mainland networks —
+        // with several fallback URLs tried serially, a cold load could pin the city-pack
+        // spinners for minutes before the .failed cooldown ever got a chance to cache.
+        // This is an idle timeout, so a slow-but-flowing pack download is not cut off.
+        let request = URLRequest(url: url, timeoutInterval: 15)
+        let (data, response) = try await session.data(for: request)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw RoutePlanningError.networkError }
         return data
     }

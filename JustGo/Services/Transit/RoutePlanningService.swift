@@ -60,79 +60,107 @@ final class RoutePlanningService {
             to: destination,
             accessibilityFilter: accessibilityFilter
         )
-        var enrichedRoutes: [Route] = []
-        for route in routes {
-            var route = route
-            let routeCityID = route.networkCityID ?? city
-            let criticalStops = criticalStops(for: route)
-            let criticalStopNames = criticalStops.map(\.name)
 
-            // These three official-data lookups are independent of one another — kick them
-            // off concurrently and await results in the order their side effects are applied.
-            async let dataCoverage = officialStationData.routeCoverage(
-                cityID: routeCityID,
-                stationNames: criticalStopNames
-            )
-            async let criticalStationsResult = officialStationData.enrichStations(
-                criticalStops.compactMap { stop -> Station? in
-                    guard let coordinate = stop.coordinate else { return nil }
-                    return Station(
-                        stationID: stop.stationID,
-                        name: stop.name,
-                        latitude: coordinate.latitude,
-                        longitude: coordinate.longitude,
-                        cityID: routeCityID
+        // Each route's enrichment below is a handful of officialStationData lookups that don't
+        // touch any shared mutable state — running them one route after another multiplied
+        // enrichment latency by the number of alternatives. They're independent, so enrich
+        // concurrently instead (same fix already applied to the analogous per-alternative
+        // fetch in BundledMetroRouteProvider.routes).
+        return await withTaskGroup(of: (Int, Route).self) { group in
+            for (index, route) in routes.enumerated() {
+                group.addTask {
+                    let enriched = await self.enrichedRoute(
+                        route,
+                        city: city,
+                        accessibilityFilter: accessibilityFilter,
+                        tripAnchor: tripAnchor
                     )
-                }
-            )
-            async let crowdControlStations = officialStationData.crowdControlWindows(
-                cityID: routeCityID,
-                stationNames: criticalStopNames
-            )
-
-            route.dataCoverage = await dataCoverage
-            let criticalStations = await criticalStationsResult
-            route.stepFreeAssessment = stepFreeAssessment(
-                route: route,
-                criticalStations: criticalStations,
-                expectedStationCount: criticalStops.count
-            )
-            route.isFullyAccessible = route.stepFreeAssessment == .confirmed
-            if route.stepFreeAssessment == .unknown,
-               accessibilityFilter.requiresWheelchairAccess || accessibilityFilter.requiresElevator {
-                route.warnings.append(RouteWarning(
-                    type: .stepFreeAccessUnconfirmed,
-                    message: AppLocalization.localized("Step-free access is not confirmed for the boarding and arrival points."),
-                    affectedStationID: nil
-                ))
-            }
-
-            if let boarding = route.boardingTransitSegment, let boardingName = boarding.fromStationName {
-                let windows = await officialStationData.serviceWindows(cityID: routeCityID, stationName: boardingName)
-                let boardingMoment = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
-                let status = serviceHoursResolver.status(
-                    boardingLineName: boarding.lineName,
-                    windows: windows,
-                    at: boardingMoment
-                )
-                route.serviceStatus = status
-                if let warningType = status.warningType, let banner = status.bannerText {
-                    route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
+                    return (index, enriched)
                 }
             }
-            route.crowdControl = RouteCrowdControl(stations: await crowdControlStations)
-
-            // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
-            let guidanceByStation = await officialStationData.stationGuidance(
-                cityID: routeCityID,
-                stationNames: criticalStopNames
-            )
-            route.stationGuidance = buildStationGuidance(route: route, guidance: guidanceByStation)
-            route.accessGuidance = upgradeAccessGuidance(route.accessGuidance, guidance: guidanceByStation)
-
-            enrichedRoutes.append(route)
+            var collected: [(Int, Route)] = []
+            for await result in group {
+                collected.append(result)
+            }
+            return collected.sorted { $0.0 < $1.0 }.map(\.1)
         }
-        return enrichedRoutes
+    }
+
+    private func enrichedRoute(
+        _ route: Route,
+        city: String,
+        accessibilityFilter: AccessibilityFilter,
+        tripAnchor: TripTimeAnchor
+    ) async -> Route {
+        var route = route
+        let routeCityID = route.networkCityID ?? city
+        let criticalStops = criticalStops(for: route)
+        let criticalStopNames = criticalStops.map(\.name)
+
+        // These three official-data lookups are independent of one another — kick them
+        // off concurrently and await results in the order their side effects are applied.
+        async let dataCoverage = officialStationData.routeCoverage(
+            cityID: routeCityID,
+            stationNames: criticalStopNames
+        )
+        async let criticalStationsResult = officialStationData.enrichStations(
+            criticalStops.compactMap { stop -> Station? in
+                guard let coordinate = stop.coordinate else { return nil }
+                return Station(
+                    stationID: stop.stationID,
+                    name: stop.name,
+                    latitude: coordinate.latitude,
+                    longitude: coordinate.longitude,
+                    cityID: routeCityID
+                )
+            }
+        )
+        async let crowdControlStations = officialStationData.crowdControlWindows(
+            cityID: routeCityID,
+            stationNames: criticalStopNames
+        )
+
+        route.dataCoverage = await dataCoverage
+        let criticalStations = await criticalStationsResult
+        route.stepFreeAssessment = stepFreeAssessment(
+            route: route,
+            criticalStations: criticalStations,
+            expectedStationCount: criticalStops.count
+        )
+        route.isFullyAccessible = route.stepFreeAssessment == .confirmed
+        if route.stepFreeAssessment == .unknown,
+           accessibilityFilter.requiresWheelchairAccess || accessibilityFilter.requiresElevator {
+            route.warnings.append(RouteWarning(
+                type: .stepFreeAccessUnconfirmed,
+                message: AppLocalization.localized("Step-free access is not confirmed for the boarding and arrival points."),
+                affectedStationID: nil
+            ))
+        }
+
+        if let boarding = route.boardingTransitSegment, let boardingName = boarding.fromStationName {
+            let windows = await officialStationData.serviceWindows(cityID: routeCityID, stationName: boardingName)
+            let boardingMoment = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
+            let status = serviceHoursResolver.status(
+                boardingLineName: boarding.lineName,
+                windows: windows,
+                at: boardingMoment
+            )
+            route.serviceStatus = status
+            if let warningType = status.warningType, let banner = status.bannerText {
+                route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
+            }
+        }
+        route.crowdControl = RouteCrowdControl(stations: await crowdControlStations)
+
+        // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
+        let guidanceByStation = await officialStationData.stationGuidance(
+            cityID: routeCityID,
+            stationNames: criticalStopNames
+        )
+        route.stationGuidance = buildStationGuidance(route: route, guidance: guidanceByStation)
+        route.accessGuidance = upgradeAccessGuidance(route.accessGuidance, guidance: guidanceByStation)
+
+        return route
     }
 
     /// Tags the boarding, transfer, and arrival stations of a route with the best-available

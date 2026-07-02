@@ -1,11 +1,11 @@
 import SwiftUI
 
 extension View {
-    /// Presents `content` for a bound `Identifiable?` item as a panel pinned to the trailing
-    /// edge of the screen, instead of a bottom sheet. Mirrors `.sheet(item:onDismiss:content:)`'s
-    /// call signature so `.sheet(item:)` call sites can switch with close to a 1-line rename.
-    /// Dismisses via a right-ward swipe on the panel, tapping the scrim, or the caller setting
-    /// `item` back to `nil`.
+    /// Presents `content` for a bound `Identifiable?` item as a full-screen page that slides
+    /// in from the trailing edge, instead of a bottom sheet. Mirrors
+    /// `.sheet(item:onDismiss:content:)`'s call signature so `.sheet(item:)` call sites can
+    /// switch with close to a 1-line rename. Dismisses via a right-ward swipe (from anywhere,
+    /// like a standard push-navigation pop) or the caller setting `item` back to `nil`.
     func rightSidePanel<Item: Identifiable, PanelContent: View>(
         item: Binding<Item?>,
         onDismiss: (() -> Void)? = nil,
@@ -31,29 +31,16 @@ private struct RightSidePanelModifier<Item: Identifiable, PanelContent: View>: V
         content
             .overlay {
                 GeometryReader { proxy in
-                    let panelWidth = min(420, proxy.size.width * 0.86)
-                    ZStack(alignment: .trailing) {
-                        if displayedItem != nil {
-                            Color.black.opacity(0.25)
-                                .ignoresSafeArea()
-                                .contentShape(Rectangle())
-                                .onTapGesture { dismiss() }
-                                .transition(.opacity)
-                        }
-                        if let displayedItem {
-                            panelContent(displayedItem)
-                                .frame(width: panelWidth)
-                                .frame(maxHeight: .infinity)
-                                .background(Color.appBackground)
-                                .clipShape(
-                                    UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 16)
-                                )
-                                .shadow(color: .black.opacity(0.22), radius: 18, x: -6)
-                                .ignoresSafeArea(edges: .vertical)
-                                .offset(x: max(0, dragTranslationX))
-                                .simultaneousGesture(dragToDismiss(panelWidth: panelWidth))
-                                .transition(.move(edge: .trailing))
-                        }
+                    let pageWidth = proxy.size.width
+                    if let displayedItem {
+                        panelContent(displayedItem)
+                            .frame(width: pageWidth)
+                            .frame(maxHeight: .infinity)
+                            .background(Color.appBackground)
+                            .ignoresSafeArea(edges: .vertical)
+                            .offset(x: max(0, dragTranslationX))
+                            .simultaneousGesture(dragToDismiss(pageWidth: pageWidth))
+                            .transition(.move(edge: .trailing))
                     }
                 }
             }
@@ -74,7 +61,7 @@ private struct RightSidePanelModifier<Item: Identifiable, PanelContent: View>: V
         item = nil
     }
 
-    private func dragToDismiss(panelWidth: CGFloat) -> some Gesture {
+    private func dragToDismiss(pageWidth: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 let horizontalDominant = abs(value.translation.width) > abs(value.translation.height)
@@ -83,8 +70,8 @@ private struct RightSidePanelModifier<Item: Identifiable, PanelContent: View>: V
             }
             .onEnded { value in
                 let horizontalDominant = abs(value.translation.width) > abs(value.translation.height)
-                let draggedFarEnough = value.translation.width > panelWidth * 0.3
-                let flungFastEnough = value.predictedEndTranslation.width > panelWidth * 0.6
+                let draggedFarEnough = value.translation.width > pageWidth * 0.3
+                let flungFastEnough = value.predictedEndTranslation.width > pageWidth * 0.6
                 if horizontalDominant && (draggedFarEnough || flungFastEnough) {
                     dismiss()
                 } else {

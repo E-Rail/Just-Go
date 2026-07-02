@@ -75,11 +75,17 @@ struct FullScreenRouteMapView: View {
         _visibleRegion = State(initialValue: route.previewRegion)
     }
 
+    /// Markers for every stop the route passes through, built from the route's own stop data
+    /// rather than a city-pack lookup — this is a map trace, not an interactive station picker.
+    private var routeStations: [Station] {
+        route.stationTimelineStops.map { $0.asStation(cityID: route.networkCityID ?? "") }
+    }
+
     var body: some View {
         ZStack {
             TransitMapView(
                 visibleRegion: $visibleRegion,
-                stations: [],
+                stations: routeStations,
                 metroNetworks: metroNetworks,
                 route: route,
                 showsUserLocation: false,

@@ -53,13 +53,13 @@ struct AccessibilitySettingsView: View {
                 ) {
                     Text(AppLocalization.localized("Distance"))
                 } minimumValueLabel: {
-                    Text("100m")
+                    Text(AppLocalization.distance(100))
                         .font(.caption)
                 } maximumValueLabel: {
-                    Text("1km")
+                    Text(AppLocalization.distance(1000))
                         .font(.caption)
                 }
-                Text("\(Int(appState.accessibilityPreference.maxWalkingDistance))m")
+                Text(AppLocalization.distance(appState.accessibilityPreference.maxWalkingDistance))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

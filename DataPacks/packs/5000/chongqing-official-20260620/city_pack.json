@@ -16,27 +16,6 @@
   "sourceAttribution": "重庆轨道交通官方数据",
   "stations": [
     {
-      "stationName": "2026年端午假期首末班时刻表",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.cqmetro.cn/smbsj/json/data.json"
-      ]
-    },
-    {
       "stationName": "七星岗",
       "stationID": null,
       "accessibility": null,
@@ -66,15 +45,9 @@
           "lastTime": "00:11"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -98,15 +71,9 @@
           "lastTime": "00:04"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -130,15 +97,9 @@
           "lastTime": "00:34"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -162,15 +123,9 @@
           "lastTime": "23:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -206,15 +161,9 @@
           "lastTime": "00:25"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -238,15 +187,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -270,15 +213,9 @@
           "lastTime": "00:26"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -314,15 +251,9 @@
           "lastTime": "00:38"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -358,15 +289,9 @@
           "lastTime": "23:27"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -390,15 +315,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -434,15 +353,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -478,15 +391,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -510,15 +417,9 @@
           "lastTime": "23:09"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -542,15 +443,9 @@
           "lastTime": "00:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -574,15 +469,9 @@
           "lastTime": "00:04"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -600,15 +489,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -632,15 +515,9 @@
           "lastTime": "23:52"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -664,15 +541,9 @@
           "lastTime": "23:31"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -690,15 +561,9 @@
           "lastTime": "22:38"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -722,15 +587,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -778,15 +637,9 @@
           "lastTime": "00:14"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -804,15 +657,9 @@
           "lastTime": "22:48"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -836,15 +683,9 @@
           "lastTime": "23:53"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -868,22 +709,16 @@
           "lastTime": "00:22"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
       ]
     },
     {
-      "stationName": "从岩寺",
+      "stationName": "丛岩寺",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -900,15 +735,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -932,15 +761,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -964,15 +787,9 @@
           "lastTime": "23:56"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -996,15 +813,9 @@
           "lastTime": "23:27"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1028,15 +839,9 @@
           "lastTime": "23:47"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1072,15 +877,9 @@
           "lastTime": "23:58"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1104,15 +903,9 @@
           "lastTime": "23:42"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1136,15 +929,9 @@
           "lastTime": "23:47"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1168,15 +955,9 @@
           "lastTime": "23:42"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1200,15 +981,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1232,15 +1007,9 @@
           "lastTime": "00:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1264,15 +1033,9 @@
           "lastTime": "23:13"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1320,15 +1083,9 @@
           "lastTime": "23:58"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1352,15 +1109,9 @@
           "lastTime": "23:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1384,15 +1135,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1416,15 +1161,9 @@
           "lastTime": "23:41"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1448,15 +1187,9 @@
           "lastTime": "23:10"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1486,15 +1219,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1518,15 +1245,9 @@
           "lastTime": "22:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1550,15 +1271,9 @@
           "lastTime": "00:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1582,15 +1297,9 @@
           "lastTime": "23:33"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1614,15 +1323,9 @@
           "lastTime": "23:53"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1640,15 +1343,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1672,15 +1369,9 @@
           "lastTime": "23:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1704,15 +1395,9 @@
           "lastTime": "23:03"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1736,15 +1421,9 @@
           "lastTime": "23:17"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1768,15 +1447,9 @@
           "lastTime": "23:14"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1800,15 +1473,9 @@
           "lastTime": "23:22"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1832,15 +1499,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1864,15 +1525,9 @@
           "lastTime": "23:35"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1896,15 +1551,9 @@
           "lastTime": "23:53"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1940,15 +1589,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -1972,15 +1615,9 @@
           "lastTime": "23:13"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2004,15 +1641,9 @@
           "lastTime": "23:24"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2030,15 +1661,9 @@
           "lastTime": "22:43"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2062,15 +1687,9 @@
           "lastTime": "22:36"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2094,15 +1713,9 @@
           "lastTime": "00:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2126,15 +1739,9 @@
           "lastTime": "23:15"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2158,15 +1765,9 @@
           "lastTime": "23:56"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2190,15 +1791,9 @@
           "lastTime": "23:43"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2222,15 +1817,9 @@
           "lastTime": "23:10"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2266,15 +1855,9 @@
           "lastTime": "23:14"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2310,15 +1893,9 @@
           "lastTime": "23:38"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2342,15 +1919,9 @@
           "lastTime": "23:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2374,15 +1945,9 @@
           "lastTime": "22:39"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2406,15 +1971,9 @@
           "lastTime": "00:07"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2438,15 +1997,9 @@
           "lastTime": "22:48"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2470,15 +2023,9 @@
           "lastTime": "22:51"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2502,15 +2049,9 @@
           "lastTime": "00:01"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2520,18 +2061,10 @@
       "stationName": "圣泉寺",
       "stationID": null,
       "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "schedules": [],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2555,15 +2088,9 @@
           "lastTime": "22:34"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2587,15 +2114,9 @@
           "lastTime": "23:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2619,15 +2140,9 @@
           "lastTime": "00:06"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2663,15 +2178,9 @@
           "lastTime": "23:44"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2695,15 +2204,9 @@
           "lastTime": "23:31"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2727,15 +2230,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2759,15 +2256,9 @@
           "lastTime": "00:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2791,15 +2282,9 @@
           "lastTime": "00:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2823,15 +2308,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2855,15 +2334,9 @@
           "lastTime": "23:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2887,15 +2360,9 @@
           "lastTime": "23:56"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2931,15 +2398,9 @@
           "lastTime": "00:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2963,15 +2424,9 @@
           "lastTime": "00:13"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -2995,15 +2450,9 @@
           "lastTime": "23:38"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3021,15 +2470,9 @@
           "lastTime": "22:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3065,15 +2508,9 @@
           "lastTime": "23:47"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3097,15 +2534,9 @@
           "lastTime": "23:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3129,15 +2560,9 @@
           "lastTime": "23:41"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3161,15 +2586,9 @@
           "lastTime": "00:07"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3193,15 +2612,9 @@
           "lastTime": "23:46"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3237,15 +2650,9 @@
           "lastTime": "00:01"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3281,15 +2688,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3313,15 +2714,9 @@
           "lastTime": "00:03"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3345,15 +2740,9 @@
           "lastTime": "23:16"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3383,15 +2772,9 @@
           "lastTime": "23:57"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3415,15 +2798,9 @@
           "lastTime": "23:54"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3459,15 +2836,9 @@
           "lastTime": "00:09"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3503,15 +2874,9 @@
           "lastTime": "23:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3535,15 +2900,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3567,15 +2926,9 @@
           "lastTime": "23:54"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3599,15 +2952,9 @@
           "lastTime": "23:33"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3631,15 +2978,9 @@
           "lastTime": "23:26"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3663,15 +3004,9 @@
           "lastTime": "23:16"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3695,15 +3030,9 @@
           "lastTime": "23:26"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3727,15 +3056,9 @@
           "lastTime": "23:50"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3753,15 +3076,9 @@
           "lastTime": "22:19"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3785,15 +3102,9 @@
           "lastTime": "23:36"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3817,15 +3128,9 @@
           "lastTime": "23:15"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3849,15 +3154,9 @@
           "lastTime": "00:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3881,15 +3180,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3913,15 +3206,9 @@
           "lastTime": "23:15"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3945,15 +3232,9 @@
           "lastTime": "23:39"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -3977,15 +3258,9 @@
           "lastTime": "22:37"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4021,15 +3296,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4047,15 +3316,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4079,15 +3342,9 @@
           "lastTime": "00:21"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4111,15 +3368,9 @@
           "lastTime": "23:21"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4143,15 +3394,9 @@
           "lastTime": "23:10"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4175,15 +3420,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4207,15 +3446,9 @@
           "lastTime": "23:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4251,15 +3484,9 @@
           "lastTime": "23:54"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4277,15 +3504,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4309,15 +3530,9 @@
           "lastTime": "23:49"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4341,15 +3556,9 @@
           "lastTime": "23:50"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4373,15 +3582,9 @@
           "lastTime": "23:24"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4405,15 +3608,9 @@
           "lastTime": "23:35"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4449,15 +3646,9 @@
           "lastTime": "23:36"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4481,15 +3672,9 @@
           "lastTime": "23:32"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4513,15 +3698,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4545,15 +3724,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4577,15 +3750,9 @@
           "lastTime": "00:19"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4609,15 +3776,9 @@
           "lastTime": "23:01"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4665,15 +3826,9 @@
           "lastTime": "23:49"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4709,15 +3864,9 @@
           "lastTime": "00:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4741,15 +3890,9 @@
           "lastTime": "00:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4785,15 +3928,9 @@
           "lastTime": "00:03"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4823,15 +3960,9 @@
           "lastTime": "22:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4855,15 +3986,9 @@
           "lastTime": "00:48"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4881,15 +4006,9 @@
           "lastTime": "22:52"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4937,15 +4056,9 @@
           "lastTime": "23:44"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4963,15 +4076,9 @@
           "lastTime": "22:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -4989,15 +4096,9 @@
           "lastTime": "22:06"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5021,15 +4122,9 @@
           "lastTime": "00:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5053,15 +4148,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5085,15 +4174,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5117,15 +4200,9 @@
           "lastTime": "00:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5149,15 +4226,9 @@
           "lastTime": "22:43"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5181,15 +4252,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5213,15 +4278,9 @@
           "lastTime": "00:11"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5245,15 +4304,9 @@
           "lastTime": "23:49"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5277,15 +4330,9 @@
           "lastTime": "00:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5309,15 +4356,9 @@
           "lastTime": "23:35"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5341,15 +4382,9 @@
           "lastTime": "23:35"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5373,15 +4408,9 @@
           "lastTime": "23:33"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5417,15 +4446,9 @@
           "lastTime": "23:25"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5449,15 +4472,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5481,15 +4498,9 @@
           "lastTime": "23:07"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5525,15 +4536,9 @@
           "lastTime": "23:49"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5557,15 +4562,9 @@
           "lastTime": "00:10"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5595,15 +4594,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5627,15 +4620,9 @@
           "lastTime": "00:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5653,15 +4640,9 @@
           "lastTime": "22:03"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5679,15 +4660,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5711,15 +4686,9 @@
           "lastTime": "00:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5743,15 +4712,9 @@
           "lastTime": "23:28"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5787,15 +4750,9 @@
           "lastTime": "23:07"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5819,15 +4776,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5851,15 +4802,9 @@
           "lastTime": "00:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5883,15 +4828,9 @@
           "lastTime": "23:28"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5915,15 +4854,9 @@
           "lastTime": "23:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5947,15 +4880,9 @@
           "lastTime": "23:28"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -5973,15 +4900,9 @@
           "lastTime": "22:32"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6017,15 +4938,9 @@
           "lastTime": "23:47"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6049,15 +4964,9 @@
           "lastTime": "23:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6081,15 +4990,9 @@
           "lastTime": "23:51"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6113,15 +5016,9 @@
           "lastTime": "23:24"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6145,15 +5042,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6171,15 +5062,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6209,15 +5094,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6241,15 +5120,9 @@
           "lastTime": "23:31"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6279,15 +5152,9 @@
           "lastTime": "23:27"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6305,15 +5172,9 @@
           "lastTime": "22:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6337,15 +5198,9 @@
           "lastTime": "23:11"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6369,36 +5224,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.cqmetro.cn/smbsj/json/data.json"
-      ]
-    },
-    {
-      "stationName": "端午假期首末班时刻表",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6434,15 +5262,9 @@
           "lastTime": "00:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6466,15 +5288,9 @@
           "lastTime": "22:32"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6510,15 +5326,9 @@
           "lastTime": "23:59"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6554,15 +5364,9 @@
           "lastTime": "23:17"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6586,15 +5390,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6618,15 +5416,9 @@
           "lastTime": "22:46"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6662,15 +5454,9 @@
           "lastTime": "23:50"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6694,15 +5480,9 @@
           "lastTime": "23:57"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6726,15 +5506,9 @@
           "lastTime": "23:19"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6752,15 +5526,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6784,15 +5552,9 @@
           "lastTime": "23:14"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6810,15 +5572,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6842,15 +5598,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6874,15 +5624,9 @@
           "lastTime": "23:17"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6906,15 +5650,9 @@
           "lastTime": "23:48"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6938,15 +5676,9 @@
           "lastTime": "23:41"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -6970,15 +5702,9 @@
           "lastTime": "23:02"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7002,15 +5728,9 @@
           "lastTime": "23:04"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7046,15 +5766,9 @@
           "lastTime": "23:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7090,15 +5804,9 @@
           "lastTime": "23:38"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7122,15 +5830,9 @@
           "lastTime": "23:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7160,15 +5862,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7186,15 +5882,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7224,15 +5914,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7242,18 +5926,10 @@
       "stationName": "邮轮母港",
       "stationID": null,
       "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "schedules": [],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7277,15 +5953,9 @@
           "lastTime": "00:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7309,15 +5979,9 @@
           "lastTime": "23:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7341,15 +6005,9 @@
           "lastTime": "23:59"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7367,15 +6025,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7399,15 +6051,9 @@
           "lastTime": "23:44"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7443,15 +6089,9 @@
           "lastTime": "00:27"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7499,15 +6139,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7531,15 +6165,9 @@
           "lastTime": "23:39"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7563,15 +6191,9 @@
           "lastTime": "23:46"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7595,15 +6217,9 @@
           "lastTime": "23:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7627,15 +6243,9 @@
           "lastTime": "23:22"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7671,15 +6281,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7703,15 +6307,9 @@
           "lastTime": "23:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7735,15 +6333,9 @@
           "lastTime": "23:25"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7767,15 +6359,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7799,15 +6385,9 @@
           "lastTime": "22:57"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7831,15 +6411,9 @@
           "lastTime": "22:55"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7863,15 +6437,9 @@
           "lastTime": "00:09"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7895,15 +6463,9 @@
           "lastTime": "23:05"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7927,15 +6489,9 @@
           "lastTime": "23:40"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7959,15 +6515,9 @@
           "lastTime": "23:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -7977,18 +6527,10 @@
       "stationName": "铜梁西",
       "stationID": null,
       "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "schedules": [],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8006,15 +6548,9 @@
           "lastTime": "22:27"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8038,15 +6574,9 @@
           "lastTime": "00:43"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8070,15 +6600,9 @@
           "lastTime": "00:20"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8102,15 +6626,9 @@
           "lastTime": "22:43"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8134,15 +6652,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8166,15 +6678,9 @@
           "lastTime": "23:11"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8198,15 +6704,9 @@
           "lastTime": "23:26"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8230,15 +6730,9 @@
           "lastTime": "23:19"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8248,18 +6742,10 @@
       "stationName": "青龙湖",
       "stationID": null,
       "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "schedules": [],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8283,15 +6769,9 @@
           "lastTime": "23:42"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8315,15 +6795,9 @@
           "lastTime": "23:28"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8347,15 +6821,9 @@
           "lastTime": "22:54"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8379,15 +6847,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8411,15 +6873,9 @@
           "lastTime": "23:44"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8437,15 +6893,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8469,15 +6919,9 @@
           "lastTime": "23:10"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8501,15 +6945,9 @@
           "lastTime": "23:29"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8533,15 +6971,9 @@
           "lastTime": "22:30"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8565,15 +6997,9 @@
           "lastTime": "00:06"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8597,15 +7023,9 @@
           "lastTime": "00:14"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8641,15 +7061,9 @@
           "lastTime": "00:18"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8673,15 +7087,9 @@
           "lastTime": "22:51"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8705,15 +7113,9 @@
           "lastTime": "23:56"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8737,15 +7139,9 @@
           "lastTime": null
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8769,15 +7165,9 @@
           "lastTime": "23:35"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8801,15 +7191,9 @@
           "lastTime": "23:49"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8827,15 +7211,9 @@
           "lastTime": "23:00"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8859,15 +7237,9 @@
           "lastTime": "23:32"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8891,15 +7263,9 @@
           "lastTime": "23:55"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8923,15 +7289,9 @@
           "lastTime": "23:58"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8955,15 +7315,9 @@
           "lastTime": "22:58"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -8987,15 +7341,9 @@
           "lastTime": "23:52"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9019,15 +7367,9 @@
           "lastTime": "23:12"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9051,15 +7393,9 @@
           "lastTime": "23:08"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9083,15 +7419,9 @@
           "lastTime": "23:03"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9115,15 +7445,9 @@
           "lastTime": "00:23"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9147,15 +7471,9 @@
           "lastTime": "00:13"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"
@@ -9179,15 +7497,9 @@
           "lastTime": "23:15"
         }
       ],
-      "stationFacilities": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.cqmetro.cn/smbsj/json/data.json"

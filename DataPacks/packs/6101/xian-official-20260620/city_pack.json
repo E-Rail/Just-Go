@@ -2483,7 +2483,7 @@
       ]
     },
     {
-      "stationName": "延兴门",
+      "stationName": "延兴门（沙坡）",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -3054,7 +3054,7 @@
       ]
     },
     {
-      "stationName": "机场(T5)",
+      "stationName": "机场（T5）",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -3075,7 +3075,7 @@
       ]
     },
     {
-      "stationName": "机场西(T1、T2、T3)",
+      "stationName": "机场西（T1、T2、T3）",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -5092,7 +5092,7 @@
       ]
     },
     {
-      "stationName": "西工程大·西科大",
+      "stationName": "西工程大·西科大（临潼校区）",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -5197,7 +5197,7 @@
       ]
     },
     {
-      "stationName": "西部大道(西太路口)",
+      "stationName": "西部大道（西太路口）",
       "stationID": null,
       "accessibility": null,
       "schedules": [

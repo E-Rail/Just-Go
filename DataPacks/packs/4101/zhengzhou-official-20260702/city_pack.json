@@ -1,0 +1,4816 @@
+{
+  "schemaVersion": 1,
+  "cityID": "4101",
+  "version": "zhengzhou-official-20260702",
+  "generatedAt": "2026-07-02T00:00:00Z",
+  "sourceURLs": [
+    "https://www.zzmetro.com/",
+    "https://www.zhengzhou.gov.cn/news1/9825560.jhtml",
+    "https://m.zz.bendibao.com/traffic/151074.shtm",
+    "https://news.qq.com/rain/a/20260205A0430Y00",
+    "https://m.zz.bendibao.com/traffic/97406.shtm",
+    "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+    "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+    "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+    "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+    "https://m.zz.bendibao.com/traffic/97534.shtm",
+    "https://m.zz.bendibao.com/traffic/88105.shtm",
+    "https://m.zz.bendibao.com/traffic/88100.shtm",
+    "https://m.zz.bendibao.com/traffic/127758.shtm",
+    "https://m.zz.bendibao.com/traffic/126957.shtm",
+    "https://www.autohome.com.cn/ask/12854895.html",
+    "https://m.zz.bendibao.com/traffic/88103.shtm"
+  ],
+  "capabilities": {
+    "accessibility": "source_pending",
+    "schedules": "partial_static",
+    "liveArrivals": "schedule_only",
+    "stationMaps": "source_pending"
+  },
+  "liveProvider": "schedule_only",
+  "sourceAttribution": "郑州公共静态时刻表数据",
+  "stations": [
+    {
+      "stationName": "七里河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "东十里铺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "东周",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "东大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "东风东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "东风南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "中原福塔",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "中央商务区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "丰庆路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "二七广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "二里岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "二里岗东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "五一公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "京广南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "人民公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "人民路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "众意西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "会展中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "儿童医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "兰寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "兴隆铺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "农业东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "农业南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "冯庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "冯湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "凤凰台",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "凤凰台南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "北二十里铺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "医学院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "南五里堡",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "南阳新村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "博学路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "博览中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "卧龙岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "司赵",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "同乐",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "后河芦",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "商鼎路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "圃田西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "城东南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "大学中路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "大石桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "奥体中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm",
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "奥体中心西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "姚庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "姚砦",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "安宁路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "小营",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "嵩淮",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "市中心医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "市体育中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "市委党校",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "市民中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "市民大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "市第二人民医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "常庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "康宁街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "张家村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "文苑北路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "月季公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "李江沟",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "杨君刘",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "果树所",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "桐淮",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "梁湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "梧桐街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "森林公园北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "民航路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "沙口路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "沙门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "河南大学新区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "河南工业大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "河南建院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "洞林寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "洞林湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "海滩寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "清华附中",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "滨河新城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "滨河新城南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "潮河",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "火车头体育场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "燕庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "王砦",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "省人民医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "省体育中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "省骨科医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "碧沙岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "祭城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "福塔东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "秦岭路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "紫荆山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "经北二路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "经北五路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "经开中心广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "绿城广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "老鸦陈",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "航海广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "莲湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "营岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "西三环",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "西周",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "西大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "西流湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "货站街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "贾峪",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "通泰路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "郎庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "郑大科技园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "郑州东站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "郑州人民医院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "郑州大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "郑州文庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往省体育中心",
+          "firstTime": "05:31",
+          "lastTime": "23:20"
+        },
+        {
+          "lineName": "郑州地铁3号线",
+          "direction": "开往滨河新城南",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.zhengzhou.gov.cn/news1/7811120.jhtml",
+        "https://app-api.henandaily.cn/mobile/view/news/407773373154721792513937",
+        "http://zz.bendibao.com/traffic/2021128/88111.shtm"
+      ]
+    },
+    {
+      "stationName": "郑州火车站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm"
+      ]
+    },
+    {
+      "stationName": "金岱",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "金桢路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "金水东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "金汇桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "金融岛南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "金融岛西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "铁炉",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "陇海西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "陇秀公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "陈寨东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "须水",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往莲湖",
+          "firstTime": "06:03",
+          "lastTime": "22:03"
+        },
+        {
+          "lineName": "郑州地铁14号线",
+          "direction": "开往须水",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.autohome.com.cn/ask/12854895.html",
+        "https://m.zz.bendibao.com/traffic/88103.shtm"
+      ]
+    },
+    {
+      "stationName": "马寨",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往贾峪",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁6号线",
+          "direction": "开往清华附中",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/127758.shtm"
+      ]
+    },
+    {
+      "stationName": "高铁公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "黄河南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "黄河路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "齐礼阎",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "内环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁5号线",
+          "direction": "外环方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/88105.shtm",
+        "https://m.zz.bendibao.com/traffic/88100.shtm"
+      ]
+    },
+    {
+      "stationName": "龙子湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南工业大学",
+          "firstTime": "06:14",
+          "lastTime": "00:14"
+        },
+        {
+          "lineName": "郑州地铁1号线",
+          "direction": "开往河南大学新区",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/97406.shtm",
+        "https://m.zz.bendibao.com/traffic/88113.shtm",
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "龙子湖东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "龙子湖西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往龙子湖东",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁12号线",
+          "direction": "开往梁湖",
+          "firstTime": "06:00",
+          "lastTime": "23:30"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/traffic/126957.shtm"
+      ]
+    },
+    {
+      "stationName": "龙湖中环北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "龙湖中环南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "龙湖北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    },
+    {
+      "stationName": "龙湖南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往郎庄",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "郑州地铁4号线",
+          "direction": "开往老鸦陈",
+          "firstTime": "06:17",
+          "lastTime": "23:53"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.zz.bendibao.com/ditie/shike_176.shtml",
+        "https://m.zz.bendibao.com/traffic/97534.shtm"
+      ]
+    }
+  ]
+}

@@ -172,6 +172,7 @@ struct MapContainerView: View {
             stationOpenTask?.cancel()
             centerOnUserTask?.cancel()
             isLoadingStationDetail = false
+            pendingResolvedItem = nil
         }
     }
 
@@ -397,6 +398,11 @@ struct MapContainerView: View {
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
         pendingResolvedItem = nil
+        // Dismiss any prior tap's sheet up front so "tappedPlace != nil" always means THIS
+        // tap's sheet in handlePlaceResolved — enforced here rather than relying on sheets
+        // blocking background map taps (true today, but a detent/background-interaction
+        // change would silently route the new resolve into the old sheet).
+        tappedPlace = nil
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
             guard !Task.isCancelled else { return }

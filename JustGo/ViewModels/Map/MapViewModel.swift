@@ -193,7 +193,7 @@ final class MapViewModel {
     private func loadNetworks(cityIDs: [String]) async {
         let requested = Set(cityIDs)
         let retained = metroNetworks.filter { requested.contains($0.cityID) }
-        var loadedByCity = Dictionary(uniqueKeysWithValues: retained.map { ($0.cityID, $0) })
+        var loadedByCity = Dictionary(retained.map { ($0.cityID, $0) }, uniquingKeysWith: { first, _ in first })
 
         await withTaskGroup(of: (MetroNetwork?, [Station]).self) { group in
             for cityID in requested where loadedByCity[cityID] == nil {

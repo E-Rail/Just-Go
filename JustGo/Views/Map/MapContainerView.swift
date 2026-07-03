@@ -339,8 +339,13 @@ struct MapContainerView: View {
     }
 
     private func openStation(_ station: Station) {
-        // Opening a station always wins over a place card — dismiss any place sheet (e.g. one still
-        // loading from a prior POI tap) so the two `.sheet` presentations can't contend.
+        // Opening a station always wins over a place card — dismiss any place sheet AND cancel a
+        // prior POI tap's still-running station match, which would otherwise present a place
+        // sheet over/after this station navigation when it eventually completes. (Self-cancel is
+        // fine on the paths where placeMatchTask itself calls openStation: nothing runs after
+        // that call, and stationOpenTask below is a fresh Task that doesn't inherit cancellation.)
+        placeMatchTask?.cancel()
+        pendingResolvedItem = nil
         tappedPlace = nil
         stationOpenTask?.cancel()
         stationOpenGeneration += 1

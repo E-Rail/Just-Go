@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import UIKit
 
 /// A tapped Apple POI. `id` is stable for the lifetime of the tap so that flipping
 /// `resolvedItem` from nil → the resolved `MKMapItem` updates the already-presented sheet
@@ -10,6 +11,15 @@ private struct TappedPlace: Identifiable {
     let name: String
     let coordinate: CLLocationCoordinate2D
     var resolvedItem: MKMapItem?
+}
+
+/// Reports the search pill's rendered bottom edge (post-padding/shadow) in `.global` space,
+/// so the results dropdown's height cap tracks Dynamic Type growth instead of a hardcoded offset.
+private struct SearchBarBottomYKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
 }
 
 struct MapContainerView: View {
@@ -26,7 +36,11 @@ struct MapContainerView: View {
     @State private var centerOnUserTask: Task<Void, Never>?
     @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var searchBarBottomY: CGFloat = 0
     @FocusState private var isSearchFocused: Bool
+
+    private let searchDropdownSpacing: CGFloat = 8
 
     var body: some View {
         NavigationStack {
@@ -86,9 +100,27 @@ struct MapContainerView: View {
             .padding(.bottom, 10)
             .zIndex(2)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle(AppLocalization.localized("Map"))
         .toolbar(.hidden, for: .navigationBar)
         .toolbarBackground(.visible, for: .tabBar)
+        .onPreferenceChange(SearchBarBottomYKey.self) { searchBarBottomY = $0 }
+        // keyboardWillChangeFrame alone covers show, hide, and in-place resizes (QuickType
+        // bar, predictive text) so one observer suffices; keyboardWillHide is a defensive
+        // reset in case a dismissal path doesn't fire a frame-change notification.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+            withAnimation(.easeInOut(duration: duration)) {
+                keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
+            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+            withAnimation(.easeInOut(duration: duration)) {
+                keyboardHeight = 0
+            }
+        }
         .navigationDestination(item: $selectedStation) { station in
             StationDetailView(station: station)
         }
@@ -160,7 +192,7 @@ struct MapContainerView: View {
     }
 
     private var topControls: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: searchDropdownSpacing) {
             HStack(spacing: 10) {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -210,6 +242,11 @@ struct MapContainerView: View {
                 .contentShape(Rectangle())
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear.preference(key: SearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
+                    }
+                }
                 .onTapGesture {
                     isSearchFocused = true
                 }
@@ -231,41 +268,52 @@ struct MapContainerView: View {
         .zIndex(20)
     }
 
-    private var searchResultsDropdown: some View {
-        VStack(spacing: 0) {
-            ForEach(viewModel?.searchResults ?? []) { place in
-                Button {
-                    selectSearchResult(place)
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "mappin.circle.fill")
-                            .foregroundStyle(.secondary)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(place.name)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .lineLimit(1)
-                            if let address = place.address, !address.isEmpty {
-                                Text(address)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                        }
-                        Spacer()
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+    // keyboardTopY and searchBarBottomY are both measured in `.global` screen space, matching
+    // UIScreen.main.bounds, so this needs no window-relative coordinate conversion.
+    private var searchDropdownMaxHeight: CGFloat {
+        let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
+        return max(0, keyboardTopY - searchBarBottomY - searchDropdownSpacing)
+    }
 
-                if place.id != viewModel?.searchResults.last?.id {
-                    Divider()
-                        .padding(.leading, 12)
+    private var searchResultsDropdown: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                ForEach(viewModel?.searchResults ?? []) { place in
+                    Button {
+                        selectSearchResult(place)
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(place.name)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .lineLimit(1)
+                                if let address = place.address, !address.isEmpty {
+                                    Text(address)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
+                    if place.id != viewModel?.searchResults.last?.id {
+                        Divider()
+                            .padding(.leading, 12)
+                    }
                 }
             }
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .frame(maxHeight: searchDropdownMaxHeight)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }

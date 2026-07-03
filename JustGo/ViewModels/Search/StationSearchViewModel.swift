@@ -40,6 +40,10 @@ final class StationSearchViewModel {
     func loadInitialStations(city: String) async {
         let loadID = UUID()
         stationLoadID = loadID
+        // Minting a new token supersedes any in-flight keyword search, whose defer then
+        // (correctly) refuses to touch the spinner — so clear it here, or a city switch
+        // mid-search leaves isSearching stuck true with nothing left to reset it.
+        isSearching = false
         if city != currentCityID {
             currentCityID = city
             facilityEnrichmentTask?.cancel()

@@ -130,7 +130,10 @@ struct MapContainerView: View {
         .onChange(of: selectedStation?.id) { _, newID in
             if newID == nil { isLoadingStationDetail = false }
         }
-        .sheet(item: $tappedPlace, onDismiss: { tappedPlace = nil }) { place in
+        // No onDismiss here: sheet(item:) already nils the binding on dismissal, and an
+        // explicit `tappedPlace = nil` closure would fire for the OLD sheet's dismissal —
+        // clobbering a new tap's sheet presented while the old one was still animating out.
+        .sheet(item: $tappedPlace) { place in
             Group {
                 if let item = place.resolvedItem {
                     MapItemDetailSheet(mapItem: item) {

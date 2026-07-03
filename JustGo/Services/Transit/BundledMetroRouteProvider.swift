@@ -116,8 +116,10 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         if let graph = graphs[key] {
             return graph
         }
-        let stationsByID = Dictionary(uniqueKeysWithValues: network.stations.map { ($0.id, $0) })
-        let linesByID = Dictionary(uniqueKeysWithValues: network.lines.map { ($0.id, $0) })
+        // Tolerate duplicated ids in a data pack (keep the first) instead of trapping —
+        // a single malformed pack entry must not crash route search.
+        let stationsByID = Dictionary(network.stations.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let linesByID = Dictionary(network.lines.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var adjacency: [String: [MetroGraphEdge]] = [:]
         var edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]] = [:]
         var seenEdges = Set<MetroGraphEdgeKey>()
@@ -165,7 +167,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         }
 
         let destinationsByID = Dictionary(
-            uniqueKeysWithValues: context.destinationStations.map { ($0.station.id, $0) }
+            context.destinationStations.map { ($0.station.id, $0) },
+            uniquingKeysWith: { first, _ in first }
         )
         var best: (state: MetroSearchState, destination: MetroStationCandidate, cost: Double)?
         while let item = heap.removeMin() {

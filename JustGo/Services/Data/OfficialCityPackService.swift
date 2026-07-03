@@ -215,11 +215,27 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func enrichLoadedStation(_ station: Station) -> Station {
         guard let item = stationRecord(cityID: station.cityID, stationName: station.name) else { return station }
+        // Station is a reference type, and callers pass in instances the main thread may
+        // already be rendering — mutating those here (on the actor's executor) races the UI.
+        // Enrich a copy instead; every caller consumes the returned station.
+        let enriched = Station(
+            stationID: station.stationID,
+            name: station.name,
+            nameEn: station.nameEn,
+            namePinyin: station.namePinyin,
+            latitude: station.latitude,
+            longitude: station.longitude,
+            cityID: station.cityID,
+            isTransferStation: station.isTransferStation
+        )
+        enriched.lines = station.lines
         if let data = item.accessibility?.data {
-            station.accessibility = StationAccessibility(stationID: station.stationID, data: data)
+            enriched.accessibility = StationAccessibility(stationID: station.stationID, data: data)
+        } else {
+            enriched.accessibility = station.accessibility
         }
-        station.facilities = item.facilities(for: station.stationID)
-        return station
+        enriched.facilities = item.facilities(for: station.stationID)
+        return enriched
     }
 
     func stationMap(for station: Station) async -> CityPackStationMap? {

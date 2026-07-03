@@ -523,15 +523,21 @@ private struct RouteStationGuideSheet: View {
             }
         }
         .task {
-            let place = TransitPlace(
-                name: stop.name,
-                coordinate: CLLocationCoordinate2D(
-                    latitude: stop.coordinate?.latitude ?? 0,
-                    longitude: stop.coordinate?.longitude ?? 0
-                ),
-                source: .localStationData
-            )
-            station = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            // Only match when the stop carries a real coordinate — matching with a (0,0)
+            // placeholder disambiguates same-named stations by distance to Null Island and
+            // can pick the wrong one. A coordinate-less stop falls through to the
+            // name-based fallback instead.
+            if let coordinate = stop.coordinate {
+                let place = TransitPlace(
+                    name: stop.name,
+                    coordinate: CLLocationCoordinate2D(
+                        latitude: coordinate.latitude,
+                        longitude: coordinate.longitude
+                    ),
+                    source: .localStationData
+                )
+                station = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            }
             didResolve = true
         }
     }

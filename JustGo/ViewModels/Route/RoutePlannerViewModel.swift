@@ -285,7 +285,6 @@ final class RoutePlannerViewModel {
         TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
     }
 
-    var canQuickRouteHome: Bool { quickPlace(for: .home) != nil }
     var canQuickRouteWork: Bool { quickPlace(for: .company) != nil }
 
     func quickRoute(to kind: QuickPlaceKind) async {

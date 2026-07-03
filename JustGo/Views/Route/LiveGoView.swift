@@ -1,4 +1,5 @@
 import SwiftUI
+import MapKit
 
 @Observable
 final class LiveGoViewModel {
@@ -117,6 +118,8 @@ struct LiveGoView: View {
                     .multilineTextAlignment(.center)
             }
 
+            mapSection(for: step)
+
             if let stopsLeft = step.rideStopsRemainingText {
                 Text(stopsLeft)
                     .font(.headline)
@@ -159,6 +162,43 @@ struct LiveGoView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(step.accessibilityLabel)
+    }
+
+    /// Nothing renders when coordinate/path data is unavailable (e.g. MKDirections failed) —
+    /// falls back to the plain icon+title+detail card rather than showing a broken/blank map.
+    @ViewBuilder
+    private func mapSection(for step: TripStep) -> some View {
+        switch step.kind {
+        case .transfer:
+            if let coordinate = step.transferCLCoordinate {
+                VStack(spacing: 6) {
+                    StepMapPreview(mode: .station(coordinate: coordinate), tint: color(for: step))
+                    Text(AppLocalization.text(
+                        english: "3D station preview",
+                        simplified: "车站 3D 预览",
+                        traditional: "車站 3D 預覽"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+        case .walkToStation, .walkToDestination:
+            let path = step.walkingPathCLCoordinates
+            if path.count > 1 {
+                VStack(spacing: 6) {
+                    StepMapPreview(mode: .walkingRoute(coordinates: path), tint: themeColor)
+                    Text(AppLocalization.text(
+                        english: "Apple Maps walking route",
+                        simplified: "Apple 地图步行路线",
+                        traditional: "Apple 地圖步行路線"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+        case .ride, .arrive:
+            EmptyView()
+        }
     }
 
     private var controls: some View {

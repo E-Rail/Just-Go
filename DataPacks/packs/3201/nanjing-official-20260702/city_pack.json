@@ -1,0 +1,7184 @@
+{
+  "schemaVersion": 1,
+  "cityID": "3201",
+  "version": "nanjing-official-20260702",
+  "generatedAt": "2026-07-02T00:00:00Z",
+  "sourceURLs": [
+    "http://nj.bendibao.com/live/2023129/146870.shtm",
+    "http://nj.bendibao.com/news/20231228/162269.shtm",
+    "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+    "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+    "http://nj.bendibao.com/traffic/20251219/177926.shtm",
+    "http://nj.bendibao.com/traffic/202586/175383.shtm",
+    "http://nj.bendibao.com/traffic/2026421/180129.shtm",
+    "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+    "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+    "https://m.nj.bendibao.com/ditie/time.shtml"
+  ],
+  "capabilities": {
+    "accessibility": "source_pending",
+    "schedules": "partial_static",
+    "liveArrivals": "schedule_only",
+    "stationMaps": "source_pending"
+  },
+  "liveProvider": "schedule_only",
+  "sourceAttribution": "南京公共静态时刻表数据",
+  "stations": [
+    {
+      "stationName": "丁家庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "丁家庄南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "七桥瓮",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "万寿",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "三山街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "上元门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "上海路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "上秦淮西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "下关",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "东大九龙湖校区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "东大成贤学院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "东山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "东山香樟园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "东流",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "东郊小镇",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "东麒路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "中华门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "中国药科大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "中山湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "中胜",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "九华山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "九龙湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "九龙湖南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "云南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "五台山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "五塘广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/live/2023129/146870.shtm"
+      ]
+    },
+    {
+      "stationName": "仙新路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "仙林湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "信息工程大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "元通",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "光华门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "八卦洲大桥南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "八百桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "六合开发区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "共青团路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "凤凰山公园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "前庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "化工园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "华阳",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "南京交院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "南京南站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm"
+      ]
+    },
+    {
+      "stationName": "南京工业大学",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "南京林业大学·新庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "南京猿人洞",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "南京站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm"
+      ]
+    },
+    {
+      "stationName": "南京西站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "南医大·江苏经贸学院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "南湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "卡子门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm",
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "卧龙湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "卸甲甸",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "双龙大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "古平岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "古泉",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "句容",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "吉印大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "吉祥庵",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "嘉陵江东街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "团结圩",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "大厂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "大士茶亭",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "大明路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "大校场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm",
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "大行宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "天元西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "天印大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "天润城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "天隆寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "太清路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "太白",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "夫子庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "奥体中心",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "姑孰",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "孟北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "安德门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "宏运大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "小市",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "小行",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "小龙湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "尧化新村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "尧化门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "岗子村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "崇明",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "常府街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "幕府山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "幕府西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "幸庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "应天大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "张府园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "徐庄·苏宁总部",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "慈湖高新区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "承天大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "文德路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "文靖路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "新亭路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "新城科技园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "新模范马路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "新街口",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "方家营",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "方洲广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "无想山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "明发广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "明觉",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "星火路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "晓庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm"
+      ]
+    },
+    {
+      "stationName": "朝天宫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "机场跑道旧址",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "杨庄",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "板桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "板桥南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "林场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "柘塘",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "柳洲东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "梦都大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "梦都大街东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "正方中路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "武定门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "毛纺厂路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "永初路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "汇通路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "江宁滨江开发区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "江宁镇",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "江心洲",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "汤山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "沈桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "河定桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "河海大学·佛城西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "泉都大街",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "泰冯路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm"
+      ]
+    },
+    {
+      "stationName": "泰山新村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "浦口万汇城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "浮桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "清凉山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "湖北路・二中",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "湖南路・安工大",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "溧水",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "灵山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "燕子矶",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "牧龙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "玄武门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "王家湾",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "珠江路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "百家湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "百水桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "盐仓桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "石杨路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "石湫",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "石门坎",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "神机营",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "禄口机场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "福建路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "科宁路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "秣周东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "秣陵",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "空港新城江宁",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "空港新城溧水",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "童世界",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "竹山路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "笆斗山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "红山动物园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "绿博园",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "群力",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往无想山方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S7号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "翔宇路北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "翔宇路南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "翠屏山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往空港新城江宁方向",
+          "firstTime": "06:00",
+          "lastTime": "22:40"
+        },
+        {
+          "lineName": "南京地铁S1号线",
+          "direction": "开往南京南站方向",
+          "firstTime": "05:57",
+          "lastTime": "22:40"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "聚宝山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "胜太西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "胜太路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "花神庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "草场门·南艺·二师",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "莫愁湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "葛塘",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "蒋王庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "虹桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "螺塘路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "西善桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "西岗桦墅",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "诚信大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm",
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "软件大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "迈皋桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "通济门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "金牛湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "金马路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "钟阜路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往仙新路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁7号线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/news/20231228/162269.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "铜井",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "铜山",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "长江大桥北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "长芦",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "阳湖",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "雄州",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "雨山东路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "雨山路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "雨花台",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "雨花经济开发区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "雨花门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/live/2023129/146870.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "青春广场",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "静海寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往九龙湖南方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁5号线",
+          "direction": "开往大校场方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/202586/175383.shtm"
+      ]
+    },
+    {
+      "stationName": "马群",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "马鞍山经开区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往太白方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S2号线/宁马线",
+          "direction": "开往西善桥方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2026421/180132.shtm",
+        "http://nj.bendibao.com/traffic/2026421/180129.shtm"
+      ]
+    },
+    {
+      "stationName": "高新开发区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "高桥门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "高淳",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往高淳方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        },
+        {
+          "lineName": "南京地铁S9号线",
+          "direction": "开往翔宇路南方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "鸡鸣寺",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往秣陵方向",
+          "firstTime": "05:50",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁3号线",
+          "direction": "开往林场方向",
+          "firstTime": "05:35",
+          "lastTime": "23:05"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/live/2023129/146870.shtm"
+      ]
+    },
+    {
+      "stationName": "麒麟门",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "黄梅",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往句容方向",
+          "firstTime": "06:00",
+          "lastTime": "22:30"
+        },
+        {
+          "lineName": "南京地铁S6号线",
+          "direction": "开往马群方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "鼓楼",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml",
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm"
+      ]
+    },
+    {
+      "stationName": "龙华路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往东麒路方向",
+          "firstTime": "05:40",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁10号线",
+          "direction": "开往雨山路方向",
+          "firstTime": "06:00",
+          "lastTime": "23:15"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/20251218/177916.shtm",
+        "http://nj.bendibao.com/traffic/20251219/177926.shtm"
+      ]
+    },
+    {
+      "stationName": "龙江",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往仙林湖方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        },
+        {
+          "lineName": "南京地铁4号线",
+          "direction": "开往龙江方向",
+          "firstTime": "06:00",
+          "lastTime": "23:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "龙池",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往金牛湖方向",
+          "firstTime": "06:02",
+          "lastTime": "22:22"
+        },
+        {
+          "lineName": "南京地铁S8号线",
+          "direction": "开往泰冯路方向",
+          "firstTime": "06:00",
+          "lastTime": "22:00"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://wenda.bendibao.com/traffic/201994/58604.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    },
+    {
+      "stationName": "龙眠大道",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往中国药科大学方向",
+          "firstTime": "05:30",
+          "lastTime": "23:08"
+        },
+        {
+          "lineName": "南京地铁1号线",
+          "direction": "开往八卦洲大桥南方向",
+          "firstTime": "05:47",
+          "lastTime": "23:27"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "http://nj.bendibao.com/traffic/2022913/138526.shtm",
+        "https://m.nj.bendibao.com/ditie/time.shtml"
+      ]
+    }
+  ]
+}

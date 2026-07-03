@@ -46,12 +46,8 @@
           "lastTime": "0:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -81,12 +77,8 @@
           "lastTime": "23:40"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -110,12 +102,8 @@
           "lastTime": "23:18"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -157,12 +145,8 @@
           "lastTime": "23:48"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -210,12 +194,8 @@
           "lastTime": "23:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -239,12 +219,8 @@
           "lastTime": "0:07"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -268,12 +244,8 @@
           "lastTime": "23:52"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -297,12 +269,8 @@
           "lastTime": "22:49"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -332,12 +300,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -385,12 +349,8 @@
           "lastTime": "23:17"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -414,30 +374,8 @@
           "lastTime": "23:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
-      "stationName": "东新园站",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -491,12 +429,8 @@
           "lastTime": "23:12"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -512,12 +446,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "母婴室、第三卫生间位于C出入口通道，两部垂梯分别位于C口及站厅中部"
         ]
@@ -536,12 +466,8 @@
           "lastTime": "22:55"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -565,12 +491,8 @@
           "lastTime": "23:42"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -594,12 +516,8 @@
           "lastTime": "22:59"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -635,12 +553,8 @@
           "lastTime": "23:38"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -664,12 +578,8 @@
           "lastTime": "23:58"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -693,12 +603,8 @@
           "lastTime": "22:36"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -722,12 +628,8 @@
           "lastTime": "0:00"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -749,17 +651,21 @@
           "direction": "往龙安方向",
           "firstTime": "6:23",
           "lastTime": "23:54"
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
+        "https://www.hzmetro.com/api/operation/all",
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
       ]
     },
     {
@@ -780,12 +686,8 @@
           "lastTime": "22:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -821,12 +723,8 @@
           "lastTime": "23:06"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -850,12 +748,8 @@
           "lastTime": "23:47"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -879,12 +773,8 @@
           "lastTime": "23:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -914,12 +804,8 @@
           "lastTime": "23:43"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -949,12 +835,8 @@
           "lastTime": "23:45"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -972,12 +854,8 @@
           "lastTime": "22:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1001,12 +879,8 @@
           "lastTime": "23:37"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1036,12 +910,8 @@
           "lastTime": "0:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1065,12 +935,8 @@
           "lastTime": "23:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1100,12 +966,8 @@
           "lastTime": "23:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1129,12 +991,8 @@
           "lastTime": "0:08"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1164,12 +1022,8 @@
           "lastTime": "23:31"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1205,12 +1059,8 @@
           "lastTime": "23:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1246,12 +1096,8 @@
           "lastTime": "22:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1275,12 +1121,8 @@
           "lastTime": "23:09"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1304,12 +1146,8 @@
           "lastTime": "23:19"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1345,12 +1183,8 @@
           "lastTime": "23:14"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1374,12 +1208,8 @@
           "lastTime": "23:11"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1403,12 +1233,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1424,12 +1250,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "目前投入使用的为A口、B1口、B2口、D口共4个出入口，垂梯位于B2口，C口为预留口暂不开放"
         ]
@@ -1460,12 +1282,8 @@
           "lastTime": "23:48"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1495,12 +1313,8 @@
           "lastTime": "23:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1524,12 +1338,8 @@
           "lastTime": "22:45"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1553,12 +1363,8 @@
           "lastTime": "22:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1582,12 +1388,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1617,12 +1419,8 @@
           "lastTime": "23:31"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1646,12 +1444,8 @@
           "lastTime": "22:40"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1675,12 +1469,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1704,12 +1494,8 @@
           "lastTime": "23:07"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1751,12 +1537,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1804,12 +1586,8 @@
           "lastTime": "0:08"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1833,12 +1611,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1862,12 +1636,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1915,12 +1685,8 @@
           "lastTime": "23:54"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1956,12 +1722,8 @@
           "lastTime": "0:05"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -1985,12 +1747,8 @@
           "lastTime": "22:54"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2006,12 +1764,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "车站共设计5个出入口，分别是A口、B口、C口、D口、E口（出入口暂未开通，无障碍电梯可使用）"
         ]
@@ -2048,12 +1802,8 @@
           "lastTime": "23:14"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2077,12 +1827,8 @@
           "lastTime": "22:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2090,24 +1836,6 @@
     },
     {
       "stationName": "南湖东",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
-      "stationName": "南湖东站",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -2124,12 +1852,8 @@
           "lastTime": "23:08"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2153,12 +1877,8 @@
           "lastTime": "23:57"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2182,12 +1902,8 @@
           "lastTime": "22:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2211,12 +1927,8 @@
           "lastTime": "22:46"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2252,12 +1964,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2281,12 +1989,8 @@
           "lastTime": "22:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2302,12 +2006,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "垂梯位于A出入口"
         ]
@@ -2320,12 +2020,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2341,12 +2037,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "垂梯位于D出入口，卫生间和母婴室位于A出入口"
         ]
@@ -2365,12 +2057,8 @@
           "lastTime": "22:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2418,12 +2106,8 @@
           "lastTime": "23:20"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2447,12 +2131,8 @@
           "lastTime": "23:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2500,12 +2180,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2553,12 +2229,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2582,12 +2254,8 @@
           "lastTime": "23:03"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2635,12 +2303,8 @@
           "lastTime": "23:57"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2664,12 +2328,8 @@
           "lastTime": "22:35"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2693,12 +2353,8 @@
           "lastTime": "22:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2722,12 +2378,8 @@
           "lastTime": "23:43"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2751,12 +2403,8 @@
           "lastTime": "22:47"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2780,12 +2428,8 @@
           "lastTime": "23:15"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2827,12 +2471,8 @@
           "lastTime": "23:42"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2892,12 +2532,8 @@
           "lastTime": "23:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2921,12 +2557,8 @@
           "lastTime": "22:57"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -2956,12 +2588,8 @@
           "lastTime": "23:20"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3003,12 +2631,8 @@
           "lastTime": "23:15"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3032,12 +2656,8 @@
           "lastTime": "22:37"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3061,12 +2681,8 @@
           "lastTime": "0:09"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3096,12 +2712,8 @@
           "lastTime": "23:11"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3149,12 +2761,8 @@
           "lastTime": "23:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3184,12 +2792,8 @@
           "lastTime": "23:40"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3205,12 +2809,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "站台为岛式站台，负一层A口及负二层均设有洗手间及第三卫生间，母婴室位于负一层A口，垂梯位于C口、D4口、K口"
         ]
@@ -3259,12 +2859,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3288,12 +2884,8 @@
           "lastTime": "23:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3311,12 +2903,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3346,12 +2934,8 @@
           "lastTime": "23:15"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3387,30 +2971,8 @@
           "lastTime": "23:53"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
-      "stationName": "学院路站",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3440,12 +3002,8 @@
           "lastTime": "23:19"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3469,12 +3027,8 @@
           "lastTime": "23:21"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3516,12 +3070,8 @@
           "lastTime": "23:48"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3537,12 +3087,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "车站共设有4个出入口，分别为A口、B口、C口、D口，卫生间位于C出入口"
         ]
@@ -3561,12 +3107,8 @@
           "lastTime": "22:40"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3596,12 +3138,8 @@
           "lastTime": "22:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3631,12 +3169,8 @@
           "lastTime": "22:35"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3660,12 +3194,8 @@
           "lastTime": "23:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3713,12 +3243,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3742,12 +3268,8 @@
           "lastTime": "23:48"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3771,12 +3293,8 @@
           "lastTime": "23:54"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3800,12 +3318,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3829,12 +3343,8 @@
           "lastTime": "23:36"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3870,12 +3380,8 @@
           "lastTime": "23:19"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3911,12 +3417,8 @@
           "lastTime": "23:20"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3940,12 +3442,8 @@
           "lastTime": "23:16"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -3987,12 +3485,8 @@
           "lastTime": "23:36"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4034,12 +3528,8 @@
           "lastTime": "23:19"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4075,12 +3565,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4122,12 +3608,8 @@
           "lastTime": "23:25"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4157,12 +3639,8 @@
           "lastTime": "23:37"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4186,12 +3664,8 @@
           "lastTime": "23:21"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4221,12 +3695,8 @@
           "lastTime": "22:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4268,12 +3738,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4289,12 +3755,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "车站共设4个出入口（D出入口为垂梯出入口）"
         ]
@@ -4313,12 +3775,8 @@
           "lastTime": "0:01"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4348,12 +3806,8 @@
           "lastTime": "23:58"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4389,12 +3843,8 @@
           "lastTime": "0:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4418,12 +3868,8 @@
           "lastTime": "23:18"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4453,12 +3899,8 @@
           "lastTime": "23:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4488,12 +3930,8 @@
           "lastTime": "23:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4553,12 +3991,8 @@
           "lastTime": "23:47"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4588,12 +4022,8 @@
           "lastTime": "23:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4617,12 +4047,8 @@
           "lastTime": "22:53"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4640,12 +4066,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4675,12 +4097,8 @@
           "lastTime": "23:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4704,12 +4122,8 @@
           "lastTime": "22:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4739,12 +4153,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4774,12 +4184,8 @@
           "lastTime": "23:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4803,12 +4209,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4844,12 +4246,8 @@
           "lastTime": "23:46"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4873,12 +4271,8 @@
           "lastTime": "22:35"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4914,12 +4308,8 @@
           "lastTime": "23:29"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4949,12 +4339,8 @@
           "lastTime": "23:28"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -4978,12 +4364,8 @@
           "lastTime": "23:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5001,12 +4383,8 @@
           "lastTime": "23:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5030,12 +4408,8 @@
           "lastTime": "0:17"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5065,12 +4439,8 @@
           "lastTime": "23:01"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5094,12 +4464,8 @@
           "lastTime": "23:11"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5123,12 +4489,8 @@
           "lastTime": "22:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5158,12 +4520,8 @@
           "lastTime": "0:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5187,12 +4545,8 @@
           "lastTime": "23:27"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5228,12 +4582,8 @@
           "lastTime": "23:53"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5269,12 +4619,8 @@
           "lastTime": "23:03"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5298,12 +4644,8 @@
           "lastTime": "22:50"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5319,12 +4661,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "卫生间、母婴室和无障碍卫生间位于A出入口"
         ]
@@ -5337,12 +4675,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5366,12 +4700,8 @@
           "lastTime": "23:40"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5419,12 +4749,8 @@
           "lastTime": "23:59"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5448,12 +4774,8 @@
           "lastTime": "23:08"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5519,12 +4841,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5584,12 +4902,8 @@
           "lastTime": "23:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5619,12 +4933,8 @@
           "lastTime": "23:09"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5640,12 +4950,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "周边建筑以居民区、商业区、工业园、学校为主，其中空港新天地商场与H口衔接，站点南侧为萧山区靖江镇初级中学、申通快递，北侧为杭州临空SOHO创意港、靖江工业园区、恒8酒店、西侧主要有菲尼克斯电梯公司、申通快递华东分拨中心，东侧主要有花神庙社区、伟南社区"
         ]
@@ -5670,12 +4976,8 @@
           "lastTime": "22:45"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5705,12 +5007,8 @@
           "lastTime": "23:59"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5728,12 +5026,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5775,12 +5069,8 @@
           "lastTime": "23:13"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5804,12 +5094,8 @@
           "lastTime": "23:00"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5825,12 +5111,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "站厅层设置母婴室和无障碍卫生间，垂直电梯位于C口"
         ]
@@ -5861,12 +5143,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5890,12 +5168,8 @@
           "lastTime": "23:23"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5925,12 +5199,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -5984,12 +5254,8 @@
           "lastTime": "23:26"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6007,12 +5273,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6022,15 +5284,9 @@
       "stationName": "汤家村",
       "stationID": null,
       "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "schedules": [],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6078,12 +5334,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6125,12 +5377,8 @@
           "lastTime": "23:37"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6154,12 +5402,8 @@
           "lastTime": "23:11"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6189,12 +5433,8 @@
           "lastTime": "23:11"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6224,12 +5464,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6253,12 +5489,8 @@
           "lastTime": "23:00"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6288,12 +5520,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6317,12 +5545,8 @@
           "lastTime": "23:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6346,12 +5570,8 @@
           "lastTime": "22:41"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6375,12 +5595,8 @@
           "lastTime": "23:00"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6410,12 +5626,8 @@
           "lastTime": "23:07"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6457,12 +5669,8 @@
           "lastTime": "22:48"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6478,12 +5686,8 @@
         "hasWheelchairRamp": true,
         "hasTactilePath": null,
         "hasAccessibleRestroom": true,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "本站设有自动售票机、无障碍电梯、母婴室、无障碍卫生间、AED、轮椅斜坡板、宽通道闸机、低位票亭、母婴室、老年乘客爱心候车区，还可进行爱心预约服务，为周边乘客提供了切实的便利"
         ]
@@ -6502,12 +5706,8 @@
           "lastTime": "23:06"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6555,12 +5755,8 @@
           "lastTime": "23:36"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6608,12 +5804,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6637,12 +5829,8 @@
           "lastTime": "22:35"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6684,12 +5872,8 @@
           "lastTime": "23:15"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6713,12 +5897,8 @@
           "lastTime": "23:45"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6734,12 +5914,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "目前投入使用的为A、C1、D，共3个出入口，C2、C3、C4、C5及C5口垂梯暂未开通"
         ]
@@ -6764,12 +5940,8 @@
           "lastTime": "23:16"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6799,12 +5971,8 @@
           "lastTime": "22:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6828,12 +5996,8 @@
           "lastTime": "0:14"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6857,12 +6021,8 @@
           "lastTime": "23:38"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6886,12 +6046,8 @@
           "lastTime": "23:00"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6915,12 +6071,8 @@
           "lastTime": "23:25"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6944,12 +6096,8 @@
           "lastTime": "0:01"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -6973,12 +6121,8 @@
           "lastTime": "22:30"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7002,12 +6146,8 @@
           "lastTime": "23:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7031,12 +6171,8 @@
           "lastTime": "23:03"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7052,12 +6188,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "垂梯位于A口"
         ]
@@ -7076,12 +6208,8 @@
           "lastTime": "23:59"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7105,12 +6233,8 @@
           "lastTime": "23:29"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7134,12 +6258,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7193,12 +6313,8 @@
           "lastTime": "0:13"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7234,12 +6350,8 @@
           "lastTime": "23:01"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7263,12 +6375,8 @@
           "lastTime": "23:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7292,12 +6400,8 @@
           "lastTime": "23:21"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7321,12 +6425,8 @@
           "lastTime": "23:58"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7356,12 +6456,8 @@
           "lastTime": "23:06"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7391,12 +6487,8 @@
           "lastTime": "23:08"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7420,12 +6512,8 @@
           "lastTime": "23:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7449,12 +6537,8 @@
           "lastTime": "22:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7472,12 +6556,8 @@
           "lastTime": "23:02"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7507,12 +6587,8 @@
           "lastTime": "0:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7536,12 +6612,8 @@
           "lastTime": "23:28"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7589,12 +6661,8 @@
           "lastTime": "23:15"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7602,24 +6670,6 @@
     },
     {
       "stationName": "荆长路",
-      "stationID": null,
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
-      "serviceStatus": null,
-      "sourceURLs": [
-        "https://www.hzmetro.com/api/operation/all"
-      ]
-    },
-    {
-      "stationName": "荆长路站",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -7642,12 +6692,8 @@
           "lastTime": "23:24"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7671,12 +6717,8 @@
           "lastTime": "0:06"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7706,12 +6748,8 @@
           "lastTime": "23:19"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7741,12 +6779,8 @@
           "lastTime": "23:45"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7788,12 +6822,8 @@
           "lastTime": "22:49"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7823,12 +6853,8 @@
           "lastTime": "0:10"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7858,12 +6884,8 @@
           "lastTime": "23:53"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7879,12 +6901,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "卫生间和母婴室位于A出入口"
         ]
@@ -7903,12 +6921,8 @@
           "lastTime": "22:46"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7932,12 +6946,8 @@
           "lastTime": "0:05"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7967,12 +6977,8 @@
           "lastTime": "23:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -7996,12 +7002,8 @@
           "lastTime": "23:32"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8037,12 +7039,8 @@
           "lastTime": "23:09"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8126,12 +7124,8 @@
           "lastTime": "23:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8161,12 +7155,8 @@
           "lastTime": "23:27"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8214,12 +7204,8 @@
           "lastTime": "23:13"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8255,12 +7241,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8296,12 +7278,8 @@
           "lastTime": "23:17"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8349,12 +7327,8 @@
           "lastTime": "23:18"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8378,12 +7352,8 @@
           "lastTime": "22:38"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8401,12 +7371,8 @@
           "lastTime": "22:54"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8430,12 +7396,8 @@
           "lastTime": "0:03"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8459,12 +7421,8 @@
           "lastTime": "22:51"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8500,12 +7458,8 @@
           "lastTime": "23:59"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8529,12 +7483,8 @@
           "lastTime": "23:38"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8564,12 +7514,8 @@
           "lastTime": "0:17"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8599,12 +7545,8 @@
           "lastTime": "23:54"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8628,12 +7570,8 @@
           "lastTime": "22:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8681,12 +7619,8 @@
           "lastTime": "23:36"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8740,12 +7674,8 @@
           "lastTime": "23:26"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8761,12 +7691,8 @@
         "hasWheelchairRamp": null,
         "hasTactilePath": null,
         "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-
-        ],
+        "elevatorLocations": [],
+        "accessibleEntrances": [],
         "facilityNotes": [
           "卫生间和母婴室位于A出入口"
         ]
@@ -8785,12 +7711,8 @@
           "lastTime": "22:49"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8838,12 +7760,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8873,12 +7791,8 @@
           "lastTime": "23:33"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8902,12 +7816,8 @@
           "lastTime": "22:35"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8931,12 +7841,8 @@
           "lastTime": "23:56"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -8972,12 +7878,8 @@
           "lastTime": "22:34"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9001,12 +7903,8 @@
           "lastTime": "22:42"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9030,12 +7928,8 @@
           "lastTime": "22:49"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9059,12 +7953,8 @@
           "lastTime": "23:14"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9088,12 +7978,8 @@
           "lastTime": "22:57"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9117,12 +8003,8 @@
           "lastTime": "23:23"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9170,12 +8052,8 @@
           "lastTime": "23:39"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9205,12 +8083,8 @@
           "lastTime": "23:44"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9240,12 +8114,8 @@
           "lastTime": "23:06"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9269,12 +8139,8 @@
           "lastTime": "22:38"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9304,12 +8170,8 @@
           "lastTime": "23:55"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9345,12 +8207,8 @@
           "lastTime": "0:07"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9404,12 +8262,8 @@
           "lastTime": "23:25"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9457,12 +8311,8 @@
           "lastTime": "23:28"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9486,12 +8336,8 @@
           "lastTime": "23:26"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9509,12 +8355,8 @@
           "lastTime": "23:04"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9544,12 +8386,8 @@
           "lastTime": "23:22"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
@@ -9579,15 +8417,302 @@
           "lastTime": "22:53"
         }
       ],
-      "stationMaps": [
-
-      ],
-      "stationAssets": [
-
-      ],
+      "stationMaps": [],
+      "stationAssets": [],
       "serviceStatus": null,
       "sourceURLs": [
         "https://www.hzmetro.com/api/operation/all"
+      ]
+    },
+    {
+      "stationName": "许村",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "海宁高铁西站",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "长安(东方学院)",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "长安东",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "周王庙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "盐官",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "桐九公路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "斜桥",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "皮革城",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "海昌路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往浙大国际校区方向",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
+      ]
+    },
+    {
+      "stationName": "浙大国际校区",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "杭海城际铁路",
+          "direction": "往临平南高铁站方向",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [],
+      "stationMaps": [],
+      "stationAssets": [],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://zh.wikipedia.org/zh-hans/%E6%9D%AD%E6%B5%B7%E5%9F%8E%E9%99%85",
+        "https://m.hz.bendibao.com/traffic/103832.shtm"
       ]
     }
   ]

@@ -42563,6 +42563,207 @@
         "https://apis.gzmtr.com/app-map/serviceTime/list/龙潭",
         "https://apis.gzmtr.com/app-map/station/getDevice/龙潭"
       ]
+    },
+    {
+      "stationName": "机场南",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "三北线",
+          "direction": "开往 体育西路",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "三北线",
+          "direction": "开往 机场北（T2）",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/机场南",
+        "https://apis.gzmtr.com/app-map/station/getDevice/机场南"
+      ]
+    },
+    {
+      "stationName": "机场北",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "三北线",
+          "direction": "开往 体育西路",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/机场北",
+        "https://apis.gzmtr.com/app-map/station/getDevice/机场北"
+      ]
+    },
+    {
+      "stationName": "会展西",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "海珠有轨",
+          "direction": "开往 广州塔（有轨）",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "海珠有轨",
+          "direction": "开往 万胜围（有轨）",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/会展西",
+        "https://apis.gzmtr.com/app-map/station/getDevice/会展西",
+        "https://news.dayoo.com/guangzhou/202505/13/139995_54824570.htm"
+      ]
+    },
+    {
+      "stationName": "区少年宫（萝岗）",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "黄埔有轨1号线",
+          "direction": "开往 地铁香雪",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "黄埔有轨1号线",
+          "direction": "开往 新丰路",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/区少年宫（萝岗）",
+        "https://apis.gzmtr.com/app-map/station/getDevice/区少年宫（萝岗）"
+      ]
+    },
+    {
+      "stationName": "庆盛",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "四号线",
+          "direction": "开往 黄村",
+          "firstTime": "06:35",
+          "lastTime": "22:29"
+        },
+        {
+          "lineName": "四号线",
+          "direction": "开往 南沙客运港",
+          "firstTime": "06:46",
+          "lastTime": "23:26"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/庆盛",
+        "https://apis.gzmtr.com/app-map/station/getDevice/庆盛",
+        "https://ditie.mapbar.com/guangzhou_stationtime/ditie4haoxian/5w67RR7hP/"
+      ]
+    },
+    {
+      "stationName": "𧒽岗",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "广佛线",
+          "direction": "开往 沥滘",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "广佛线",
+          "direction": "开往 新城东",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://apis.gzmtr.com/app-map/metroweb/linestation",
+        "https://apis.gzmtr.com/app-map/serviceTime/list/𧒽岗",
+        "https://apis.gzmtr.com/app-map/station/getDevice/𧒽岗",
+        "https://baike.baidu.com/item/%F0%A7%92%BD%E5%B2%97%E7%AB%99/58941639"
+      ]
     }
   ]
 }

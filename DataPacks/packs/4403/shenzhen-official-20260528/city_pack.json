@@ -6215,7 +6215,7 @@
       ]
     },
     {
-      "stationName": "深圳北",
+      "stationName": "深圳北站",
       "stationID": null,
       "accessibility": null,
       "schedules": [
@@ -10504,6 +10504,209 @@
           "direction": "开往 牛湖",
           "firstTime": "07:00",
           "lastTime": "23:43"
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "新安",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往 罗湖",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往 机场东",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "白石洲",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "1号线",
+          "direction": "开往 罗湖",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "1号线",
+          "direction": "开往 机场东",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "仙湖路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往 赤湾",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往 莲塘",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "南约",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "14号线",
+          "direction": "开往 岗厦北",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "14号线",
+          "direction": "开往 沙田",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "白石龙",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "4号线",
+          "direction": "开往 牛湖",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "4号线",
+          "direction": "开往 福田口岸",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "长岭陂",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "5号线",
+          "direction": "开往 大剧院",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "5号线",
+          "direction": "开往 赤湾",
+          "firstTime": null,
+          "lastTime": null
+        }
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://www.szmc.net/zdxx"
+      ]
+    },
+    {
+      "stationName": "雅宝",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "10号线",
+          "direction": "开往 双拥街",
+          "firstTime": null,
+          "lastTime": null
+        },
+        {
+          "lineName": "10号线",
+          "direction": "开往 福田口岸",
+          "firstTime": null,
+          "lastTime": null
         }
       ],
       "stationMaps": [

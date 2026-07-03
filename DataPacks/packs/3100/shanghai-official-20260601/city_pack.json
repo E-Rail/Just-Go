@@ -13972,6 +13972,33 @@
       ]
     },
     {
+      "stationName": "康文路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "18号线",
+          "direction": "开往 航头",
+          "firstTime": "05:55",
+          "lastTime": "22:16"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://www.thepaper.cn/newsDetail_forward_32253109"
+      ]
+    },
+    {
       "stationName": "康新公路",
       "stationID": null,
       "accessibility": {
@@ -23076,6 +23103,28 @@
       ]
     },
     {
+      "stationName": "爱辉路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://www.thepaper.cn/newsDetail_forward_32253109"
+      ]
+    },
+    {
       "stationName": "环城东路",
       "stationID": null,
       "accessibility": {
@@ -27376,6 +27425,39 @@
       ]
     },
     {
+      "stationName": "蟠祥路·国家会计学院",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+        {
+          "lineName": "2号线",
+          "direction": "开往 浦东1号2号航站楼",
+          "firstTime": "05:25",
+          "lastTime": "21:57"
+        },
+        {
+          "lineName": "2号线",
+          "direction": "开往 广兰路",
+          "firstTime": null,
+          "lastTime": "22:42"
+        }
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://jtw.sh.gov.cn/xwfb2/20251027/14557ac7aeaa4e95a61cce023ce01a55.html"
+      ]
+    },
+    {
       "stationName": "蟠龙路",
       "stationID": null,
       "accessibility": {
@@ -28395,6 +28477,28 @@
       "sourceURLs": [
         "https://service.shmetro.com/skin/js/pca.js",
         "http://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id=1163"
+      ]
+    },
+    {
+      "stationName": "通南路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://www.thepaper.cn/newsDetail_forward_32253109"
       ]
     },
     {
@@ -30496,6 +30600,28 @@
         "https://service.shmetro.com/skin/js/pca.js",
         "http://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id=331",
         "http://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id=1846"
+      ]
+    },
+    {
+      "stationName": "长江西路",
+      "stationID": null,
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "stationMaps": [
+
+      ],
+      "stationAssets": [
+
+      ],
+      "serviceStatus": null,
+      "sourceURLs": [
+        "https://service.shmetro.com/hcskb/index.htm",
+        "https://www.thepaper.cn/newsDetail_forward_32253109"
       ]
     },
     {

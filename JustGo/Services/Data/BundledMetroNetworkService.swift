@@ -89,18 +89,22 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 
     private var displayLinesByID: [String: SubwayLine] {
-        Dictionary(uniqueKeysWithValues: lines.map { line in
-            (
-                line.id,
-                SubwayLine(
-                    lineID: line.id,
-                    name: line.name,
-                    nameEn: line.nameEn,
-                    colorHex: line.colorHex,
-                    cityID: cityID
+        // Tolerate a duplicated line id in a data pack (keep the first) instead of trapping.
+        Dictionary(
+            lines.map { line in
+                (
+                    line.id,
+                    SubwayLine(
+                        lineID: line.id,
+                        name: line.name,
+                        nameEn: line.nameEn,
+                        colorHex: line.colorHex,
+                        cityID: cityID
+                    )
                 )
-            )
-        })
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
     }
 
     private func displayStation(_ item: MetroStation, linesByID: [String: SubwayLine]) -> Station {

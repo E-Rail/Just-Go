@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 /// A single step in the Live "Go" in-station companion.
 enum LiveStepKind: Equatable {
@@ -24,6 +25,21 @@ struct TripStep: Identifiable, Equatable {
     var duration: TimeInterval = 0
     /// Recommended exit/entrance at the step's end station, when known (best-available).
     var exitHint: String? = nil
+    /// Station coordinate for `.transfer` steps, used to render a 3D map preview.
+    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working —
+    /// matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
+    var transferCoordinate: CodableCoordinate? = nil
+    /// Apple's real, already-computed walking-route polyline for `.walkToStation`/
+    /// `.walkToDestination` steps (the same data already stored on `RouteSegment.polylineCoordinates`).
+    var walkingPathCoordinates: [CodableCoordinate] = []
+
+    var transferCLCoordinate: CLLocationCoordinate2D? {
+        transferCoordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+
+    var walkingPathCLCoordinates: [CLLocationCoordinate2D] {
+        walkingPathCoordinates.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+    }
 
     var title: String {
         switch kind {

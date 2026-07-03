@@ -188,9 +188,17 @@ struct LiveGoTripBuilder {
                     toStationName: isOrigin ? segment.toStationName : route.destination,
                     stopCount: 0,
                     walkingDistance: segment.distance,
-                    duration: segment.duration
+                    duration: segment.duration,
+                    walkingPathCoordinates: segment.polylineCoordinates
                 ))
             case .transfer:
+                // The transfer segment's own stationStops is always empty by construction —
+                // the transfer station's coordinate instead lives on stationStops.first of the
+                // ride segment that immediately follows it (same station, since a transfer and
+                // the ride after it always share the same starting station).
+                let nextRide = route.segments.indices.contains(index + 1) ? route.segments[index + 1] : nil
+                let transferStop = nextRide?.stationStops.first { $0.stationID == segment.toStationID }
+                    ?? nextRide?.stationStops.first
                 steps.append(TripStep(
                     id: steps.count,
                     kind: .transfer,
@@ -200,7 +208,8 @@ struct LiveGoTripBuilder {
                     toStationName: nil,
                     stopCount: 0,
                     walkingDistance: 0,
-                    duration: segment.duration
+                    duration: segment.duration,
+                    transferCoordinate: transferStop?.coordinate
                 ))
             case .subway, .transit:
                 steps.append(TripStep(

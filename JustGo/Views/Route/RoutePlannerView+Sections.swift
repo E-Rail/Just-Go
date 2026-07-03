@@ -82,54 +82,27 @@ extension RoutePlannerView {
 
     var quickTagsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if viewModel?.canQuickRouteHome == true || viewModel?.canQuickRouteWork == true {
-                HStack(spacing: 10) {
-                    if viewModel?.canQuickRouteHome == true {
-                        Button {
-                            Task {
-                                await viewModel?.quickRoute(to: .home)
-                                showResults = viewModel?.routes.isEmpty == false
-                            }
-                        } label: {
-                            Label(
-                                AppLocalization.text(english: "Route Home", simplified: "回家路线", traditional: "回家路線"),
-                                systemImage: "house.fill"
-                            )
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
-                            .foregroundStyle(.white)
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(viewModel?.isLoading == true)
+            if viewModel?.canQuickRouteWork == true {
+                Button {
+                    Task {
+                        await viewModel?.quickRoute(to: .company)
+                        showResults = viewModel?.routes.isEmpty == false
                     }
-
-                    if viewModel?.canQuickRouteWork == true {
-                        Button {
-                            Task {
-                                await viewModel?.quickRoute(to: .company)
-                                showResults = viewModel?.routes.isEmpty == false
-                            }
-                        } label: {
-                            Label(
-                                AppLocalization.text(english: "Route to Work", simplified: "去公司路线", traditional: "去公司路線"),
-                                systemImage: "building.2.fill"
-                            )
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity)
-                            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
-                            .foregroundStyle(.primary)
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(viewModel?.isLoading == true)
-                    }
+                } label: {
+                    Label(
+                        AppLocalization.text(english: "Route to Work", simplified: "去公司路线", traditional: "去公司路線"),
+                        systemImage: "building.2.fill"
+                    )
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.primary)
                 }
+                .buttonStyle(.plain)
+                .disabled(viewModel?.isLoading == true)
             }
 
             ScrollView(.horizontal, showsIndicators: false) {

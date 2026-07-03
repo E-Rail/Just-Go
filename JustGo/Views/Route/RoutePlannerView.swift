@@ -29,9 +29,6 @@ struct RoutePlannerView: View {
                             smartCommuteSection
                             routeInputSection
                             quickTagsSection
-                            departurePlannerSection
-                            savedTripsSection
-                            accessibilityFiltersWrapper
                             saveCurrentTripButton
                             searchButton
                             if let hint = searchHint {
@@ -40,6 +37,9 @@ struct RoutePlannerView: View {
                                     .foregroundStyle(.secondary)
                                     .multilineTextAlignment(.center)
                             }
+                            departurePlannerSection
+                            savedTripsSection
+                            accessibilityFiltersWrapper
                             recentRoutesSection
                         }
                         .padding()

@@ -22,6 +22,9 @@ struct MapContainerView: View {
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
     @State private var placeMatchTask: Task<Void, Never>?
+    @State private var stationOpenTask: Task<Void, Never>?
+    @State private var centerOnUserTask: Task<Void, Never>?
+    @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
     @FocusState private var isSearchFocused: Bool
 
@@ -128,6 +131,12 @@ struct MapContainerView: View {
         }
         .sheet(isPresented: $showNetworkLineStatus) {
             NetworkLineStatusView(cityID: appState.selectedCity?.id ?? "")
+        }
+        .onDisappear {
+            placeMatchTask?.cancel()
+            stationOpenTask?.cancel()
+            centerOnUserTask?.cancel()
+            isLoadingStationDetail = false
         }
     }
 
@@ -263,7 +272,8 @@ struct MapContainerView: View {
 
     private var mapLocateButton: some View {
         Button {
-            Task {
+            centerOnUserTask?.cancel()
+            centerOnUserTask = Task {
                 await viewModel?.centerOnUser()
             }
         } label: {
@@ -281,13 +291,20 @@ struct MapContainerView: View {
         // Opening a station always wins over a place card — dismiss any place sheet (e.g. one still
         // loading from a prior POI tap) so the two `.sheet` presentations can't contend.
         tappedPlace = nil
-        Task {
-            guard !isLoadingStationDetail else { return }
-
+        stationOpenTask?.cancel()
+        stationOpenGeneration += 1
+        let generation = stationOpenGeneration
+        stationOpenTask = Task {
             isLoadingStationDetail = true
-            defer { isLoadingStationDetail = false }
+            defer {
+                if stationOpenGeneration == generation {
+                    isLoadingStationDetail = false
+                }
+            }
 
-            selectedStation = await viewModel?.selectStation(station) ?? station
+            let selected = await viewModel?.selectStation(station) ?? station
+            guard !Task.isCancelled, stationOpenGeneration == generation else { return }
+            selectedStation = selected
         }
     }
 
@@ -299,6 +316,8 @@ struct MapContainerView: View {
         // Track + cancel so rapidly tapping results can't stack matchingStation calls whose
         // out-of-order completion would open the wrong station detail.
         placeMatchTask?.cancel()
+        stationOpenTask?.cancel()
+        isLoadingStationDetail = false
         placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
                 guard !Task.isCancelled else { return }
@@ -319,6 +338,8 @@ struct MapContainerView: View {
         let place = TransitPlace(name: displayName, coordinate: coordinate, source: .mapKit)
         placeCardDetent = .large
         placeMatchTask?.cancel()
+        stationOpenTask?.cancel()
+        isLoadingStationDetail = false
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
             guard !Task.isCancelled else { return }

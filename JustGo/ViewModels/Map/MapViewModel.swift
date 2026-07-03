@@ -54,6 +54,13 @@ final class MapViewModel {
         self.metroNetworkProvider = metroNetworkProvider
     }
 
+    deinit {
+        viewportLoadTask?.cancel()
+        cityLoadTask?.cancel()
+        searchTask?.cancel()
+        markerRefreshTask?.cancel()
+    }
+
     var userLocation: CLLocationCoordinate2D? {
         locationService.currentLocation?.coordinate
     }
@@ -126,6 +133,7 @@ final class MapViewModel {
 
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
+        cityLoadTask?.cancel()
         viewportLoadTask?.cancel()
         scheduleVisibleStationsRefresh()
 
@@ -196,6 +204,7 @@ final class MapViewModel {
                 }
             }
             for await (network, stations) in group {
+                guard !Task.isCancelled else { continue }
                 if let network {
                     loadedByCity[network.cityID] = network
                     stationsByCity[network.cityID] = stations

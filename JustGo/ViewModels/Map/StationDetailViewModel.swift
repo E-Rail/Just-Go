@@ -15,26 +15,37 @@ final class StationDetailViewModel {
     var accessGuidance: StationAccessGuidance?
 
     private let officialStationData: OfficialStationDataProviding
+    private var trainTimesGeneration = 0
+    private var cityPackGeneration = 0
 
     init(officialStationData: OfficialStationDataProviding) {
         self.officialStationData = officialStationData
     }
 
     func loadStation(_ station: Station) {
+        trainTimesGeneration += 1
+        cityPackGeneration += 1
         self.station = station
     }
 
     func loadTrainTimes() async {
         guard let station = station else { return }
+        let stationID = station.id
+        let generation = trainTimesGeneration
 
         isLoading = true
         arrivals = []
         errorMessage = nil
-        defer { isLoading = false }
+        defer {
+            if isCurrentTrainTimesLoad(stationID: stationID, generation: generation) {
+                isLoading = false
+            }
+        }
 
-        arrivals = await officialStationData.trainTimes(for: station)
+        let loadedArrivals = await officialStationData.trainTimes(for: station)
+        guard isCurrentTrainTimesLoad(stationID: stationID, generation: generation) else { return }
 
-        arrivals.sort {
+        arrivals = loadedArrivals.sorted {
             ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
         }
 
@@ -45,15 +56,23 @@ final class StationDetailViewModel {
 
     func loadCityPack() async {
         guard let station else { return }
+        let stationID = station.id
+        let generation = cityPackGeneration
 
         isLoadingCityPack = true
         stationMapStatusMessage = nil
+        stationMap = nil
         timetableAssets = []
         serviceStatus = nil
         accessGuidance = nil
-        defer { isLoadingCityPack = false }
+        defer {
+            if isCurrentCityPackLoad(stationID: stationID, generation: generation) {
+                isLoadingCityPack = false
+            }
+        }
 
         let status = await officialStationData.loadCityPack(for: station.cityID)
+        guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         cityPackLoadStatus = status
         switch status {
         case .available:
@@ -63,14 +82,29 @@ final class StationDetailViewModel {
                 traditional: "官方城市資料尚未載入。"
             )
         case .loaded:
-            self.station = await officialStationData.enrichStation(station)
-            stationMap = await officialStationData.stationMap(for: station)
-            timetableAssets = await officialStationData.timetableAssets(for: station)
-            serviceStatus = await officialStationData.serviceStatus(for: station)
-            accessGuidance = (await officialStationData.stationGuidance(
+            let enrichedStation = await officialStationData.enrichStation(station)
+            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+            self.station = enrichedStation
+
+            let loadedStationMap = await officialStationData.stationMap(for: station)
+            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+            stationMap = loadedStationMap
+
+            let loadedTimetableAssets = await officialStationData.timetableAssets(for: station)
+            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+            timetableAssets = loadedTimetableAssets
+
+            let loadedServiceStatus = await officialStationData.serviceStatus(for: station)
+            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+            serviceStatus = loadedServiceStatus
+
+            let loadedGuidance = (await officialStationData.stationGuidance(
                 cityID: station.cityID,
                 stationNames: [station.name]
             ))[station.name]
+            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+            accessGuidance = loadedGuidance
+
             if stationMap != nil {
                 stationMapStatusMessage = AppLocalization.localized("Official station map available")
             } else {
@@ -85,6 +119,14 @@ final class StationDetailViewModel {
         case .failed:
             stationMapStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
         }
+    }
+
+    private func isCurrentTrainTimesLoad(stationID: String, generation: Int) -> Bool {
+        station?.id == stationID && trainTimesGeneration == generation
+    }
+
+    private func isCurrentCityPackLoad(stationID: String, generation: Int) -> Bool {
+        station?.id == stationID && cityPackGeneration == generation
     }
 
     var trainTimeStatusMessage: String? {

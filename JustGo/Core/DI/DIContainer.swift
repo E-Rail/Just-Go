@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 @Observable
 final class DIContainer {
@@ -15,6 +16,10 @@ final class DIContainer {
     let routeConfidenceService: RouteConfidenceService
     let comfortForecastService: ComfortForecastService
     let tripReminderService: TripReminderService
+    private let memoryManagedOfficialStationData: OfficialCityPackService?
+    private let memoryManagedMetroNetworkProvider: BundledMetroNetworkService?
+    private let memoryManagedTransitRouteProvider: BundledMetroRouteProvider?
+    private var memoryWarningObserver: NSObjectProtocol?
 
     init(
         locationService: LocationService,
@@ -29,7 +34,10 @@ final class DIContainer {
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         comfortForecastService: ComfortForecastService,
-        tripReminderService: TripReminderService
+        tripReminderService: TripReminderService,
+        memoryManagedOfficialStationData: OfficialCityPackService? = nil,
+        memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
+        memoryManagedTransitRouteProvider: BundledMetroRouteProvider? = nil
     ) {
         self.locationService = locationService
         self.placeSearchProvider = placeSearchProvider
@@ -44,6 +52,32 @@ final class DIContainer {
         self.routeConfidenceService = routeConfidenceService
         self.comfortForecastService = comfortForecastService
         self.tripReminderService = tripReminderService
+        self.memoryManagedOfficialStationData = memoryManagedOfficialStationData
+        self.memoryManagedMetroNetworkProvider = memoryManagedMetroNetworkProvider
+        self.memoryManagedTransitRouteProvider = memoryManagedTransitRouteProvider
+    }
+
+    deinit {
+        if let memoryWarningObserver {
+            NotificationCenter.default.removeObserver(memoryWarningObserver)
+        }
+    }
+
+    @MainActor
+    func installMemoryWarningReleaseHandler() {
+        guard memoryWarningObserver == nil else { return }
+        memoryWarningObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            Task {
+                await self.memoryManagedOfficialStationData?.releaseMemory()
+                await self.memoryManagedMetroNetworkProvider?.releaseMemory()
+                await self.memoryManagedTransitRouteProvider?.releaseMemory()
+            }
+        }
     }
 
     @MainActor
@@ -106,7 +140,7 @@ final class DIContainer {
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
 
-        return DIContainer(
+        let container = DIContainer(
             locationService: locationService,
             placeSearchProvider: placeSearchProvider,
             officialStationData: officialStationData,
@@ -119,7 +153,12 @@ final class DIContainer {
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             comfortForecastService: comfortForecastService,
-            tripReminderService: tripReminderService
+            tripReminderService: tripReminderService,
+            memoryManagedOfficialStationData: officialStationData,
+            memoryManagedMetroNetworkProvider: metroNetworkProvider,
+            memoryManagedTransitRouteProvider: transitRouteProvider
         )
+        container.installMemoryWarningReleaseHandler()
+        return container
     }
 }

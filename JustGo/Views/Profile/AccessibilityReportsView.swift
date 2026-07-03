@@ -45,6 +45,8 @@ struct AccessibilityReportsView: View {
                     }
                 }
             }
+            .listStyle(.plain)
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("My Reports"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

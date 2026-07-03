@@ -121,7 +121,15 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     // Normalized-name → stations index, built once per (cityID, version) and cached, so
     // repeated `matchingStation` lookups become O(1) instead of re-normalizing every station
     // name (7 string replacements each) on every call. NSCache is thread-safe.
-    private static let normalizedIndexCache = NSCache<NSString, NormalizedStationIndexBox>()
+    private static let normalizedIndexCache: NSCache<NSString, NormalizedStationIndexBox> = {
+        let cache = NSCache<NSString, NormalizedStationIndexBox>()
+        cache.countLimit = 16
+        return cache
+    }()
+
+    static func clearNormalizedIndexCache() {
+        normalizedIndexCache.removeAllObjects()
+    }
 
     private static func normalizedIndex(for network: MetroNetwork) -> [String: [MetroStation]] {
         let key = "\(network.cityID):\(network.version)" as NSString
@@ -174,6 +182,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301", "1200", "5000", "4201", "3201", "6101", "3205", "4101", "4301", "2101", "3702", "2102", "3302", "3202", "5301", "3601", "3501", "3502", "3401", "1301", "5201", "2301", "2201", "4501", "6201", "6501", "1501", "1401", "4419", "4406", "3303", "3306", "3203", "3204", "3701", "4103", "3402", "3206", "3310", "8100", "8200"]
     private var networks: [String: MetroNetwork] = [:]
     private var stationsByCity: [String: [Station]] = [:]
+    private var summaries: [String: MetroNetworkSummary] = [:]
     private var missingCityIDs: Set<String> = []
 
     func network(for cityID: String) async -> MetroNetwork? {
@@ -195,6 +204,11 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
                 return nil
             }
             networks[cityID] = network
+            summaries[cityID] = MetroNetworkSummary(
+                cityID: network.cityID,
+                bounds: network.bounds,
+                geometryKind: network.geometryKind
+            )
             return network
         } catch {
             AppLog.data.error("Failed to load bundled metro network \(cityID, privacy: .public): \(error)")
@@ -239,10 +253,15 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     }
 
     private func networkSummary(for cityID: String) async -> MetroNetworkSummary? {
+        if let summary = summaries[cityID] {
+            return summary
+        }
         // A full network already cached (e.g. the user's current city) has the same bounds —
         // reuse it instead of re-reading and re-parsing the file a second time.
         if let network = networks[cityID] {
-            return MetroNetworkSummary(cityID: network.cityID, bounds: network.bounds, geometryKind: network.geometryKind)
+            let summary = MetroNetworkSummary(cityID: network.cityID, bounds: network.bounds, geometryKind: network.geometryKind)
+            summaries[cityID] = summary
+            return summary
         }
         guard !missingCityIDs.contains(cityID) else { return nil }
         guard let url = bundledNetworkURL(for: cityID) else {
@@ -255,6 +274,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
                 missingCityIDs.insert(cityID)
                 return nil
             }
+            summaries[cityID] = summary
             return summary
         } catch {
             AppLog.data.error("Failed to load bundled metro network summary \(cityID, privacy: .public): \(error)")
@@ -272,5 +292,11 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode(T.self, from: data)
         }.value
+    }
+
+    func releaseMemory() {
+        networks.removeAll()
+        stationsByCity.removeAll()
+        MetroNetwork.clearNormalizedIndexCache()
     }
 }

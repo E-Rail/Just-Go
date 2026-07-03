@@ -14,6 +14,7 @@ struct NetworkLineStatusView: View {
     @State private var isLoading = false
     @State private var asOfText = ""
     @State private var refreshID = UUID()
+    @State private var loadGeneration = UUID()
 
     var body: some View {
         NavigationStack {
@@ -73,6 +74,7 @@ struct NetworkLineStatusView: View {
                     .listStyle(.plain)
                 }
             }
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.text(english: "Line Status", simplified: "线路状态", traditional: "線路狀態"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -93,10 +95,17 @@ struct NetworkLineStatusView: View {
 
     private func loadLineStatuses() async {
         guard !cityID.isEmpty else { return }
+        let generation = UUID()
+        loadGeneration = generation
         isLoading = true
-        defer { isLoading = false }
+        defer {
+            if loadGeneration == generation && !Task.isCancelled {
+                isLoading = false
+            }
+        }
 
         guard let network = await container.metroNetworkProvider.network(for: cityID) else { return }
+        guard loadGeneration == generation, !Task.isCancelled else { return }
 
         let stationsByID = Dictionary(network.stations.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
@@ -118,16 +127,19 @@ struct NetworkLineStatusView: View {
                 }
             }
             for await item in group {
+                guard !Task.isCancelled else { continue }
                 if let item { results.append(item) }
             }
         }
 
+        guard loadGeneration == generation, !Task.isCancelled else { return }
         results.sort {
             let n0 = $0.line.name.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Int.init).first ?? 0
             let n1 = $1.line.name.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Int.init).first ?? 0
             if n0 != n1 { return n0 < n1 }
             return $0.line.name < $1.line.name
         }
+        guard loadGeneration == generation, !Task.isCancelled else { return }
         lineStatuses = results
         asOfText = ChinaClock.clockText(Date())
     }

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import MapKit
 
 struct TransferStationSheet: View {
     let transferSegment: RouteSegment
@@ -10,6 +11,7 @@ struct TransferStationSheet: View {
     @Environment(DIContainer.self) private var container
     @State private var enrichedStation: Station?
     @State private var isLoadingStation = false
+    @State private var lookAroundScene: MKLookAroundScene?
 
     private var stationName: String {
         transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
@@ -20,24 +22,24 @@ struct TransferStationSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    headerSection
-                    transferTimeSection
-                    accessibilitySection
-                    if !crowdWindows.isEmpty {
-                        crowdControlSection
-                    }
-                    if let nextSegment = nextTransitSegment {
-                        directionSection(nextSegment: nextSegment)
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                headerSection
+                lookAroundSection
+                transferTimeSection
+                accessibilitySection
+                if !crowdWindows.isEmpty {
+                    crowdControlSection
                 }
-                .padding()
+                if let nextSegment = nextTransitSegment {
+                    directionSection(nextSegment: nextSegment)
+                }
             }
-            .navigationTitle(stationName)
-            .navigationBarTitleDisplayMode(.inline)
+            .padding()
         }
+        .background(Color.appBackground)
+        .navigationTitle(stationName)
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }
@@ -47,6 +49,30 @@ struct TransferStationSheet: View {
                 source: .localStationData
             )
             enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            if let coordinate = enrichedStation?.coordinate {
+                lookAroundScene = try? await MKLookAroundSceneRequest(coordinate: coordinate).scene
+            }
+        }
+    }
+
+    /// Apple's Look Around has no coverage underground, so this can only ever show the
+    /// station's street-level entrance, not the platform itself — the caption makes that
+    /// explicit. Renders nothing when no coverage exists for the coordinate.
+    @ViewBuilder
+    private var lookAroundSection: some View {
+        if let lookAroundScene {
+            VStack(alignment: .leading, spacing: 6) {
+                LookAroundPreview(initialScene: lookAroundScene)
+                    .frame(height: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                Text(AppLocalization.text(
+                    english: "Station entrance (street view)",
+                    simplified: "车站入口（街景）",
+                    traditional: "車站入口（街景）"
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
         }
     }
 

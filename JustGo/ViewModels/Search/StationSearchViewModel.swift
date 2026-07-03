@@ -32,6 +32,11 @@ final class StationSearchViewModel {
         recentSearches = UserDefaults.standard.codableValue(forKey: recentSearchesKey, as: [SearchHistory].self, default: [])
     }
 
+    deinit {
+        searchTask?.cancel()
+        facilityEnrichmentTask?.cancel()
+    }
+
     func loadInitialStations(city: String) async {
         let loadID = UUID()
         stationLoadID = loadID
@@ -43,6 +48,8 @@ final class StationSearchViewModel {
         }
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard !city.isEmpty else {
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
             unfilteredResults = []
             searchResults = []
             errorMessage = AppLocalization.localized("Choose a city to browse stations")
@@ -50,11 +57,17 @@ final class StationSearchViewModel {
         }
         await refreshLocationIfAlreadyAllowed()
         errorMessage = nil
-        unfilteredResults = await stationSearchService.stations(in: city)
+        let stations = await stationSearchService.stations(in: city)
         guard stationLoadID == loadID else { return }
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
+        unfilteredResults = stations
         applyFilters()
-        unfilteredResults = await stationSearchService.enrichStations(unfilteredResults)
+        let enrichedStations = await stationSearchService.enrichStations(unfilteredResults)
         guard stationLoadID == loadID else { return }
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
+        unfilteredResults = enrichedStations
         applyFilters()
     }
 
@@ -73,13 +86,19 @@ final class StationSearchViewModel {
         // defer guarantees the spinner clears on EVERY exit, including the stale-token early
         // returns below — otherwise a cleared/superseded search leaves isSearching stuck true
         // and the results list spins forever even after loadInitialStations repopulates it.
-        defer { isSearching = false }
+        defer {
+            if stationLoadID == loadID {
+                isSearching = false
+            }
+        }
         errorMessage = nil
         await refreshLocationIfAlreadyAllowed()
 
         do {
             let results = try await stationSearchService.search(keyword: searchText, city: city)
             guard stationLoadID == loadID else { return }
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
             unfilteredResults = results
             applyFilters()
         } catch {

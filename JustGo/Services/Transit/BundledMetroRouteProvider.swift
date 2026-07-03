@@ -149,6 +149,10 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return graph
     }
 
+    func releaseMemory() {
+        graphs.removeAll()
+    }
+
     private func shortestPath(in context: MetroRouteContext, graph: MetroRoutingGraph, preference: MetroSearchPreference) -> MetroPath? {
         var distances: [MetroSearchState: Double] = [:]
         var previous: [MetroSearchState: MetroPreviousStep] = [:]

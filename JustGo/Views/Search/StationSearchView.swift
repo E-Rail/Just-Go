@@ -27,10 +27,8 @@ struct StationSearchView: View {
             .navigationTitle(AppLocalization.localized("Search"))
             .navigationBarTitleDisplayMode(.large)
             .background(Color.appBackground)
-            .rightSidePanel(item: $selectedStation) { station in
-                NavigationStack {
-                    StationDetailView(station: station)
-                }
+            .navigationDestination(item: $selectedStation) { station in
+                StationDetailView(station: station)
             }
         }
         .task(id: appState.selectedCity?.id) {

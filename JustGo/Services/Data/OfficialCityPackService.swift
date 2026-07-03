@@ -82,6 +82,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
     private var manifests: [URL: OfficialManifest] = [:]
+    private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
     private var packs: [String: LoadedPack] = [:]
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
     // A .failed status used to be excluded from loadStatuses entirely, so every caller that
@@ -393,8 +394,24 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func loadManifest(from url: URL) async throws -> OfficialManifest {
         if let manifest = manifests[url] { return manifest }
-        let data = try await download(from: url)
-        let decoded = try JSONDecoder().decode(OfficialManifest.self, from: data)
+        if let existing = inFlightManifests[url] {
+            return try await existing.value
+        }
+
+        let task = Task { [self] in
+            let data = try await download(from: url)
+            return try JSONDecoder().decode(OfficialManifest.self, from: data)
+        }
+        inFlightManifests[url] = task
+
+        let decoded: OfficialManifest
+        do {
+            decoded = try await task.value
+        } catch {
+            inFlightManifests.removeValue(forKey: url)
+            throw error
+        }
+        inFlightManifests.removeValue(forKey: url)
         manifests[url] = decoded
         return decoded
     }
@@ -452,6 +469,10 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             let manifestURL = value.hasSuffix("manifest.json") ? url : url.appendingPathComponent("manifest.json")
             return seen.insert(manifestURL.absoluteString).inserted ? manifestURL : nil
         }
+    }
+
+    func releaseMemory() {
+        packs.removeAll()
     }
 }
 

@@ -67,6 +67,7 @@ final class RoutePlannerViewModel {
     }
 
     deinit {
+        suggestionTask?.cancel()
         if let observer = quickPlacesResetObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -296,11 +297,15 @@ final class RoutePlannerViewModel {
     }
 
     func swapOriginDestination() {
+        suggestionTask?.cancel()
+        suggestionTask = nil
         swap(&originName, &destinationName)
         swap(&originPlace, &destinationPlace)
     }
 
     func useRecentRoute(_ recentRoute: RecentRoute) {
+        suggestionTask?.cancel()
+        suggestionTask = nil
         originName = recentRoute.originStationName
         destinationName = recentRoute.destinationStationName
         originPlace = nil
@@ -309,6 +314,8 @@ final class RoutePlannerViewModel {
     }
 
     func useSavedTrip(_ savedTrip: SavedTrip) {
+        suggestionTask?.cancel()
+        suggestionTask = nil
         originName = savedTrip.origin.name
         destinationName = savedTrip.destination.name
         originPlace = savedTrip.origin.hasUsableRouteCoordinate ? savedTrip.origin.transitPlace : nil
@@ -390,7 +397,11 @@ final class RoutePlannerViewModel {
             } catch is CancellationError {
                 return
             } catch {
-                guard let self, !Task.isCancelled else { return }
+                guard let self,
+                      !Task.isCancelled,
+                      selectedCity?.id == cityID,
+                      name(for: field) == keyword,
+                      place(for: field) == nil else { return }
                 errorMessage = userFacingErrorMessage(for: error)
             }
         }

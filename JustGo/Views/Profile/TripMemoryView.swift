@@ -191,6 +191,8 @@ struct TripMemoryView: View {
                     Text(AppLocalization.localized("Saved locally on this device."))
                 }
             }
+            .listStyle(.plain)
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("My Trips"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

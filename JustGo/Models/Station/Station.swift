@@ -1,6 +1,9 @@
 import CoreLocation
 
-final class Station: Identifiable {
+final class Station: Identifiable, Hashable {
+    static func == (lhs: Station, rhs: Station) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+
     var stationID: String
     var id: String { stationID }
     var name: String

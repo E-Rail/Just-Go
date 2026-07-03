@@ -90,6 +90,8 @@ struct TransitDataView: View {
                     ))
                 }
             }
+            .listStyle(.plain)
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("Transit Data"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

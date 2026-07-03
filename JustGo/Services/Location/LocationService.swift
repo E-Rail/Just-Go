@@ -4,7 +4,7 @@ import CoreLocation
 @Observable
 final class LocationService: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
-    private var pendingLocationContinuations: [CheckedContinuation<CLLocation, Error>] = []
+    private var pendingLocationContinuations: [UUID: CheckedContinuation<CLLocation, Error>] = [:]
     private var locationRequestGeneration = UUID()
 
     var currentLocation: CLLocation?
@@ -30,28 +30,40 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             return currentLocation
         }
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let shouldScheduleTimeout = pendingLocationContinuations.isEmpty
-            pendingLocationContinuations.append(continuation)
-            if shouldScheduleTimeout {
-                scheduleLocationRequestTimeout()
-            }
+        let requestID = UUID()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                let shouldScheduleTimeout = pendingLocationContinuations.isEmpty
+                pendingLocationContinuations[requestID] = continuation
+                if shouldScheduleTimeout {
+                    scheduleLocationRequestTimeout()
+                }
 
-            switch authorizationStatus {
-            case .notDetermined:
-                manager.requestWhenInUseAuthorization()
-            case .authorizedAlways, .authorizedWhenInUse:
-                // Acquire via the continuous stream (more forgiving than a single shot) and
-                // stop it the moment a fix passes the gate — see finishPendingLocationRequests.
-                startUpdatingLocation()
-            case .denied, .restricted:
-                let error = LocationServiceError.permissionDenied
-                locationErrorMessage = error.localizedDescription
-                finishPendingLocationRequests(with: .failure(error))
-            @unknown default:
-                let error = LocationServiceError.unavailable
-                locationErrorMessage = error.localizedDescription
-                finishPendingLocationRequests(with: .failure(error))
+                if Task.isCancelled {
+                    cancelPendingLocationRequest(requestID)
+                    return
+                }
+
+                switch authorizationStatus {
+                case .notDetermined:
+                    manager.requestWhenInUseAuthorization()
+                case .authorizedAlways, .authorizedWhenInUse:
+                    // Acquire via the continuous stream (more forgiving than a single shot) and
+                    // stop it the moment a fix passes the gate — see finishPendingLocationRequests.
+                    startUpdatingLocation()
+                case .denied, .restricted:
+                    let error = LocationServiceError.permissionDenied
+                    locationErrorMessage = error.localizedDescription
+                    finishPendingLocationRequests(with: .failure(error))
+                @unknown default:
+                    let error = LocationServiceError.unavailable
+                    locationErrorMessage = error.localizedDescription
+                    finishPendingLocationRequests(with: .failure(error))
+                }
+            }
+        } onCancel: { [weak self] in
+            Task { @MainActor in
+                self?.cancelPendingLocationRequest(requestID)
             }
         }
     }
@@ -125,7 +137,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         // success, failure, or timeout — so GPS doesn't keep running for the app's lifetime.
         manager.stopUpdatingLocation()
 
-        let continuations = pendingLocationContinuations
+        let continuations = Array(pendingLocationContinuations.values)
         pendingLocationContinuations.removeAll()
 
         for continuation in continuations {
@@ -135,6 +147,14 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
             case let .failure(error):
                 continuation.resume(throwing: error)
             }
+        }
+    }
+
+    private func cancelPendingLocationRequest(_ requestID: UUID) {
+        guard let continuation = pendingLocationContinuations.removeValue(forKey: requestID) else { return }
+        continuation.resume(throwing: CancellationError())
+        if pendingLocationContinuations.isEmpty {
+            manager.stopUpdatingLocation()
         }
     }
 

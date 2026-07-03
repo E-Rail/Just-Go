@@ -55,6 +55,8 @@ struct FavoriteStationsView: View {
                     }
                 }
             }
+            .listStyle(.plain)
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("My Stations"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

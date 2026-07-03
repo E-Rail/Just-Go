@@ -72,7 +72,8 @@ final class StationSearchViewModel {
     }
 
     func search(city: String) async {
-        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+        let query = searchText.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else {
             await loadInitialStations(city: city)
             return
         }
@@ -80,6 +81,9 @@ final class StationSearchViewModel {
         // Generation token so a superseded query — or one that returns after the field is
         // cleared — can't stomp the current results. MKLocalSearch ignores Swift task
         // cancellation, so the in-flight network call still completes; the token discards it.
+        // The token alone isn't enough: after the text changes, the NEXT search doesn't mint
+        // a new token until its 180ms debounce elapses, so a stale search returning inside
+        // that window would still pass — hence the captured-query check on publish too.
         let loadID = UUID()
         stationLoadID = loadID
         isSearching = true
@@ -95,14 +99,16 @@ final class StationSearchViewModel {
         await refreshLocationIfAlreadyAllowed()
 
         do {
-            let results = try await stationSearchService.search(keyword: searchText, city: city)
-            guard stationLoadID == loadID else { return }
+            let results = try await stationSearchService.search(keyword: query, city: city)
+            guard stationLoadID == loadID,
+                  searchText.trimmingCharacters(in: .whitespaces) == query else { return }
             facilityEnrichmentTask?.cancel()
             isEnrichingForFacility = false
             unfilteredResults = results
             applyFilters()
         } catch {
-            guard stationLoadID == loadID else { return }
+            guard stationLoadID == loadID,
+                  searchText.trimmingCharacters(in: .whitespaces) == query else { return }
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }

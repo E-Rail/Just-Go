@@ -36,6 +36,9 @@ struct MapContainerView: View {
     @State private var centerOnUserTask: Task<Void, Never>?
     @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
+    // Holds an MKMapItem that resolved while station matching was still deciding whether to
+    // present the place sheet — consumed (or discarded) when that decision lands.
+    @State private var pendingResolvedItem: MKMapItem?
     @State private var keyboardHeight: CGFloat = 0
     @State private var searchBarBottomY: CGFloat = 0
     @FocusState private var isSearchFocused: Bool
@@ -388,26 +391,35 @@ struct MapContainerView: View {
         placeMatchTask?.cancel()
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
+        pendingResolvedItem = nil
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
             guard !Task.isCancelled else { return }
             if let station {
+                pendingResolvedItem = nil
                 tappedPlace = nil
                 openStation(station)
             } else {
-                tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: nil)
+                // Apple's resolve may have finished while station matching was still running
+                // (it can block on a cold city-pack load) — present the sheet already filled
+                // instead of dropping the item and spinning forever.
+                tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: pendingResolvedItem)
+                pendingResolvedItem = nil
             }
         }
     }
 
-    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Fill the already-presented
-    /// sheet. Both `poiTask` (in the map coordinator) and `placeMatchTask` are cancelled on every
-    /// new tap, so this only ever fires for the latest tap — a non-nil `tappedPlace` therefore
-    /// always corresponds to this resolve. A nil `tappedPlace` means the tap resolved to a station
-    /// (sheet never shown) or the user dismissed it, so the late resolve is simply discarded.
+    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Both `poiTask` (in the map
+    /// coordinator) and `placeMatchTask` are cancelled on every new tap, so this only ever fires
+    /// for the latest tap. When the sheet is already presented, fill it in place; when station
+    /// matching is still deciding (slower than the resolve on a cold city-pack load), buffer the
+    /// item for `handlePlaceTapped` to attach at presentation time.
     private func handlePlaceResolved(_ mapItem: MKMapItem) {
-        guard tappedPlace != nil else { return }
-        tappedPlace?.resolvedItem = mapItem
+        if tappedPlace != nil {
+            tappedPlace?.resolvedItem = mapItem
+        } else {
+            pendingResolvedItem = mapItem
+        }
     }
 
 }

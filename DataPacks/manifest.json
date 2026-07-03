@@ -487,8 +487,8 @@
     {
       "cityID": "3301",
       "version": "hangzhou-official-20260528",
-      "sizeBytes": 224547,
-      "sha256": "736918580fb7884d9d09a18205a68a84ebf5169a6a835ab3db078e817ceeba87",
+      "sizeBytes": 227329,
+      "sha256": "c60938f4421894cc227f573e0c9e88b2439d40f33d91476c7cac73ba47873371",
       "downloadURL": "packs/3301/hangzhou-official-20260528/city_pack.json",
       "sourceURLs": [
         "https://www.hzmetro.com/service_1.aspx?Line1=6&Site1=184",

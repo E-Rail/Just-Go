@@ -52,6 +52,11 @@ struct TransitMapView: UIViewRepresentable {
         context.coordinator.sync(parent: self, on: mapView)
     }
 
+    static func dismantleUIView(_ mapView: MKMapView, coordinator: Coordinator) {
+        coordinator.cancelPOIResolution()
+        mapView.delegate = nil
+    }
+
     final class Coordinator: NSObject, MKMapViewDelegate {
         private var parent: TransitMapView
         private var regionSignature = ""
@@ -70,6 +75,15 @@ struct TransitMapView: UIViewRepresentable {
 
         init(parent: TransitMapView) {
             self.parent = parent
+        }
+
+        deinit {
+            poiTask?.cancel()
+        }
+
+        func cancelPOIResolution() {
+            poiTask?.cancel()
+            poiTask = nil
         }
 
         func sync(parent: TransitMapView, on mapView: MKMapView) {

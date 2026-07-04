@@ -60,6 +60,18 @@ struct MapContainerView: View {
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
             viewModel?.scheduleSearch(in: appState.selectedCity)
         }
+        // A city switch invalidates any in-flight POI/station interaction from the old city.
+        // During a POI tap's station match no sheet is presented yet, so the city picker stays
+        // reachable — without this reset a slow match started in city A presents its place
+        // sheet (or pushes its station detail) over city B's map.
+        .onChange(of: appState.selectedCity?.id) { _, _ in
+            placeMatchTask?.cancel()
+            stationOpenTask?.cancel()
+            stationOpenGeneration += 1
+            isLoadingStationDetail = false
+            pendingResolvedItem = nil
+            tappedPlace = nil
+        }
     }
 
     private var mapContent: some View {

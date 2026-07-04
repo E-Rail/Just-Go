@@ -563,6 +563,9 @@ struct QuickPlace: Identifiable, Codable {
     let coordinate: CodableCoordinate
     let entranceCoordinate: CodableCoordinate?
     let address: String?
+    /// City selected when the place was saved; nil on rows saved before this field
+    /// existed (the planner then infers one from the coordinate at use time).
+    let cityID: String?
 
     var id: String {
         kind.id
@@ -581,7 +584,7 @@ struct QuickPlace: Identifiable, Codable {
         )
     }
 
-    init(kind: QuickPlaceKind, place: TransitPlace) {
+    init(kind: QuickPlaceKind, place: TransitPlace, cityID: String?) {
         self.kind = kind
         name = place.name
         coordinate = CodableCoordinate(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
@@ -589,6 +592,7 @@ struct QuickPlace: Identifiable, Codable {
             CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude)
         }
         address = place.address
+        self.cityID = cityID
     }
 }
 

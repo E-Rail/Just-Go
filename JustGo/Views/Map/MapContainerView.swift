@@ -63,10 +63,12 @@ struct MapContainerView: View {
         // A city switch invalidates any in-flight POI/station interaction from the old city.
         // During a POI tap's station match no sheet is presented yet, so the city picker stays
         // reachable — without this reset a slow match started in city A presents its place
-        // sheet (or pushes its station detail) over city B's map.
+        // sheet (or pushes its station detail) over city B's map, and a slow locate-me fix
+        // (up to the 15s GPS timeout) yanks city B's camera back to the user's position.
         .onChange(of: appState.selectedCity?.id) { _, _ in
             placeMatchTask?.cancel()
             stationOpenTask?.cancel()
+            centerOnUserTask?.cancel()
             stationOpenGeneration += 1
             isLoadingStationDetail = false
             pendingResolvedItem = nil

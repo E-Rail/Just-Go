@@ -258,6 +258,10 @@ extension RoutePlannerView {
                         ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
                             Button {
                                 _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                // Saved trips keep their home city; planning a Beijing
+                                // trip's coordinates against a selected Shanghai network
+                                // matches nonsense nearest stations.
+                                switchPlannerCity(toCityID: trip.cityID)
                                 viewModel?.useSavedTrip(trip)
                                 Task {
                                     await viewModel?.searchRoutes()

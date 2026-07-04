@@ -65,6 +65,10 @@ struct RoutePlannerView: View {
             }
             .onChange(of: appState.selectedCity?.id) { _, _ in
                 viewModel?.cityChanged(to: appState.selectedCity)
+                // A pushed results screen belongs to the previous city's search, whose
+                // routes cityChanged just cleared — pop it rather than leave an empty
+                // "0 routes" page for the user to come back to.
+                showResults = false
             }
             .navigationDestination(isPresented: $showResults) {
                 if let viewModel = viewModel {
@@ -135,8 +139,24 @@ struct RoutePlannerView: View {
 
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
         guard let pending, let vm = viewModel else { return }
+        // A station-originated input can reference another city (favorites → station
+        // detail → "From here"); switch to it before filling the field.
+        if let cityID = pending.cityID {
+            switchPlannerCity(toCityID: cityID)
+        }
         vm.selectPlace(pending.place, for: pending.role)
         appState.pendingRouteInput = nil
+    }
+
+    /// Switches the app-wide city so a cross-city place (saved trip, favorite station)
+    /// plans against its own network instead of the selected city's. Routes through
+    /// cityChanged synchronously: the deferred selectedCity onChange then finds the view
+    /// model already up to date and doesn't wipe the fields the caller fills next.
+    func switchPlannerCity(toCityID cityID: String) {
+        guard cityID != appState.selectedCity?.id,
+              let city = container.cityService.getCity(byID: cityID) else { return }
+        appState.selectedCity = city
+        viewModel?.cityChanged(to: city)
     }
 
     private func resumeTripBanner(_ route: Route) -> some View {

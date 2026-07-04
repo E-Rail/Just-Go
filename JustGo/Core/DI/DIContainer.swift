@@ -131,7 +131,6 @@ final class DIContainer {
             placeSearchProvider: placeSearchProvider,
             routeProvider: transitRouteProvider,
             officialStationData: officialStationData,
-            cityService: cityService,
             comfortForecastService: comfortForecastService
         )
         let tripMemoryService = TripMemoryService()

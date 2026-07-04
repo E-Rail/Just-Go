@@ -124,11 +124,19 @@ final class RoutePlannerViewModel {
     /// Any input mutation supersedes an in-flight route search: bump the generation so a
     /// slow search's publish/error guards fail, and clear the spinner here — the superseded
     /// search's defer (correctly) refuses to touch it once the token has moved on. Also
-    /// voids the planned-city association, which described the previous inputs.
+    /// voids the planned-city association and any error, both of which described the
+    /// previous inputs (a "No Routes Found" alert must not outlive the query it was for).
     private func invalidateInFlightSearch() {
         routeSearchGeneration += 1
         isLoading = false
         lastPlannedCityID = nil
+        errorMessage = nil
+    }
+
+    /// A successful plan matching the current inputs exists — lastPlannedCityID survives
+    /// only while no input has mutated since the publish, so "Save this trip" can trust it.
+    var hasCurrentPlan: Bool {
+        lastPlannedCityID != nil && !routes.isEmpty
     }
 
     func selectPlace(_ place: TransitPlace, for field: RouteInputField) {
@@ -258,7 +266,6 @@ final class RoutePlannerViewModel {
             // recent route) under city B.
             invalidateInFlightSearch()
             routes = []
-            errorMessage = nil
         }
         suggestionTask?.cancel()
         suggestionTask = nil
@@ -276,6 +283,8 @@ final class RoutePlannerViewModel {
         isLoading = true
         errorMessage = nil
         routes = []
+        // The association describes the previous plan; void it until this one publishes.
+        lastPlannedCityID = nil
         defer { if generation == routeSearchGeneration { isLoading = false } }
 
         do {
@@ -314,9 +323,34 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             case (nil, nil):
+                // Resolve both names here (concurrently, as the service's name-based path
+                // did — same region/limit/first-hit semantics) instead of delegating to it:
+                // the service never surfaced its resolutions, so saving after a both-typed
+                // search — the recents-replay path — persisted name-only (0,0) endpoints.
+                let originQuery = originName.trimmingCharacters(in: .whitespacesAndNewlines)
+                let destinationQuery = destinationName.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !originQuery.isEmpty, !destinationQuery.isEmpty else {
+                    throw RoutePlanningError.stationNotFound
+                }
+                let region = MKCoordinateRegion(
+                    center: city.coordinate,
+                    latitudinalMeters: 120_000,
+                    longitudinalMeters: 120_000
+                )
+                // Local so the child tasks capture the provider, not non-Sendable self.
+                let provider = placeSearchProvider
+                async let originCandidates = provider.searchPlaces(keyword: originQuery, region: region, limit: 8)
+                async let destinationCandidates = provider.searchPlaces(keyword: destinationQuery, region: region, limit: 8)
+                guard let origin = try await originCandidates.first,
+                      let destination = try await destinationCandidates.first else {
+                    throw RoutePlanningError.stationNotFound
+                }
+                guard routeSearchGeneration == generation else { throw CancellationError() }
+                resolvedOrigin = origin
+                resolvedDestination = destination
                 planned = try await routePlanningService.planRoute(
-                    from: originName,
-                    to: destinationName,
+                    from: origin,
+                    to: destination,
                     city: city.id,
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor

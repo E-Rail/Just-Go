@@ -320,7 +320,10 @@ extension RoutePlannerView {
                 .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-        .disabled(viewModel?.canSearch != true)
+        // Gated on a current successful plan, not just filled fields: an unplanned save
+        // has no planned-network city and would fall back to whatever city is selected.
+        .disabled(viewModel?.hasCurrentPlan != true)
+        .opacity(viewModel?.hasCurrentPlan == true ? 1 : 0.55)
         .opacity(viewModel?.canSearch == true ? 1 : 0.55)
     }
 
@@ -410,7 +413,7 @@ extension RoutePlannerView {
                     Button(AppLocalization.localized("Save")) {
                         saveCurrentTrip()
                     }
-                    .disabled(viewModel?.canSearch != true)
+                    .disabled(viewModel?.hasCurrentPlan != true)
                 }
             }
         }

@@ -64,12 +64,17 @@ struct RoutePlannerView: View {
                     set: { appState.selectedCity = $0 }
                 ))
             }
-            .onChange(of: appState.selectedCity?.id) { _, _ in
+            .onChange(of: appState.selectedCity?.id) { _, newID in
+                // switchPlannerCity applies the city to the view model synchronously, so
+                // when this deferred onChange arrives with the VM already on the new city
+                // it's that switch's echo — resetting showResults then would race the
+                // saved-trip/quick-route flow and pop the results it just pushed.
+                let isProgrammaticEcho = viewModel?.selectedCity?.id == newID
                 viewModel?.cityChanged(to: appState.selectedCity)
                 // A pushed results screen belongs to the previous city's search, whose
                 // routes cityChanged just cleared — pop it rather than leave an empty
                 // "0 routes" page for the user to come back to.
-                showResults = false
+                if !isProgrammaticEcho { showResults = false }
             }
             .navigationDestination(isPresented: $showResults) {
                 if let viewModel = viewModel {

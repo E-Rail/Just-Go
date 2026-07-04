@@ -120,7 +120,13 @@ extension RoutePlannerView {
                     ) {
                         let field = quickTagTargetField
                         Task {
-                            await viewModel?.useCurrentLocation(for: field)
+                            // Align the app to the city the device is in (bounded nearest-
+                            // city rule) — filling a Beijing coordinate under a selected
+                            // Shanghai otherwise leaves suggestions, name resolution, and
+                            // a pending quick-place save keyed to the wrong city.
+                            await viewModel?.useCurrentLocation(for: field) { coordinate in
+                                switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
+                            }
                         }
                     }
 
@@ -417,7 +423,10 @@ extension RoutePlannerView {
     }
 
     private func saveCurrentTrip() {
-        guard let city = appState.selectedCity,
+        // Prefer the city of the network that actually planned the current routes: the
+        // provider picks its network by coordinates, so a seam trip (Foshan network under
+        // a selected Guangzhou) must not be persisted under the selection.
+        guard let city = plannerCity(forID: viewModel?.lastPlannedCityID) ?? appState.selectedCity,
               let origin = viewModel?.originSnapshot(),
               let destination = viewModel?.destinationSnapshot(),
               let filter = viewModel?.accessibilityFilter else { return }

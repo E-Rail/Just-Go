@@ -89,8 +89,12 @@ struct RouteResultsView: View {
                 .font(.caption)
                 .fontWeight(.medium)
             Button {
+                // Re-plan rather than re-sort: serviceStatus (and its last-train warnings)
+                // was enriched for the explicit anchor at plan time, so keeping the old
+                // routes would keep stale warnings under a chip that now says "now". The
+                // list already renders isLoading/errorMessage during the re-search.
                 viewModel.tripAnchor = .now
-                viewModel.sortRoutes()
+                Task { await viewModel.searchRoutes() }
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.caption)

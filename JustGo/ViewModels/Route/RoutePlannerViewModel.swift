@@ -25,15 +25,28 @@ final class RoutePlannerViewModel {
     var sortStrategy: RoutePreference = UserDefaults.standard.codableValue(forKey: "sortStrategy", as: RoutePreference.self, default: .metroFirst) {
         didSet { UserDefaults.standard.setCodable(sortStrategy, forKey: "sortStrategy") }
     }
-    var tripAnchor: TripTimeAnchor = .now
+    var tripAnchor: TripTimeAnchor = .now {
+        didSet { invalidateInFlightSearch() }
+    }
 
     private var suggestionTask: Task<Void, Never>?
     private var routeSearchGeneration = 0
+    /// City of the network that produced the current `routes`; nil once any input changes.
+    /// The metro provider picks its network by coordinates, so this can differ from
+    /// `selectedCity` on seam trips — "Save this trip" persists under this city.
+    private(set) var lastPlannedCityID: String?
 
-    // Accessibility filters
-    var requiresWheelchairAccess = false
-    var requiresElevator = false
-    var avoidStairs = false
+    // Accessibility filters. A toggle mid-search supersedes the search: its routes were
+    // planned with the old filter and must not publish under the new one.
+    var requiresWheelchairAccess = false {
+        didSet { invalidateInFlightSearch() }
+    }
+    var requiresElevator = false {
+        didSet { invalidateInFlightSearch() }
+    }
+    var avoidStairs = false {
+        didSet { invalidateInFlightSearch() }
+    }
 
     private let routePlanningService: RoutePlanningService
     private let placeSearchProvider: PlaceSearchProviding
@@ -102,9 +115,20 @@ final class RoutePlannerViewModel {
     }
 
     func updateName(_ name: String, for field: RouteInputField) {
+        invalidateInFlightSearch()
         setName(name, for: field)
         setPlace(nil, for: field)
         updateSuggestions(for: field)
+    }
+
+    /// Any input mutation supersedes an in-flight route search: bump the generation so a
+    /// slow search's publish/error guards fail, and clear the spinner here — the superseded
+    /// search's defer (correctly) refuses to touch it once the token has moved on. Also
+    /// voids the planned-city association, which described the previous inputs.
+    private func invalidateInFlightSearch() {
+        routeSearchGeneration += 1
+        isLoading = false
+        lastPlannedCityID = nil
     }
 
     func selectPlace(_ place: TransitPlace, for field: RouteInputField) {
@@ -124,21 +148,23 @@ final class RoutePlannerViewModel {
         assignPlace(quickPlace.transitPlace, for: field)
     }
 
-    func useCurrentLocation(for field: RouteInputField) async {
+    /// `alignCity` lets the caller switch the app to the city the device is actually in
+    /// (the view owns that decision) once a coordinate is accepted, before the fill.
+    func useCurrentLocation(for field: RouteInputField, alignCity: ((CLLocationCoordinate2D) -> Void)? = nil) async {
         // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
         // error) landing after the user switched city, edited the field, picked a suggestion,
         // or entered quick-place setup must be dropped, not applied over the newer input.
-        let entryCityID = selectedCity?.id
-        let entryName = name(for: field)
-        let entryPlace = self.place(for: field)
+        var expectedCityID = selectedCity?.id
+        var expectedName = name(for: field)
+        var expectedPlace = self.place(for: field)
         // Captured, not cleared: "set Home → tap Current Location" must save Home. The save
         // happens through savePendingQuickPlaceIfNeeded once the fix lands.
         let pendingKind = pendingQuickPlaceKind
         // self.place(for:) — the local `place` declared below shadows the method in here.
         func contextUnchanged() -> Bool {
-            selectedCity?.id == entryCityID &&
-                name(for: field) == entryName &&
-                self.place(for: field) == entryPlace &&
+            selectedCity?.id == expectedCityID &&
+                name(for: field) == expectedName &&
+                self.place(for: field) == expectedPlace &&
                 pendingQuickPlaceKind == pendingKind
         }
 
@@ -174,6 +200,19 @@ final class RoutePlannerViewModel {
                 }
                 coordinate = lastKnown.coordinate
             }
+        }
+
+        // Align the planner's city to where the device actually is BEFORE filling: the
+        // switch wipes the fields (so it must precede the assignment), and the pending
+        // quick-place save below must stamp the aligned city, not the one selected before
+        // the fix arrived. Re-snapshot afterwards so our own switch (and its field wipe)
+        // isn't mistaken for user interference by the guards below.
+        if let alignCity {
+            guard contextUnchanged() else { return }
+            alignCity(coordinate)
+            expectedCityID = selectedCity?.id
+            expectedName = name(for: field)
+            expectedPlace = self.place(for: field)
         }
 
         let place: TransitPlace
@@ -216,11 +255,8 @@ final class RoutePlannerViewModel {
             destinationName = ""
             // Invalidate any in-flight route search too: its generation guard alone can't
             // see a city change, so a slow city-A plan would publish routes (and save a
-            // recent route) under city B. Bumping the generation fails its publish/error
-            // guards, and its defer then refuses to touch isLoading — so whoever bumps the
-            // token owns clearing the spinner and the stale results.
-            routeSearchGeneration += 1
-            isLoading = false
+            // recent route) under city B.
+            invalidateInFlightSearch()
             routes = []
             errorMessage = nil
         }
@@ -244,6 +280,10 @@ final class RoutePlannerViewModel {
 
         do {
             let planned: [Route]
+            // Typed endpoints resolved during planning; written back on success so
+            // "Save this trip" snapshots coordinates instead of name-only endpoints.
+            var resolvedOrigin: TransitPlace?
+            var resolvedDestination: TransitPlace?
             switch (originPlace, destinationPlace) {
             case let (originPlace?, destinationPlace?):
                 planned = try await routePlanningService.planRoute(
@@ -255,6 +295,7 @@ final class RoutePlannerViewModel {
                 )
             case let (originPlace?, nil):
                 let destination = try await resolveTypedPlace(destinationName, city: city, field: .destination, generation: generation)
+                resolvedDestination = destination
                 planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destination,
@@ -264,6 +305,7 @@ final class RoutePlannerViewModel {
                 )
             case let (nil, destinationPlace?):
                 let origin = try await resolveTypedPlace(originName, city: city, field: .origin, generation: generation)
+                resolvedOrigin = origin
                 planned = try await routePlanningService.planRoute(
                     from: origin,
                     to: destinationPlace,
@@ -281,6 +323,13 @@ final class RoutePlannerViewModel {
                 )
             }
             guard generation == routeSearchGeneration else { return }
+            // The generation still matching proves no input changed since this search
+            // started (every mutation bumps it), so the write-back below can't clobber
+            // newer user input. setPlace, not assignPlace: assignPlace invalidates, which
+            // would supersede this very search and strand the spinner.
+            if let resolvedOrigin { setPlace(resolvedOrigin, for: .origin) }
+            if let resolvedDestination { setPlace(resolvedDestination, for: .destination) }
+            lastPlannedCityID = planned.first?.networkCityID ?? city.id
             routes = planned
             sortRoutes()
             if let firstRoute = routes.first {
@@ -331,6 +380,7 @@ final class RoutePlannerViewModel {
     }
 
     func swapOriginDestination() {
+        invalidateInFlightSearch()
         suggestionTask?.cancel()
         suggestionTask = nil
         swap(&originName, &destinationName)
@@ -338,6 +388,7 @@ final class RoutePlannerViewModel {
     }
 
     func useRecentRoute(_ recentRoute: RecentRoute) {
+        invalidateInFlightSearch()
         suggestionTask?.cancel()
         suggestionTask = nil
         originName = recentRoute.originStationName
@@ -348,6 +399,7 @@ final class RoutePlannerViewModel {
     }
 
     func useSavedTrip(_ savedTrip: SavedTrip) {
+        invalidateInFlightSearch()
         suggestionTask?.cancel()
         suggestionTask = nil
         originName = savedTrip.origin.name
@@ -471,6 +523,7 @@ final class RoutePlannerViewModel {
     }
 
     private func assignPlace(_ place: TransitPlace, for field: RouteInputField) {
+        invalidateInFlightSearch()
         suggestionTask?.cancel()
         suggestionTask = nil
         setPlace(place, for: field)

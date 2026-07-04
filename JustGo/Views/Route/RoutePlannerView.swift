@@ -164,6 +164,12 @@ struct RoutePlannerView: View {
         viewModel?.cityChanged(to: city)
     }
 
+    /// City object for a pack cityID — lets the save-trip sheet persist the trip under
+    /// the network that actually planned it, which can differ from the selection.
+    func plannerCity(forID id: String?) -> City? {
+        id.flatMap { container.cityService.getCity(byID: $0) }
+    }
+
     /// City switch for a place that may not name its city (map POIs, legacy quick places).
     /// A known cityID is authoritative. Otherwise infer only when the coordinate is clearly
     /// outside the selected city's metro area (beyond the 80km suggestion-search radius):

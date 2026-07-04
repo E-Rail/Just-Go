@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 struct RoutePlannerView: View {
     @Environment(DIContainer.self) private var container
@@ -140,10 +141,9 @@ struct RoutePlannerView: View {
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
         guard let pending, let vm = viewModel else { return }
         // A station-originated input can reference another city (favorites → station
-        // detail → "From here"); switch to it before filling the field.
-        if let cityID = pending.cityID {
-            switchPlannerCity(toCityID: cityID)
-        }
+        // detail → "From here"); a map POI names no city, so infer one when it's clearly
+        // outside the selected city's area (the map pans freely across cities).
+        switchPlannerCity(forPlaceCityID: pending.cityID, coordinate: pending.place.coordinate)
         vm.selectPlace(pending.place, for: pending.role)
         appState.pendingRouteInput = nil
     }
@@ -157,6 +157,25 @@ struct RoutePlannerView: View {
               let city = container.cityService.getCity(byID: cityID) else { return }
         appState.selectedCity = city
         viewModel?.cityChanged(to: city)
+    }
+
+    /// City switch for a place that may not name its city (map POIs, legacy quick places).
+    /// A known cityID is authoritative. Otherwise infer only when the coordinate is clearly
+    /// outside the selected city's metro area (beyond the 80km suggestion-search radius):
+    /// seam places in adjacent, interconnected metros (Guangzhou/Foshan) must keep the
+    /// user's selected network, since nearest-city-center would misassign them.
+    func switchPlannerCity(forPlaceCityID cityID: String?, coordinate: CLLocationCoordinate2D) {
+        if let cityID {
+            switchPlannerCity(toCityID: cityID)
+            return
+        }
+        guard let selected = appState.selectedCity else { return }
+        let place = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let selectedCenter = CLLocation(latitude: selected.coordinate.latitude, longitude: selected.coordinate.longitude)
+        guard place.distance(from: selectedCenter) > 80_000,
+              let nearest = container.cityService.findNearestCity(to: place),
+              nearest.id != selected.id else { return }
+        switchPlannerCity(toCityID: nearest.id)
     }
 
     private func resumeTripBanner(_ route: Route) -> some View {

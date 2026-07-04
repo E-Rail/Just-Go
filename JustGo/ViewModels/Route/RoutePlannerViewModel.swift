@@ -265,7 +265,7 @@ final class RoutePlannerViewModel {
             routes = planned
             sortRoutes()
             if let firstRoute = routes.first {
-                saveRecentRoute(firstRoute)
+                saveRecentRoute(firstRoute, cityID: city.id)
             }
         } catch is CancellationError {
             return
@@ -480,7 +480,7 @@ final class RoutePlannerViewModel {
         }
     }
 
-    private func saveRecentRoute(_ route: Route) {
+    private func saveRecentRoute(_ route: Route, cityID: String) {
         let recentRoute = RecentRoute(
             originStationID: route.originStationID,
             originStationName: route.origin,
@@ -488,7 +488,8 @@ final class RoutePlannerViewModel {
             destinationStationName: route.destination,
             lineName: route.segments.first(where: { $0.type.isTransit })?.lineName,
             duration: route.formattedDuration,
-            plannedDuration: route.totalDuration
+            plannedDuration: route.totalDuration,
+            cityID: cityID
         )
 
         var routes = recentRoutes.filter {
@@ -501,7 +502,7 @@ final class RoutePlannerViewModel {
 
     private func savePendingQuickPlaceIfNeeded(_ place: TransitPlace) -> TransitPlace {
         guard let kind = pendingQuickPlaceKind else { return place }
-        let quickPlace = QuickPlace(kind: kind, place: place)
+        let quickPlace = QuickPlace(kind: kind, place: place, cityID: selectedCity?.id)
         quickPlaces.removeAll { $0.kind == kind }
         quickPlaces.append(quickPlace)
         quickPlaces.sort { $0.kind.rawValue < $1.kind.rawValue }
@@ -536,11 +537,23 @@ struct RecentRoute: Identifiable, Codable {
     let lineName: String?
     let duration: String
     let plannedDuration: TimeInterval?
+    /// City the route was planned in; nil on rows saved before this field existed.
+    let cityID: String?
 
     /// Localized at display time from the raw duration so it follows a language switch;
     /// falls back to the legacy stored string for records saved before plannedDuration existed.
     var displayDuration: String {
         if let plannedDuration { return AppLocalization.minutes(Int(plannedDuration / 60)) }
         return duration
+    }
+
+    /// The stored city, or one recovered from the station ID for legacy rows — every route
+    /// producer builds IDs as "network-<cityID>-<station>", so the middle component is the
+    /// city. Returns nil (caller keeps the selected city) when neither source is usable.
+    var resolvedCityID: String? {
+        if let cityID { return cityID }
+        let parts = originStationID.split(separator: "-")
+        guard parts.count >= 3, parts[0] == "network" else { return nil }
+        return String(parts[1])
     }
 }

@@ -84,6 +84,12 @@ extension RoutePlannerView {
         VStack(alignment: .leading, spacing: 8) {
             if viewModel?.canQuickRouteWork == true {
                 Button {
+                    // Company keeps its home city (saved before Round 8 rows infer one) —
+                    // routing to a Beijing office under a selected Shanghai network snaps
+                    // both endpoints to nonsense stations.
+                    if let company = viewModel?.quickPlace(for: .company) {
+                        switchPlannerCity(forPlaceCityID: company.cityID, coordinate: company.transitPlace.coordinate)
+                    }
                     Task {
                         await viewModel?.quickRoute(to: .company)
                         showResults = viewModel?.routes.isEmpty == false
@@ -127,6 +133,7 @@ extension RoutePlannerView {
                         ) {
                             let field = quickTagTargetField
                             if let quickPlace {
+                                switchPlannerCity(forPlaceCityID: quickPlace.cityID, coordinate: quickPlace.transitPlace.coordinate)
                                 viewModel?.useQuickPlace(quickPlace, for: field)
                             } else {
                                 viewModel?.beginSavingQuickPlace(kind)
@@ -331,6 +338,13 @@ extension RoutePlannerView {
                 VStack(spacing: 0) {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
                         Button {
+                            // Recents fill by NAME and resolve at search time in the
+                            // current city — a Beijing name under Shanghai silently
+                            // matches a same-named Shanghai station. Legacy rows recover
+                            // their city from the station ID prefix.
+                            if let cityID = route.resolvedCityID {
+                                switchPlannerCity(toCityID: cityID)
+                            }
                             viewModel?.useRecentRoute(route)
                             scrollToTopTrigger.toggle()
                         } label: {

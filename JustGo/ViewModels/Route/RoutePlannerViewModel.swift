@@ -195,6 +195,15 @@ final class RoutePlannerViewModel {
             destinationPlace = nil
             originName = ""
             destinationName = ""
+            // Invalidate any in-flight route search too: its generation guard alone can't
+            // see a city change, so a slow city-A plan would publish routes (and save a
+            // recent route) under city B. Bumping the generation fails its publish/error
+            // guards, and its defer then refuses to touch isLoading — so whoever bumps the
+            // token owns clearing the spinner and the stale results.
+            routeSearchGeneration += 1
+            isLoading = false
+            routes = []
+            errorMessage = nil
         }
         suggestionTask?.cancel()
         suggestionTask = nil

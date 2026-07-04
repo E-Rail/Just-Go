@@ -52,15 +52,18 @@ struct TransferStationSheet: View {
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }
-            // Match by the real transfer-station coordinate when the route carries one — a
-            // (0,0) placeholder makes same-named stations disambiguate by distance to Null
-            // Island and picks an arbitrary one.
-            let place = TransitPlace(
-                name: stationName,
-                coordinate: transferStopCoordinate ?? CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                source: .localStationData
-            )
-            enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            // Match only when the route carries the real transfer-station coordinate
+            // (provider-built routes always do). With a (0,0) placeholder, same-named
+            // stations disambiguate by distance to Null Island and pick an arbitrary one —
+            // showing the wrong station's accessibility data is worse than showing none.
+            if let coordinate = transferStopCoordinate {
+                let place = TransitPlace(
+                    name: stationName,
+                    coordinate: coordinate,
+                    source: .localStationData
+                )
+                enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            }
             // Street view keys off the route's own coordinate first so it still works when the
             // official pack doesn't list this station (matchingStation returned nil above).
             if let coordinate = transferStopCoordinate ?? enrichedStation?.coordinate,

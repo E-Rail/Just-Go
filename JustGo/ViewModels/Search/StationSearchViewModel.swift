@@ -49,6 +49,15 @@ final class StationSearchViewModel {
             facilityEnrichmentTask?.cancel()
             isEnrichingForFacility = false
             filter = StationFilter()
+            // A real city switch also invalidates the previous city's query: without this,
+            // a non-empty searchText returns at the guard below and leaves the old city's
+            // results listed under the new one — with a still-pending debounced searchTask
+            // that would reload the OLD city once its 180ms sleep elapses.
+            searchTask?.cancel()
+            searchText = ""
+            unfilteredResults = []
+            searchResults = []
+            errorMessage = nil
         }
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         guard !city.isEmpty else {

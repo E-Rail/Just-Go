@@ -125,7 +125,22 @@ final class RoutePlannerViewModel {
     }
 
     func useCurrentLocation(for field: RouteInputField) async {
-        pendingQuickPlaceKind = nil
+        // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
+        // error) landing after the user switched city, edited the field, picked a suggestion,
+        // or entered quick-place setup must be dropped, not applied over the newer input.
+        let entryCityID = selectedCity?.id
+        let entryName = name(for: field)
+        let entryPlace = self.place(for: field)
+        // Captured, not cleared: "set Home → tap Current Location" must save Home. The save
+        // happens through savePendingQuickPlaceIfNeeded once the fix lands.
+        let pendingKind = pendingQuickPlaceKind
+        // self.place(for:) — the local `place` declared below shadows the method in here.
+        func contextUnchanged() -> Bool {
+            selectedCity?.id == entryCityID &&
+                name(for: field) == entryName &&
+                self.place(for: field) == entryPlace &&
+                pendingQuickPlaceKind == pendingKind
+        }
 
         let coordinate: CLLocationCoordinate2D
         if let recent = locationService.currentLocation,
@@ -142,6 +157,7 @@ final class RoutePlannerViewModel {
             do {
                 coordinate = try await locationService.requestCurrentLocation().coordinate
             } catch {
+                guard contextUnchanged() else { return }
                 if let locationError = error as? LocationServiceError,
                    locationError == .permissionDenied {
                     errorMessage = userFacingErrorMessage(for: error)
@@ -162,9 +178,11 @@ final class RoutePlannerViewModel {
 
         let place: TransitPlace
         do {
+            // While saving a quick place, let the geocoder name the spot (street/POI) —
+            // a Home tag permanently labeled "Current Location" reads as broken later.
             place = try await placeSearchProvider.reverseGeocode(
                 location: coordinate,
-                name: AppLocalization.localized("Current Location")
+                name: pendingKind == nil ? AppLocalization.localized("Current Location") : nil
             ).withSource(.currentLocation)
         } catch {
             place = TransitPlace(
@@ -173,7 +191,8 @@ final class RoutePlannerViewModel {
                 source: .currentLocation
             )
         }
-        assignPlace(place, for: field)
+        guard contextUnchanged() else { return }
+        assignPlace(savePendingQuickPlaceIfNeeded(place), for: field)
     }
 
     /// Begin populating the device location in the background when already authorized, so a
@@ -265,7 +284,11 @@ final class RoutePlannerViewModel {
             routes = planned
             sortRoutes()
             if let firstRoute = routes.first {
-                saveRecentRoute(firstRoute, cityID: city.id)
+                // The metro provider picks its network by coordinates, not the selected
+                // city — a seam route (Foshan network under a selected Guangzhou) must be
+                // saved under the network that actually planned it, or replaying the
+                // recent resolves its station names in the wrong city.
+                saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID ?? city.id)
             }
         } catch is CancellationError {
             return
@@ -297,6 +320,9 @@ final class RoutePlannerViewModel {
     var canQuickRouteWork: Bool { quickPlace(for: .company) != nil }
 
     func quickRoute(to kind: QuickPlaceKind) async {
+        // A route shortcut, not a place pick — leave quick-place setup mode so the
+        // current-location origin fill below doesn't get consumed as the pending save.
+        pendingQuickPlaceKind = nil
         guard let destination = quickPlace(for: kind) else { return }
         await useCurrentLocation(for: .origin)
         guard originPlace != nil else { return }

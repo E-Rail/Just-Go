@@ -1,4 +1,15 @@
 import SwiftUI
+import UIKit
+
+/// Reports the search bar's rendered bottom edge in `.global` space so the dropdown's
+/// height cap tracks the bar's real height (Dynamic Type) and the keyboard, instead of
+/// a hardcoded offset — same pattern as the map's SearchBarBottomYKey.
+private struct StationSearchBarBottomYKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
 
 struct StationSearchView: View {
     @Environment(DIContainer.self) private var container
@@ -6,22 +17,40 @@ struct StationSearchView: View {
     @State private var viewModel: StationSearchViewModel?
     @State private var selectedStation: Station?
     @State private var showFacilityPicker = false
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var searchBarBottomY: CGFloat = 0
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .top) {
-                VStack(spacing: 0) {
-                    searchBar
-                    filterBar
-                    resultsList
+            VStack(spacing: 0) {
+                searchBar
+                    // The dropdown hangs directly off the bar (its top aligned to the
+                    // bar's bottom), so it tracks the bar's actual position instead of a
+                    // fixed 58pt offset that Dynamic Type growth silently breaks.
+                    .overlay(alignment: .bottom) {
+                        if isSearchFocused && viewModel?.searchResults.isEmpty == false {
+                            searchDropdown
+                                .padding(.horizontal)
+                                .alignmentGuide(.bottom) { $0[.top] - 8 }
+                        }
+                    }
+                    .zIndex(40)
+                filterBar
+                resultsList
+            }
+            .onPreferenceChange(StationSearchBarBottomYKey.self) { searchBarBottomY = $0 }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+                guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+                withAnimation(.easeInOut(duration: duration)) {
+                    keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
                 }
-
-                if isSearchFocused && viewModel?.searchResults.isEmpty == false {
-                    searchDropdown
-                        .padding(.horizontal)
-                        .padding(.top, 58)
-                        .zIndex(40)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
+                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+                withAnimation(.easeInOut(duration: duration)) {
+                    keyboardHeight = 0
                 }
             }
             .navigationTitle(AppLocalization.localized("Search"))
@@ -74,12 +103,35 @@ struct StationSearchView: View {
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(key: StationSearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
+            }
+        }
+    }
+
+    // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion;
+    // the floor keeps at least one row reachable in pathological layouts.
+    private var searchDropdownMaxHeight: CGFloat {
+        let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
+        return max(44, keyboardTopY - searchBarBottomY - 16)
     }
 
     private var searchDropdown: some View {
-        let topResults = Array(viewModel?.searchResults.prefix(8) ?? [])
+        ScrollView {
+            searchDropdownRows
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .frame(maxHeight: searchDropdownMaxHeight)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
+    }
+
+    // All matches, scrollable — not a silent prefix(8) truncation.
+    private var searchDropdownRows: some View {
+        let results = viewModel?.searchResults ?? []
         return VStack(spacing: 0) {
-            ForEach(topResults) { station in
+            ForEach(results) { station in
                 Button {
                     isSearchFocused = false
                     viewModel?.selectStation(station)
@@ -108,7 +160,7 @@ struct StationSearchView: View {
                 }
                 .buttonStyle(.plain)
 
-                if station.id != topResults.last?.id {
+                if station.id != results.last?.id {
                     Divider()
                         .padding(.leading, 12)
                 }
@@ -267,8 +319,32 @@ struct StationSearchView: View {
             ForEach(viewModel?.recentSearches ?? []) { search in
                 Button {
                     isSearchFocused = false
-                    viewModel?.searchText = search.stationName
-                    Task { await viewModel?.search(city: appState.selectedCity?.id ?? "") }
+                    Task {
+                        // A recent replays in ITS city — same-named stations exist across
+                        // cities, so name-searching the currently selected one can open
+                        // the wrong station entirely.
+                        var cityID = search.cityID
+                        if cityID.isEmpty { cityID = appState.selectedCity?.id ?? "" }
+                        if cityID != appState.selectedCity?.id,
+                           let city = container.cityService.getCity(byID: cityID) {
+                            appState.selectedCity = city
+                            // Load the city ourselves so currentCityID is already correct
+                            // when the deferred .task(id:) reload fires — otherwise that
+                            // reload's real-city-change reset would wipe the fallback
+                            // query set below.
+                            await viewModel?.loadInitialStations(city: cityID)
+                        }
+                        if let station = await viewModel?.station(withID: search.stationID, in: cityID) {
+                            viewModel?.selectStation(station)
+                            selectedStation = station
+                        } else {
+                            // Station no longer in the pack — fall back to a name search
+                            // in its home city. scheduleSearch (not search) so the
+                            // debounce orders it after the .task(id:) reload's token mint.
+                            viewModel?.searchText = search.stationName
+                            viewModel?.scheduleSearch(city: cityID)
+                        }
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "clock")

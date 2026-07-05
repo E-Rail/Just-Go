@@ -48,12 +48,15 @@ struct RoutePlannerView: View {
                     .onChange(of: scrollToTopTrigger) { _, _ in
                         withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
                     }
+                    // Pin the input card to the top when suggestions appear (or move
+                    // between fields) so the field, its inline suggestion list, and the
+                    // keyboard fit together on small screens.
+                    .onChange(of: activeSuggestions?.field) { _, field in
+                        guard field != nil else { return }
+                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
+                    }
                 }
 
-                activeSuggestionDropdown
-                    .padding(.horizontal)
-                    .padding(.top, 132)
-                    .zIndex(50)
             }
             .navigationTitle(AppLocalization.localized("Route Planner"))
             .navigationBarTitleDisplayMode(.large)
@@ -280,6 +283,18 @@ struct RoutePlannerView: View {
                     }
                 }
 
+                // Inline (in the card, under the field group) rather than a floating
+                // overlay pinned at a fixed offset: the card's position varies with the
+                // banner/welcome/commute sections above it, with scrolling, and with type
+                // size, so the overlay could cover the fields or detach entirely. Inline
+                // content also participates in the scroll view's keyboard avoidance.
+                if let activeSuggestions {
+                    suggestionDropdown(
+                        suggestions: activeSuggestions.suggestions,
+                        select: { viewModel?.selectPlace($0, for: activeSuggestions.field) }
+                    )
+                }
+
                 HStack {
                     Spacer()
                     Button(action: { viewModel?.swapOriginDestination() }) {
@@ -293,18 +308,7 @@ struct RoutePlannerView: View {
                 }
             }
         }
-        .zIndex(30)
-    }
-
-    @ViewBuilder
-    private var activeSuggestionDropdown: some View {
-        if let activeSuggestions {
-            suggestionDropdown(
-                suggestions: activeSuggestions.suggestions,
-                select: { viewModel?.selectPlace($0, for: activeSuggestions.field) }
-            )
-            .padding(.top, activeSuggestions.field == .destination ? 56 : 0)
-        }
+        .id("routeInputCard")
     }
 
     private var activeSuggestions: (field: RouteInputField, suggestions: [TransitPlace])? {
@@ -330,6 +334,19 @@ struct RoutePlannerView: View {
     }
 
     private func suggestionDropdown(
+        suggestions: [TransitPlace],
+        select: @escaping (TransitPlace) -> Void
+    ) -> some View {
+        ScrollView {
+            suggestionRows(suggestions: suggestions, select: select)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        // Bounded so the field group stays visible above; taller lists scroll internally.
+        .frame(maxHeight: 260)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func suggestionRows(
         suggestions: [TransitPlace],
         select: @escaping (TransitPlace) -> Void
     ) -> some View {
@@ -362,8 +379,6 @@ struct RoutePlannerView: View {
                 }
             }
         }
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-        .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
     }
 
     private var searchButton: some View {

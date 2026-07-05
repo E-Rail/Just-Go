@@ -203,6 +203,13 @@ final class StationSearchViewModel {
         )
     }
 
+    /// The exact stored station for a recent-search row — replay must not re-resolve by
+    /// name, since same-named stations exist across cities.
+    func station(withID stationID: String, in city: String) async -> Station? {
+        guard !city.isEmpty else { return nil }
+        return await stationSearchService.stations(in: city).first { $0.stationID == stationID }
+    }
+
     func selectStation(_ station: Station) {
         var recent = recentSearches.filter { $0.stationID != station.stationID }
         recent.insert(SearchHistory(

@@ -22,6 +22,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func requestCurrentLocation() async throws -> CLLocation {
         locationErrorMessage = nil
 
+        // The cache fast path returns before the cancellation handler below is armed —
+        // without this check an already-cancelled caller (e.g. locate-me superseded by a
+        // city switch) would still receive a fix and act on it.
+        try Task.checkCancellation()
+
         if let currentLocation,
            isAuthorized,
            currentLocation.horizontalAccuracy >= 0,

@@ -158,7 +158,10 @@ final class RoutePlannerViewModel {
 
     /// `alignCity` lets the caller switch the app to the city the device is actually in
     /// (the view owns that decision) once a coordinate is accepted, before the fill.
-    func useCurrentLocation(for field: RouteInputField, alignCity: ((CLLocationCoordinate2D) -> Void)? = nil) async {
+    /// Returns whether THIS invocation applied a fill — false on failure, denial, or a
+    /// stale-context drop — so flows like quickRoute don't proceed on a leftover origin.
+    @discardableResult
+    func useCurrentLocation(for field: RouteInputField, alignCity: ((CLLocationCoordinate2D) -> Void)? = nil) async -> Bool {
         // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
         // error) landing after the user switched city, edited the field, picked a suggestion,
         // or entered quick-place setup must be dropped, not applied over the newer input.
@@ -191,11 +194,11 @@ final class RoutePlannerViewModel {
             do {
                 coordinate = try await locationService.requestCurrentLocation().coordinate
             } catch {
-                guard contextUnchanged() else { return }
+                guard contextUnchanged() else { return false }
                 if let locationError = error as? LocationServiceError,
                    locationError == .permissionDenied {
                     errorMessage = userFacingErrorMessage(for: error)
-                    return
+                    return false
                 }
                 // Last resort once the strict request fails: fall back to a last-known fix so
                 // the field still fills, but reject an obviously coarse one (accuracy-relaxed
@@ -204,7 +207,7 @@ final class RoutePlannerViewModel {
                       lastKnown.horizontalAccuracy >= 0,
                       lastKnown.horizontalAccuracy <= 1000 else {
                     errorMessage = userFacingErrorMessage(for: error)
-                    return
+                    return false
                 }
                 coordinate = lastKnown.coordinate
             }
@@ -216,7 +219,7 @@ final class RoutePlannerViewModel {
         // the fix arrived. Re-snapshot afterwards so our own switch (and its field wipe)
         // isn't mistaken for user interference by the guards below.
         if let alignCity {
-            guard contextUnchanged() else { return }
+            guard contextUnchanged() else { return false }
             alignCity(coordinate)
             expectedCityID = selectedCity?.id
             expectedName = name(for: field)
@@ -238,8 +241,9 @@ final class RoutePlannerViewModel {
                 source: .currentLocation
             )
         }
-        guard contextUnchanged() else { return }
+        guard contextUnchanged() else { return false }
         assignPlace(savePendingQuickPlaceIfNeeded(place), for: field)
+        return true
     }
 
     /// Begin populating the device location in the background when already authorized, so a
@@ -407,8 +411,9 @@ final class RoutePlannerViewModel {
         // current-location origin fill below doesn't get consumed as the pending save.
         pendingQuickPlaceKind = nil
         guard let destination = quickPlace(for: kind) else { return }
-        await useCurrentLocation(for: .origin)
-        guard originPlace != nil else { return }
+        // Proceed only when THIS fill applied — a failed/denied/stale-dropped location
+        // must not silently route to work from an old origin left in the field.
+        guard await useCurrentLocation(for: .origin) else { return }
         useQuickPlace(destination, for: .destination)
         await searchRoutes()
     }

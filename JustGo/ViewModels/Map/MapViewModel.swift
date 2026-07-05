@@ -37,6 +37,9 @@ final class MapViewModel {
     private let cityService: CityService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
+    // The city the map is currently loaded for — search publishes are guarded on it so
+    // a slow city-A place search can't flash its results under city B's map.
+    private var activeCityID: String?
     private var viewportLoadTask: Task<Void, Never>?
     private var cityLoadTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
@@ -66,6 +69,7 @@ final class MapViewModel {
     }
 
     func loadStations(for city: City) async {
+        activeCityID = city.id
         clearSearch()
         viewportLoadTask?.cancel()
         cityLoadTask?.cancel()
@@ -80,6 +84,7 @@ final class MapViewModel {
 
     func searchEverywhere(in city: City?) async {
         guard let city else { return }
+        let cityID = city.id
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
             searchResults = []
@@ -90,17 +95,20 @@ final class MapViewModel {
         do {
             let results = try await stationSearchService.searchPlaces(
                 keyword: query,
-                city: city.id,
+                city: cityID,
                 region: visibleRegion?.mkCoordinateRegion
             )
             // MKLocalSearch ignores Swift task cancellation, so a superseded query can return
-            // after a newer one — drop it instead of stomping the current results.
+            // after a newer one — drop it instead of stomping the current results. The city
+            // guard covers the window before a city switch's deferred clearSearch runs.
             guard !Task.isCancelled,
+                  activeCityID == cityID,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
             errorMessage = nil
             searchResults = results
         } catch {
             guard !Task.isCancelled,
+                  activeCityID == cityID,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
             searchResults = []
             errorMessage = AppLocalization.localized("Place search requires a network connection")

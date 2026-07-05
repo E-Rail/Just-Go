@@ -19,6 +19,9 @@ struct StationSearchView: View {
     @State private var showFacilityPicker = false
     @State private var keyboardHeight: CGFloat = 0
     @State private var searchBarBottomY: CGFloat = 0
+    // Tracked so a newer recent tap (or a direct station selection) supersedes an older
+    // replay still loading its city — the loser must not overwrite the winner's push.
+    @State private var recentReplayTask: Task<Void, Never>?
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -59,6 +62,9 @@ struct StationSearchView: View {
             .navigationDestination(item: $selectedStation) { station in
                 StationDetailView(station: station)
             }
+        }
+        .onDisappear {
+            recentReplayTask?.cancel()
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
@@ -134,6 +140,7 @@ struct StationSearchView: View {
             ForEach(results) { station in
                 Button {
                     isSearchFocused = false
+                    recentReplayTask?.cancel()
                     viewModel?.selectStation(station)
                     selectedStation = station
                 } label: {
@@ -267,6 +274,7 @@ struct StationSearchView: View {
                         station: station,
                         distanceText: viewModel?.distanceText(for: station)
                     ) {
+                        recentReplayTask?.cancel()
                         viewModel?.selectStation(station)
                         selectedStation = station
                     }
@@ -319,10 +327,14 @@ struct StationSearchView: View {
             ForEach(viewModel?.recentSearches ?? []) { search in
                 Button {
                     isSearchFocused = false
-                    Task {
+                    recentReplayTask?.cancel()
+                    recentReplayTask = Task {
                         // A recent replays in ITS city — same-named stations exist across
                         // cities, so name-searching the currently selected one can open
-                        // the wrong station entirely.
+                        // the wrong station entirely. Cancellation checks after each await
+                        // keep a superseded replay from overwriting the newer tap's push.
+                        // (No cancel-on-city-change anywhere: this task switches the city
+                        // itself and must survive its own switch.)
                         var cityID = search.cityID
                         if cityID.isEmpty { cityID = appState.selectedCity?.id ?? "" }
                         if cityID != appState.selectedCity?.id,
@@ -333,8 +345,11 @@ struct StationSearchView: View {
                             // reload's real-city-change reset would wipe the fallback
                             // query set below.
                             await viewModel?.loadInitialStations(city: cityID)
+                            guard !Task.isCancelled else { return }
                         }
-                        if let station = await viewModel?.station(withID: search.stationID, in: cityID) {
+                        let station = await viewModel?.station(withID: search.stationID, in: cityID)
+                        guard !Task.isCancelled else { return }
+                        if let station {
                             viewModel?.selectStation(station)
                             selectedStation = station
                         } else {

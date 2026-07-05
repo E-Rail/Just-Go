@@ -69,6 +69,9 @@ struct MapContainerView: View {
             placeMatchTask?.cancel()
             stationOpenTask?.cancel()
             centerOnUserTask?.cancel()
+            // Kill the old city's place search here rather than waiting for the deferred
+            // .task(id:) reload — its results must not flash under the new city.
+            viewModel?.clearSearch()
             stationOpenGeneration += 1
             isLoadingStationDetail = false
             pendingResolvedItem = nil

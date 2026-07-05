@@ -1,5 +1,15 @@
 import SwiftUI
 import CoreLocation
+import UIKit
+
+/// Reports the inline suggestion list's top edge in `.global` space so its height cap can
+/// track the keyboard's measured top (same pattern as Map/Station Search).
+private struct SuggestionListTopYKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
 
 struct RoutePlannerView: View {
     @Environment(DIContainer.self) private var container
@@ -16,6 +26,8 @@ struct RoutePlannerView: View {
     @State var scrollToTopTrigger = false
     @State private var resumableTrip: Route?
     @State private var showResumeLiveGo = false
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var suggestionListTopY: CGFloat = 0
 
     var body: some View {
         NavigationStack {
@@ -61,6 +73,20 @@ struct RoutePlannerView: View {
             .navigationTitle(AppLocalization.localized("Route Planner"))
             .navigationBarTitleDisplayMode(.large)
             .background(Color.appBackground)
+            .onPreferenceChange(SuggestionListTopYKey.self) { suggestionListTopY = $0 }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+                guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+                withAnimation(.easeInOut(duration: duration)) {
+                    keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
+                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+                withAnimation(.easeInOut(duration: duration)) {
+                    keyboardHeight = 0
+                }
+            }
             .sheet(isPresented: $showCityPicker) {
                 CityPickerView(selectedCity: Binding(
                     get: { appState.selectedCity },
@@ -333,6 +359,15 @@ struct RoutePlannerView: View {
             .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
     }
 
+    // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.
+    // The floor keeps a couple of rows usable in pathological layouts; the ceiling keeps
+    // the list from dwarfing the card when no keyboard is on screen (hardware keyboard).
+    private var suggestionMaxHeight: CGFloat {
+        guard suggestionListTopY > 0 else { return 260 }
+        let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
+        return min(320, max(96, keyboardTopY - suggestionListTopY - 12))
+    }
+
     private func suggestionDropdown(
         suggestions: [TransitPlace],
         select: @escaping (TransitPlace) -> Void
@@ -341,9 +376,15 @@ struct RoutePlannerView: View {
             suggestionRows(suggestions: suggestions, select: select)
         }
         .scrollBounceBehavior(.basedOnSize)
-        // Bounded so the field group stays visible above; taller lists scroll internally.
-        .frame(maxHeight: 260)
+        // Capped at the keyboard's measured top edge so the field group, the list, and
+        // the keyboard stay simultaneously visible; taller lists scroll internally.
+        .frame(maxHeight: suggestionMaxHeight)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(key: SuggestionListTopYKey.self, value: proxy.frame(in: .global).minY)
+            }
+        }
     }
 
     private func suggestionRows(

@@ -186,6 +186,9 @@ final class MapViewModel {
     func centerOnUser() async {
         do {
             let location = try await locationService.requestCurrentLocation()
+            // A cancelled locate-me (city switch mid-fix) must not recenter the new
+            // city's map onto the user's physical position.
+            guard !Task.isCancelled else { return }
             updateCamera(to: location.coordinate)
         } catch { }
     }

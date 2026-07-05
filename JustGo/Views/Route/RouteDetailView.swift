@@ -411,7 +411,10 @@ struct RouteDetailView: View {
                     Text(AppLocalization.text(english: "Leave-time reminder", simplified: "出发提醒", traditional: "出發提醒"))
                         .font(.headline)
                     Button {
-                        Task { await scheduleReminder(plan: departurePlan) }
+                        // Capture the route ID with the plan: the auth prompt inside
+                        // scheduleReminder awaits user input, and a tab switch during it
+                        // would otherwise file this plan under the newly-shown route.
+                        Task { await scheduleReminder(plan: departurePlan, routeID: route.id) }
                     } label: {
                         Label(
                             reminderScheduled
@@ -455,7 +458,7 @@ struct RouteDetailView: View {
         }
     }
 
-    private func scheduleReminder(plan: DeparturePlan) async {
+    private func scheduleReminder(plan: DeparturePlan, routeID: UUID) async {
         guard plan.leaveByDate.addingTimeInterval(-Double(reminderLeadMinutes) * 60) > Date() else {
             showReminderTooLate = true
             return
@@ -464,14 +467,14 @@ struct RouteDetailView: View {
             showReminderDenied = true
             return
         }
-        let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: reminderLeadMinutes)
+        let scheduled = await container.tripReminderService.scheduleReminder(routeID: routeID, plan: plan, leadMinutes: reminderLeadMinutes)
         if scheduled {
             // Enforce a single active reminder: drop the one from a previously-reminded route
             // so scheduling on route A then route B can't leave two notifications pending.
-            if let previous = scheduledReminderRouteID, previous != route.id {
+            if let previous = scheduledReminderRouteID, previous != routeID {
                 container.tripReminderService.cancelReminder(routeID: previous)
             }
-            scheduledReminderRouteID = route.id
+            scheduledReminderRouteID = routeID
         }
         showReminderTooLate = !scheduled
     }

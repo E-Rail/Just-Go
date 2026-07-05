@@ -88,7 +88,9 @@ struct NetworkLineStatusView: View {
                 }
             }
         }
-        .task(id: refreshID) {
+        // Keyed by city as well as the manual refresh token, so a surviving sheet
+        // instance reloads if the selected city ever changes under it.
+        .task(id: "\(cityID)|\(refreshID)") {
             await loadLineStatuses()
         }
     }

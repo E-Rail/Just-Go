@@ -395,6 +395,10 @@ struct MapContainerView: View {
         placeMatchTask?.cancel()
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
+        // Same entry-point invariant as handlePlaceTapped/openStation: every new interaction
+        // resets the POI-tap state, so a cancelled match's buffered resolve can't linger.
+        pendingResolvedItem = nil
+        tappedPlace = nil
         placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
                 guard !Task.isCancelled else { return }

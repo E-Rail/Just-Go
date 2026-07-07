@@ -6,6 +6,7 @@ struct RouteDetailView: View {
     let preference: RoutePreference
     let alternatives: [Route]
     let tripAnchor: TripTimeAnchor
+    let accessibilityFilter: AccessibilityFilter
     @State var selectedRouteID: UUID
     @State var showRouteReport = false
     @State var showTripNote = false
@@ -122,7 +123,8 @@ struct RouteDetailView: View {
         route: Route,
         preference: RoutePreference = .fastest,
         alternatives: [Route] = [],
-        tripAnchor: TripTimeAnchor = .now
+        tripAnchor: TripTimeAnchor = .now,
+        accessibilityFilter: AccessibilityFilter = .none
     ) {
         initialRoute = route
         self.preference = preference
@@ -130,6 +132,7 @@ struct RouteDetailView: View {
             ? alternatives
             : [route] + alternatives
         self.tripAnchor = tripAnchor
+        self.accessibilityFilter = accessibilityFilter
         _selectedRouteID = State(initialValue: route.id)
     }
 

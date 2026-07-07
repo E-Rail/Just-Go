@@ -1,9 +1,5 @@
 import SwiftUI
 
-extension Notification.Name {
-    static let quickPlacesDidReset = Notification.Name("quickPlacesDidReset")
-}
-
 enum AppTheme: String, CaseIterable, Identifiable {
     case forestGreen  = "#2D7055"
     case oceanBlue    = "#1D6FA5"

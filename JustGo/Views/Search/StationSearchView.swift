@@ -117,10 +117,11 @@ struct StationSearchView: View {
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion;
-    // the floor keeps at least one row reachable in pathological layouts.
+    // when the keyboard is visible, cap strictly to the measured space above it.
     private var searchDropdownMaxHeight: CGFloat {
         let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
-        return max(44, keyboardTopY - searchBarBottomY - 16)
+        let available = max(0, keyboardTopY - searchBarBottomY - 16)
+        return keyboardHeight > 0 ? available : max(44, available)
     }
 
     private var searchDropdown: some View {

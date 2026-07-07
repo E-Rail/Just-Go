@@ -40,6 +40,24 @@ struct AccessibilityPreference: Codable {
 
 }
 
+struct RouteAffectingAccessibilitySignature: Equatable {
+    let requiresWheelchairAccess: Bool
+    let prefersElevator: Bool
+    let avoidStairs: Bool
+    let maxWalkingDistance: Double
+}
+
+extension AccessibilityPreference {
+    var routeAffectingSignature: RouteAffectingAccessibilitySignature {
+        RouteAffectingAccessibilitySignature(
+            requiresWheelchairAccess: requiresWheelchairAccess,
+            prefersElevator: prefersElevator,
+            avoidStairs: avoidStairs,
+            maxWalkingDistance: maxWalkingDistance
+        )
+    }
+}
+
 enum DisabilityCategory: String, Codable, CaseIterable {
     case mobility = "mobility"
     case visualImpairment = "visual_impairment"

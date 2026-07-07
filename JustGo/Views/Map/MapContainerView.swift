@@ -346,7 +346,12 @@ struct MapContainerView: View {
         Button {
             centerOnUserTask?.cancel()
             centerOnUserTask = Task {
-                await viewModel?.centerOnUser()
+                // Locate also aligns the app to the city the user is physically in
+                // (bounded — see centerOnUser): the camera alone moving left the city
+                // pill, station search, and planner stuck on the old city.
+                if let city = await viewModel?.centerOnUser() {
+                    appState.selectedCity = city
+                }
             }
         } label: {
             Image(systemName: "location.fill")

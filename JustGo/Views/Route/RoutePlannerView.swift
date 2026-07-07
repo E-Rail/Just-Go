@@ -37,12 +37,16 @@ struct RoutePlannerView: View {
                         VStack(spacing: 20) {
                             Color.clear.frame(height: 0).id("plannerTop")
                             if let resumableTrip { resumeTripBanner(resumableTrip) }
-                            if !hasSeenWelcome { welcomeCard }
+                            // Simplified UI (cognitive accessibility): only the essentials —
+                            // city, the fields, quick tags, search, and the accessibility
+                            // filters themselves. The resume banner stays: an active trip
+                            // is never noise.
+                            if !simplifiedUI, !hasSeenWelcome { welcomeCard }
                             citySelector
-                            smartCommuteSection
+                            if !simplifiedUI { smartCommuteSection }
                             routeInputSection
                             quickTagsSection
-                            saveCurrentTripButton
+                            if !simplifiedUI { saveCurrentTripButton }
                             searchButton
                             if let hint = searchHint {
                                 Text(hint)
@@ -50,10 +54,12 @@ struct RoutePlannerView: View {
                                     .foregroundStyle(.secondary)
                                     .multilineTextAlignment(.center)
                             }
-                            departurePlannerSection
-                            savedTripsSection
+                            if !simplifiedUI {
+                                departurePlannerSection
+                                savedTripsSection
+                            }
                             accessibilityFiltersWrapper
-                            recentRoutesSection
+                            if !simplifiedUI { recentRoutesSection }
                         }
                         .padding()
                     }
@@ -134,7 +140,17 @@ struct RoutePlannerView: View {
         .task {
             if viewModel == nil {
                 viewModel = container.makeRoutePlannerViewModel()
+                // Seed the per-trip chips from the persisted accessibility defaults —
+                // the 无障碍 sheet's mobility settings previously never reached routing.
+                // The chips remain a per-trip override on top.
+                let preference = appState.accessibilityPreference
+                viewModel?.requiresWheelchairAccess = preference.requiresWheelchairAccess
+                viewModel?.requiresElevator = preference.prefersElevator
+                viewModel?.avoidStairs = preference.avoidStairs
             }
+            // Refresh every appearance: the sheet lives in the Profile tab, so changes
+            // land next time the planner shows.
+            viewModel?.basePreference = appState.accessibilityPreference
             viewModel?.cityChanged(to: appState.selectedCity)
             viewModel?.prewarmLocation()
             applyPendingRouteInput(appState.pendingRouteInput)
@@ -170,6 +186,10 @@ struct RoutePlannerView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+    }
+
+    private var simplifiedUI: Bool {
+        appState.accessibilityPreference.simplifiedUI
     }
 
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {

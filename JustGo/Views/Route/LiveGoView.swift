@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import AVFoundation
 
 @Observable
 final class LiveGoViewModel {
@@ -41,8 +42,13 @@ struct LiveGoView: View {
     // .fullScreenCover, whose first rendered frame doesn't yet have the root .tint(...)
     // environment value propagated and would otherwise flash system blue.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @Environment(AppState.self) private var appState
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?
+    // Accessibility step-change effects (无障碍 sheet): speech, haptics, visual banner.
+    @State private var speechSynthesizer = AVSpeechSynthesizer()
+    @State private var announcedStep: TripStep?
+    @State private var announcementTask: Task<Void, Never>?
     @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
 
@@ -75,9 +81,15 @@ struct LiveGoView: View {
             }
             .padding()
             .overlay(alignment: .top) {
-                if showGetOffBanner {
-                    getOffBanner
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                VStack(spacing: 8) {
+                    if showGetOffBanner {
+                        getOffBanner
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    if let announcedStep {
+                        announcementBanner(announcedStep)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                 }
             }
             .navigationTitle(AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發"))
@@ -91,13 +103,59 @@ struct LiveGoView: View {
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             refreshArrivalAlert()
+            announceCurrentStep()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             cancelArrivalAlert()
+            speechSynthesizer.stopSpeaking(at: .immediate)
+            announcementTask?.cancel()
         }
-        .onChange(of: viewModel.currentIndex) { _, _ in refreshArrivalAlert() }
+        .onChange(of: viewModel.currentIndex) { _, _ in
+            refreshArrivalAlert()
+            announceCurrentStep()
+        }
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
+    }
+
+    /// Applies the enabled accessibility effects for the step now showing: spoken
+    /// instruction (语音导航), haptic (振动提醒), and a transient banner (视觉播报).
+    private func announceCurrentStep() {
+        guard let step = viewModel.currentStep else { return }
+        let preference = appState.accessibilityPreference
+        if preference.vibrationAlerts {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        }
+        if preference.audioNavigation {
+            speechSynthesizer.stopSpeaking(at: .immediate)
+            let separator = AppLocalization.isChinese ? "。" : ". "
+            let utterance = AVSpeechUtterance(string: [step.title, step.detail].compactMap { $0 }.joined(separator: separator))
+            utterance.voice = AVSpeechSynthesisVoice(language: AppLocalization.isChinese ? "zh-CN" : "en-US")
+            speechSynthesizer.speak(utterance)
+        }
+        if preference.visualAnnouncements {
+            announcementTask?.cancel()
+            withAnimation { announcedStep = step }
+            announcementTask = Task {
+                try? await Task.sleep(for: .seconds(2.5))
+                guard !Task.isCancelled else { return }
+                withAnimation { announcedStep = nil }
+            }
+        }
+    }
+
+    private func announcementBanner(_ step: TripStep) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon(for: step.kind))
+            Text(step.title)
+                .fontWeight(.semibold)
+                .lineLimit(2)
+        }
+        .font(.headline)
+        .foregroundStyle(.white)
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func stepCard(_ step: TripStep) -> some View {

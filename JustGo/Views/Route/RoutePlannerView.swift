@@ -64,19 +64,21 @@ struct RoutePlannerView: View {
                     .onChange(of: scrollToTopTrigger) { _, _ in
                         withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
                     }
-                    // Keep the active field, its inline suggestion list, and the keyboard
-                    // visible together on small screens.
+                    // Pin the input card to the top whenever a field is active — centering
+                    // the field wasted the space below it, squeezing the suggestion list.
+                    // With the card at the top, the active field, its capped list, and the
+                    // keyboard fit together even on small screens.
                     .onChange(of: activeSuggestions?.field) { _, field in
                         guard field != nil else { return }
-                        withAnimation { proxy.scrollTo(field, anchor: .center) }
+                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
                     }
                     .onChange(of: focusedField) { _, field in
-                        guard let field else { return }
-                        withAnimation { proxy.scrollTo(field, anchor: .center) }
+                        guard field != nil else { return }
+                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
                     }
                     .onChange(of: keyboardHeight) { _, height in
-                        guard height > 0, let focusedField else { return }
-                        withAnimation { proxy.scrollTo(focusedField, anchor: .center) }
+                        guard height > 0, focusedField != nil else { return }
+                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
                     }
                 }
 
@@ -307,29 +309,34 @@ struct RoutePlannerView: View {
                             .frame(width: 12, height: 12)
                     }
 
+                    // Inline (in the card, directly under whichever field is active) rather
+                    // than a floating overlay pinned at a fixed offset: the card's position
+                    // varies with the sections above it, with scrolling, and with type size,
+                    // so an overlay could cover the fields or detach entirely. Inline content
+                    // also participates in the scroll view's keyboard avoidance.
                     VStack(spacing: 12) {
                         stationField(
                             placeholder: LocalizedStringKey(AppLocalization.localized("From")),
                             field: .origin
                         )
+                        if let activeSuggestions, activeSuggestions.field == .origin {
+                            suggestionDropdown(
+                                suggestions: activeSuggestions.suggestions,
+                                select: { viewModel?.selectPlace($0, for: .origin) }
+                            )
+                        }
 
                         stationField(
                             placeholder: LocalizedStringKey(AppLocalization.localized("To")),
                             field: .destination
                         )
+                        if let activeSuggestions, activeSuggestions.field == .destination {
+                            suggestionDropdown(
+                                suggestions: activeSuggestions.suggestions,
+                                select: { viewModel?.selectPlace($0, for: .destination) }
+                            )
+                        }
                     }
-                }
-
-                // Inline (in the card, under the field group) rather than a floating
-                // overlay pinned at a fixed offset: the card's position varies with the
-                // banner/welcome/commute sections above it, with scrolling, and with type
-                // size, so the overlay could cover the fields or detach entirely. Inline
-                // content also participates in the scroll view's keyboard avoidance.
-                if let activeSuggestions {
-                    suggestionDropdown(
-                        suggestions: activeSuggestions.suggestions,
-                        select: { viewModel?.selectPlace($0, for: activeSuggestions.field) }
-                    )
                 }
 
                 HStack {
@@ -368,7 +375,6 @@ struct RoutePlannerView: View {
             .textFieldStyle(.plain)
             .padding(12)
             .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
-            .id(field)
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.
@@ -438,8 +444,11 @@ struct RoutePlannerView: View {
     private var searchButton: some View {
         Button(action: {
             Task {
-                await viewModel?.searchRoutes()
-                showResults = viewModel?.routes.isEmpty == false
+                // Push only when THIS search published; never set false here — a
+                // superseded continuation must not pop the owning search's results.
+                if await viewModel?.searchRoutes() == true {
+                    showResults = true
+                }
             }
         }) {
             HStack {

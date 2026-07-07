@@ -41,14 +41,15 @@ final class StationSearchViewModel {
     func loadInitialStations(city: String) async {
         let loadID = UUID()
         stationLoadID = loadID
-        // Minting a new token supersedes any in-flight keyword search, whose defer then
-        // (correctly) refuses to touch the spinner — so clear it here, or a city switch
-        // mid-search leaves isSearching stuck true with nothing left to reset it.
+        // Minting a new token supersedes any in-flight keyword search AND facility
+        // enrichment, whose stale-token guards then (correctly) refuse to publish — so
+        // this mint owns clearing both flags, or a re-appearance mid-work leaves a
+        // spinner stuck true with nothing left to reset it.
         isSearching = false
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
         if city != currentCityID {
             currentCityID = city
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
             filter = StationFilter()
             // A real city switch also invalidates the previous city's query: without this,
             // a non-empty searchText returns at the guard below and leaves the old city's
@@ -61,10 +62,13 @@ final class StationSearchViewModel {
             searchResults = []
             errorMessage = nil
         }
-        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            // Keyword results stay listed; the entry cancel above killed any in-flight
+            // enrichment, so restart it under the fresh token if filters still need it.
+            enrichForActiveFacilityFiltersIfNeeded()
+            return
+        }
         guard !city.isEmpty else {
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
             unfilteredResults = []
             hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
@@ -104,6 +108,11 @@ final class StationSearchViewModel {
         // that window would still pass — hence the captured-query check on publish too.
         let loadID = UUID()
         stationLoadID = loadID
+        // Minting the token supersedes any in-flight facility enrichment (its stale-token
+        // guard will refuse to publish) — so this mint owns clearing its flag, or a search
+        // that errors out leaves "Checking station details…" spinning forever.
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
         isSearching = true
         // defer guarantees the spinner clears on EVERY exit, including the stale-token early
         // returns below — otherwise a cleared/superseded search leaves isSearching stuck true
@@ -270,7 +279,11 @@ final class StationSearchViewModel {
         facilityEnrichmentTask = Task { [weak self] in
             guard let self else { return }
             let enriched = await stationSearchService.enrichStations(stationsToEnrich)
-            guard !Task.isCancelled, stationLoadID == expectedLoadID else { return }
+            // Identity check (Station is a class): publish only while the list this task
+            // enriched is still the one displayed — the load token alone can't see a
+            // keyword search that replaced the results within the same city epoch.
+            guard !Task.isCancelled, stationLoadID == expectedLoadID,
+                  unfilteredResults.elementsEqual(stationsToEnrich, by: ===) else { return }
             unfilteredResults = enriched
             hasEnrichedUnfilteredResultsForFacilities = true
             applyFilters()

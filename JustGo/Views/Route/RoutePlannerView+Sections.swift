@@ -55,12 +55,13 @@ extension RoutePlannerView {
                     viewModel?.swapOriginDestination()
                 }
                 Task {
-                    await viewModel?.searchRoutes()
-                    let hasRoutes = viewModel?.routes.isEmpty == false
-                    if hasRoutes {
+                    // Credit the trip only when ITS OWN search published — inspecting the
+                    // shared routes after the await would credit trip A for trip B's
+                    // results when taps overlap.
+                    if await viewModel?.searchRoutes() == true {
                         _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                        showResults = true
                     }
-                    showResults = hasRoutes
                 }
             }
         }
@@ -175,12 +176,11 @@ extension RoutePlannerView {
                                 switchPlannerCity(toCityID: trip.cityID)
                                 viewModel?.useSavedTrip(trip)
                                 Task {
-                                    await viewModel?.searchRoutes()
-                                    let hasRoutes = viewModel?.routes.isEmpty == false
-                                    if hasRoutes {
+                                    // Same ownership rule as the smart-commute card above.
+                                    if await viewModel?.searchRoutes() == true {
                                         _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                        showResults = true
                                     }
-                                    showResults = hasRoutes
                                 }
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {

@@ -186,7 +186,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         // Actor re-entrancy at each await point would otherwise let multiple callers bypass the
         // packs/loadStatuses checks simultaneously and trigger redundant parallel downloads.
         if let existing = inFlightLoads[cityID] {
-            return await existing.task.value
+            let status = await existing.task.value
+            // A delete can invalidate the load we coalesced onto (its cancelled task yields
+            // .failed) — mirror the creator path and report the current truth instead.
+            guard loadGenerationMatches(for: cityID, generation: existing.generation) else {
+                return await cityPackStatus(for: cityID)
+            }
+            return status
         }
         guard !Self.manifestURLs.isEmpty else { return .notConfigured }
 

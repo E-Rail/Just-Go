@@ -134,7 +134,7 @@ final class RoutePlannerViewModel {
     func syncAccessibilityPreference(_ preference: AccessibilityPreference) -> Bool {
         let oldSignature = syncedDefaultAccessibilitySignature
         let newSignature = preference.routeAffectingSignature
-        let shouldSeedMobilityDefaults = oldSignature.map { $0.mobilityDefaults != newSignature.mobilityDefaults } ?? true
+        let shouldSeedMobilityDefaults = oldSignature.map { !$0.mobilityMatches(newSignature) } ?? true
         let shouldClearCurrentPlan = oldSignature != nil &&
             oldSignature != newSignature &&
             (isLoading || hasCurrentPlan || !routes.isEmpty)
@@ -280,8 +280,12 @@ final class RoutePlannerViewModel {
         clearSuggestions()
     }
 
-    func searchRoutes() async {
-        guard let city = selectedCity else { return }
+    /// Returns whether THIS invocation published non-empty routes — a superseded or failed
+    /// search returns false, so callers (saved-trip credit, results push) act only on the
+    /// search they own instead of inspecting the shared `routes` after the await.
+    @discardableResult
+    func searchRoutes() async -> Bool {
+        guard let city = selectedCity else { return false }
 
         // Generation guard: a second search (e.g. a stray tap during a quick-route location
         // fetch, while isLoading is still false) must not let a slower, superseded result
@@ -364,7 +368,7 @@ final class RoutePlannerViewModel {
                     tripAnchor: tripAnchor
                 )
             }
-            guard generation == routeSearchGeneration else { return }
+            guard generation == routeSearchGeneration else { return false }
             // The generation still matching proves no input changed since this search
             // started (every mutation bumps it), so the write-back below can't clobber
             // newer user input. setPlace, not assignPlace: assignPlace invalidates, which
@@ -381,11 +385,13 @@ final class RoutePlannerViewModel {
                 // recent resolves its station names in the wrong city.
                 saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID ?? city.id)
             }
+            return !routes.isEmpty
         } catch is CancellationError {
-            return
+            return false
         } catch {
-            guard generation == routeSearchGeneration else { return }
+            guard generation == routeSearchGeneration else { return false }
             errorMessage = userFacingErrorMessage(for: error)
+            return false
         }
     }
 
@@ -529,15 +535,11 @@ final class RoutePlannerViewModel {
                       name(for: field) == keyword,
                       place(for: field) == nil else { return }
                 setSuggestions(suggestions, for: field)
-            } catch is CancellationError {
-                return
             } catch {
-                guard let self,
-                      !Task.isCancelled,
-                      selectedCity?.id == cityID,
-                      name(for: field) == keyword,
-                      place(for: field) == nil else { return }
-                errorMessage = userFacingErrorMessage(for: error)
+                // Autocomplete is best-effort: a failed lookup while typing must not raise
+                // the "No Routes Found" alert (errorMessage feeds it). Searching surfaces
+                // real connectivity errors itself.
+                return
             }
         }
     }

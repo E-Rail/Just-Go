@@ -282,7 +282,9 @@ struct StationSearchView: View {
                         selectedStation = station
                     }
                 }
-            } else if isAnyFilterActive {
+            } else if isAnyFilterActive && viewModel?.errorMessage == nil {
+                // A real search error (filtered keyword search failing offline) must win
+                // over the filter empty-state — fall through to the branches below.
                 activeFilterEmptyState
             } else if !(viewModel?.searchText.isEmpty ?? true) {
                 if let message = viewModel?.errorMessage {

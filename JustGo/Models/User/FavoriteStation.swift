@@ -8,8 +8,10 @@ struct FavoriteStation: Identifiable, Codable {
     let latitude: Double
     let longitude: Double
     let cityID: String
-    let cityName: String
-    let cityNameEn: String?
+    // var: repairable via withCityMetadata — rows favorited from another city's context
+    // were historically stamped with the selected city's name.
+    var cityName: String
+    var cityNameEn: String?
     let lineNames: [String]
     let lineNamesEn: [String]?
     let lineIDs: [String]?
@@ -33,52 +35,11 @@ struct FavoriteStation: Identifiable, Codable {
         self.lineColorsHex = station.lines.map(\.colorHex)
     }
 
-    private init(
-        id: String,
-        stationID: String,
-        name: String,
-        nameEn: String?,
-        latitude: Double,
-        longitude: Double,
-        cityID: String,
-        cityName: String,
-        cityNameEn: String?,
-        lineNames: [String],
-        lineNamesEn: [String]?,
-        lineIDs: [String]?,
-        lineColorsHex: [String]?
-    ) {
-        self.id = id
-        self.stationID = stationID
-        self.name = name
-        self.nameEn = nameEn
-        self.latitude = latitude
-        self.longitude = longitude
-        self.cityID = cityID
-        self.cityName = cityName
-        self.cityNameEn = cityNameEn
-        self.lineNames = lineNames
-        self.lineNamesEn = lineNamesEn
-        self.lineIDs = lineIDs
-        self.lineColorsHex = lineColorsHex
-    }
-
     func withCityMetadata(cityName: String, cityNameEn: String?) -> FavoriteStation {
-        FavoriteStation(
-            id: id,
-            stationID: stationID,
-            name: name,
-            nameEn: nameEn,
-            latitude: latitude,
-            longitude: longitude,
-            cityID: cityID,
-            cityName: cityName,
-            cityNameEn: cityNameEn,
-            lineNames: lineNames,
-            lineNamesEn: lineNamesEn,
-            lineIDs: lineIDs,
-            lineColorsHex: lineColorsHex
-        )
+        var repaired = self
+        repaired.cityName = cityName
+        repaired.cityNameEn = cityNameEn
+        return repaired
     }
 
     /// Station name localized for display, derived from the stored raw identifiers so the

@@ -46,19 +46,13 @@ struct RouteAffectingAccessibilitySignature: Equatable {
     let avoidStairs: Bool
     let maxWalkingDistance: Double
 
-    var mobilityDefaults: MobilityAccessibilityDefaults {
-        MobilityAccessibilityDefaults(
-            requiresWheelchairAccess: requiresWheelchairAccess,
-            prefersElevator: prefersElevator,
-            avoidStairs: avoidStairs
-        )
+    /// The mobility trio only — a maxWalkingDistance change alone must not reseed the
+    /// planner's per-trip chips.
+    func mobilityMatches(_ other: RouteAffectingAccessibilitySignature) -> Bool {
+        requiresWheelchairAccess == other.requiresWheelchairAccess &&
+            prefersElevator == other.prefersElevator &&
+            avoidStairs == other.avoidStairs
     }
-}
-
-struct MobilityAccessibilityDefaults: Equatable {
-    let requiresWheelchairAccess: Bool
-    let prefersElevator: Bool
-    let avoidStairs: Bool
 }
 
 extension AccessibilityPreference {

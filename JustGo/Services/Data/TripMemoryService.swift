@@ -157,14 +157,19 @@ final class TripMemoryService {
     }
 
     func repairFavoriteCityMetadata(cityLookup: (String) -> City?) {
+        // Assign the observed property only when a repair actually happened — this runs on
+        // every favorites-list appearance, and an unconditional reassign would fire
+        // observation churn each time.
+        var repaired = favoriteStations
         var didRepair = false
-        favoriteStations = favoriteStations.map { favorite in
-            guard let city = cityLookup(favorite.cityID) else { return favorite }
-            guard favorite.cityName != city.name || favorite.cityNameEn != city.nameEn else { return favorite }
+        for (index, favorite) in favoriteStations.enumerated() {
+            guard let city = cityLookup(favorite.cityID),
+                  favorite.cityName != city.name || favorite.cityNameEn != city.nameEn else { continue }
+            repaired[index] = favorite.withCityMetadata(cityName: city.name, cityNameEn: city.nameEn)
             didRepair = true
-            return favorite.withCityMetadata(cityName: city.name, cityNameEn: city.nameEn)
         }
         if didRepair {
+            favoriteStations = repaired
             persistFavoriteStations()
         }
     }

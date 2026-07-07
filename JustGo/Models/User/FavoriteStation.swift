@@ -33,6 +33,54 @@ struct FavoriteStation: Identifiable, Codable {
         self.lineColorsHex = station.lines.map(\.colorHex)
     }
 
+    private init(
+        id: String,
+        stationID: String,
+        name: String,
+        nameEn: String?,
+        latitude: Double,
+        longitude: Double,
+        cityID: String,
+        cityName: String,
+        cityNameEn: String?,
+        lineNames: [String],
+        lineNamesEn: [String]?,
+        lineIDs: [String]?,
+        lineColorsHex: [String]?
+    ) {
+        self.id = id
+        self.stationID = stationID
+        self.name = name
+        self.nameEn = nameEn
+        self.latitude = latitude
+        self.longitude = longitude
+        self.cityID = cityID
+        self.cityName = cityName
+        self.cityNameEn = cityNameEn
+        self.lineNames = lineNames
+        self.lineNamesEn = lineNamesEn
+        self.lineIDs = lineIDs
+        self.lineColorsHex = lineColorsHex
+    }
+
+    func withCityMetadata(cityName: String, cityNameEn: String?) -> FavoriteStation {
+        FavoriteStation(
+            id: id,
+            stationID: stationID,
+            name: name,
+            nameEn: nameEn,
+            latitude: latitude,
+            longitude: longitude,
+            cityID: cityID,
+            cityName: cityName,
+            cityNameEn: cityNameEn,
+            lineNames: lineNames,
+            lineNamesEn: lineNamesEn,
+            lineIDs: lineIDs,
+            lineColorsHex: lineColorsHex
+        )
+    }
+
     /// Station name localized for display, derived from the stored raw identifiers so the
     /// persisted `name` stays a stable lookup key across locales. Mirrors `Station.localizedName`.
     var displayName: String {

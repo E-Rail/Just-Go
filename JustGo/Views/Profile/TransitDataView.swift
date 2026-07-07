@@ -75,6 +75,15 @@ struct TransitDataView: View {
                             Spacer()
                             cityPackControl(for: city)
                         }
+                        .swipeActions {
+                            if case .loaded = packStatus[city.id] {
+                                Button(role: .destructive) {
+                                    Task { await deletePack(city) }
+                                } label: {
+                                    Label(AppLocalization.localized("Delete"), systemImage: "trash")
+                                }
+                            }
+                        }
                     }
                 } header: {
                     Text(AppLocalization.text(
@@ -149,6 +158,13 @@ struct TransitDataView: View {
     private func downloadPack(_ city: City) async {
         downloading.insert(city.id)
         let status = await container.officialStationData.loadCityPack(for: city.id)
+        downloading.remove(city.id)
+        packStatus[city.id] = status
+    }
+
+    private func deletePack(_ city: City) async {
+        downloading.insert(city.id)
+        let status = await container.officialStationData.deleteCityPack(for: city.id)
         downloading.remove(city.id)
         packStatus[city.id] = status
     }

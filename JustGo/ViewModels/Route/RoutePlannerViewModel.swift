@@ -57,7 +57,7 @@ final class RoutePlannerViewModel {
     private let locationService: LocationService
     private let recentRoutesKey = "recentRoutes"
     private var isSyncingAccessibilityPreference = false
-    private var syncedAccessibilitySignature: RouteAffectingAccessibilitySignature?
+    private var syncedDefaultAccessibilitySignature: RouteAffectingAccessibilitySignature?
 
     init(
         routePlanningService: RoutePlanningService,
@@ -123,7 +123,6 @@ final class RoutePlannerViewModel {
 
     private func routeAffectingSettingsChanged() {
         guard !isSyncingAccessibilityPreference else { return }
-        syncedAccessibilitySignature = accessibilityPreferences.routeAffectingSignature
         invalidateInFlightSearch()
         clearCurrentPlan()
     }
@@ -133,19 +132,22 @@ final class RoutePlannerViewModel {
     /// can pop the stale results screen. Non-route accessibility toggles are ignored here.
     @discardableResult
     func syncAccessibilityPreference(_ preference: AccessibilityPreference) -> Bool {
-        let oldSignature = syncedAccessibilitySignature
+        let oldSignature = syncedDefaultAccessibilitySignature
         let newSignature = preference.routeAffectingSignature
+        let shouldSeedMobilityDefaults = oldSignature.map { $0.mobilityDefaults != newSignature.mobilityDefaults } ?? true
         let shouldClearCurrentPlan = oldSignature != nil &&
             oldSignature != newSignature &&
             (isLoading || hasCurrentPlan || !routes.isEmpty)
 
         isSyncingAccessibilityPreference = true
         basePreference = preference
-        requiresWheelchairAccess = preference.requiresWheelchairAccess
-        requiresElevator = preference.prefersElevator
-        avoidStairs = preference.avoidStairs
+        if shouldSeedMobilityDefaults {
+            requiresWheelchairAccess = preference.requiresWheelchairAccess
+            requiresElevator = preference.prefersElevator
+            avoidStairs = preference.avoidStairs
+        }
         isSyncingAccessibilityPreference = false
-        syncedAccessibilitySignature = newSignature
+        syncedDefaultAccessibilitySignature = newSignature
 
         if shouldClearCurrentPlan {
             invalidateInFlightSearch()

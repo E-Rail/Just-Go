@@ -3,7 +3,6 @@ import SwiftUI
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
-    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(AccessibilityReportService.self) var accessibilityReportService
@@ -45,7 +44,7 @@ struct StationDetailView: View {
                     if isFavorited {
                         tripMemoryService.removeFavorite(id: "\(s.cityID)|\(s.stationID)")
                     } else {
-                        let city = appState.selectedCity ?? container.cityService.getCity(byID: s.cityID)
+                        let city = container.cityService.getCity(byID: s.cityID)
                         tripMemoryService.addFavorite(
                             station: s,
                             cityName: city?.name ?? s.cityID,

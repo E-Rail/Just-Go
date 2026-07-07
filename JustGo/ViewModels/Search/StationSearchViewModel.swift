@@ -9,6 +9,7 @@ final class StationSearchViewModel {
     var isSearching = false
     var errorMessage: String?
     private var unfilteredResults: [Station] = []
+    private var hasEnrichedUnfilteredResultsForFacilities = false
 
     var filter = StationFilter()
 
@@ -56,6 +57,7 @@ final class StationSearchViewModel {
             searchTask?.cancel()
             searchText = ""
             unfilteredResults = []
+            hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
             errorMessage = nil
         }
@@ -64,6 +66,7 @@ final class StationSearchViewModel {
             facilityEnrichmentTask?.cancel()
             isEnrichingForFacility = false
             unfilteredResults = []
+            hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
             errorMessage = AppLocalization.localized("Choose a city to browse stations")
             return
@@ -75,12 +78,14 @@ final class StationSearchViewModel {
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
         unfilteredResults = stations
+        hasEnrichedUnfilteredResultsForFacilities = false
         applyFilters()
         let enrichedStations = await stationSearchService.enrichStations(unfilteredResults)
         guard stationLoadID == loadID else { return }
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
         unfilteredResults = enrichedStations
+        hasEnrichedUnfilteredResultsForFacilities = true
         applyFilters()
     }
 
@@ -115,10 +120,7 @@ final class StationSearchViewModel {
             let results = try await stationSearchService.search(keyword: query, city: city)
             guard stationLoadID == loadID,
                   searchText.trimmingCharacters(in: .whitespaces) == query else { return }
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
-            unfilteredResults = results
-            applyFilters()
+            replaceUnfilteredResults(results, loadID: loadID)
         } catch {
             guard stationLoadID == loadID,
                   searchText.trimmingCharacters(in: .whitespaces) == query else { return }
@@ -144,6 +146,7 @@ final class StationSearchViewModel {
         stationLoadID = UUID()
         searchText = ""
         unfilteredResults = []
+        hasEnrichedUnfilteredResultsForFacilities = false
         searchResults = []
         errorMessage = nil
     }
@@ -151,11 +154,13 @@ final class StationSearchViewModel {
     func toggleAccessibleFilter() {
         filter.accessibleOnly.toggle()
         applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
     }
 
     func toggleElevatorFilter() {
         filter.elevatorOnly.toggle()
         applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
     }
 
     func toggleTransferFilter() {
@@ -172,22 +177,12 @@ final class StationSearchViewModel {
 
     func setFacilityFilter(_ type: StationFacilityType?) {
         filter.facilityType = type
-        if type != nil && unfilteredResults.allSatisfy({ $0.facilities.isEmpty }) {
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = true
-            facilityEnrichmentTask = Task { [weak self] in
-                guard let self else { return }
-                let enriched = await stationSearchService.enrichStations(unfilteredResults)
-                guard !Task.isCancelled else { return }
-                unfilteredResults = enriched
-                applyFilters()
-                isEnrichingForFacility = false
-            }
-        } else {
+        applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
+        if !activeFiltersNeedOfficialData {
             facilityEnrichmentTask?.cancel()
             isEnrichingForFacility = false
-            applyFilters()
-            if type == nil && unfilteredResults.isEmpty == false {
+            if unfilteredResults.isEmpty == false {
                 errorMessage = nil
             }
         }
@@ -243,6 +238,43 @@ final class StationSearchViewModel {
                 .map { (station: $0, key: $0.localizedName) }
                 .sorted { $0.key < $1.key }
                 .map(\.station)
+        }
+    }
+
+    private func replaceUnfilteredResults(_ stations: [Station], loadID: UUID) {
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
+        unfilteredResults = stations
+        hasEnrichedUnfilteredResultsForFacilities = false
+        applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded(loadID: loadID)
+    }
+
+    private var activeFiltersNeedOfficialData: Bool {
+        filter.accessibleOnly || filter.elevatorOnly || filter.facilityType != nil
+    }
+
+    private func enrichForActiveFacilityFiltersIfNeeded(loadID: UUID? = nil) {
+        guard activeFiltersNeedOfficialData else {
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
+            return
+        }
+        guard !hasEnrichedUnfilteredResultsForFacilities,
+              !unfilteredResults.isEmpty else { return }
+
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = true
+        let expectedLoadID = loadID ?? stationLoadID
+        let stationsToEnrich = unfilteredResults
+        facilityEnrichmentTask = Task { [weak self] in
+            guard let self else { return }
+            let enriched = await stationSearchService.enrichStations(stationsToEnrich)
+            guard !Task.isCancelled, stationLoadID == expectedLoadID else { return }
+            unfilteredResults = enriched
+            hasEnrichedUnfilteredResultsForFacilities = true
+            applyFilters()
+            isEnrichingForFacility = false
         }
     }
 

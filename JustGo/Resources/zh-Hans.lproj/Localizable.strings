@@ -231,6 +231,7 @@
 "Apple Maps walking directions mention stairs." = "Apple 地图步行指引提到楼梯。";
 "Bottleneck" = "瓶颈";
 "Choose City" = "选择城市";
+"Checking station details..." = "正在检查车站详情…";
 "Complete Trip" = "完成行程";
 "Critical" = "严重";
 "Facility" = "设施";
@@ -243,6 +244,7 @@
 "No Personal Reports" = "暂无个人报告";
 "No accessibility concerns found from available data." = "现有数据未发现无障碍问题。";
 "No saved trips yet" = "暂无已保存行程";
+"No stations match these filters" = "没有车站符合这些筛选条件";
 "No trip history yet" = "暂无行程历史";
 "Not present" = "不存在";
 "Note" = "备注";
@@ -258,6 +260,7 @@
 "Report Route Issue" = "报告路线问题";
 "Report Station Issue" = "报告车站问题";
 "Report route issue" = "报告路线问题";
+"Try clearing filters or loading official city data." = "请尝试清除筛选条件，或加载官方城市数据。";
 "Report station issue" = "报告车站问题";
 "Rider Notes" = "乘客备注";
 "Route Concern" = "路线关注点";

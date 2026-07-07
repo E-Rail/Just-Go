@@ -65,6 +65,7 @@ extension RouteDetailView {
                         tripMemoryService.markTripComplete(
                             route: route,
                             cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                            accessibilityFilter: accessibilityFilter,
                             note: tripNote
                         )
                         tripLoggedConfirmation = true

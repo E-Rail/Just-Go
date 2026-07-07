@@ -97,6 +97,10 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
         guard let status = loadStatuses[cityID] else { return nil }
+        if case .loaded = status, packs[cityID] == nil {
+            loadStatuses.removeValue(forKey: cityID)
+            return nil
+        }
         if let cooldownUntil = failedCooldownUntil[cityID], Date() >= cooldownUntil {
             return nil
         }
@@ -488,7 +492,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func releaseMemory() {
+        let releasedCityIDs = Array(packs.keys)
         packs.removeAll()
+        for cityID in releasedCityIDs {
+            if case .loaded = loadStatuses[cityID] {
+                loadStatuses.removeValue(forKey: cityID)
+            }
+        }
     }
 }
 

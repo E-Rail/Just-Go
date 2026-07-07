@@ -18,8 +18,6 @@ final class RoutePlannerViewModel {
     var selectedCity: City?
     var routes: [Route] = []
     var recentRoutes: [RecentRoute] = []
-    var quickPlaces: [QuickPlace] = []
-    var pendingQuickPlaceKind: QuickPlaceKind?
     var isLoading = false
     var errorMessage: String?
     var sortStrategy: RoutePreference = UserDefaults.standard.codableValue(forKey: "sortStrategy", as: RoutePreference.self, default: .metroFirst) {
@@ -45,21 +43,21 @@ final class RoutePlannerViewModel {
     // Accessibility filters. A toggle mid-search supersedes the search: its routes were
     // planned with the old filter and must not publish under the new one.
     var requiresWheelchairAccess = false {
-        didSet { invalidateInFlightSearch() }
+        didSet { routeAffectingSettingsChanged() }
     }
     var requiresElevator = false {
-        didSet { invalidateInFlightSearch() }
+        didSet { routeAffectingSettingsChanged() }
     }
     var avoidStairs = false {
-        didSet { invalidateInFlightSearch() }
+        didSet { routeAffectingSettingsChanged() }
     }
 
     private let routePlanningService: RoutePlanningService
     private let placeSearchProvider: PlaceSearchProviding
     private let locationService: LocationService
     private let recentRoutesKey = "recentRoutes"
-    private let quickPlacesKey = "quickPlaces"
-    private var quickPlacesResetObserver: NSObjectProtocol?
+    private var isSyncingAccessibilityPreference = false
+    private var syncedAccessibilitySignature: RouteAffectingAccessibilitySignature?
 
     init(
         routePlanningService: RoutePlanningService,
@@ -70,31 +68,10 @@ final class RoutePlannerViewModel {
         self.placeSearchProvider = placeSearchProvider
         self.locationService = locationService
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
-        quickPlaces = UserDefaults.standard.codableValue(forKey: quickPlacesKey, as: [QuickPlace].self, default: [])
-        quickPlacesResetObserver = NotificationCenter.default.addObserver(forName: .quickPlacesDidReset, object: nil, queue: .main) { [weak self] notification in
-            guard let self else { return }
-            if let kind = notification.object as? QuickPlaceKind {
-                self.quickPlaces.removeAll { $0.kind == kind }
-                if self.pendingQuickPlaceKind == kind {
-                    self.pendingQuickPlaceKind = nil
-                }
-            } else {
-                self.quickPlaces = []
-                self.pendingQuickPlaceKind = nil
-            }
-        }
     }
 
     deinit {
         suggestionTask?.cancel()
-        if let observer = quickPlacesResetObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
-
-    func removeQuickPlace(_ kind: QuickPlaceKind) {
-        quickPlaces.removeAll { $0.kind == kind }
-        UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
     }
 
     var accessibilityFilter: AccessibilityFilter {
@@ -139,6 +116,44 @@ final class RoutePlannerViewModel {
         errorMessage = nil
     }
 
+    private func clearCurrentPlan() {
+        routes = []
+        lastPlannedCityID = nil
+    }
+
+    private func routeAffectingSettingsChanged() {
+        guard !isSyncingAccessibilityPreference else { return }
+        syncedAccessibilitySignature = accessibilityPreferences.routeAffectingSignature
+        invalidateInFlightSearch()
+        clearCurrentPlan()
+    }
+
+    /// Pulls the persisted accessibility defaults into the planner. Returns true when
+    /// route-affecting defaults changed while a search/current plan existed, so the view
+    /// can pop the stale results screen. Non-route accessibility toggles are ignored here.
+    @discardableResult
+    func syncAccessibilityPreference(_ preference: AccessibilityPreference) -> Bool {
+        let oldSignature = syncedAccessibilitySignature
+        let newSignature = preference.routeAffectingSignature
+        let shouldClearCurrentPlan = oldSignature != nil &&
+            oldSignature != newSignature &&
+            (isLoading || hasCurrentPlan || !routes.isEmpty)
+
+        isSyncingAccessibilityPreference = true
+        basePreference = preference
+        requiresWheelchairAccess = preference.requiresWheelchairAccess
+        requiresElevator = preference.prefersElevator
+        avoidStairs = preference.avoidStairs
+        isSyncingAccessibilityPreference = false
+        syncedAccessibilitySignature = newSignature
+
+        if shouldClearCurrentPlan {
+            invalidateInFlightSearch()
+            clearCurrentPlan()
+        }
+        return shouldClearCurrentPlan
+    }
+
     /// A successful plan matching the current inputs exists — lastPlannedCityID survives
     /// only while no input has mutated since the publish, so "Save this trip" can trust it.
     var hasCurrentPlan: Bool {
@@ -146,26 +161,13 @@ final class RoutePlannerViewModel {
     }
 
     func selectPlace(_ place: TransitPlace, for field: RouteInputField) {
-        assignPlace(savePendingQuickPlaceIfNeeded(place), for: field)
-    }
-
-    func quickPlace(for kind: QuickPlaceKind) -> QuickPlace? {
-        quickPlaces.first { $0.kind == kind }
-    }
-
-    func beginSavingQuickPlace(_ kind: QuickPlaceKind) {
-        pendingQuickPlaceKind = kind
-    }
-
-    func useQuickPlace(_ quickPlace: QuickPlace, for field: RouteInputField) {
-        pendingQuickPlaceKind = nil
-        assignPlace(quickPlace.transitPlace, for: field)
+        assignPlace(place, for: field)
     }
 
     /// `alignCity` lets the caller switch the app to the city the device is actually in
     /// (the view owns that decision) once a coordinate is accepted, before the fill.
     /// Returns whether THIS invocation applied a fill — false on failure, denial, or a
-    /// stale-context drop — so flows like quickRoute don't proceed on a leftover origin.
+    /// stale-context drop.
     @discardableResult
     func useCurrentLocation(for field: RouteInputField, alignCity: ((CLLocationCoordinate2D) -> Void)? = nil) async -> Bool {
         // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
@@ -174,15 +176,11 @@ final class RoutePlannerViewModel {
         var expectedCityID = selectedCity?.id
         var expectedName = name(for: field)
         var expectedPlace = self.place(for: field)
-        // Captured, not cleared: "set Home → tap Current Location" must save Home. The save
-        // happens through savePendingQuickPlaceIfNeeded once the fix lands.
-        let pendingKind = pendingQuickPlaceKind
         // self.place(for:) — the local `place` declared below shadows the method in here.
         func contextUnchanged() -> Bool {
             selectedCity?.id == expectedCityID &&
                 name(for: field) == expectedName &&
-                self.place(for: field) == expectedPlace &&
-                pendingQuickPlaceKind == pendingKind
+                self.place(for: field) == expectedPlace
         }
 
         let coordinate: CLLocationCoordinate2D
@@ -234,11 +232,9 @@ final class RoutePlannerViewModel {
 
         let place: TransitPlace
         do {
-            // While saving a quick place, let the geocoder name the spot (street/POI) —
-            // a Home tag permanently labeled "Current Location" reads as broken later.
             place = try await placeSearchProvider.reverseGeocode(
                 location: coordinate,
-                name: pendingKind == nil ? AppLocalization.localized("Current Location") : nil
+                name: AppLocalization.localized("Current Location")
             ).withSource(.currentLocation)
         } catch {
             place = TransitPlace(
@@ -248,7 +244,7 @@ final class RoutePlannerViewModel {
             )
         }
         guard contextUnchanged() else { return false }
-        assignPlace(savePendingQuickPlaceIfNeeded(place), for: field)
+        assignPlace(place, for: field)
         return true
     }
 
@@ -408,20 +404,6 @@ final class RoutePlannerViewModel {
 
     func tripTimeContext(for route: Route) -> TripTimeContext {
         TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
-    }
-
-    var canQuickRouteWork: Bool { quickPlace(for: .company) != nil }
-
-    func quickRoute(to kind: QuickPlaceKind) async {
-        // A route shortcut, not a place pick — leave quick-place setup mode so the
-        // current-location origin fill below doesn't get consumed as the pending save.
-        pendingQuickPlaceKind = nil
-        guard let destination = quickPlace(for: kind) else { return }
-        // Proceed only when THIS fill applied — a failed/denied/stale-dropped location
-        // must not silently route to work from an old origin left in the field.
-        guard await useCurrentLocation(for: .origin) else { return }
-        useQuickPlace(destination, for: .destination)
-        await searchRoutes()
     }
 
     func swapOriginDestination() {
@@ -642,17 +624,6 @@ final class RoutePlannerViewModel {
         routes.insert(recentRoute, at: 0)
         recentRoutes = Array(routes.prefix(10))
         UserDefaults.standard.setCodable(recentRoutes, forKey: recentRoutesKey)
-    }
-
-    private func savePendingQuickPlaceIfNeeded(_ place: TransitPlace) -> TransitPlace {
-        guard let kind = pendingQuickPlaceKind else { return place }
-        let quickPlace = QuickPlace(kind: kind, place: place, cityID: selectedCity?.id)
-        quickPlaces.removeAll { $0.kind == kind }
-        quickPlaces.append(quickPlace)
-        quickPlaces.sort { $0.kind.rawValue < $1.kind.rawValue }
-        UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
-        pendingQuickPlaceKind = nil
-        return quickPlace.transitPlace
     }
 
     private func userFacingErrorMessage(for error: Error) -> String {

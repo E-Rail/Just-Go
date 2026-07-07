@@ -64,12 +64,19 @@ struct RoutePlannerView: View {
                     .onChange(of: scrollToTopTrigger) { _, _ in
                         withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
                     }
-                    // Pin the input card to the top when suggestions appear (or move
-                    // between fields) so the field, its inline suggestion list, and the
-                    // keyboard fit together on small screens.
+                    // Keep the active field, its inline suggestion list, and the keyboard
+                    // visible together on small screens.
                     .onChange(of: activeSuggestions?.field) { _, field in
                         guard field != nil else { return }
-                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
+                        withAnimation { proxy.scrollTo(field, anchor: .center) }
+                    }
+                    .onChange(of: focusedField) { _, field in
+                        guard let field else { return }
+                        withAnimation { proxy.scrollTo(field, anchor: .center) }
+                    }
+                    .onChange(of: keyboardHeight) { _, height in
+                        guard height > 0, let focusedField else { return }
+                        withAnimation { proxy.scrollTo(focusedField, anchor: .center) }
                     }
                 }
 
@@ -109,6 +116,11 @@ struct RoutePlannerView: View {
                 // "0 routes" page for the user to come back to.
                 if !isProgrammaticEcho { showResults = false }
             }
+            .onChange(of: appState.accessibilityPreference.routeAffectingSignature) { _, _ in
+                if viewModel?.syncAccessibilityPreference(appState.accessibilityPreference) == true {
+                    showResults = false
+                }
+            }
             .navigationDestination(isPresented: $showResults) {
                 if let viewModel = viewModel {
                     RouteResultsView(viewModel: viewModel)
@@ -119,9 +131,6 @@ struct RoutePlannerView: View {
             }
             .onChange(of: appState.pendingRouteInput) { _, pending in
                 applyPendingRouteInput(pending)
-            }
-            .onChange(of: appState.pendingQuickPlaceSetup) { _, kind in
-                applyPendingQuickPlaceSetup(kind)
             }
             .sheet(isPresented: $showSaveCurrentTrip) {
                 saveCurrentTripSheet
@@ -138,21 +147,13 @@ struct RoutePlannerView: View {
         .task {
             if viewModel == nil {
                 viewModel = container.makeRoutePlannerViewModel()
-                // Seed the per-trip chips from the persisted accessibility defaults —
-                // the 无障碍 sheet's mobility settings previously never reached routing.
-                // The chips remain a per-trip override on top.
-                let preference = appState.accessibilityPreference
-                viewModel?.requiresWheelchairAccess = preference.requiresWheelchairAccess
-                viewModel?.requiresElevator = preference.prefersElevator
-                viewModel?.avoidStairs = preference.avoidStairs
             }
-            // Refresh every appearance: the sheet lives in the Profile tab, so changes
-            // land next time the planner shows.
-            viewModel?.basePreference = appState.accessibilityPreference
+            if viewModel?.syncAccessibilityPreference(appState.accessibilityPreference) == true {
+                showResults = false
+            }
             viewModel?.cityChanged(to: appState.selectedCity)
             viewModel?.prewarmLocation()
             applyPendingRouteInput(appState.pendingRouteInput)
-            applyPendingQuickPlaceSetup(appState.pendingQuickPlaceSetup)
             resumableTrip = ActiveTripStore.load()
         }
     }
@@ -275,14 +276,6 @@ struct RoutePlannerView: View {
         .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    private func applyPendingQuickPlaceSetup(_ kind: QuickPlaceKind?) {
-        guard let kind, let vm = viewModel else { return }
-        vm.beginSavingQuickPlace(kind)
-        scrollToTopTrigger.toggle()
-        focusedField = .origin
-        appState.pendingQuickPlaceSetup = nil
-    }
-
     private var searchHint: String? {
         guard viewModel?.canSearch != true, let vm = viewModel else { return nil }
         if vm.selectedCity == nil {
@@ -339,13 +332,6 @@ struct RoutePlannerView: View {
                     )
                 }
 
-                if let pendingKind = viewModel?.pendingQuickPlaceKind {
-                    Text(String(format: AppLocalization.localized("Search a place to save %@"), pendingKind.title))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-
                 HStack {
                     Spacer()
                     Button(action: { viewModel?.swapOriginDestination() }) {
@@ -382,15 +368,17 @@ struct RoutePlannerView: View {
             .textFieldStyle(.plain)
             .padding(12)
             .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
+            .id(field)
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.
     // The floor keeps a couple of rows usable in pathological layouts; the ceiling keeps
     // the list from dwarfing the card when no keyboard is on screen (hardware keyboard).
     private var suggestionMaxHeight: CGFloat {
-        guard suggestionListTopY > 0 else { return 260 }
+        guard suggestionListTopY > 0 else { return keyboardHeight > 0 ? 0 : 260 }
         let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
-        return min(320, max(96, keyboardTopY - suggestionListTopY - 12))
+        let available = max(0, keyboardTopY - suggestionListTopY - 12)
+        return keyboardHeight > 0 ? available : min(320, max(96, available))
     }
 
     private func suggestionDropdown(

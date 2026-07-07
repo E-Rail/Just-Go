@@ -50,7 +50,8 @@ struct RouteResultsView: View {
                     route: route,
                     preference: viewModel.sortStrategy,
                     alternatives: viewModel.routes,
-                    tripAnchor: viewModel.tripAnchor
+                    tripAnchor: viewModel.tripAnchor,
+                    accessibilityFilter: viewModel.accessibilityFilter
                 )
             }
         }

@@ -2,16 +2,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppState.self) private var appState
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
-    @State private var quickPlaces: [QuickPlace] = []
-
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
-    private let quickPlacesKey = "quickPlaces"
 
     var body: some View {
         NavigationStack {
@@ -19,7 +15,6 @@ struct SettingsView: View {
                 themeSection
                 languageSection
                 notificationsSection
-                quickPlacesSection
                 dataSection
                 accessibilitySection
             }
@@ -30,7 +25,6 @@ struct SettingsView: View {
                     Button(AppLocalization.localized("Done")) { dismiss() }
                 }
             }
-            .onAppear { loadQuickPlaces() }
         }
     }
 
@@ -84,77 +78,6 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
-    }
-
-    // MARK: - Quick Places
-
-    private var quickPlacesSection: some View {
-        Section {
-            ForEach(QuickPlaceKind.allCases) { kind in
-                quickPlaceRow(for: kind)
-            }
-
-            if !quickPlaces.isEmpty {
-                Button(role: .destructive) {
-                    resetAllQuickPlaces()
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text(AppLocalization.text(english: "Reset All Quick Places", simplified: "重置所有快捷地点", traditional: "重置所有快捷地點"))
-                    }
-                }
-            }
-        } header: {
-            Text(AppLocalization.text(english: "Quick Places", simplified: "快捷地点", traditional: "快捷地點"))
-        } footer: {
-            Text(AppLocalization.text(english: "Quick places let you route to Home, Company, or School with one tap.", simplified: "快捷地点让您一键导航至家、公司或学校。", traditional: "快捷地點讓您一鍵導航至家、公司或學校。"))
-        }
-    }
-
-    @ViewBuilder
-    private func quickPlaceRow(for kind: QuickPlaceKind) -> some View {
-        let saved = quickPlaces.first { $0.kind == kind }
-        HStack {
-            Image(systemName: kind.icon)
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(kind.title)
-                    .font(.subheadline)
-                if let saved {
-                    Text(saved.name)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(AppLocalization.text(english: "Not set", simplified: "未设置", traditional: "未設置"))
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-            Spacer()
-            Button(saved == nil
-                   ? AppLocalization.text(english: "Set", simplified: "设置", traditional: "設置")
-                   : AppLocalization.text(english: "Change", simplified: "更改", traditional: "更改")) {
-                startQuickPlaceSetup(kind)
-            }
-            .font(.caption)
-            .buttonStyle(.borderless)
-            if saved != nil {
-                Button {
-                    removeQuickPlace(kind)
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(Color(.systemGray3))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private func startQuickPlaceSetup(_ kind: QuickPlaceKind) {
-        appState.pendingQuickPlaceSetup = kind
-        appState.selectedTab = 1 // Route planner tab
-        dismiss()
     }
 
     // MARK: - Language
@@ -236,21 +159,4 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Quick Place Helpers
-
-    private func loadQuickPlaces() {
-        quickPlaces = UserDefaults.standard.codableValue(forKey: quickPlacesKey, as: [QuickPlace].self, default: [])
-    }
-
-    private func removeQuickPlace(_ kind: QuickPlaceKind) {
-        quickPlaces.removeAll { $0.kind == kind }
-        UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
-        NotificationCenter.default.post(name: .quickPlacesDidReset, object: kind)
-    }
-
-    private func resetAllQuickPlaces() {
-        quickPlaces = []
-        UserDefaults.standard.setCodable(quickPlaces, forKey: quickPlacesKey)
-        NotificationCenter.default.post(name: .quickPlacesDidReset, object: nil)
-    }
 }

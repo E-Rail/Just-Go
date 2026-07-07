@@ -294,6 +294,25 @@ final class RoutePlanningService {
         preferences: AccessibilityPreference,
         tripAnchor: TripTimeAnchor = .now
     ) -> [Route] {
+        let ranked = rankedRoutes(routes, by: strategy, preferences: preferences, tripAnchor: tripAnchor)
+        // A hard accessibility requirement demotes routes with a DETECTED barrier under
+        // every strategy, not just the step-free sort — otherwise the toggles have no
+        // visible effect on the default orderings. Demoted, not removed: hiding every
+        // option behind an unmet requirement helps no one, and the route cards carry the
+        // barrier warning explaining the ordering. (Path-level avoidance would need
+        // accessibility data inside the routing graph — not available there today.)
+        guard preferences.requiresWheelchairAccess || preferences.prefersElevator else { return ranked }
+        let clear = ranked.filter { $0.stepFreeAssessment != .barrierDetected }
+        let barriers = ranked.filter { $0.stepFreeAssessment == .barrierDetected }
+        return clear + barriers
+    }
+
+    private func rankedRoutes(
+        _ routes: [Route],
+        by strategy: RoutePreference,
+        preferences: AccessibilityPreference,
+        tripAnchor: TripTimeAnchor
+    ) -> [Route] {
         switch strategy {
         case .metroFirst:
             return routes.sorted {

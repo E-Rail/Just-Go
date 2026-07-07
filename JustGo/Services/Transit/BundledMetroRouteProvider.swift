@@ -234,9 +234,67 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         guard let match = matches.min(by: { $0.score < $1.score }), match.score < 2_000 else {
             return []
         }
-        let slice = match.from <= match.to
+        let direct = match.from <= match.to
             ? Array(match.path[match.from...match.to])
             : Array(match.path[match.to...match.from].reversed())
+        var slice = direct
+        // On a closed ring (loop line: first point == last point) the seam edge matches
+        // indices at opposite ends of the array, and the direct slice is essentially the
+        // WHOLE ring — the arc that wraps across the seam is the real geometry. Take
+        // whichever arc is shorter.
+        if let first = match.path.first, let last = match.path.last,
+           first.coordinate.distance(to: last.coordinate) < 5 {
+            let ring = Array(match.path.dropLast())
+            let wrapped = wrappedRingArc(ring, from: match.from, to: match.to)
+            if wrapped.count >= 2, arcLength(wrapped) < arcLength(direct) {
+                slice = wrapped
+            }
+        }
+        // A slice grossly longer than the stations' straight-line separation is a bad
+        // match (mis-picked vertices, self-approaching geometry) — better to return
+        // nothing and let the renderer draw its station-to-station straight fallback.
+        guard arcLength(slice) <= max(2.5 * edge.distance, edge.distance + 1_500) else {
+            return []
+        }
         return slice.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+
+    /// The arc from `from` to `to` that crosses the ring's seam (walks off the end of the
+    /// array and back in at the start). Indices refer to the original path; the caller
+    /// passes the ring with the duplicated closing point dropped.
+    private func wrappedRingArc(_ ring: [MetroCoordinate], from: Int, to: Int) -> [MetroCoordinate] {
+        let count = ring.count
+        guard count >= 2 else { return [] }
+        let start = from % count
+        let end = to % count
+        guard start != end else { return [] }
+        var arc: [MetroCoordinate] = []
+        // Walk in the direction that crosses the seam: forward when the direct slice ran
+        // backward through the array (from > to), backward otherwise.
+        if from > to {
+            var index = start
+            while true {
+                arc.append(ring[index])
+                if index == end { break }
+                index = (index + 1) % count
+            }
+        } else {
+            var index = start
+            while true {
+                arc.append(ring[index])
+                if index == end { break }
+                index = (index - 1 + count) % count
+            }
+        }
+        return arc
+    }
+
+    private func arcLength(_ coordinates: [MetroCoordinate]) -> Double {
+        guard coordinates.count >= 2 else { return 0 }
+        var total: Double = 0
+        for index in 1..<coordinates.count {
+            total += coordinates[index - 1].coordinate.distance(to: coordinates[index].coordinate)
+        }
+        return total
     }
 }

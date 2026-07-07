@@ -269,6 +269,8 @@ struct StationSearchView: View {
                         .padding()
                     Spacer()
                 }
+            } else if viewModel?.isEnrichingForFacility == true && (viewModel?.searchResults.isEmpty ?? true) {
+                filterLoadingRow
             } else if let results = viewModel?.searchResults, !results.isEmpty {
                 ForEach(results) { station in
                     StationRow(
@@ -280,6 +282,8 @@ struct StationSearchView: View {
                         selectedStation = station
                     }
                 }
+            } else if isAnyFilterActive {
+                activeFilterEmptyState
             } else if !(viewModel?.searchText.isEmpty ?? true) {
                 if let message = viewModel?.errorMessage {
                     ContentUnavailableView {
@@ -297,30 +301,40 @@ struct StationSearchView: View {
                         Text(AppLocalization.localized("Try a different search term"))
                     }
                 }
-            } else if viewModel?.filter.facilityType != nil && viewModel?.isEnrichingForFacility == false {
-                ContentUnavailableView {
-                    Label(
-                        AppLocalization.text(english: "No Stations Found", simplified: "未找到站点", traditional: "未找到站點"),
-                        systemImage: "building.2"
-                    )
-                } description: {
-                    Text(AppLocalization.text(
-                        english: "Facility data requires the city data pack to be loaded.",
-                        simplified: "设施数据需要城市数据包。",
-                        traditional: "設施資料需要城市資料包。"
-                    ))
-                }
             } else if let message = viewModel?.errorMessage {
                 ContentUnavailableView {
                     Label(AppLocalization.localized("Choose City"), systemImage: "building.2")
                 } description: {
                     Text(message)
                 }
-            } else if viewModel?.recentSearches.isEmpty == false {
+            } else if !isAnyFilterActive && viewModel?.recentSearches.isEmpty == false {
                 recentSearchesSection
             }
         }
         .listStyle(.plain)
+    }
+
+    private var filterLoadingRow: some View {
+        HStack(spacing: 12) {
+            Spacer()
+            ProgressView()
+            Text(AppLocalization.localized("Checking station details..."))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(.vertical, 28)
+    }
+
+    private var activeFilterEmptyState: some View {
+        ContentUnavailableView {
+            Label(
+                AppLocalization.localized("No stations match these filters"),
+                systemImage: "line.3.horizontal.decrease.circle"
+            )
+        } description: {
+            Text(AppLocalization.localized("Try clearing filters or loading official city data."))
+        }
     }
 
     private var recentSearchesSection: some View {

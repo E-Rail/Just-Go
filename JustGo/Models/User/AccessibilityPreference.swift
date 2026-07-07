@@ -45,6 +45,20 @@ struct RouteAffectingAccessibilitySignature: Equatable {
     let prefersElevator: Bool
     let avoidStairs: Bool
     let maxWalkingDistance: Double
+
+    var mobilityDefaults: MobilityAccessibilityDefaults {
+        MobilityAccessibilityDefaults(
+            requiresWheelchairAccess: requiresWheelchairAccess,
+            prefersElevator: prefersElevator,
+            avoidStairs: avoidStairs
+        )
+    }
+}
+
+struct MobilityAccessibilityDefaults: Equatable {
+    let requiresWheelchairAccess: Bool
+    let prefersElevator: Bool
+    let avoidStairs: Bool
 }
 
 extension AccessibilityPreference {

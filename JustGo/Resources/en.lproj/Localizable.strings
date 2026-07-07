@@ -231,6 +231,7 @@
 "Apple Maps walking directions mention stairs." = "Apple Maps walking directions mention stairs.";
 "Bottleneck" = "Bottleneck";
 "Choose City" = "Choose City";
+"Checking station details..." = "Checking station details...";
 "Complete Trip" = "Complete Trip";
 "Critical" = "Critical";
 "Facility" = "Facility";
@@ -243,6 +244,7 @@
 "No Personal Reports" = "No Personal Reports";
 "No accessibility concerns found from available data." = "No accessibility concerns found from available data.";
 "No saved trips yet" = "No saved trips yet";
+"No stations match these filters" = "No stations match these filters";
 "No trip history yet" = "No trip history yet";
 "Not present" = "Not present";
 "Note" = "Note";
@@ -258,6 +260,7 @@
 "Report Route Issue" = "Report Route Issue";
 "Report Station Issue" = "Report Station Issue";
 "Report route issue" = "Report route issue";
+"Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Report station issue" = "Report station issue";
 "Rider Notes" = "Rider Notes";
 "Route Concern" = "Route Concern";

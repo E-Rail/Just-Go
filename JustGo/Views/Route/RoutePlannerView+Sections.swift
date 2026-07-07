@@ -50,14 +50,17 @@ extension RoutePlannerView {
                 isEvening: isEvening,
                 cityID: appState.selectedCity?.id ?? ""
             ) {
-                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
                 viewModel?.useSavedTrip(trip)
                 if isEvening {
                     viewModel?.swapOriginDestination()
                 }
                 Task {
                     await viewModel?.searchRoutes()
-                    showResults = viewModel?.routes.isEmpty == false
+                    let hasRoutes = viewModel?.routes.isEmpty == false
+                    if hasRoutes {
+                        _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                    }
+                    showResults = hasRoutes
                 }
             }
         }
@@ -166,7 +169,6 @@ extension RoutePlannerView {
                     HStack(spacing: 10) {
                         ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
                             Button {
-                                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
                                 // Saved trips keep their home city; planning a Beijing
                                 // trip's coordinates against a selected Shanghai network
                                 // matches nonsense nearest stations.
@@ -174,7 +176,11 @@ extension RoutePlannerView {
                                 viewModel?.useSavedTrip(trip)
                                 Task {
                                     await viewModel?.searchRoutes()
-                                    showResults = viewModel?.routes.isEmpty == false
+                                    let hasRoutes = viewModel?.routes.isEmpty == false
+                                    if hasRoutes {
+                                        _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                    }
+                                    showResults = hasRoutes
                                 }
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {

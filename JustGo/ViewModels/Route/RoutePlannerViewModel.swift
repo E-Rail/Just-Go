@@ -36,6 +36,12 @@ final class RoutePlannerViewModel {
     /// `selectedCity` on seam trips — "Save this trip" persists under this city.
     private(set) var lastPlannedCityID: String?
 
+    /// Persisted app-wide accessibility defaults (the 无障碍 sheet), refreshed by the view
+    /// on each appearance. Feeds max-walk warnings and ranking; the chips below override
+    /// the mobility flags per-trip. Plain set on purpose — refreshing it must not
+    /// invalidate an in-flight search.
+    var basePreference: AccessibilityPreference = .default
+
     // Accessibility filters. A toggle mid-search supersedes the search: its routes were
     // planned with the old filter and must not publish under the new one.
     var requiresWheelchairAccess = false {
@@ -368,7 +374,7 @@ final class RoutePlannerViewModel {
             if let resolvedOrigin { setPlace(resolvedOrigin, for: .origin) }
             if let resolvedDestination { setPlace(resolvedDestination, for: .destination) }
             lastPlannedCityID = planned.first?.networkCityID ?? city.id
-            routes = planned
+            routes = planned.map(withMaxWalkWarning)
             sortRoutes()
             if let firstRoute = routes.first {
                 // The metro provider picks its network by coordinates, not the selected
@@ -478,11 +484,31 @@ final class RoutePlannerViewModel {
     }
 
     private var accessibilityPreferences: AccessibilityPreference {
-        var preferences = AccessibilityPreference.default
+        var preferences = basePreference
         preferences.requiresWheelchairAccess = requiresWheelchairAccess
         preferences.prefersElevator = requiresElevator
         preferences.avoidStairs = avoidStairs
         return preferences
+    }
+
+    /// Flags routes whose total walking exceeds the user's configured maximum (the 无障碍
+    /// sheet's slider), replacing the generic fixed-800m long-walk warning with one that
+    /// names the user's own limit.
+    private func withMaxWalkWarning(_ route: Route) -> Route {
+        let limit = basePreference.maxWalkingDistance
+        guard limit > 0, route.walkingDistance > limit else { return route }
+        var route = route
+        route.warnings.removeAll { $0.type == .longWalk }
+        route.warnings.append(RouteWarning(
+            type: .longWalk,
+            message: AppLocalization.text(
+                english: "Walking exceeds your \(AppLocalization.distance(limit)) limit",
+                simplified: "步行距离超过你设置的\(AppLocalization.distance(limit))上限",
+                traditional: "步行距離超過你設定的\(AppLocalization.distance(limit))上限"
+            ),
+            affectedStationID: nil
+        ))
+        return route
     }
 
     private func updateSuggestions(for field: RouteInputField) {

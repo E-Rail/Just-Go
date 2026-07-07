@@ -22,6 +22,9 @@ struct RouteDetailView: View {
     @State var selectedTransferSegment: RouteSegment?
     @State private var selectedTimelineStation: RouteStationStop?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
+    // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
+    // navigator re-fires onAppear, and a reset would immediately re-present it.
+    @State private var didAutoPresentLiveGo = false
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
@@ -61,6 +64,16 @@ struct RouteDetailView: View {
         .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Step-by-Step Guidance (cognitive accessibility): go straight into the
+            // guided navigator instead of the dense detail screen; dismissing it lands
+            // on the full detail as usual.
+            if appState.accessibilityPreference.stepByStepGuidance, !didAutoPresentLiveGo {
+                didAutoPresentLiveGo = true
+                ActiveTripStore.save(route)
+                showLiveGo = true
+            }
+        }
         .sheet(isPresented: $showRouteReport) {
             routeReportSheet
         }

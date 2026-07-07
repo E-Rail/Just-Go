@@ -9,16 +9,15 @@ struct AccessibilityPreference: Codable {
     var maxWalkingDistance: Double
     var avoidStairs: Bool
 
-    // Vision
-    var voiceOverEnabled: Bool
-    var highContrastMode: Bool
-    var largeText: Bool
+    // Vision. VoiceOver / high contrast / large text are SYSTEM features an app can't
+    // toggle — the settings sheet points to the right iOS Settings paths instead of
+    // carrying dead switches for them.
     var audioNavigation: Bool
 
-    // Hearing
+    // Hearing. LED flash-for-alerts is likewise system-level (covers our trip-reminder
+    // notifications); only the in-app behaviors keep preference fields.
     var visualAnnouncements: Bool
     var vibrationAlerts: Bool
-    var flashAlerts: Bool
 
     // Cognitive
     var simplifiedUI: Bool
@@ -31,13 +30,9 @@ struct AccessibilityPreference: Codable {
             prefersElevator: false,
             maxWalkingDistance: 500,
             avoidStairs: false,
-            voiceOverEnabled: false,
-            highContrastMode: false,
-            largeText: false,
             audioNavigation: false,
             visualAnnouncements: false,
             vibrationAlerts: false,
-            flashAlerts: false,
             simplifiedUI: false,
             stepByStepGuidance: false
         )

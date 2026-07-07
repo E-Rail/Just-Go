@@ -38,14 +38,12 @@ struct RoutePlannerView: View {
                             Color.clear.frame(height: 0).id("plannerTop")
                             if let resumableTrip { resumeTripBanner(resumableTrip) }
                             // Simplified UI (cognitive accessibility): only the essentials —
-                            // city, the fields, quick tags, search, and the accessibility
-                            // filters themselves. The resume banner stays: an active trip
-                            // is never noise.
+                            // city, the fields, search, and the accessibility filters
+                            // themselves. The resume banner stays: an active trip is never noise.
                             if !simplifiedUI, !hasSeenWelcome { welcomeCard }
                             citySelector
                             if !simplifiedUI { smartCommuteSection }
                             routeInputSection
-                            quickTagsSection
                             if !simplifiedUI { saveCurrentTripButton }
                             searchButton
                             if let hint = searchHint {
@@ -339,6 +337,13 @@ struct RoutePlannerView: View {
                         suggestions: activeSuggestions.suggestions,
                         select: { viewModel?.selectPlace($0, for: activeSuggestions.field) }
                     )
+                }
+
+                if let pendingKind = viewModel?.pendingQuickPlaceKind {
+                    Text(String(format: AppLocalization.localized("Search a place to save %@"), pendingKind.title))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 HStack {

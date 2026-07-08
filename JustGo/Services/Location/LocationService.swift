@@ -22,6 +22,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func requestCurrentLocation() async throws -> CLLocation {
         locationErrorMessage = nil
 
+        // The cache fast path returns before the cancellation handler below is armed —
+        // without this check an already-cancelled caller (e.g. locate-me superseded by a
+        // city switch) would still receive a fix and act on it.
+        try Task.checkCancellation()
+
         if let currentLocation,
            isAuthorized,
            currentLocation.horizontalAccuracy >= 0,
@@ -118,6 +123,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        // kCLErrorLocationUnknown is transient — Core Location keeps trying and will deliver
+        // a fix (or a real error) shortly. Failing every pending request here made a cold GPS
+        // start (indoors, first fix after launch) error out instantly; keep waiting instead.
+        // The 15s request timeout remains the backstop and stops the stream on expiry.
+        if (error as? CLError)?.code == .locationUnknown { return }
         locationErrorMessage = error.localizedDescription
         finishPendingLocationRequests(with: .failure(error))
 

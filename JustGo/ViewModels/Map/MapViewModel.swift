@@ -37,6 +37,13 @@ final class MapViewModel {
     private let cityService: CityService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
+    // The city the map is currently loaded for — search publishes are guarded on it so
+    // a slow city-A place search can't flash its results under city B's map.
+    private var activeCityID: String?
+    // Set when the locate flow has already centered the camera on the user inside the
+    // city about to be selected — that city's loadStations must not yank the camera to
+    // the city center. Cleared on every load so a manual pick invalidates it.
+    private var pendingUserCameraCityID: String?
     private var viewportLoadTask: Task<Void, Never>?
     private var cityLoadTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
@@ -66,11 +73,18 @@ final class MapViewModel {
     }
 
     func loadStations(for city: City) async {
+        activeCityID = city.id
+        let keepUserCamera = pendingUserCameraCityID == city.id
+        pendingUserCameraCityID = nil
         clearSearch()
         viewportLoadTask?.cancel()
         cityLoadTask?.cancel()
         markerRefreshTask?.cancel()
-        updateCamera(to: city.coordinate, spanDelta: 0.22)
+        if !keepUserCamera {
+            // Skipped only when the locate flow triggered this switch — the camera is
+            // already on the user inside this city, and recentering would undo the locate.
+            updateCamera(to: city.coordinate, spanDelta: 0.22)
+        }
         metroNetworks = []
         stations = []
         cityLoadTask = Task { [weak self] in
@@ -80,6 +94,7 @@ final class MapViewModel {
 
     func searchEverywhere(in city: City?) async {
         guard let city else { return }
+        let cityID = city.id
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
             searchResults = []
@@ -90,17 +105,20 @@ final class MapViewModel {
         do {
             let results = try await stationSearchService.searchPlaces(
                 keyword: query,
-                city: city.id,
+                city: cityID,
                 region: visibleRegion?.mkCoordinateRegion
             )
             // MKLocalSearch ignores Swift task cancellation, so a superseded query can return
-            // after a newer one — drop it instead of stomping the current results.
+            // after a newer one — drop it instead of stomping the current results. The city
+            // guard covers the window before a city switch's deferred clearSearch runs.
             guard !Task.isCancelled,
+                  activeCityID == cityID,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
             errorMessage = nil
             searchResults = results
         } catch {
             guard !Task.isCancelled,
+                  activeCityID == cityID,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
             searchResults = []
             errorMessage = AppLocalization.localized("Place search requires a network connection")
@@ -183,17 +201,37 @@ final class MapViewModel {
         }
     }
 
-    func centerOnUser() async {
+    /// Centers the camera on the user and returns the city the app should switch to when
+    /// the user is clearly outside the selected city's metro area — nil otherwise. The
+    /// caller owns the actual `selectedCity` write; `loadStations` for the returned city
+    /// then keeps the user-centered camera instead of recentering (pendingUserCameraCityID).
+    func centerOnUser() async -> City? {
         do {
             let location = try await locationService.requestCurrentLocation()
+            // A cancelled locate-me (city switch mid-fix) must not recenter the new
+            // city's map onto the user's physical position.
+            guard !Task.isCancelled else { return nil }
             updateCamera(to: location.coordinate)
-        } catch { }
+            // Bounded, same rule as the planner's cross-city fills: within 80km of the
+            // selected city's center the user is plausibly in its metro area — seam
+            // positions in adjacent interconnected metros (Guangzhou/Foshan) must not
+            // flip the selection. Beyond it, follow the user to the nearest city.
+            guard let selected = activeCityID.flatMap({ cityService.getCity(byID: $0) }) else { return nil }
+            let selectedCenter = CLLocation(latitude: selected.coordinate.latitude, longitude: selected.coordinate.longitude)
+            guard location.distance(from: selectedCenter) > 80_000,
+                  let nearest = cityService.findNearestCity(to: location),
+                  nearest.id != selected.id else { return nil }
+            pendingUserCameraCityID = nearest.id
+            return nearest
+        } catch {
+            return nil
+        }
     }
 
     private func loadNetworks(cityIDs: [String]) async {
         let requested = Set(cityIDs)
         let retained = metroNetworks.filter { requested.contains($0.cityID) }
-        var loadedByCity = Dictionary(uniqueKeysWithValues: retained.map { ($0.cityID, $0) })
+        var loadedByCity = Dictionary(retained.map { ($0.cityID, $0) }, uniquingKeysWith: { first, _ in first })
 
         await withTaskGroup(of: (MetroNetwork?, [Station]).self) { group in
             for cityID in requested where loadedByCity[cityID] == nil {

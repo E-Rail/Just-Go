@@ -50,14 +50,18 @@ extension RoutePlannerView {
                 isEvening: isEvening,
                 cityID: appState.selectedCity?.id ?? ""
             ) {
-                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
                 viewModel?.useSavedTrip(trip)
                 if isEvening {
                     viewModel?.swapOriginDestination()
                 }
                 Task {
-                    await viewModel?.searchRoutes()
-                    showResults = viewModel?.routes.isEmpty == false
+                    // Credit the trip only when ITS OWN search published — inspecting the
+                    // shared routes after the await would credit trip A for trip B's
+                    // results when taps overlap.
+                    if await viewModel?.searchRoutes() == true {
+                        _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                        showResults = true
+                    }
                 }
             }
         }
@@ -78,97 +82,6 @@ extension RoutePlannerView {
             .first
         guard let trip else { return nil }
         return (trip, isEvening)
-    }
-
-    var quickTagsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if viewModel?.canQuickRouteWork == true {
-                Button {
-                    Task {
-                        await viewModel?.quickRoute(to: .company)
-                        showResults = viewModel?.routes.isEmpty == false
-                    }
-                } label: {
-                    Label(
-                        AppLocalization.text(english: "Route to Work", simplified: "去公司路线", traditional: "去公司路線"),
-                        systemImage: "building.2.fill"
-                    )
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(.primary)
-                }
-                .buttonStyle(.plain)
-                .disabled(viewModel?.isLoading == true)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    quickTagButton(
-                        title: AppLocalization.localized("Current Location"),
-                        icon: "location.fill",
-                        isSaved: true
-                    ) {
-                        let field = quickTagTargetField
-                        Task {
-                            await viewModel?.useCurrentLocation(for: field)
-                        }
-                    }
-
-                    ForEach(QuickPlaceKind.allCases) { kind in
-                        let quickPlace = viewModel?.quickPlace(for: kind)
-                        quickTagButton(
-                            title: quickPlace?.name ?? kind.title,
-                            icon: kind.icon,
-                            isSaved: quickPlace != nil
-                        ) {
-                            let field = quickTagTargetField
-                            if let quickPlace {
-                                viewModel?.useQuickPlace(quickPlace, for: field)
-                            } else {
-                                viewModel?.beginSavingQuickPlace(kind)
-                                focusedField = field
-                            }
-                        }
-                    }
-                }
-                .padding(.vertical, 2)
-            }
-
-            if let pendingKind = viewModel?.pendingQuickPlaceKind {
-                Text(String(format: AppLocalization.localized("Search a place to save %@"), pendingKind.title))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private var quickTagTargetField: RouteInputField {
-        focusedField ?? ((viewModel?.originName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) ? .origin : .destination)
-    }
-
-    private func quickTagButton(title: String, icon: String, isSaved: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            quickTagLabel(title: title, icon: icon, isSaved: isSaved)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func quickTagLabel(title: String, icon: String, isSaved: Bool) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.caption)
-            Text(title)
-                .font(.caption)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(isSaved ? Color.accentColor.opacity(0.12) : Color(.systemGray5), in: Capsule())
-        .foregroundStyle(isSaved ? Color.accentColor : Color.primary)
     }
 
     private var anyFilterActive: Bool {
@@ -257,11 +170,17 @@ extension RoutePlannerView {
                     HStack(spacing: 10) {
                         ForEach(tripMemoryService.savedTrips.prefix(6)) { trip in
                             Button {
-                                _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                // Saved trips keep their home city; planning a Beijing
+                                // trip's coordinates against a selected Shanghai network
+                                // matches nonsense nearest stations.
+                                switchPlannerCity(toCityID: trip.cityID)
                                 viewModel?.useSavedTrip(trip)
                                 Task {
-                                    await viewModel?.searchRoutes()
-                                    showResults = viewModel?.routes.isEmpty == false
+                                    // Same ownership rule as the smart-commute card above.
+                                    if await viewModel?.searchRoutes() == true {
+                                        _ = tripMemoryService.markSavedTripUsed(id: trip.id)
+                                        showResults = true
+                                    }
                                 }
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {
@@ -303,7 +222,10 @@ extension RoutePlannerView {
                 .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-        .disabled(viewModel?.canSearch != true)
+        // Gated on a current successful plan, not just filled fields: an unplanned save
+        // has no planned-network city and would fall back to whatever city is selected.
+        .disabled(viewModel?.hasCurrentPlan != true)
+        .opacity(viewModel?.hasCurrentPlan == true ? 1 : 0.55)
         .opacity(viewModel?.canSearch == true ? 1 : 0.55)
     }
 
@@ -327,6 +249,13 @@ extension RoutePlannerView {
                 VStack(spacing: 0) {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
                         Button {
+                            // Recents fill by NAME and resolve at search time in the
+                            // current city — a Beijing name under Shanghai silently
+                            // matches a same-named Shanghai station. Legacy rows recover
+                            // their city from the station ID prefix.
+                            if let cityID = route.resolvedCityID {
+                                switchPlannerCity(toCityID: cityID)
+                            }
                             viewModel?.useRecentRoute(route)
                             scrollToTopTrigger.toggle()
                         } label: {
@@ -386,7 +315,7 @@ extension RoutePlannerView {
                     Button(AppLocalization.localized("Save")) {
                         saveCurrentTrip()
                     }
-                    .disabled(viewModel?.canSearch != true)
+                    .disabled(viewModel?.hasCurrentPlan != true)
                 }
             }
         }
@@ -399,7 +328,10 @@ extension RoutePlannerView {
     }
 
     private func saveCurrentTrip() {
-        guard let city = appState.selectedCity,
+        // Prefer the city of the network that actually planned the current routes: the
+        // provider picks its network by coordinates, so a seam trip (Foshan network under
+        // a selected Guangzhou) must not be persisted under the selection.
+        guard let city = plannerCity(forID: viewModel?.lastPlannedCityID) ?? appState.selectedCity,
               let origin = viewModel?.originSnapshot(),
               let destination = viewModel?.destinationSnapshot(),
               let filter = viewModel?.accessibilityFilter else { return }

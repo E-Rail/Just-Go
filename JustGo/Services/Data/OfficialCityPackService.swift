@@ -62,6 +62,7 @@ struct CityPackServiceStatus: Codable, Equatable {
 protocol OfficialStationDataProviding {
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus
+    func deleteCityPack(for cityID: String) async -> CityPackLoadStatus
     func enrichStation(_ station: Station) async -> Station
     func enrichStations(_ stations: [Station]) async -> [Station]
     func stationMap(for station: Station) async -> CityPackStationMap?
@@ -93,10 +94,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     // while still retrying periodically in case connectivity comes back.
     private var failedCooldownUntil: [String: Date] = [:]
     private static let failureCooldown: TimeInterval = 45
-    private var inFlightLoads: [String: Task<CityPackLoadStatus, Never>] = [:]
+    private var loadGenerations: [String: Int] = [:]
+    private var inFlightLoads: [String: InFlightCityPackLoad] = [:]
 
     private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
         guard let status = loadStatuses[cityID] else { return nil }
+        if case .loaded = status, packs[cityID] == nil {
+            loadStatuses.removeValue(forKey: cityID)
+            return nil
+        }
         if let cooldownUntil = failedCooldownUntil[cityID], Date() >= cooldownUntil {
             return nil
         }
@@ -106,6 +112,20 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private func cacheStatus(_ status: CityPackLoadStatus, for cityID: String) {
         loadStatuses[cityID] = status
         failedCooldownUntil[cityID] = status == .failed ? Date().addingTimeInterval(Self.failureCooldown) : nil
+    }
+
+    private func advanceLoadGeneration(for cityID: String) -> Int {
+        let generation = (loadGenerations[cityID] ?? 0) + 1
+        loadGenerations[cityID] = generation
+        return generation
+    }
+
+    private func loadGenerationMatches(for cityID: String, generation: Int) -> Bool {
+        loadGenerations[cityID] == generation
+    }
+
+    private func shouldContinueLoad(for cityID: String, generation: Int) -> Bool {
+        loadGenerationMatches(for: cityID, generation: generation) && !Task.isCancelled
     }
 
     init(session: URLSession = .shared, metroNetworks: MetroNetworkProviding) {
@@ -166,34 +186,60 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         // Actor re-entrancy at each await point would otherwise let multiple callers bypass the
         // packs/loadStatuses checks simultaneously and trigger redundant parallel downloads.
         if let existing = inFlightLoads[cityID] {
-            return await existing.value
+            let status = await existing.task.value
+            // A delete can invalidate the load we coalesced onto (its cancelled task yields
+            // .failed) — mirror the creator path and report the current truth instead.
+            guard loadGenerationMatches(for: cityID, generation: existing.generation) else {
+                return await cityPackStatus(for: cityID)
+            }
+            return status
         }
         guard !Self.manifestURLs.isEmpty else { return .notConfigured }
 
-        let task = Task { [self] in await self.performDownload(for: cityID) }
-        inFlightLoads[cityID] = task
+        let generation = advanceLoadGeneration(for: cityID)
+        let task = Task { [self] in await self.performDownload(for: cityID, generation: generation) }
+        inFlightLoads[cityID] = InFlightCityPackLoad(generation: generation, task: task)
         let status = await task.value
-        inFlightLoads.removeValue(forKey: cityID)
+        if inFlightLoads[cityID]?.generation == generation {
+            inFlightLoads.removeValue(forKey: cityID)
+        }
+        guard loadGenerationMatches(for: cityID, generation: generation) else {
+            return await cityPackStatus(for: cityID)
+        }
         cacheStatus(status, for: cityID)
         return status
     }
 
-    private func performDownload(for cityID: String) async -> CityPackLoadStatus {
+    func deleteCityPack(for cityID: String) async -> CityPackLoadStatus {
+        _ = advanceLoadGeneration(for: cityID)
+        inFlightLoads.removeValue(forKey: cityID)?.task.cancel()
+        packs.removeValue(forKey: cityID)
+        loadStatuses.removeValue(forKey: cityID)
+        failedCooldownUntil.removeValue(forKey: cityID)
+        return await cityPackStatus(for: cityID)
+    }
+
+    private func performDownload(for cityID: String, generation: Int) async -> CityPackLoadStatus {
         var pendingStatus: CityPackLoadStatus?
         for manifestURL in Self.manifestURLs {
+            guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
             do {
                 let manifest = try await loadManifest(from: manifestURL)
+                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                 guard let entry = manifest.cities.first(where: { $0.cityID == cityID }) else { continue }
                 guard let downloadURL = resolvedURL(entry.downloadURL, relativeTo: manifestURL) else {
                     pendingStatus = entry.hasPendingData ? .sourcePending : .notAvailable
                     continue
                 }
                 let data = try await download(from: downloadURL)
+                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                 let decoded = try JSONDecoder().decode(OfficialPack.self, from: data)
                 guard decoded.cityID == cityID, decoded.version == entry.version else { continue }
+                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                 packs[cityID] = LoadedPack(data: decoded, assetBaseURL: downloadURL.deletingLastPathComponent())
                 return .loaded(version: decoded.version)
             } catch {
+                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                 AppLog.data.warning("City pack load failed for \(cityID, privacy: .public) via \(manifestURL.absoluteString, privacy: .public): \(error)")
                 continue
             }
@@ -215,11 +261,27 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func enrichLoadedStation(_ station: Station) -> Station {
         guard let item = stationRecord(cityID: station.cityID, stationName: station.name) else { return station }
+        // Station is a reference type, and callers pass in instances the main thread may
+        // already be rendering — mutating those here (on the actor's executor) races the UI.
+        // Enrich a copy instead; every caller consumes the returned station.
+        let enriched = Station(
+            stationID: station.stationID,
+            name: station.name,
+            nameEn: station.nameEn,
+            namePinyin: station.namePinyin,
+            latitude: station.latitude,
+            longitude: station.longitude,
+            cityID: station.cityID,
+            isTransferStation: station.isTransferStation
+        )
+        enriched.lines = station.lines
         if let data = item.accessibility?.data {
-            station.accessibility = StationAccessibility(stationID: station.stationID, data: data)
+            enriched.accessibility = StationAccessibility(stationID: station.stationID, data: data)
+        } else {
+            enriched.accessibility = station.accessibility
         }
-        station.facilities = item.facilities(for: station.stationID)
-        return station
+        enriched.facilities = item.facilities(for: station.stationID)
+        return enriched
     }
 
     func stationMap(for station: Station) async -> CityPackStationMap? {
@@ -472,7 +534,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func releaseMemory() {
+        let releasedCityIDs = Array(packs.keys)
         packs.removeAll()
+        for cityID in releasedCityIDs {
+            if case .loaded = loadStatuses[cityID] {
+                loadStatuses.removeValue(forKey: cityID)
+            }
+        }
     }
 }
 
@@ -489,6 +557,11 @@ private struct LoadedPack {
             uniquingKeysWith: { first, _ in first }
         )
     }
+}
+
+private struct InFlightCityPackLoad {
+    let generation: Int
+    let task: Task<CityPackLoadStatus, Never>
 }
 
 private struct OfficialManifest: Decodable {

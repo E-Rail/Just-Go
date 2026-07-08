@@ -5,6 +5,9 @@ struct TransitDataView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var packStatus: [String: CityPackLoadStatus] = [:]
     @State private var downloading: Set<String> = []
+    /// Cities whose download/delete completed while the appearance-time refresh was still
+    /// fetching — the refresh's snapshot predates those ops and must not overwrite them.
+    @State private var opCompletedCityIDs: Set<String> = []
 
     private var cities: [City] {
         container.cityService.getAllCities()
@@ -75,6 +78,15 @@ struct TransitDataView: View {
                             Spacer()
                             cityPackControl(for: city)
                         }
+                        .swipeActions {
+                            if case .loaded = packStatus[city.id], !downloading.contains(city.id) {
+                                Button(role: .destructive) {
+                                    Task { await deletePack(city) }
+                                } label: {
+                                    Label(AppLocalization.localized("Delete"), systemImage: "trash")
+                                }
+                            }
+                        }
                     }
                 } header: {
                     Text(AppLocalization.text(
@@ -139,10 +151,14 @@ struct TransitDataView: View {
     }
 
     private func refreshPackStatuses() async {
+        opCompletedCityIDs = []
         let cityIDs = cities.map(\.id)
         let statuses = await container.officialStationData.cityPackStatuses(for: cityIDs)
-        await MainActor.run {
-            packStatus = statuses
+        // Merge per city, skipping any the user operated on while this snapshot was in
+        // flight (completed ops wrote fresher statuses; in-flight ones will).
+        for (cityID, status) in statuses
+            where !opCompletedCityIDs.contains(cityID) && !downloading.contains(cityID) {
+            packStatus[cityID] = status
         }
     }
 
@@ -150,6 +166,15 @@ struct TransitDataView: View {
         downloading.insert(city.id)
         let status = await container.officialStationData.loadCityPack(for: city.id)
         downloading.remove(city.id)
+        opCompletedCityIDs.insert(city.id)
+        packStatus[city.id] = status
+    }
+
+    private func deletePack(_ city: City) async {
+        downloading.insert(city.id)
+        let status = await container.officialStationData.deleteCityPack(for: city.id)
+        downloading.remove(city.id)
+        opCompletedCityIDs.insert(city.id)
         packStatus[city.id] = status
     }
 

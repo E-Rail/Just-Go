@@ -36,6 +36,9 @@ struct MapContainerView: View {
     @State private var centerOnUserTask: Task<Void, Never>?
     @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
+    // Holds an MKMapItem that resolved while station matching was still deciding whether to
+    // present the place sheet — consumed (or discarded) when that decision lands.
+    @State private var pendingResolvedItem: MKMapItem?
     @State private var keyboardHeight: CGFloat = 0
     @State private var searchBarBottomY: CGFloat = 0
     @FocusState private var isSearchFocused: Bool
@@ -56,6 +59,23 @@ struct MapContainerView: View {
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
             viewModel?.scheduleSearch(in: appState.selectedCity)
+        }
+        // A city switch invalidates any in-flight POI/station interaction from the old city.
+        // During a POI tap's station match no sheet is presented yet, so the city picker stays
+        // reachable — without this reset a slow match started in city A presents its place
+        // sheet (or pushes its station detail) over city B's map, and a slow locate-me fix
+        // (up to the 15s GPS timeout) yanks city B's camera back to the user's position.
+        .onChange(of: appState.selectedCity?.id) { _, _ in
+            placeMatchTask?.cancel()
+            stationOpenTask?.cancel()
+            centerOnUserTask?.cancel()
+            // Kill the old city's place search here rather than waiting for the deferred
+            // .task(id:) reload — its results must not flash under the new city.
+            viewModel?.clearSearch()
+            stationOpenGeneration += 1
+            isLoadingStationDetail = false
+            pendingResolvedItem = nil
+            tappedPlace = nil
         }
     }
 
@@ -127,7 +147,10 @@ struct MapContainerView: View {
         .onChange(of: selectedStation?.id) { _, newID in
             if newID == nil { isLoadingStationDetail = false }
         }
-        .sheet(item: $tappedPlace, onDismiss: { tappedPlace = nil }) { place in
+        // No onDismiss here: sheet(item:) already nils the binding on dismissal, and an
+        // explicit `tappedPlace = nil` closure would fire for the OLD sheet's dismissal —
+        // clobbering a new tap's sheet presented while the old one was still animating out.
+        .sheet(item: $tappedPlace) { place in
             Group {
                 if let item = place.resolvedItem {
                     MapItemDetailSheet(mapItem: item) {
@@ -169,6 +192,7 @@ struct MapContainerView: View {
             stationOpenTask?.cancel()
             centerOnUserTask?.cancel()
             isLoadingStationDetail = false
+            pendingResolvedItem = nil
         }
     }
 
@@ -322,7 +346,12 @@ struct MapContainerView: View {
         Button {
             centerOnUserTask?.cancel()
             centerOnUserTask = Task {
-                await viewModel?.centerOnUser()
+                // Locate also aligns the app to the city the user is physically in
+                // (bounded — see centerOnUser): the camera alone moving left the city
+                // pill, station search, and planner stuck on the old city.
+                if let city = await viewModel?.centerOnUser() {
+                    appState.selectedCity = city
+                }
             }
         } label: {
             Image(systemName: "location.fill")
@@ -336,8 +365,13 @@ struct MapContainerView: View {
     }
 
     private func openStation(_ station: Station) {
-        // Opening a station always wins over a place card — dismiss any place sheet (e.g. one still
-        // loading from a prior POI tap) so the two `.sheet` presentations can't contend.
+        // Opening a station always wins over a place card — dismiss any place sheet AND cancel a
+        // prior POI tap's still-running station match, which would otherwise present a place
+        // sheet over/after this station navigation when it eventually completes. (Self-cancel is
+        // fine on the paths where placeMatchTask itself calls openStation: nothing runs after
+        // that call, and stationOpenTask below is a fresh Task that doesn't inherit cancellation.)
+        placeMatchTask?.cancel()
+        pendingResolvedItem = nil
         tappedPlace = nil
         stationOpenTask?.cancel()
         stationOpenGeneration += 1
@@ -366,6 +400,10 @@ struct MapContainerView: View {
         placeMatchTask?.cancel()
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
+        // Same entry-point invariant as handlePlaceTapped/openStation: every new interaction
+        // resets the POI-tap state, so a cancelled match's buffered resolve can't linger.
+        pendingResolvedItem = nil
+        tappedPlace = nil
         placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
                 guard !Task.isCancelled else { return }
@@ -388,26 +426,40 @@ struct MapContainerView: View {
         placeMatchTask?.cancel()
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
+        pendingResolvedItem = nil
+        // Dismiss any prior tap's sheet up front so "tappedPlace != nil" always means THIS
+        // tap's sheet in handlePlaceResolved — enforced here rather than relying on sheets
+        // blocking background map taps (true today, but a detent/background-interaction
+        // change would silently route the new resolve into the old sheet).
+        tappedPlace = nil
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
             guard !Task.isCancelled else { return }
             if let station {
+                pendingResolvedItem = nil
                 tappedPlace = nil
                 openStation(station)
             } else {
-                tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: nil)
+                // Apple's resolve may have finished while station matching was still running
+                // (it can block on a cold city-pack load) — present the sheet already filled
+                // instead of dropping the item and spinning forever.
+                tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: pendingResolvedItem)
+                pendingResolvedItem = nil
             }
         }
     }
 
-    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Fill the already-presented
-    /// sheet. Both `poiTask` (in the map coordinator) and `placeMatchTask` are cancelled on every
-    /// new tap, so this only ever fires for the latest tap — a non-nil `tappedPlace` therefore
-    /// always corresponds to this resolve. A nil `tappedPlace` means the tap resolved to a station
-    /// (sheet never shown) or the user dismissed it, so the late resolve is simply discarded.
+    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Both `poiTask` (in the map
+    /// coordinator) and `placeMatchTask` are cancelled on every new tap, so this only ever fires
+    /// for the latest tap. When the sheet is already presented, fill it in place; when station
+    /// matching is still deciding (slower than the resolve on a cold city-pack load), buffer the
+    /// item for `handlePlaceTapped` to attach at presentation time.
     private func handlePlaceResolved(_ mapItem: MKMapItem) {
-        guard tappedPlace != nil else { return }
-        tappedPlace?.resolvedItem = mapItem
+        if tappedPlace != nil {
+            tappedPlace?.resolvedItem = mapItem
+        } else {
+            pendingResolvedItem = mapItem
+        }
     }
 
 }

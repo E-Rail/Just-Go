@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FavoriteStationsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -63,6 +64,11 @@ struct FavoriteStationsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(AppLocalization.localized("Done")) { dismiss() }
                 }
+            }
+        }
+        .task {
+            tripMemoryService.repairFavoriteCityMetadata { cityID in
+                container.cityService.getCity(byID: cityID)
             }
         }
     }

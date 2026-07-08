@@ -109,7 +109,7 @@ struct RouteDetailView: View {
             FullScreenRouteMapView(route: route)
         }
         .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
-            LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
+            LiveGoView(route: route)
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false

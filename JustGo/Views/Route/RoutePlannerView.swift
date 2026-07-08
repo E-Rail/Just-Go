@@ -136,7 +136,7 @@ struct RoutePlannerView: View {
                 resumableTrip = nil
             }) {
                 if let resumableTrip {
-                    LiveGoView(plan: LiveGoTripBuilder().plan(for: resumableTrip))
+                    LiveGoView(route: resumableTrip)
                 }
             }
         }

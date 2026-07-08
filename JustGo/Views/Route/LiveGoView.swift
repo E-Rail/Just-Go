@@ -1,14 +1,24 @@
 import SwiftUI
 import MapKit
 import AVFoundation
+import CoreLocation
 
 @Observable
 final class LiveGoViewModel {
-    let plan: LiveTripPlan
+    private(set) var route: Route
+    private(set) var plan: LiveTripPlan
     var currentIndex = 0
 
-    init(plan: LiveTripPlan) {
-        self.plan = plan
+    init(route: Route) {
+        self.route = route
+        self.plan = LiveGoTripBuilder().plan(for: route)
+    }
+
+    /// Swap in a freshly planned route (off-route recovery) and restart the steps.
+    func reroute(with newRoute: Route) {
+        route = newRoute
+        plan = LiveGoTripBuilder().plan(for: newRoute)
+        currentIndex = 0
     }
 
     var currentStep: TripStep? {
@@ -31,7 +41,9 @@ final class LiveGoViewModel {
     }
 }
 
-/// Full-screen, accessibility-first step-by-step in-station companion.
+/// Map-first, accessibility-first step-by-step trip companion: a full-screen interactive
+/// map (pan/zoom, user-location puck, follow-me button) with the whole route drawn on it,
+/// a compact instruction panel at the bottom, and off-route re-planning while walking.
 struct LiveGoView: View {
     @State private var viewModel: LiveGoViewModel
     @Environment(\.dismiss) private var dismiss
@@ -51,37 +63,40 @@ struct LiveGoView: View {
     @State private var announcementTask: Task<Void, Never>?
     @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
+    // Live-navigation map + off-route recovery.
+    @State private var camera: MapCameraPosition = .automatic
+    @State private var isRerouting = false
+    @State private var offRouteStrikes = 0
+    @State private var lastRerouteAt = Date.distantPast
+    @State private var rerouteNotice: String?
+    @State private var rerouteNoticeTask: Task<Void, Never>?
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
-    init(plan: LiveTripPlan) {
-        _viewModel = State(initialValue: LiveGoViewModel(plan: plan))
+    init(route: Route) {
+        _viewModel = State(initialValue: LiveGoViewModel(route: route))
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                ProgressView(value: viewModel.progressFraction)
-                    .tint(themeColor)
-
-                Text(viewModel.progressText)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                if let step = viewModel.currentStep {
-                    stepCard(step)
-                        .id(step.id)
-                        .transition(.opacity)
-                }
-
-                Spacer()
-                controls
+            ZStack(alignment: .bottom) {
+                liveMap
+                    .ignoresSafeArea(edges: .bottom)
+                instructionPanel
             }
-            .padding()
             .overlay(alignment: .top) {
                 VStack(spacing: 8) {
+                    if isRerouting {
+                        noticeBanner(
+                            text: AppLocalization.text(english: "Rerouting…", simplified: "正在重新规划…", traditional: "正在重新規劃…"),
+                            icon: "arrow.triangle.2.circlepath",
+                            showsSpinner: true
+                        )
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    } else if let rerouteNotice {
+                        noticeBanner(text: rerouteNotice, icon: "arrow.triangle.2.circlepath")
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                     if showGetOffBanner {
                         getOffBanner
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -91,6 +106,7 @@ struct LiveGoView: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }
+                .padding(.horizontal)
             }
             .navigationTitle(AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發"))
             .navigationBarTitleDisplayMode(.inline)
@@ -102,21 +118,430 @@ struct LiveGoView: View {
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
+            // Continuous fixes drive the puck and off-route detection; ended on disappear.
+            container.locationService.beginContinuousUpdates()
+            frameCurrentStep(animated: false)
             refreshArrivalAlert()
             announceCurrentStep()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
+            container.locationService.endContinuousUpdates()
             cancelArrivalAlert()
             speechSynthesizer.stopSpeaking(at: .immediate)
             announcementTask?.cancel()
+            rerouteNoticeTask?.cancel()
         }
         .onChange(of: viewModel.currentIndex) { _, _ in
+            frameCurrentStep(animated: true)
             refreshArrivalAlert()
             announceCurrentStep()
         }
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
+        .onChange(of: container.locationService.currentLocation) { _, location in
+            handleLocationUpdate(location)
+        }
     }
+
+    // MARK: - Map
+
+    private struct RouteOverlay: Identifiable {
+        let id: Int
+        let coordinates: [CLLocationCoordinate2D]
+        let color: Color
+        let isWalking: Bool
+        let isCurrent: Bool
+    }
+
+    private struct StopMarker: Identifiable {
+        let id: String
+        let name: String
+        let coordinate: CLLocationCoordinate2D
+    }
+
+    private var liveMap: some View {
+        Map(position: $camera) {
+            UserAnnotation()
+
+            ForEach(routeOverlays) { overlay in
+                MapPolyline(coordinates: overlay.coordinates)
+                    .stroke(
+                        overlay.color.opacity(overlay.isCurrent ? 1 : 0.55),
+                        style: StrokeStyle(
+                            lineWidth: overlay.isCurrent ? 7 : 4.5,
+                            lineCap: .round,
+                            lineJoin: .round,
+                            dash: overlay.isWalking ? [7, 7] : []
+                        )
+                    )
+            }
+
+            ForEach(stopMarkers) { stop in
+                Annotation(stop.name, coordinate: stop.coordinate) {
+                    Circle()
+                        .fill(.white)
+                        .stroke(.black, lineWidth: 1.5)
+                        .frame(width: 10, height: 10)
+                }
+                .annotationTitles(.hidden)
+            }
+
+            if let destination = destinationCoordinate {
+                Marker(
+                    viewModel.plan.destination,
+                    systemImage: "flag.checkered",
+                    coordinate: destination
+                )
+                .tint(.green)
+            }
+        }
+        .mapControls {
+            MapUserLocationButton()
+            MapCompass()
+            MapScaleView()
+        }
+    }
+
+    /// One drawable per route segment, with the current step's segment emphasized.
+    /// Transfers have no geometry and draw nothing; segments without a polyline fall back
+    /// to their station-to-station straight line (same rule as TransitMapView).
+    private var routeOverlays: [RouteOverlay] {
+        let currentSegmentIndex = viewModel.currentStep?.segmentIndex
+        return viewModel.route.segments.enumerated().compactMap { index, segment in
+            var coordinates = segment.polylineCoordinates.map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
+            if coordinates.count < 2 {
+                coordinates = segment.stationStops.compactMap(\.coordinate).map {
+                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                }
+            }
+            guard coordinates.count >= 2 else { return nil }
+            let isWalking = segment.type == .walking
+            return RouteOverlay(
+                id: index,
+                coordinates: coordinates,
+                color: isWalking ? .gray : Color(hex: segment.lineColorHex ?? "#007AFF"),
+                isWalking: isWalking,
+                isCurrent: index == currentSegmentIndex
+            )
+        }
+    }
+
+    private var stopMarkers: [StopMarker] {
+        var seen = Set<String>()
+        var markers: [StopMarker] = []
+        for segment in viewModel.route.segments where segment.type.isTransit {
+            for stop in segment.stationStops {
+                guard let coordinate = stop.coordinate,
+                      seen.insert("\(stop.stationID)|\(coordinate.latitude)").inserted else { continue }
+                markers.append(StopMarker(
+                    id: "\(stop.stationID)|\(coordinate.latitude)|\(coordinate.longitude)",
+                    name: stop.name,
+                    coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                ))
+            }
+        }
+        return markers
+    }
+
+    /// The trip's real end point: the last segment that carries geometry, walking back
+    /// from the end of the route.
+    private var destinationCoordinate: CLLocationCoordinate2D? {
+        for segment in viewModel.route.segments.reversed() {
+            if let last = segment.polylineCoordinates.last {
+                return CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
+            }
+            if let stop = segment.stationStops.last?.coordinate {
+                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
+            }
+        }
+        return nil
+    }
+
+    /// Re-frame the camera on the current step's geometry. The rider stays free to pan and
+    /// zoom afterwards (and can follow their own position via the map's location button) —
+    /// only a step change or a reroute moves the camera.
+    private func frameCurrentStep(animated: Bool) {
+        guard let region = region(for: viewModel.currentStep) else { return }
+        if animated {
+            withAnimation(.easeInOut(duration: 0.6)) { camera = .region(region) }
+        } else {
+            camera = .region(region)
+        }
+    }
+
+    private func region(for step: TripStep?) -> MKCoordinateRegion? {
+        guard let step else { return nil }
+        var coordinates: [CLLocationCoordinate2D] = []
+        switch step.kind {
+        case .walkToStation, .walkToDestination:
+            coordinates = step.walkingPathCLCoordinates
+        case .transfer:
+            if let coordinate = step.transferCLCoordinate { coordinates = [coordinate] }
+        case .ride:
+            if let index = step.segmentIndex, viewModel.route.segments.indices.contains(index) {
+                let segment = viewModel.route.segments[index]
+                coordinates = segment.polylineCoordinates.map {
+                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                }
+                if coordinates.count < 2 {
+                    coordinates = segment.stationStops.compactMap(\.coordinate).map {
+                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                    }
+                }
+            }
+        case .arrive:
+            if let destination = destinationCoordinate { coordinates = [destination] }
+        }
+        guard let first = coordinates.first else { return nil }
+        guard coordinates.count > 1 else {
+            return MKCoordinateRegion(
+                center: first,
+                span: MKCoordinateSpan(latitudeDelta: 0.006, longitudeDelta: 0.006)
+            )
+        }
+        let latitudes = coordinates.map(\.latitude)
+        let longitudes = coordinates.map(\.longitude)
+        let center = CLLocationCoordinate2D(
+            latitude: (latitudes.min()! + latitudes.max()!) / 2,
+            longitude: (longitudes.min()! + longitudes.max()!) / 2
+        )
+        // 1.45× padding so the step never touches the screen edges; floor keeps very short
+        // steps from zooming in to building level.
+        return MKCoordinateRegion(
+            center: center,
+            span: MKCoordinateSpan(
+                latitudeDelta: max(0.006, (latitudes.max()! - latitudes.min()!) * 1.45),
+                longitudeDelta: max(0.006, (longitudes.max()! - longitudes.min()!) * 1.45)
+            )
+        )
+    }
+
+    // MARK: - Off-route recovery
+
+    /// Off-route detection runs ONLY on walking steps with a decent fix: underground (rides,
+    /// transfers) GPS drifts or vanishes entirely, and auto-rerouting on tunnel noise would
+    /// constantly replan a trip the rider is following correctly.
+    private func handleLocationUpdate(_ location: CLLocation?) {
+        guard let location,
+              location.horizontalAccuracy >= 0,
+              location.horizontalAccuracy <= 65,
+              let step = viewModel.currentStep,
+              step.kind == .walkToStation || step.kind == .walkToDestination else {
+            offRouteStrikes = 0
+            return
+        }
+        let path = step.walkingPathCLCoordinates
+        guard path.count >= 2 else { return }
+        if distance(from: location.coordinate, toPolyline: path) > 100 {
+            offRouteStrikes += 1
+        } else {
+            offRouteStrikes = 0
+        }
+        // Two consecutive off-corridor fixes (distanceFilter is 10 m, so this is real
+        // movement, not jitter) + a cooldown so a failed or just-finished replan doesn't
+        // immediately fire again.
+        guard offRouteStrikes >= 2, !isRerouting,
+              Date().timeIntervalSince(lastRerouteAt) > 45 else { return }
+        offRouteStrikes = 0
+        Task { await reroute(from: location.coordinate) }
+    }
+
+    @MainActor
+    private func reroute(from coordinate: CLLocationCoordinate2D) async {
+        guard let destination = destinationCoordinate else { return }
+        isRerouting = true
+        lastRerouteAt = Date()
+        defer { isRerouting = false }
+
+        let preference = appState.accessibilityPreference
+        do {
+            let routes = try await container.routePlanningService.planRoute(
+                from: TransitPlace(
+                    name: AppLocalization.localized("Current Location"),
+                    coordinate: coordinate,
+                    source: .currentLocation
+                ),
+                to: TransitPlace(name: viewModel.plan.destination, coordinate: destination, source: .mapKit),
+                city: viewModel.route.networkCityID ?? appState.selectedCity?.id ?? "",
+                accessibilityFilter: AccessibilityFilter(
+                    requiresWheelchairAccess: preference.requiresWheelchairAccess,
+                    requiresElevator: preference.prefersElevator,
+                    avoidStairs: preference.avoidStairs
+                )
+            )
+            guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }
+            viewModel.reroute(with: newRoute)
+            // Keep the resume banner's stored trip in step with what's actually guiding.
+            ActiveTripStore.save(newRoute)
+            frameCurrentStep(animated: true)
+            refreshArrivalAlert()
+            announceCurrentStep()
+            showRerouteNotice(AppLocalization.text(
+                english: "Route updated from your location",
+                simplified: "已根据您的位置更新路线",
+                traditional: "已根據您的位置更新路線"
+            ))
+        } catch {
+            showRerouteNotice(AppLocalization.text(
+                english: "Couldn't reroute — following the original route",
+                simplified: "重新规划失败，继续按原路线导航",
+                traditional: "重新規劃失敗，繼續按原路線導航"
+            ))
+        }
+    }
+
+    private func showRerouteNotice(_ text: String) {
+        rerouteNoticeTask?.cancel()
+        withAnimation { rerouteNotice = text }
+        rerouteNoticeTask = Task {
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            withAnimation { rerouteNotice = nil }
+        }
+    }
+
+    /// Minimum distance from a point to a polyline (point-to-segment projections in a
+    /// small local planar frame — exact enough at street scale).
+    private func distance(from coordinate: CLLocationCoordinate2D, toPolyline path: [CLLocationCoordinate2D]) -> Double {
+        var best = Double.greatestFiniteMagnitude
+        for index in 0..<(path.count - 1) {
+            let a = path[index]
+            let b = path[index + 1]
+            let metersPerDegreeLongitude = 111_320.0 * cos(a.latitude * .pi / 180)
+            let metersPerDegreeLatitude = 110_540.0
+            let ax = a.longitude * metersPerDegreeLongitude, ay = a.latitude * metersPerDegreeLatitude
+            let bx = b.longitude * metersPerDegreeLongitude, by = b.latitude * metersPerDegreeLatitude
+            let px = coordinate.longitude * metersPerDegreeLongitude, py = coordinate.latitude * metersPerDegreeLatitude
+            let dx = bx - ax, dy = by - ay
+            let lengthSquared = dx * dx + dy * dy
+            let t = lengthSquared == 0 ? 0 : min(1, max(0, ((px - ax) * dx + (py - ay) * dy) / lengthSquared))
+            let qx = ax + t * dx, qy = ay + t * dy
+            best = min(best, ((px - qx) * (px - qx) + (py - qy) * (py - qy)).squareRoot())
+        }
+        return best
+    }
+
+    // MARK: - Instruction panel
+
+    private var instructionPanel: some View {
+        VStack(spacing: 12) {
+            ProgressView(value: viewModel.progressFraction)
+                .tint(themeColor)
+
+            if let step = viewModel.currentStep {
+                stepSummary(step)
+                    .id(step.id)
+                    .transition(.opacity)
+            }
+
+            controls
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+        .padding([.horizontal, .bottom], 10)
+    }
+
+    private func stepSummary(_ step: TripStep) -> some View {
+        VStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: icon(for: step.kind))
+                    .font(.title)
+                    .foregroundStyle(color(for: step))
+                    .frame(width: 40)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(step.title)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                    if let detail = step.detail {
+                        Text(detail)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+                }
+                Spacer()
+                Text(viewModel.progressText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if step.rideStopsRemainingText != nil || (step.kind == .ride && step.exitHint?.isEmpty == false) {
+                HStack(spacing: 12) {
+                    if let stopsLeft = step.rideStopsRemainingText {
+                        Text(stopsLeft)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(themeColor)
+                    }
+                    if step.kind == .ride, let exit = step.exitHint, !exit.isEmpty {
+                        Label(
+                            AppLocalization.text(english: "Get off toward \(exit)", simplified: "下车走向\(exit)", traditional: "下車走向\(exit)"),
+                            systemImage: "arrow.up.forward.circle.fill"
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(themeColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    }
+                    Spacer()
+                }
+            }
+
+            if step.kind == .ride {
+                Toggle(isOn: $arrivalAlertEnabled) {
+                    Label(
+                        AppLocalization.text(english: "Alert before getting off", simplified: "下车前提醒我", traditional: "下車前提醒我"),
+                        systemImage: "bell.badge"
+                    )
+                    .font(.subheadline)
+                }
+                .tint(themeColor)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(step.accessibilityLabel)
+    }
+
+    private var controls: some View {
+        HStack(spacing: 14) {
+            Button {
+                withAnimation { viewModel.goBack() }
+            } label: {
+                Label(AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"), systemImage: "chevron.left")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 13)
+                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 14))
+            }
+            .buttonStyle(.plain)
+            .disabled(!viewModel.canGoBack)
+            .opacity(viewModel.canGoBack ? 1 : 0.4)
+
+            Button {
+                if viewModel.canAdvance {
+                    withAnimation { viewModel.advance() }
+                } else {
+                    dismiss()
+                }
+            } label: {
+                Label(
+                    viewModel.canAdvance ? AppLocalization.text(english: "Next", simplified: "下一步", traditional: "下一步") : AppLocalization.localized("Done"),
+                    systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark"
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
+                .foregroundStyle(.white)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Announcements & alerts
 
     /// Applies the enabled accessibility effects for the step now showing: spoken
     /// instruction (语音导航), haptic (振动提醒), and a transient banner (视觉播报).
@@ -158,139 +583,25 @@ struct LiveGoView: View {
         .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    private func stepCard(_ step: TripStep) -> some View {
-        VStack(spacing: 18) {
-            Image(systemName: icon(for: step.kind))
-                .font(.system(size: 60))
-                .foregroundStyle(color(for: step))
-
-            Text(step.title)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
-
-            if let detail = step.detail {
-                Text(detail)
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+    private func noticeBanner(text: String, icon: String, showsSpinner: Bool = false) -> some View {
+        HStack(spacing: 10) {
+            if showsSpinner {
+                ProgressView()
+                    .tint(.white)
+            } else {
+                Image(systemName: icon)
             }
-
-            mapSection(for: step)
-
-            if let stopsLeft = step.rideStopsRemainingText {
-                Text(stopsLeft)
-                    .font(.headline)
-                    .foregroundStyle(themeColor)
-            }
-
-            if step.kind == .ride, let exit = step.exitHint, !exit.isEmpty {
-                Label(
-                    AppLocalization.text(english: "Get off toward \(exit)", simplified: "下车走向\(exit)", traditional: "下車走向\(exit)"),
-                    systemImage: "arrow.up.forward.circle.fill"
-                )
-                .font(.headline)
-                .foregroundStyle(themeColor)
-            }
-
-            if step.kind == .ride {
-                VStack(spacing: 6) {
-                    Toggle(isOn: $arrivalAlertEnabled) {
-                        Label(
-                            AppLocalization.text(english: "Alert before getting off", simplified: "下车前提醒我", traditional: "下車前提醒我"),
-                            systemImage: "bell.badge"
-                        )
-                        .font(.subheadline)
-                    }
-                    .tint(themeColor)
-                    Text(AppLocalization.text(
-                        english: "Estimated from route time, not a live train position.",
-                        simplified: "根据线路时间估算，非实时列车位置。",
-                        traditional: "根據路線時間估算，非實時列車位置。"
-                    ))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.top, 4)
-            }
+            Text(text)
+                .fontWeight(.semibold)
+                .lineLimit(2)
+            Spacer()
         }
-        .frame(maxWidth: .infinity)
-        .padding(28)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(step.accessibilityLabel)
-    }
-
-    /// Nothing renders when coordinate/path data is unavailable (e.g. MKDirections failed) —
-    /// falls back to the plain icon+title+detail card rather than showing a broken/blank map.
-    @ViewBuilder
-    private func mapSection(for step: TripStep) -> some View {
-        switch step.kind {
-        case .transfer:
-            if let coordinate = step.transferCLCoordinate {
-                VStack(spacing: 6) {
-                    StepMapPreview(mode: .station(coordinate: coordinate), tint: color(for: step))
-                    Text(AppLocalization.text(
-                        english: "3D station preview",
-                        simplified: "车站 3D 预览",
-                        traditional: "車站 3D 預覽"
-                    ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-            }
-        case .walkToStation, .walkToDestination:
-            let path = step.walkingPathCLCoordinates
-            if path.count > 1 {
-                VStack(spacing: 6) {
-                    StepMapPreview(mode: .walkingRoute(coordinates: path), tint: themeColor)
-                    Text(AppLocalization.text(
-                        english: "Apple Maps walking route",
-                        simplified: "Apple 地图步行路线",
-                        traditional: "Apple 地圖步行路線"
-                    ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-            }
-        case .ride, .arrive:
-            EmptyView()
-        }
-    }
-
-    private var controls: some View {
-        HStack(spacing: 14) {
-            Button {
-                withAnimation { viewModel.goBack() }
-            } label: {
-                Label(AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"), systemImage: "chevron.left")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 14))
-            }
-            .buttonStyle(.plain)
-            .disabled(!viewModel.canGoBack)
-            .opacity(viewModel.canGoBack ? 1 : 0.4)
-
-            Button {
-                if viewModel.canAdvance {
-                    withAnimation { viewModel.advance() }
-                } else {
-                    dismiss()
-                }
-            } label: {
-                Label(
-                    viewModel.canAdvance ? AppLocalization.text(english: "Next", simplified: "下一步", traditional: "下一步") : AppLocalization.localized("Done"),
-                    systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark"
-                )
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
-                .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-        }
+        .font(.subheadline)
+        .foregroundStyle(.white)
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
+        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }
 
     private func icon(for kind: LiveStepKind) -> String {
@@ -330,7 +641,6 @@ struct LiveGoView: View {
         .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
-        .padding(.horizontal)
     }
 
     /// (Re)arms the estimated "get off" alert for the current step. Cancels any prior alert first,

@@ -21,8 +21,6 @@ struct RoutePlannerView: View {
     @State private var showCityPicker = false
     @State var showSaveCurrentTrip = false
     @State var savedTripName = ""
-    @State var showAccessibilityFilters = false
-    @AppStorage("hasSeenWelcome") var hasSeenWelcome = false
     @State var scrollToTopTrigger = false
     @State private var resumableTrip: Route?
     @State private var showResumeLiveGo = false
@@ -38,9 +36,9 @@ struct RoutePlannerView: View {
                             Color.clear.frame(height: 0).id("plannerTop")
                             if let resumableTrip { resumeTripBanner(resumableTrip) }
                             // Simplified UI (cognitive accessibility): only the essentials —
-                            // city, the fields, search, and the accessibility filters
-                            // themselves. The resume banner stays: an active trip is never noise.
-                            if !simplifiedUI, !hasSeenWelcome { welcomeCard }
+                            // city, the fields, and search. The resume banner stays: an
+                            // active trip is never noise. Accessibility needs live in
+                            // Profile → Accessibility Settings and seed the search directly.
                             citySelector
                             if !simplifiedUI { smartCommuteSection }
                             routeInputSection
@@ -55,9 +53,8 @@ struct RoutePlannerView: View {
                             if !simplifiedUI {
                                 departurePlannerSection
                                 savedTripsSection
+                                recentRoutesSection
                             }
-                            accessibilityFiltersWrapper
-                            if !simplifiedUI { recentRoutesSection }
                         }
                         .padding()
                     }
@@ -127,9 +124,6 @@ struct RoutePlannerView: View {
                 if let viewModel = viewModel {
                     RouteResultsView(viewModel: viewModel)
                 }
-            }
-            .onChange(of: viewModel?.routes.isEmpty) { _, isEmpty in
-                if isEmpty == false { hasSeenWelcome = true }
             }
             .onChange(of: appState.pendingRouteInput) { _, pending in
                 applyPendingRouteInput(pending)

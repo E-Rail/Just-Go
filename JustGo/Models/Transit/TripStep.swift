@@ -32,6 +32,9 @@ struct TripStep: Identifiable, Equatable {
     /// Apple's real, already-computed walking-route polyline for `.walkToStation`/
     /// `.walkToDestination` steps (the same data already stored on `RouteSegment.polylineCoordinates`).
     var walkingPathCoordinates: [CodableCoordinate] = []
+    /// Index of the `Route.segments` entry this step came from (nil for the synthetic
+    /// `.arrive` step) — lets the live map frame the step's real geometry.
+    var segmentIndex: Int? = nil
 
     var transferCLCoordinate: CLLocationCoordinate2D? {
         transferCoordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }

@@ -218,82 +218,131 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         max(60, distance / 9.7 + 30)
     }
 
+    /// A station's closest point ON a path's polyline (not its closest vertex): the point,
+    /// how far the station sits from the track, and the point's arc-length offset from the
+    /// path start — which is what the slicer walks by.
+    private struct PathProjection {
+        let point: CLLocationCoordinate2D
+        let distance: Double
+        let pathOffset: Double
+    }
+
     private func edgeGeometry(_ edge: MetroGraphEdge, stations: [String: MetroStation], line: MetroLine) -> [CodableCoordinate] {
         guard let from = stations[edge.fromStationID], let to = stations[edge.toStationID] else { return [] }
         let fromCoordinate = from.coordinate
         let toCoordinate = to.coordinate
-        let matches = line.paths.compactMap { path -> (path: [MetroCoordinate], from: Int, to: Int, score: Double)? in
-            guard path.count >= 2,
-                  let fromIndex = path.indices.min(by: { path[$0].coordinate.distance(to: fromCoordinate) < path[$1].coordinate.distance(to: fromCoordinate) }),
-                  let toIndex = path.indices.min(by: { path[$0].coordinate.distance(to: toCoordinate) < path[$1].coordinate.distance(to: toCoordinate) }) else {
+        // Project each station onto the polyline itself, never snap to vertices: OSM ways
+        // can run kilometres between vertices (Beijing Line 2's whole ring is 48 points),
+        // so the nearest VERTEX can sit 1km+ past the station and the drawn ride overshoots
+        // or stops short by that much.
+        let matches = line.paths.compactMap { path -> (path: [MetroCoordinate], cumulative: [Double], from: PathProjection, to: PathProjection)? in
+            guard path.count >= 2 else { return nil }
+            let points = path.map(\.coordinate)
+            var cumulative: [Double] = [0]
+            cumulative.reserveCapacity(points.count)
+            for index in 1..<points.count {
+                cumulative.append(cumulative[index - 1] + points[index - 1].distance(to: points[index]))
+            }
+            guard let fromProjection = projection(of: fromCoordinate, onto: points, cumulative: cumulative),
+                  let toProjection = projection(of: toCoordinate, onto: points, cumulative: cumulative) else {
                 return nil
             }
-            let score = path[fromIndex].coordinate.distance(to: fromCoordinate) + path[toIndex].coordinate.distance(to: toCoordinate)
-            return (path, fromIndex, toIndex, score)
+            return (path, cumulative, fromProjection, toProjection)
         }
-        guard let match = matches.min(by: { $0.score < $1.score }), match.score < 2_000 else {
+        guard let match = matches.min(by: { ($0.from.distance + $0.to.distance) < ($1.from.distance + $1.to.distance) }),
+              match.from.distance + match.to.distance < 2_000 else {
             return []
         }
-        let direct = match.from <= match.to
-            ? Array(match.path[match.from...match.to])
-            : Array(match.path[match.to...match.from].reversed())
-        var slice = direct
-        // On a closed ring (loop line: first point == last point) the seam edge matches
-        // indices at opposite ends of the array, and the direct slice is essentially the
-        // WHOLE ring — the arc that wraps across the seam is the real geometry. Take
-        // whichever arc is shorter.
-        if let first = match.path.first, let last = match.path.last,
-           first.coordinate.distance(to: last.coordinate) < 5 {
-            let ring = Array(match.path.dropLast())
-            let wrapped = wrappedRingArc(ring, from: match.from, to: match.to)
-            if wrapped.count >= 2, arcLength(wrapped) < arcLength(direct) {
-                slice = wrapped
+
+        let points = match.path.map(\.coordinate)
+        let total = match.cumulative[match.cumulative.count - 1]
+        let isRing = points.count >= 3 && points[0].distance(to: points[points.count - 1]) < 5
+        let lowOffset = min(match.from.pathOffset, match.to.pathOffset)
+        let highOffset = max(match.from.pathOffset, match.to.pathOffset)
+        let reversed = match.from.pathOffset > match.to.pathOffset
+        let lowPoint = reversed ? match.to.point : match.from.point
+        let highPoint = reversed ? match.from.point : match.to.point
+
+        var slice: [CLLocationCoordinate2D]
+        if !isRing || highOffset - lowOffset <= total - (highOffset - lowOffset) {
+            // Direct arc: projected endpoint, the vertices strictly between the two
+            // offsets, projected endpoint.
+            slice = [lowPoint]
+            for index in points.indices where match.cumulative[index] > lowOffset && match.cumulative[index] < highOffset {
+                slice.append(points[index])
             }
+            slice.append(highPoint)
+        } else {
+            // Closed ring where the seam-crossing arc is shorter: walk from the higher
+            // offset forward off the end of the array and back in at the start. The ring's
+            // duplicated closing vertex meets the first vertex at the seam — dedup it.
+            slice = [highPoint]
+            for index in points.indices where match.cumulative[index] > highOffset {
+                slice.append(points[index])
+            }
+            for index in points.indices where match.cumulative[index] < lowOffset {
+                if let last = slice.last, last.distance(to: points[index]) < 1 { continue }
+                slice.append(points[index])
+            }
+            slice.append(lowPoint)
+            slice.reverse()
         }
+        if reversed {
+            slice.reverse()
+        }
+
         // A slice grossly longer than the stations' straight-line separation is a bad
-        // match (mis-picked vertices, self-approaching geometry) — better to return
+        // match (wrong path variant, self-approaching geometry) — better to return
         // nothing and let the renderer draw its station-to-station straight fallback.
-        guard arcLength(slice) <= max(2.5 * edge.distance, edge.distance + 1_500) else {
+        guard slice.count >= 2, arcLength(slice) <= max(2.5 * edge.distance, edge.distance + 1_500) else {
             return []
         }
         return slice.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
-    /// The arc from `from` to `to` that crosses the ring's seam (walks off the end of the
-    /// array and back in at the start). Indices refer to the original path; the caller
-    /// passes the ring with the duplicated closing point dropped.
-    private func wrappedRingArc(_ ring: [MetroCoordinate], from: Int, to: Int) -> [MetroCoordinate] {
-        let count = ring.count
-        guard count >= 2 else { return [] }
-        let start = from % count
-        let end = to % count
-        guard start != end else { return [] }
-        var arc: [MetroCoordinate] = []
-        // Walk in the direction that crosses the seam: forward when the direct slice ran
-        // backward through the array (from > to), backward otherwise.
-        if from > to {
-            var index = start
-            while true {
-                arc.append(ring[index])
-                if index == end { break }
-                index = (index + 1) % count
-            }
-        } else {
-            var index = start
-            while true {
-                arc.append(ring[index])
-                if index == end { break }
-                index = (index - 1 + count) % count
+    /// Nearest point on the polyline to `coordinate`, via point-to-segment projection in a
+    /// small local planar frame (metres-per-degree at the segment; exact enough at station
+    /// scale, and far cheaper than geodesic projection).
+    private func projection(
+        of coordinate: CLLocationCoordinate2D,
+        onto points: [CLLocationCoordinate2D],
+        cumulative: [Double]
+    ) -> PathProjection? {
+        guard points.count >= 2 else { return nil }
+        var best: PathProjection?
+        for index in 0..<(points.count - 1) {
+            let a = points[index]
+            let b = points[index + 1]
+            let metersPerDegreeLongitude = 111_320.0 * cos(a.latitude * .pi / 180)
+            let metersPerDegreeLatitude = 110_540.0
+            let ax = a.longitude * metersPerDegreeLongitude, ay = a.latitude * metersPerDegreeLatitude
+            let bx = b.longitude * metersPerDegreeLongitude, by = b.latitude * metersPerDegreeLatitude
+            let px = coordinate.longitude * metersPerDegreeLongitude, py = coordinate.latitude * metersPerDegreeLatitude
+            let dx = bx - ax, dy = by - ay
+            let lengthSquared = dx * dx + dy * dy
+            let t = lengthSquared == 0 ? 0 : min(1, max(0, ((px - ax) * dx + (py - ay) * dy) / lengthSquared))
+            let projected = CLLocationCoordinate2D(
+                latitude: (ay + t * dy) / metersPerDegreeLatitude,
+                longitude: (ax + t * dx) / metersPerDegreeLongitude
+            )
+            let distance = coordinate.distance(to: projected)
+            if best == nil || distance < best!.distance {
+                let segmentLength = cumulative[index + 1] - cumulative[index]
+                best = PathProjection(
+                    point: projected,
+                    distance: distance,
+                    pathOffset: cumulative[index] + t * segmentLength
+                )
             }
         }
-        return arc
+        return best
     }
 
-    private func arcLength(_ coordinates: [MetroCoordinate]) -> Double {
+    private func arcLength(_ coordinates: [CLLocationCoordinate2D]) -> Double {
         guard coordinates.count >= 2 else { return 0 }
         var total: Double = 0
         for index in 1..<coordinates.count {
-            total += coordinates[index - 1].coordinate.distance(to: coordinates[index].coordinate)
+            total += coordinates[index - 1].distance(to: coordinates[index])
         }
         return total
     }

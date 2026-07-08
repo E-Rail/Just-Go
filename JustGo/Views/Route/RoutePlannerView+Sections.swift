@@ -1,47 +1,6 @@
 import SwiftUI
 
 extension RoutePlannerView {
-    var welcomeCard: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Image(systemName: "tram.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(Color.accentColor)
-                    Text(AppLocalization.text(english: "Welcome to JustGo", simplified: "欢迎使用 JustGo", traditional: "歡迎使用 JustGo"))
-                        .font(.headline)
-                    Spacer()
-                    Button {
-                        withAnimation(.easeOut(duration: 0.2)) { hasSeenWelcome = true }
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                }
-                Text(AppLocalization.text(
-                    english: "Plan metro routes across 46+ Chinese cities. Select your city above, then enter your starting station and destination.",
-                    simplified: "规划中国46+城市地铁路线。选择城市，输入出发站和目的站，即可开始。",
-                    traditional: "規劃中國46+城市地鐵路線。選擇城市，輸入出發站和目的站，即可開始。"
-                ))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                Button {
-                    withAnimation(.easeOut(duration: 0.2)) { hasSeenWelcome = true }
-                } label: {
-                    Text(AppLocalization.text(english: "Got it", simplified: "明白了", traditional: "明白了"))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 10))
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
     @ViewBuilder
     var smartCommuteSection: some View {
         if let (trip, isEvening) = smartCommuteTrip(for: appState.selectedCity?.id ?? "") {
@@ -82,71 +41,6 @@ extension RoutePlannerView {
             .first
         guard let trip else { return nil }
         return (trip, isEvening)
-    }
-
-    private var anyFilterActive: Bool {
-        (viewModel?.requiresWheelchairAccess ?? false)
-            || (viewModel?.requiresElevator ?? false)
-            || (viewModel?.avoidStairs ?? false)
-    }
-
-    private var needsFiltersExpanded: Bool {
-        appState.accessibilityPreference.primaryCategory != .none || anyFilterActive
-    }
-
-    @ViewBuilder
-    var accessibilityFiltersWrapper: some View {
-        if needsFiltersExpanded || showAccessibilityFilters {
-            accessibilityFiltersSection
-        } else {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    showAccessibilityFilters = true
-                }
-            } label: {
-                Label(
-                    AppLocalization.localized("Accessibility filters"),
-                    systemImage: "accessibility"
-                )
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    var accessibilityFiltersSection: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Travel Support"))
-                    .font(.headline)
-
-                Toggle(isOn: Binding(
-                    get: { viewModel?.requiresWheelchairAccess ?? false },
-                    set: { viewModel?.requiresWheelchairAccess = $0 }
-                )) {
-                    Label(AppLocalization.localized("Wheelchair Access"), systemImage: "figure.roll")
-                }
-
-                Toggle(isOn: Binding(
-                    get: { viewModel?.requiresElevator ?? false },
-                    set: { viewModel?.requiresElevator = $0 }
-                )) {
-                    Label(AppLocalization.localized("Elevator Required"), systemImage: "arrow.up.arrow.down.circle")
-                }
-
-                Toggle(isOn: Binding(
-                    get: { viewModel?.avoidStairs ?? false },
-                    set: { viewModel?.avoidStairs = $0 }
-                )) {
-                    Label(AppLocalization.localized("Avoid Stairs"), systemImage: "stairs")
-                }
-            }
-        }
     }
 
     var savedTripsSection: some View {

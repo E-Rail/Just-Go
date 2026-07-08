@@ -6,6 +6,7 @@ struct SettingsView: View {
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @State private var showTour = false
 
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
 
@@ -17,6 +18,7 @@ struct SettingsView: View {
                 notificationsSection
                 dataSection
                 accessibilitySection
+                helpSection
             }
             .navigationTitle(AppLocalization.localized("Settings"))
             .navigationBarTitleDisplayMode(.inline)
@@ -25,6 +27,32 @@ struct SettingsView: View {
                     Button(AppLocalization.localized("Done")) { dismiss() }
                 }
             }
+            .fullScreenCover(isPresented: $showTour) {
+                OnboardingTourView { showTour = false }
+            }
+        }
+    }
+
+    // MARK: - Help
+
+    private var helpSection: some View {
+        Section {
+            Button {
+                showTour = true
+            } label: {
+                Label(
+                    AppLocalization.text(english: "App Tour", simplified: "界面导览", traditional: "介面導覽"),
+                    systemImage: "sparkles.tv"
+                )
+            }
+        } header: {
+            Text(AppLocalization.text(english: "Help", simplified: "帮助", traditional: "幫助"))
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Replay the walkthrough shown on first launch.",
+                simplified: "重看首次启动时的功能导览。",
+                traditional: "重看首次啟動時的功能導覽。"
+            ))
         }
     }
 

@@ -85,6 +85,7 @@
 		A1000313 /* Map/MapItemDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000313 /* Map/MapItemDetailSheet.swift */; };
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
 		A1000400 /* Route/StepMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000400 /* Route/StepMapPreview.swift */; };
+		A1000401 /* Onboarding/OnboardingTourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000401 /* Onboarding/OnboardingTourView.swift */; };
 		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
 		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
@@ -184,6 +185,7 @@
 		A2000313 /* Map/MapItemDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapItemDetailSheet.swift; sourceTree = "<group>"; };
 		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000400 /* Route/StepMapPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/StepMapPreview.swift; sourceTree = "<group>"; };
+		A2000401 /* Onboarding/OnboardingTourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/OnboardingTourView.swift; sourceTree = "<group>"; };
 		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
 		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
@@ -350,6 +352,7 @@
 				A2000058 /* Profile/AccessibilityReportsView.swift */,
 				A2000310 /* Profile/FavoriteStationsView.swift */,
 				A2000015 /* Accessibility/AccessibilitySettingsView.swift */,
+				A2000401 /* Onboarding/OnboardingTourView.swift */,
 				A2000017 /* Components/Transit/StationRow.swift */,
 				A2000018 /* Components/Glass/GlassCard.swift */,
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
@@ -547,6 +550,7 @@
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 				A1000400 /* Route/StepMapPreview.swift in Sources */,
+				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

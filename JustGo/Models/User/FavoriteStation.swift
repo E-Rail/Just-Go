@@ -1,5 +1,32 @@
 import Foundation
 
+/// User-assigned place tag on a favorite station. Assigned only in Personal → My Stations;
+/// the route planner surfaces tagged favorites as one-tap fill chips but offers no set flow.
+enum FavoriteStationTag: Codable, Equatable, Hashable {
+    case home
+    case work
+    case custom(String)
+
+    var title: String {
+        switch self {
+        case .home:
+            return AppLocalization.localized("Home")
+        case .work:
+            return AppLocalization.text(english: "Work", simplified: "公司", traditional: "公司")
+        case .custom(let label):
+            return label
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .home: return "house.fill"
+        case .work: return "building.2.fill"
+        case .custom: return "tag.fill"
+        }
+    }
+}
+
 struct FavoriteStation: Identifiable, Codable {
     let id: String
     let stationID: String
@@ -16,6 +43,8 @@ struct FavoriteStation: Identifiable, Codable {
     let lineNamesEn: [String]?
     let lineIDs: [String]?
     let lineColorsHex: [String]?
+    // Optional so favorites persisted before tags existed decode as untagged.
+    var tag: FavoriteStationTag?
 
     init(station: Station, cityName: String, cityNameEn: String? = nil) {
         self.id = "\(station.cityID)|\(station.stationID)"
@@ -33,6 +62,7 @@ struct FavoriteStation: Identifiable, Codable {
         self.lineNamesEn = station.lines.map { $0.nameEn ?? $0.name }
         self.lineIDs = station.lines.map(\.lineID)
         self.lineColorsHex = station.lines.map(\.colorHex)
+        self.tag = nil
     }
 
     func withCityMetadata(cityName: String, cityNameEn: String?) -> FavoriteStation {

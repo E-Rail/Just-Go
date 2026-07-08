@@ -135,21 +135,43 @@ final class TripMemoryService {
         userDefaults.setCodable(tripRecords, forKey: tripRecordsKey)
     }
 
+    private func persistFavoriteStations() {
+        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+    }
+
     func addFavorite(station: Station, cityName: String, cityNameEn: String? = nil) {
         let favorite = FavoriteStation(station: station, cityName: cityName, cityNameEn: cityNameEn)
         favoriteStations.removeAll { $0.id == favorite.id }
         favoriteStations.insert(favorite, at: 0)
         favoriteStations = Array(favoriteStations.prefix(maxFavoriteStations))
-        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+        persistFavoriteStations()
     }
 
     func removeFavorite(id: String) {
         favoriteStations.removeAll { $0.id == id }
-        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+        persistFavoriteStations()
     }
 
     func isFavorite(stationID: String, cityID: String) -> Bool {
         favoriteStations.contains { $0.stationID == stationID && $0.cityID == cityID }
+    }
+
+    func repairFavoriteCityMetadata(cityLookup: (String) -> City?) {
+        // Assign the observed property only when a repair actually happened — this runs on
+        // every favorites-list appearance, and an unconditional reassign would fire
+        // observation churn each time.
+        var repaired = favoriteStations
+        var didRepair = false
+        for (index, favorite) in favoriteStations.enumerated() {
+            guard let city = cityLookup(favorite.cityID),
+                  favorite.cityName != city.name || favorite.cityNameEn != city.nameEn else { continue }
+            repaired[index] = favorite.withCityMetadata(cityName: city.name, cityNameEn: city.nameEn)
+            didRepair = true
+        }
+        if didRepair {
+            favoriteStations = repaired
+            persistFavoriteStations()
+        }
     }
 }
 

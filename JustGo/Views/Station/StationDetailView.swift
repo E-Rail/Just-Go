@@ -3,7 +3,6 @@ import SwiftUI
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
-    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(AccessibilityReportService.self) var accessibilityReportService
@@ -45,7 +44,7 @@ struct StationDetailView: View {
                     if isFavorited {
                         tripMemoryService.removeFavorite(id: "\(s.cityID)|\(s.stationID)")
                     } else {
-                        let city = appState.selectedCity ?? container.cityService.getCity(byID: s.cityID)
+                        let city = container.cityService.getCity(byID: s.cityID)
                         tripMemoryService.addFavorite(
                             station: s,
                             cityName: city?.name ?? s.cityID,
@@ -197,7 +196,7 @@ struct StationDetailView: View {
             coordinate: station.coordinate,
             source: .mapKit
         )
-        return PlanRouteButtons(place: place, onSelected: { dismiss() })
+        return PlanRouteButtons(place: place, cityID: station.cityID, onSelected: { dismiss() })
     }
 
     private var linesSection: some View {
@@ -237,6 +236,8 @@ struct StationDetailView: View {
 /// matches the app accent (and lifts for legibility in dark mode).
 struct PlanRouteButtons: View {
     let place: TransitPlace
+    /// Set when the place belongs to a known city (a station detail); nil for map POIs.
+    var cityID: String? = nil
     var onSelected: () -> Void = {}
 
     @Environment(AppState.self) private var appState
@@ -247,7 +248,7 @@ struct PlanRouteButtons: View {
         HStack(spacing: 10) {
             // "From here" — white (themed surface) with green text + outline.
             Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin)
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin, cityID: cityID)
                 appState.selectedTab = 1
                 onSelected()
             } label: {
@@ -270,7 +271,7 @@ struct PlanRouteButtons: View {
 
             // "To here" — solid theme green with white text.
             Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination)
+                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination, cityID: cityID)
                 appState.selectedTab = 1
                 onSelected()
             } label: {

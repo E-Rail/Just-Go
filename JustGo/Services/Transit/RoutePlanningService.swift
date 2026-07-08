@@ -6,7 +6,6 @@ final class RoutePlanningService {
     private let placeSearchProvider: PlaceSearchProviding
     private let routeProvider: TransitRouteProviding
     private let officialStationData: OfficialStationDataProviding
-    private let cityService: CityService
     private let comfortForecastService: ComfortForecastService
     private let serviceHoursResolver = ServiceHoursResolver()
 
@@ -14,38 +13,12 @@ final class RoutePlanningService {
         placeSearchProvider: PlaceSearchProviding,
         routeProvider: TransitRouteProviding,
         officialStationData: OfficialStationDataProviding,
-        cityService: CityService,
         comfortForecastService: ComfortForecastService
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
         self.officialStationData = officialStationData
-        self.cityService = cityService
         self.comfortForecastService = comfortForecastService
-    }
-
-    func planRoute(
-        from originName: String,
-        to destinationName: String,
-        city: String,
-        accessibilityFilter: AccessibilityFilter = .none,
-        tripAnchor: TripTimeAnchor = .now
-    ) async throws -> [Route] {
-        let region = cityService.getCity(byID: city).map {
-            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 120_000, longitudinalMeters: 120_000)
-        }
-        async let originPlaces = placeSearchProvider.searchPlaces(keyword: originName, region: region, limit: 8)
-        async let destinationPlaces = placeSearchProvider.searchPlaces(keyword: destinationName, region: region, limit: 8)
-
-        let originPlace = try await originPlaces.first
-        let destinationPlace = try await destinationPlaces.first
-
-        guard let origin = originPlace,
-              let destination = destinationPlace else {
-            throw RoutePlanningError.stationNotFound
-        }
-
-        return try await planRoute(from: origin, to: destination, city: city, accessibilityFilter: accessibilityFilter, tripAnchor: tripAnchor)
     }
 
     func planRoute(
@@ -320,6 +293,25 @@ final class RoutePlanningService {
         by strategy: RoutePreference,
         preferences: AccessibilityPreference,
         tripAnchor: TripTimeAnchor = .now
+    ) -> [Route] {
+        let ranked = rankedRoutes(routes, by: strategy, preferences: preferences, tripAnchor: tripAnchor)
+        // A hard accessibility requirement demotes routes with a DETECTED barrier under
+        // every strategy, not just the step-free sort — otherwise the toggles have no
+        // visible effect on the default orderings. Demoted, not removed: hiding every
+        // option behind an unmet requirement helps no one, and the route cards carry the
+        // barrier warning explaining the ordering. (Path-level avoidance would need
+        // accessibility data inside the routing graph — not available there today.)
+        guard preferences.requiresWheelchairAccess || preferences.prefersElevator else { return ranked }
+        let clear = ranked.filter { $0.stepFreeAssessment != .barrierDetected }
+        let barriers = ranked.filter { $0.stepFreeAssessment == .barrierDetected }
+        return clear + barriers
+    }
+
+    private func rankedRoutes(
+        _ routes: [Route],
+        by strategy: RoutePreference,
+        preferences: AccessibilityPreference,
+        tripAnchor: TripTimeAnchor
     ) -> [Route] {
         switch strategy {
         case .metroFirst:

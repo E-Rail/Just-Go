@@ -6,6 +6,7 @@ struct RouteDetailView: View {
     let preference: RoutePreference
     let alternatives: [Route]
     let tripAnchor: TripTimeAnchor
+    let accessibilityFilter: AccessibilityFilter
     @State var selectedRouteID: UUID
     @State var showRouteReport = false
     @State var showTripNote = false
@@ -22,6 +23,9 @@ struct RouteDetailView: View {
     @State var selectedTransferSegment: RouteSegment?
     @State private var selectedTimelineStation: RouteStationStop?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
+    // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
+    // navigator re-fires onAppear, and a reset would immediately re-present it.
+    @State private var didAutoPresentLiveGo = false
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
@@ -61,6 +65,16 @@ struct RouteDetailView: View {
         .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Step-by-Step Guidance (cognitive accessibility): go straight into the
+            // guided navigator instead of the dense detail screen; dismissing it lands
+            // on the full detail as usual.
+            if appState.accessibilityPreference.stepByStepGuidance, !didAutoPresentLiveGo {
+                didAutoPresentLiveGo = true
+                ActiveTripStore.save(route)
+                showLiveGo = true
+            }
+        }
         .sheet(isPresented: $showRouteReport) {
             routeReportSheet
         }
@@ -109,7 +123,8 @@ struct RouteDetailView: View {
         route: Route,
         preference: RoutePreference = .fastest,
         alternatives: [Route] = [],
-        tripAnchor: TripTimeAnchor = .now
+        tripAnchor: TripTimeAnchor = .now,
+        accessibilityFilter: AccessibilityFilter = .none
     ) {
         initialRoute = route
         self.preference = preference
@@ -117,6 +132,7 @@ struct RouteDetailView: View {
             ? alternatives
             : [route] + alternatives
         self.tripAnchor = tripAnchor
+        self.accessibilityFilter = accessibilityFilter
         _selectedRouteID = State(initialValue: route.id)
     }
 
@@ -411,7 +427,10 @@ struct RouteDetailView: View {
                     Text(AppLocalization.text(english: "Leave-time reminder", simplified: "出发提醒", traditional: "出發提醒"))
                         .font(.headline)
                     Button {
-                        Task { await scheduleReminder(plan: departurePlan) }
+                        // Capture the route ID with the plan: the auth prompt inside
+                        // scheduleReminder awaits user input, and a tab switch during it
+                        // would otherwise file this plan under the newly-shown route.
+                        Task { await scheduleReminder(plan: departurePlan, routeID: route.id) }
                     } label: {
                         Label(
                             reminderScheduled
@@ -455,7 +474,7 @@ struct RouteDetailView: View {
         }
     }
 
-    private func scheduleReminder(plan: DeparturePlan) async {
+    private func scheduleReminder(plan: DeparturePlan, routeID: UUID) async {
         guard plan.leaveByDate.addingTimeInterval(-Double(reminderLeadMinutes) * 60) > Date() else {
             showReminderTooLate = true
             return
@@ -464,14 +483,14 @@ struct RouteDetailView: View {
             showReminderDenied = true
             return
         }
-        let scheduled = await container.tripReminderService.scheduleReminder(routeID: route.id, plan: plan, leadMinutes: reminderLeadMinutes)
+        let scheduled = await container.tripReminderService.scheduleReminder(routeID: routeID, plan: plan, leadMinutes: reminderLeadMinutes)
         if scheduled {
             // Enforce a single active reminder: drop the one from a previously-reminded route
             // so scheduling on route A then route B can't leave two notifications pending.
-            if let previous = scheduledReminderRouteID, previous != route.id {
+            if let previous = scheduledReminderRouteID, previous != routeID {
                 container.tripReminderService.cancelReminder(routeID: previous)
             }
-            scheduledReminderRouteID = route.id
+            scheduledReminderRouteID = routeID
         }
         showReminderTooLate = !scheduled
     }
@@ -523,15 +542,21 @@ private struct RouteStationGuideSheet: View {
             }
         }
         .task {
-            let place = TransitPlace(
-                name: stop.name,
-                coordinate: CLLocationCoordinate2D(
-                    latitude: stop.coordinate?.latitude ?? 0,
-                    longitude: stop.coordinate?.longitude ?? 0
-                ),
-                source: .localStationData
-            )
-            station = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            // Only match when the stop carries a real coordinate — matching with a (0,0)
+            // placeholder disambiguates same-named stations by distance to Null Island and
+            // can pick the wrong one. A coordinate-less stop falls through to the
+            // name-based fallback instead.
+            if let coordinate = stop.coordinate {
+                let place = TransitPlace(
+                    name: stop.name,
+                    coordinate: CLLocationCoordinate2D(
+                        latitude: coordinate.latitude,
+                        longitude: coordinate.longitude
+                    ),
+                    source: .localStationData
+                )
+                station = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            }
             didResolve = true
         }
     }

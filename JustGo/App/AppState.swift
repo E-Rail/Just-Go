@@ -12,11 +12,12 @@ final class AppState {
     struct PendingRouteInput: Equatable {
         let place: TransitPlace
         let role: RouteInputField
+        /// The place's home city when the sender knows it (station-originated inputs);
+        /// nil for map POIs, which carry no city. The planner switches to this city on
+        /// apply so a cross-city favorite doesn't plan against the wrong network.
+        let cityID: String?
     }
     var pendingRouteInput: PendingRouteInput?
-
-    /// Set from Settings to deep-link into the planner and begin saving a quick place.
-    var pendingQuickPlaceSetup: QuickPlaceKind?
 
     var accessibilityPreference: AccessibilityPreference {
         didSet {

@@ -291,6 +291,9 @@ struct TransitMapView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard let annotation = view.annotation else { return }
             if let station = annotationStations[ObjectIdentifier(annotation)] {
+                // A station tap supersedes any in-flight POI resolve — stop the request
+                // instead of letting it run to completion for a result nobody will show.
+                cancelPOIResolution()
                 parent.onStationSelected(station)
                 mapView.deselectAnnotation(annotation, animated: false)
             } else if let feature = annotation as? MKMapFeatureAnnotation,

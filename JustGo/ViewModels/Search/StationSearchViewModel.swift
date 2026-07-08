@@ -9,6 +9,7 @@ final class StationSearchViewModel {
     var isSearching = false
     var errorMessage: String?
     private var unfilteredResults: [Station] = []
+    private var hasEnrichedUnfilteredResultsForFacilities = false
 
     var filter = StationFilter()
 
@@ -40,17 +41,36 @@ final class StationSearchViewModel {
     func loadInitialStations(city: String) async {
         let loadID = UUID()
         stationLoadID = loadID
+        // Minting a new token supersedes any in-flight keyword search AND facility
+        // enrichment, whose stale-token guards then (correctly) refuse to publish — so
+        // this mint owns clearing both flags, or a re-appearance mid-work leaves a
+        // spinner stuck true with nothing left to reset it.
+        isSearching = false
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
         if city != currentCityID {
             currentCityID = city
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
             filter = StationFilter()
-        }
-        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        guard !city.isEmpty else {
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
+            // A real city switch also invalidates the previous city's query: without this,
+            // a non-empty searchText returns at the guard below and leaves the old city's
+            // results listed under the new one — with a still-pending debounced searchTask
+            // that would reload the OLD city once its 180ms sleep elapses.
+            searchTask?.cancel()
+            searchText = ""
             unfilteredResults = []
+            hasEnrichedUnfilteredResultsForFacilities = false
+            searchResults = []
+            errorMessage = nil
+        }
+        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            // Keyword results stay listed; the entry cancel above killed any in-flight
+            // enrichment, so restart it under the fresh token if filters still need it.
+            enrichForActiveFacilityFiltersIfNeeded()
+            return
+        }
+        guard !city.isEmpty else {
+            unfilteredResults = []
+            hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
             errorMessage = AppLocalization.localized("Choose a city to browse stations")
             return
@@ -62,17 +82,20 @@ final class StationSearchViewModel {
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
         unfilteredResults = stations
+        hasEnrichedUnfilteredResultsForFacilities = false
         applyFilters()
         let enrichedStations = await stationSearchService.enrichStations(unfilteredResults)
         guard stationLoadID == loadID else { return }
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
         unfilteredResults = enrichedStations
+        hasEnrichedUnfilteredResultsForFacilities = true
         applyFilters()
     }
 
     func search(city: String) async {
-        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+        let query = searchText.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else {
             await loadInitialStations(city: city)
             return
         }
@@ -80,8 +103,16 @@ final class StationSearchViewModel {
         // Generation token so a superseded query — or one that returns after the field is
         // cleared — can't stomp the current results. MKLocalSearch ignores Swift task
         // cancellation, so the in-flight network call still completes; the token discards it.
+        // The token alone isn't enough: after the text changes, the NEXT search doesn't mint
+        // a new token until its 180ms debounce elapses, so a stale search returning inside
+        // that window would still pass — hence the captured-query check on publish too.
         let loadID = UUID()
         stationLoadID = loadID
+        // Minting the token supersedes any in-flight facility enrichment (its stale-token
+        // guard will refuse to publish) — so this mint owns clearing its flag, or a search
+        // that errors out leaves "Checking station details…" spinning forever.
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
         isSearching = true
         // defer guarantees the spinner clears on EVERY exit, including the stale-token early
         // returns below — otherwise a cleared/superseded search leaves isSearching stuck true
@@ -95,14 +126,13 @@ final class StationSearchViewModel {
         await refreshLocationIfAlreadyAllowed()
 
         do {
-            let results = try await stationSearchService.search(keyword: searchText, city: city)
-            guard stationLoadID == loadID else { return }
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
-            unfilteredResults = results
-            applyFilters()
+            let results = try await stationSearchService.search(keyword: query, city: city)
+            guard stationLoadID == loadID,
+                  searchText.trimmingCharacters(in: .whitespaces) == query else { return }
+            replaceUnfilteredResults(results, loadID: loadID)
         } catch {
-            guard stationLoadID == loadID else { return }
+            guard stationLoadID == loadID,
+                  searchText.trimmingCharacters(in: .whitespaces) == query else { return }
             errorMessage = AppLocalization.localized("Place search requires a network connection")
         }
     }
@@ -125,6 +155,7 @@ final class StationSearchViewModel {
         stationLoadID = UUID()
         searchText = ""
         unfilteredResults = []
+        hasEnrichedUnfilteredResultsForFacilities = false
         searchResults = []
         errorMessage = nil
     }
@@ -132,11 +163,13 @@ final class StationSearchViewModel {
     func toggleAccessibleFilter() {
         filter.accessibleOnly.toggle()
         applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
     }
 
     func toggleElevatorFilter() {
         filter.elevatorOnly.toggle()
         applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
     }
 
     func toggleTransferFilter() {
@@ -153,22 +186,12 @@ final class StationSearchViewModel {
 
     func setFacilityFilter(_ type: StationFacilityType?) {
         filter.facilityType = type
-        if type != nil && unfilteredResults.allSatisfy({ $0.facilities.isEmpty }) {
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = true
-            facilityEnrichmentTask = Task { [weak self] in
-                guard let self else { return }
-                let enriched = await stationSearchService.enrichStations(unfilteredResults)
-                guard !Task.isCancelled else { return }
-                unfilteredResults = enriched
-                applyFilters()
-                isEnrichingForFacility = false
-            }
-        } else {
+        applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
+        if !activeFiltersNeedOfficialData {
             facilityEnrichmentTask?.cancel()
             isEnrichingForFacility = false
-            applyFilters()
-            if type == nil && unfilteredResults.isEmpty == false {
+            if unfilteredResults.isEmpty == false {
                 errorMessage = nil
             }
         }
@@ -182,6 +205,13 @@ final class StationSearchViewModel {
             simplified: "距当前位置 \(AppLocalization.distance(meters))",
             traditional: "距目前位置 \(AppLocalization.distance(meters))"
         )
+    }
+
+    /// The exact stored station for a recent-search row — replay must not re-resolve by
+    /// name, since same-named stations exist across cities.
+    func station(withID stationID: String, in city: String) async -> Station? {
+        guard !city.isEmpty else { return nil }
+        return await stationSearchService.stations(in: city).first { $0.stationID == stationID }
     }
 
     func selectStation(_ station: Station) {
@@ -217,6 +247,47 @@ final class StationSearchViewModel {
                 .map { (station: $0, key: $0.localizedName) }
                 .sorted { $0.key < $1.key }
                 .map(\.station)
+        }
+    }
+
+    private func replaceUnfilteredResults(_ stations: [Station], loadID: UUID) {
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = false
+        unfilteredResults = stations
+        hasEnrichedUnfilteredResultsForFacilities = false
+        applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded(loadID: loadID)
+    }
+
+    private var activeFiltersNeedOfficialData: Bool {
+        filter.accessibleOnly || filter.elevatorOnly || filter.facilityType != nil
+    }
+
+    private func enrichForActiveFacilityFiltersIfNeeded(loadID: UUID? = nil) {
+        guard activeFiltersNeedOfficialData else {
+            facilityEnrichmentTask?.cancel()
+            isEnrichingForFacility = false
+            return
+        }
+        guard !hasEnrichedUnfilteredResultsForFacilities,
+              !unfilteredResults.isEmpty else { return }
+
+        facilityEnrichmentTask?.cancel()
+        isEnrichingForFacility = true
+        let expectedLoadID = loadID ?? stationLoadID
+        let stationsToEnrich = unfilteredResults
+        facilityEnrichmentTask = Task { [weak self] in
+            guard let self else { return }
+            let enriched = await stationSearchService.enrichStations(stationsToEnrich)
+            // Identity check (Station is a class): publish only while the list this task
+            // enriched is still the one displayed — the load token alone can't see a
+            // keyword search that replaced the results within the same city epoch.
+            guard !Task.isCancelled, stationLoadID == expectedLoadID,
+                  unfilteredResults.elementsEqual(stationsToEnrich, by: ===) else { return }
+            unfilteredResults = enriched
+            hasEnrichedUnfilteredResultsForFacilities = true
+            applyFilters()
+            isEnrichingForFacility = false
         }
     }
 

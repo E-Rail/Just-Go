@@ -21,6 +21,15 @@ struct TransferStationSheet: View {
         crowdControl.stations.first { $0.stationName == stationName }?.windows ?? []
     }
 
+    /// The transfer station's real coordinate. A transfer segment's own stationStops is always
+    /// empty by construction — the coordinate lives on the ride segment that follows it (same
+    /// station, matched by ID with a defensive first-stop fallback).
+    private var transferStopCoordinate: CLLocationCoordinate2D? {
+        let stop = nextTransitSegment?.stationStops.first { $0.stationID == transferSegment.toStationID }
+            ?? nextTransitSegment?.stationStops.first
+        return stop?.coordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -43,13 +52,23 @@ struct TransferStationSheet: View {
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }
-            let place = TransitPlace(
-                name: stationName,
-                coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                source: .localStationData
-            )
-            enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
-            if let coordinate = enrichedStation?.coordinate {
+            // Match only when the route carries the real transfer-station coordinate
+            // (provider-built routes always do). With a (0,0) placeholder, same-named
+            // stations disambiguate by distance to Null Island and pick an arbitrary one —
+            // showing the wrong station's accessibility data is worse than showing none.
+            if let coordinate = transferStopCoordinate {
+                let place = TransitPlace(
+                    name: stationName,
+                    coordinate: coordinate,
+                    source: .localStationData
+                )
+                enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
+            }
+            // Street view keys off the route's own coordinate first so it still works when the
+            // official pack doesn't list this station (matchingStation returned nil above).
+            if let coordinate = transferStopCoordinate ?? enrichedStation?.coordinate,
+               CLLocationCoordinate2DIsValid(coordinate),
+               coordinate.latitude != 0 || coordinate.longitude != 0 {
                 lookAroundScene = try? await MKLookAroundSceneRequest(coordinate: coordinate).scene
             }
         }

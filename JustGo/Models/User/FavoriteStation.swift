@@ -8,8 +8,10 @@ struct FavoriteStation: Identifiable, Codable {
     let latitude: Double
     let longitude: Double
     let cityID: String
-    let cityName: String
-    let cityNameEn: String?
+    // var: repairable via withCityMetadata — rows favorited from another city's context
+    // were historically stamped with the selected city's name.
+    var cityName: String
+    var cityNameEn: String?
     let lineNames: [String]
     let lineNamesEn: [String]?
     let lineIDs: [String]?
@@ -31,6 +33,13 @@ struct FavoriteStation: Identifiable, Codable {
         self.lineNamesEn = station.lines.map { $0.nameEn ?? $0.name }
         self.lineIDs = station.lines.map(\.lineID)
         self.lineColorsHex = station.lines.map(\.colorHex)
+    }
+
+    func withCityMetadata(cityName: String, cityNameEn: String?) -> FavoriteStation {
+        var repaired = self
+        repaired.cityName = cityName
+        repaired.cityNameEn = cityNameEn
+        return repaired
     }
 
     /// Station name localized for display, derived from the stored raw identifiers so the

@@ -140,7 +140,9 @@ final class TripMemoryService {
     }
 
     func addFavorite(station: Station, cityName: String, cityNameEn: String? = nil) {
-        let favorite = FavoriteStation(station: station, cityName: cityName, cityNameEn: cityNameEn)
+        var favorite = FavoriteStation(station: station, cityName: cityName, cityNameEn: cityNameEn)
+        // Re-favoriting rebuilds the row from the station — keep the user's tag with it.
+        favorite.tag = favoriteStations.first { $0.id == favorite.id }?.tag
         favoriteStations.removeAll { $0.id == favorite.id }
         favoriteStations.insert(favorite, at: 0)
         favoriteStations = Array(favoriteStations.prefix(maxFavoriteStations))
@@ -149,6 +151,31 @@ final class TripMemoryService {
 
     func removeFavorite(id: String) {
         favoriteStations.removeAll { $0.id == id }
+        persistFavoriteStations()
+    }
+
+    func setFavoriteTag(id: String, tag: FavoriteStationTag?) {
+        var updated = favoriteStations
+        var didChange = false
+        for (index, favorite) in updated.enumerated() {
+            if favorite.id == id {
+                guard favorite.tag != tag else { continue }
+                updated[index].tag = tag
+                didChange = true
+            } else if let tag, favorite.tag == tag {
+                // Home and Work are single places; assigning one to another station
+                // unassigns the previous holder. Custom tags may repeat.
+                switch tag {
+                case .home, .work:
+                    updated[index].tag = nil
+                    didChange = true
+                case .custom:
+                    break
+                }
+            }
+        }
+        guard didChange else { return }
+        favoriteStations = updated
         persistFavoriteStations()
     }
 

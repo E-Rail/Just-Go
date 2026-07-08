@@ -1,6 +1,13 @@
 import SwiftUI
 import CoreLocation
 
+/// The two pushes this screen can make, unified so they share ONE
+/// `navigationDestination(item:)` registration.
+enum RouteDetailDestination: Hashable {
+    case transfer(RouteSegment)
+    case station(RouteStationStop)
+}
+
 struct RouteDetailView: View {
     private let initialRoute: Route
     let preference: RoutePreference
@@ -19,9 +26,7 @@ struct RouteDetailView: View {
     @State var tripNote = ""
     @State var routeReportNote = ""
     @State var routeReportSeverity: AccessibilityReportSeverity = .medium
-    @State var metroNetworks: [MetroNetwork] = []
-    @State var selectedTransferSegment: RouteSegment?
-    @State private var selectedTimelineStation: RouteStationStop?
+    @State var detailDestination: RouteDetailDestination?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
     // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
     // navigator re-fires onAppear, and a reset would immediately re-present it.
@@ -81,22 +86,27 @@ struct RouteDetailView: View {
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
         }
-        .navigationDestination(item: $selectedTransferSegment) { segment in
-            TransferStationSheet(
-                transferSegment: segment,
-                nextTransitSegment: nextTransitSegment(after: segment),
-                cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
-                crowdControl: route.crowdControl
-            )
-        }
-        .navigationDestination(item: $selectedTimelineStation) { stop in
-            RouteStationGuideSheet(
-                stop: stop,
-                cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
-            )
+        // A single destination registration: two navigationDestination(item:) modifiers on
+        // the same node is a historically unreliable SwiftUI pattern (one registration can
+        // shadow the other), and both pushes share this screen anyway.
+        .navigationDestination(item: $detailDestination) { destination in
+            switch destination {
+            case .transfer(let segment):
+                TransferStationSheet(
+                    transferSegment: segment,
+                    nextTransitSegment: nextTransitSegment(after: segment),
+                    cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                    crowdControl: route.crowdControl
+                )
+            case .station(let stop):
+                RouteStationGuideSheet(
+                    stop: stop,
+                    cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
+                )
+            }
         }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
-            FullScreenRouteMapView(route: route, metroNetworks: routeLineNetworks)
+            FullScreenRouteMapView(route: route)
         }
         .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
             LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
@@ -109,12 +119,7 @@ struct RouteDetailView: View {
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
             boardingServiceWindows = []
-            guard let cityID = route.networkCityID ?? appState.selectedCity?.id,
-                  let network = await container.metroNetworkProvider.network(for: cityID) else {
-                metroNetworks = []
-                return
-            }
-            metroNetworks = [network]
+            guard let cityID = route.networkCityID ?? appState.selectedCity?.id else { return }
             await loadServiceHours(cityID: cityID)
         }
     }
@@ -159,23 +164,6 @@ struct RouteDetailView: View {
     func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
         guard let idx = route.segments.firstIndex(where: { $0.id == transferSegment.id }) else { return nil }
         return route.segments[(idx + 1)...].first { $0.type.isTransit }
-    }
-
-    /// `metroNetworks` holds the whole city network (fetched once for the service-hours lookup);
-    /// the expanded map should only trace the line(s) this route actually rides, not every line
-    /// in the city.
-    private var routeLineNetworks: [MetroNetwork] {
-        let routeLineNames = Set(route.segments.compactMap(\.lineName))
-        return metroNetworks.map { network in
-            MetroNetwork(
-                cityID: network.cityID,
-                version: network.version,
-                bounds: network.bounds,
-                geometryKind: network.geometryKind,
-                lines: network.lines.filter { routeLineNames.contains($0.name) },
-                stations: network.stations
-            )
-        }
     }
 
     private var routeMapPreview: some View {
@@ -395,7 +383,7 @@ struct RouteDetailView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 RouteStationTimeline(stops: route.stationTimelineStops) { stop in
-                    selectedTimelineStation = stop
+                    detailDestination = .station(stop)
                 }
             }
         }

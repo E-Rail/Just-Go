@@ -271,9 +271,12 @@ extension RouteDetailView {
                     .foregroundStyle(.secondary)
             }
         }
+        // A plain-style Button only hit-tests its label's content — the Spacer and padding
+        // between the short text and the chevron were dead zones covering most of the row.
+        .contentShape(Rectangle())
         return Group {
             if segment.type == .transfer {
-                Button { selectedTransferSegment = segment } label: { rowContent }
+                Button { detailDestination = .transfer(segment) } label: { rowContent }
                     .buttonStyle(.plain)
             } else {
                 rowContent

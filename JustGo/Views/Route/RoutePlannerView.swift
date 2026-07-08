@@ -339,8 +339,8 @@ struct RoutePlannerView: View {
                     }
                 }
 
-                HStack {
-                    Spacer()
+                HStack(spacing: 8) {
+                    quickTagRow
                     Button(action: { viewModel?.swapOriginDestination() }) {
                         Image(systemName: "arrow.up.arrow.down")
                             .font(.title3)
@@ -353,6 +353,90 @@ struct RoutePlannerView: View {
             }
         }
         .id("routeInputCard")
+    }
+
+    /// One-tap fills under the From/To bars: current location plus favorites the user
+    /// tagged in Personal → My Stations. Fills the focused field, else the first empty
+    /// one. Tags are assigned only in My Stations — no save flow here.
+    private var quickTagRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                quickTagChip(
+                    title: AppLocalization.localized("Current Location"),
+                    icon: "location.fill"
+                ) {
+                    let field = quickTagTargetField
+                    Task {
+                        // Align the app to the city the device is in (bounded nearest-city
+                        // rule) — filling a Beijing coordinate under a selected Shanghai
+                        // otherwise leaves suggestions and name resolution keyed to the
+                        // wrong city.
+                        await viewModel?.useCurrentLocation(for: field) { coordinate in
+                            switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
+                        }
+                    }
+                }
+
+                ForEach(taggedFavorites) { favorite in
+                    if let tag = favorite.tag {
+                        quickTagChip(title: tag.title, icon: tag.icon) {
+                            fillField(with: favorite)
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    /// Home, then Work, then custom tags in favorites order (explicit buckets — no
+    /// reliance on sort stability).
+    private var taggedFavorites: [FavoriteStation] {
+        let favorites = tripMemoryService.favoriteStations
+        let customs = favorites.filter {
+            if case .custom = $0.tag { return true }
+            return false
+        }
+        return favorites.filter { $0.tag == .home }
+            + favorites.filter { $0.tag == .work }
+            + customs
+    }
+
+    private var quickTagTargetField: RouteInputField {
+        focusedField
+            ?? ((viewModel?.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+                ? .origin
+                : .destination)
+    }
+
+    private func fillField(with favorite: FavoriteStation) {
+        // Capture the target before the city switch: a cross-city favorite wipes the
+        // fields when the planner realigns to its network (same switch as the favorites →
+        // station detail → "From here" path).
+        let field = quickTagTargetField
+        let coordinate = CLLocationCoordinate2D(latitude: favorite.latitude, longitude: favorite.longitude)
+        switchPlannerCity(forPlaceCityID: favorite.cityID, coordinate: coordinate)
+        viewModel?.selectPlace(
+            TransitPlace(name: favorite.displayName, coordinate: coordinate, source: .mapKit),
+            for: field
+        )
+    }
+
+    private func quickTagChip(title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.caption)
+                Text(title)
+                    .font(.caption)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.accentColor.opacity(0.12), in: Capsule())
+            .foregroundStyle(Color.accentColor)
+        }
+        .buttonStyle(.plain)
     }
 
     private var activeSuggestions: (field: RouteInputField, suggestions: [TransitPlace])? {

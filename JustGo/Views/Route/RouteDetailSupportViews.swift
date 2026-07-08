@@ -65,13 +65,11 @@ struct TripConfidenceCard: View {
 
 struct FullScreenRouteMapView: View {
     let route: Route
-    let metroNetworks: [MetroNetwork]
     @Environment(\.dismiss) private var dismiss
     @State private var visibleRegion: MapVisibleRegion?
 
-    init(route: Route, metroNetworks: [MetroNetwork]) {
+    init(route: Route) {
         self.route = route
-        self.metroNetworks = metroNetworks
         _visibleRegion = State(initialValue: route.previewRegion)
     }
 
@@ -86,7 +84,10 @@ struct FullScreenRouteMapView: View {
             TransitMapView(
                 visibleRegion: $visibleRegion,
                 stations: routeStations,
-                metroNetworks: metroNetworks,
+                // Only the traveled geometry: the route's own per-segment polylines.
+                // Tracing the involved lines end to end made a short hop on a loop line
+                // read as riding the whole loop.
+                metroNetworks: [],
                 route: route,
                 showsUserLocation: false,
                 onRegionChanged: { visibleRegion = $0 },
@@ -109,7 +110,9 @@ struct FullScreenRouteMapView: View {
                     .padding(16)
                 }
                 Spacer()
-                if !metroNetworks.isEmpty {
+                // Bundled-network routes draw OSM-derived segment geometry, which requires
+                // attribution; Apple-transit routes carry Apple polylines and don't.
+                if route.networkCityID != nil {
                     HStack {
                         Spacer()
                         MetroGeometryAttributionView()

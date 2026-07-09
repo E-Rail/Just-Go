@@ -19,6 +19,7 @@ struct TransferStationSheet: View {
     @State private var transferPath: TransferPathHint?
     @State private var doorGuidance: DoorGuidance?
     @State private var fullScreenImage: FullScreenStationImage?
+    @State private var showIndoorSteps = false
 
     private var stationName: String {
         transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
@@ -57,6 +58,17 @@ struct TransferStationSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(item: $fullScreenImage) { image in
             FullScreenStationImageView(image: image)
+        }
+        .fullScreenCover(isPresented: $showIndoorSteps) {
+            if let indoorMap, let transferPath, let url = stationMap?.resolvedURL {
+                IndoorStepGoView(
+                    stationTitle: stationName,
+                    mapImageURL: url,
+                    indoorMap: indoorMap,
+                    routeNodeIDs: transferPath.routeNodeIDs,
+                    destinationLineName: nextTransitSegment?.lineName
+                )
+            }
         }
         .task {
             isLoadingStation = true
@@ -289,6 +301,20 @@ struct TransferStationSheet: View {
                     ))
                     .font(.caption2)
                     .foregroundStyle(Color.accentColor)
+
+                    Button {
+                        showIndoorSteps = true
+                    } label: {
+                        Label(
+                            AppLocalization.text(english: "Start step-by-step", simplified: "开始逐步导航", traditional: "開始逐步導航"),
+                            systemImage: "figure.walk.motion"
+                        )
+                        .font(.caption)
+                        .fontWeight(.medium)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Color.accentColor)
+                    .padding(.top, 2)
                 }
                 ForEach(path.notes, id: \.self) { note in
                     Text(note)

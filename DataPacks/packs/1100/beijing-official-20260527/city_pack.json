@@ -19062,6 +19062,58 @@
             },
             "geoCoordinate": null,
             "isStepFree": true
+          },
+          {
+            "id": "n_elev_L10",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.4375,
+              "y": 0.3355,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true
+          },
+          {
+            "id": "n_elev_L4",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.641,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true
+          },
+          {
+            "id": "n_stairs_L10",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.3125,
+              "y": 0.464,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false
+          },
+          {
+            "id": "n_stairs_L4",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.34,
+              "y": 0.5985,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false
           }
         ],
         "edges": [
@@ -19081,15 +19133,6 @@
             "distanceMeters": 25,
             "typicalSeconds": 20,
             "isStepFree": false,
-            "isBidirectional": true
-          },
-          {
-            "id": "e3",
-            "fromNodeID": "n_concourse_ne",
-            "toNodeID": "n_platform_L10",
-            "distanceMeters": 30,
-            "typicalSeconds": 30,
-            "isStepFree": true,
             "isBidirectional": true
           },
           {
@@ -19147,29 +19190,74 @@
             "isBidirectional": true
           },
           {
-            "id": "e10",
-            "fromNodeID": "n_concourse_s",
-            "toNodeID": "n_platform_L4",
-            "distanceMeters": 35,
-            "typicalSeconds": 35,
+            "id": "e3a",
+            "fromNodeID": "n_concourse_ne",
+            "toNodeID": "n_elev_L10",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
             "isStepFree": true,
             "isBidirectional": true
           },
           {
-            "id": "e11",
-            "fromNodeID": "n_concourse_central",
+            "id": "e3b",
+            "fromNodeID": "n_elev_L10",
             "toNodeID": "n_platform_L10",
-            "distanceMeters": 45,
-            "typicalSeconds": 45,
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e10a",
+            "fromNodeID": "n_concourse_s",
+            "toNodeID": "n_elev_L4",
+            "distanceMeters": 17.5,
+            "typicalSeconds": 17.5,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e10b",
+            "fromNodeID": "n_elev_L4",
+            "toNodeID": "n_platform_L4",
+            "distanceMeters": 17.5,
+            "typicalSeconds": 17.5,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e11a",
+            "fromNodeID": "n_concourse_central",
+            "toNodeID": "n_stairs_L10",
+            "distanceMeters": 22.5,
+            "typicalSeconds": 22.5,
             "isStepFree": false,
             "isBidirectional": true
           },
           {
-            "id": "e12",
+            "id": "e11b",
+            "fromNodeID": "n_stairs_L10",
+            "toNodeID": "n_platform_L10",
+            "distanceMeters": 22.5,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true
+          },
+          {
+            "id": "e12a",
             "fromNodeID": "n_concourse_central",
+            "toNodeID": "n_stairs_L4",
+            "distanceMeters": 25.0,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true
+          },
+          {
+            "id": "e12b",
+            "fromNodeID": "n_stairs_L4",
             "toNodeID": "n_platform_L4",
-            "distanceMeters": 50,
-            "typicalSeconds": 45,
+            "distanceMeters": 25.0,
+            "typicalSeconds": 22.5,
             "isStepFree": false,
             "isBidirectional": true
           }
@@ -26604,6 +26692,45 @@
             },
             "geoCoordinate": null,
             "isStepFree": false
+          },
+          {
+            "id": "n_elev_L13",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.1875,
+              "y": 0.3385,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true
+          },
+          {
+            "id": "n_elev_L2",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.365,
+              "y": 0.5645,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true
+          },
+          {
+            "id": "n_stairs_L4",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.3525,
+              "y": 0.651,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false
           }
         ],
         "edges": [
@@ -26632,15 +26759,6 @@
             "distanceMeters": 40,
             "typicalSeconds": 35,
             "isStepFree": false,
-            "isBidirectional": true
-          },
-          {
-            "id": "e4",
-            "fromNodeID": "n_concourse_north",
-            "toNodeID": "n_platform_L13",
-            "distanceMeters": 30,
-            "typicalSeconds": 30,
-            "isStepFree": true,
             "isBidirectional": true
           },
           {
@@ -26680,24 +26798,6 @@
             "isBidirectional": true
           },
           {
-            "id": "e9",
-            "fromNodeID": "n_concourse_south",
-            "toNodeID": "n_platform_L2",
-            "distanceMeters": 25,
-            "typicalSeconds": 25,
-            "isStepFree": true,
-            "isBidirectional": true
-          },
-          {
-            "id": "e10",
-            "fromNodeID": "n_concourse_south",
-            "toNodeID": "n_platform_L4",
-            "distanceMeters": 90,
-            "typicalSeconds": 85,
-            "isStepFree": false,
-            "isBidirectional": true
-          },
-          {
             "id": "e11",
             "fromNodeID": "n_platform_L4",
             "toNodeID": "n_exit_D",
@@ -26712,6 +26812,60 @@
             "toNodeID": "n_exit_C",
             "distanceMeters": 60,
             "typicalSeconds": 55,
+            "isStepFree": false,
+            "isBidirectional": true
+          },
+          {
+            "id": "e4a",
+            "fromNodeID": "n_concourse_north",
+            "toNodeID": "n_elev_L13",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e4b",
+            "fromNodeID": "n_elev_L13",
+            "toNodeID": "n_platform_L13",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e9a",
+            "fromNodeID": "n_concourse_south",
+            "toNodeID": "n_elev_L2",
+            "distanceMeters": 12.5,
+            "typicalSeconds": 12.5,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e9b",
+            "fromNodeID": "n_elev_L2",
+            "toNodeID": "n_platform_L2",
+            "distanceMeters": 12.5,
+            "typicalSeconds": 12.5,
+            "isStepFree": true,
+            "isBidirectional": true
+          },
+          {
+            "id": "e10a",
+            "fromNodeID": "n_concourse_south",
+            "toNodeID": "n_stairs_L4",
+            "distanceMeters": 45.0,
+            "typicalSeconds": 42.5,
+            "isStepFree": false,
+            "isBidirectional": true
+          },
+          {
+            "id": "e10b",
+            "fromNodeID": "n_stairs_L4",
+            "toNodeID": "n_platform_L4",
+            "distanceMeters": 45.0,
+            "typicalSeconds": 42.5,
             "isStepFree": false,
             "isBidirectional": true
           }

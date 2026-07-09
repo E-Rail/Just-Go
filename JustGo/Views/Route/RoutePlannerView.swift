@@ -42,14 +42,7 @@ struct RoutePlannerView: View {
                             citySelector
                             if !simplifiedUI { smartCommuteSection }
                             routeInputSection
-                            if !simplifiedUI { saveCurrentTripButton }
-                            searchButton
-                            if let hint = searchHint {
-                                Text(hint)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                            }
+                            plannerActionRail
                             if !simplifiedUI {
                                 departurePlannerSection
                                 savedTripsSection
@@ -189,7 +182,7 @@ struct RoutePlannerView: View {
 
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
         guard let pending, let vm = viewModel else { return }
-        // A station-originated input can reference another city (favorites → station
+        // A station-originated input can reference another city (Quick Tags → station
         // detail → "From here"); a map POI names no city, so infer one when it's clearly
         // outside the selected city's area (the map pans freely across cities).
         switchPlannerCity(forPlaceCityID: pending.cityID, coordinate: pending.place.coordinate)
@@ -197,7 +190,7 @@ struct RoutePlannerView: View {
         appState.pendingRouteInput = nil
     }
 
-    /// Switches the app-wide city so a cross-city place (saved trip, favorite station)
+    /// Switches the app-wide city so a cross-city place (saved trip, quick tag)
     /// plans against its own network instead of the selected city's. Routes through
     /// cityChanged synchronously: the deferred selectedCity onChange then finds the view
     /// model already up to date and doesn't wipe the fields the caller fills next.
@@ -280,6 +273,24 @@ struct RoutePlannerView: View {
         return AppLocalization.localized("Enter a starting station and destination to search")
     }
 
+    private var plannerActionRail: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                if !simplifiedUI {
+                    saveCurrentTripButton
+                }
+                searchButton
+            }
+            if let hint = searchHint {
+                Text(hint)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
     private var errorAlertIsPresented: Binding<Bool> {
         Binding(
             get: { viewModel?.errorMessage != nil && viewModel?.routes.isEmpty == true },
@@ -349,9 +360,8 @@ struct RoutePlannerView: View {
         .id("routeInputCard")
     }
 
-    /// One-tap fills under the From/To bars: current location plus favorites the user
-    /// tagged in Personal → My Stations. Fills the focused field, else the first empty
-    /// one. Tags are assigned only in My Stations — no save flow here.
+    /// One-tap fills under the From/To bars: current location plus Quick Tags.
+    /// Fills the focused field, else the first empty one.
     private var quickTagRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -371,11 +381,9 @@ struct RoutePlannerView: View {
                     }
                 }
 
-                ForEach(taggedFavorites) { favorite in
-                    if let tag = favorite.tag {
-                        quickTagChip(title: tag.title, icon: tag.icon) {
-                            fillField(with: favorite)
-                        }
+                ForEach(sortedQuickTags) { quickTag in
+                    quickTagChip(title: quickTag.kind.title, icon: quickTag.kind.icon) {
+                        fillField(with: quickTag)
                     }
                 }
             }
@@ -383,16 +391,16 @@ struct RoutePlannerView: View {
         }
     }
 
-    /// Home, then Work, then custom tags in favorites order (explicit buckets — no
+    /// Home, then Work, then custom tags in saved order (explicit buckets — no
     /// reliance on sort stability).
-    private var taggedFavorites: [FavoriteStation] {
-        let favorites = tripMemoryService.favoriteStations
-        let customs = favorites.filter {
-            if case .custom = $0.tag { return true }
+    private var sortedQuickTags: [StationQuickTag] {
+        let quickTags = tripMemoryService.stationQuickTags
+        let customs = quickTags.filter {
+            if case .custom = $0.kind { return true }
             return false
         }
-        return favorites.filter { $0.tag == .home }
-            + favorites.filter { $0.tag == .work }
+        return quickTags.filter { $0.kind == .home }
+            + quickTags.filter { $0.kind == .work }
             + customs
     }
 
@@ -403,15 +411,14 @@ struct RoutePlannerView: View {
                 : .destination)
     }
 
-    private func fillField(with favorite: FavoriteStation) {
-        // Capture the target before the city switch: a cross-city favorite wipes the
-        // fields when the planner realigns to its network (same switch as the favorites →
-        // station detail → "From here" path).
+    private func fillField(with quickTag: StationQuickTag) {
+        // Capture the target before the city switch: a cross-city quick tag wipes the
+        // fields when the planner realigns to its network.
         let field = quickTagTargetField
-        let coordinate = CLLocationCoordinate2D(latitude: favorite.latitude, longitude: favorite.longitude)
-        switchPlannerCity(forPlaceCityID: favorite.cityID, coordinate: coordinate)
+        let coordinate = CLLocationCoordinate2D(latitude: quickTag.latitude, longitude: quickTag.longitude)
+        switchPlannerCity(forPlaceCityID: quickTag.cityID, coordinate: coordinate)
         viewModel?.selectPlace(
-            TransitPlace(name: favorite.displayName, coordinate: coordinate, source: .mapKit),
+            quickTag.transitPlace,
             for: field
         )
     }
@@ -538,12 +545,13 @@ struct RoutePlannerView: View {
                 }
                 Text(AppLocalization.localized("Find Routes"))
                     .fontWeight(.semibold)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .padding()
+            .frame(height: 48)
             .background(viewModel?.canSearch == true ? Color.accentColor : Color.gray)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .disabled(viewModel?.canSearch != true || viewModel?.isLoading == true)
         .alert(AppLocalization.localized("No Routes Found"), isPresented: errorAlertIsPresented) {

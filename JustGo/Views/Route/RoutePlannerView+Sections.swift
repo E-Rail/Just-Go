@@ -109,11 +109,13 @@ extension RoutePlannerView {
             savedTripName = defaultSavedTripName
             showSaveCurrentTrip = true
         } label: {
-            Label(AppLocalization.localized("Save this trip"), systemImage: "bookmark")
+            Label(AppLocalization.localized("Save"), systemImage: "bookmark")
                 .font(.subheadline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 12))
+                .fontWeight(.medium)
+                .lineLimit(1)
+                .padding(.horizontal, 12)
+                .frame(height: 48)
+                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         // Gated on a current successful plan, not just filled fields: an unplanned save

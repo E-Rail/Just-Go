@@ -82,10 +82,10 @@ struct OnboardingTourView: View {
                 icon: "person.fill",
                 title: AppLocalization.text(english: "Make it yours", simplified: "打造您的专属", traditional: "打造您的專屬"),
                 points: [
-                    ("star.fill", AppLocalization.text(
-                        english: "Star stations into My Stations (Profile), then tag one as Home or Work to get its one-tap chip in the planner.",
-                        simplified: "在“个人”中收藏车站到“我的车站”，标记为家或公司后，路线页会出现一键快捷标签。",
-                        traditional: "在「個人」中收藏車站到「我的車站」，標記為家或公司後，路線頁會出現一鍵快捷標籤。"
+                    ("tag.fill", AppLocalization.text(
+                        english: "Tag stations as Home, Work, or custom places, then fill them with one tap in the planner.",
+                        simplified: "把车站设为家、公司或自定义标签，即可在路线规划中一键填入。",
+                        traditional: "把車站設為家、公司或自訂標籤，即可在路線規劃中一鍵填入。"
                     )),
                     ("bookmark.fill", AppLocalization.text(
                         english: "Save trips you repeat — they come back as one-tap cards, morning and evening.",

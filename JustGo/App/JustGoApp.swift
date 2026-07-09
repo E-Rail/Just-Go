@@ -17,7 +17,6 @@ struct JustGoApp: App {
                 .environment(appState)
                 .environment(container)
                 .environment(container.tripMemoryService)
-                .environment(container.accessibilityReportService)
                 .task {
                     appState.initialize(container: container)
                 }

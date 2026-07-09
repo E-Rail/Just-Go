@@ -3,86 +3,66 @@ import SwiftUI
 extension StationDetailView {
     /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
     /// platform hints, labeled with a confidence chip. Sits above Train Times.
+    @ViewBuilder
     var stationGuideSection: some View {
         let exits = viewModel?.accessPoints ?? []
         let platformHints = viewModel?.platformHints ?? []
-        return GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text(AppLocalization.text(english: "Station Guide", simplified: "进出站指引", traditional: "進出站指引"))
-                        .font(.headline)
-                    Spacer()
-                    DataConfidenceChip(confidence: viewModel?.guideConfidence ?? .unknown, compact: true)
-                }
+        if viewModel?.isLoadingCityPack == true || !exits.isEmpty || !platformHints.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text(AppLocalization.text(english: "Station Guide", simplified: "进出站指引", traditional: "進出站指引"))
+                            .font(.headline)
+                        Spacer()
+                        DataConfidenceChip(confidence: viewModel?.guideConfidence ?? .unknown, compact: true)
+                    }
 
-                Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    if viewModel?.isLoadingCityPack == true {
+                        ProgressView()
+                    } else if !exits.isEmpty {
+                        Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
 
-                if viewModel?.isLoadingCityPack == true {
-                    ProgressView()
-                } else if exits.isEmpty {
-                    Text(AppLocalization.text(
-                        english: "Specific exit data is not available yet — see the station map below.",
-                        simplified: "暂无具体出入口数据，请参考下方站内图。",
-                        traditional: "暫無具體出入口資料，請參考下方站內圖。"
-                    ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                } else {
-                    ForEach(exits) { exit in
-                        HStack(spacing: 8) {
-                            Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
-                                .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
-                                .frame(width: 22)
-                            Text(exit.name)
-                                .font(.subheadline)
-                            if exit.isAccessible {
-                                Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
-                                    .font(.caption2)
-                                    .foregroundStyle(.green)
+                        ForEach(exits) { exit in
+                            HStack(spacing: 8) {
+                                Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
+                                    .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
+                                    .frame(width: 22)
+                                Text(exit.name)
+                                    .font(.subheadline)
+                                if exit.isAccessible {
+                                    Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
+                                        .font(.caption2)
+                                        .foregroundStyle(.green)
+                                }
+                                Spacer()
                             }
-                            Spacer()
                         }
                     }
-                }
 
-                if !platformHints.isEmpty {
-                    Divider()
-                    Text(AppLocalization.text(english: "On the platform", simplified: "站台提示", traditional: "月台提示"))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
-                        platformHintRow(hint)
+                    if !platformHints.isEmpty {
+                        if !exits.isEmpty {
+                            Divider()
+                        }
+                        Text(AppLocalization.text(english: "On the platform", simplified: "站台提示", traditional: "月台提示"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
+                            platformHintRow(hint)
+                        }
                     }
-                }
 
-                Text(AppLocalization.text(
-                    english: "Tap the station map below for the full layout.",
-                    simplified: "点按下方站内图查看完整布局。",
-                    traditional: "點按下方站內圖查看完整佈局。"
-                ))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                    if viewModel?.stationMap != nil {
+                        Text(AppLocalization.text(
+                            english: "Tap the station map below for the full layout.",
+                            simplified: "点按下方站内图查看完整布局。",
+                            traditional: "點按下方站內圖查看完整佈局。"
+                        ))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    }
 
-                Divider()
-
-                Button {
-                    reportItemType = .exit
-                    reportStatus = .notPresent
-                    reportSeverity = .low
-                    reportNote = ""
-                    showStationReport = true
-                } label: {
-                    Label(
-                        AppLocalization.text(
-                            english: "Report wrong exit or station issue",
-                            simplified: "反馈出入口或车站问题",
-                            traditional: "回報出入口或車站問題"
-                        ),
-                        systemImage: "exclamationmark.bubble"
-                    )
-                    .font(.caption)
                 }
             }
         }
@@ -159,54 +139,24 @@ extension StationDetailView {
         }
     }
 
+    @ViewBuilder
     var stationEssentialsSection: some View {
         let station = displayedStation
         let facilities = station.facilities.deduplicatedForDisplay()
-        let personalReports = accessibilityReportService.reports(for: station)
-        return GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
+        if !facilities.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
                     Text(AppLocalization.localized("Station Essentials"))
                         .font(.headline)
-                    Spacer()
-                    Button {
-                        reportItemType = .elevator
-                        reportStatus = .outOfService
-                        reportSeverity = .medium
-                        reportNote = ""
-                        showStationReport = true
-                    } label: {
-                        Image(systemName: "exclamationmark.bubble")
-                            .imageScale(.medium)
-                    }
-                    .accessibilityLabel(AppLocalization.localized("Report station issue"))
-                }
 
-                if !facilities.isEmpty {
                     ForEach(facilities) { facility in
                         facilityRow(facility)
                     }
-                } else {
-                    Text(AppLocalization.localized("Official station facilities are pending for this station."))
-                        .font(.subheadline)
+
+                    Text(AppLocalization.localized("Official city data"))
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-
-                if !personalReports.isEmpty {
-                    Divider()
-                    Text(AppLocalization.localized("Your Reports"))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    ForEach(personalReports.prefix(3)) { report in
-                        Label("\(report.itemType.title): \(report.displayNote)", systemImage: "person.crop.circle.badge.exclamationmark")
-                            .font(.caption)
-                            .foregroundStyle(report.status.isProblem ? .orange : .secondary)
-                    }
-                }
-
-                Text(facilities.isEmpty ? AppLocalization.localized("Source pending") : AppLocalization.localized("Official city data"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -235,27 +185,25 @@ extension StationDetailView {
         }
     }
 
+    @ViewBuilder
     var stationMapSection: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Station Map"))
-                    .font(.headline)
+        if viewModel?.isLoadingCityPack == true || viewModel?.stationMap != nil || viewModel?.stationMapStatusMessage != nil {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(AppLocalization.localized("Station Map"))
+                        .font(.headline)
 
-                if viewModel?.isLoadingCityPack == true {
-                    ProgressView()
-                } else if let stationMap = viewModel?.stationMap {
-                    stationMapContent(stationMap)
-                } else {
-                    Text(AppLocalization.localized("Official 3D station map not collected yet"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                    if viewModel?.isLoadingCityPack == true {
+                        ProgressView()
+                    } else if let stationMap = viewModel?.stationMap {
+                        stationMapContent(stationMap)
+                    }
 
-                if let statusMessage = viewModel?.stationMapStatusMessage {
-                    Text(statusMessage)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let statusMessage = viewModel?.stationMapStatusMessage {
+                        Text(statusMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
@@ -391,55 +339,6 @@ extension StationDetailView {
         }
     }
 
-    var stationReportSheet: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Picker(AppLocalization.localized("Facility"), selection: $reportItemType) {
-                        ForEach(VerificationItemType.allCases.filter { $0 != .routeConcern }, id: \.self) { item in
-                            Text(item.title).tag(item)
-                        }
-                    }
-                    Picker(AppLocalization.localized("Status"), selection: $reportStatus) {
-                        ForEach(VerificationStatus.allCases.filter { $0 != .note }, id: \.self) { status in
-                            Text(status.title).tag(status)
-                        }
-                    }
-                    Picker(AppLocalization.localized("Severity"), selection: $reportSeverity) {
-                        ForEach(AccessibilityReportSeverity.allCases, id: \.self) { severity in
-                            Text(severity.title).tag(severity)
-                        }
-                    }
-                    TextEditor(text: $reportNote)
-                        .frame(minHeight: 120)
-                } header: {
-                    Text(AppLocalization.localized("Personal Station Report"))
-                } footer: {
-                    Text(AppLocalization.localized("This stays on your device and is not shown as official data."))
-                }
-            }
-            .navigationTitle(AppLocalization.localized("Report Station Issue"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(AppLocalization.localized("Cancel")) { showStationReport = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Save")) {
-                        accessibilityReportService.createStationReport(
-                            cityID: displayedStation.cityID,
-                            station: displayedStation,
-                            itemType: reportItemType,
-                            status: reportStatus,
-                            severity: reportSeverity,
-                            note: reportNote
-                        )
-                        showStationReport = false
-                    }
-                }
-            }
-        }
-    }
 }
 
 private extension Array where Element == StationFacility {

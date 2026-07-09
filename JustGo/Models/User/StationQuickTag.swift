@@ -1,8 +1,7 @@
 import Foundation
+import CoreLocation
 
-/// User-assigned place tag on a favorite station. Assigned only in Personal → My Stations;
-/// the route planner surfaces tagged favorites as one-tap fill chips but offers no set flow.
-enum FavoriteStationTag: Codable, Equatable, Hashable {
+enum StationQuickTagKind: Codable, Equatable, Hashable {
     case home
     case work
     case custom(String)
@@ -25,9 +24,25 @@ enum FavoriteStationTag: Codable, Equatable, Hashable {
         case .custom: return "tag.fill"
         }
     }
+
+    var isExclusive: Bool {
+        switch self {
+        case .home, .work:
+            return true
+        case .custom:
+            return false
+        }
+    }
+
+    var customLabel: String? {
+        if case .custom(let label) = self {
+            return label
+        }
+        return nil
+    }
 }
 
-struct FavoriteStation: Identifiable, Codable {
+struct StationQuickTag: Identifiable, Codable, Equatable {
     let id: String
     let stationID: String
     let name: String
@@ -43,10 +58,9 @@ struct FavoriteStation: Identifiable, Codable {
     let lineNamesEn: [String]?
     let lineIDs: [String]?
     let lineColorsHex: [String]?
-    // Optional so favorites persisted before tags existed decode as untagged.
-    var tag: FavoriteStationTag?
+    var kind: StationQuickTagKind
 
-    init(station: Station, cityName: String, cityNameEn: String? = nil) {
+    init(station: Station, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
         self.id = "\(station.cityID)|\(station.stationID)"
         self.stationID = station.stationID
         // Store the raw, stable source names — these are the keys the city-pack enrichment
@@ -62,14 +76,20 @@ struct FavoriteStation: Identifiable, Codable {
         self.lineNamesEn = station.lines.map { $0.nameEn ?? $0.name }
         self.lineIDs = station.lines.map(\.lineID)
         self.lineColorsHex = station.lines.map(\.colorHex)
-        self.tag = nil
+        self.kind = kind
     }
 
-    func withCityMetadata(cityName: String, cityNameEn: String?) -> FavoriteStation {
+    func withCityMetadata(cityName: String, cityNameEn: String?) -> StationQuickTag {
         var repaired = self
         repaired.cityName = cityName
         repaired.cityNameEn = cityNameEn
         return repaired
+    }
+
+    func withKind(_ kind: StationQuickTagKind) -> StationQuickTag {
+        var updated = self
+        updated.kind = kind
+        return updated
     }
 
     /// Station name localized for display, derived from the stored raw identifiers so the
@@ -113,5 +133,13 @@ struct FavoriteStation: Identifiable, Codable {
             )
         }
         return station
+    }
+
+    var transitPlace: TransitPlace {
+        TransitPlace(
+            name: displayName,
+            coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+            source: .quickPlace
+        )
     }
 }

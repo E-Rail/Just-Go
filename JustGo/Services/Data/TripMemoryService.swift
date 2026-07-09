@@ -6,20 +6,22 @@ final class TripMemoryService {
     private let userDefaults: UserDefaults
     private let savedTripsKey = "savedTrips"
     private let tripRecordsKey = "tripRecords"
-    private let favoriteStationsKey = "favoriteStations"
+    private let stationQuickTagsKey = "stationQuickTags"
+    private let obsoleteFavoriteStationsKey = "favoriteStations"
     private let maxSavedTrips = 50
     private let maxTripRecords = 300
-    private let maxFavoriteStations = 50
+    private let maxStationQuickTags = 50
 
     private(set) var savedTrips: [SavedTrip]
     private(set) var tripRecords: [TripRecord]
-    private(set) var favoriteStations: [FavoriteStation]
+    private(set) var stationQuickTags: [StationQuickTag]
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         savedTrips = userDefaults.codableValue(forKey: savedTripsKey, as: [SavedTrip].self, default: [])
         tripRecords = userDefaults.codableValue(forKey: tripRecordsKey, as: [TripRecord].self, default: [])
-        favoriteStations = userDefaults.codableValue(forKey: favoriteStationsKey, as: [FavoriteStation].self, default: [])
+        stationQuickTags = userDefaults.codableValue(forKey: stationQuickTagsKey, as: [StationQuickTag].self, default: [])
+        userDefaults.removeObject(forKey: obsoleteFavoriteStationsKey)
     }
 
     func createSavedTrip(
@@ -135,69 +137,61 @@ final class TripMemoryService {
         userDefaults.setCodable(tripRecords, forKey: tripRecordsKey)
     }
 
-    private func persistFavoriteStations() {
-        userDefaults.setCodable(favoriteStations, forKey: favoriteStationsKey)
+    private func persistStationQuickTags() {
+        userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
     }
 
-    func addFavorite(station: Station, cityName: String, cityNameEn: String? = nil) {
-        var favorite = FavoriteStation(station: station, cityName: cityName, cityNameEn: cityNameEn)
-        // Re-favoriting rebuilds the row from the station — keep the user's tag with it.
-        favorite.tag = favoriteStations.first { $0.id == favorite.id }?.tag
-        favoriteStations.removeAll { $0.id == favorite.id }
-        favoriteStations.insert(favorite, at: 0)
-        favoriteStations = Array(favoriteStations.prefix(maxFavoriteStations))
-        persistFavoriteStations()
-    }
-
-    func removeFavorite(id: String) {
-        favoriteStations.removeAll { $0.id == id }
-        persistFavoriteStations()
-    }
-
-    func setFavoriteTag(id: String, tag: FavoriteStationTag?) {
-        var updated = favoriteStations
-        var didChange = false
-        for (index, favorite) in updated.enumerated() {
-            if favorite.id == id {
-                guard favorite.tag != tag else { continue }
-                updated[index].tag = tag
-                didChange = true
-            } else if let tag, favorite.tag == tag {
-                // Home and Work are single places; assigning one to another station
-                // unassigns the previous holder. Custom tags may repeat.
-                switch tag {
-                case .home, .work:
-                    updated[index].tag = nil
-                    didChange = true
-                case .custom:
-                    break
-                }
-            }
+    func setQuickTag(station: Station, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
+        var quickTag = StationQuickTag(station: station, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
+        if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
+            quickTag = existing
+                .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
+                .withKind(kind)
         }
-        guard didChange else { return }
-        favoriteStations = updated
-        persistFavoriteStations()
+        stationQuickTags.removeAll { tag in
+            tag.id == quickTag.id || (kind.isExclusive && tag.kind == kind)
+        }
+        stationQuickTags.insert(quickTag, at: 0)
+        stationQuickTags = Array(stationQuickTags.prefix(maxStationQuickTags))
+        persistStationQuickTags()
     }
 
-    func isFavorite(stationID: String, cityID: String) -> Bool {
-        favoriteStations.contains { $0.stationID == stationID && $0.cityID == cityID }
+    func deleteQuickTag(id: String) {
+        stationQuickTags.removeAll { $0.id == id }
+        persistStationQuickTags()
     }
 
-    func repairFavoriteCityMetadata(cityLookup: (String) -> City?) {
-        // Assign the observed property only when a repair actually happened — this runs on
-        // every favorites-list appearance, and an unconditional reassign would fire
-        // observation churn each time.
-        var repaired = favoriteStations
+    func updateQuickTag(id: String, kind: StationQuickTagKind) {
+        guard let existing = stationQuickTags.first(where: { $0.id == id }) else { return }
+        let updatedTag = existing.withKind(kind)
+        var updated = stationQuickTags.filter { quickTag in
+            quickTag.id != id && !(kind.isExclusive && quickTag.kind == kind)
+        }
+        updated.insert(updatedTag, at: 0)
+        stationQuickTags = updated
+        persistStationQuickTags()
+    }
+
+    func quickTag(stationID: String, cityID: String) -> StationQuickTag? {
+        stationQuickTags.first { $0.stationID == stationID && $0.cityID == cityID }
+    }
+
+    func isQuickTagged(stationID: String, cityID: String) -> Bool {
+        quickTag(stationID: stationID, cityID: cityID) != nil
+    }
+
+    func repairQuickTagCityMetadata(cityLookup: (String) -> City?) {
+        var repaired = stationQuickTags
         var didRepair = false
-        for (index, favorite) in favoriteStations.enumerated() {
-            guard let city = cityLookup(favorite.cityID),
-                  favorite.cityName != city.name || favorite.cityNameEn != city.nameEn else { continue }
-            repaired[index] = favorite.withCityMetadata(cityName: city.name, cityNameEn: city.nameEn)
+        for (index, quickTag) in stationQuickTags.enumerated() {
+            guard let city = cityLookup(quickTag.cityID),
+                  quickTag.cityName != city.name || quickTag.cityNameEn != city.nameEn else { continue }
+            repaired[index] = quickTag.withCityMetadata(cityName: city.name, cityNameEn: city.nameEn)
             didRepair = true
         }
         if didRepair {
-            favoriteStations = repaired
-            persistFavoriteStations()
+            stationQuickTags = repaired
+            persistStationQuickTags()
         }
     }
 }

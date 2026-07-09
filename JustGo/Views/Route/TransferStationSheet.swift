@@ -7,6 +7,7 @@ struct TransferStationSheet: View {
     let nextTransitSegment: RouteSegment?
     let cityID: String
     let crowdControl: RouteCrowdControl
+    let accessibilityFilter: AccessibilityFilter
 
     @Environment(DIContainer.self) private var container
     @State private var enrichedStation: Station?
@@ -14,6 +15,9 @@ struct TransferStationSheet: View {
     @State private var lookAroundScene: MKLookAroundScene?
     @State private var guidance: StationAccessGuidance?
     @State private var stationMap: CityPackStationMap?
+    @State private var indoorMap: StationIndoorMap?
+    @State private var transferPath: TransferPathHint?
+    @State private var doorGuidance: DoorGuidance?
     @State private var fullScreenImage: FullScreenStationImage?
 
     private var stationName: String {
@@ -38,8 +42,8 @@ struct TransferStationSheet: View {
             VStack(alignment: .leading, spacing: 16) {
                 headerSection
                 rideSection
-                transferGuideSection
                 stationMapSection
+                transferGuideSection
                 accessibilitySection
                 if !crowdWindows.isEmpty {
                     crowdControlSection
@@ -86,6 +90,19 @@ struct TransferStationSheet: View {
                     cityID: cityID
                 )
                 stationMap = await container.officialStationData.stationMap(for: mapLookupStation)
+                indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
+                transferPath = await container.officialStationData.transferPath(
+                    for: mapLookupStation,
+                    fromLineName: transferSegment.lineName,
+                    toLineName: nextTransitSegment?.lineName,
+                    accessibilityFilter: accessibilityFilter
+                )
+                doorGuidance = await container.officialStationData.doorGuidance(
+                    for: mapLookupStation,
+                    lineName: nextTransitSegment?.lineName,
+                    directionText: nextTransitSegment?.toStationName,
+                    target: .transfer
+                )
             }
             // Street view keys off the route's own coordinate first so it still works when the
             // official pack doesn't list this station (matchingStation returned nil above).
@@ -216,17 +233,101 @@ struct TransferStationSheet: View {
                         ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
                             platformHintRow(hint)
                         }
-                    } else {
-                        Text(AppLocalization.text(
-                            english: "Boarding car and door guidance is not collected for this station yet.",
-                            simplified: "本站的车厢/车门位置指引尚未收录。",
-                            traditional: "本站的車廂/車門位置指引尚未收錄。"
-                        ))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
                     }
+
+                    Divider()
+                    indoorGuidanceStatus
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var indoorGuidanceStatus: some View {
+        if let transferPath {
+            corridorPathRow(transferPath)
+        } else if let doorGuidance {
+            doorGuidanceRow(doorGuidance)
+        } else {
+            Label {
+                Text(AppLocalization.text(
+                    english: "Verified 3D indoor path, car, and door guidance is not collected for this station yet.",
+                    simplified: "本站尚未收录经验证的 3D 站内路径、车厢和车门指引。",
+                    traditional: "本站尚未收錄經驗證的 3D 站內路徑、車廂和車門指引。"
+                ))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            } icon: {
+                Image(systemName: "cube.transparent")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func corridorPathRow(_ path: TransferPathHint) -> some View {
+        var parts: [String] = []
+        if let meters = path.walkingMeters {
+            parts.append(AppLocalization.text(
+                english: "about \(Int(meters)) m",
+                simplified: "约\(Int(meters))米",
+                traditional: "約\(Int(meters))米"
+            ))
+        }
+        if let minutes = path.walkingMinutes {
+            parts.append(AppLocalization.minutes(Int(minutes.rounded())))
+        }
+        return Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(parts.isEmpty ? AppLocalization.text(english: "Verified indoor transfer path", simplified: "经验证的站内换乘路径", traditional: "經驗證的站內轉乘路徑") : parts.joined(separator: " · "))
+                    .font(.caption)
+                if path.routeNodeIDs.count > 1 {
+                    Text(AppLocalization.text(
+                        english: "Path highlighted on the station map above.",
+                        simplified: "路径已在上方站内图中标出。",
+                        traditional: "路徑已在上方站內圖中標出。"
+                    ))
+                    .font(.caption2)
+                    .foregroundStyle(Color.accentColor)
+                }
+                ForEach(path.notes, id: \.self) { note in
+                    Text(note)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } icon: {
+            Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
+                .font(.caption)
+                .foregroundStyle(Color.accentColor)
+        }
+    }
+
+    private func doorGuidanceRow(_ guidance: DoorGuidance) -> some View {
+        let cars = guidance.recommendedCars
+            .map { AppLocalization.text(english: "Car \($0)", simplified: "\($0)车", traditional: "\($0)車") }
+            .joined(separator: " · ")
+        let parts = [
+            cars.isEmpty ? nil : cars,
+            guidance.recommendedDoorText?.nilIfEmpty
+        ].compactMap { $0 }
+        return Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(parts.isEmpty
+                    ? AppLocalization.text(english: "Verified door guidance", simplified: "经验证的车门指引", traditional: "經驗證的車門指引")
+                    : parts.joined(separator: " · ")
+                )
+                    .font(.caption)
+                ForEach(guidance.notes, id: \.self) { note in
+                    Text(note)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } icon: {
+            Image(systemName: "tram.fill")
+                .font(.caption)
+                .foregroundStyle(Color.accentColor)
         }
     }
 
@@ -290,7 +391,7 @@ struct TransferStationSheet: View {
         }
     }
 
-    /// Official in-station (3D) map when the pack collected one; tap for full screen.
+    /// Official in-station map when the pack collected one; tap for full screen.
     @ViewBuilder
     private var stationMapSection: some View {
         if let stationMap, stationMap.isImage, let url = stationMap.resolvedURL {
@@ -311,6 +412,7 @@ struct TransferStationSheet: View {
                                 image
                                     .resizable()
                                     .scaledToFit()
+                                    .overlay(indoorPathOverlay)
                                     .frame(maxWidth: .infinity)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
@@ -334,6 +436,57 @@ struct TransferStationSheet: View {
                     .foregroundStyle(.secondary)
                 }
             }
+        } else if indoorMap == nil {
+            GlassCard {
+                Label {
+                    Text(AppLocalization.text(
+                        english: "Official station map is not collected yet.",
+                        simplified: "官方站内图尚未收录。",
+                        traditional: "官方站內圖尚未收錄。"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "map")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    /// Draws `transferPath`'s route directly on the station image above. Chained right after
+    /// `.scaledToFit()` (before the outer `.frame`/`.clipShape`), so this overlay's own layout
+    /// size exactly matches the image's letterboxed content rect — no manual aspect-ratio math
+    /// needed. Node coordinates are fractional (0...1) of that same rect (see `IndoorCoordinate`).
+    @ViewBuilder
+    private var indoorPathOverlay: some View {
+        if let indoorMap, let transferPath, transferPath.routeNodeIDs.count > 1 {
+            let nodesByID = Dictionary(uniqueKeysWithValues: indoorMap.nodes.map { ($0.id, $0) })
+            let points = transferPath.routeNodeIDs.compactMap { nodesByID[$0]?.coordinate }
+            Canvas { context, size in
+                guard points.count > 1 else { return }
+                let resolved = points.map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
+
+                var path = Path()
+                path.addLines(resolved)
+                context.stroke(
+                    path,
+                    with: .color(.accentColor),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                )
+
+                if let start = resolved.first {
+                    let dot = CGRect(x: start.x - 6, y: start.y - 6, width: 12, height: 12)
+                    context.fill(Path(ellipseIn: dot), with: .color(.accentColor))
+                    context.stroke(Path(ellipseIn: dot), with: .color(.white), lineWidth: 2)
+                }
+                if let end = resolved.last {
+                    let marker = CGRect(x: end.x - 8, y: end.y - 8, width: 16, height: 16)
+                    context.fill(Path(ellipseIn: marker), with: .color(.green))
+                    context.stroke(Path(ellipseIn: marker), with: .color(.white), lineWidth: 2)
+                }
+            }
+            .allowsHitTesting(false)
         }
     }
 
@@ -443,5 +596,11 @@ struct TransferStationSheet: View {
                 .foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }

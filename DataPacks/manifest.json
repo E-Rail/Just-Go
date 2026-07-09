@@ -6,8 +6,8 @@
     {
       "cityID": "1100",
       "version": "beijing-official-20260527",
-      "sizeBytes": 1105155,
-      "sha256": "fe9f719a3dfe8da0fef4d1d9bd2cfdae722fe5922c9143c129ec424c52f2562a",
+      "sizeBytes": 1111731,
+      "sha256": "4e86970267a4c913f7e85605604258bc62f41de71feea076b58738cb1007020d",
       "downloadURL": "packs/1100/beijing-official-20260527/city_pack.json",
       "sourceURLs": [
         "https://www.bjsubway.com/station/wzass/",

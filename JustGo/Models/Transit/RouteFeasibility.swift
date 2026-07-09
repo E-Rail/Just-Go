@@ -5,7 +5,7 @@ struct RouteFeasibility: Equatable {
     let title: String
     let reasons: [String]
     let unknowns: [String]
-    let personalReports: [LocalAccessibilityReport]
+    let aiReportInsights: [AIReportInsight]
     let bottleneck: RouteBottleneck?
     let estimatedExtraMinutes: Int
 

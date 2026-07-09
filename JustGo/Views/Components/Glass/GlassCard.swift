@@ -10,8 +10,12 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
+            .padding(14)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 10))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(Color.secondary.opacity(0.12), lineWidth: 0.5)
+            }
+            .shadow(color: .black.opacity(0.035), radius: 4, y: 1)
     }
 }

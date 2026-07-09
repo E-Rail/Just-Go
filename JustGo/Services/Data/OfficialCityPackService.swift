@@ -77,6 +77,21 @@ protocol OfficialStationDataProviding {
     /// keyed by the original station name passed in. Official when authored in the pack,
     /// otherwise text-extracted at `.estimated` confidence, otherwise `.empty`/`.unavailable`.
     func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance]
+    func indoorMap(for station: Station) async -> StationIndoorMap?
+    /// `station` (not just an ID) because pack records are looked up by name — city packs
+    /// don't carry a `stationID` that lines up with the app's bundled station identifiers.
+    func transferPath(
+        for station: Station,
+        fromLineName: String?,
+        toLineName: String?,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> TransferPathHint?
+    func doorGuidance(
+        for station: Station,
+        lineName: String?,
+        directionText: String?,
+        target: DoorGuidanceTarget
+    ) async -> DoorGuidance?
 }
 
 actor OfficialCityPackService: OfficialStationDataProviding {
@@ -410,6 +425,64 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return result
     }
 
+    func indoorMap(for station: Station) async -> StationIndoorMap? {
+        _ = await loadCityPack(for: station.cityID)
+        return stationRecord(cityID: station.cityID, stationName: station.name)?.indoorMap
+    }
+
+    func transferPath(
+        for station: Station,
+        fromLineName: String?,
+        toLineName: String?,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> TransferPathHint? {
+        guard let fromLineName, let toLineName,
+              let indoorMap = await indoorMap(for: station) else { return nil }
+
+        let fromNodes = indoorMap.nodes(kind: .platform, matchingLineName: fromLineName)
+        let toNodes = indoorMap.nodes(kind: .platform, matchingLineName: toLineName)
+        guard !fromNodes.isEmpty, !toNodes.isEmpty else { return nil }
+        let fromIDs = fromNodes.map(\.id)
+        let toIDs = toNodes.map(\.id)
+
+        let requiresStepFree = accessibilityFilter.requiresWheelchairAccess
+            || accessibilityFilter.requiresElevator
+            || accessibilityFilter.avoidStairs
+
+        let stepFreeResult = indoorMap.shortestPath(from: fromIDs, to: toIDs, stepFreeOnly: true)
+        let generalResult = requiresStepFree ? stepFreeResult : indoorMap.shortestPath(from: fromIDs, to: toIDs, stepFreeOnly: false)
+        guard let primary = generalResult ?? stepFreeResult else { return nil }
+
+        // Surface a step-free alternative only when the primary route isn't already one.
+        let alternative = (stepFreeResult?.nodeIDs == primary.nodeIDs) ? nil : stepFreeResult
+
+        return TransferPathHint(
+            stationID: station.stationID,
+            fromLineName: fromLineName,
+            fromPlatformID: fromIDs.first,
+            toLineName: toLineName,
+            toPlatformID: toIDs.first,
+            routeNodeIDs: primary.nodeIDs,
+            walkingMeters: primary.meters,
+            walkingMinutes: primary.minutes,
+            stepFreeAlternativeNodeIDs: alternative?.nodeIDs ?? [],
+            notes: [],
+            confidence: .communityVerified
+        )
+    }
+
+    /// No bundled or city-pack asset anywhere carries boarding-car/door alignment — the
+    /// official station diagrams this app traces (`indoorMap`) don't show it either, so
+    /// there is nothing honest to derive it from yet. Stays nil rather than guessing.
+    func doorGuidance(
+        for station: Station,
+        lineName: String?,
+        directionText: String?,
+        target: DoorGuidanceTarget
+    ) async -> DoorGuidance? {
+        nil
+    }
+
     /// Best-effort exit/entrance extraction from accessibility free text (`.estimated` confidence).
     /// Surfaces letter/number tokens that precede a 口 / 出口 / 出入口 marker, e.g. "A口 C口" or
     /// "A、C口直梯" → exits A, C. Marks a point accessible when it also appears in the station's
@@ -610,10 +683,15 @@ private struct OfficialStation: Decodable {
     let stationAccessPoints: [OfficialAccessPoint]?
     let platformHints: [OfficialPlatformHint]?
     let interchangeHints: [OfficialInterchangeHint]?
+    // Hand-traced indoor node graph (present only for a small pilot set of stations today —
+    // see Scripts/validate_indoor_maps.rb). `StationIndoorMap` is already Codable so this
+    // decodes straight through.
+    let indoorMap: StationIndoorMap?
 
     enum CodingKeys: String, CodingKey {
         case stationName, stationID, accessibility, schedules, stationMaps, stationAssets,
-             stationFacilities, serviceStatus, stationAccessPoints, platformHints, interchangeHints
+             stationFacilities, serviceStatus, stationAccessPoints, platformHints, interchangeHints,
+             indoorMap
     }
 
     init(from decoder: Decoder) throws {
@@ -629,6 +707,7 @@ private struct OfficialStation: Decodable {
         stationAccessPoints = try values.decodeIfPresent([OfficialAccessPoint].self, forKey: .stationAccessPoints)
         platformHints = try values.decodeIfPresent([OfficialPlatformHint].self, forKey: .platformHints)
         interchangeHints = try values.decodeIfPresent([OfficialInterchangeHint].self, forKey: .interchangeHints)
+        indoorMap = try values.decodeIfPresent(StationIndoorMap.self, forKey: .indoorMap)
     }
 
     func facilities(for stationID: String) -> [StationFacility] {

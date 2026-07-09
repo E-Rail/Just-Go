@@ -6,9 +6,8 @@ struct ProfileView: View {
     @State private var showAccessibilitySettings = false
     @State private var showTransitData = false
     @State private var showTripMemory = false
-    @State private var showReports = false
     @State private var showSettings = false
-    @State private var showFavoriteStations = false
+    @State private var showQuickTags = false
 
     var body: some View {
         NavigationStack {
@@ -32,14 +31,11 @@ struct ProfileView: View {
             .sheet(isPresented: $showTripMemory) {
                 TripMemoryView()
             }
-            .sheet(isPresented: $showReports) {
-                AccessibilityReportsView()
-            }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
-            .sheet(isPresented: $showFavoriteStations) {
-                FavoriteStationsView()
+            .sheet(isPresented: $showQuickTags) {
+                QuickTagsView()
             }
         }
     }
@@ -100,14 +96,14 @@ struct ProfileView: View {
 
     private var riderTrustSection: some View {
         Section {
-            Button(action: { showFavoriteStations = true }) {
+            Button(action: { showQuickTags = true }) {
                 HStack {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(.yellow)
-                    Text(AppLocalization.localized("My Stations"))
+                    Image(systemName: "tag.fill")
+                        .foregroundStyle(Color.accentColor)
+                    Text(AppLocalization.localized("Quick Tags"))
                     Spacer()
-                    if !tripMemoryService.favoriteStations.isEmpty {
-                        Text("\(tripMemoryService.favoriteStations.count)")
+                    if !tripMemoryService.stationQuickTags.isEmpty {
+                        Text("\(tripMemoryService.stationQuickTags.count)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -129,21 +125,10 @@ struct ProfileView: View {
                 }
             }
 
-            Button(action: { showReports = true }) {
-                HStack {
-                    Image(systemName: "person.crop.circle.badge.exclamationmark")
-                        .foregroundStyle(.orange)
-                    Text(AppLocalization.localized("My Reports"))
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
         } header: {
             Text(AppLocalization.localized("My Activity"))
         } footer: {
-            Text(AppLocalization.localized("Saved trips, history, reports, and favorite stations stay on this device."))
+            Text(AppLocalization.localized("Saved trips, history, and quick tags stay on this device."))
         }
     }
 

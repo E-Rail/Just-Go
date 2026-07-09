@@ -3,7 +3,6 @@ import SwiftUI
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
     @Environment(DIContainer.self) private var container
-    @Environment(AccessibilityReportService.self) private var accessibilityReportService
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var selectedRouteID: UUID?
     @State private var showRouteDetail = false
@@ -111,11 +110,11 @@ struct RouteResultsView: View {
 
     private var sortOptionsSection: some View {
         Section {
-            if viewModel.tripAnchor.isExplicit {
-                activeTimeChip
-            }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
+                    if viewModel.tripAnchor.isExplicit {
+                        activeTimeChip
+                    }
                     ForEach(RoutePreference.primary) { strategy in
                         SortChip(
                             title: strategy.title,
@@ -190,8 +189,8 @@ struct RouteResultsView: View {
             )
             showRouteDetail = true
         } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(AppLocalization.text(
                         english: "Route \(metrics.rank)",
                         simplified: "路线 \(metrics.rank)",
@@ -208,32 +207,32 @@ struct RouteResultsView: View {
                     }
                     Spacer()
                     Text(metrics.durationText)
-                        .font(.subheadline)
+                        .font(.title3)
                         .fontWeight(.bold)
+                        .monospacedDigit()
                 }
-                HStack(spacing: 10) {
-                    Label(metrics.walkingText, systemImage: "figure.walk")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Label(metrics.transferEffort, systemImage: "arrow.triangle.2.circlepath")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        resultMetricChip(metrics.walkingText, icon: "figure.walk")
+                        resultMetricChip(metrics.transferEffort, icon: "arrow.triangle.2.circlepath")
+                        DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
+                        Text(metrics.bestForReason)
+                            .font(.caption2)
+                            .fontWeight(.medium)
+                            .lineLimit(1)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.accentColor.opacity(0.12), in: Capsule())
+                            .foregroundStyle(Color.accentColor)
+                    }
                 }
-                Text(AppLocalization.text(
-                    english: "Best for: \(metrics.bestForReason)",
-                    simplified: "适合：\(metrics.bestForReason)",
-                    traditional: "適合：\(metrics.bestForReason)"
-                ))
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 10))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 10)
                     .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
             )
         }
@@ -241,6 +240,16 @@ struct RouteResultsView: View {
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+    }
+
+    private func resultMetricChip(_ text: String, icon: String) -> some View {
+        Label(text, systemImage: icon)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color(.systemGray6), in: Capsule())
     }
 
     private func comparisonMetrics(for route: Route, rank: Int) -> RouteComparisonMetrics {

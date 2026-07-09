@@ -5,17 +5,14 @@ struct StationDetailView: View {
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @Environment(AccessibilityReportService.self) var accessibilityReportService
     @State var viewModel: StationDetailViewModel?
     @State var selectedStationImage: FullScreenStationImage?
-    @State var showStationReport = false
-    @State var reportItemType: VerificationItemType = .elevator
-    @State var reportStatus: VerificationStatus = .outOfService
-    @State var reportSeverity: AccessibilityReportSeverity = .medium
-    @State var reportNote = ""
+    @State var showQuickTagDialog = false
+    @State var showCustomQuickTagAlert = false
+    @State var customQuickTagText = ""
 
-    private var isFavorited: Bool {
-        tripMemoryService.isFavorite(stationID: displayedStation.stationID, cityID: displayedStation.cityID)
+    private var currentQuickTag: StationQuickTag? {
+        tripMemoryService.quickTag(stationID: displayedStation.stationID, cityID: displayedStation.cityID)
     }
 
     var body: some View {
@@ -40,24 +37,14 @@ struct StationDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    let s = displayedStation
-                    if isFavorited {
-                        tripMemoryService.removeFavorite(id: "\(s.cityID)|\(s.stationID)")
-                    } else {
-                        let city = container.cityService.getCity(byID: s.cityID)
-                        tripMemoryService.addFavorite(
-                            station: s,
-                            cityName: city?.name ?? s.cityID,
-                            cityNameEn: city?.nameEn
-                        )
-                    }
+                    showQuickTagDialog = true
                 } label: {
-                    Image(systemName: isFavorited ? "star.fill" : "star")
-                        .foregroundStyle(isFavorited ? .yellow : .primary)
+                    Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
+                        .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
                 }
-                .accessibilityLabel(isFavorited
-                    ? AppLocalization.localized("Remove from favorites")
-                    : AppLocalization.localized("Add to favorites")
+                .accessibilityLabel(currentQuickTag == nil
+                    ? AppLocalization.localized("Add Quick Tag")
+                    : AppLocalization.localized("Edit Quick Tag")
                 )
             }
         }
@@ -70,9 +57,15 @@ struct StationDetailView: View {
         .fullScreenCover(item: $selectedStationImage) { image in
             FullScreenStationImageView(image: image)
         }
-        .sheet(isPresented: $showStationReport) {
-            stationReportSheet
-        }
+        .quickTagEditor(
+            isPresented: $showQuickTagDialog,
+            showCustom: $showCustomQuickTagAlert,
+            customText: $customQuickTagText,
+            station: displayedStation,
+            currentQuickTag: currentQuickTag,
+            container: container,
+            tripMemoryService: tripMemoryService
+        )
     }
 
     var displayedStation: Station {
@@ -82,67 +75,84 @@ struct StationDetailView: View {
     private var beforeYouGoSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Before You Go"))
-                    .font(.headline)
-
-                Text(AppLocalization.localized("Best data available"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                confidenceRow(
-                    title: AppLocalization.localized("Schedule"),
-                    confidence: viewModel?.scheduleConfidence ?? .unknown,
-                    icon: "clock"
-                )
-                confidenceRow(
-                    title: AppLocalization.localized("Station Map"),
-                    confidence: viewModel?.stationMapConfidence ?? .unknown,
-                    icon: "map"
-                )
-                confidenceRow(
-                    title: AppLocalization.localized("Accessibility"),
-                    confidence: viewModel?.accessibilityConfidence ?? .unknown,
-                    icon: "accessibility"
-                )
-                confidenceRow(
-                    title: AppLocalization.localized("Live arrivals"),
-                    confidence: viewModel?.liveArrivalConfidence ?? .unknown,
-                    icon: "wave.3.right"
-                )
-
-                if displayedStation.isTransferStation {
-                    Label(AppLocalization.localized("Transfer station"), systemImage: "arrow.triangle.2.circlepath")
-                        .font(.caption)
-                }
-                if !displayedStation.facilities.isEmpty {
-                    Label(AppLocalization.localized("Station essentials available"), systemImage: "info.circle.fill")
-                        .font(.caption)
-                }
-                if viewModel?.arrivals.isEmpty == false {
-                    Label(AppLocalization.localized("First and last train information available"), systemImage: "clock.fill")
-                        .font(.caption)
+                HStack {
+                    Text(AppLocalization.localized("Before You Go"))
+                        .font(.headline)
+                    Spacer()
+                    Text(AppLocalization.localized("Best data available"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
 
-                Text(AppLocalization.localized("JustGo shows what is known before you enter the station."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 124), spacing: 8)], alignment: .leading, spacing: 8) {
+                    confidenceChip(
+                        title: AppLocalization.localized("Schedule"),
+                        confidence: viewModel?.scheduleConfidence ?? .unknown,
+                        icon: "clock"
+                    )
+                    confidenceChip(
+                        title: AppLocalization.localized("Station Map"),
+                        confidence: viewModel?.stationMapConfidence ?? .unknown,
+                        icon: "map"
+                    )
+                    confidenceChip(
+                        title: AppLocalization.localized("Accessibility"),
+                        confidence: viewModel?.accessibilityConfidence ?? .unknown,
+                        icon: "accessibility"
+                    )
+                    confidenceChip(
+                        title: AppLocalization.localized("Live arrivals"),
+                        confidence: viewModel?.liveArrivalConfidence ?? .unknown,
+                        icon: "wave.3.right"
+                    )
+                }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        if displayedStation.isTransferStation {
+                            stationFactChip(AppLocalization.localized("Transfer station"), icon: "arrow.triangle.2.circlepath", tint: .orange)
+                        }
+                        if !displayedStation.facilities.isEmpty {
+                            stationFactChip(AppLocalization.localized("Station essentials available"), icon: "info.circle.fill", tint: .blue)
+                        }
+                        if viewModel?.arrivals.isEmpty == false {
+                            stationFactChip(AppLocalization.localized("First and last train information available"), icon: "clock.fill", tint: .green)
+                        }
+                    }
+                }
             }
         }
     }
 
-    private func confidenceRow(title: String, confidence: DataConfidence, icon: String) -> some View {
-        Label {
-            HStack {
-                Text(title)
-                Spacer()
-                Text(confidence.label)
-                    .foregroundStyle(.secondary)
-            }
-        } icon: {
+    private func confidenceChip(title: String, confidence: DataConfidence, icon: String) -> some View {
+        HStack(spacing: 6) {
             Image(systemName: icon)
                 .foregroundStyle(confidence.color)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text(confidence.label)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
         }
-        .font(.subheadline)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(confidence.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func stationFactChip(_ title: String, icon: String, tint: Color) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption2)
+            .fontWeight(.medium)
+            .foregroundStyle(tint)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(tint.opacity(0.12), in: Capsule())
     }
 
     private var stationHeader: some View {
@@ -206,22 +216,99 @@ struct StationDetailView: View {
                 Text(AppLocalization.localized("Lines"))
                     .font(.headline)
 
-                ForEach(station.uniqueLogicalLines) { line in
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(Color(hex: line.colorHex))
-                            .frame(width: 12, height: 12)
-                        Text(line.localizedName)
-                            .font(.body)
-                        if let alternateName = line.alternateLocalizedName {
-                            Text(alternateName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 8)], alignment: .leading, spacing: 8) {
+                    ForEach(station.uniqueLogicalLines) { line in
+                        HStack(spacing: 7) {
+                            Circle()
+                                .fill(Color(hex: line.colorHex))
+                                .frame(width: 10, height: 10)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(line.localizedName)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .lineLimit(1)
+                                if let alternateName = line.alternateLocalizedName {
+                                    Text(alternateName)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                            }
+                            Spacer(minLength: 0)
                         }
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 7)
+                        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
             }
         }
+    }
+}
+
+private extension View {
+    func quickTagEditor(
+        isPresented: Binding<Bool>,
+        showCustom: Binding<Bool>,
+        customText: Binding<String>,
+        station: Station,
+        currentQuickTag: StationQuickTag?,
+        container: DIContainer,
+        tripMemoryService: TripMemoryService
+    ) -> some View {
+        confirmationDialog(
+            station.localizedName,
+            isPresented: isPresented,
+            titleVisibility: .visible
+        ) {
+            Button(StationQuickTagKind.home.title) {
+                saveQuickTag(.home, station: station, container: container, tripMemoryService: tripMemoryService)
+            }
+            Button(StationQuickTagKind.work.title) {
+                saveQuickTag(.work, station: station, container: container, tripMemoryService: tripMemoryService)
+            }
+            Button(AppLocalization.text(english: "Custom…", simplified: "自定义…", traditional: "自訂…")) {
+                customText.wrappedValue = currentQuickTag?.kind.customLabel ?? ""
+                showCustom.wrappedValue = true
+            }
+            if let currentQuickTag {
+                Button(AppLocalization.localized("Delete Quick Tag"), role: .destructive) {
+                    tripMemoryService.deleteQuickTag(id: currentQuickTag.id)
+                }
+            }
+        } message: {
+            Text(AppLocalization.localized("Quick Tags appear as one-tap chips in Route Planner."))
+        }
+        .alert(
+            AppLocalization.text(english: "Custom Tag", simplified: "自定义标签", traditional: "自訂標籤"),
+            isPresented: showCustom
+        ) {
+            TextField(
+                AppLocalization.text(english: "Tag name", simplified: "标签名称", traditional: "標籤名稱"),
+                text: customText
+            )
+            Button(AppLocalization.localized("Save")) {
+                let label = customText.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !label.isEmpty else { return }
+                saveQuickTag(.custom(label), station: station, container: container, tripMemoryService: tripMemoryService)
+            }
+            Button(AppLocalization.localized("Cancel"), role: .cancel) {}
+        }
+    }
+
+    func saveQuickTag(
+        _ kind: StationQuickTagKind,
+        station: Station,
+        container: DIContainer,
+        tripMemoryService: TripMemoryService
+    ) {
+        let city = container.cityService.getCity(byID: station.cityID)
+        tripMemoryService.setQuickTag(
+            station: station,
+            cityName: city?.name ?? station.cityID,
+            cityNameEn: city?.nameEn,
+            kind: kind
+        )
     }
 }
 

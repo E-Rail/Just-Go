@@ -301,6 +301,12 @@ struct RouteSegment: Identifiable, Codable {
     let polylineCoordinates: [CodableCoordinate]
     let walkingDirections: [WalkingStep]?
     let accessibilityNotes: [String]
+    /// The line the rider was just riding, for `.transfer` segments only — `lineName` on a
+    /// transfer segment is the *outgoing* line (correct for "Transfer to X" display text), so
+    /// resolving a real indoor path needs this separate field for where they're coming from.
+    /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
+    var incomingLineName: String? = nil
+    var incomingLineColorHex: String? = nil
 
     var formattedDuration: String {
         let minutes = Int(duration / 60)

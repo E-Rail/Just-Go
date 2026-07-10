@@ -105,7 +105,7 @@ struct TransferStationSheet: View {
                 indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
                 transferPath = await container.officialStationData.transferPath(
                     for: mapLookupStation,
-                    fromLineName: transferSegment.lineName,
+                    fromLineName: transferSegment.incomingLineName ?? transferSegment.lineName,
                     toLineName: nextTransitSegment?.lineName,
                     accessibilityFilter: accessibilityFilter
                 )

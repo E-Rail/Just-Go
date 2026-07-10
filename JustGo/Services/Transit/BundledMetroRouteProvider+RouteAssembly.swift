@@ -83,6 +83,10 @@ extension BundledMetroRouteProvider {
                 continue
             }
             if index > 0 {
+                // `lineName` below is the outgoing line (correct for "Transfer to X" display
+                // text) — the incoming line, for resolving a real indoor transfer path, is the
+                // *previous* group's line, only available here, not reconstructable later.
+                let previousLine = groups[index - 1].last.flatMap { graph.linesByID[$0.lineID] }
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .transfer,
@@ -98,7 +102,9 @@ extension BundledMetroRouteProvider {
                     stationStops: [],
                     polylineCoordinates: [],
                     walkingDirections: nil,
-                    accessibilityNotes: []
+                    accessibilityNotes: [],
+                    incomingLineName: previousLine?.name,
+                    incomingLineColorHex: previousLine?.colorHex
                 ))
             }
             let stationIDs = [first.fromStationID] + group.map(\.toStationID)

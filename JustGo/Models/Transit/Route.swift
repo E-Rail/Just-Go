@@ -285,6 +285,27 @@ enum RouteStrategy: String, Codable, CaseIterable {
     }
 }
 
+struct TransitLegContext: Codable, Equatable {
+    let lineID: String
+    let lineName: String
+    let boardingStationID: String
+    let alightingStationID: String
+    let directionNextStationID: String?
+    let directionNextStationName: String?
+    let arrivalPreviousStationID: String?
+    let arrivalPreviousStationName: String?
+    let directionTerminalStationID: String?
+    let directionTerminalStationName: String?
+}
+
+struct TransferContext: Codable, Equatable {
+    let cityID: String
+    let stationID: String
+    let stationName: String
+    let incoming: TransitLegContext
+    let outgoing: TransitLegContext
+}
+
 struct RouteSegment: Identifiable, Codable {
     let id: UUID
     let type: SegmentType
@@ -301,6 +322,8 @@ struct RouteSegment: Identifiable, Codable {
     let polylineCoordinates: [CodableCoordinate]
     let walkingDirections: [WalkingStep]?
     let accessibilityNotes: [String]
+    var transitContext: TransitLegContext? = nil
+    var transferContext: TransferContext? = nil
     /// The line the rider was just riding, for `.transfer` segments only — `lineName` on a
     /// transfer segment is the *outgoing* line (correct for "Transfer to X" display text), so
     /// resolving a real indoor path needs this separate field for where they're coming from.
@@ -396,6 +419,7 @@ struct RouteStationStop: Identifiable, Codable {
     let coordinate: CodableCoordinate?
     let arrivalTimeText: String?
     let isTransfer: Bool
+    var lineID: String? = nil
 
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"

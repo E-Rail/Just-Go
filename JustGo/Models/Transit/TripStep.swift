@@ -35,6 +35,7 @@ struct TripStep: Identifiable, Equatable {
     /// Index of the `Route.segments` entry this step came from (nil for the synthetic
     /// `.arrive` step) — lets the live map frame the step's real geometry.
     var segmentIndex: Int? = nil
+    var transferContext: TransferContext? = nil
 
     var transferCLCoordinate: CLLocationCoordinate2D? {
         transferCoordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }

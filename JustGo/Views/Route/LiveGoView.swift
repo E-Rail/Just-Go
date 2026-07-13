@@ -41,12 +41,34 @@ final class LiveGoViewModel {
     }
 }
 
+private struct LiveIndoorPathGuidance {
+    let stationTitle: String
+    let mapImageURL: URL?
+    let indoorMap: StationIndoorMap
+    let routeNodeIDs: [String]
+    let routeEdgeIDs: [String]
+    let destinationLineName: String?
+    let transferContext: TransferContext?
+}
+
+private struct LiveTransferGuidance {
+    let stepID: Int
+    let indoorPath: LiveIndoorPathGuidance?
+    let boardingZoneGuidance: IndoorBoardingZoneGuidance?
+}
+
+private struct LiveTransferGuidanceRequest: Hashable {
+    let routeID: UUID
+    let stepID: Int
+}
+
 /// Map-first, accessibility-first step-by-step trip companion: a full-screen interactive
 /// map (pan/zoom, user-location puck, follow-me button) with the whole route drawn on it,
 /// a compact instruction panel at the bottom, and off-route re-planning while walking.
 struct LiveGoView: View {
     @State private var viewModel: LiveGoViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
     @AppStorage("arrivalAlertLeadMinutes") private var arrivalAlertLeadMinutes = 2
@@ -70,6 +92,9 @@ struct LiveGoView: View {
     @State private var lastRerouteAt = Date.distantPast
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
+    // Transfer guidance is loaded lazily only while its transfer step is current.
+    @State private var transferGuidance: LiveTransferGuidance?
+    @State private var completedIndoorTransferStepIDs: Set<Int> = []
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
@@ -79,10 +104,17 @@ struct LiveGoView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
-                liveMap
-                    .ignoresSafeArea(edges: .bottom)
-                instructionPanel
+            Group {
+                if let activeTransferGuidance,
+                   let indoorPath = activeTransferGuidance.indoorPath {
+                    embeddedIndoorGuidance(indoorPath, transferGuidance: activeTransferGuidance)
+                } else {
+                    ZStack(alignment: .bottom) {
+                        liveMap
+                            .ignoresSafeArea(edges: .bottom)
+                        instructionPanel
+                    }
+                }
             }
             .overlay(alignment: .top) {
                 VStack(spacing: 8) {
@@ -108,7 +140,10 @@ struct LiveGoView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationTitle(AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發"))
+            .navigationTitle(
+                activeTransferGuidance?.indoorPath?.stationTitle
+                    ?? AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發")
+            )
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -141,6 +176,158 @@ struct LiveGoView: View {
         .onChange(of: container.locationService.currentLocation) { _, location in
             handleLocationUpdate(location)
         }
+        .task(id: transferGuidanceRequest) {
+            guard let request = transferGuidanceRequest else {
+                transferGuidance = nil
+                return
+            }
+            await loadTransferGuidance(for: request)
+        }
+        .task(id: viewModel.route.id) {
+            await container.officialStationData.prefetchTransferAssets(for: viewModel.route)
+        }
+    }
+
+    // MARK: - Indoor transfer guidance
+
+    private var transferGuidanceRequest: LiveTransferGuidanceRequest? {
+        guard let step = viewModel.currentStep,
+              step.kind == .transfer,
+              !completedIndoorTransferStepIDs.contains(step.id) else { return nil }
+        return LiveTransferGuidanceRequest(routeID: viewModel.route.id, stepID: step.id)
+    }
+
+    private var activeTransferGuidance: LiveTransferGuidance? {
+        guard let step = viewModel.currentStep,
+              step.kind == .transfer,
+              !completedIndoorTransferStepIDs.contains(step.id),
+              let transferGuidance,
+              transferGuidance.stepID == step.id else { return nil }
+        return transferGuidance
+    }
+
+    private func embeddedIndoorGuidance(
+        _ guidance: LiveIndoorPathGuidance,
+        transferGuidance: LiveTransferGuidance
+    ) -> some View {
+        IndoorStepGoView(
+            stationTitle: guidance.stationTitle,
+            mapImageURL: guidance.mapImageURL,
+            indoorMap: guidance.indoorMap,
+            routeNodeIDs: guidance.routeNodeIDs,
+            routeEdgeIDs: guidance.routeEdgeIDs,
+            destinationLineName: guidance.destinationLineName,
+            transferContext: guidance.transferContext,
+            boardingZoneGuidance: transferGuidance.boardingZoneGuidance,
+            onComplete: {
+                completeIndoorGuidance(for: transferGuidance.stepID)
+            },
+            onBack: viewModel.canGoBack ? {
+                withAnimation { viewModel.goBack() }
+            } : nil
+        )
+    }
+
+    @MainActor
+    private func loadTransferGuidance(for request: LiveTransferGuidanceRequest) async {
+        transferGuidance = nil
+        guard request == transferGuidanceRequest,
+              let step = viewModel.currentStep,
+              step.id == request.stepID,
+              let segmentIndex = step.segmentIndex,
+              viewModel.route.segments.indices.contains(segmentIndex) else { return }
+
+        let transferSegment = viewModel.route.segments[segmentIndex]
+        let context = step.transferContext ?? transferSegment.transferContext
+        let cityID = context?.cityID
+            ?? viewModel.route.networkCityID
+            ?? appState.selectedCity?.id
+            ?? ""
+        let stationName = context?.stationName
+            ?? step.fromStationName
+            ?? AppLocalization.localized("Transfer station")
+        let stationID = context?.stationID
+            ?? transferSegment.toStationID
+            ?? transferSegment.fromStationID
+            ?? stationName
+        guard !cityID.isEmpty else { return }
+
+        let coordinate = step.transferCLCoordinate
+        let station = Station(
+            stationID: stationID,
+            name: stationName,
+            latitude: coordinate?.latitude ?? 0,
+            longitude: coordinate?.longitude ?? 0,
+            cityID: cityID,
+            isTransferStation: true
+        )
+        let preference = appState.accessibilityPreference
+        let accessibilityFilter = AccessibilityFilter(
+            requiresWheelchairAccess: preference.requiresWheelchairAccess,
+            requiresElevator: preference.prefersElevator,
+            avoidStairs: preference.avoidStairs
+        )
+
+        let boardingZoneGuidance: IndoorBoardingZoneGuidance?
+        if let context {
+            boardingZoneGuidance = await container.officialStationData.boardingZoneGuidance(
+                for: station,
+                context: context,
+                accessibilityFilter: accessibilityFilter
+            )
+        } else {
+            boardingZoneGuidance = nil
+        }
+        guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+
+        let transferPath: TransferPathHint?
+        if let context {
+            transferPath = await container.officialStationData.transferPath(
+                for: station,
+                context: context,
+                accessibilityFilter: accessibilityFilter
+            )
+        } else {
+            transferPath = await container.officialStationData.transferPath(
+                for: station,
+                fromLineName: transferSegment.incomingLineName,
+                toLineName: step.lineName ?? transferSegment.lineName,
+                accessibilityFilter: accessibilityFilter
+            )
+        }
+        guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+
+        var indoorPath: LiveIndoorPathGuidance?
+        if let transferPath, transferPath.routeNodeIDs.count > 1 {
+            let indoorMap = await container.officialStationData.indoorMap(for: station)
+            guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+            if let indoorMap {
+                let stationMap = await container.officialStationData.stationMap(for: station)
+                guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+                indoorPath = LiveIndoorPathGuidance(
+                    stationTitle: stationName,
+                    mapImageURL: stationMap?.isImage == true ? stationMap?.resolvedURL : nil,
+                    indoorMap: indoorMap,
+                    routeNodeIDs: transferPath.routeNodeIDs,
+                    routeEdgeIDs: transferPath.routeEdgeIDs,
+                    destinationLineName: context?.outgoing.lineName ?? step.lineName,
+                    transferContext: context
+                )
+            }
+        }
+
+        transferGuidance = LiveTransferGuidance(
+            stepID: step.id,
+            indoorPath: indoorPath,
+            boardingZoneGuidance: boardingZoneGuidance
+        )
+    }
+
+    private func completeIndoorGuidance(for stepID: Int) {
+        guard viewModel.currentStep?.id == stepID,
+              completedIndoorTransferStepIDs.insert(stepID).inserted,
+              viewModel.canAdvance else { return }
+        withAnimation { viewModel.advance() }
     }
 
     // MARK: - Map
@@ -373,6 +560,8 @@ struct LiveGoView: View {
             )
             guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }
             viewModel.reroute(with: newRoute)
+            transferGuidance = nil
+            completedIndoorTransferStepIDs.removeAll()
             // Keep the resume banner's stored trip in step with what's actually guiding.
             ActiveTripStore.save(newRoute)
             frameCurrentStep(animated: true)
@@ -439,7 +628,7 @@ struct LiveGoView: View {
             controls
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .padding([.horizontal, .bottom], 10)
     }
 
@@ -455,13 +644,12 @@ struct LiveGoView: View {
                     Text(step.title)
                         .font(.title3)
                         .fontWeight(.bold)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                     if let detail = step.detail {
                         Text(detail)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                            .lineLimit(2)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                     }
                 }
                 Spacer()
@@ -485,11 +673,17 @@ struct LiveGoView: View {
                         )
                         .font(.subheadline)
                         .foregroundStyle(themeColor)
-                        .lineLimit(1)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                         .minimumScaleFactor(0.8)
                     }
                     Spacer()
                 }
+            }
+
+            if step.kind == .transfer,
+               activeTransferGuidance?.indoorPath == nil,
+               let boardingZoneGuidance = activeTransferGuidance?.boardingZoneGuidance {
+                boardingZoneSummary(boardingZoneGuidance)
             }
 
             if step.kind == .ride {
@@ -504,41 +698,104 @@ struct LiveGoView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(step.accessibilityLabel)
+        .accessibilityLabel(stepAccessibilityLabel(step))
     }
 
-    private var controls: some View {
-        HStack(spacing: 14) {
-            Button {
-                withAnimation { viewModel.goBack() }
-            } label: {
-                Label(AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"), systemImage: "chevron.left")
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
-                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 14))
-            }
-            .buttonStyle(.plain)
-            .disabled(!viewModel.canGoBack)
-            .opacity(viewModel.canGoBack ? 1 : 0.4)
-
-            Button {
-                if viewModel.canAdvance {
-                    withAnimation { viewModel.advance() }
-                } else {
-                    dismiss()
-                }
-            } label: {
-                Label(
-                    viewModel.canAdvance ? AppLocalization.text(english: "Next", simplified: "下一步", traditional: "下一步") : AppLocalization.localized("Done"),
-                    systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark"
-                )
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 13)
-                .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
-                .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
+    private func stepAccessibilityLabel(_ step: TripStep) -> String {
+        var parts = [step.accessibilityLabel]
+        if step.kind == .transfer,
+           let guidance = activeTransferGuidance?.boardingZoneGuidance {
+            parts.append(AppLocalization.text(
+                english: "Boarding zone: \(guidance.zone.localizedLabel)",
+                simplified: "建议候车位置：\(guidance.zone.localizedLabel)",
+                traditional: "建議候車位置：\(guidance.zone.localizedLabel)"
+            ))
         }
+        return parts.joined(separator: ", ")
+    }
+
+    private func boardingZoneSummary(_ guidance: IndoorBoardingZoneGuidance) -> some View {
+        let title = AppLocalization.text(
+            english: "Boarding zone: \(guidance.zone.localizedLabel)",
+            simplified: "建议候车位置：\(guidance.zone.localizedLabel)",
+            traditional: "建議候車位置：\(guidance.zone.localizedLabel)"
+        )
+        return VStack(spacing: 8) {
+            Divider()
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) {
+                    Label(title, systemImage: "train.side.front.car")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(themeColor)
+                    Spacer(minLength: 8)
+                    DataConfidenceChip(confidence: guidance.confidence, compact: true)
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                    Label(title, systemImage: "train.side.front.car")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(themeColor)
+                    DataConfidenceChip(confidence: guidance.confidence, compact: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var controls: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 10) {
+                nextButton
+                backButton
+            }
+        } else {
+            HStack(spacing: 14) {
+                backButton
+                nextButton
+            }
+        }
+    }
+
+    private var backButton: some View {
+        Button {
+            withAnimation { viewModel.goBack() }
+        } label: {
+            Label(
+                AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"),
+                systemImage: "chevron.left"
+            )
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 13)
+            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .disabled(!viewModel.canGoBack)
+        .opacity(viewModel.canGoBack ? 1 : 0.4)
+    }
+
+    private var nextButton: some View {
+        Button {
+            if viewModel.canAdvance {
+                withAnimation { viewModel.advance() }
+            } else {
+                dismiss()
+            }
+        } label: {
+            Label(
+                viewModel.canAdvance
+                    ? AppLocalization.text(english: "Next", simplified: "下一步", traditional: "下一步")
+                    : AppLocalization.localized("Done"),
+                systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark"
+            )
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 13)
+            .background(themeColor, in: RoundedRectangle(cornerRadius: 8))
+            .foregroundStyle(.white)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Announcements & alerts

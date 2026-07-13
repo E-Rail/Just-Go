@@ -82,11 +82,21 @@ extension BundledMetroRouteProvider {
                   let to = graph.stationsByID[last.toStationID] else {
                 continue
             }
+            let currentContext = transitLegContext(
+                group: group,
+                line: line,
+                cityID: cityID,
+                graph: graph
+            )
             if index > 0 {
                 // `lineName` below is the outgoing line (correct for "Transfer to X" display
                 // text) — the incoming line, for resolving a real indoor transfer path, is the
                 // *previous* group's line, only available here, not reconstructable later.
-                let previousLine = groups[index - 1].last.flatMap { graph.linesByID[$0.lineID] }
+                let previousGroup = groups[index - 1]
+                let previousLine = previousGroup.last.flatMap { graph.linesByID[$0.lineID] }
+                let incomingContext = previousLine.map {
+                    transitLegContext(group: previousGroup, line: $0, cityID: cityID, graph: graph)
+                }
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .transfer,
@@ -103,6 +113,15 @@ extension BundledMetroRouteProvider {
                     polylineCoordinates: [],
                     walkingDirections: nil,
                     accessibilityNotes: [],
+                    transferContext: incomingContext.map {
+                        TransferContext(
+                            cityID: cityID,
+                            stationID: "network-\(cityID)-\(from.id)",
+                            stationName: from.name,
+                            incoming: $0,
+                            outgoing: currentContext
+                        )
+                    },
                     incomingLineName: previousLine?.name,
                     incomingLineColorHex: previousLine?.colorHex
                 ))
@@ -118,7 +137,8 @@ extension BundledMetroRouteProvider {
                     lineColorHex: line.colorHex,
                     coordinate: CodableCoordinate(latitude: station.latitude, longitude: station.longitude),
                     arrivalTimeText: nil,
-                    isTransfer: lineCount > 1
+                    isTransfer: lineCount > 1,
+                    lineID: line.id
                 )
             }
             let coordinates = group.flatMap { graph.edgeGeometries[$0.key] ?? [] }.consecutiveUnique
@@ -137,10 +157,54 @@ extension BundledMetroRouteProvider {
                 stationStops: stops,
                 polylineCoordinates: coordinates,
                 walkingDirections: nil,
-                accessibilityNotes: []
+                accessibilityNotes: [],
+                transitContext: currentContext
             ))
         }
         return segments
+    }
+
+    private func transitLegContext(
+        group: [MetroGraphEdge],
+        line: MetroLine,
+        cityID: String,
+        graph: MetroRoutingGraph
+    ) -> TransitLegContext {
+        let first = group.first!
+        let last = group.last!
+        let next = graph.stationsByID[first.toStationID]
+        let previous = graph.stationsByID[last.fromStationID]
+        let terminal = directionTerminal(for: first, line: line, graph: graph)
+        return TransitLegContext(
+            lineID: line.id,
+            lineName: line.name,
+            boardingStationID: "network-\(cityID)-\(first.fromStationID)",
+            alightingStationID: "network-\(cityID)-\(last.toStationID)",
+            directionNextStationID: next.map { "network-\(cityID)-\($0.id)" },
+            directionNextStationName: next?.name,
+            arrivalPreviousStationID: previous.map { "network-\(cityID)-\($0.id)" },
+            arrivalPreviousStationName: previous?.name,
+            directionTerminalStationID: terminal.map { "network-\(cityID)-\($0.id)" },
+            directionTerminalStationName: terminal?.name
+        )
+    }
+
+    private func directionTerminal(
+        for edge: MetroGraphEdge,
+        line: MetroLine,
+        graph: MetroRoutingGraph
+    ) -> MetroStation? {
+        for pattern in line.servicePatterns where pattern.count > 1 && pattern.first != pattern.last {
+            if pattern.adjacentPairs.contains(where: { $0.0 == edge.fromStationID && $0.1 == edge.toStationID }),
+               let terminalID = pattern.last {
+                return graph.stationsByID[terminalID]
+            }
+            if pattern.adjacentPairs.contains(where: { $0.0 == edge.toStationID && $0.1 == edge.fromStationID }),
+               let terminalID = pattern.first {
+                return graph.stationsByID[terminalID]
+            }
+        }
+        return nil
     }
 
     func walkingSegment(

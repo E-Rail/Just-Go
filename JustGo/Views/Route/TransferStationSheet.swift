@@ -17,6 +17,7 @@ struct TransferStationSheet: View {
     @State private var stationMap: CityPackStationMap?
     @State private var indoorMap: StationIndoorMap?
     @State private var transferPath: TransferPathHint?
+    @State private var boardingZoneGuidance: IndoorBoardingZoneGuidance?
     @State private var doorGuidance: DoorGuidance?
     @State private var fullScreenImage: FullScreenStationImage?
     @State private var showIndoorSteps = false
@@ -27,6 +28,14 @@ struct TransferStationSheet: View {
 
     private var crowdWindows: [String] {
         crowdControl.stations.first { $0.stationName == stationName }?.windows ?? []
+    }
+
+    private var routeCoverageGapLineNames: [String] {
+        guard let indoorMap, let context = transferSegment.transferContext else { return [] }
+        let routeLegs = [context.incoming, context.outgoing]
+        return indoorMap.resolvedLineCoverageGaps.compactMap { gap in
+            routeLegs.first { $0.lineID == gap.lineID }?.lineName
+        }
     }
 
     /// The transfer station's real coordinate. A transfer segment's own stationStops is always
@@ -60,13 +69,16 @@ struct TransferStationSheet: View {
             FullScreenStationImageView(image: image)
         }
         .fullScreenCover(isPresented: $showIndoorSteps) {
-            if let indoorMap, let transferPath, let url = stationMap?.resolvedURL {
+            if let indoorMap, let transferPath {
                 IndoorStepGoView(
                     stationTitle: stationName,
-                    mapImageURL: url,
+                    mapImageURL: stationMap?.resolvedURL,
                     indoorMap: indoorMap,
                     routeNodeIDs: transferPath.routeNodeIDs,
-                    destinationLineName: nextTransitSegment?.lineName
+                    routeEdgeIDs: transferPath.routeEdgeIDs,
+                    destinationLineName: nextTransitSegment?.lineName,
+                    transferContext: transferSegment.transferContext,
+                    boardingZoneGuidance: boardingZoneGuidance
                 )
             }
         }
@@ -103,12 +115,25 @@ struct TransferStationSheet: View {
                 )
                 stationMap = await container.officialStationData.stationMap(for: mapLookupStation)
                 indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
-                transferPath = await container.officialStationData.transferPath(
-                    for: mapLookupStation,
-                    fromLineName: transferSegment.incomingLineName ?? transferSegment.lineName,
-                    toLineName: nextTransitSegment?.lineName,
-                    accessibilityFilter: accessibilityFilter
-                )
+                if let transferContext = transferSegment.transferContext {
+                    transferPath = await container.officialStationData.transferPath(
+                        for: mapLookupStation,
+                        context: transferContext,
+                        accessibilityFilter: accessibilityFilter
+                    )
+                    boardingZoneGuidance = await container.officialStationData.boardingZoneGuidance(
+                        for: mapLookupStation,
+                        context: transferContext,
+                        accessibilityFilter: accessibilityFilter
+                    )
+                } else {
+                    transferPath = await container.officialStationData.transferPath(
+                        for: mapLookupStation,
+                        fromLineName: transferSegment.incomingLineName ?? transferSegment.lineName,
+                        toLineName: nextTransitSegment?.lineName,
+                        accessibilityFilter: accessibilityFilter
+                    )
+                }
                 doorGuidance = await container.officialStationData.doorGuidance(
                     for: mapLookupStation,
                     lineName: nextTransitSegment?.lineName,
@@ -256,8 +281,50 @@ struct TransferStationSheet: View {
 
     @ViewBuilder
     private var indoorGuidanceStatus: some View {
-        if let transferPath {
+        if !routeCoverageGapLineNames.isEmpty {
+            ForEach(routeCoverageGapLineNames, id: \.self) { lineName in
+                Label {
+                    Text(AppLocalization.text(
+                        english: "The collected official diagram does not show the \(lineName) platform, so its position and connected indoor path are unavailable.",
+                        simplified: "已收录的官方站内图未显示\(lineName)站台，因此暂无法提供其位置和连通站内路径。",
+                        traditional: "已收錄的官方站內圖未顯示\(lineName)月台，因此暫無法提供其位置和連通站內路徑。"
+                    ))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "map.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } else if let transferPath {
             corridorPathRow(transferPath)
+            if let boardingZoneGuidance {
+                boardingZoneRow(boardingZoneGuidance)
+            }
+        } else if let boardingZoneGuidance {
+            boardingZoneRow(boardingZoneGuidance)
+            Text(AppLocalization.text(
+                english: "A connected indoor corridor path is not verified for this station.",
+                simplified: "本站尚无经验证的连通站内换乘路径。",
+                traditional: "本站尚無經驗證的連通站內轉乘路徑。"
+            ))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        } else if indoorMap?.effectiveCoverageMode == .platformCheckpoints {
+            Label {
+                Text(AppLocalization.text(
+                    english: "Platform locations are diagram-reviewed. A connected corridor path and boarding zone are not verified for this station.",
+                    simplified: "站台位置已按站内图核对；本站尚无经验证的连通换乘路径和上车区域。",
+                    traditional: "月台位置已按站內圖核對；本站尚無經驗證的連通轉乘路徑和上車區域。"
+                ))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            } icon: {
+                Image(systemName: "map")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         } else if let doorGuidance {
             doorGuidanceRow(doorGuidance)
         } else {
@@ -277,6 +344,20 @@ struct TransferStationSheet: View {
         }
     }
 
+    private func boardingZoneRow(_ guidance: IndoorBoardingZoneGuidance) -> some View {
+        return Label {
+            HStack(spacing: 8) {
+                Text(guidance.zone.localizedLabel)
+                    .font(.caption)
+                DataConfidenceChip(confidence: guidance.confidence, compact: true)
+            }
+        } icon: {
+            Image(systemName: "train.side.front.car")
+                .font(.caption)
+                .foregroundStyle(Color.accentColor)
+        }
+    }
+
     private func corridorPathRow(_ path: TransferPathHint) -> some View {
         var parts: [String] = []
         if let meters = path.walkingMeters {
@@ -291,7 +372,7 @@ struct TransferStationSheet: View {
         }
         return Label {
             VStack(alignment: .leading, spacing: 2) {
-                Text(parts.isEmpty ? AppLocalization.text(english: "Verified indoor transfer path", simplified: "经验证的站内换乘路径", traditional: "經驗證的站內轉乘路徑") : parts.joined(separator: " · "))
+                Text(parts.isEmpty ? AppLocalization.text(english: "Diagram-reviewed indoor transfer path", simplified: "经站内图核对的换乘路径", traditional: "經站內圖核對的轉乘路徑") : parts.joined(separator: " · "))
                     .font(.caption)
                 if path.routeNodeIDs.count > 1 {
                     Text(AppLocalization.text(
@@ -426,32 +507,29 @@ struct TransferStationSheet: View {
                     Text(AppLocalization.localized("Station Map"))
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            Button {
-                                fullScreenImage = FullScreenStationImage(
-                                    url: url,
-                                    title: stationMap.title ?? AppLocalization.localized("Station Map")
-                                )
-                            } label: {
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .overlay(indoorPathOverlay)
-                                    .frame(maxWidth: .infinity)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                            }
-                            .buttonStyle(.plain)
-                        case .failure:
-                            Text(AppLocalization.localized("Station map could not be loaded"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        default:
-                            ProgressView()
+                    StationAssetImage(url: url) { image in
+                        Button {
+                            fullScreenImage = FullScreenStationImage(
+                                url: url,
+                                title: stationMap.title ?? AppLocalization.localized("Station Map")
+                            )
+                        } label: {
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .overlay(indoorPathOverlay)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 24)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
+                        .buttonStyle(.plain)
+                    } placeholder: {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 24)
+                    } failure: {
+                        Text(AppLocalization.localized("Station map could not be loaded"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                     Text(AppLocalization.text(
                         english: "Tap to zoom — official station layout.",
@@ -513,6 +591,7 @@ struct TransferStationSheet: View {
                 }
             }
             .allowsHitTesting(false)
+            .accessibilityHidden(true)
         }
     }
 

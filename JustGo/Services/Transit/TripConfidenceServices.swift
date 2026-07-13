@@ -211,7 +211,8 @@ struct LiveGoTripBuilder {
                     walkingDistance: 0,
                     duration: segment.duration,
                     transferCoordinate: transferStop?.coordinate,
-                    segmentIndex: index
+                    segmentIndex: index,
+                    transferContext: segment.transferContext
                 ))
             case .subway, .transit:
                 steps.append(TripStep(

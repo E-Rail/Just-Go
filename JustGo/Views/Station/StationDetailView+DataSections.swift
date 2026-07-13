@@ -282,45 +282,40 @@ extension StationDetailView {
 
     @ViewBuilder
     private func remoteImage(url: URL, title: String) -> some View {
-        AsyncImage(url: url) { phase in
-            switch phase {
-            case .success(let image):
-                Button {
-                    selectedStationImage = FullScreenStationImage(url: url, title: title)
-                } label: {
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: 160)
-                        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(alignment: .topTrailing) {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .padding(8)
-                                .background(.black.opacity(0.55), in: Circle())
-                                .padding(8)
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
-                        }
+        StationAssetImage(url: url) { image in
+            Button {
+                selectedStationImage = FullScreenStationImage(url: url, title: title)
+            } label: {
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 160)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(.black.opacity(0.55), in: Circle())
+                            .padding(8)
                     }
-                .buttonStyle(.plain)
-                .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
-            case .failure:
-                Text(AppLocalization.localized("Station map could not be loaded"))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            case .empty:
-                ProgressView()
-                    .frame(maxWidth: .infinity, minHeight: 160)
-            @unknown default:
-                EmptyView()
-            }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
+                    }
+                }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
+        } placeholder: {
+            ProgressView()
+                .frame(maxWidth: .infinity, minHeight: 160)
+        } failure: {
+            Text(AppLocalization.localized("Station map could not be loaded"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 

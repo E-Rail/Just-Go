@@ -112,8 +112,13 @@ struct RouteDetailView: View {
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
             boardingServiceWindows = []
-            guard let cityID = route.networkCityID ?? appState.selectedCity?.id else { return }
-            await loadServiceHours(cityID: cityID)
+            async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
+                for: route
+            )
+            if let cityID = route.networkCityID ?? appState.selectedCity?.id {
+                await loadServiceHours(cityID: cityID)
+            }
+            await transferAssets
         }
     }
 

@@ -1,5 +1,34 @@
 import SwiftUI
 
+/// Renders persisted `file://` city-pack assets and remote fallbacks through the same API.
+/// SwiftUI's `AsyncImage` is retained for HTTP caching while local images are decoded from
+/// the app's private Application Support directory.
+struct StationAssetImage<Content: View, Placeholder: View, Failure: View>: View {
+    let url: URL
+    @ViewBuilder let content: (Image) -> Content
+    @ViewBuilder let placeholder: () -> Placeholder
+    @ViewBuilder let failure: () -> Failure
+
+    var body: some View {
+        if url.isFileURL {
+            if let image = UIImage(contentsOfFile: url.path) {
+                content(Image(uiImage: image))
+            } else {
+                failure()
+            }
+        } else {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image): content(image)
+                case .failure: failure()
+                case .empty: placeholder()
+                @unknown default: failure()
+                }
+            }
+        }
+    }
+}
+
 struct FullScreenStationImage: Identifiable {
     let url: URL
     let title: String
@@ -18,22 +47,17 @@ struct FullScreenStationImageView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                AsyncImage(url: image.url) { phase in
-                    switch phase {
-                    case .success(let loadedImage):
-                        ZoomableStationImage(image: loadedImage)
-                    case .failure:
-                        ContentUnavailableView(
-                            AppLocalization.localized("Station map could not be loaded"),
-                            systemImage: "exclamationmark.triangle"
-                        )
-                        .foregroundStyle(.white)
-                    case .empty:
-                        ProgressView()
-                            .tint(.white)
-                    @unknown default:
-                        EmptyView()
-                    }
+                StationAssetImage(url: image.url) { loadedImage in
+                    ZoomableStationImage(image: loadedImage)
+                } placeholder: {
+                    ProgressView()
+                        .tint(.white)
+                } failure: {
+                    ContentUnavailableView(
+                        AppLocalization.localized("Station map could not be loaded"),
+                        systemImage: "exclamationmark.triangle"
+                    )
+                    .foregroundStyle(.white)
                 }
             }
             .navigationTitle(image.title)

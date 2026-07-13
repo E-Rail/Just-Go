@@ -69,6 +69,28 @@ cities.each do |city|
     end
   end
 
+  indoor_maps_url = city["indoorMapsDownloadURL"]
+  unless indoor_maps_url.nil?
+    fail_with("#{city_id} indoorMapsDownloadURL must be relative") if indoor_maps_url.match?(%r{\Ahttps?://}i)
+
+    indoor_maps_path = File.expand_path(indoor_maps_url, DATA_PACKS_DIR)
+    fail_with("#{city_id} indoorMapsDownloadURL escapes DataPacks") unless indoor_maps_path.start_with?("#{DATA_PACKS_DIR}/")
+    fail_with("#{city_id} indoor maps file is missing at #{indoor_maps_url}") unless File.file?(indoor_maps_path)
+
+    indoor_data = File.binread(indoor_maps_path)
+    expected_indoor_size = city["indoorMapsSizeBytes"]
+    fail_with("#{city_id} indoorMapsSizeBytes mismatch") if expected_indoor_size && expected_indoor_size != indoor_data.bytesize
+
+    expected_indoor_sha = city["indoorMapsSHA256"]
+    actual_indoor_sha = Digest::SHA256.hexdigest(indoor_data)
+    fail_with("#{city_id} indoorMapsSHA256 mismatch") if expected_indoor_sha.to_s.empty? || expected_indoor_sha != actual_indoor_sha
+
+    indoor_pack = load_json(indoor_maps_path)
+    fail_with("#{city_id} indoor_maps cityID mismatch") unless indoor_pack["cityID"] == city_id
+    fail_with("#{city_id} indoor_maps version mismatch") unless indoor_pack["version"] == city["version"]
+    fail_with("#{city_id} indoor_maps stations must be an array") unless indoor_pack["stations"].is_a?(Array)
+  end
+
   pack_count += 1
 end
 

@@ -8,6 +8,7 @@ enum IndoorStepKind: Equatable {
     case turnLeft
     case turnRight
     case stairs
+    case escalator
     case elevator
     case arrivePlatform
     case arriveExit
@@ -18,6 +19,7 @@ enum IndoorStepKind: Equatable {
         case .turnLeft: "arrow.turn.up.left"
         case .turnRight: "arrow.turn.up.right"
         case .stairs: "figure.stairs"
+        case .escalator: "figure.stairs"
         case .elevator: "arrow.up.arrow.down.circle.fill"
         case .arrivePlatform: "tram.fill"
         case .arriveExit: "arrow.up.forward.circle.fill"
@@ -38,30 +40,20 @@ struct IndoorStep: Identifiable, Equatable {
     let throughNodeIndex: Int
 }
 
-private enum TurnBucket {
-    case straight
-    case left
-    case right
-}
-
 extension IndoorStep {
-    /// Builds an ordered turn-by-turn walkthrough from a Dijkstra path's node sequence.
-    ///
-    /// Distances come from `map.edges` between consecutive nodes; turn direction is bucketed
-    /// (straight / left / right — never a specific angle) from the cross product of the
-    /// incoming/outgoing vectors in the diagram's fractional coordinates. Left/right holds up
-    /// even though the source diagram is isometric, not a true top-down plan — an axonometric
-    /// projection doesn't mirror-flip — but an exact degree would be false precision on data
-    /// traced by hand from a single image, so only coarse buckets are ever produced.
-    ///
-    /// A node whose `kind` is `.elevator` or `.stairs` always becomes its own dedicated step
-    /// regardless of the turn angle there, since "take the elevator" matters more than the
-    /// incidental turn direction at that point. Consecutive straight-walking hops collapse
-    /// into one combined step; the final hop's distance folds into the arrival step rather
-    /// than getting its own "continue" card first.
-    static func build(nodeIDs: [String], map: StationIndoorMap, destinationLineName: String?) -> [IndoorStep] {
+    /// Builds an ordered walkthrough from a routed graph. Turns are emitted only when the
+    /// directed edge carries an authored instruction; an isometric diagram alone cannot prove
+    /// real-world left/right orientation. Unannotated walking edges collapse into one neutral
+    /// "follow the highlighted path" instruction.
+    static func build(
+        nodeIDs: [String],
+        edgeIDs: [String],
+        map: StationIndoorMap,
+        destinationLineName: String?
+    ) -> [IndoorStep] {
         guard nodeIDs.count > 1 else { return [] }
         let nodesByID = Dictionary(uniqueKeysWithValues: map.nodes.map { ($0.id, $0) })
+        let edgesByID = Dictionary(uniqueKeysWithValues: map.edges.map { ($0.id, $0) })
 
         var edgeByPair: [String: IndoorEdge] = [:]
         for edge in map.edges {
@@ -82,7 +74,11 @@ extension IndoorStep {
             steps.append(IndoorStep(
                 id: nextID,
                 kind: .walk,
-                title: AppLocalization.text(english: "Continue straight", simplified: "直行", traditional: "直行"),
+                title: AppLocalization.text(
+                    english: "Follow the highlighted path",
+                    simplified: "沿高亮路径前行",
+                    traditional: "沿高亮路徑前行"
+                ),
                 detail: AppLocalization.distance(pendingMeters),
                 legMeters: pendingMeters,
                 fromNodeIndex: segmentStartIndex,
@@ -94,28 +90,38 @@ extension IndoorStep {
         for index in 1..<nodeIDs.count {
             let fromID = nodeIDs[index - 1]
             let toID = nodeIDs[index]
+            let routedEdge = edgeIDs.indices.contains(index - 1) ? edgesByID[edgeIDs[index - 1]] : nil
             guard let toNode = nodesByID[toID],
-                  let edge = edgeByPair["\(fromID)->\(toID)"] else { continue }
+                  let edge = routedEdge ?? edgeByPair["\(fromID)->\(toID)"] else { continue }
             let isLast = index == nodeIDs.count - 1
 
-            if isLast {
-                pendingMeters += edge.distanceMeters
-                let detail = pendingMeters > 0.5 ? AppLocalization.distance(pendingMeters) : nil
-                steps.append(arrivalStep(
-                    id: nextID, node: toNode, detail: detail, destinationLineName: destinationLineName,
-                    fromNodeIndex: segmentStartIndex, throughNodeIndex: index
-                ))
-                continue
-            }
-
-            if toNode.kind == .elevator || toNode.kind == .stairs {
+            let traversalKind = edge.traversalKind ?? {
+                if toNode.kind == .elevator { return .elevator }
+                if toNode.kind == .stairs { return .stairs }
+                return .walkway
+            }()
+            if [.elevator, .stairs, .escalator].contains(traversalKind) {
                 flushWalk(throughIndex: index - 1)
+                let kind: IndoorStepKind = switch traversalKind {
+                case .elevator: .elevator
+                case .stairs: .stairs
+                case .escalator: .escalator
+                default: .walk
+                }
+                let title = switch traversalKind {
+                case .elevator:
+                    AppLocalization.text(english: "Take the elevator", simplified: "乘坐电梯", traditional: "搭乘電梯")
+                case .stairs:
+                    AppLocalization.text(english: "Take the stairs", simplified: "走楼梯", traditional: "走樓梯")
+                case .escalator:
+                    AppLocalization.text(english: "Take the escalator", simplified: "乘坐扶梯", traditional: "搭乘扶梯")
+                default:
+                    AppLocalization.text(english: "Continue", simplified: "继续前行", traditional: "繼續前行")
+                }
                 steps.append(IndoorStep(
                     id: nextID,
-                    kind: toNode.kind == .elevator ? .elevator : .stairs,
-                    title: toNode.kind == .elevator
-                        ? AppLocalization.text(english: "Take the elevator", simplified: "乘坐电梯", traditional: "搭乘電梯")
-                        : AppLocalization.text(english: "Take the stairs", simplified: "走楼梯", traditional: "走樓梯"),
+                    kind: kind,
+                    title: title,
                     detail: nil,
                     legMeters: edge.distanceMeters,
                     fromNodeIndex: index - 1,
@@ -123,38 +129,94 @@ extension IndoorStep {
                 ))
                 nextID += 1
                 segmentStartIndex = index
+                if isLast {
+                    steps.append(arrivalStep(
+                        id: nextID,
+                        node: toNode,
+                        detail: nil,
+                        destinationLineName: destinationLineName,
+                        fromNodeIndex: index,
+                        throughNodeIndex: index
+                    ))
+                }
                 continue
             }
 
-            pendingMeters += edge.distanceMeters
-
-            // Interior walking node: bucket the turn using the segment before and after it.
-            let prevID = nodeIDs[index - 1]
-            let nextNodeID = nodeIDs[index + 1]
-            guard let prevNode = nodesByID[prevID], let nextNode = nodesByID[nextNodeID] else { continue }
-            let turn = turnBucket(prev: prevNode.coordinate, cur: toNode.coordinate, next: nextNode.coordinate)
-            switch turn {
-            case .straight:
-                continue
-            case .left, .right:
-                flushWalk(throughIndex: index)
-                steps.append(IndoorStep(
+            let isForward = edge.fromNodeID == fromID && edge.toNodeID == toID
+            let instruction = isForward ? edge.forwardInstruction : edge.reverseInstruction
+            if let instruction {
+                flushWalk(throughIndex: index - 1)
+                let instructionStep = step(
                     id: nextID,
-                    kind: turn == .left ? .turnLeft : .turnRight,
-                    title: turn == .left
-                        ? AppLocalization.text(english: "Turn left", simplified: "向左转", traditional: "向左轉")
-                        : AppLocalization.text(english: "Turn right", simplified: "向右转", traditional: "向右轉"),
-                    detail: nil,
-                    legMeters: 0,
-                    fromNodeIndex: index,
+                    instruction: instruction,
+                    edge: edge,
+                    fromNodeIndex: index - 1,
                     throughNodeIndex: index
-                ))
+                )
+                steps.append(instructionStep)
                 nextID += 1
                 segmentStartIndex = index
+            } else {
+                pendingMeters += edge.distanceMeters
+            }
+            if isLast {
+                let detail = instruction == nil && pendingMeters > 0.5
+                    ? AppLocalization.distance(pendingMeters)
+                    : nil
+                steps.append(arrivalStep(
+                    id: nextID,
+                    node: toNode,
+                    detail: detail,
+                    destinationLineName: destinationLineName,
+                    fromNodeIndex: instruction == nil ? segmentStartIndex : index,
+                    throughNodeIndex: index
+                ))
             }
         }
 
         return steps
+    }
+
+    private static func step(
+        id: Int,
+        instruction: IndoorDirectedInstruction,
+        edge: IndoorEdge,
+        fromNodeIndex: Int,
+        throughNodeIndex: Int
+    ) -> IndoorStep {
+        let kind: IndoorStepKind = switch instruction.action {
+        case .turnLeft: .turnLeft
+        case .turnRight: .turnRight
+        case .takeStairs: .stairs
+        case .takeEscalator: .escalator
+        case .takeElevator: .elevator
+        case .continueStraight, .followSigns: .walk
+        }
+        let title = switch instruction.action {
+        case .continueStraight:
+            AppLocalization.text(english: "Continue straight", simplified: "直行", traditional: "直行")
+        case .turnLeft:
+            AppLocalization.text(english: "Turn left", simplified: "向左转", traditional: "向左轉")
+        case .turnRight:
+            AppLocalization.text(english: "Turn right", simplified: "向右转", traditional: "向右轉")
+        case .followSigns:
+            AppLocalization.text(english: "Follow the station signs", simplified: "跟随站内标识", traditional: "跟隨站內標識")
+        case .takeStairs:
+            AppLocalization.text(english: "Take the stairs", simplified: "走楼梯", traditional: "走樓梯")
+        case .takeEscalator:
+            AppLocalization.text(english: "Take the escalator", simplified: "乘坐扶梯", traditional: "搭乘扶梯")
+        case .takeElevator:
+            AppLocalization.text(english: "Take the elevator", simplified: "乘坐电梯", traditional: "搭乘電梯")
+        }
+        return IndoorStep(
+            id: id,
+            kind: kind,
+            title: title,
+            detail: instruction.signText ?? AppLocalization.distance(edge.distanceMeters),
+            legMeters: edge.distanceMeters,
+            fromNodeIndex: fromNodeIndex,
+            throughNodeIndex: throughNodeIndex
+        )
     }
 
     private static func arrivalStep(
@@ -206,16 +268,4 @@ extension IndoorStep {
         return title
     }
 
-    private static func turnBucket(prev: IndoorCoordinate, cur: IndoorCoordinate, next: IndoorCoordinate) -> TurnBucket {
-        let inX = cur.x - prev.x
-        let inY = cur.y - prev.y
-        let outX = next.x - cur.x
-        let outY = next.y - cur.y
-        let cross = inX * outY - inY * outX
-        let dot = inX * outX + inY * outY
-        guard cross != 0 || dot != 0 else { return .straight }
-        let angleDegrees = atan2(cross, dot) * 180 / .pi
-        if abs(angleDegrees) < 20 { return .straight }
-        return angleDegrees > 0 ? .right : .left
-    }
 }

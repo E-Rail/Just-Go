@@ -1,15 +1,67 @@
 import Foundation
 
 struct StationIndoorMap: Codable, Equatable {
+    let schemaVersion: Int?
     let stationID: String
     let version: String
     let source: String
     let confidence: DataConfidence
+    let coverageMode: IndoorMapCoverageMode?
+    let provenance: IndoorMapProvenance?
     let levels: [IndoorLevel]
     let nodes: [IndoorNode]
     let edges: [IndoorEdge]
     let landmarks: [IndoorLandmark]
     let mapImageCalibration: MapImageCalibration?
+    let boardingZoneHints: [IndoorBoardingZoneHint]?
+    let lineCoverageGaps: [IndoorLineCoverageGap]?
+
+    var effectiveSchemaVersion: Int { schemaVersion ?? 1 }
+    var effectiveCoverageMode: IndoorMapCoverageMode {
+        coverageMode ?? (edges.isEmpty ? .platformCheckpoints : .transferPaths)
+    }
+    var resolvedBoardingZoneHints: [IndoorBoardingZoneHint] { boardingZoneHints ?? [] }
+    var resolvedLineCoverageGaps: [IndoorLineCoverageGap] { lineCoverageGaps ?? [] }
+}
+
+enum IndoorMapCoverageMode: String, Codable {
+    case platformCheckpoints
+    case transferPaths
+}
+
+enum IndoorMapReviewStatus: String, Codable {
+    case draft
+    case diagramReviewed
+    case onSiteVerified
+}
+
+enum IndoorAssetUsageStatus: String, Codable {
+    case approvedEmbedded
+    case approvedRemote
+    case metadataOnly
+    case blocked
+    case reviewRequired
+}
+
+enum IndoorLineCoverageGapReason: String, Codable {
+    case sourceDoesNotDepictLine
+}
+
+struct IndoorLineCoverageGap: Codable, Equatable {
+    let lineID: String
+    let reason: IndoorLineCoverageGapReason
+    let note: String
+}
+
+struct IndoorMapProvenance: Codable, Equatable {
+    let sourceURL: String
+    let sourceContentSHA256: String
+    let retrievedAt: String?
+    let authoredAt: String?
+    let reviewedAt: String?
+    let reviewStatus: IndoorMapReviewStatus
+    let assetUsageStatus: IndoorAssetUsageStatus
+    let notes: [String]
 }
 
 struct IndoorLevel: Identifiable, Codable, Equatable {
@@ -37,6 +89,39 @@ struct IndoorNode: Identifiable, Codable, Equatable {
     let coordinate: IndoorCoordinate
     let geoCoordinate: CodableCoordinate?
     let isStepFree: Bool
+    let lineID: String?
+    let platformID: String?
+    let arrivalFromStationIDs: [String]?
+    let departureTowardStationIDs: [String]?
+    let recognitionAliases: [String]?
+
+    var resolvedArrivalFromStationIDs: [String] { arrivalFromStationIDs ?? [] }
+    var resolvedDepartureTowardStationIDs: [String] { departureTowardStationIDs ?? [] }
+    var resolvedRecognitionAliases: [String] { recognitionAliases ?? [] }
+}
+
+enum IndoorTraversalKind: String, Codable {
+    case walkway
+    case stairs
+    case escalator
+    case elevator
+    case gate
+}
+
+enum IndoorInstructionAction: String, Codable {
+    case continueStraight
+    case turnLeft
+    case turnRight
+    case followSigns
+    case takeStairs
+    case takeEscalator
+    case takeElevator
+}
+
+struct IndoorDirectedInstruction: Codable, Equatable {
+    let action: IndoorInstructionAction
+    let signText: String?
+    let landmarkNodeID: String?
 }
 
 struct IndoorEdge: Identifiable, Codable, Equatable {
@@ -47,6 +132,12 @@ struct IndoorEdge: Identifiable, Codable, Equatable {
     let typicalSeconds: TimeInterval
     let isStepFree: Bool
     let isBidirectional: Bool
+    let traversalKind: IndoorTraversalKind?
+    let shape: [IndoorCoordinate]?
+    let forwardInstruction: IndoorDirectedInstruction?
+    let reverseInstruction: IndoorDirectedInstruction?
+
+    var resolvedShape: [IndoorCoordinate] { shape ?? [] }
 }
 
 struct IndoorLandmark: Identifiable, Codable, Equatable {
@@ -75,10 +166,49 @@ extension StationIndoorMap {
         nodes.filter { $0.kind == kind && $0.title.localizedCaseInsensitiveContains(lineName) }
     }
 
+    enum PlatformRole {
+        case arrival
+        case departure
+    }
+
+    func platformNodes(for leg: TransitLegContext, role: PlatformRole) -> [IndoorNode] {
+        let lineMatches = nodes.filter { $0.kind == .platform && $0.lineID == leg.lineID }
+        guard !lineMatches.isEmpty else {
+            return nodes(kind: .platform, matchingLineName: leg.lineName)
+        }
+
+        let directionStationID: String? = switch role {
+        case .arrival: rawNetworkStationID(leg.arrivalPreviousStationID)
+        case .departure: rawNetworkStationID(leg.directionNextStationID)
+        }
+        guard let directionStationID else { return lineMatches }
+
+        let directed = lineMatches.filter { node in
+            switch role {
+            case .arrival: node.resolvedArrivalFromStationIDs.contains(directionStationID)
+            case .departure: node.resolvedDepartureTowardStationIDs.contains(directionStationID)
+            }
+        }
+        return directed.isEmpty ? lineMatches.filter {
+            $0.resolvedArrivalFromStationIDs.isEmpty && $0.resolvedDepartureTowardStationIDs.isEmpty
+        } : directed
+    }
+
+    private func rawNetworkStationID(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let prefix = "network-"
+        guard value.hasPrefix(prefix),
+              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else { return value }
+        return String(value[value.index(after: citySeparator)...])
+    }
+
     struct PathResult {
         let nodeIDs: [String]
+        let edgeIDs: [String]
         let meters: Double
         let minutes: Double
+        let startNodeID: String
+        let endNodeID: String
     }
 
     /// Dijkstra shortest path from any node in `from` to any node in `to`, optionally
@@ -97,38 +227,48 @@ extension StationIndoorMap {
             }
         }
 
-        var bestDistance: [String: Double] = [:]
+        var bestCost: [String: Double] = [:]
         var previous: [String: (node: String, edge: IndoorEdge)] = [:]
         var visited: Set<String> = []
-        var frontier: [(node: String, distance: Double)] = from.map { ($0, 0) }
-        for id in from { bestDistance[id] = 0 }
+        var frontier: [(node: String, cost: Double)] = from.map { ($0, 0) }
+        for id in from { bestCost[id] = 0 }
 
         while !frontier.isEmpty {
-            frontier.sort { $0.distance < $1.distance }
+            frontier.sort { $0.cost < $1.cost }
             let current = frontier.removeFirst()
             guard !visited.contains(current.node) else { continue }
             visited.insert(current.node)
 
             if targets.contains(current.node) {
                 var path = [current.node]
+                var edgeIDs: [String] = []
                 var meters = 0.0
                 var seconds = 0.0
                 var cursor = current.node
                 while let step = previous[cursor] {
                     meters += step.edge.distanceMeters
                     seconds += step.edge.typicalSeconds
+                    edgeIDs.append(step.edge.id)
                     path.append(step.node)
                     cursor = step.node
                 }
-                return PathResult(nodeIDs: path.reversed(), meters: meters, minutes: seconds / 60)
+                let nodeIDs = Array(path.reversed())
+                return PathResult(
+                    nodeIDs: nodeIDs,
+                    edgeIDs: edgeIDs.reversed(),
+                    meters: meters,
+                    minutes: seconds / 60,
+                    startNodeID: nodeIDs.first!,
+                    endNodeID: nodeIDs.last!
+                )
             }
 
             for (neighbor, edge) in adjacency[current.node] ?? [] where !visited.contains(neighbor) {
-                let candidateDistance = current.distance + edge.distanceMeters
-                if candidateDistance < (bestDistance[neighbor] ?? .infinity) {
-                    bestDistance[neighbor] = candidateDistance
+                let candidateCost = current.cost + edge.typicalSeconds
+                if candidateCost < (bestCost[neighbor] ?? .infinity) {
+                    bestCost[neighbor] = candidateCost
                     previous[neighbor] = (current.node, edge)
-                    frontier.append((neighbor, candidateDistance))
+                    frontier.append((neighbor, candidateCost))
                 }
             }
         }
@@ -171,10 +311,48 @@ struct TransferPathHint: Codable, Equatable {
     let toLineName: String?
     let toPlatformID: String?
     let routeNodeIDs: [String]
+    var routeEdgeIDs: [String] = []
     let walkingMeters: Double?
     let walkingMinutes: Double?
     let stepFreeAlternativeNodeIDs: [String]
     let notes: [String]
+    let confidence: DataConfidence
+}
+
+enum IndoorBoardingZone: String, Codable {
+    case front
+    case middle
+    case rear
+
+    var localizedLabel: String {
+        switch self {
+        case .front:
+            AppLocalization.text(english: "Front of train", simplified: "列车前部", traditional: "列車前部")
+        case .middle:
+            AppLocalization.text(english: "Middle of train", simplified: "列车中部", traditional: "列車中部")
+        case .rear:
+            AppLocalization.text(english: "Rear of train", simplified: "列车后部", traditional: "列車後部")
+        }
+    }
+}
+
+struct IndoorBoardingZoneHint: Codable, Equatable {
+    let incomingLineID: String
+    let arrivalFromStationID: String?
+    let transferToLineID: String
+    let zone: IndoorBoardingZone
+    let accessible: Bool?
+    let evidenceNodeID: String
+    let confidence: DataConfidence
+}
+
+struct IndoorBoardingZoneGuidance: Codable, Equatable {
+    let stationID: String
+    let incomingLineID: String
+    let transferToLineID: String
+    let zone: IndoorBoardingZone
+    let accessible: Bool?
+    let evidenceNodeID: String
     let confidence: DataConfidence
 }
 

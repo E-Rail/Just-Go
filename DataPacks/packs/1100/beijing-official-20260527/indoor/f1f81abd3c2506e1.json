@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "f1f81abd3c2506e1", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd0c.html", "sourceContentSHA256": "630000668cf42e233196134f3be3a2a9a65997762278efa6d46ca30953dc4541", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L5", "kind": "platform", "levelID": "platform", "title": "5号线站台", "coordinate": { "x": 0.49, "y": 0.57, "z": 0.0 }, "isStepFree": false, "lineID": "442244829301b221", "platformID": "platform-442244829301b221", "arrivalFromStationIDs": ["cc33c71d5ad17ebe", "5d4e1917329c5c59"], "departureTowardStationIDs": ["cc33c71d5ad17ebe", "5d4e1917329c5c59"], "recognitionAliases": ["5号线", "Line 5"] },
+    { "id": "platform-L14", "kind": "platform", "levelID": "platform", "title": "14号线站台", "coordinate": { "x": 0.38, "y": 0.42, "z": 0.0 }, "isStepFree": false, "lineID": "8c826ef269efd948", "platformID": "platform-8c826ef269efd948", "arrivalFromStationIDs": ["e4a48907906f4bc0", "2b4853ddf641bf00"], "departureTowardStationIDs": ["e4a48907906f4bc0", "2b4853ddf641bf00"], "recognitionAliases": ["14号线", "Line 14"] }
+  ], "edges": [], "landmarks": []
+}

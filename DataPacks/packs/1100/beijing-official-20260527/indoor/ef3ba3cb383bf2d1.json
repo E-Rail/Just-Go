@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "ef3ba3cb383bf2d1", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd73.html", "sourceContentSHA256": "ba69590ed97faa14319ee2ab0feeeafc91501009147bbf92e1062c3583efb4bd", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L4", "kind": "platform", "levelID": "platform", "title": "4号线/大兴线站台", "coordinate": { "x": 0.38, "y": 0.54, "z": 0.0 }, "isStepFree": false, "lineID": "0e6109e318df9b8b", "platformID": "platform-0e6109e318df9b8b", "arrivalFromStationIDs": ["3195c9845d718402", "c603f419ff94a2ac"], "departureTowardStationIDs": ["3195c9845d718402", "c603f419ff94a2ac"], "recognitionAliases": ["4号线", "大兴线", "Line 4"] },
+    { "id": "platform-L10", "kind": "platform", "levelID": "platform", "title": "10号线站台", "coordinate": { "x": 0.53, "y": 0.43, "z": 0.0 }, "isStepFree": false, "lineID": "a9ebe043abebb24f", "platformID": "platform-a9ebe043abebb24f", "arrivalFromStationIDs": ["890b4dde225a6276", "4357b6acbe5cb80d"], "departureTowardStationIDs": ["890b4dde225a6276", "4357b6acbe5cb80d"], "recognitionAliases": ["10号线", "Line 10"] }
+  ], "edges": [], "landmarks": []
+}

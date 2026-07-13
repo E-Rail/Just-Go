@@ -1,0 +1,4439 @@
+{
+  "cityID": "1100",
+  "version": "beijing-official-20260527",
+  "stations": [
+    {
+      "stationName": "七里庄",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "c2573eb677c323c3",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd02.html",
+          "sourceContentSHA256": "b03bdb0cc69a573e58b2229da4c7bdddcaf95d3cbb1416734cc2e7e856bbf5bc",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints traced from the bundled official diagram."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l9-east",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "9号线站台（六里桥东方向）",
+            "coordinate": {
+              "x": 0.43,
+              "y": 0.58,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "189834e28c203ab8",
+            "platformID": "l9-toward-09262c58a7f60299",
+            "arrivalFromStationIDs": [
+              "08108d51648f115e",
+              "890b4dde225a6276"
+            ],
+            "departureTowardStationIDs": [
+              "08108d51648f115e",
+              "890b4dde225a6276"
+            ],
+            "recognitionAliases": [
+              "七里庄",
+              "9号线",
+              "六里桥东"
+            ]
+          },
+          {
+            "id": "l14-north",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台（善各庄方向）",
+            "coordinate": {
+              "x": 0.55,
+              "y": 0.53,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14-toward-14a6729f67bd18f1",
+            "arrivalFromStationIDs": [
+              "34792e1d7bf378cc",
+              "f21c6fa2644eed9d"
+            ],
+            "departureTowardStationIDs": [
+              "34792e1d7bf378cc",
+              "f21c6fa2644eed9d"
+            ],
+            "recognitionAliases": [
+              "七里庄",
+              "14号线",
+              "善各庄"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "东大桥",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "4baf11eb0af55857",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/694f14df78586657026fb952.html",
+          "sourceContentSHA256": "2bd90678cb90b62367f6e8df5e3e7caa86ced4e2803a048db9f67145b2104737",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints traced from the bundled official diagram."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l6-west",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "6号线站台（北海北方向）",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.39,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "b174a35600c5a5b3",
+            "platformID": "l6-toward-cc8cf64105f91edd",
+            "arrivalFromStationIDs": [
+              "a79724ed32aba778",
+              "535db968b56cbbb6"
+            ],
+            "departureTowardStationIDs": [
+              "a79724ed32aba778",
+              "535db968b56cbbb6"
+            ],
+            "recognitionAliases": [
+              "东大桥",
+              "6号线",
+              "北海北"
+            ]
+          },
+          {
+            "id": "l17-north",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台（未来科技城北方向）",
+            "coordinate": {
+              "x": 0.71,
+              "y": 0.54,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "l17-toward-e888b4cdd22afa38",
+            "arrivalFromStationIDs": [
+              "3d1f68c433d5d4de",
+              "1d13ba9409119c61"
+            ],
+            "departureTowardStationIDs": [
+              "3d1f68c433d5d4de",
+              "1d13ba9409119c61"
+            ],
+            "recognitionAliases": [
+              "东大桥",
+              "17号线",
+              "未来科技城北"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "东管头南",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "df3701f29006fa08",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af75ae9088860a952a7959.html",
+          "sourceContentSHA256": "f58ad734f0ca94361bc0d0bd9809ff1d61ab2d674b528798e222b3ed16fef0cb",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints traced from the bundled official diagram."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l16-south",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台（丰台南路方向）",
+            "coordinate": {
+              "x": 0.48,
+              "y": 0.66,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16-toward-91fa6c791c8b4f3a",
+            "arrivalFromStationIDs": [
+              "ae77df55e1cf663a",
+              "a92f22ded4dd7189"
+            ],
+            "departureTowardStationIDs": [
+              "ae77df55e1cf663a",
+              "a92f22ded4dd7189"
+            ],
+            "recognitionAliases": [
+              "东管头南",
+              "16号线",
+              "丰台南路"
+            ]
+          },
+          {
+            "id": "fs-east",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "房山线站台（花乡东桥方向）",
+            "coordinate": {
+              "x": 0.6,
+              "y": 0.59,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7c0ce98e738de39e",
+            "platformID": "fs-toward-55f2a928ad498930",
+            "arrivalFromStationIDs": [
+              "ac799af5754f747a"
+            ],
+            "departureTowardStationIDs": [
+              "ac799af5754f747a"
+            ],
+            "recognitionAliases": [
+              "东管头南",
+              "房山线",
+              "花乡东桥"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "丰台南路",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "91fa6c791c8b4f3a",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af75f69088860a952a795c.html",
+          "sourceContentSHA256": "616998ec54543ffec50b769cd4d564f4f468b69d8edc4a19f64aeac4af9cb2cb",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints traced from the bundled official diagram."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l9-north",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "9号线站台（丰台东大街方向）",
+            "coordinate": {
+              "x": 0.5,
+              "y": 0.67,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "189834e28c203ab8",
+            "platformID": "l9-toward-08108d51648f115e",
+            "arrivalFromStationIDs": [
+              "a65d570225267778",
+              "08108d51648f115e"
+            ],
+            "departureTowardStationIDs": [
+              "a65d570225267778",
+              "08108d51648f115e"
+            ],
+            "recognitionAliases": [
+              "丰台南路",
+              "9号线",
+              "丰台东大街"
+            ]
+          },
+          {
+            "id": "l16-north",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台（东管头南方向）",
+            "coordinate": {
+              "x": 0.56,
+              "y": 0.59,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16-toward-df3701f29006fa08",
+            "arrivalFromStationIDs": [
+              "a92f22ded4dd7189",
+              "c4cac3c35dc64e7b"
+            ],
+            "departureTowardStationIDs": [
+              "a92f22ded4dd7189",
+              "c4cac3c35dc64e7b"
+            ],
+            "recognitionAliases": [
+              "丰台南路",
+              "16号线",
+              "东管头南"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "丰台站",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "a92f22ded4dd7189",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af75d79088860a952a795b.html",
+          "sourceContentSHA256": "e82b13111d99f536c38ad4643c45762a170007c816a60fb2599a7d341965bdc3",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints traced from the bundled official diagram."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l10-east",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台（首经贸方向）",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.64,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "l10-toward-ac799af5754f747a",
+            "arrivalFromStationIDs": [
+              "ac799af5754f747a",
+              "342557fa2739482d"
+            ],
+            "departureTowardStationIDs": [
+              "ac799af5754f747a",
+              "342557fa2739482d"
+            ],
+            "recognitionAliases": [
+              "丰台站",
+              "10号线",
+              "首经贸"
+            ]
+          },
+          {
+            "id": "l16-north",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台（苏州街方向）",
+            "coordinate": {
+              "x": 0.6,
+              "y": 0.42,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16-toward-781a2df2a0bb0f19",
+            "arrivalFromStationIDs": [
+              "df3701f29006fa08",
+              "91fa6c791c8b4f3a"
+            ],
+            "departureTowardStationIDs": [
+              "df3701f29006fa08",
+              "91fa6c791c8b4f3a"
+            ],
+            "recognitionAliases": [
+              "丰台站",
+              "16号线",
+              "苏州街"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "丽泽商务区",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "ae77df55e1cf663a",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/61ce4a4fb0972c463ee519d3.html",
+          "sourceContentSHA256": "efc65de75fd033d74030c1cb2529f16b50391cb57c184e51409769c3d8163d5e",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.4,
+              "y": 0.6,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "丽泽商务区",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "15daf7e3d0364023",
+              "daf9a3f77cf9b4a6"
+            ],
+            "departureTowardStationIDs": [
+              "15daf7e3d0364023",
+              "daf9a3f77cf9b4a6"
+            ]
+          },
+          {
+            "id": "l16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.55,
+              "y": 0.68,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16",
+            "recognitionAliases": [
+              "丽泽商务区",
+              "16号线"
+            ],
+            "arrivalFromStationIDs": [
+              "e8228b42a4e8beaf",
+              "df3701f29006fa08"
+            ],
+            "departureTowardStationIDs": [
+              "e8228b42a4e8beaf",
+              "df3701f29006fa08"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "九龙山",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "0a6f37e8ceb2d327",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd0e.html",
+          "sourceContentSHA256": "e8edbf7a08a94bcb9bcb465cb793e177cee87c34baf4ccf2ed36ac1e6632e4fa",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l7",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "7号线站台",
+            "coordinate": {
+              "x": 0.52,
+              "y": 0.48,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "cf2854160e05c825",
+            "platformID": "l7",
+            "recognitionAliases": [
+              "九龙山",
+              "7号线"
+            ],
+            "arrivalFromStationIDs": [
+              "e0871c4ef41d0cf3",
+              "ac28d06d7137168c"
+            ],
+            "departureTowardStationIDs": [
+              "e0871c4ef41d0cf3",
+              "ac28d06d7137168c"
+            ]
+          },
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.43,
+              "y": 0.65,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "九龙山",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "e4a48907906f4bc0",
+              "eb549c3d8e3b7457"
+            ],
+            "departureTowardStationIDs": [
+              "e4a48907906f4bc0",
+              "eb549c3d8e3b7457"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "二里沟",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "5f9f18435850feff",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/641432779088860a952ad339.html",
+          "sourceContentSHA256": "14321e8ce3d7351c93291551bc54e5956f409bb34588e285ae7ff27aa53db4fb",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l6",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "6号线站台",
+            "coordinate": {
+              "x": 0.47,
+              "y": 0.52,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "b174a35600c5a5b3",
+            "platformID": "l6",
+            "recognitionAliases": [
+              "二里沟",
+              "6号线"
+            ],
+            "arrivalFromStationIDs": [
+              "ac1d2a0a6312a818",
+              "ab1ee7459e9a868c"
+            ],
+            "departureTowardStationIDs": [
+              "ac1d2a0a6312a818",
+              "ab1ee7459e9a868c"
+            ]
+          },
+          {
+            "id": "l16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.43,
+              "y": 0.7,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16",
+            "recognitionAliases": [
+              "二里沟",
+              "16号线"
+            ],
+            "arrivalFromStationIDs": [
+              "2173f5f346e8b9e0",
+              "99fc5d7b52569b45"
+            ],
+            "departureTowardStationIDs": [
+              "2173f5f346e8b9e0",
+              "99fc5d7b52569b45"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "人民大学",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "748628746403bc0e",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd64.html",
+          "sourceContentSHA256": "e35837cff0d5c0036a7525790e16e66f57d999cd850e6d263ab31726063b9fa9",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.39,
+              "y": 0.58,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "人民大学",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "4357b6acbe5cb80d",
+              "3bd5d899c582024f"
+            ],
+            "departureTowardStationIDs": [
+              "4357b6acbe5cb80d",
+              "3bd5d899c582024f"
+            ]
+          },
+          {
+            "id": "l12",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "12号线站台",
+            "coordinate": {
+              "x": 0.55,
+              "y": 0.41,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "5f88dc6c1e521bd0",
+            "platformID": "l12",
+            "recognitionAliases": [
+              "人民大学",
+              "12号线"
+            ],
+            "arrivalFromStationIDs": [
+              "0144182a584cdeeb",
+              "c8a69e74f63db354"
+            ],
+            "departureTowardStationIDs": [
+              "0144182a584cdeeb",
+              "c8a69e74f63db354"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "北京南站",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "962deba08233ab87",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd71.html",
+          "sourceContentSHA256": "f6ed052c8f76d681028a2a9355c269973fa541e32a5d2042fae0888c29a67d6e",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.36,
+              "y": 0.62,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "北京南站",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "0b7dc0140ff40c1d",
+              "c603f419ff94a2ac"
+            ],
+            "departureTowardStationIDs": [
+              "0b7dc0140ff40c1d",
+              "c603f419ff94a2ac"
+            ]
+          },
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.61,
+              "y": 0.43,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "北京南站",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "7b029a89f71f59e7",
+              "3b7c1e95340ec0b1",
+              "2b4853ddf641bf00"
+            ],
+            "departureTowardStationIDs": [
+              "7b029a89f71f59e7",
+              "3b7c1e95340ec0b1",
+              "2b4853ddf641bf00"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "十里河",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "9ba8a4016ef608d3",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd0d.html",
+          "sourceContentSHA256": "5a16c8ce4566480d101c1b6eb9d648940875737ef28bb59410f248259e7d68d9",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台",
+            "coordinate": {
+              "x": 0.53,
+              "y": 0.6,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "l10",
+            "recognitionAliases": [
+              "十里河",
+              "10号线"
+            ],
+            "arrivalFromStationIDs": [
+              "5408aad4a29eab7a",
+              "59641d1536e67c60"
+            ],
+            "departureTowardStationIDs": [
+              "5408aad4a29eab7a",
+              "59641d1536e67c60"
+            ]
+          },
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.35,
+              "y": 0.49,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "十里河",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "bda07e7c37c1a3cb",
+              "f4ea38b8e6891cac"
+            ],
+            "departureTowardStationIDs": [
+              "bda07e7c37c1a3cb",
+              "f4ea38b8e6891cac"
+            ]
+          },
+          {
+            "id": "l17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.72,
+              "y": 0.74,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "l17",
+            "recognitionAliases": [
+              "十里河",
+              "17号线"
+            ],
+            "arrivalFromStationIDs": [
+              "1407ee2109c4eacb",
+              "36e62e73fe9c025b"
+            ],
+            "departureTowardStationIDs": [
+              "1407ee2109c4eacb",
+              "36e62e73fe9c025b"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "国家图书馆",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "2173f5f346e8b9e0",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd66.html",
+          "sourceContentSHA256": "6c93bab1bcaf0c0069d86bfa4330810c027069b6a2396dd1ad37ddf80b5f8a56",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.41,
+              "y": 0.59,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "国家图书馆",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "3bd5d899c582024f",
+              "ad262f721f3b99ed"
+            ],
+            "departureTowardStationIDs": [
+              "3bd5d899c582024f",
+              "ad262f721f3b99ed"
+            ]
+          },
+          {
+            "id": "l9",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "9号线站台",
+            "coordinate": {
+              "x": 0.33,
+              "y": 0.73,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "189834e28c203ab8",
+            "platformID": "l9",
+            "recognitionAliases": [
+              "国家图书馆",
+              "9号线"
+            ],
+            "arrivalFromStationIDs": [
+              "ac1d2a0a6312a818"
+            ],
+            "departureTowardStationIDs": [
+              "ac1d2a0a6312a818"
+            ]
+          },
+          {
+            "id": "l16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.57,
+              "y": 0.46,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "l16",
+            "recognitionAliases": [
+              "国家图书馆",
+              "16号线"
+            ],
+            "arrivalFromStationIDs": [
+              "2b915d9f0719f7bc",
+              "5f9f18435850feff"
+            ],
+            "departureTowardStationIDs": [
+              "2b915d9f0719f7bc",
+              "5f9f18435850feff"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "大望路",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "e4a48907906f4bc0",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd0f.html",
+          "sourceContentSHA256": "9a9374deec41d8d4b48adc8b02e3505ba41a679a2dbae5f57602f550dff24d11",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l1",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "1号线站台",
+            "coordinate": {
+              "x": 0.36,
+              "y": 0.66,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7443f6d4039f61de",
+            "platformID": "l1",
+            "recognitionAliases": [
+              "大望路",
+              "1号线"
+            ],
+            "arrivalFromStationIDs": [
+              "2eb5fe2a39511214",
+              "f791ad0f41d31319"
+            ],
+            "departureTowardStationIDs": [
+              "2eb5fe2a39511214",
+              "f791ad0f41d31319"
+            ]
+          },
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.67,
+              "y": 0.55,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "大望路",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "b220fe55109b248f",
+              "0a6f37e8ceb2d327"
+            ],
+            "departureTowardStationIDs": [
+              "b220fe55109b248f",
+              "0a6f37e8ceb2d327"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "天通苑东",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "5bbfed9581b264a2",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/6584fa8a11244c4ae1b3a2c5.html",
+          "sourceContentSHA256": "9f90dafc4bd4460254201fd3fb4d5109a6f6f07b48a3cff7fc2427a41258607d",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.42,
+              "y": 0.6,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "l17",
+            "recognitionAliases": [
+              "天通苑东",
+              "17号线"
+            ],
+            "arrivalFromStationIDs": [
+              "6aa134394693f670",
+              "81142eb64fe7c9f9"
+            ],
+            "departureTowardStationIDs": [
+              "6aa134394693f670",
+              "81142eb64fe7c9f9"
+            ]
+          },
+          {
+            "id": "l18",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "18号线站台",
+            "coordinate": {
+              "x": 0.66,
+              "y": 0.66,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8610a9f64305f3dd",
+            "platformID": "l18",
+            "recognitionAliases": [
+              "天通苑东",
+              "18号线"
+            ],
+            "arrivalFromStationIDs": [
+              "8883766b6d382930"
+            ],
+            "departureTowardStationIDs": [
+              "8883766b6d382930"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "太阳宫",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "df452c6bdbeca517",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/6584fab411244c4ae1b3a2c8.html",
+          "sourceContentSHA256": "2301636ebc036a848f36a6579f3de7e349866b5b1adf260c3f18a2a9ae334f5f",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台",
+            "coordinate": {
+              "x": 0.48,
+              "y": 0.53,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "l10",
+            "recognitionAliases": [
+              "太阳宫",
+              "10号线"
+            ],
+            "arrivalFromStationIDs": [
+              "cc0129f1dc6a7624",
+              "f540874cb626cd98"
+            ],
+            "departureTowardStationIDs": [
+              "cc0129f1dc6a7624",
+              "f540874cb626cd98"
+            ]
+          },
+          {
+            "id": "l17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.5,
+              "y": 0.69,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "l17",
+            "recognitionAliases": [
+              "太阳宫",
+              "17号线"
+            ],
+            "arrivalFromStationIDs": [
+              "bbfe183fc2b4ca4a",
+              "985cabe448604b78"
+            ],
+            "departureTowardStationIDs": [
+              "bbfe183fc2b4ca4a",
+              "985cabe448604b78"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "宣武门",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "2a0607a8a3167ba6",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd6e.html",
+          "sourceContentSHA256": "19684b3c97a43e12e315a3a7e3a3d593d966d6753877e578bb90a8c1cd58f5ba",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l2",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "2号线站台",
+            "coordinate": {
+              "x": 0.56,
+              "y": 0.54,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "5cdbbd2bf0cc05e3",
+            "platformID": "l2",
+            "recognitionAliases": [
+              "宣武门",
+              "2号线"
+            ],
+            "arrivalFromStationIDs": [
+              "ef9746bf23c7f83a",
+              "5edcfe8cb6530586"
+            ],
+            "departureTowardStationIDs": [
+              "ef9746bf23c7f83a",
+              "5edcfe8cb6530586"
+            ]
+          },
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.4,
+              "y": 0.65,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "宣武门",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "413fc8c62f77c543",
+              "f6598018e6587a49"
+            ],
+            "departureTowardStationIDs": [
+              "413fc8c62f77c543",
+              "f6598018e6587a49"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "工人体育场",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "3d1f68c433d5d4de",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/6584facb11244c4ae1b3a2cb.html",
+          "sourceContentSHA256": "6338234105b696ac3b947a134eed9915202eb8398e31d9289eed8bfbd1b60b2c",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l3",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "3号线站台",
+            "coordinate": {
+              "x": 0.42,
+              "y": 0.51,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "419d1bd0828b5e24",
+            "platformID": "l3",
+            "recognitionAliases": [
+              "工人体育场",
+              "3号线"
+            ],
+            "arrivalFromStationIDs": [
+              "33b6b8749699078e",
+              "46f6c220d503ce0d"
+            ],
+            "departureTowardStationIDs": [
+              "33b6b8749699078e",
+              "46f6c220d503ce0d"
+            ]
+          },
+          {
+            "id": "l17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.59,
+              "y": 0.66,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "l17",
+            "recognitionAliases": [
+              "工人体育场",
+              "17号线"
+            ],
+            "arrivalFromStationIDs": [
+              "d7246943398db4b7",
+              "4baf11eb0af55857"
+            ],
+            "departureTowardStationIDs": [
+              "d7246943398db4b7",
+              "4baf11eb0af55857"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "平安里",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "3fc0b54d37371d8a",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd6a.html",
+          "sourceContentSHA256": "a43d5c29d41e04c451251bfe31dd333f04d1e7eddbe6d2bdadd60297f71c3f23",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.39,
+              "y": 0.64,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "平安里",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "4ce0c1fde748275a",
+              "3304524cf6b7a3c3"
+            ],
+            "departureTowardStationIDs": [
+              "4ce0c1fde748275a",
+              "3304524cf6b7a3c3"
+            ]
+          },
+          {
+            "id": "l6",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "6号线站台",
+            "coordinate": {
+              "x": 0.5,
+              "y": 0.44,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "b174a35600c5a5b3",
+            "platformID": "l6",
+            "recognitionAliases": [
+              "平安里",
+              "6号线"
+            ],
+            "arrivalFromStationIDs": [
+              "160b30e134da8663",
+              "cc8cf64105f91edd"
+            ],
+            "departureTowardStationIDs": [
+              "160b30e134da8663",
+              "cc8cf64105f91edd"
+            ]
+          },
+          {
+            "id": "l19",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "19号线站台",
+            "coordinate": {
+              "x": 0.66,
+              "y": 0.58,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7777ab46dc1e8311",
+            "platformID": "l19",
+            "recognitionAliases": [
+              "平安里",
+              "19号线"
+            ],
+            "arrivalFromStationIDs": [
+              "717a499f469be9cf",
+              "5dc213d7e6ca19b6"
+            ],
+            "departureTowardStationIDs": [
+              "717a499f469be9cf",
+              "5dc213d7e6ca19b6"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "新宫",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "fe7a7b9e98111de1",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a1958b1ea0278b8fffd75.html",
+          "sourceContentSHA256": "ee97bc231a3941c62291c84fb5bbf42a8cda021c9226b47feeb571b8434ff69e",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台",
+            "coordinate": {
+              "x": 0.42,
+              "y": 0.63,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "l4",
+            "recognitionAliases": [
+              "新宫",
+              "4号线"
+            ],
+            "arrivalFromStationIDs": [
+              "3195c9845d718402",
+              "349fb2cd54125fa5"
+            ],
+            "departureTowardStationIDs": [
+              "3195c9845d718402",
+              "349fb2cd54125fa5"
+            ]
+          },
+          {
+            "id": "l19",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "19号线站台",
+            "coordinate": {
+              "x": 0.69,
+              "y": 0.55,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7777ab46dc1e8311",
+            "platformID": "l19",
+            "recognitionAliases": [
+              "新宫",
+              "19号线"
+            ],
+            "arrivalFromStationIDs": [
+              "79c62e7bc6968c35"
+            ],
+            "departureTowardStationIDs": [
+              "79c62e7bc6968c35"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "景风门",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "3b7c1e95340ec0b1",
+        "version": "1",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/61ce49edb0972c463ee519d0.html",
+          "sourceContentSHA256": "3ad71cd273463b7e9224404e0982a7a92e283c52c45777feeec85d8e0790e85e",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Visible platform locations only; no route distances inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "l14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.5,
+              "y": 0.61,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "l14",
+            "recognitionAliases": [
+              "景风门",
+              "14号线"
+            ],
+            "arrivalFromStationIDs": [
+              "962deba08233ab87",
+              "41c9e1a800bec007"
+            ],
+            "departureTowardStationIDs": [
+              "962deba08233ab87",
+              "41c9e1a800bec007"
+            ]
+          },
+          {
+            "id": "l19",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "19号线站台",
+            "coordinate": {
+              "x": 0.36,
+              "y": 0.52,
+              "z": 0
+            },
+            "isStepFree": false,
+            "lineID": "7777ab46dc1e8311",
+            "platformID": "l19",
+            "recognitionAliases": [
+              "景风门",
+              "19号线"
+            ],
+            "arrivalFromStationIDs": [
+              "1e57386f5a0a20af",
+              "706ef69da8cc1742"
+            ],
+            "departureTowardStationIDs": [
+              "1e57386f5a0a20af",
+              "706ef69da8cc1742"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "望京",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "bb9b22a5e2f278ad",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd15.html",
+          "sourceContentSHA256": "ba20ef1723d4b0d26f3f85e73f0ac53c948e442b8ea40382818bdef320b4f28c",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.4,
+              "y": 0.47,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "d8f4a75a67cada37",
+              "81794e5a8b300696"
+            ],
+            "departureTowardStationIDs": [
+              "d8f4a75a67cada37",
+              "81794e5a8b300696"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          },
+          {
+            "id": "platform-L15",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "15号线站台",
+            "coordinate": {
+              "x": 0.31,
+              "y": 0.59,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "94d7555971b78ae3",
+            "platformID": "platform-94d7555971b78ae3",
+            "arrivalFromStationIDs": [
+              "41fa609df9dbf82a",
+              "bbfe183fc2b4ca4a"
+            ],
+            "departureTowardStationIDs": [
+              "41fa609df9dbf82a",
+              "bbfe183fc2b4ca4a"
+            ],
+            "recognitionAliases": [
+              "15号线",
+              "Line 15"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "望京西",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "bbfe183fc2b4ca4a",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/697b40056a97b45630c3c3c6.html",
+          "sourceContentSHA256": "5d4cf727614eb35338d6d42fcd4dd5a656fc3d97e53e34cac00f860257b77d6f",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L13",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "13号线站台",
+            "coordinate": {
+              "x": 0.31,
+              "y": 0.57,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "57908b0bb9757459",
+            "platformID": "platform-57908b0bb9757459",
+            "arrivalFromStationIDs": [
+              "cc0129f1dc6a7624",
+              "70259a76b210be56"
+            ],
+            "departureTowardStationIDs": [
+              "cc0129f1dc6a7624",
+              "70259a76b210be56"
+            ],
+            "recognitionAliases": [
+              "13号线",
+              "Line 13"
+            ]
+          },
+          {
+            "id": "platform-L15",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "15号线站台",
+            "coordinate": {
+              "x": 0.45,
+              "y": 0.43,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "94d7555971b78ae3",
+            "platformID": "platform-94d7555971b78ae3",
+            "arrivalFromStationIDs": [
+              "bb9b22a5e2f278ad",
+              "d83fe650c8653ed6"
+            ],
+            "departureTowardStationIDs": [
+              "bb9b22a5e2f278ad",
+              "d83fe650c8653ed6"
+            ],
+            "recognitionAliases": [
+              "15号线",
+              "Line 15"
+            ]
+          },
+          {
+            "id": "platform-L17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.62,
+              "y": 0.47,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "platform-7b7f6568044e3957",
+            "arrivalFromStationIDs": [
+              "90d042336ecb0482",
+              "df452c6bdbeca517"
+            ],
+            "departureTowardStationIDs": [
+              "90d042336ecb0482",
+              "df452c6bdbeca517"
+            ],
+            "recognitionAliases": [
+              "17号线",
+              "Line 17"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "朝阳公园",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "fe21a34d6135aed1",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd10.html",
+          "sourceContentSHA256": "b01aa577d198c9d62356f3e09692f39ff51f5e18ec77b7953852f349f6b14ebc",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L3",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "3号线站台",
+            "coordinate": {
+              "x": 0.31,
+              "y": 0.58,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "419d1bd0828b5e24",
+            "platformID": "platform-419d1bd0828b5e24",
+            "arrivalFromStationIDs": [
+              "46f6c220d503ce0d",
+              "d4f701b7d6d29370"
+            ],
+            "departureTowardStationIDs": [
+              "46f6c220d503ce0d",
+              "d4f701b7d6d29370"
+            ],
+            "recognitionAliases": [
+              "3号线",
+              "Line 3"
+            ]
+          },
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.47,
+              "y": 0.4,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "7f1fd65a6860593b",
+              "028aba86ca4ec024"
+            ],
+            "departureTowardStationIDs": [
+              "7f1fd65a6860593b",
+              "028aba86ca4ec024"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "木樨地",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "f0cbd6be1903a652",
+        "version": "3",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af74f69088860a952a7952.html",
+          "sourceContentSHA256": "1fe1e904d3126b888300fa2d6edad335cc37eef31aa0aaeb209ad3a2c5fb03e6",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "The bundled official schematic depicts the Line 1 platform but does not depict Line 16; no Line 16 position or traversal is inferred."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L1",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "1号线/八通线站台",
+            "coordinate": {
+              "x": 0.29,
+              "y": 0.58,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7443f6d4039f61de",
+            "platformID": "platform-7443f6d4039f61de",
+            "arrivalFromStationIDs": [
+              "73179abb76c9884a",
+              "4c76e2f2e93cbd4b"
+            ],
+            "departureTowardStationIDs": [
+              "73179abb76c9884a",
+              "4c76e2f2e93cbd4b"
+            ],
+            "recognitionAliases": [
+              "1号线",
+              "八通线",
+              "Line 1"
+            ]
+          }
+        ],
+        "lineCoverageGaps": [
+          {
+            "lineID": "f303a610a2da9bca",
+            "reason": "sourceDoesNotDepictLine",
+            "note": "The bundled official station diagram does not depict the Line 16 platform."
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "次渠",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "7a08b72c7e798533",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/61ce4911b0972c463ee519ca.html",
+          "sourceContentSHA256": "be059f90e3e92e48b9fdb0aefd22cee69c097ebf46d052e76a5d5479455c3c28",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-YZ",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "亦庄线站台",
+            "coordinate": {
+              "x": 0.43,
+              "y": 0.58,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "2f902bce1232fcb4",
+            "platformID": "platform-2f902bce1232fcb4",
+            "arrivalFromStationIDs": [
+              "8d60bfb788af89ec",
+              "524b07d790525f17"
+            ],
+            "departureTowardStationIDs": [
+              "8d60bfb788af89ec",
+              "524b07d790525f17"
+            ],
+            "recognitionAliases": [
+              "亦庄线",
+              "Yizhuang Line"
+            ]
+          },
+          {
+            "id": "platform-L17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.49,
+              "y": 0.35,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "platform-7b7f6568044e3957",
+            "arrivalFromStationIDs": [
+              "e9e95c7f7ed17030",
+              "d6f86e7dd1a466ea"
+            ],
+            "departureTowardStationIDs": [
+              "e9e95c7f7ed17030",
+              "d6f86e7dd1a466ea"
+            ],
+            "recognitionAliases": [
+              "17号线",
+              "Line 17"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "永安里",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "1d13ba9409119c61",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/694f158e78586657026fb953.html",
+          "sourceContentSHA256": "e0d352b2bee61372da532780ee878f2a393cf1f3589f06b899758b7282e01a68",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L1",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "1号线/八通线站台",
+            "coordinate": {
+              "x": 0.52,
+              "y": 0.66,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7443f6d4039f61de",
+            "platformID": "platform-7443f6d4039f61de",
+            "arrivalFromStationIDs": [
+              "1549561ba2165975",
+              "2eb5fe2a39511214"
+            ],
+            "departureTowardStationIDs": [
+              "1549561ba2165975",
+              "2eb5fe2a39511214"
+            ],
+            "recognitionAliases": [
+              "1号线",
+              "八通线",
+              "Line 1"
+            ]
+          },
+          {
+            "id": "platform-L17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.49,
+              "y": 0.36,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "platform-7b7f6568044e3957",
+            "arrivalFromStationIDs": [
+              "4baf11eb0af55857",
+              "1407ee2109c4eacb"
+            ],
+            "departureTowardStationIDs": [
+              "4baf11eb0af55857",
+              "1407ee2109c4eacb"
+            ],
+            "recognitionAliases": [
+              "17号线",
+              "Line 17"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "永定门外",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "2b4853ddf641bf00",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd06.html",
+          "sourceContentSHA256": "0074937bdb37abcb0033bfeab999179935e018d73ec695fd55fc4a39a8a4cced",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L8",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "8号线站台",
+            "coordinate": {
+              "x": 0.46,
+              "y": 0.63,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "0ff94a8b4d2f864b",
+            "platformID": "platform-0ff94a8b4d2f864b",
+            "arrivalFromStationIDs": [
+              "47ddf79cf8de7bd8",
+              "7bb48bd8c2dd0f1a"
+            ],
+            "departureTowardStationIDs": [
+              "47ddf79cf8de7bd8",
+              "7bb48bd8c2dd0f1a"
+            ],
+            "recognitionAliases": [
+              "8号线",
+              "Line 8"
+            ]
+          },
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.34,
+              "y": 0.39,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "b7dbce7f569fcad5",
+              "7b029a89f71f59e7",
+              "962deba08233ab87"
+            ],
+            "departureTowardStationIDs": [
+              "b7dbce7f569fcad5",
+              "7b029a89f71f59e7",
+              "962deba08233ab87"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "海淀黄庄",
+      "indoorMap": {
+        "stationID": "4357b6acbe5cb80d",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "levels": [
+          {
+            "id": "concourse",
+            "name": "Concourse",
+            "ordinal": 0
+          },
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 1
+          }
+        ],
+        "nodes": [
+          {
+            "id": "n_exit_A1",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "A1口（西北口）",
+            "coordinate": {
+              "x": 0.435,
+              "y": 0.201,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "A1口（西北口）"
+            ]
+          },
+          {
+            "id": "n_exit_A2",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "A2口（西北口）",
+            "coordinate": {
+              "x": 0.51,
+              "y": 0.189,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "A2口（西北口）"
+            ]
+          },
+          {
+            "id": "n_concourse_ne",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（东北）",
+            "coordinate": {
+              "x": 0.48,
+              "y": 0.305,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "站厅换乘通道（东北）"
+            ]
+          },
+          {
+            "id": "n_exit_B",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "B口（东北口）",
+            "coordinate": {
+              "x": 0.575,
+              "y": 0.379,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "B口（东北口）"
+            ]
+          },
+          {
+            "id": "n_platform_L10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台（苏州街/知春里方向）",
+            "coordinate": {
+              "x": 0.395,
+              "y": 0.366,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "10号线",
+              "Line 10"
+            ],
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "platform-a9ebe043abebb24f",
+            "arrivalFromStationIDs": [
+              "781a2df2a0bb0f19",
+              "cce4e1fbf082cc4d"
+            ],
+            "departureTowardStationIDs": [
+              "781a2df2a0bb0f19",
+              "cce4e1fbf082cc4d"
+            ]
+          },
+          {
+            "id": "n_concourse_w",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（西）",
+            "coordinate": {
+              "x": 0.24,
+              "y": 0.464,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "站厅换乘通道（西）"
+            ]
+          },
+          {
+            "id": "n_exit_D",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "D口（西南口）",
+            "coordinate": {
+              "x": 0.205,
+              "y": 0.415,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "D口（西南口）"
+            ]
+          },
+          {
+            "id": "n_concourse_central",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅主通道",
+            "coordinate": {
+              "x": 0.23,
+              "y": 0.562,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "站厅主通道"
+            ]
+          },
+          {
+            "id": "n_concourse_s",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（南）",
+            "coordinate": {
+              "x": 0.31,
+              "y": 0.647,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "站厅换乘通道（南）"
+            ]
+          },
+          {
+            "id": "n_exit_C",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "C口（东南口）",
+            "coordinate": {
+              "x": 0.3,
+              "y": 0.678,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "C口（东南口）"
+            ]
+          },
+          {
+            "id": "n_platform_L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台（安河桥北/天宫院方向）",
+            "coordinate": {
+              "x": 0.45,
+              "y": 0.635,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ],
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "e2bce146aa982d91",
+              "748628746403bc0e"
+            ],
+            "departureTowardStationIDs": [
+              "e2bce146aa982d91",
+              "748628746403bc0e"
+            ]
+          },
+          {
+            "id": "n_elev_L10",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.4375,
+              "y": 0.3355,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "电梯"
+            ]
+          },
+          {
+            "id": "n_elev_L4",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.641,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "电梯"
+            ]
+          },
+          {
+            "id": "n_stairs_L10",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.3125,
+              "y": 0.464,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "楼梯"
+            ]
+          },
+          {
+            "id": "n_stairs_L4",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.34,
+              "y": 0.5985,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "楼梯"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "id": "e1",
+            "fromNodeID": "n_exit_A1",
+            "toNodeID": "n_concourse_ne",
+            "distanceMeters": 20,
+            "typicalSeconds": 20,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e2",
+            "fromNodeID": "n_exit_A2",
+            "toNodeID": "n_concourse_ne",
+            "distanceMeters": 25,
+            "typicalSeconds": 20,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e4",
+            "fromNodeID": "n_concourse_ne",
+            "toNodeID": "n_exit_B",
+            "distanceMeters": 60,
+            "typicalSeconds": 55,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e5",
+            "fromNodeID": "n_concourse_ne",
+            "toNodeID": "n_concourse_w",
+            "distanceMeters": 110,
+            "typicalSeconds": 95,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e6",
+            "fromNodeID": "n_concourse_w",
+            "toNodeID": "n_exit_D",
+            "distanceMeters": 20,
+            "typicalSeconds": 20,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e7",
+            "fromNodeID": "n_concourse_w",
+            "toNodeID": "n_concourse_central",
+            "distanceMeters": 30,
+            "typicalSeconds": 30,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e8",
+            "fromNodeID": "n_concourse_central",
+            "toNodeID": "n_concourse_s",
+            "distanceMeters": 40,
+            "typicalSeconds": 40,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e9",
+            "fromNodeID": "n_concourse_s",
+            "toNodeID": "n_exit_C",
+            "distanceMeters": 20,
+            "typicalSeconds": 20,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e3a",
+            "fromNodeID": "n_concourse_ne",
+            "toNodeID": "n_elev_L10",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e3b",
+            "fromNodeID": "n_elev_L10",
+            "toNodeID": "n_platform_L10",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e10a",
+            "fromNodeID": "n_concourse_s",
+            "toNodeID": "n_elev_L4",
+            "distanceMeters": 17.5,
+            "typicalSeconds": 17.5,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e10b",
+            "fromNodeID": "n_elev_L4",
+            "toNodeID": "n_platform_L4",
+            "distanceMeters": 17.5,
+            "typicalSeconds": 17.5,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e11a",
+            "fromNodeID": "n_concourse_central",
+            "toNodeID": "n_stairs_L10",
+            "distanceMeters": 22.5,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          },
+          {
+            "id": "e11b",
+            "fromNodeID": "n_stairs_L10",
+            "toNodeID": "n_platform_L10",
+            "distanceMeters": 22.5,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          },
+          {
+            "id": "e12a",
+            "fromNodeID": "n_concourse_central",
+            "toNodeID": "n_stairs_L4",
+            "distanceMeters": 25.0,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          },
+          {
+            "id": "e12b",
+            "fromNodeID": "n_stairs_L4",
+            "toNodeID": "n_platform_L4",
+            "distanceMeters": 25.0,
+            "typicalSeconds": 22.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          }
+        ],
+        "landmarks": [
+
+        ],
+        "mapImageCalibration": null,
+        "schemaVersion": 2,
+        "coverageMode": "transferPaths",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd63.html",
+          "sourceContentSHA256": "008f0df255049a4d25254ec2f8e5c7eaf1aa4f70d9233ec199d150595671e353",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Path geometry was hand-traced from the station diagram.",
+            "Distances and walking times are estimates; no door-level or continuous-position claim is made."
+          ]
+        }
+      }
+    },
+    {
+      "stationName": "苏州桥",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "0144182a584cdeeb",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5fed2ff0b17a37c682d20aa3.html",
+          "sourceContentSHA256": "d4ad9b26fcae1c522e9c7edf32d45d25c89b4ec2b374b8059e4cd9c7e2eaf278",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L12",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "12号线站台",
+            "coordinate": {
+              "x": 0.37,
+              "y": 0.58,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "5f88dc6c1e521bd0",
+            "platformID": "platform-5f88dc6c1e521bd0",
+            "arrivalFromStationIDs": [
+              "8b33de3695986f6a",
+              "748628746403bc0e"
+            ],
+            "departureTowardStationIDs": [
+              "8b33de3695986f6a",
+              "748628746403bc0e"
+            ],
+            "recognitionAliases": [
+              "12号线",
+              "Line 12"
+            ]
+          },
+          {
+            "id": "platform-L16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.49,
+              "y": 0.4,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "platform-f303a610a2da9bca",
+            "arrivalFromStationIDs": [
+              "781a2df2a0bb0f19",
+              "2b915d9f0719f7bc"
+            ],
+            "departureTowardStationIDs": [
+              "781a2df2a0bb0f19",
+              "2b915d9f0719f7bc"
+            ],
+            "recognitionAliases": [
+              "16号线",
+              "Line 16"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "苏州街",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "781a2df2a0bb0f19",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/6585078711244c4ae1b3a2cc.html",
+          "sourceContentSHA256": "87432145c11aaba46794c6b4e34a784e08ec47fcd203f6ce87145ec16b27b31c",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台",
+            "coordinate": {
+              "x": 0.53,
+              "y": 0.52,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "platform-a9ebe043abebb24f",
+            "arrivalFromStationIDs": [
+              "b5b163abec8b11f5",
+              "4357b6acbe5cb80d"
+            ],
+            "departureTowardStationIDs": [
+              "b5b163abec8b11f5",
+              "4357b6acbe5cb80d"
+            ],
+            "recognitionAliases": [
+              "10号线",
+              "Line 10"
+            ]
+          },
+          {
+            "id": "platform-L16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.45,
+              "y": 0.65,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "platform-f303a610a2da9bca",
+            "arrivalFromStationIDs": [
+              "d82c92024c2fde16",
+              "0144182a584cdeeb"
+            ],
+            "departureTowardStationIDs": [
+              "d82c92024c2fde16",
+              "0144182a584cdeeb"
+            ],
+            "recognitionAliases": [
+              "16号线",
+              "Line 16"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "菜市口",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "f6598018e6587a49",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd6f.html",
+          "sourceContentSHA256": "27a5ce5c704b16d1e7e5186fddbc1f71683f104b18d997a5a1decdbddcbd93b1",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线/大兴线站台",
+            "coordinate": {
+              "x": 0.3,
+              "y": 0.61,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "2a0607a8a3167ba6",
+              "0b7dc0140ff40c1d"
+            ],
+            "departureTowardStationIDs": [
+              "2a0607a8a3167ba6",
+              "0b7dc0140ff40c1d"
+            ],
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ]
+          },
+          {
+            "id": "platform-L7",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "7号线站台",
+            "coordinate": {
+              "x": 0.48,
+              "y": 0.41,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "cf2854160e05c825",
+            "platformID": "platform-cf2854160e05c825",
+            "arrivalFromStationIDs": [
+              "1771fe529cd6c29f",
+              "ff192ec89faf0229"
+            ],
+            "departureTowardStationIDs": [
+              "1771fe529cd6c29f",
+              "ff192ec89faf0229"
+            ],
+            "recognitionAliases": [
+              "7号线",
+              "Line 7"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "蒲黄榆",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "f1f81abd3c2506e1",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd0c.html",
+          "sourceContentSHA256": "630000668cf42e233196134f3be3a2a9a65997762278efa6d46ca30953dc4541",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L5",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "5号线站台",
+            "coordinate": {
+              "x": 0.49,
+              "y": 0.57,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "442244829301b221",
+            "platformID": "platform-442244829301b221",
+            "arrivalFromStationIDs": [
+              "cc33c71d5ad17ebe",
+              "5d4e1917329c5c59"
+            ],
+            "departureTowardStationIDs": [
+              "cc33c71d5ad17ebe",
+              "5d4e1917329c5c59"
+            ],
+            "recognitionAliases": [
+              "5号线",
+              "Line 5"
+            ]
+          },
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.42,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "f4ea38b8e6891cac",
+              "b7dbce7f569fcad5"
+            ],
+            "departureTowardStationIDs": [
+              "f4ea38b8e6891cac",
+              "b7dbce7f569fcad5"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "西单",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "413fc8c62f77c543",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd6d.html",
+          "sourceContentSHA256": "0bb5b78cf5e78c79e2e780f89b5badce94fb3fbfe69f8436b219662ed8db892f",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L1",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "1号线/八通线站台",
+            "coordinate": {
+              "x": 0.35,
+              "y": 0.35,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7443f6d4039f61de",
+            "platformID": "platform-7443f6d4039f61de",
+            "arrivalFromStationIDs": [
+              "a9a1a8d3d261fa94",
+              "cbe302179db92100"
+            ],
+            "departureTowardStationIDs": [
+              "a9a1a8d3d261fa94",
+              "cbe302179db92100"
+            ],
+            "recognitionAliases": [
+              "1号线",
+              "八通线",
+              "Line 1"
+            ]
+          },
+          {
+            "id": "platform-L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线/大兴线站台",
+            "coordinate": {
+              "x": 0.58,
+              "y": 0.6,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "cfd235c2e126af60",
+              "2a0607a8a3167ba6"
+            ],
+            "departureTowardStationIDs": [
+              "cfd235c2e126af60",
+              "2a0607a8a3167ba6"
+            ],
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "西坝河",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "985cabe448604b78",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/6584fabc11244c4ae1b3a2c9.html",
+          "sourceContentSHA256": "bd21fd7abf27b7c515700c509164dded1e3237ef430b2ea964e3483eca5c14f9",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L12",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "12号线站台",
+            "coordinate": {
+              "x": 0.32,
+              "y": 0.46,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "5f88dc6c1e521bd0",
+            "platformID": "platform-5f88dc6c1e521bd0",
+            "arrivalFromStationIDs": [
+              "c22a237329dd0815",
+              "f540874cb626cd98"
+            ],
+            "departureTowardStationIDs": [
+              "c22a237329dd0815",
+              "f540874cb626cd98"
+            ],
+            "recognitionAliases": [
+              "12号线",
+              "Line 12"
+            ]
+          },
+          {
+            "id": "platform-L17",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "17号线站台",
+            "coordinate": {
+              "x": 0.5,
+              "y": 0.37,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "7b7f6568044e3957",
+            "platformID": "platform-7b7f6568044e3957",
+            "arrivalFromStationIDs": [
+              "df452c6bdbeca517",
+              "d7246943398db4b7"
+            ],
+            "departureTowardStationIDs": [
+              "df452c6bdbeca517",
+              "d7246943398db4b7"
+            ],
+            "recognitionAliases": [
+              "17号线",
+              "Line 17"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "西局",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "34792e1d7bf378cc",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd03.html",
+          "sourceContentSHA256": "86c8d681ec9c7e27b04b2cb6839d8c6db0eba273f9ca3abf34f541ca710c4a49",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台",
+            "coordinate": {
+              "x": 0.53,
+              "y": 0.57,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "platform-a9ebe043abebb24f",
+            "arrivalFromStationIDs": [
+              "890b4dde225a6276",
+              "342557fa2739482d"
+            ],
+            "departureTowardStationIDs": [
+              "890b4dde225a6276",
+              "342557fa2739482d"
+            ],
+            "recognitionAliases": [
+              "10号线",
+              "Line 10"
+            ]
+          },
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.41,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "daf9a3f77cf9b4a6",
+              "c2573eb677c323c3"
+            ],
+            "departureTowardStationIDs": [
+              "daf9a3f77cf9b4a6",
+              "c2573eb677c323c3"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "西直门",
+      "indoorMap": {
+        "stationID": "7a211ea6af9671a3",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "levels": [
+          {
+            "id": "concourse",
+            "name": "Concourse",
+            "ordinal": 0
+          },
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 1
+          }
+        ],
+        "nodes": [
+          {
+            "id": "n_exit_E",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "E口",
+            "coordinate": {
+              "x": 0.058,
+              "y": 0.417,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "E口"
+            ]
+          },
+          {
+            "id": "n_exit_F1",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "F1口",
+            "coordinate": {
+              "x": 0.108,
+              "y": 0.475,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "F1口"
+            ]
+          },
+          {
+            "id": "n_exit_F2",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "F2口",
+            "coordinate": {
+              "x": 0.008,
+              "y": 0.568,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "F2口"
+            ]
+          },
+          {
+            "id": "n_platform_L13",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "13号线站台（西直门端）",
+            "coordinate": {
+              "x": 0.115,
+              "y": 0.245,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "13号线",
+              "Line 13"
+            ],
+            "lineID": "57908b0bb9757459",
+            "platformID": "platform-57908b0bb9757459",
+            "arrivalFromStationIDs": [
+              "c8a69e74f63db354"
+            ],
+            "departureTowardStationIDs": [
+              "c8a69e74f63db354"
+            ]
+          },
+          {
+            "id": "n_exit_A_north",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "A口（北京北站方向）",
+            "coordinate": {
+              "x": 0.215,
+              "y": 0.381,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "A口（北京北站方向）"
+            ]
+          },
+          {
+            "id": "n_concourse_north",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（北）",
+            "coordinate": {
+              "x": 0.26,
+              "y": 0.432,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "站厅换乘通道（北）"
+            ]
+          },
+          {
+            "id": "n_exit_B",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "B口",
+            "coordinate": {
+              "x": 0.415,
+              "y": 0.353,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "B口"
+            ]
+          },
+          {
+            "id": "n_concourse_east",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（东）",
+            "coordinate": {
+              "x": 0.475,
+              "y": 0.489,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "站厅换乘通道（东）"
+            ]
+          },
+          {
+            "id": "n_platform_L2",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "2号线站台（积水潭/车公庄方向）",
+            "coordinate": {
+              "x": 0.39,
+              "y": 0.633,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "2号线",
+              "Line 2"
+            ],
+            "lineID": "5cdbbd2bf0cc05e3",
+            "platformID": "platform-5cdbbd2bf0cc05e3",
+            "arrivalFromStationIDs": [
+              "5dc213d7e6ca19b6",
+              "160b30e134da8663"
+            ],
+            "departureTowardStationIDs": [
+              "5dc213d7e6ca19b6",
+              "160b30e134da8663"
+            ]
+          },
+          {
+            "id": "n_exit_C",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "C口",
+            "coordinate": {
+              "x": 0.575,
+              "y": 0.669,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "C口"
+            ]
+          },
+          {
+            "id": "n_concourse_south",
+            "kind": "concourse",
+            "levelID": "concourse",
+            "title": "站厅换乘通道（南）",
+            "coordinate": {
+              "x": 0.34,
+              "y": 0.496,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "站厅换乘通道（南）"
+            ]
+          },
+          {
+            "id": "n_platform_L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线站台（安河桥北/天宫院方向）",
+            "coordinate": {
+              "x": 0.365,
+              "y": 0.806,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ],
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "ad262f721f3b99ed",
+              "4ce0c1fde748275a"
+            ],
+            "departureTowardStationIDs": [
+              "ad262f721f3b99ed",
+              "4ce0c1fde748275a"
+            ]
+          },
+          {
+            "id": "n_exit_D",
+            "kind": "exit",
+            "levelID": "concourse",
+            "title": "D口",
+            "coordinate": {
+              "x": 0.33,
+              "y": 0.878,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "D口"
+            ]
+          },
+          {
+            "id": "n_elev_L13",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.1875,
+              "y": 0.3385,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "电梯"
+            ]
+          },
+          {
+            "id": "n_elev_L2",
+            "kind": "elevator",
+            "levelID": "concourse",
+            "title": "电梯",
+            "coordinate": {
+              "x": 0.365,
+              "y": 0.5645,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": true,
+            "recognitionAliases": [
+              "电梯"
+            ]
+          },
+          {
+            "id": "n_stairs_L4",
+            "kind": "stairs",
+            "levelID": "concourse",
+            "title": "楼梯",
+            "coordinate": {
+              "x": 0.3525,
+              "y": 0.651,
+              "z": 0.0
+            },
+            "geoCoordinate": null,
+            "isStepFree": false,
+            "recognitionAliases": [
+              "楼梯"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "id": "e1",
+            "fromNodeID": "n_exit_F2",
+            "toNodeID": "n_concourse_north",
+            "distanceMeters": 70,
+            "typicalSeconds": 60,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e2",
+            "fromNodeID": "n_exit_F1",
+            "toNodeID": "n_concourse_north",
+            "distanceMeters": 60,
+            "typicalSeconds": 50,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e3",
+            "fromNodeID": "n_exit_E",
+            "toNodeID": "n_concourse_north",
+            "distanceMeters": 40,
+            "typicalSeconds": 35,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e5",
+            "fromNodeID": "n_concourse_north",
+            "toNodeID": "n_exit_A_north",
+            "distanceMeters": 20,
+            "typicalSeconds": 20,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e6",
+            "fromNodeID": "n_concourse_north",
+            "toNodeID": "n_concourse_east",
+            "distanceMeters": 90,
+            "typicalSeconds": 80,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e7",
+            "fromNodeID": "n_exit_B",
+            "toNodeID": "n_concourse_east",
+            "distanceMeters": 50,
+            "typicalSeconds": 45,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e8",
+            "fromNodeID": "n_concourse_east",
+            "toNodeID": "n_concourse_south",
+            "distanceMeters": 70,
+            "typicalSeconds": 65,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e11",
+            "fromNodeID": "n_platform_L4",
+            "toNodeID": "n_exit_D",
+            "distanceMeters": 40,
+            "typicalSeconds": 35,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e12",
+            "fromNodeID": "n_concourse_east",
+            "toNodeID": "n_exit_C",
+            "distanceMeters": 60,
+            "typicalSeconds": 55,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "walkway"
+          },
+          {
+            "id": "e4a",
+            "fromNodeID": "n_concourse_north",
+            "toNodeID": "n_elev_L13",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e4b",
+            "fromNodeID": "n_elev_L13",
+            "toNodeID": "n_platform_L13",
+            "distanceMeters": 15.0,
+            "typicalSeconds": 15.0,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e9a",
+            "fromNodeID": "n_concourse_south",
+            "toNodeID": "n_elev_L2",
+            "distanceMeters": 12.5,
+            "typicalSeconds": 12.5,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e9b",
+            "fromNodeID": "n_elev_L2",
+            "toNodeID": "n_platform_L2",
+            "distanceMeters": 12.5,
+            "typicalSeconds": 12.5,
+            "isStepFree": true,
+            "isBidirectional": true,
+            "traversalKind": "elevator"
+          },
+          {
+            "id": "e10a",
+            "fromNodeID": "n_concourse_south",
+            "toNodeID": "n_stairs_L4",
+            "distanceMeters": 45.0,
+            "typicalSeconds": 42.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          },
+          {
+            "id": "e10b",
+            "fromNodeID": "n_stairs_L4",
+            "toNodeID": "n_platform_L4",
+            "distanceMeters": 45.0,
+            "typicalSeconds": 42.5,
+            "isStepFree": false,
+            "isBidirectional": true,
+            "traversalKind": "stairs"
+          }
+        ],
+        "landmarks": [
+
+        ],
+        "mapImageCalibration": null,
+        "schemaVersion": 2,
+        "coverageMode": "transferPaths",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd68.html",
+          "sourceContentSHA256": "d09cabca8f92a862c50d62bc62fe1e273921b61a6f4f30f6a1f9ca1521af27d0",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Path geometry was hand-traced from the station diagram.",
+            "Distances and walking times are estimates; no door-level or continuous-position claim is made."
+          ]
+        }
+      }
+    },
+    {
+      "stationName": "西苑",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "f2205eb914112a2b",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd5f.html",
+          "sourceContentSHA256": "2c779d5a442d2bd7f721f8d63af402a94af7bf8895af224a4dca6d6517604977",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线/大兴线站台",
+            "coordinate": {
+              "x": 0.31,
+              "y": 0.47,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "0a21b18dccbfbce6",
+              "2a26899826b692c4"
+            ],
+            "departureTowardStationIDs": [
+              "0a21b18dccbfbce6",
+              "2a26899826b692c4"
+            ],
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ]
+          },
+          {
+            "id": "platform-L16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.55,
+              "y": 0.54,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "platform-f303a610a2da9bca",
+            "arrivalFromStationIDs": [
+              "8c6a60636692a0e2",
+              "d82c92024c2fde16"
+            ],
+            "departureTowardStationIDs": [
+              "8c6a60636692a0e2",
+              "d82c92024c2fde16"
+            ],
+            "recognitionAliases": [
+              "16号线",
+              "Line 16"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "角门西",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "ef3ba3cb383bf2d1",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd73.html",
+          "sourceContentSHA256": "ba69590ed97faa14319ee2ab0feeeafc91501009147bbf92e1062c3583efb4bd",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L4",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "4号线/大兴线站台",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.54,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "0e6109e318df9b8b",
+            "platformID": "platform-0e6109e318df9b8b",
+            "arrivalFromStationIDs": [
+              "c603f419ff94a2ac",
+              "3195c9845d718402"
+            ],
+            "departureTowardStationIDs": [
+              "c603f419ff94a2ac",
+              "3195c9845d718402"
+            ],
+            "recognitionAliases": [
+              "4号线",
+              "大兴线",
+              "Line 4"
+            ]
+          },
+          {
+            "id": "platform-L10",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "10号线站台",
+            "coordinate": {
+              "x": 0.53,
+              "y": 0.43,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "a9ebe043abebb24f",
+            "platformID": "platform-a9ebe043abebb24f",
+            "arrivalFromStationIDs": [
+              "3ca5639b879dd250",
+              "1e57386f5a0a20af"
+            ],
+            "departureTowardStationIDs": [
+              "3ca5639b879dd250",
+              "1e57386f5a0a20af"
+            ],
+            "recognitionAliases": [
+              "10号线",
+              "Line 10"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "达官营",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "8d718981f776d77e",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af750b9088860a952a7954.html",
+          "sourceContentSHA256": "50bb15d18149b79cc5d05aa1caca7aa87950a0c5bdb2de29f660f6c5606260d3",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L7",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "7号线站台",
+            "coordinate": {
+              "x": 0.48,
+              "y": 0.56,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "cf2854160e05c825",
+            "platformID": "platform-cf2854160e05c825",
+            "arrivalFromStationIDs": [
+              "d3acdfe9e858fdf2",
+              "1771fe529cd6c29f"
+            ],
+            "departureTowardStationIDs": [
+              "d3acdfe9e858fdf2",
+              "1771fe529cd6c29f"
+            ],
+            "recognitionAliases": [
+              "7号线",
+              "Line 7"
+            ]
+          },
+          {
+            "id": "platform-L16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.42,
+              "y": 0.37,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "platform-f303a610a2da9bca",
+            "arrivalFromStationIDs": [
+              "f0cbd6be1903a652",
+              "e8228b42a4e8beaf"
+            ],
+            "departureTowardStationIDs": [
+              "f0cbd6be1903a652",
+              "e8228b42a4e8beaf"
+            ],
+            "recognitionAliases": [
+              "16号线",
+              "Line 16"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "金台路",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "028aba86ca4ec024",
+        "version": "2",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a13a4b1ea0278b8fffd16.html",
+          "sourceContentSHA256": "6193d79d9fa17eb830fd0677aa4156e37d59ddd0aa72ee19d7bd8f1f39c7fcde",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L6",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "6号线站台",
+            "coordinate": {
+              "x": 0.47,
+              "y": 0.64,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "b174a35600c5a5b3",
+            "platformID": "platform-b174a35600c5a5b3",
+            "arrivalFromStationIDs": [
+              "535db968b56cbbb6",
+              "d6cc37ed3415f8e9"
+            ],
+            "departureTowardStationIDs": [
+              "535db968b56cbbb6",
+              "d6cc37ed3415f8e9"
+            ],
+            "recognitionAliases": [
+              "6号线",
+              "Line 6"
+            ]
+          },
+          {
+            "id": "platform-L14",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "14号线站台",
+            "coordinate": {
+              "x": 0.38,
+              "y": 0.43,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8c826ef269efd948",
+            "platformID": "platform-8c826ef269efd948",
+            "arrivalFromStationIDs": [
+              "fe21a34d6135aed1",
+              "b220fe55109b248f"
+            ],
+            "departureTowardStationIDs": [
+              "fe21a34d6135aed1",
+              "b220fe55109b248f"
+            ],
+            "recognitionAliases": [
+              "14号线",
+              "Line 14"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    },
+    {
+      "stationName": "马连洼",
+      "indoorMap": {
+        "schemaVersion": 2,
+        "stationID": "e81333417e66812d",
+        "version": "3",
+        "source": "traced_from_official_diagram",
+        "confidence": "estimated",
+        "provenance": {
+          "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a1291b1ea0278b8fffcf5.html",
+          "sourceContentSHA256": "f90fdc45aaa4536dc0c189b07f6f64d32ebda19e249bee466d628e6e896b0c1f",
+          "reviewStatus": "diagramReviewed",
+          "assetUsageStatus": "reviewRequired",
+          "notes": [
+            "Line 16 and Line 18 platform checkpoints are normalized to the visible official schematic; unmeasured traversals are intentionally omitted."
+          ]
+        },
+        "levels": [
+          {
+            "id": "platform",
+            "name": "Platform",
+            "ordinal": 0
+          }
+        ],
+        "nodes": [
+          {
+            "id": "platform-L16",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "16号线站台",
+            "coordinate": {
+              "x": 0.15,
+              "y": 0.44,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "f303a610a2da9bca",
+            "platformID": "platform-f303a610a2da9bca",
+            "arrivalFromStationIDs": [
+              "13124ad23dd6b84f",
+              "8c6a60636692a0e2"
+            ],
+            "departureTowardStationIDs": [
+              "13124ad23dd6b84f",
+              "8c6a60636692a0e2"
+            ],
+            "recognitionAliases": [
+              "16号线",
+              "Line 16"
+            ]
+          },
+          {
+            "id": "platform-L18",
+            "kind": "platform",
+            "levelID": "platform",
+            "title": "18号线站台",
+            "coordinate": {
+              "x": 0.43,
+              "y": 0.62,
+              "z": 0.0
+            },
+            "isStepFree": false,
+            "lineID": "8610a9f64305f3dd",
+            "platformID": "platform-8610a9f64305f3dd",
+            "recognitionAliases": [
+              "18号线",
+              "北京地铁18号线",
+              "Line 18"
+            ],
+            "arrivalFromStationIDs": [
+              "a2af9aa171b760a3"
+            ],
+            "departureTowardStationIDs": [
+              "a2af9aa171b760a3"
+            ]
+          }
+        ],
+        "edges": [
+
+        ],
+        "landmarks": [
+
+        ],
+        "coverageMode": "platformCheckpoints"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 2, "stationID": "f0cbd6be1903a652", "version": "3", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/63af74f69088860a952a7952.html", "sourceContentSHA256": "1fe1e904d3126b888300fa2d6edad335cc37eef31aa0aaeb209ad3a2c5fb03e6", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["The bundled official schematic depicts the Line 1 platform but does not depict Line 16; no Line 16 position or traversal is inferred."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [{ "id": "platform-L1", "kind": "platform", "levelID": "platform", "title": "1号线/八通线站台", "coordinate": { "x": 0.29, "y": 0.58, "z": 0.0 }, "isStepFree": false, "lineID": "7443f6d4039f61de", "platformID": "platform-7443f6d4039f61de", "arrivalFromStationIDs": ["4c76e2f2e93cbd4b", "73179abb76c9884a"], "departureTowardStationIDs": ["4c76e2f2e93cbd4b", "73179abb76c9884a"], "recognitionAliases": ["1号线", "八通线", "Line 1"] }],
+  "lineCoverageGaps": [{ "lineID": "f303a610a2da9bca", "reason": "sourceDoesNotDepictLine", "note": "The bundled official station diagram does not depict the Line 16 platform." }],
+  "edges": [], "landmarks": []
+}

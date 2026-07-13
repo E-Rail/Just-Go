@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "1d13ba9409119c61", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/694f158e78586657026fb953.html", "sourceContentSHA256": "e0d352b2bee61372da532780ee878f2a393cf1f3589f06b899758b7282e01a68", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L1", "kind": "platform", "levelID": "platform", "title": "1号线/八通线站台", "coordinate": { "x": 0.52, "y": 0.66, "z": 0.0 }, "isStepFree": false, "lineID": "7443f6d4039f61de", "platformID": "platform-7443f6d4039f61de", "arrivalFromStationIDs": ["2eb5fe2a39511214", "1549561ba2165975"], "departureTowardStationIDs": ["2eb5fe2a39511214", "1549561ba2165975"], "recognitionAliases": ["1号线", "八通线", "Line 1"] },
+    { "id": "platform-L17", "kind": "platform", "levelID": "platform", "title": "17号线站台", "coordinate": { "x": 0.49, "y": 0.36, "z": 0.0 }, "isStepFree": false, "lineID": "7b7f6568044e3957", "platformID": "platform-7b7f6568044e3957", "arrivalFromStationIDs": ["bbfe183fc2b4ca4a", "9ba8a4016ef608d3"], "departureTowardStationIDs": ["bbfe183fc2b4ca4a", "9ba8a4016ef608d3"], "recognitionAliases": ["17号线", "Line 17"] }
+  ], "edges": [], "landmarks": []
+}

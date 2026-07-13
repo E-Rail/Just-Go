@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "413fc8c62f77c543", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd6d.html", "sourceContentSHA256": "0bb5b78cf5e78c79e2e780f89b5badce94fb3fbfe69f8436b219662ed8db892f", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L1", "kind": "platform", "levelID": "platform", "title": "1号线/八通线站台", "coordinate": { "x": 0.35, "y": 0.35, "z": 0.0 }, "isStepFree": false, "lineID": "7443f6d4039f61de", "platformID": "platform-7443f6d4039f61de", "arrivalFromStationIDs": ["774deafe80689bc3", "b9584350d71ebb65"], "departureTowardStationIDs": ["774deafe80689bc3", "b9584350d71ebb65"], "recognitionAliases": ["1号线", "八通线", "Line 1"] },
+    { "id": "platform-L4", "kind": "platform", "levelID": "platform", "title": "4号线/大兴线站台", "coordinate": { "x": 0.58, "y": 0.60, "z": 0.0 }, "isStepFree": false, "lineID": "0e6109e318df9b8b", "platformID": "platform-0e6109e318df9b8b", "arrivalFromStationIDs": ["2a0607a8a3167ba6", "cfd235c2e126af60"], "departureTowardStationIDs": ["2a0607a8a3167ba6", "cfd235c2e126af60"], "recognitionAliases": ["4号线", "大兴线", "Line 4"] }
+  ], "edges": [], "landmarks": []
+}

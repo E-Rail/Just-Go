@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2, "stationID": "bbfe183fc2b4ca4a", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/697b40056a97b45630c3c3c6.html", "sourceContentSHA256": "5d4cf727614eb35338d6d42fcd4dd5a656fc3d97e53e34cac00f860257b77d6f", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L13", "kind": "platform", "levelID": "platform", "title": "13号线站台", "coordinate": { "x": 0.31, "y": 0.57, "z": 0.0 }, "isStepFree": false, "lineID": "57908b0bb9757459", "platformID": "platform-57908b0bb9757459", "arrivalFromStationIDs": ["c8a69e74f63db354", "7a211ea6af9671a3"], "departureTowardStationIDs": ["c8a69e74f63db354", "7a211ea6af9671a3"], "recognitionAliases": ["13号线", "Line 13"] },
+    { "id": "platform-L15", "kind": "platform", "levelID": "platform", "title": "15号线站台", "coordinate": { "x": 0.45, "y": 0.43, "z": 0.0 }, "isStepFree": false, "lineID": "94d7555971b78ae3", "platformID": "platform-94d7555971b78ae3", "arrivalFromStationIDs": ["d83fe650c8653ed6", "bb9b22a5e2f278ad"], "departureTowardStationIDs": ["d83fe650c8653ed6", "bb9b22a5e2f278ad"], "recognitionAliases": ["15号线", "Line 15"] },
+    { "id": "platform-L17", "kind": "platform", "levelID": "platform", "title": "17号线站台", "coordinate": { "x": 0.62, "y": 0.47, "z": 0.0 }, "isStepFree": false, "lineID": "7b7f6568044e3957", "platformID": "platform-7b7f6568044e3957", "arrivalFromStationIDs": ["d6f86e7dd1a466ea", "1d13ba9409119c61"], "departureTowardStationIDs": ["d6f86e7dd1a466ea", "1d13ba9409119c61"], "recognitionAliases": ["17号线", "Line 17"] }
+  ], "edges": [], "landmarks": []
+}

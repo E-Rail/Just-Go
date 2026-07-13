@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "7a08b72c7e798533", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/61ce4911b0972c463ee519ca.html", "sourceContentSHA256": "be059f90e3e92e48b9fdb0aefd22cee69c097ebf46d052e76a5d5479455c3c28", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-YZ", "kind": "platform", "levelID": "platform", "title": "亦庄线站台", "coordinate": { "x": 0.43, "y": 0.58, "z": 0.0 }, "isStepFree": false, "lineID": "2f902bce1232fcb4", "platformID": "platform-2f902bce1232fcb4", "arrivalFromStationIDs": ["524b07d790525f17", "8d60bfb788af89ec"], "departureTowardStationIDs": ["524b07d790525f17", "8d60bfb788af89ec"], "recognitionAliases": ["亦庄线", "Yizhuang Line"] },
+    { "id": "platform-L17", "kind": "platform", "levelID": "platform", "title": "17号线站台", "coordinate": { "x": 0.49, "y": 0.35, "z": 0.0 }, "isStepFree": false, "lineID": "7b7f6568044e3957", "platformID": "platform-7b7f6568044e3957", "arrivalFromStationIDs": ["df452c6bdbeca517", "4baf11eb0af55857"], "departureTowardStationIDs": ["df452c6bdbeca517", "4baf11eb0af55857"], "recognitionAliases": ["17号线", "Line 17"] }
+  ], "edges": [], "landmarks": []
+}

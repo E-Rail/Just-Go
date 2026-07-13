@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "e81333417e66812d", "version": "3", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a1291b1ea0278b8fffcf5.html", "sourceContentSHA256": "f90fdc45aaa4536dc0c189b07f6f64d32ebda19e249bee466d628e6e896b0c1f", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Line 16 and Line 18 platform checkpoints are normalized to the visible official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L16", "kind": "platform", "levelID": "platform", "title": "16号线站台", "coordinate": { "x": 0.15, "y": 0.44, "z": 0.0 }, "isStepFree": false, "lineID": "f303a610a2da9bca", "platformID": "platform-f303a610a2da9bca", "arrivalFromStationIDs": ["13124ad23dd6b84f", "8c6a60636692a0e2"], "departureTowardStationIDs": ["13124ad23dd6b84f", "8c6a60636692a0e2"], "recognitionAliases": ["16号线", "Line 16"] },
+    { "id": "platform-L18", "kind": "platform", "levelID": "platform", "title": "18号线站台", "coordinate": { "x": 0.43, "y": 0.62, "z": 0.0 }, "isStepFree": false, "lineID": "8610a9f64305f3dd", "platformID": "platform-8610a9f64305f3dd", "recognitionAliases": ["18号线", "北京地铁18号线", "Line 18"] }
+  ], "edges": [], "landmarks": []
+}

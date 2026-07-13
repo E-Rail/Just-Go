@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "985cabe448604b78", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/6584fabc11244c4ae1b3a2c9.html", "sourceContentSHA256": "bd21fd7abf27b7c515700c509164dded1e3237ef430b2ea964e3483eca5c14f9", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L12", "kind": "platform", "levelID": "platform", "title": "12号线站台", "coordinate": { "x": 0.32, "y": 0.46, "z": 0.0 }, "isStepFree": false, "lineID": "5f88dc6c1e521bd0", "platformID": "platform-5f88dc6c1e521bd0", "arrivalFromStationIDs": ["0144182a584cdeeb", "5573e4c7838b2b4b"], "departureTowardStationIDs": ["0144182a584cdeeb", "5573e4c7838b2b4b"], "recognitionAliases": ["12号线", "Line 12"] },
+    { "id": "platform-L17", "kind": "platform", "levelID": "platform", "title": "17号线站台", "coordinate": { "x": 0.50, "y": 0.37, "z": 0.0 }, "isStepFree": false, "lineID": "7b7f6568044e3957", "platformID": "platform-7b7f6568044e3957", "arrivalFromStationIDs": ["90d042336ecb0482", "d7246943398db4b7"], "departureTowardStationIDs": ["90d042336ecb0482", "d7246943398db4b7"], "recognitionAliases": ["17号线", "Line 17"] }
+  ], "edges": [], "landmarks": []
+}

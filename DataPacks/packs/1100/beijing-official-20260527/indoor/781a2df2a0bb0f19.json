@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "stationID": "781a2df2a0bb0f19", "version": "2", "source": "traced_from_official_diagram", "confidence": "estimated",
+  "provenance": { "sourceURL": "https://www.mtr.bj.cn/service/line/station/6585078711244c4ae1b3a2cc.html", "sourceContentSHA256": "87432145c11aaba46794c6b4e34a784e08ec47fcd203f6ce87145ec16b27b31c", "reviewStatus": "diagramReviewed", "assetUsageStatus": "reviewRequired", "notes": ["Platform checkpoints normalized to the official schematic; unmeasured traversals are intentionally omitted."] },
+  "levels": [{ "id": "platform", "name": "Platform", "ordinal": 0 }],
+  "nodes": [
+    { "id": "platform-L10", "kind": "platform", "levelID": "platform", "title": "10号线站台", "coordinate": { "x": 0.53, "y": 0.52, "z": 0.0 }, "isStepFree": false, "lineID": "a9ebe043abebb24f", "platformID": "platform-a9ebe043abebb24f", "arrivalFromStationIDs": ["cce4e1fbf082cc4d", "b5b163abec8b11f5"], "departureTowardStationIDs": ["cce4e1fbf082cc4d", "b5b163abec8b11f5"], "recognitionAliases": ["10号线", "Line 10"] },
+    { "id": "platform-L16", "kind": "platform", "levelID": "platform", "title": "16号线站台", "coordinate": { "x": 0.45, "y": 0.65, "z": 0.0 }, "isStepFree": false, "lineID": "f303a610a2da9bca", "platformID": "platform-f303a610a2da9bca", "arrivalFromStationIDs": ["a92f22ded4dd7189", "df3701f29006fa08"], "departureTowardStationIDs": ["a92f22ded4dd7189", "df3701f29006fa08"], "recognitionAliases": ["16号线", "Line 16"] }
+  ], "edges": [], "landmarks": []
+}

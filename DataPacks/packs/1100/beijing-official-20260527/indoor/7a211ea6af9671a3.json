@@ -1,0 +1,476 @@
+{
+  "stationID": "7a211ea6af9671a3",
+  "version": "2",
+  "source": "traced_from_official_diagram",
+  "confidence": "estimated",
+  "levels": [
+    {
+      "id": "concourse",
+      "name": "Concourse",
+      "ordinal": 0
+    },
+    {
+      "id": "platform",
+      "name": "Platform",
+      "ordinal": 1
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_exit_E",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "E口",
+      "coordinate": {
+        "x": 0.058,
+        "y": 0.417,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "E口"
+      ]
+    },
+    {
+      "id": "n_exit_F1",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "F1口",
+      "coordinate": {
+        "x": 0.108,
+        "y": 0.475,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "F1口"
+      ]
+    },
+    {
+      "id": "n_exit_F2",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "F2口",
+      "coordinate": {
+        "x": 0.008,
+        "y": 0.568,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "F2口"
+      ]
+    },
+    {
+      "id": "n_platform_L13",
+      "kind": "platform",
+      "levelID": "platform",
+      "title": "13号线站台（西直门端）",
+      "coordinate": {
+        "x": 0.115,
+        "y": 0.245,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": true,
+      "recognitionAliases": [
+        "13号线",
+        "Line 13"
+      ],
+      "lineID": "57908b0bb9757459",
+      "platformID": "platform-57908b0bb9757459",
+      "arrivalFromStationIDs": [
+        "c8a69e74f63db354"
+      ],
+      "departureTowardStationIDs": [
+        "c8a69e74f63db354"
+      ]
+    },
+    {
+      "id": "n_exit_A_north",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "A口（北京北站方向）",
+      "coordinate": {
+        "x": 0.215,
+        "y": 0.381,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "A口（北京北站方向）"
+      ]
+    },
+    {
+      "id": "n_concourse_north",
+      "kind": "concourse",
+      "levelID": "concourse",
+      "title": "站厅换乘通道（北）",
+      "coordinate": {
+        "x": 0.26,
+        "y": 0.432,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "站厅换乘通道（北）"
+      ]
+    },
+    {
+      "id": "n_exit_B",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "B口",
+      "coordinate": {
+        "x": 0.415,
+        "y": 0.353,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "B口"
+      ]
+    },
+    {
+      "id": "n_concourse_east",
+      "kind": "concourse",
+      "levelID": "concourse",
+      "title": "站厅换乘通道（东）",
+      "coordinate": {
+        "x": 0.475,
+        "y": 0.489,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "站厅换乘通道（东）"
+      ]
+    },
+    {
+      "id": "n_platform_L2",
+      "kind": "platform",
+      "levelID": "platform",
+      "title": "2号线站台（积水潭/车公庄方向）",
+      "coordinate": {
+        "x": 0.39,
+        "y": 0.633,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "2号线",
+        "Line 2"
+      ],
+      "lineID": "5cdbbd2bf0cc05e3",
+      "platformID": "platform-5cdbbd2bf0cc05e3",
+      "arrivalFromStationIDs": [
+        "5dc213d7e6ca19b6",
+        "160b30e134da8663"
+      ],
+      "departureTowardStationIDs": [
+        "5dc213d7e6ca19b6",
+        "160b30e134da8663"
+      ]
+    },
+    {
+      "id": "n_exit_C",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "C口",
+      "coordinate": {
+        "x": 0.575,
+        "y": 0.669,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "C口"
+      ]
+    },
+    {
+      "id": "n_concourse_south",
+      "kind": "concourse",
+      "levelID": "concourse",
+      "title": "站厅换乘通道（南）",
+      "coordinate": {
+        "x": 0.34,
+        "y": 0.496,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": true,
+      "recognitionAliases": [
+        "站厅换乘通道（南）"
+      ]
+    },
+    {
+      "id": "n_platform_L4",
+      "kind": "platform",
+      "levelID": "platform",
+      "title": "4号线站台（安河桥北/天宫院方向）",
+      "coordinate": {
+        "x": 0.365,
+        "y": 0.806,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "4号线",
+        "大兴线",
+        "Line 4"
+      ],
+      "lineID": "0e6109e318df9b8b",
+      "platformID": "platform-0e6109e318df9b8b",
+      "arrivalFromStationIDs": [
+        "ad262f721f3b99ed",
+        "4ce0c1fde748275a"
+      ],
+      "departureTowardStationIDs": [
+        "ad262f721f3b99ed",
+        "4ce0c1fde748275a"
+      ]
+    },
+    {
+      "id": "n_exit_D",
+      "kind": "exit",
+      "levelID": "concourse",
+      "title": "D口",
+      "coordinate": {
+        "x": 0.33,
+        "y": 0.878,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "D口"
+      ]
+    },
+    {
+      "id": "n_elev_L13",
+      "kind": "elevator",
+      "levelID": "concourse",
+      "title": "电梯",
+      "coordinate": {
+        "x": 0.1875,
+        "y": 0.3385,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": true,
+      "recognitionAliases": [
+        "电梯"
+      ]
+    },
+    {
+      "id": "n_elev_L2",
+      "kind": "elevator",
+      "levelID": "concourse",
+      "title": "电梯",
+      "coordinate": {
+        "x": 0.365,
+        "y": 0.5645,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": true,
+      "recognitionAliases": [
+        "电梯"
+      ]
+    },
+    {
+      "id": "n_stairs_L4",
+      "kind": "stairs",
+      "levelID": "concourse",
+      "title": "楼梯",
+      "coordinate": {
+        "x": 0.3525,
+        "y": 0.651,
+        "z": 0.0
+      },
+      "geoCoordinate": null,
+      "isStepFree": false,
+      "recognitionAliases": [
+        "楼梯"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNodeID": "n_exit_F2",
+      "toNodeID": "n_concourse_north",
+      "distanceMeters": 70,
+      "typicalSeconds": 60,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e2",
+      "fromNodeID": "n_exit_F1",
+      "toNodeID": "n_concourse_north",
+      "distanceMeters": 60,
+      "typicalSeconds": 50,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e3",
+      "fromNodeID": "n_exit_E",
+      "toNodeID": "n_concourse_north",
+      "distanceMeters": 40,
+      "typicalSeconds": 35,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e5",
+      "fromNodeID": "n_concourse_north",
+      "toNodeID": "n_exit_A_north",
+      "distanceMeters": 20,
+      "typicalSeconds": 20,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e6",
+      "fromNodeID": "n_concourse_north",
+      "toNodeID": "n_concourse_east",
+      "distanceMeters": 90,
+      "typicalSeconds": 80,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e7",
+      "fromNodeID": "n_exit_B",
+      "toNodeID": "n_concourse_east",
+      "distanceMeters": 50,
+      "typicalSeconds": 45,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e8",
+      "fromNodeID": "n_concourse_east",
+      "toNodeID": "n_concourse_south",
+      "distanceMeters": 70,
+      "typicalSeconds": 65,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e11",
+      "fromNodeID": "n_platform_L4",
+      "toNodeID": "n_exit_D",
+      "distanceMeters": 40,
+      "typicalSeconds": 35,
+      "isStepFree": true,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e12",
+      "fromNodeID": "n_concourse_east",
+      "toNodeID": "n_exit_C",
+      "distanceMeters": 60,
+      "typicalSeconds": 55,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "walkway"
+    },
+    {
+      "id": "e4a",
+      "fromNodeID": "n_concourse_north",
+      "toNodeID": "n_elev_L13",
+      "distanceMeters": 15.0,
+      "typicalSeconds": 15.0,
+      "isStepFree": true,
+      "isBidirectional": true,
+      "traversalKind": "elevator"
+    },
+    {
+      "id": "e4b",
+      "fromNodeID": "n_elev_L13",
+      "toNodeID": "n_platform_L13",
+      "distanceMeters": 15.0,
+      "typicalSeconds": 15.0,
+      "isStepFree": true,
+      "isBidirectional": true,
+      "traversalKind": "elevator"
+    },
+    {
+      "id": "e9a",
+      "fromNodeID": "n_concourse_south",
+      "toNodeID": "n_elev_L2",
+      "distanceMeters": 12.5,
+      "typicalSeconds": 12.5,
+      "isStepFree": true,
+      "isBidirectional": true,
+      "traversalKind": "elevator"
+    },
+    {
+      "id": "e9b",
+      "fromNodeID": "n_elev_L2",
+      "toNodeID": "n_platform_L2",
+      "distanceMeters": 12.5,
+      "typicalSeconds": 12.5,
+      "isStepFree": true,
+      "isBidirectional": true,
+      "traversalKind": "elevator"
+    },
+    {
+      "id": "e10a",
+      "fromNodeID": "n_concourse_south",
+      "toNodeID": "n_stairs_L4",
+      "distanceMeters": 45.0,
+      "typicalSeconds": 42.5,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "stairs"
+    },
+    {
+      "id": "e10b",
+      "fromNodeID": "n_stairs_L4",
+      "toNodeID": "n_platform_L4",
+      "distanceMeters": 45.0,
+      "typicalSeconds": 42.5,
+      "isStepFree": false,
+      "isBidirectional": true,
+      "traversalKind": "stairs"
+    }
+  ],
+  "landmarks": [
+
+  ],
+  "mapImageCalibration": null,
+  "schemaVersion": 2,
+  "coverageMode": "transferPaths",
+  "provenance": {
+    "sourceURL": "https://www.mtr.bj.cn/service/line/station/5d5a18eeb1ea0278b8fffd68.html",
+    "sourceContentSHA256": "d09cabca8f92a862c50d62bc62fe1e273921b61a6f4f30f6a1f9ca1521af27d0",
+    "reviewStatus": "diagramReviewed",
+    "assetUsageStatus": "reviewRequired",
+    "notes": [
+      "Path geometry was hand-traced from the station diagram.",
+      "Distances and walking times are estimates; no door-level or continuous-position claim is made."
+    ]
+  }
+}

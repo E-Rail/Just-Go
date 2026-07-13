@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 // Pre-compiled once instead of recompiling on every exitTokens(in:) call — stationGuidance
 // calls it per station per route, so this pattern was being rebuilt dozens of times per search.
@@ -28,6 +29,15 @@ struct CityPackStationMap: Codable, Equatable {
               let url = URL(string: assetURL, relativeTo: baseURL)?.absoluteURL else { return self }
         return CityPackStationMap(title: title, assetURL: url.absoluteString, assetType: assetType, sourceURL: sourceURL)
     }
+
+    func replacingAssetURL(with url: URL) -> CityPackStationMap {
+        CityPackStationMap(
+            title: title,
+            assetURL: url.absoluteString,
+            assetType: assetType,
+            sourceURL: sourceURL
+        )
+    }
 }
 
 struct CityPackStationAsset: Codable, Equatable {
@@ -46,6 +56,21 @@ struct CityPackStationAsset: Codable, Equatable {
               let url = URL(string: assetURL, relativeTo: baseURL)?.absoluteURL else { return self }
         return CityPackStationAsset(category: category, title: title, assetURL: url.absoluteString, assetType: assetType, sourceURL: sourceURL)
     }
+}
+
+/// Indoor node graphs live in a sibling file to `city_pack.json`, not embedded in it — every
+/// consumer of a city pack (schedules, accessibility, station maps) would otherwise download
+/// and decode dozens of KB of indoor-nav data per authored station even when indoor nav is
+/// never used. Fetched lazily, only when `indoorMap(for:)`/`transferPath(for:)` is called.
+private struct IndoorMapsPack: Decodable {
+    let cityID: String
+    let version: String
+    let stations: [IndoorMapsPackStation]
+}
+
+private struct IndoorMapsPackStation: Decodable {
+    let stationName: String
+    let indoorMap: StationIndoorMap
 }
 
 struct CityPackServiceStatus: Codable, Equatable {
@@ -86,17 +111,29 @@ protocol OfficialStationDataProviding {
         toLineName: String?,
         accessibilityFilter: AccessibilityFilter
     ) async -> TransferPathHint?
+    func transferPath(
+        for station: Station,
+        context: TransferContext,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> TransferPathHint?
+    func boardingZoneGuidance(
+        for station: Station,
+        context: TransferContext,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> IndoorBoardingZoneGuidance?
     func doorGuidance(
         for station: Station,
         lineName: String?,
         directionText: String?,
         target: DoorGuidanceTarget
     ) async -> DoorGuidance?
+    func prefetchTransferAssets(for route: Route) async
 }
 
 actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
+    private let diskStore = CityPackDiskStore()
     private var manifests: [URL: OfficialManifest] = [:]
     private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
     private var packs: [String: LoadedPack] = [:]
@@ -111,6 +148,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private static let failureCooldown: TimeInterval = 45
     private var loadGenerations: [String: Int] = [:]
     private var inFlightLoads: [String: InFlightCityPackLoad] = [:]
+    // Keyed by normalized station name; a city with no indoor_maps.json (or a failed fetch)
+    // caches an empty dictionary so repeat lookups within a session don't re-hit the network.
+    private var indoorMapsByCity: [String: [String: StationIndoorMap]] = [:]
 
     private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
         guard let status = loadStatuses[cityID] else { return nil }
@@ -164,6 +204,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             return status
         }
         if let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }) {
+            if diskStore.validatedPackData(for: entry) != nil {
+                return .loaded(version: entry.version)
+            }
             return status(for: entry)
         }
         guard !Self.manifestURLs.isEmpty else { return .notConfigured }
@@ -229,12 +272,30 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         _ = advanceLoadGeneration(for: cityID)
         inFlightLoads.removeValue(forKey: cityID)?.task.cancel()
         packs.removeValue(forKey: cityID)
+        indoorMapsByCity.removeValue(forKey: cityID)
         loadStatuses.removeValue(forKey: cityID)
         failedCooldownUntil.removeValue(forKey: cityID)
+        try? diskStore.deleteCity(cityID)
         return await cityPackStatus(for: cityID)
     }
 
     private func performDownload(for cityID: String, generation: Int) async -> CityPackLoadStatus {
+        if let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }),
+           let downloadURL = resolvedURL(entry.downloadURL, relativeTo: Self.manifestURLs.first ?? URL(fileURLWithPath: "/")),
+           let data = diskStore.validatedPackData(for: entry),
+           let decoded = try? JSONDecoder().decode(OfficialPack.self, from: data),
+           decoded.cityID == cityID,
+           decoded.version == entry.version {
+            let manifestURL = Self.manifestURLs.first ?? downloadURL
+            packs[cityID] = LoadedPack(
+                data: decoded,
+                assetBaseURL: downloadURL.deletingLastPathComponent(),
+                manifestURL: manifestURL,
+                manifestEntry: entry
+            )
+            return .loaded(version: decoded.version)
+        }
+
         var pendingStatus: CityPackLoadStatus?
         for manifestURL in Self.manifestURLs {
             guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
@@ -248,10 +309,17 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 }
                 let data = try await download(from: downloadURL)
                 guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
+                guard entry.validatesPackData(data) else { continue }
                 let decoded = try JSONDecoder().decode(OfficialPack.self, from: data)
                 guard decoded.cityID == cityID, decoded.version == entry.version else { continue }
                 guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-                packs[cityID] = LoadedPack(data: decoded, assetBaseURL: downloadURL.deletingLastPathComponent())
+                try diskStore.storePackData(data, for: entry)
+                packs[cityID] = LoadedPack(
+                    data: decoded,
+                    assetBaseURL: downloadURL.deletingLastPathComponent(),
+                    manifestURL: manifestURL,
+                    manifestEntry: entry
+                )
                 return .loaded(version: decoded.version)
             } catch {
                 guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
@@ -301,9 +369,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     func stationMap(for station: Station) async -> CityPackStationMap? {
         _ = await loadCityPack(for: station.cityID)
-        guard let loaded = packs[station.cityID] else { return nil }
-        return stationRecord(cityID: station.cityID, stationName: station.name)?
-            .stationMaps.first?.resolving(relativeTo: loaded.assetBaseURL)
+        guard let loaded = packs[station.cityID],
+              let stationMap = stationRecord(cityID: station.cityID, stationName: station.name)?
+                .stationMaps.first else { return nil }
+        if let cachedURL = diskStore.cachedAssetURL(
+            relativePath: stationMap.assetURL,
+            for: loaded.manifestEntry
+        ) {
+            return stationMap.replacingAssetURL(with: cachedURL)
+        }
+        return stationMap.resolving(relativeTo: loaded.assetBaseURL)
     }
 
     func timetableAssets(for station: Station) async -> [CityPackStationAsset] {
@@ -427,7 +502,52 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     func indoorMap(for station: Station) async -> StationIndoorMap? {
         _ = await loadCityPack(for: station.cityID)
-        return stationRecord(cityID: station.cityID, stationName: station.name)?.indoorMap
+        let indoorMaps = await loadIndoorMaps(for: station.cityID)
+        return indoorMaps[normalizedStationName(station.name)]
+    }
+
+    /// Fetches and decodes the city's sibling `indoor_maps.json` the first time any station's
+    /// indoor data is asked for, then caches it (including an empty result) for the rest of the
+    /// session — most cities have none, and this must not turn every station-detail view into a
+    /// second network round trip.
+    private func loadIndoorMaps(for cityID: String) async -> [String: StationIndoorMap] {
+        if let cached = indoorMapsByCity[cityID] { return cached }
+        guard let loaded = packs[cityID],
+              let url = resolvedURL(
+                loaded.manifestEntry.indoorMapsDownloadURL,
+                relativeTo: loaded.manifestURL
+              ) else {
+            indoorMapsByCity[cityID] = [:]
+            return [:]
+        }
+        do {
+            let data: Data
+            if let cached = diskStore.validatedIndoorMapsData(for: loaded.manifestEntry) {
+                data = cached
+            } else {
+                let downloaded = try await download(from: url)
+                guard loaded.manifestEntry.validatesIndoorMapsData(downloaded) else {
+                    throw CityPackDiskError.validationFailed
+                }
+                try diskStore.storeIndoorMapsData(downloaded, for: loaded.manifestEntry)
+                data = downloaded
+            }
+            let decoded = try JSONDecoder().decode(IndoorMapsPack.self, from: data)
+            guard decoded.cityID == cityID, decoded.version == loaded.manifestEntry.version else {
+                indoorMapsByCity[cityID] = [:]
+                return [:]
+            }
+            let byName = Dictionary(
+                decoded.stations.map { (normalizedStationName($0.stationName), $0.indoorMap) },
+                uniquingKeysWith: { first, _ in first }
+            )
+            indoorMapsByCity[cityID] = byName
+            return byName
+        } catch {
+            AppLog.data.warning("Indoor maps load failed for \(cityID, privacy: .public): \(error)")
+            indoorMapsByCity[cityID] = [:]
+            return [:]
+        }
     }
 
     func transferPath(
@@ -442,6 +562,47 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let fromNodes = indoorMap.nodes(kind: .platform, matchingLineName: fromLineName)
         let toNodes = indoorMap.nodes(kind: .platform, matchingLineName: toLineName)
         guard !fromNodes.isEmpty, !toNodes.isEmpty else { return nil }
+        return resolvedTransferPath(
+            station: station,
+            indoorMap: indoorMap,
+            fromNodes: fromNodes,
+            toNodes: toNodes,
+            fromLineName: fromLineName,
+            toLineName: toLineName,
+            accessibilityFilter: accessibilityFilter
+        )
+    }
+
+    func transferPath(
+        for station: Station,
+        context: TransferContext,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> TransferPathHint? {
+        guard context.incoming.lineID != context.outgoing.lineID,
+              let indoorMap = await indoorMap(for: station) else { return nil }
+        let fromNodes = indoorMap.platformNodes(for: context.incoming, role: .arrival)
+        let toNodes = indoorMap.platformNodes(for: context.outgoing, role: .departure)
+        guard !fromNodes.isEmpty, !toNodes.isEmpty else { return nil }
+        return resolvedTransferPath(
+            station: station,
+            indoorMap: indoorMap,
+            fromNodes: fromNodes,
+            toNodes: toNodes,
+            fromLineName: context.incoming.lineName,
+            toLineName: context.outgoing.lineName,
+            accessibilityFilter: accessibilityFilter
+        )
+    }
+
+    private func resolvedTransferPath(
+        station: Station,
+        indoorMap: StationIndoorMap,
+        fromNodes: [IndoorNode],
+        toNodes: [IndoorNode],
+        fromLineName: String,
+        toLineName: String,
+        accessibilityFilter: AccessibilityFilter
+    ) -> TransferPathHint? {
         let fromIDs = fromNodes.map(\.id)
         let toIDs = toNodes.map(\.id)
 
@@ -459,16 +620,55 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return TransferPathHint(
             stationID: station.stationID,
             fromLineName: fromLineName,
-            fromPlatformID: fromIDs.first,
+            fromPlatformID: primary.startNodeID,
             toLineName: toLineName,
-            toPlatformID: toIDs.first,
+            toPlatformID: primary.endNodeID,
             routeNodeIDs: primary.nodeIDs,
+            routeEdgeIDs: primary.edgeIDs,
             walkingMeters: primary.meters,
             walkingMinutes: primary.minutes,
             stepFreeAlternativeNodeIDs: alternative?.nodeIDs ?? [],
             notes: [],
-            confidence: .communityVerified
+            confidence: indoorMap.confidence
         )
+    }
+
+    func boardingZoneGuidance(
+        for station: Station,
+        context: TransferContext,
+        accessibilityFilter: AccessibilityFilter
+    ) async -> IndoorBoardingZoneGuidance? {
+        guard let indoorMap = await indoorMap(for: station) else { return nil }
+        let arrivalFromID = context.incoming.arrivalPreviousStationID.map(networkStationID)
+        let candidates = indoorMap.resolvedBoardingZoneHints.filter { hint in
+            hint.incomingLineID == context.incoming.lineID
+                && hint.transferToLineID == context.outgoing.lineID
+                && (hint.arrivalFromStationID == nil || hint.arrivalFromStationID == arrivalFromID)
+        }
+        let requiresAccessibleZone = accessibilityFilter.requiresWheelchairAccess
+            || accessibilityFilter.requiresElevator
+        let selected = requiresAccessibleZone
+            ? candidates.first(where: { $0.accessible == true })
+            : candidates.first
+        guard let selected else { return nil }
+        return IndoorBoardingZoneGuidance(
+            stationID: station.stationID,
+            incomingLineID: selected.incomingLineID,
+            transferToLineID: selected.transferToLineID,
+            zone: selected.zone,
+            accessible: selected.accessible,
+            evidenceNodeID: selected.evidenceNodeID,
+            confidence: selected.confidence
+        )
+    }
+
+    private func networkStationID(_ value: String) -> String {
+        let prefix = "network-"
+        guard value.hasPrefix(prefix),
+              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
+            return value
+        }
+        return String(value[value.index(after: citySeparator)...])
     }
 
     /// No bundled or city-pack asset anywhere carries boarding-car/door alignment — the
@@ -481,6 +681,83 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         target: DoorGuidanceTarget
     ) async -> DoorGuidance? {
         nil
+    }
+
+    /// Warms only the assets a selected route can use underground: the city's compact
+    /// indoor graph file and each transfer station's diagram. Asset failures are isolated
+    /// so route planning/navigation remains available with text guidance.
+    func prefetchTransferAssets(for route: Route) async {
+        var seen = Set<String>()
+        let requests: [(cityID: String, stationName: String)] = route.segments.compactMap { segment in
+            guard segment.type == .transfer else { return nil }
+            let cityID = segment.transferContext?.cityID ?? route.networkCityID
+            let stationName = segment.transferContext?.stationName ?? segment.fromStationName
+            guard let cityID, let stationName,
+                  seen.insert("\(cityID)|\(normalizedStationName(stationName))").inserted else {
+                return nil
+            }
+            return (cityID, stationName)
+        }
+        guard !requests.isEmpty else { return }
+
+        for request in requests {
+            _ = await loadCityPack(for: request.cityID)
+            guard let loaded = packs[request.cityID] else { continue }
+            _ = await loadIndoorMaps(for: request.cityID)
+
+            guard let record = stationRecord(
+                cityID: request.cityID,
+                stationName: request.stationName
+            ), let stationMap = record.stationMaps.first,
+                diskStore.cachedAssetURL(
+                    relativePath: stationMap.assetURL,
+                    for: loaded.manifestEntry
+                ) == nil,
+                stationMap.isImage,
+                let remoteURL = resolvedURL(stationMap.assetURL, relativeTo: loaded.assetBaseURL)
+            else { continue }
+
+            do {
+                let data = try await download(from: remoteURL)
+                guard Self.isSupportedStationMapData(data, assetType: stationMap.assetType) else {
+                    continue
+                }
+                try diskStore.storeAssetData(
+                    data,
+                    relativePath: stationMap.assetURL,
+                    for: loaded.manifestEntry
+                )
+            } catch {
+                AppLog.data.warning(
+                    "Transfer asset prefetch failed for \(request.stationName, privacy: .public): \(error)"
+                )
+            }
+        }
+    }
+
+    nonisolated private static func isSupportedStationMapData(
+        _ data: Data,
+        assetType: String
+    ) -> Bool {
+        let maximumAssetBytes = 12 * 1_024 * 1_024
+        guard !data.isEmpty, data.count <= maximumAssetBytes else { return false }
+        let bytes = [UInt8](data.prefix(12))
+        switch assetType.lowercased() {
+        case "jpg", "jpeg", "image":
+            return bytes.starts(with: [0xFF, 0xD8, 0xFF])
+                || bytes.starts(with: [0x89, 0x50, 0x4E, 0x47])
+                || (bytes.count >= 12
+                    && Array(bytes[0..<4]) == Array("RIFF".utf8)
+                    && Array(bytes[8..<12]) == Array("WEBP".utf8))
+        case "png":
+            return bytes.starts(with: [0x89, 0x50, 0x4E, 0x47])
+        case "webp":
+            return bytes.count >= 12
+                && Array(bytes[0..<4]) == Array("RIFF".utf8)
+                && Array(bytes[8..<12]) == Array("WEBP".utf8)
+        default:
+            return false
+        }
     }
 
     /// Best-effort exit/entrance extraction from accessibility free text (`.estimated` confidence).
@@ -609,6 +886,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     func releaseMemory() {
         let releasedCityIDs = Array(packs.keys)
         packs.removeAll()
+        indoorMapsByCity.removeAll()
         for cityID in releasedCityIDs {
             if case .loaded = loadStatuses[cityID] {
                 loadStatuses.removeValue(forKey: cityID)
@@ -620,11 +898,20 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 private struct LoadedPack {
     let data: OfficialPack
     let assetBaseURL: URL
+    let manifestURL: URL
+    let manifestEntry: OfficialManifestCity
     let stationsByName: [String: OfficialStation]
 
-    init(data: OfficialPack, assetBaseURL: URL) {
+    init(
+        data: OfficialPack,
+        assetBaseURL: URL,
+        manifestURL: URL,
+        manifestEntry: OfficialManifestCity
+    ) {
         self.data = data
         self.assetBaseURL = assetBaseURL
+        self.manifestURL = manifestURL
+        self.manifestEntry = manifestEntry
         self.stationsByName = Dictionary(
             data.stations.map { (normalizedStationName($0.stationName), $0) },
             uniquingKeysWith: { first, _ in first }
@@ -644,8 +931,15 @@ private struct OfficialManifest: Decodable {
 private struct OfficialManifestCity: Decodable {
     let cityID: String
     let version: String
+    let sizeBytes: Int?
+    let sha256: String?
     let downloadURL: String?
     let capabilities: OfficialCapabilities
+    // Sibling indoor-maps file, mirroring downloadURL/sizeBytes/sha256 — absent entirely for
+    // cities with no authored indoor data yet.
+    let indoorMapsDownloadURL: String?
+    let indoorMapsSizeBytes: Int?
+    let indoorMapsSHA256: String?
 
     var hasDownload: Bool {
         downloadURL?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
@@ -655,6 +949,32 @@ private struct OfficialManifestCity: Decodable {
         capabilities.accessibility == "source_pending" ||
             capabilities.schedules == "source_pending" ||
             capabilities.stationMaps == "source_pending"
+    }
+
+    func validatesPackData(_ data: Data) -> Bool {
+        validates(data, expectedSize: sizeBytes, expectedSHA256: sha256)
+    }
+
+    func validatesIndoorMapsData(_ data: Data) -> Bool {
+        validates(
+            data,
+            expectedSize: indoorMapsSizeBytes,
+            expectedSHA256: indoorMapsSHA256
+        )
+    }
+
+    private func validates(
+        _ data: Data,
+        expectedSize: Int?,
+        expectedSHA256: String?
+    ) -> Bool {
+        guard !data.isEmpty else { return false }
+        if let expectedSize, expectedSize > 0, data.count != expectedSize { return false }
+        if let expectedSHA256, !expectedSHA256.isEmpty,
+           data.sha256Hex.caseInsensitiveCompare(expectedSHA256) != .orderedSame {
+            return false
+        }
+        return true
     }
 }
 
@@ -683,15 +1003,10 @@ private struct OfficialStation: Decodable {
     let stationAccessPoints: [OfficialAccessPoint]?
     let platformHints: [OfficialPlatformHint]?
     let interchangeHints: [OfficialInterchangeHint]?
-    // Hand-traced indoor node graph (present only for a small pilot set of stations today —
-    // see Scripts/validate_indoor_maps.rb). `StationIndoorMap` is already Codable so this
-    // decodes straight through.
-    let indoorMap: StationIndoorMap?
 
     enum CodingKeys: String, CodingKey {
         case stationName, stationID, accessibility, schedules, stationMaps, stationAssets,
-             stationFacilities, serviceStatus, stationAccessPoints, platformHints, interchangeHints,
-             indoorMap
+             stationFacilities, serviceStatus, stationAccessPoints, platformHints, interchangeHints
     }
 
     init(from decoder: Decoder) throws {
@@ -707,7 +1022,6 @@ private struct OfficialStation: Decodable {
         stationAccessPoints = try values.decodeIfPresent([OfficialAccessPoint].self, forKey: .stationAccessPoints)
         platformHints = try values.decodeIfPresent([OfficialPlatformHint].self, forKey: .platformHints)
         interchangeHints = try values.decodeIfPresent([OfficialInterchangeHint].self, forKey: .interchangeHints)
-        indoorMap = try values.decodeIfPresent(StationIndoorMap.self, forKey: .indoorMap)
     }
 
     func facilities(for stationID: String) -> [StationFacility] {
@@ -845,5 +1159,123 @@ private struct OfficialInterchangeHint: Decodable {
             walkingMinutes: walkingMinutes,
             notes: notes ?? []
         )
+    }
+}
+
+private enum CityPackDiskError: Error {
+    case invalidPath
+    case validationFailed
+}
+
+/// Persistent, version-scoped storage for city packs and the exact transfer assets a rider
+/// has opened or prefetched. Everything is checksum-validated before use where the manifest
+/// provides a digest; relative asset paths are constrained beneath the version directory.
+private struct CityPackDiskStore {
+    private let rootURL: URL
+    private let fileManager = FileManager.default
+
+    init() {
+        let applicationSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        ).first ?? FileManager.default.temporaryDirectory
+        rootURL = applicationSupport
+            .appendingPathComponent("JustGo", isDirectory: true)
+            .appendingPathComponent("CityPacks", isDirectory: true)
+    }
+
+    func validatedPackData(for entry: OfficialManifestCity) -> Data? {
+        validatedData(
+            at: versionDirectory(for: entry).appendingPathComponent("city_pack.json"),
+            validator: entry.validatesPackData
+        )
+    }
+
+    func validatedIndoorMapsData(for entry: OfficialManifestCity) -> Data? {
+        validatedData(
+            at: versionDirectory(for: entry).appendingPathComponent("indoor_maps.json"),
+            validator: entry.validatesIndoorMapsData
+        )
+    }
+
+    func storePackData(_ data: Data, for entry: OfficialManifestCity) throws {
+        guard entry.validatesPackData(data) else { throw CityPackDiskError.validationFailed }
+        try store(data, at: versionDirectory(for: entry).appendingPathComponent("city_pack.json"))
+    }
+
+    func storeIndoorMapsData(_ data: Data, for entry: OfficialManifestCity) throws {
+        guard entry.validatesIndoorMapsData(data) else { throw CityPackDiskError.validationFailed }
+        try store(data, at: versionDirectory(for: entry).appendingPathComponent("indoor_maps.json"))
+    }
+
+    func cachedAssetURL(relativePath: String, for entry: OfficialManifestCity) -> URL? {
+        guard let url = assetURL(relativePath: relativePath, for: entry),
+              fileManager.isReadableFile(atPath: url.path) else { return nil }
+        return url
+    }
+
+    func storeAssetData(
+        _ data: Data,
+        relativePath: String,
+        for entry: OfficialManifestCity
+    ) throws {
+        guard let url = assetURL(relativePath: relativePath, for: entry) else {
+            throw CityPackDiskError.invalidPath
+        }
+        try store(data, at: url)
+    }
+
+    func deleteCity(_ cityID: String) throws {
+        let url = rootURL.appendingPathComponent(safeComponent(cityID), isDirectory: true)
+        guard fileManager.fileExists(atPath: url.path) else { return }
+        try fileManager.removeItem(at: url)
+    }
+
+    private func validatedData(
+        at url: URL,
+        validator: (Data) -> Bool
+    ) -> Data? {
+        guard let data = try? Data(contentsOf: url), validator(data) else { return nil }
+        return data
+    }
+
+    private func store(_ data: Data, at url: URL) throws {
+        try fileManager.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try data.write(to: url, options: .atomic)
+    }
+
+    private func versionDirectory(for entry: OfficialManifestCity) -> URL {
+        rootURL
+            .appendingPathComponent(safeComponent(entry.cityID), isDirectory: true)
+            .appendingPathComponent(safeComponent(entry.version), isDirectory: true)
+    }
+
+    private func assetURL(relativePath: String, for entry: OfficialManifestCity) -> URL? {
+        guard URL(string: relativePath)?.scheme == nil,
+              let decoded = relativePath.removingPercentEncoding else { return nil }
+        let components = decoded.split(separator: "/", omittingEmptySubsequences: true).map(String.init)
+        guard !components.isEmpty,
+              components.allSatisfy({ $0 != "." && $0 != ".." && !$0.contains("\\") }) else {
+            return nil
+        }
+        return components.reduce(versionDirectory(for: entry)) { partial, component in
+            partial.appendingPathComponent(component, isDirectory: false)
+        }
+    }
+
+    private func safeComponent(_ value: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_."))
+        let component = value.unicodeScalars.map { allowed.contains($0) ? Character(String($0)) : "_" }
+            .reduce(into: "") { $0.append($1) }
+        return component.isEmpty || component == "." || component == ".." ? "_" : component
+    }
+}
+
+private extension Data {
+    var sha256Hex: String {
+        SHA256.hash(data: self).map { String(format: "%02x", $0) }.joined()
     }
 }

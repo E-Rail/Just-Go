@@ -1,2 +1,3 @@
 "NSLocationWhenInUseUsageDescription" = "JustGo uses your location to find nearby subway stations and provide directions.";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "JustGo uses your location to provide navigation and subway station arrival reminders.";
+"NSCameraUsageDescription" = "JustGo uses the camera only when you scan a station sign to confirm an indoor checkpoint. Recognition happens on this device and is not saved.";

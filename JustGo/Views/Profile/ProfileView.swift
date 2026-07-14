@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum AppWebLinks {
+    static let privacyPolicy = URL(string: "https://e-rail.github.io/justgo/docs/privacy/")!
+    static let termsOfService = URL(string: "https://e-rail.github.io/justgo/docs/terms/")!
+}
+
 struct ProfileView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -157,7 +162,7 @@ struct ProfileView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Link(destination: URL(string: "https://justgo.app/privacy")!) {
+            Link(destination: AppWebLinks.privacyPolicy) {
                 HStack {
                     Text(AppLocalization.localized("Privacy Policy"))
                     Spacer()
@@ -167,7 +172,7 @@ struct ProfileView: View {
                 }
             }
 
-            Link(destination: URL(string: "https://justgo.app/terms")!) {
+            Link(destination: AppWebLinks.termsOfService) {
                 HStack {
                     Text(AppLocalization.localized("Terms of Service"))
                     Spacer()

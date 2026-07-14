@@ -53,6 +53,9 @@ private struct LiveIndoorPathGuidance {
 
 private struct LiveTransferGuidance {
     let stepID: Int
+    let stationTitle: String
+    let indoorMap: StationIndoorMap?
+    let transferContext: TransferContext?
     let indoorPath: LiveIndoorPathGuidance?
     let boardingZoneGuidance: IndoorBoardingZoneGuidance?
 }
@@ -94,6 +97,7 @@ struct LiveGoView: View {
     @State private var rerouteNoticeTask: Task<Void, Never>?
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
+    @State private var isLoadingTransferGuidance = false
     @State private var completedIndoorTransferStepIDs: Set<Int> = []
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
@@ -105,9 +109,12 @@ struct LiveGoView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let activeTransferGuidance,
+                if isActiveTransferStep,
+                   let activeTransferGuidance,
                    let indoorPath = activeTransferGuidance.indoorPath {
                     embeddedIndoorGuidance(indoorPath, transferGuidance: activeTransferGuidance)
+                } else if isActiveTransferStep {
+                    transferStepSurface
                 } else {
                     ZStack(alignment: .bottom) {
                         liveMap
@@ -141,8 +148,7 @@ struct LiveGoView: View {
                 .padding(.horizontal)
             }
             .navigationTitle(
-                activeTransferGuidance?.indoorPath?.stationTitle
-                    ?? AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發")
+                transferNavigationTitle
             )
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -179,6 +185,7 @@ struct LiveGoView: View {
         .task(id: transferGuidanceRequest) {
             guard let request = transferGuidanceRequest else {
                 transferGuidance = nil
+                isLoadingTransferGuidance = false
                 return
             }
             await loadTransferGuidance(for: request)
@@ -195,6 +202,20 @@ struct LiveGoView: View {
               step.kind == .transfer,
               !completedIndoorTransferStepIDs.contains(step.id) else { return nil }
         return LiveTransferGuidanceRequest(routeID: viewModel.route.id, stepID: step.id)
+    }
+
+    private var isActiveTransferStep: Bool {
+        guard let step = viewModel.currentStep, step.kind == .transfer else { return false }
+        return !completedIndoorTransferStepIDs.contains(step.id)
+    }
+
+    private var transferNavigationTitle: String {
+        guard isActiveTransferStep else {
+            return AppLocalization.text(english: "Go", simplified: "出发", traditional: "出發")
+        }
+        return activeTransferGuidance?.stationTitle
+            ?? viewModel.currentStep?.fromStationName
+            ?? AppLocalization.localized("Transfer station")
     }
 
     private var activeTransferGuidance: LiveTransferGuidance? {
@@ -228,9 +249,121 @@ struct LiveGoView: View {
         )
     }
 
+    private var transferStepSurface: some View {
+        VStack(spacing: 0) {
+            transferStatusContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            instructionPanel
+        }
+        .background(Color.appBackground)
+    }
+
+    @ViewBuilder
+    private var transferStatusContent: some View {
+        if isLoadingTransferGuidance, activeTransferGuidance == nil {
+            VStack(spacing: 14) {
+                ProgressView()
+                    .controlSize(.large)
+                Text(AppLocalization.text(
+                    english: "Loading indoor transfer guidance…",
+                    simplified: "正在加载站内换乘指引…",
+                    traditional: "正在載入站內轉乘指引…"
+                ))
+                .font(.headline)
+            }
+            .padding(24)
+            .accessibilityElement(children: .combine)
+        } else if let guidance = activeTransferGuidance {
+            VStack(spacing: 12) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.system(size: 42, weight: .semibold))
+                    .foregroundStyle(.orange)
+                Text(guidance.stationTitle)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+                Text(AppLocalization.text(
+                    english: "Indoor path not verified",
+                    simplified: "暂无已核实的站内路径",
+                    traditional: "暫無已核實的站內路徑"
+                ))
+                .font(.headline)
+                Text(transferUnavailableDescription(for: guidance))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 420)
+                if let indoorMap = guidance.indoorMap {
+                    DataConfidenceChip(confidence: indoorMap.confidence, compact: true)
+                }
+            }
+            .padding(24)
+            .accessibilityElement(children: .combine)
+        } else {
+            ContentUnavailableView {
+                Label(
+                    AppLocalization.text(
+                        english: "Indoor guidance unavailable",
+                        simplified: "站内指引不可用",
+                        traditional: "站內指引不可用"
+                    ),
+                    systemImage: "signpost.right"
+                )
+            } description: {
+                Text(AppLocalization.text(
+                    english: "Follow station signs for this transfer.",
+                    simplified: "本次换乘请以站内标识为准。",
+                    traditional: "本次轉乘請以站內標識為準。"
+                ))
+            }
+            .padding(24)
+        }
+    }
+
+    private func transferUnavailableDescription(for guidance: LiveTransferGuidance) -> String {
+        if let context = guidance.transferContext,
+           let gap = guidance.indoorMap?.resolvedLineCoverageGaps.first(where: {
+               $0.lineID == context.incoming.lineID || $0.lineID == context.outgoing.lineID
+           }) {
+            let lineName = gap.lineID == context.incoming.lineID
+                ? context.incoming.lineName
+                : context.outgoing.lineName
+            return AppLocalization.text(
+                english: "The source diagram does not show \(lineName), so no connecting path is claimed. Follow station signs.",
+                simplified: "来源站内图未显示\(lineName)，因此不提供未经核实的连接路径，请以站内标识为准。",
+                traditional: "來源站內圖未顯示\(lineName)，因此不提供未經核實的連接路徑，請以站內標識為準。"
+            )
+        }
+        if guidance.indoorMap?.effectiveCoverageMode == .platformCheckpoints {
+            return AppLocalization.text(
+                english: "Platform checkpoints are mapped, but the connecting corridor is not verified. Follow station signs.",
+                simplified: "已标注站台位置，但连接通道尚未核实，请以站内标识为准。",
+                traditional: "已標註月台位置，但連接通道尚未核實，請以站內標識為準。"
+            )
+        }
+        if guidance.indoorMap != nil {
+            return AppLocalization.text(
+                english: "No verified path matches this route and its accessibility settings. Follow station signs.",
+                simplified: "暂无符合本次路线及无障碍设置的已核实路径，请以站内标识为准。",
+                traditional: "暫無符合本次路線及無障礙設定的已核實路徑，請以站內標識為準。"
+            )
+        }
+        return AppLocalization.text(
+            english: "No verified indoor map is available for this transfer. Follow station signs.",
+            simplified: "本次换乘暂无已核实的站内图，请以站内标识为准。",
+            traditional: "本次轉乘暫無已核實的站內圖，請以站內標識為準。"
+        )
+    }
+
     @MainActor
     private func loadTransferGuidance(for request: LiveTransferGuidanceRequest) async {
         transferGuidance = nil
+        isLoadingTransferGuidance = true
+        defer {
+            if request == transferGuidanceRequest {
+                isLoadingTransferGuidance = false
+            }
+        }
         guard request == transferGuidanceRequest,
               let step = viewModel.currentStep,
               step.id == request.stepID,
@@ -239,6 +372,18 @@ struct LiveGoView: View {
 
         let transferSegment = viewModel.route.segments[segmentIndex]
         let context = step.transferContext ?? transferSegment.transferContext
+        let precedingTransitSegment = viewModel.route.segments[..<segmentIndex].last(where: { $0.type.isTransit })
+        let followingTransitSegment = viewModel.route.segments.index(after: segmentIndex) < viewModel.route.segments.endIndex
+            ? viewModel.route.segments[viewModel.route.segments.index(after: segmentIndex)...]
+                .first(where: { $0.type.isTransit })
+            : nil
+        let incomingLineName = context?.incoming.lineName
+            ?? transferSegment.incomingLineName
+            ?? precedingTransitSegment?.lineName
+        let outgoingLineName = context?.outgoing.lineName
+            ?? step.lineName
+            ?? transferSegment.lineName
+            ?? followingTransitSegment?.lineName
         let cityID = context?.cityID
             ?? viewModel.route.networkCityID
             ?? appState.selectedCity?.id
@@ -268,6 +413,9 @@ struct LiveGoView: View {
             avoidStairs: preference.avoidStairs
         )
 
+        let indoorMap = await container.officialStationData.indoorMap(for: station)
+        guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+
         let boardingZoneGuidance: IndoorBoardingZoneGuidance?
         if let context {
             boardingZoneGuidance = await container.officialStationData.boardingZoneGuidance(
@@ -280,45 +428,69 @@ struct LiveGoView: View {
         }
         guard !Task.isCancelled, request == transferGuidanceRequest else { return }
 
-        let transferPath: TransferPathHint?
+        var transferPath: TransferPathHint?
         if let context {
             transferPath = await container.officialStationData.transferPath(
                 for: station,
                 context: context,
                 accessibilityFilter: accessibilityFilter
             )
-        } else {
+        }
+        if transferPath == nil {
             transferPath = await container.officialStationData.transferPath(
                 for: station,
-                fromLineName: transferSegment.incomingLineName,
-                toLineName: step.lineName ?? transferSegment.lineName,
+                fromLineName: incomingLineName,
+                toLineName: outgoingLineName,
                 accessibilityFilter: accessibilityFilter
             )
         }
         guard !Task.isCancelled, request == transferGuidanceRequest else { return }
 
         var indoorPath: LiveIndoorPathGuidance?
-        if let transferPath, transferPath.routeNodeIDs.count > 1 {
-            let indoorMap = await container.officialStationData.indoorMap(for: station)
-            guard !Task.isCancelled, request == transferGuidanceRequest else { return }
-            if let indoorMap {
-                let stationMap = await container.officialStationData.stationMap(for: station)
-                guard !Task.isCancelled, request == transferGuidanceRequest else { return }
-                indoorPath = LiveIndoorPathGuidance(
-                    stationTitle: stationName,
-                    mapImageURL: stationMap?.isImage == true ? stationMap?.resolvedURL : nil,
-                    indoorMap: indoorMap,
-                    routeNodeIDs: transferPath.routeNodeIDs,
-                    routeEdgeIDs: transferPath.routeEdgeIDs,
-                    destinationLineName: context?.outgoing.lineName ?? step.lineName,
-                    transferContext: context
-                )
-            }
+        if let transferPath, transferPath.routeNodeIDs.count > 1, let indoorMap {
+            indoorPath = LiveIndoorPathGuidance(
+                stationTitle: stationName,
+                mapImageURL: nil,
+                indoorMap: indoorMap,
+                routeNodeIDs: transferPath.routeNodeIDs,
+                routeEdgeIDs: transferPath.routeEdgeIDs,
+                destinationLineName: outgoingLineName,
+                transferContext: context
+            )
         }
 
         transferGuidance = LiveTransferGuidance(
             stepID: step.id,
+            stationTitle: stationName,
+            indoorMap: indoorMap,
+            transferContext: context,
             indoorPath: indoorPath,
+            boardingZoneGuidance: boardingZoneGuidance
+        )
+        isLoadingTransferGuidance = false
+
+        // The graph is enough to start immediately. Resolve the much larger station diagram in
+        // the background so a slow city-pack CDN cannot keep Live Go on the previous surface.
+        guard let indoorPath else { return }
+        let stationMap = await container.officialStationData.stationMap(for: station)
+        guard !Task.isCancelled, request == transferGuidanceRequest,
+              let stationMap, stationMap.isImage,
+              let mapImageURL = stationMap.resolvedURL else { return }
+        let pathWithImage = LiveIndoorPathGuidance(
+            stationTitle: indoorPath.stationTitle,
+            mapImageURL: mapImageURL,
+            indoorMap: indoorPath.indoorMap,
+            routeNodeIDs: indoorPath.routeNodeIDs,
+            routeEdgeIDs: indoorPath.routeEdgeIDs,
+            destinationLineName: indoorPath.destinationLineName,
+            transferContext: indoorPath.transferContext
+        )
+        transferGuidance = LiveTransferGuidance(
+            stepID: step.id,
+            stationTitle: stationName,
+            indoorMap: indoorMap,
+            transferContext: context,
+            indoorPath: pathWithImage,
             boardingZoneGuidance: boardingZoneGuidance
         )
     }

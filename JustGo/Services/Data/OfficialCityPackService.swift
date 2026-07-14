@@ -501,9 +501,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func indoorMap(for station: Station) async -> StationIndoorMap? {
-        _ = await loadCityPack(for: station.cityID)
         let indoorMaps = await loadIndoorMaps(for: station.cityID)
-        return indoorMaps[normalizedStationName(station.name)]
+        if let nameMatch = indoorMaps[normalizedStationName(station.name)] {
+            return nameMatch
+        }
+        let canonicalStationID = networkStationID(station.stationID)
+        return indoorMaps.values.first { $0.stationID == canonicalStationID }
     }
 
     /// Fetches and decodes the city's sibling `indoor_maps.json` the first time any station's
@@ -512,6 +515,19 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     /// second network round trip.
     private func loadIndoorMaps(for cityID: String) async -> [String: StationIndoorMap] {
         if let cached = indoorMapsByCity[cityID] { return cached }
+
+        // Indoor guidance must remain available underground and while a new data-pack release is
+        // still waiting to land on the CDN. The compact graph is therefore an app resource; city
+        // packs and their much larger station assets remain downloadable and deletable.
+        if let bundled = bundledIndoorMapsPack(for: cityID) {
+            let byName = indoorMapsByStationName(from: bundled)
+            indoorMapsByCity[cityID] = byName
+            return byName
+        }
+
+        if packs[cityID] == nil {
+            _ = await loadCityPack(for: cityID)
+        }
         guard let loaded = packs[cityID],
               let url = resolvedURL(
                 loaded.manifestEntry.indoorMapsDownloadURL,
@@ -537,10 +553,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 indoorMapsByCity[cityID] = [:]
                 return [:]
             }
-            let byName = Dictionary(
-                decoded.stations.map { (normalizedStationName($0.stationName), $0.indoorMap) },
-                uniquingKeysWith: { first, _ in first }
-            )
+            let byName = indoorMapsByStationName(from: decoded)
             indoorMapsByCity[cityID] = byName
             return byName
         } catch {
@@ -548,6 +561,27 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             indoorMapsByCity[cityID] = [:]
             return [:]
         }
+    }
+
+    private func bundledIndoorMapsPack(for cityID: String) -> IndoorMapsPack? {
+        let expectedVersion = packs[cityID]?.data.version
+            ?? bundledManifest()?.cities.first(where: { $0.cityID == cityID })?.version
+        let candidates = Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: nil) ?? []
+        for url in candidates where url.lastPathComponent.hasPrefix("indoor_maps") {
+            guard let data = try? Data(contentsOf: url),
+                  let decoded = try? JSONDecoder().decode(IndoorMapsPack.self, from: data),
+                  decoded.cityID == cityID,
+                  expectedVersion == nil || decoded.version == expectedVersion else { continue }
+            return decoded
+        }
+        return nil
+    }
+
+    private func indoorMapsByStationName(from pack: IndoorMapsPack) -> [String: StationIndoorMap] {
+        Dictionary(
+            pack.stations.map { (normalizedStationName($0.stationName), $0.indoorMap) },
+            uniquingKeysWith: { first, _ in first }
+        )
     }
 
     func transferPath(

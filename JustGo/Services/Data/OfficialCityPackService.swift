@@ -800,7 +800,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             stationCount: names.count,
             officialAccessibilityCount: stations.filter { $0.accessibility != nil }.count,
             officialScheduleCount: stations.filter { !$0.schedules.isEmpty }.count,
-            officialStationMapCount: 0,
+            officialStationMapCount: stations.filter { $0.externalResources.contains(where: { $0.kind == .stationLayout }) }.count,
             officialFacilityCount: stations.filter { !$0.stationFacilities.isEmpty || !($0.accessibility?.facilityNotes ?? []).isEmpty }.count
         )
     }

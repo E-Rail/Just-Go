@@ -10,6 +10,7 @@ struct JustGoApp: App {
         let container = DIContainer.configure()
         _container = State(initialValue: container)
         Self.removeObsoleteRouteCaches()
+        Self.removeOrphanedPhotoImportTempFiles()
     }
 
     var body: some Scene {
@@ -28,6 +29,19 @@ struct JustGoApp: App {
         let fileManager = FileManager.default
         if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("LineOverlays", isDirectory: true))
+        }
+    }
+
+    /// `PersonalMediaPhotoFile.transferRepresentation` copies an import's original, unsanitized
+    /// bytes (GPS/EXIF intact) into the temp directory before stripping metadata. That copy is
+    /// only ever meant to live for the duration of one import; if the process is killed mid-import
+    /// it's otherwise never cleaned up, so sweep any leftovers unconditionally on next launch.
+    private static func removeOrphanedPhotoImportTempFiles() {
+        let fileManager = FileManager.default
+        let tempDirectory = fileManager.temporaryDirectory
+        guard let contents = try? fileManager.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil) else { return }
+        for url in contents where url.lastPathComponent.hasPrefix("JustGoPhotoImport-") {
+            try? fileManager.removeItem(at: url)
         }
     }
 

@@ -29,6 +29,8 @@ private enum PersonalStationMediaHarness {
 
     static func main() async {
         do {
+            try testCanonicalStationIdentity()
+            print("PASS: canonical station identity")
             try await testSourceLimit()
             print("PASS: 25 MB source limit")
             try await testNormalizationAndMetadataStripping()
@@ -43,12 +45,24 @@ private enum PersonalStationMediaHarness {
             print("PASS: atomic persistence and deletion")
             try await testRightsEpochShapedCleanup()
             print("PASS: rights-epoch media preservation")
-            print("PersonalStationMediaStore: 7 tests passed")
+            print("PersonalStationMediaStore: 8 tests passed")
         } catch {
             let message = "PersonalStationMediaStore test failed: \(error)\n"
             FileHandle.standardError.write(Data(message.utf8))
             exit(EXIT_FAILURE)
         }
+    }
+
+    private static func testCanonicalStationIdentity() throws {
+        let canonical = PersonalStationMediaKey(
+            cityID: "8100",
+            stationID: "network-8100-5100239bb9315f24"
+        )
+        try require(canonical?.canonicalStationID == "5100239bb9315f24", "network ID did not canonicalize")
+        try require(
+            PersonalStationMediaKey(cityID: "8100", stationID: "mapkit-name-22.1-114.1") == nil,
+            "provider fallback ID was accepted"
+        )
     }
 
     private static func testSourceLimit() async throws {
@@ -214,11 +228,17 @@ private enum PersonalStationMediaHarness {
             to: root.appendingPathComponent("index.json"),
             options: .atomic
         )
+        let orphanURL = root.appendingPathComponent("\(UUID().uuidString).jpg")
+        try makeJPEG(width: 20, height: 20).write(to: orphanURL, options: .atomic)
+        let tombstoneURL = root.appendingPathComponent(".deleting-\(UUID().uuidString.lowercased()).jpg")
+        try makeJPEG(width: 20, height: 20).write(to: tombstoneURL, options: .atomic)
 
         let key = PersonalStationMediaKey(cityID: "8100", canonicalStationID: "ADM")
         let store = PersonalStationMediaStore(rootURL: root)
         let corruptIndexItems = try await store.items(for: key)
         try require(corruptIndexItems.isEmpty, "corrupt index exposed records")
+        try require(!fileManager.fileExists(atPath: orphanURL.path), "corrupt index left an unreachable JPEG")
+        try require(!fileManager.fileExists(atPath: tombstoneURL.path), "recovery left a deletion tombstone")
 
         let names = try fileManager.contentsOfDirectory(atPath: root.path)
         try require(

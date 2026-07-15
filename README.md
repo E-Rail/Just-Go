@@ -3,84 +3,87 @@
 [![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
 [![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
-[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-0071e3?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/E-Rail/JustGo?style=flat&logo=github)](https://github.com/E-Rail/JustGo/stargazers)
-[![Last commit](https://img.shields.io/github/last-commit/E-Rail/JustGo?logo=git&logoColor=white)](https://github.com/E-Rail/JustGo/commits)
+[![License: MIT](https://img.shields.io/badge/software-MIT-green.svg)](LICENSE)
 
-English | [中文](https://github.com/E-Rail/JustGo/blob/main/README-zh.md)
+English | [中文](README-zh.md)
 
-**Website:** [e-rail.github.io/justgo](https://e-rail.github.io/justgo)
+JustGo is an iPhone and iPad transit companion for route planning, station context, and honest
+data confidence. It combines bundled metro routing, Apple Maps place search and walking legs,
+attributed metro geometry, and narrowly
+scoped official city data. Missing schedules, layouts, transfer paths, and door positions are
+shown as unavailable rather than inferred.
 
-JustGo is a subway confidence app for China. It helps riders understand not only which route to take, but whether that trip will be smooth, understandable, and reliable before they enter the station. JustGo combines routing, official schedules, station maps, accessibility information, exit guidance, and transparent data-source labels so every rider can travel with fewer surprises.
+## What Ships
 
-Accessibility is not a separate mode. It is the design standard that makes the app better for everyone: wheelchair users, elderly riders, tourists, people carrying luggage, families, first-time subway users, and daily commuters.
+- Apple Maps place search, walking directions, and map rendering.
+- A 58-city catalog with 46 canonical metro-network baselines, separately attributed to
+  OpenStreetMap under ODbL 1.0; 12 entries are catalog-only.
+- Two included offline city-data baselines: Beijing and Hong Kong.
+- Hong Kong MTR and Light Rail station, route, accessibility, and live-reference data from
+  DATA.GOV.HK under its custom reuse terms.
+- Official Hong Kong live arrivals from the government transport API, with timeout, cache,
+  request-coalescing, and rate-limit handling.
+- Official operator landing-page links that open only after a rider taps them.
+- Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
+  Qqhhss under CC0 1.0.
+- Private station images imported from Photos or Files, normalized and stored only on-device.
 
-> Maps tell users where to go. JustGo tells users whether the trip will actually work.
+The current bundled coverage is:
 
-## Features
+| City | Network | Matched | Accessibility | Live arrivals | Layout links | Media | Verified transfers |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Beijing | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
+| Hong Kong | 162 | 162 | 98 | 162 | 98 | 1 | 0 |
 
-- **Subway Confidence Planning**: See whether a route is likely to be smooth, confusing, walking-heavy, or data-limited before you travel
-- **Human-Centered Route Modes**: Fastest, least walking, fewest transfers, least confusing, luggage friendly, elderly friendly, step-free support, and official-data-focused choices
-- **Station Intelligence**: Entrances, exits, station maps, schedules, accessibility details, and useful station context
-- **Transparent Data Confidence**: Clear labels for official data, Apple Maps route data, estimates, source-pending fields, and unavailable live data
-- **Universal Travel Support**: Step-free information, VoiceOver support, clear guidance, and readable UI patterns designed to help everyone
-- **MapKit Integration**: Native place search, place-to-place transit routing, walking steps, and exact route geometry
-- **Apple Map Rendering**: Native MapKit display with route overlays
-- **Official City Packs**: Downloadable city-level official station data where public sources exist
+The other 56 catalog cities are source-pending. Of those, 44 retain an attributed network
+baseline and 12 are catalog-only. Included metro topology powers rail routing independently of
+optional city-pack details; Apple Maps supplies place search and walking legs.
+No current city pack is presented as downloadable. Macau remains source-pending and exposes only
+the official Macao Light Rapid Transit homepage as a tap-only operator link.
 
-## Requirements
+## Indoor Guidance
 
-- iOS 18.0+
-- iPadOS 18.0+
-- Xcode 16.0+
-- Swift 5.9+
+The indoor graph, checkpoint scanner, persistence, and Live Go integration remain in the app
+for future verified data. This release contains zero verified transfer contexts. It does not
+claim universal 3D maps, indoor routes, boarding cars, door positions, or transfer corridors.
+When verified guidance is unavailable, Live Go keeps the normal transfer step and says so.
 
 ## Setup
 
-1. Clone the repository
-2. Open `JustGo.xcworkspace` in Xcode
-3. Optional: add `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url` to `JustGo/Config/Secrets.xcconfig` to use your own city-pack host
-4. The app falls back to jsDelivr's GitHub CDN for development and beta testing
-5. Build and run
+1. Clone the repository.
+2. Open `JustGo.xcodeproj` in Xcode.
+3. Build the `JustGo` scheme.
 
-The app uses native MapKit for place search and transit routing, so no paid routing API key is required.
-Rich station accessibility, official schedules, and station-map assets are downloaded per city pack when a city is opened; they are not bundled into the app binary.
-See `DataPacks/README.md` for the city-pack hosting contract.
+Release builds use the included baseline unless a first-party city-pack origin is configured
+through the build settings. Release does not fall back to GitHub, jsDelivr, or Wikimedia.
+Debug builds may use an explicitly configured development origin. A first-party mainland mirror
+can be supplied through `CITY_PACK_SECRET_MAINLAND_MIRROR_URL`; no mirror is configured here.
 
-## Architecture
+Regenerate and validate data from the vendored, reviewed inputs:
 
-The app follows Clean Architecture with MVVM:
+```sh
+ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/validate_data_rights.rb
+ruby Scripts/validate_city_packs.rb
+```
 
-- **Models**: SwiftData models for stations, routes, and accessibility data
-- **Services**: MapKit providers, official city packs, location, accessibility, and transit confidence
-- **ViewModels**: Business logic and state management
-- **Views**: SwiftUI with glass UI components
+See [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md), and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for schema, provenance, checksums, and exact
+license treatment.
 
-## Supported Cities
+## Privacy And Network Use
 
-MapKit supports place-to-place transit planning wherever Apple Maps provides transit directions. The current manifest has official-pack downloads for nine cities: Beijing, Shanghai, Guangzhou, Shenzhen, Chengdu, Chongqing, Xian, Suzhou, and Hangzhou.
-
-## Universal Travel Support
-
-### Mobility
-- Wheelchair-accessible route planning
-- Elevator status tracking
-- Step-free navigation
-
-### Visual Support
-- VoiceOver support
-- Tactile path information
-
-### Hearing Support
-- Official visual-display information where available
-
-### Clear Guidance
-- Human-readable route explanations
-- Before-you-go station summaries
-- Clear visual hierarchy
+- Personal station media stays in Application Support, is excluded from backup, and is never
+  used to infer routing, accessibility, indoor paths, or doors.
+- External operator resources open only after a user action. JustGo does not render, prefetch,
+  cache, or count those pages as offline content.
+- Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
+  identifiers. They do not include personal media or the rider's location.
+- The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)
+  and [Terms of Service](https://e-rail.github.io/justgo/docs/terms/).
 
 ## License
 
-MIT License - see LICENSE file
+JustGo's original software source is MIT licensed. Third-party data and media are not granted
+under MIT; their terms are recorded in `DataPacks/rights_inventory.json` and
+`THIRD_PARTY_NOTICES.md`.

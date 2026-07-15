@@ -58,6 +58,7 @@ private struct LiveTransferGuidance {
     let transferContext: TransferContext?
     let indoorPath: LiveIndoorPathGuidance?
     let boardingZoneGuidance: IndoorBoardingZoneGuidance?
+    let externalResources: [ExternalTransitResource]
 }
 
 private struct LiveTransferGuidanceRequest: Hashable {
@@ -296,9 +297,24 @@ struct LiveGoView: View {
                 if let indoorMap = guidance.indoorMap {
                     DataConfidenceChip(confidence: indoorMap.confidence, compact: true)
                 }
+                ForEach(guidance.externalResources.filter { $0.kind == .stationLayout }) { resource in
+                    if let url = resource.url {
+                        Link(destination: url) {
+                            Label(
+                                AppLocalization.text(
+                                    english: "Open official station-layout page",
+                                    simplified: "打开官方车站布局页面",
+                                    traditional: "開啟官方車站佈局頁面"
+                                ),
+                                systemImage: "safari"
+                            )
+                            .font(.subheadline)
+                        }
+                    }
+                }
             }
             .padding(24)
-            .accessibilityElement(children: .combine)
+            .accessibilityElement(children: .contain)
         } else {
             ContentUnavailableView {
                 Label(
@@ -416,6 +432,9 @@ struct LiveGoView: View {
         let indoorMap = await container.officialStationData.indoorMap(for: station)
         guard !Task.isCancelled, request == transferGuidanceRequest else { return }
 
+        let externalResources = await container.officialStationData.externalResources(for: station)
+        guard !Task.isCancelled, request == transferGuidanceRequest else { return }
+
         let boardingZoneGuidance: IndoorBoardingZoneGuidance?
         if let context {
             boardingZoneGuidance = await container.officialStationData.boardingZoneGuidance(
@@ -465,34 +484,10 @@ struct LiveGoView: View {
             indoorMap: indoorMap,
             transferContext: context,
             indoorPath: indoorPath,
-            boardingZoneGuidance: boardingZoneGuidance
+            boardingZoneGuidance: boardingZoneGuidance,
+            externalResources: externalResources
         )
         isLoadingTransferGuidance = false
-
-        // The graph is enough to start immediately. Resolve the much larger station diagram in
-        // the background so a slow city-pack CDN cannot keep Live Go on the previous surface.
-        guard let indoorPath else { return }
-        let stationMap = await container.officialStationData.stationMap(for: station)
-        guard !Task.isCancelled, request == transferGuidanceRequest,
-              let stationMap, stationMap.isImage,
-              let mapImageURL = stationMap.resolvedURL else { return }
-        let pathWithImage = LiveIndoorPathGuidance(
-            stationTitle: indoorPath.stationTitle,
-            mapImageURL: mapImageURL,
-            indoorMap: indoorPath.indoorMap,
-            routeNodeIDs: indoorPath.routeNodeIDs,
-            routeEdgeIDs: indoorPath.routeEdgeIDs,
-            destinationLineName: indoorPath.destinationLineName,
-            transferContext: indoorPath.transferContext
-        )
-        transferGuidance = LiveTransferGuidance(
-            stepID: step.id,
-            stationTitle: stationName,
-            indoorMap: indoorMap,
-            transferContext: context,
-            indoorPath: pathWithImage,
-            boardingZoneGuidance: boardingZoneGuidance
-        )
     }
 
     private func completeIndoorGuidance(for stepID: Int) {

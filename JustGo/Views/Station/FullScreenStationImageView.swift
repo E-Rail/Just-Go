@@ -1,30 +1,16 @@
 import SwiftUI
 
-/// Renders persisted `file://` city-pack assets and remote fallbacks through the same API.
-/// SwiftUI's `AsyncImage` is retained for HTTP caching while local images are decoded from
-/// the app's private Application Support directory.
-struct StationAssetImage<Content: View, Placeholder: View, Failure: View>: View {
+/// Renders only bundled or privately persisted station media.
+struct StationAssetImage<Content: View, Failure: View>: View {
     let url: URL
     @ViewBuilder let content: (Image) -> Content
-    @ViewBuilder let placeholder: () -> Placeholder
     @ViewBuilder let failure: () -> Failure
 
     var body: some View {
-        if url.isFileURL {
-            if let image = UIImage(contentsOfFile: url.path) {
-                content(Image(uiImage: image))
-            } else {
-                failure()
-            }
+        if url.isFileURL, let image = UIImage(contentsOfFile: url.path) {
+            content(Image(uiImage: image))
         } else {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image): content(image)
-                case .failure: failure()
-                case .empty: placeholder()
-                @unknown default: failure()
-                }
-            }
+            failure()
         }
     }
 }
@@ -49,12 +35,13 @@ struct FullScreenStationImageView: View {
 
                 StationAssetImage(url: image.url) { loadedImage in
                     ZoomableStationImage(image: loadedImage)
-                } placeholder: {
-                    ProgressView()
-                        .tint(.white)
                 } failure: {
                     ContentUnavailableView(
-                        AppLocalization.localized("Station map could not be loaded"),
+                        AppLocalization.text(
+                            english: "Station media could not be loaded",
+                            simplified: "车站媒体无法加载",
+                            traditional: "車站媒體無法載入"
+                        ),
                         systemImage: "exclamationmark.triangle"
                     )
                     .foregroundStyle(.white)

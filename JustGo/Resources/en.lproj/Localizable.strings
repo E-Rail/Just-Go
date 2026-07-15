@@ -55,7 +55,6 @@
 "Long walking segment" = "Long walking segment";
 "Walking-heavy route" = "Walking-heavy route";
 "Step-free barrier detected" = "Step-free barrier detected";
-"Live countdown" = "Live countdown";
 "Live countdown unavailable" = "Live countdown unavailable";
 "None" = "None";
 "Not available" = "Not available";
@@ -105,8 +104,6 @@
 "Accessibility and station facilities" = "Accessibility and station facilities";
 "Official city packs when public sources exist" = "Official city packs when public sources exist";
 "Official first/last schedules; live countdown only when an official provider exists" = "Official first/last schedules; live countdown only when an official provider exists";
-"Station maps and images" = "Station maps and images";
-"Official city-pack assets where collected" = "Official city-pack assets where collected";
 "Unavailable data is shown honestly instead of guessed." = "Unavailable data is shown honestly instead of guessed.";
 "Route and Search Provider" = "Route and Search Provider";
 "Official Station Details" = "Official Station Details";
@@ -129,21 +126,12 @@
 "Home" = "Home";
 "Accessibility information from official Beijing Subway data." = "Accessibility information from official Beijing Subway data.";
 "Official scheduled time" = "Official scheduled time";
-"Station Map" = "Station Map";
-"Station map could not be loaded" = "Station map could not be loaded";
-"Open station map" = "Open station map";
-"Official station map available" = "Official station map available";
-"Official 3D station map not collected for this station" = "Official 3D station map not collected for this station";
-"Official Timetable Images" = "Official Timetable Images";
-"Official timetable image" = "Official timetable image";
-"Open official timetable image" = "Open official timetable image";
 "Open station image full screen" = "Open station image full screen";
 "Close station image" = "Close station image";
 "Station Facilities" = "Station Facilities";
 "Accessible Restroom" = "Accessible Restroom";
 "Accessibility information from official city data." = "Accessibility information from official city data.";
 "Station Status" = "Station Status";
-"Status data is from Beijing Subway official web map, not train arrival countdowns." = "Status data is from Beijing Subway official web map, not train arrival countdowns.";
 "Official city data is not configured; basic station data still works." = "Official city data is not configured; basic station data still works.";
 "Official city data is pending for this city." = "Official city data is pending for this city.";
 "Official city data is not available for this city yet." = "Official city data is not available for this city yet.";
@@ -180,8 +168,6 @@
 "Low walking distance" = "Low walking distance";
 "Official schedule available" = "Official schedule available";
 "Official schedule is incomplete" = "Official schedule is incomplete";
-"Official station maps available" = "Official station maps available";
-"Some station maps are source pending" = "Some station maps are source pending";
 "Official accessibility information available" = "Official accessibility information available";
 "Some station accessibility data is source pending" = "Some station accessibility data is source pending";
 "Fewer transfers than alternatives" = "Fewer transfers than alternatives";
@@ -196,7 +182,6 @@
 "Best data available" = "Best data available";
 "Transfer station" = "Transfer station";
 "Station essentials available" = "Station essentials available";
-"First and last train information available" = "First and last train information available";
 "Metro geometry © OpenStreetMap contributors" = "Metro geometry © OpenStreetMap contributors";
 "Metro track geometry" = "Metro track geometry";
 "OpenStreetMap physical track geometry" = "OpenStreetMap physical track geometry";
@@ -210,7 +195,6 @@
 "Accessibility unknown" = "Accessibility unknown";
 "Apple Maps" = "Apple Maps";
 "Apple Maps + official packs" = "Apple Maps + official packs";
-"Apple Maps powers place search, transit routes, and route geometry. Official city packs add verified station details where available." = "Apple Maps powers place search, transit routes, and route geometry. Official city packs add verified station details where available.";
 "Apple Maps walking directions mention a ramp." = "Apple Maps walking directions mention a ramp.";
 "Apple Maps walking directions mention an elevator." = "Apple Maps walking directions mention an elevator.";
 "Apple Maps walking directions mention an escalator." = "Apple Maps walking directions mention an escalator.";
@@ -239,7 +223,7 @@
 "Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Rider Notes" = "Rider Notes";
 "Route planning and place search use Apple Maps. Station facts use official city packs when available." = "Route planning and place search use Apple Maps. Station facts use official city packs when available.";
-"Routes use Apple Maps; station facts use downloadable official city packs where available." = "Routes use Apple Maps; station facts use downloadable official city packs where available.";
+"Routes use Apple Maps; station facts use included official city data where available." = "Routes use Apple Maps; station facts use included official city data where available.";
 "Save" = "Save";
 "Save Trip" = "Save Trip";
 "Saved Trip" = "Saved Trip";
@@ -271,10 +255,7 @@
 "Walking or transfer step" = "Walking or transfer step";
 "Walking segment" = "Walking segment";
 "Access" = "Access";
-"Essentials" = "Essentials";
-"3D Map" = "3D Map";
 "Train times" = "Train times";
-"Apple Maps transit routes" = "Apple Maps transit routes";
 "Notifications" = "Notifications";
 "Avg duration" = "Avg duration";
 "Trip Preferences" = "Trip Preferences";
@@ -317,5 +298,4 @@
 "Select the station sign or platform that matches where you are." = "Select the station sign or platform that matches where you are.";
 "Suggested" = "Suggested";
 "Choose Another Checkpoint" = "Choose Another Checkpoint";
-"Station Map Unavailable" = "Station Map Unavailable";
 "Continue with the text directions below." = "Continue with the text directions below.";

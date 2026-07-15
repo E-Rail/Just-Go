@@ -155,14 +155,14 @@ struct IndoorStepGoView: View {
         }
     }
 
-    /// This remains visible throughout the walkthrough because the path is traced from an
-    /// official diagram rather than supplied by an indoor positioning or navigation feed.
+    /// This remains visible throughout the walkthrough because verified static topology is not
+    /// a live indoor-positioning feed and may not reflect temporary closures or changed signage.
     private var disclaimerBanner: some View {
         Label {
             Text(AppLocalization.text(
-                english: "Traced from the station diagram — not an official feed. Confirm with signage as you walk.",
-                simplified: "路径根据官方站内图人工标注，非官方导航数据，请以站内标识为准。",
-                traditional: "路徑根據官方站內圖人工標注，非官方導航資料，請以站內標識為準。"
+                english: "Static indoor guidance is not live positioning. Confirm with station signs as you walk.",
+                simplified: "站内指引并非实时定位，请在行进中确认站内标识。",
+                traditional: "站內指引並非即時定位，請在行進中確認站內標識。"
             ))
             .font(.caption2)
             .foregroundStyle(.secondary)
@@ -208,10 +208,6 @@ struct IndoorStepGoView: View {
                     .overlay(pathOverlay)
                     .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-            } placeholder: {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
             } failure: {
                 mapFallback
             }
@@ -222,7 +218,14 @@ struct IndoorStepGoView: View {
 
     private var mapFallback: some View {
         ContentUnavailableView {
-            Label(AppLocalization.localized("Station Map Unavailable"), systemImage: "map")
+            Label(
+                AppLocalization.text(
+                    english: "Station Layout Unavailable",
+                    simplified: "车站布局不可用",
+                    traditional: "車站佈局不可用"
+                ),
+                systemImage: "map"
+            )
         } description: {
             Text(AppLocalization.localized("Continue with the text directions below."))
         }

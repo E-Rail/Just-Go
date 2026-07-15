@@ -127,7 +127,11 @@ final class DIContainer {
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
-        let officialStationData = OfficialCityPackService(metroNetworks: metroNetworkProvider)
+        let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
+        let officialStationData = OfficialCityPackService(
+            metroNetworks: metroNetworkProvider,
+            realtimeArrivals: realtimeArrivalProvider
+        )
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()
         let stationSearchService = StationSearchService(

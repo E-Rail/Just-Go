@@ -53,11 +53,11 @@ extension StationDetailView {
                         }
                     }
 
-                    if viewModel?.stationMap != nil {
+                    if viewModel?.externalResources.contains(where: { $0.kind == .stationLayout }) == true {
                         Text(AppLocalization.text(
-                            english: "Tap the station map below for the full layout.",
-                            simplified: "点按下方站内图查看完整布局。",
-                            traditional: "點按下方站內圖查看完整佈局。"
+                            english: "Use the official link below to view the operator's current layout information.",
+                            simplified: "可使用下方官方链接查看运营方当前的布局信息。",
+                            traditional: "可使用下方官方連結查看營運方目前的佈局資訊。"
                         ))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -94,7 +94,6 @@ extension StationDetailView {
 
     var arrivalsSection: some View {
         let arrivals = viewModel?.arrivals ?? []
-        let timetableAssets = viewModel?.timetableAssets ?? []
         return GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppLocalization.localized("Train Times"))
@@ -102,7 +101,7 @@ extension StationDetailView {
 
                 if viewModel?.isLoading == true {
                     ProgressView()
-                } else if arrivals.isEmpty && timetableAssets.isEmpty {
+                } else if arrivals.isEmpty {
                     Text(viewModel?.errorMessage ?? AppLocalization.localized("Schedule unavailable"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -111,25 +110,13 @@ extension StationDetailView {
                         ArrivalCountdown(arrival: arrival)
                     }
 
-                    if timetableAssets.isEmpty == false {
-                        Text(AppLocalization.localized("Official Timetable Images"))
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        ForEach(timetableAssets, id: \.assetURL) { asset in
-                            stationAssetContent(
-                                asset,
-                                defaultTitle: AppLocalization.localized("Official timetable image")
-                            )
-                        }
-                    }
-
                     if let statusMessage = viewModel?.trainTimeStatusMessage {
                         Text(statusMessage)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
 
-                    if arrivals.contains(where: \.hasLiveCountdown) == false {
+                    if arrivals.contains(where: \.isLiveArrival) == false {
                         Text(AppLocalization.localized("Shows first/last train times, not live arrival countdowns."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -187,19 +174,31 @@ extension StationDetailView {
 
     @ViewBuilder
     var stationMapSection: some View {
-        if viewModel?.isLoadingCityPack == true || viewModel?.stationMap != nil || viewModel?.stationMapStatusMessage != nil {
+        let resources = viewModel?.externalResources ?? []
+        let media = viewModel?.licensedMedia ?? []
+        if viewModel?.isLoadingCityPack == true || !resources.isEmpty || !media.isEmpty || viewModel?.stationLayoutStatusMessage != nil {
             GlassCard {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(AppLocalization.localized("Station Map"))
+                    Text(AppLocalization.text(
+                        english: "Station Resources",
+                        simplified: "车站资源",
+                        traditional: "車站資源"
+                    ))
                         .font(.headline)
 
                     if viewModel?.isLoadingCityPack == true {
                         ProgressView()
-                    } else if let stationMap = viewModel?.stationMap {
-                        stationMapContent(stationMap)
+                    } else {
+                        ForEach(resources) { resource in
+                            externalResourceRow(resource)
+                        }
+
+                        ForEach(media) { item in
+                            licensedMediaContent(item)
+                        }
                     }
 
-                    if let statusMessage = viewModel?.stationMapStatusMessage {
+                    if let statusMessage = viewModel?.stationLayoutStatusMessage {
                         Text(statusMessage)
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -233,7 +232,11 @@ extension StationDetailView {
                         .font(.subheadline)
                     }
 
-                    Text(AppLocalization.localized("Status data is from Beijing Subway official web map, not train arrival countdowns."))
+                    Text(AppLocalization.text(
+                        english: "Status details are separate from train-arrival countdowns.",
+                        simplified: "车站状态信息与列车到站倒计时相互独立。",
+                        traditional: "車站狀態資訊與列車到站倒數相互獨立。"
+                    ))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -242,46 +245,78 @@ extension StationDetailView {
     }
 
     @ViewBuilder
-    private func stationMapContent(_ stationMap: CityPackStationMap) -> some View {
-        if stationMap.isImage, let url = stationMap.resolvedURL {
-            remoteImage(
-                url: url,
-                title: stationMap.title ?? AppLocalization.localized("Station Map")
-            )
-
-            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
-        } else if let url = stationMap.resolvedURL {
-            Link(stationMap.title ?? AppLocalization.localized("Open station map"), destination: url)
-                .font(.subheadline)
-        } else {
-            Text(AppLocalization.localized("Station map could not be loaded"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    @ViewBuilder
-    private func stationAssetContent(_ asset: CityPackStationAsset, defaultTitle: String) -> some View {
-        if asset.isImage, let url = asset.resolvedURL {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(asset.title ?? defaultTitle)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                remoteImage(
-                    url: url,
-                    title: asset.title ?? defaultTitle
-                )
-                Link(AppLocalization.localized("Open official timetable image"), destination: url)
-                    .font(.caption)
-                    .foregroundStyle(Color.accentColor)
+    private func externalResourceRow(_ resource: ExternalTransitResource) -> some View {
+        Group {
+            if let url = resource.url {
+                Link(destination: url) {
+                    HStack(spacing: 10) {
+                        Image(systemName: resource.kind == .stationLayout ? "safari" : "arrow.up.right.square")
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(resource.title)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text(resource.provider)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                }
             }
         }
     }
 
     @ViewBuilder
-    private func remoteImage(url: URL, title: String) -> some View {
+    private func licensedMediaContent(_ media: LicensedStationMedia) -> some View {
+        if let url = media.bundledURL {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(media.title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                localStationImage(
+                    url: url,
+                    title: media.title
+                )
+                Text("\(media.attribution) · \(media.licenseSPDX)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(media.modifications)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 16) {
+                    if let sourceURL = URL(string: media.sourcePageURL) {
+                        Link(destination: sourceURL) {
+                            Label(
+                                AppLocalization.text(
+                                    english: "Source page",
+                                    simplified: "来源页面",
+                                    traditional: "來源頁面"
+                                ),
+                                systemImage: "arrow.up.right.square"
+                            )
+                        }
+                    }
+                    if let licenseURL = URL(string: media.licenseURL) {
+                        Link(destination: licenseURL) {
+                            Label(media.licenseSPDX, systemImage: "doc.text")
+                        }
+                    }
+                }
+                .font(.caption)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func localStationImage(url: URL, title: String) -> some View {
         StationAssetImage(url: url) { image in
             Button {
                 selectedStationImage = FullScreenStationImage(url: url, title: title)
@@ -309,11 +344,12 @@ extension StationDetailView {
                 }
             .buttonStyle(.plain)
             .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
-        } placeholder: {
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 160)
         } failure: {
-            Text(AppLocalization.localized("Station map could not be loaded"))
+            Text(AppLocalization.text(
+                english: "Station media could not be loaded",
+                simplified: "车站媒体无法加载",
+                traditional: "車站媒體無法載入"
+            ))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }

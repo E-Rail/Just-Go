@@ -1,8 +1,8 @@
 import Foundation
 
 /// One discrete, actionable instruction in an indoor turn-by-turn walkthrough — the
-/// step-by-step equivalent of `TripStep`, but generated from a `StationIndoorMap`'s traced
-/// node graph instead of a real GPS route. See `IndoorStep.build`.
+/// step-by-step equivalent of `TripStep`, but generated from a verified `StationIndoorMap`
+/// topology graph instead of a GPS route. See `IndoorStep.build`.
 enum IndoorStepKind: Equatable {
     case walk
     case turnLeft

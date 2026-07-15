@@ -336,8 +336,8 @@ private func testLightRailNormalAndSpecialServices() async throws {
             "arrival_departure": "",
             "dest_en": "SIU HONG",
             "dest_ch": "兆康",
-            "time_en": "-",
-            "time_ch": "-",
+            "time_en": "Arriving",
+            "time_ch": "正在到站",
             "route_no": "",
             "stop": 0,
             "special": 1,
@@ -371,9 +371,11 @@ private func testLightRailNormalAndSpecialServices() async throws {
 
     let special = try requireArrival(destination: "Siu Hong", in: arrivals)
     try requireEqual(special.lineName, "Special service", "special-service label")
-    try requireEqual(special.minutesRemaining, nil, "missing special-service time must stay nil")
-    try requireEqual(special.timeText, nil, "missing special-service text must stay nil")
+    try requireEqual(special.minutesRemaining, nil, "textual live time must not invent minutes")
+    try requireEqual(special.timeText, "Arriving", "textual live time must be preserved")
     try requireEqual(special.source, .liveCountdown, "Light Rail data must be live")
+    try require(special.isLiveArrival, "text-only government responses must remain live")
+    try require(!special.hasLiveCountdown, "text-only responses must not claim a numeric countdown")
 
     guard let url = MockTransport.urls.first else {
         throw HarnessFailure(description: "Light Rail request URL was not recorded")

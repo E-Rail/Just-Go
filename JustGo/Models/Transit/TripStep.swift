@@ -25,7 +25,8 @@ struct TripStep: Identifiable, Equatable {
     var duration: TimeInterval = 0
     /// Recommended exit/entrance at the step's end station, when known (best-available).
     var exitHint: String? = nil
-    /// Station coordinate for `.transfer` steps, used to render a 3D map preview.
+    /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
+    /// separately verified indoor guidance.
     /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working —
     /// matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
     var transferCoordinate: CodableCoordinate? = nil

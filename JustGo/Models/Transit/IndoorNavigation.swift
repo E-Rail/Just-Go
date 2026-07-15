@@ -147,12 +147,9 @@ struct IndoorLandmark: Identifiable, Codable, Equatable {
     let coordinate: IndoorCoordinate
 }
 
-/// For stations traced from a bundled official isometric diagram (the only indoor-layout
-/// source this app has), `x`/`y` are fractional 0...1 position within that diagram image
-/// — not meters or geo-calibrated — so a node renders at the same spot on the image
-/// regardless of the size the image is displayed at. `z` is unused for this source (the
-/// diagrams draw all levels in one flattened isometric image) and is reserved for a future
-/// source that separates levels spatially.
+/// Normalized coordinates for a separately licensed, verified indoor source. `x` and `y`
+/// use fractional 0...1 positions within its declared layout image; `z` is reserved for
+/// sources that distinguish levels spatially. No such source is bundled in the OSS baseline.
 struct IndoorCoordinate: Codable, Equatable {
     let x: Double
     let y: Double
@@ -212,9 +209,9 @@ extension StationIndoorMap {
     }
 
     /// Dijkstra shortest path from any node in `from` to any node in `to`, optionally
-    /// restricted to step-free edges. Graphs are small (traced by hand from a single
-    /// station diagram, ~10-25 nodes) so a plain array frontier outperforms the bookkeeping
-    /// a heap would need. Returns nil when no path exists under the given constraint.
+    /// restricted to step-free edges. Station graphs are expected to remain small, so a plain
+    /// array frontier avoids the bookkeeping a heap would need. Returns nil when no path exists
+    /// under the given constraint.
     func shortestPath(from: [String], to: [String], stepFreeOnly: Bool) -> PathResult? {
         guard !from.isEmpty, !to.isEmpty else { return nil }
         let targets = Set(to)

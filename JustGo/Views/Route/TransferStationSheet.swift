@@ -14,12 +14,11 @@ struct TransferStationSheet: View {
     @State private var isLoadingStation = false
     @State private var lookAroundScene: MKLookAroundScene?
     @State private var guidance: StationAccessGuidance?
-    @State private var stationMap: CityPackStationMap?
+    @State private var externalResources: [ExternalTransitResource] = []
     @State private var indoorMap: StationIndoorMap?
     @State private var transferPath: TransferPathHint?
     @State private var boardingZoneGuidance: IndoorBoardingZoneGuidance?
     @State private var doorGuidance: DoorGuidance?
-    @State private var fullScreenImage: FullScreenStationImage?
     @State private var showIndoorSteps = false
 
     private var stationName: String {
@@ -65,14 +64,11 @@ struct TransferStationSheet: View {
         .background(Color.appBackground)
         .navigationTitle(stationName)
         .navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(item: $fullScreenImage) { image in
-            FullScreenStationImageView(image: image)
-        }
         .fullScreenCover(isPresented: $showIndoorSteps) {
             if let indoorMap, let transferPath {
                 IndoorStepGoView(
                     stationTitle: stationName,
-                    mapImageURL: stationMap?.resolvedURL,
+                    mapImageURL: nil,
                     indoorMap: indoorMap,
                     routeNodeIDs: transferPath.routeNodeIDs,
                     routeEdgeIDs: transferPath.routeEdgeIDs,
@@ -98,7 +94,7 @@ struct TransferStationSheet: View {
                 enrichedStation = await container.officialStationData.matchingStation(place: place, cityID: cityID)
             }
             if !cityID.isEmpty {
-                // Exits/corridor/platform guidance and the official station map are keyed by
+                // Exits/corridor/platform guidance and official landing pages are keyed by
                 // station NAME in the pack, so they still resolve when matchingStation found
                 // no full record (a minimal name+coordinate station suffices for the lookup).
                 guidance = (await container.officialStationData.stationGuidance(
@@ -113,7 +109,7 @@ struct TransferStationSheet: View {
                     longitude: transferStopCoordinate?.longitude ?? 0,
                     cityID: cityID
                 )
-                stationMap = await container.officialStationData.stationMap(for: mapLookupStation)
+                externalResources = await container.officialStationData.externalResources(for: mapLookupStation)
                 indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
                 if let transferContext = transferSegment.transferContext {
                     transferPath = await container.officialStationData.transferPath(
@@ -230,9 +226,9 @@ struct TransferStationSheet: View {
                 } else {
                     if exits.isEmpty {
                         Text(AppLocalization.text(
-                            english: "Specific exit data is not available yet — see the station map below.",
-                            simplified: "暂无具体出入口数据，请参考下方站内图。",
-                            traditional: "暫無具體出入口資料，請參考下方站內圖。"
+                            english: "Specific exit data is unavailable. Official operator resources appear below when provided.",
+                            simplified: "暂无具体出入口数据；如有官方运营方页面，可在下方打开。",
+                            traditional: "暫無具體出入口資料；如有官方營運方頁面，可在下方開啟。"
                         ))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -285,9 +281,9 @@ struct TransferStationSheet: View {
             ForEach(routeCoverageGapLineNames, id: \.self) { lineName in
                 Label {
                     Text(AppLocalization.text(
-                        english: "The collected official diagram does not show the \(lineName) platform, so its position and connected indoor path are unavailable.",
-                        simplified: "已收录的官方站内图未显示\(lineName)站台，因此暂无法提供其位置和连通站内路径。",
-                        traditional: "已收錄的官方站內圖未顯示\(lineName)月台，因此暫無法提供其位置和連通站內路徑。"
+                        english: "The verified source does not show the \(lineName) platform, so its position and connected indoor path are unavailable.",
+                        simplified: "已验证的数据源未显示\(lineName)站台，因此暂无法提供其位置和连通站内路径。",
+                        traditional: "已驗證的資料來源未顯示\(lineName)月台，因此暫無法提供其位置和連通站內路徑。"
                     ))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -314,9 +310,9 @@ struct TransferStationSheet: View {
         } else if indoorMap?.effectiveCoverageMode == .platformCheckpoints {
             Label {
                 Text(AppLocalization.text(
-                    english: "Platform locations are diagram-reviewed. A connected corridor path and boarding zone are not verified for this station.",
-                    simplified: "站台位置已按站内图核对；本站尚无经验证的连通换乘路径和上车区域。",
-                    traditional: "月台位置已按站內圖核對；本站尚無經驗證的連通轉乘路徑和上車區域。"
+                    english: "Verified platform checkpoints are available. A connected corridor path and boarding zone are not verified for this station.",
+                    simplified: "已有经核实的站台检查点；本站尚无经核实的连通换乘路径和上车区域。",
+                    traditional: "已有經核實的月台檢查點；本站尚無經核實的連通轉乘路徑和上車區域。"
                 ))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -330,9 +326,9 @@ struct TransferStationSheet: View {
         } else {
             Label {
                 Text(AppLocalization.text(
-                    english: "Verified 3D indoor path, car, and door guidance is not collected for this station yet.",
-                    simplified: "本站尚未收录经验证的 3D 站内路径、车厢和车门指引。",
-                    traditional: "本站尚未收錄經驗證的 3D 站內路徑、車廂和車門指引。"
+                    english: "Verified indoor path, boarding position, and door guidance are not available for this station.",
+                    simplified: "本站暂无经核实的站内路径、候车位置和车门指引。",
+                    traditional: "本站暫無經核實的站內路徑、候車位置和車門指引。"
                 ))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -372,13 +368,13 @@ struct TransferStationSheet: View {
         }
         return Label {
             VStack(alignment: .leading, spacing: 2) {
-                Text(parts.isEmpty ? AppLocalization.text(english: "Diagram-reviewed indoor transfer path", simplified: "经站内图核对的换乘路径", traditional: "經站內圖核對的轉乘路徑") : parts.joined(separator: " · "))
+                Text(parts.isEmpty ? AppLocalization.text(english: "Verified indoor transfer path", simplified: "经核实的站内换乘路径", traditional: "經核實的站內轉乘路徑") : parts.joined(separator: " · "))
                     .font(.caption)
                 if path.routeNodeIDs.count > 1 {
                     Text(AppLocalization.text(
-                        english: "Path highlighted on the station map above.",
-                        simplified: "路径已在上方站内图中标出。",
-                        traditional: "路徑已在上方站內圖中標出。"
+                        english: "A verified schematic walkthrough is available.",
+                        simplified: "可使用经核实的示意逐步指引。",
+                        traditional: "可使用經核實的示意逐步指引。"
                     ))
                     .font(.caption2)
                     .foregroundStyle(Color.accentColor)
@@ -498,100 +494,51 @@ struct TransferStationSheet: View {
         }
     }
 
-    /// Official in-station map when the pack collected one; tap for full screen.
+    /// Official pages remain ordinary user-initiated links and never become route geometry.
     @ViewBuilder
     private var stationMapSection: some View {
-        if let stationMap, stationMap.isImage, let url = stationMap.resolvedURL {
-            GlassCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(AppLocalization.localized("Station Map"))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    StationAssetImage(url: url) { image in
-                        Button {
-                            fullScreenImage = FullScreenStationImage(
-                                url: url,
-                                title: stationMap.title ?? AppLocalization.localized("Station Map")
-                            )
-                        } label: {
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .overlay(indoorPathOverlay)
-                                .frame(maxWidth: .infinity)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        .buttonStyle(.plain)
-                    } placeholder: {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 24)
-                    } failure: {
-                        Text(AppLocalization.localized("Station map could not be loaded"))
-                            .font(.caption)
+        GlassCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(AppLocalization.text(
+                    english: "Station Layout",
+                    simplified: "车站布局",
+                    traditional: "車站佈局"
+                ))
+                .font(.subheadline)
+                .fontWeight(.medium)
+
+                let layoutResources = externalResources.filter { $0.kind == .stationLayout }
+                if layoutResources.isEmpty {
+                    Label {
+                        Text(AppLocalization.text(
+                            english: "No verified indoor layout or door positions are available.",
+                            simplified: "暂无经核实的站内布局或车门位置。",
+                            traditional: "暫無經核實的站內佈局或車門位置。"
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    } icon: {
+                        Image(systemName: "map")
                             .foregroundStyle(.secondary)
                     }
-                    Text(AppLocalization.text(
-                        english: "Tap to zoom — official station layout.",
-                        simplified: "点按放大查看官方站内图。",
-                        traditional: "點按放大查看官方站內圖。"
-                    ))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                } else {
+                    ForEach(layoutResources) { resource in
+                        if let url = resource.url {
+                            Link(destination: url) {
+                                HStack {
+                                    Label(resource.title, systemImage: "safari")
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.caption)
+                                }
+                            }
+                            Text(resource.provider)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
-        } else if indoorMap == nil {
-            GlassCard {
-                Label {
-                    Text(AppLocalization.text(
-                        english: "Official station map is not collected yet.",
-                        simplified: "官方站内图尚未收录。",
-                        traditional: "官方站內圖尚未收錄。"
-                    ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                } icon: {
-                    Image(systemName: "map")
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    /// Draws `transferPath`'s route directly on the station image above. Chained right after
-    /// `.scaledToFit()` (before the outer `.frame`/`.clipShape`), so this overlay's own layout
-    /// size exactly matches the image's letterboxed content rect — no manual aspect-ratio math
-    /// needed. Node coordinates are fractional (0...1) of that same rect (see `IndoorCoordinate`).
-    @ViewBuilder
-    private var indoorPathOverlay: some View {
-        if let indoorMap, let transferPath, transferPath.routeNodeIDs.count > 1 {
-            let nodesByID = Dictionary(uniqueKeysWithValues: indoorMap.nodes.map { ($0.id, $0) })
-            let points = transferPath.routeNodeIDs.compactMap { nodesByID[$0]?.coordinate }
-            Canvas { context, size in
-                guard points.count > 1 else { return }
-                let resolved = points.map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
-
-                var path = Path()
-                path.addLines(resolved)
-                context.stroke(
-                    path,
-                    with: .color(.accentColor),
-                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-                )
-
-                if let start = resolved.first {
-                    let dot = CGRect(x: start.x - 6, y: start.y - 6, width: 12, height: 12)
-                    context.fill(Path(ellipseIn: dot), with: .color(.accentColor))
-                    context.stroke(Path(ellipseIn: dot), with: .color(.white), lineWidth: 2)
-                }
-                if let end = resolved.last {
-                    let marker = CGRect(x: end.x - 8, y: end.y - 8, width: 16, height: 16)
-                    context.fill(Path(ellipseIn: marker), with: .color(.green))
-                    context.stroke(Path(ellipseIn: marker), with: .color(.white), lineWidth: 2)
-                }
-            }
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
         }
     }
 

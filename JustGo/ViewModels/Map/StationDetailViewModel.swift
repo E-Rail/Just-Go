@@ -4,12 +4,13 @@ import Foundation
 final class StationDetailViewModel {
     var station: Station?
     var arrivals: [RealTimeArrival] = []
+    var realtimeAvailability: RealtimeArrivalAvailability = .notConfigured
     var isLoading = false
     var isLoadingCityPack = false
     var errorMessage: String?
-    var stationMapStatusMessage: String?
-    var stationMap: CityPackStationMap?
-    var timetableAssets: [CityPackStationAsset] = []
+    var stationLayoutStatusMessage: String?
+    var externalResources: [ExternalTransitResource] = []
+    var licensedMedia: [LicensedStationMedia] = []
     var serviceStatus: CityPackServiceStatus?
     var cityPackLoadStatus: CityPackLoadStatus?
     var accessGuidance: StationAccessGuidance?
@@ -35,6 +36,7 @@ final class StationDetailViewModel {
 
         isLoading = true
         arrivals = []
+        realtimeAvailability = .notConfigured
         errorMessage = nil
         defer {
             if isCurrentTrainTimesLoad(stationID: stationID, generation: generation) {
@@ -42,15 +44,31 @@ final class StationDetailViewModel {
             }
         }
 
-        let loadedArrivals = await officialStationData.trainTimes(for: station)
+        let snapshot = await officialStationData.arrivalSnapshot(for: station)
         guard isCurrentTrainTimesLoad(stationID: stationID, generation: generation) else { return }
 
-        arrivals = loadedArrivals.sorted {
+        realtimeAvailability = snapshot.realtimeAvailability
+        arrivals = snapshot.arrivals.sorted {
             ($0.minutesRemaining ?? Int.max) < ($1.minutesRemaining ?? Int.max)
         }
 
         if arrivals.isEmpty {
-            errorMessage = AppLocalization.localized("Official schedule pending for this city/station")
+            switch realtimeAvailability {
+            case .available, .noUpcomingService:
+                errorMessage = AppLocalization.text(
+                    english: "No upcoming trains are reported right now.",
+                    simplified: "目前没有即将到站的列车。",
+                    traditional: "目前沒有即將到站的列車。"
+                )
+            case .temporarilyUnavailable:
+                errorMessage = AppLocalization.text(
+                    english: "Live arrivals are temporarily unavailable. Try again shortly.",
+                    simplified: "实时到站信息暂时不可用，请稍后重试。",
+                    traditional: "即時到站資訊暫時不可用，請稍後重試。"
+                )
+            case .notConfigured:
+                errorMessage = AppLocalization.localized("Official schedule pending for this city/station")
+            }
         }
     }
 
@@ -60,9 +78,9 @@ final class StationDetailViewModel {
         let generation = cityPackGeneration
 
         isLoadingCityPack = true
-        stationMapStatusMessage = nil
-        stationMap = nil
-        timetableAssets = []
+        stationLayoutStatusMessage = nil
+        externalResources = []
+        licensedMedia = []
         serviceStatus = nil
         accessGuidance = nil
         defer {
@@ -76,23 +94,23 @@ final class StationDetailViewModel {
         cityPackLoadStatus = status
         switch status {
         case .available:
-            stationMapStatusMessage = AppLocalization.text(
+            stationLayoutStatusMessage = AppLocalization.text(
                 english: "Official city data is not loaded yet.",
                 simplified: "官方城市数据尚未加载。",
                 traditional: "官方城市資料尚未載入。"
             )
-        case .loaded:
+        case .included, .loaded, .updateAvailable:
             let enrichedStation = await officialStationData.enrichStation(station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             self.station = enrichedStation
 
-            let loadedStationMap = await officialStationData.stationMap(for: station)
+            let loadedExternalResources = await officialStationData.externalResources(for: station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
-            stationMap = loadedStationMap
+            externalResources = loadedExternalResources
 
-            let loadedTimetableAssets = await officialStationData.timetableAssets(for: station)
+            let loadedLicensedMedia = await officialStationData.licensedMedia(for: station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
-            timetableAssets = loadedTimetableAssets
+            licensedMedia = loadedLicensedMedia
 
             let loadedServiceStatus = await officialStationData.serviceStatus(for: station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
@@ -105,19 +123,27 @@ final class StationDetailViewModel {
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             accessGuidance = loadedGuidance
 
-            if stationMap != nil {
-                stationMapStatusMessage = AppLocalization.localized("Official station map available")
+            if externalResources.contains(where: { $0.kind == .stationLayout }) {
+                stationLayoutStatusMessage = AppLocalization.text(
+                    english: "An official station-layout page is available.",
+                    simplified: "可打开官方车站布局页面。",
+                    traditional: "可開啟官方車站佈局頁面。"
+                )
             } else {
-                stationMapStatusMessage = AppLocalization.localized("Official 3D station map not collected for this station")
+                stationLayoutStatusMessage = AppLocalization.text(
+                    english: "Verified indoor layout and door positions are unavailable.",
+                    simplified: "暂无经核实的站内布局和车门位置。",
+                    traditional: "暫無經核實的站內佈局和車門位置。"
+                )
             }
         case .notConfigured:
-            stationMapStatusMessage = AppLocalization.localized("Official city data is not configured; basic station data still works.")
+            stationLayoutStatusMessage = AppLocalization.localized("Official city data is not configured; basic station data still works.")
         case .sourcePending:
-            stationMapStatusMessage = AppLocalization.localized("Official city data is pending for this city.")
+            stationLayoutStatusMessage = AppLocalization.localized("Official city data is pending for this city.")
         case .notAvailable:
-            stationMapStatusMessage = AppLocalization.localized("Official city data is not available for this city yet.")
+            stationLayoutStatusMessage = AppLocalization.localized("Official city data is not available for this city yet.")
         case .failed:
-            stationMapStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
+            stationLayoutStatusMessage = AppLocalization.localized("Official city data could not be reached; basic station data still works.")
         }
     }
 
@@ -131,18 +157,38 @@ final class StationDetailViewModel {
 
     var trainTimeStatusMessage: String? {
         guard !arrivals.isEmpty else { return nil }
-        return arrivals.contains(where: \.hasLiveCountdown) ? nil : AppLocalization.localized("Live countdown unavailable")
+        if arrivals.contains(where: \.isLiveArrival) { return nil }
+        switch realtimeAvailability {
+        case .temporarilyUnavailable:
+            return AppLocalization.text(
+                english: "Live arrivals are temporarily unavailable. Showing official schedule information.",
+                simplified: "实时到站信息暂时不可用，现显示官方时刻信息。",
+                traditional: "即時到站資訊暫時不可用，現顯示官方時刻資訊。"
+            )
+        case .noUpcomingService:
+            return AppLocalization.text(
+                english: "No live trains are reported right now. Showing official schedule information.",
+                simplified: "目前没有实时列车信息，现显示官方时刻信息。",
+                traditional: "目前沒有即時列車資訊，現顯示官方時刻資訊。"
+            )
+        case .available, .notConfigured:
+            return AppLocalization.localized("Live countdown unavailable")
+        }
     }
 
     var scheduleConfidence: DataConfidence {
-        if arrivals.contains(where: { $0.source == .officialSchedule || $0.source == .bundledSchedule }) {
+        if arrivals.contains(where: {
+            $0.isLiveArrival || $0.source == .officialSchedule || $0.source == .bundledSchedule
+        }) {
             return .official
         }
         return arrivals.isEmpty ? cityPackPendingConfidence : .estimated
     }
 
     var stationMapConfidence: DataConfidence {
-        stationMap == nil ? cityPackPendingConfidence : .official
+        externalResources.contains(where: { $0.kind == .stationLayout })
+            ? .official
+            : cityPackPendingConfidence
     }
 
     var accessibilityConfidence: DataConfidence {
@@ -150,7 +196,10 @@ final class StationDetailViewModel {
     }
 
     var liveArrivalConfidence: DataConfidence {
-        arrivals.contains(where: \.hasLiveCountdown) ? .official : .unavailable
+        if arrivals.contains(where: \.isLiveArrival) || realtimeAvailability == .noUpcomingService {
+            return .official
+        }
+        return .unavailable
     }
 
     /// Best-available exits/entrances for the Station Guide section (official or text-estimated).
@@ -175,7 +224,7 @@ final class StationDetailViewModel {
         switch cityPackLoadStatus {
         case .available:
             return .unknown
-        case .loaded, .sourcePending:
+        case .included, .loaded, .updateAvailable, .sourcePending:
             return .sourcePending
         case .notConfigured, .notAvailable, .failed:
             return .unavailable

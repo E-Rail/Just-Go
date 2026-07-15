@@ -7,7 +7,7 @@
 "Arriving" = "即將到站";
 "Audio Announcement" = "語音播報";
 "Audio Navigation" = "語音導航";
-"Available" = "可下載";
+"Available" = "可用";
 "Avoid Stairs" = "避開樓梯";
 "Arrival Exit" = "出站出口";
 "Boarding Access" = "進站入口";
@@ -54,7 +54,6 @@
 "Long walking segment" = "步行距離較長";
 "Walking-heavy route" = "步行較多的路線";
 "Step-free barrier detected" = "偵測到無障礙通行障礙";
-"Live countdown" = "即時倒數";
 "Live countdown unavailable" = "暫無即時倒數";
 "None" = "無";
 "Not available" = "不可用";
@@ -105,8 +104,6 @@
 "Accessibility and station facilities" = "無障礙與車站設施";
 "Official city packs when public sources exist" = "有公開官方來源時使用官方城市資料包";
 "Official first/last schedules; live countdown only when an official provider exists" = "官方首末班時刻；只有接入官方來源時才顯示即時倒數";
-"Station maps and images" = "站內圖與車站圖片";
-"Official city-pack assets where collected" = "已收錄時使用官方城市資料包素材";
 "Unavailable data is shown honestly instead of guessed." = "不可用的資料會明確說明，不會猜測。";
 "Route and Search Provider" = "路線與搜尋提供方";
 "Official Station Details" = "官方車站詳情";
@@ -129,21 +126,12 @@
 "Home" = "家";
 "Accessibility information from official Beijing Subway data." = "無障礙資訊來自北京地鐵官方資料。";
 "Official scheduled time" = "官方計劃時刻";
-"Station Map" = "站內圖";
-"Station map could not be loaded" = "站內圖無法載入";
-"Open station map" = "開啟站內圖";
-"Official station map available" = "官方站內圖可用";
-"Official 3D station map not collected for this station" = "本站官方 3D 站內圖暫未收錄";
-"Official Timetable Images" = "官方時刻表圖片";
-"Official timetable image" = "官方時刻表圖片";
-"Open official timetable image" = "開啟官方時刻表圖片";
 "Open station image full screen" = "全螢幕開啟車站圖片";
 "Close station image" = "關閉車站圖片";
 "Station Facilities" = "車站設施";
 "Accessible Restroom" = "無障礙洗手間";
 "Accessibility information from official city data." = "無障礙資訊來自官方城市資料。";
 "Station Status" = "車站狀態";
-"Status data is from Beijing Subway official web map, not train arrival countdowns." = "狀態資料來自北京地鐵官方網頁地圖，不是列車到站倒數。";
 "Official city data is not configured; basic station data still works." = "官方城市資料未設定；基礎車站資料仍可使用。";
 "Official city data is pending for this city." = "此城市的官方資料來源待接入。";
 "Official city data is not available for this city yet." = "此城市暫未提供官方城市資料。";
@@ -180,8 +168,6 @@
 "Low walking distance" = "步行距離較短";
 "Official schedule available" = "有官方時刻表";
 "Official schedule is incomplete" = "官方時刻表資訊不完整";
-"Official station maps available" = "有官方車站圖";
-"Some station maps are source pending" = "部分車站圖資料來源待接入";
 "Official accessibility information available" = "有官方無障礙資訊";
 "Some station accessibility data is source pending" = "部分車站無障礙資料來源待接入";
 "Fewer transfers than alternatives" = "比其他方案轉乘更少";
@@ -196,7 +182,6 @@
 "Best data available" = "目前最佳資料";
 "Transfer station" = "轉乘站";
 "Station essentials available" = "車站必備資訊可用";
-"First and last train information available" = "首末班車資訊可用";
 "Metro geometry © OpenStreetMap contributors" = "地鐵線路幾何 © OpenStreetMap 貢獻者";
 "Metro track geometry" = "地鐵真實線路";
 "OpenStreetMap physical track geometry" = "OpenStreetMap 實際軌道幾何";
@@ -210,7 +195,6 @@
 "Accessibility unknown" = "無障礙情況未知";
 "Apple Maps" = "Apple 地圖";
 "Apple Maps + official packs" = "Apple 地圖 + 官方資料包";
-"Apple Maps powers place search, transit routes, and route geometry. Official city packs add verified station details where available." = "Apple 地圖提供地點搜尋、公共交通路線和路線幾何；可用時，官方城市資料包會補充已驗證的車站詳情。";
 "Apple Maps walking directions mention a ramp." = "Apple 地圖步行指引提到坡道。";
 "Apple Maps walking directions mention an elevator." = "Apple 地圖步行指引提到電梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地圖步行指引提到電扶梯。";
@@ -239,7 +223,7 @@
 "Try clearing filters or loading official city data." = "請嘗試清除篩選條件，或載入官方城市資料。";
 "Rider Notes" = "乘客備註";
 "Route planning and place search use Apple Maps. Station facts use official city packs when available." = "路線規劃和地點搜尋使用 Apple 地圖；車站資訊在可用時使用官方城市資料包。";
-"Routes use Apple Maps; station facts use downloadable official city packs where available." = "路線使用 Apple 地圖；車站資訊在可用時使用可下載的官方城市資料包。";
+"Routes use Apple Maps; station facts use included official city data where available." = "路線使用 Apple 地圖；車站資訊在可用時使用內置的官方城市資料。";
 "Save" = "儲存";
 "Save Trip" = "儲存行程";
 "Saved Trip" = "已儲存行程";
@@ -271,10 +255,7 @@
 "Walking or transfer step" = "步行或轉乘步驟";
 "Walking segment" = "步行路段";
 "Access" = "無障礙";
-"Essentials" = "設施";
-"3D Map" = "3D 站內圖";
 "Train times" = "列車時刻";
-"Apple Maps transit routes" = "Apple 地圖大眾運輸路線";
 "Notifications" = "通知";
 "Avg duration" = "平均時長";
 "Trip Preferences" = "行程偏好";
@@ -317,5 +298,4 @@
 "Select the station sign or platform that matches where you are." = "請選擇與您目前位置相符的站內標識或月台。";
 "Suggested" = "建議";
 "Choose Another Checkpoint" = "選擇其他途經點";
-"Station Map Unavailable" = "站內圖無法使用";
 "Continue with the text directions below." = "請繼續按照下方文字指引前行。";

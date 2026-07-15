@@ -95,7 +95,7 @@ struct ProfileView: View {
         } header: {
             Text(AppLocalization.localized("Data Source"))
         } footer: {
-            Text(AppLocalization.localized("Routes use Apple Maps; station facts use downloadable official city packs where available."))
+            Text(AppLocalization.localized("Routes use Apple Maps; station facts use included official city data where available."))
         }
     }
 

@@ -51,9 +51,9 @@ struct OnboardingTourView: View {
                         traditional: "「分步導航」一步一步帶您走完全程，到站前還會提醒。"
                     )),
                     ("arrow.triangle.2.circlepath", AppLocalization.text(
-                        english: "Tap a transfer step for the station's exits, walking corridor, and station map.",
-                        simplified: "点按换乘步骤可查看车站出入口、换乘通道和站内图。",
-                        traditional: "點按換乘步驟可查看車站出入口、換乘通道和站內圖。"
+                        english: "Tap a transfer step for official station links and verified indoor guidance when available. Missing paths and doors are clearly marked.",
+                        simplified: "点按换乘步骤可查看官方车站链接及可用的已核实站内指引。缺少通道或车门数据时会明确说明。",
+                        traditional: "點按換乘步驟可查看官方車站連結及可用的已核實站內指引。缺少通道或車門資料時會明確說明。"
                     ))
                 ]
             ),
@@ -72,9 +72,9 @@ struct OnboardingTourView: View {
                         traditional: "在城市公開資料的車站，會顯示電梯、坡道和無障礙出入口。"
                     )),
                     ("clock", AppLocalization.text(
-                        english: "First/last train times come from official schedules, not live feeds.",
-                        simplified: "首末班车时间来自官方时刻表，非实时数据。",
-                        traditional: "首末班車時間來自官方時刻表，非即時資料。"
+                        english: "Live arrivals appear only where an official provider exists. Otherwise the app shows a licensed static schedule or an honest unavailable state.",
+                        simplified: "仅在官方提供实时数据时显示到站信息；否则显示许可的静态时刻表或明确的不可用状态。",
+                        traditional: "僅在官方提供即時資料時顯示到站資訊；否則顯示授權的靜態時刻表或明確的不可用狀態。"
                     ))
                 ]
             ),

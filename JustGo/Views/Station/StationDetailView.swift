@@ -28,6 +28,17 @@ struct StationDetailView: View {
                 arrivalsSection
                 serviceStatusSection
                 stationMapSection
+                if let stationKey = PersonalStationMediaKey(
+                    cityID: displayedStation.cityID,
+                    stationID: displayedStation.stationID
+                ) {
+                    PersonalStationMediaSection(
+                        stationKey: stationKey,
+                        stationName: displayedStation.localizedName
+                    ) { image in
+                        selectedStationImage = image
+                    }
+                }
             }
             .padding()
         }
@@ -91,7 +102,11 @@ struct StationDetailView: View {
                         icon: "clock"
                     )
                     confidenceChip(
-                        title: AppLocalization.localized("Station Map"),
+                        title: AppLocalization.text(
+                            english: "Layout link",
+                            simplified: "布局链接",
+                            traditional: "佈局連結"
+                        ),
                         confidence: viewModel?.stationMapConfidence ?? .unknown,
                         icon: "map"
                     )
@@ -116,7 +131,15 @@ struct StationDetailView: View {
                             stationFactChip(AppLocalization.localized("Station essentials available"), icon: "info.circle.fill", tint: .blue)
                         }
                         if viewModel?.arrivals.isEmpty == false {
-                            stationFactChip(AppLocalization.localized("First and last train information available"), icon: "clock.fill", tint: .green)
+                            stationFactChip(
+                                AppLocalization.text(
+                                    english: "Train information available",
+                                    simplified: "列车信息可用",
+                                    traditional: "列車資訊可用"
+                                ),
+                                icon: "clock.fill",
+                                tint: .green
+                            )
                         }
                     }
                 }

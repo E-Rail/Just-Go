@@ -38,7 +38,10 @@ paths.each do |path|
   abort "#{city}: attribution missing" unless network["attribution"].to_s.include?("OpenStreetMap")
   abort "#{city}: license missing" if network["licenseURL"].to_s.empty?
   abort "#{city}: snapshot missing" if network["sourceSnapshot"].to_s.empty?
-  abort "#{city}: coordinate system must be gcj02" unless network["coordinateSystem"] == "gcj02"
+  expected_coordinate_system = city == "8100" ? "wgs84" : "gcj02"
+  unless network["coordinateSystem"] == expected_coordinate_system
+    abort "#{city}: coordinate system must be #{expected_coordinate_system}"
+  end
 
   stations = network.fetch("stations")
   station_ids = stations.map { |station| station.fetch("id") }.to_set

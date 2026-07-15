@@ -451,6 +451,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 if let data = diskStore.validatedPackData(for: entry),
                    let decoded = try? Self.decodeValidatedPack(data, matching: entry, origin: .downloaded),
                    await validatesCanonicalMembership(decoded) {
+                    guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                     try diskStore.storePackData(data, for: entry, manifestURL: manifestURL)
                     let loaded = LoadedPack(
                         data: decoded,
@@ -484,6 +485,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 continue
             }
         }
+        guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
         if let installed {
             packs[cityID] = installed
             return installed.loadStatus

@@ -302,7 +302,24 @@ actor PersonalStationMediaStore: PersonalStationMediaProviding {
     private func removeDeletionTombstones() {
         guard let names = try? fileManager.contentsOfDirectory(atPath: rootURL.path) else { return }
         for name in names where name.hasPrefix(".deleting-") && name.hasSuffix(".jpg") {
-            try? fileManager.removeItem(at: rootURL.appendingPathComponent(name))
+            let tombstoneURL = rootURL.appendingPathComponent(name)
+            // A tombstone can outlive a `deleteItem` call whose rollback (move back to the
+            // original filename) itself failed. In that case the index still references the
+            // original filename, and this tombstone is the only surviving copy of that photo —
+            // restore it instead of deleting it, rather than silently losing data the app is
+            // still telling the user exists.
+            let uuidString = name
+                .dropFirst(".deleting-".count)
+                .dropLast(".jpg".count)
+            if let id = UUID(uuidString: String(uuidString)),
+               currentIndex.records.contains(where: { $0.id == id }),
+               let restoredURL = safeFileURL(filename: Self.filename(for: id), id: id),
+               !fileManager.fileExists(atPath: restoredURL.path) {
+                if (try? fileManager.moveItem(at: tombstoneURL, to: restoredURL)) != nil {
+                    continue
+                }
+            }
+            try? fileManager.removeItem(at: tombstoneURL)
         }
     }
 

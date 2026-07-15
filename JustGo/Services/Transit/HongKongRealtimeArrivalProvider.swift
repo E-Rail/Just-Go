@@ -1,5 +1,12 @@
 import Foundation
 
+private extension Duration {
+    var timeInterval: TimeInterval {
+        let (seconds, attoseconds) = components
+        return Double(seconds) + Double(attoseconds) / 1e18
+    }
+}
+
 enum RealtimeArrivalProviderError: Error, Equatable, Sendable {
     case invalidRequest(String)
     case timedOut
@@ -65,7 +72,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
 
     private struct CacheEntry: Sendable {
         let arrivals: [RealTimeArrival]
-        let expiresAt: Date
+        let expiresAt: ContinuousClock.Instant
     }
 
     private struct InFlightRequest: Sendable {
@@ -76,11 +83,14 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     private static let cacheLifetime: TimeInterval = 10
     private static let requestTimeout: TimeInterval = 5
     private static let defaultRetryDelay: TimeInterval = 30
+    // Monotonic, not wall-clock: a device clock change/NTP resync must not make a 10s cache
+    // entry or a 30s rate-limit backoff appear valid for far longer than intended.
+    private static let clock = ContinuousClock()
 
     private let session: URLSession
     private var cache: [CacheKey: CacheEntry] = [:]
     private var inFlight: [CacheKey: InFlightRequest] = [:]
-    private var retryNotBefore: [Endpoint: Date] = [:]
+    private var retryNotBefore: [Endpoint: ContinuousClock.Instant] = [:]
 
     init(session: URLSession = .shared) {
         self.session = session
@@ -89,7 +99,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     func arrivals(for request: RealtimeArrivalRequest) async throws -> [RealTimeArrival] {
         let prepared = try Self.prepare(request)
         let key = prepared.cacheKey
-        let now = Date()
+        let now = Self.clock.now
 
         if let cached = cache[key] {
             if cached.expiresAt > now {
@@ -105,7 +115,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         if let retryDate = retryNotBefore[prepared.endpoint] {
             guard retryDate <= now else {
                 throw RealtimeArrivalProviderError.rateLimited(
-                    retryAfter: retryDate.timeIntervalSince(now)
+                    retryAfter: (retryDate - now).timeInterval
                 )
             }
             retryNotBefore.removeValue(forKey: prepared.endpoint)
@@ -133,7 +143,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
                 inFlight.removeValue(forKey: key)
                 cache[key] = CacheEntry(
                     arrivals: arrivals,
-                    expiresAt: Date().addingTimeInterval(Self.cacheLifetime)
+                    expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
                 )
             }
             return arrivals
@@ -142,7 +152,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
                 inFlight.removeValue(forKey: key)
                 if let providerError = error as? RealtimeArrivalProviderError,
                    case .rateLimited(let retryAfter) = providerError {
-                    let retryDate = Date().addingTimeInterval(retryAfter)
+                    let retryDate = Self.clock.now.advanced(by: .seconds(retryAfter))
                     retryNotBefore[endpoint] = max(retryNotBefore[endpoint] ?? retryDate, retryDate)
                 }
             }
@@ -363,47 +373,54 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         var arrivals: [RealTimeArrival] = []
         for platform in platforms {
             for route in platform.routeList {
-                guard route.stop.value == 0 || route.stop.value == 1 else {
-                    throw RealtimeArrivalProviderError.contractViolation(
-                        "Light Rail stop must be 0 or 1"
-                    )
-                }
-                guard route.stop.value == 0 else { continue }
-                guard route.special.value == 0 || route.special.value == 1 else {
-                    throw RealtimeArrivalProviderError.contractViolation(
-                        "Light Rail special must be 0 or 1"
-                    )
-                }
+                // A single unexpected `stop`/`special` value or empty destination on one entry
+                // (plausible during unusual service states) should drop just that entry, not
+                // discard every other valid platform/route already parsed in this response.
+                do {
+                    guard route.stop.value == 0 || route.stop.value == 1 else {
+                        throw RealtimeArrivalProviderError.contractViolation(
+                            "Light Rail stop must be 0 or 1"
+                        )
+                    }
+                    guard route.stop.value == 0 else { continue }
+                    guard route.special.value == 0 || route.special.value == 1 else {
+                        throw RealtimeArrivalProviderError.contractViolation(
+                            "Light Rail special must be 0 or 1"
+                        )
+                    }
 
-                guard let destination = lightRailDestination(
-                    english: route.destinationEnglish.value,
-                    traditionalChinese: route.destinationChinese.value,
-                    lookup: request.destinationNamesByCode
-                ) else {
-                    throw RealtimeArrivalProviderError.contractViolation(
-                        "Light Rail destination is empty"
+                    guard let destination = lightRailDestination(
+                        english: route.destinationEnglish.value,
+                        traditionalChinese: route.destinationChinese.value,
+                        lookup: request.destinationNamesByCode
+                    ) else {
+                        throw RealtimeArrivalProviderError.contractViolation(
+                            "Light Rail destination is empty"
+                        )
+                    }
+                    let serviceName: String
+                    if route.special.value == 1 {
+                        serviceName = trimmed(route.additionalInfo1?.value) ?? request.lineName
+                    } else {
+                        serviceName = trimmed(route.routeNumber.value) ?? request.lineName
+                    }
+                    let time = lightRailTime(
+                        english: route.timeEnglish.value,
+                        traditionalChinese: route.timeChinese.value,
+                        arrivalDeparture: route.arrivalDeparture.value
                     )
+                    arrivals.append(RealTimeArrival(
+                        id: UUID(),
+                        lineName: serviceName,
+                        lineColorHex: request.lineColorHex,
+                        destination: destination,
+                        minutesRemaining: time.minutes,
+                        timeText: time.text,
+                        source: .liveCountdown
+                    ))
+                } catch {
+                    AppLog.data.warning("Skipping malformed Light Rail route entry: \(error)")
                 }
-                let serviceName: String
-                if route.special.value == 1 {
-                    serviceName = trimmed(route.additionalInfo1?.value) ?? request.lineName
-                } else {
-                    serviceName = trimmed(route.routeNumber.value) ?? request.lineName
-                }
-                let time = lightRailTime(
-                    english: route.timeEnglish.value,
-                    traditionalChinese: route.timeChinese.value,
-                    arrivalDeparture: route.arrivalDeparture.value
-                )
-                arrivals.append(RealTimeArrival(
-                    id: UUID(),
-                    lineName: serviceName,
-                    lineColorHex: request.lineColorHex,
-                    destination: destination,
-                    minutesRemaining: time.minutes,
-                    timeText: time.text,
-                    source: .liveCountdown
-                ))
             }
         }
         return arrivals

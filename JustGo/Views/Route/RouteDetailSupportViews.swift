@@ -186,5 +186,6 @@ struct DataConfidenceChip: View {
         .padding(.vertical, compact ? 2 : 4)
         .background(confidence.color, in: Capsule())
         .foregroundStyle(.white)
+        .accessibilityElement(children: .combine)
     }
 }

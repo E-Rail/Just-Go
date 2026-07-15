@@ -279,6 +279,7 @@ struct LiveGoView: View {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.system(size: 42, weight: .semibold))
                     .foregroundStyle(.orange)
+                    .accessibilityHidden(true)
                 Text(guidance.stationTitle)
                     .font(.title2)
                     .fontWeight(.bold)

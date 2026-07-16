@@ -122,7 +122,7 @@ enum AppLocalization {
 
     static func transfers(_ count: Int) -> String {
         if count == 0 {
-            return localized("Direct")
+            return AppLocalization.localized("Direct")
         }
         return text(english: "\(count) transfer\(count == 1 ? "" : "s")", simplified: "\(count)次换乘", traditional: "\(count)次轉乘")
     }

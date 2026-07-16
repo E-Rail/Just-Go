@@ -1,5 +1,20 @@
 import SwiftUI
 
+/// Renders only bundled or privately persisted station media.
+struct StationAssetImage<Content: View, Failure: View>: View {
+    let url: URL
+    @ViewBuilder let content: (Image) -> Content
+    @ViewBuilder let failure: () -> Failure
+
+    var body: some View {
+        if url.isFileURL, let image = UIImage(contentsOfFile: url.path) {
+            content(Image(uiImage: image))
+        } else {
+            failure()
+        }
+    }
+}
+
 struct FullScreenStationImage: Identifiable {
     let url: URL
     let title: String
@@ -18,22 +33,18 @@ struct FullScreenStationImageView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                AsyncImage(url: image.url) { phase in
-                    switch phase {
-                    case .success(let loadedImage):
-                        ZoomableStationImage(image: loadedImage)
-                    case .failure:
-                        ContentUnavailableView(
-                            AppLocalization.localized("Station map could not be loaded"),
-                            systemImage: "exclamationmark.triangle"
-                        )
-                        .foregroundStyle(.white)
-                    case .empty:
-                        ProgressView()
-                            .tint(.white)
-                    @unknown default:
-                        EmptyView()
-                    }
+                StationAssetImage(url: image.url) { loadedImage in
+                    ZoomableStationImage(image: loadedImage)
+                } failure: {
+                    ContentUnavailableView(
+                        AppLocalization.text(
+                            english: "Station media could not be loaded",
+                            simplified: "车站媒体无法加载",
+                            traditional: "車站媒體無法載入"
+                        ),
+                        systemImage: "exclamationmark.triangle"
+                    )
+                    .foregroundStyle(.white)
                 }
             }
             .navigationTitle(image.title)

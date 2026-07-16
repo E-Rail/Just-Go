@@ -1,0 +1,504 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-15T00:00:00Z",
+  "supportedLicenses": [
+    "MIT",
+    "ODbL-1.0",
+    "LicenseRef-DATA-GOV-HK-1.2",
+    "LicenseRef-External-Link-Only",
+    "CC-BY-2.0",
+    "CC0-1.0"
+  ],
+  "rights": [
+    {
+      "id": "justgo-generated-catalog",
+      "kind": "authoredMetadata",
+      "scope": "Generated catalog, rights inventory, and deterministic pack structure",
+      "licenseSPDX": "MIT",
+      "licenseURL": "https://opensource.org/license/mit",
+      "sourceURL": "https://github.com/e-rail/justgo",
+      "attribution": "JustGo contributors",
+      "redistribution": "Covered by the repository MIT license; third-party fields retain their separately declared terms."
+    },
+    {
+      "id": "osm-metro-networks",
+      "kind": "database",
+      "scope": "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry",
+      "licenseSPDX": "ODbL-1.0",
+      "licenseURL": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "sourceURL": "https://www.openstreetmap.org/",
+      "attribution": "OpenStreetMap contributors",
+      "redistribution": "Permitted under ODbL 1.0; preserve attribution and share-alike obligations for adapted databases."
+    },
+    {
+      "id": "data-gov-hk-mtr",
+      "kind": "dataset",
+      "scope": "DataPacks/sources/8100 CSV snapshots, sanitized Hong Kong station fields, and runtime MTR and Light Rail arrival APIs",
+      "licenseSPDX": "LicenseRef-DATA-GOV-HK-1.2",
+      "licenseURL": "https://data.gov.hk/en/terms-and-conditions",
+      "sourceURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "attribution": "MTR Corporation Limited and DATA.GOV.HK",
+      "redistribution": "Custom DATA.GOV.HK Terms of Use v1.2 apply; attribution and source identification are required."
+    },
+    {
+      "id": "beijing-official-landing-links",
+      "kind": "linkMetadata",
+      "scope": "HTTPS landing-page links only; no operator facts or media are copied",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.bjsubway.com/",
+      "sourceURL": "https://www.bjsubway.com/",
+      "attribution": "Beijing Subway and Beijing MTR",
+      "redistribution": "Only factual link metadata is bundled. Linked content remains with its provider."
+    },
+    {
+      "id": "macau-official-landing-link",
+      "kind": "linkMetadata",
+      "scope": "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.mlm.com.mo/en/",
+      "sourceURL": "https://www.mlm.com.mo/en/",
+      "attribution": "Macao Light Rapid Transit Corporation, Limited",
+      "redistribution": "Only factual link metadata is bundled. Linked content remains with its provider."
+    },
+    {
+      "id": "official-transit-resource-links",
+      "kind": "linkMetadata",
+      "scope": "Reviewed HTTPS target URLs, source-page URLs, providers, formats, scopes, and verification dates in the official transit resource catalog",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.mtr.com.hk/en/customer/services/system_map.html",
+      "sourceURL": "https://www.mtr.com.hk/en/customer/services/system_map.html",
+      "attribution": "Official transit operators and government transport authorities identified per catalog record",
+      "redistribution": "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
+    },
+    {
+      "id": "media-jianguomen-ian-holton",
+      "kind": "mediaMetadata",
+      "scope": "LicensedMedia/beijing-jianguomen.jpg",
+      "licenseSPDX": "CC-BY-2.0",
+      "licenseURL": "https://creativecommons.org/licenses/by/2.0/",
+      "sourceURL": "https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg",
+      "creator": "Ian Holton",
+      "attribution": "Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.",
+      "sourceSizeBytes": 3011512,
+      "sourceSHA1": "682c2dd88704d654c79557a7a5f6d6f518d7f4b8",
+      "bundledSizeBytes": 470435,
+      "bundledSHA256": "54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750",
+      "bundled": true
+    },
+    {
+      "id": "media-central-qqhhss",
+      "kind": "mediaMetadata",
+      "scope": "LicensedMedia/hong-kong-central.jpg",
+      "licenseSPDX": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceURL": "https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg",
+      "creator": "Qqhhss",
+      "attribution": "Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.",
+      "sourceSizeBytes": 4463295,
+      "sourceSHA1": "23ad1d16a17cc4837b960e3606a3e91ee2cdf490",
+      "bundledSizeBytes": 955201,
+      "bundledSHA256": "7ef38511d29cee0872787d5ab154bafce6a0089af3bc48508999244ff0840370",
+      "bundled": true
+    }
+  ],
+  "dataLicenses": [
+    {
+      "rightsID": "data-gov-hk-mtr",
+      "datasetName": "MTR routes, stations, accessibility, and real-time MTR and Light Rail arrivals",
+      "termsURL": "https://data.gov.hk/en/terms-and-conditions",
+      "attribution": "MTR Corporation Limited and DATA.GOV.HK",
+      "snapshotDate": "2026-07-15",
+      "redistributionEvidenceURL": "https://data.gov.hk/en/terms-and-conditions",
+      "redistributionEvidence": "Official DATA.GOV.HK Terms of Use v1.2 reviewed for reuse, redistribution, attribution, and source-identification conditions."
+    }
+  ],
+  "files": [
+    {
+      "path": "DataPacks/manifest.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/official_transit_resources.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/rights_inventory.json",
+      "rightsIDs": [
+        "justgo-generated-catalog"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/8100/barrier_free_facilities.csv",
+      "rightsIDs": [
+        "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/8100/barrier_free_facility_category.csv",
+      "rightsIDs": [
+        "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/8100/light_rail_routes_and_stops.csv",
+      "rightsIDs": [
+        "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/8100/metadata.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/8100/mtr_lines_and_stations.csv",
+      "rightsIDs": [
+        "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/hong_kong_index.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/1100.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "justgo-generated-catalog",
+        "media-jianguomen-ian-holton",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/8100.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "media-central-qqhhss",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg",
+      "rightsIDs": [
+        "media-jianguomen-ian-holton"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/LicensedMedia/hong-kong-central.jpg",
+      "rightsIDs": [
+        "media-central-qqhhss"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/1100.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/1200.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/1301.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/1401.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/1501.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/2101.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/2102.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/2201.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/2301.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3100.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3201.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3202.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3203.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3204.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3205.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3206.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3301.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3302.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3303.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3306.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3310.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3401.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3402.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3501.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3502.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3601.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3701.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3702.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4101.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4103.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4201.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4301.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4401.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4403.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4406.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4419.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4501.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/5000.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/5101.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/5201.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/5301.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/6101.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/6201.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/6501.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/8100.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/8200.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "rightsIDs": [
+        "justgo-generated-catalog"
+      ]
+    }
+  ]
+}

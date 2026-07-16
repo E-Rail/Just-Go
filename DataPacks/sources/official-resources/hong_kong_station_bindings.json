@@ -1,0 +1,2295 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T00:00:00Z",
+  "rightsIDs": [
+    "data-gov-hk-mtr",
+    "osm-metro-networks"
+  ],
+  "stations": [
+    {
+      "stationID": "0757fe7e6afe4ad1",
+      "stationName": "兆麟",
+      "stationNameEn": "Siu Lun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "265"
+        }
+      ]
+    },
+    {
+      "stationID": "080789fe9b024e29",
+      "stationName": "塘坊村",
+      "stationNameEn": "Tong Fong Tsuen",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "390"
+        }
+      ]
+    },
+    {
+      "stationID": "088ef3ab658cfdbd",
+      "stationName": "輕鐵車廠",
+      "stationNameEn": "Light Rail Depot",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "20"
+        }
+      ]
+    },
+    {
+      "stationID": "09a35a437b8ad930",
+      "stationName": "啟德",
+      "stationNameEn": "Kai Tak",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KAT"
+        }
+      ]
+    },
+    {
+      "stationID": "0a3a7b50afa7cd65",
+      "stationName": "安定",
+      "stationNameEn": "On Ting",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "270"
+        }
+      ]
+    },
+    {
+      "stationID": "0af4b25f4b0e0624",
+      "stationName": "大圍",
+      "stationNameEn": "Tai Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TAW"
+        }
+      ]
+    },
+    {
+      "stationID": "0b30297a035a15e5",
+      "stationName": "頌富",
+      "stationNameEn": "Chung Fu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "468"
+        }
+      ]
+    },
+    {
+      "stationID": "0e542d7d3801c627",
+      "stationName": "紅磡",
+      "stationNameEn": "Hung Hom",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HUH"
+        }
+      ]
+    },
+    {
+      "stationID": "0f4723c4f5ab31f8",
+      "stationName": "坑口",
+      "stationNameEn": "Hang Hau",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HAH"
+        }
+      ]
+    },
+    {
+      "stationID": "1020b7e29a9ff636",
+      "stationName": "鳴琴",
+      "stationNameEn": "Ming Kum",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "200"
+        }
+      ]
+    },
+    {
+      "stationID": "10555697e0c72133",
+      "stationName": "上水",
+      "stationNameEn": "Sheung Shui",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SHS"
+        }
+      ]
+    },
+    {
+      "stationID": "1078a493e93235d7",
+      "stationName": "牛頭角",
+      "stationNameEn": "Ngau Tau Kok",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "NTK"
+        }
+      ]
+    },
+    {
+      "stationID": "10d482539db90fe3",
+      "stationName": "顯徑",
+      "stationNameEn": "Hin Keng",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HIK"
+        }
+      ]
+    },
+    {
+      "stationID": "1645c287e62f2ad0",
+      "stationName": "銀座",
+      "stationNameEn": "Ginza",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "455"
+        }
+      ]
+    },
+    {
+      "stationID": "17120deb49c6d358",
+      "stationName": "海怡半島",
+      "stationNameEn": "South Horizons",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SOH"
+        }
+      ]
+    },
+    {
+      "stationID": "19bcccbafba0d7f4",
+      "stationName": "海洋公園",
+      "stationNameEn": "Ocean Park",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "OCP"
+        }
+      ]
+    },
+    {
+      "stationID": "1b2b1a713317f034",
+      "stationName": "北角",
+      "stationNameEn": "North Point",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "NOP"
+        }
+      ]
+    },
+    {
+      "stationID": "1b5e93f9e02a732e",
+      "stationName": "澤豐",
+      "stationNameEn": "Affluence",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "80"
+        }
+      ]
+    },
+    {
+      "stationID": "1bab5363f0518029",
+      "stationName": "新墟",
+      "stationNameEn": "San Hui",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "320"
+        }
+      ]
+    },
+    {
+      "stationID": "1be01c1e57931646",
+      "stationName": "會展",
+      "stationNameEn": "Exhibition Centre",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "EXC"
+        }
+      ]
+    },
+    {
+      "stationID": "1c17c6762455491a",
+      "stationName": "旺角東",
+      "stationNameEn": "Mong Kok East",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "MKK"
+        }
+      ]
+    },
+    {
+      "stationID": "1df53903b616ded1",
+      "stationName": "九龍灣",
+      "stationNameEn": "Kowloon Bay",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KOB"
+        }
+      ]
+    },
+    {
+      "stationID": "224c84764f118115",
+      "stationName": "黃大仙",
+      "stationNameEn": "Wong Tai Sin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "WTS"
+        }
+      ]
+    },
+    {
+      "stationID": "234fee1662378e22",
+      "stationName": "黃埔",
+      "stationNameEn": "Whampoa",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "WHA"
+        }
+      ]
+    },
+    {
+      "stationID": "241c7970cccd7966",
+      "stationName": "樂湖",
+      "stationNameEn": "Locwood",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "448"
+        }
+      ]
+    },
+    {
+      "stationID": "25d5ad9d91ded7e4",
+      "stationName": "河田",
+      "stationNameEn": "Ho Tin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "70"
+        }
+      ]
+    },
+    {
+      "stationID": "29843c9b3a1ba230",
+      "stationName": "旺角",
+      "stationNameEn": "Mong Kok",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "MOK"
+        }
+      ]
+    },
+    {
+      "stationID": "29e1da6af63e5169",
+      "stationName": "迪士尼",
+      "stationNameEn": "Disneyland Resort",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "DIS"
+        }
+      ]
+    },
+    {
+      "stationID": "2a4de894d1250ee9",
+      "stationName": "荔枝角",
+      "stationNameEn": "Lai Chi Kok",
+      "aliases": [
+        "茘枝角"
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LCK"
+        }
+      ]
+    },
+    {
+      "stationID": "2b133d15571fe1e5",
+      "stationName": "鳳地",
+      "stationNameEn": "Fung Tei",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "340"
+        }
+      ]
+    },
+    {
+      "stationID": "2c6c7f592af20bd5",
+      "stationName": "何文田",
+      "stationNameEn": "Ho Man Tin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HOM"
+        }
+      ]
+    },
+    {
+      "stationID": "2f788e1f9927d298",
+      "stationName": "大窩口",
+      "stationNameEn": "Tai Wo Hau",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TWH"
+        }
+      ]
+    },
+    {
+      "stationID": "2fe5a3b7d92a4bac",
+      "stationName": "荔景",
+      "stationNameEn": "Lai King",
+      "aliases": [
+        "茘景"
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LAK"
+        }
+      ]
+    },
+    {
+      "stationID": "32ca624a7c4e90e3",
+      "stationName": "九龍",
+      "stationNameEn": "Kowloon",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KOW"
+        }
+      ]
+    },
+    {
+      "stationID": "342908557fccae02",
+      "stationName": "調景嶺",
+      "stationNameEn": "Tiu Keng Leng",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TIK"
+        }
+      ]
+    },
+    {
+      "stationID": "361b9bc9da98f72d",
+      "stationName": "鰂魚涌",
+      "stationNameEn": "Quarry Bay",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "QUB"
+        }
+      ]
+    },
+    {
+      "stationID": "362d5a07b2d1c999",
+      "stationName": "馬鞍山",
+      "stationNameEn": "Ma On Shan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "MOS"
+        }
+      ]
+    },
+    {
+      "stationID": "387075c58fa96ac1",
+      "stationName": "水邊圍",
+      "stationNameEn": "Shui Pin Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "560"
+        }
+      ]
+    },
+    {
+      "stationID": "39f59d6900ec190a",
+      "stationName": "葵興",
+      "stationNameEn": "Kwai Hing",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KWH"
+        }
+      ]
+    },
+    {
+      "stationID": "3ac853f4faeb37a9",
+      "stationName": "宋皇臺",
+      "stationNameEn": "Sung Wong Toi",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SUW"
+        }
+      ]
+    },
+    {
+      "stationID": "3aeda716d0d599d1",
+      "stationName": "博覽館",
+      "stationNameEn": "AsiaWorld-Expo",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "AWE"
+        }
+      ]
+    },
+    {
+      "stationID": "3b32b9d6a3fe89de",
+      "stationName": "大興 (南)",
+      "stationNameEn": "Tai Hing (South)",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "220"
+        }
+      ]
+    },
+    {
+      "stationID": "3da25ad7c7f93371",
+      "stationName": "石硤尾",
+      "stationNameEn": "Shek Kip Mei",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SKM"
+        }
+      ]
+    },
+    {
+      "stationID": "41ff5ab9ea0d6cd9",
+      "stationName": "香港",
+      "stationNameEn": "Hong Kong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HOK"
+        }
+      ]
+    },
+    {
+      "stationID": "4275dd1c9db0d9b5",
+      "stationName": "新圍",
+      "stationNameEn": "San Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "160"
+        }
+      ]
+    },
+    {
+      "stationID": "429663b8eba7b2e8",
+      "stationName": "屯門",
+      "stationNameEn": "Tuen Mun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TUM"
+        },
+        {
+          "mode": "lightRail",
+          "stationCode": "295"
+        }
+      ]
+    },
+    {
+      "stationID": "42d0a669b76fabbb",
+      "stationName": "康城",
+      "stationNameEn": "LOHAS Park",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LHP"
+        }
+      ]
+    },
+    {
+      "stationID": "4422eedc5d38d8b1",
+      "stationName": "蔡意橋",
+      "stationNameEn": "Choy Yee Bridge",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "75"
+        }
+      ]
+    },
+    {
+      "stationID": "45a3e50bc4319386",
+      "stationName": "樂富",
+      "stationNameEn": "Lok Fu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LOF"
+        }
+      ]
+    },
+    {
+      "stationID": "47d3321090c9795a",
+      "stationName": "西營盤",
+      "stationNameEn": "Sai Ying Pun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SYP"
+        }
+      ]
+    },
+    {
+      "stationID": "48aa6b05014673c6",
+      "stationName": "機場",
+      "stationNameEn": "Airport",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "AIR"
+        }
+      ]
+    },
+    {
+      "stationID": "4a1a1453d25432e7",
+      "stationName": "龍門",
+      "stationNameEn": "Lung Mun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "30"
+        }
+      ]
+    },
+    {
+      "stationID": "4b25eb47d5dc2842",
+      "stationName": "太和",
+      "stationNameEn": "Tai Wo",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TWO"
+        }
+      ]
+    },
+    {
+      "stationID": "4d30de3bda7bbd09",
+      "stationName": "杯渡",
+      "stationNameEn": "Pui To",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "300"
+        }
+      ]
+    },
+    {
+      "stationID": "4d878364ca53fc02",
+      "stationName": "屯門醫院",
+      "stationNameEn": "Tuen Mun Hospital",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "90"
+        }
+      ]
+    },
+    {
+      "stationID": "4eeef34ed3149fb9",
+      "stationName": "大棠路",
+      "stationNameEn": "Tai Tong Road",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "590"
+        }
+      ]
+    },
+    {
+      "stationID": "50d026cf2fa590aa",
+      "stationName": "沙田",
+      "stationNameEn": "Sha Tin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SHT"
+        }
+      ]
+    },
+    {
+      "stationID": "5100239bb9315f24",
+      "stationName": "馬場",
+      "stationNameEn": "Racecourse",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "RAC"
+        }
+      ]
+    },
+    {
+      "stationID": "561363634b909f8c",
+      "stationName": "泥圍",
+      "stationNameEn": "Nai Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "360"
+        }
+      ]
+    },
+    {
+      "stationID": "58489a5c93aa2192",
+      "stationName": "屯門碼頭",
+      "stationNameEn": "Tuen Mun Ferry Pier",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "1"
+        }
+      ]
+    },
+    {
+      "stationID": "5bc3abf623f9fc3d",
+      "stationName": "翠湖",
+      "stationNameEn": "Chestwood",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "490"
+        }
+      ]
+    },
+    {
+      "stationID": "5d3075df7e84d1f3",
+      "stationName": "天耀",
+      "stationNameEn": "Tin Yiu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "445"
+        }
+      ]
+    },
+    {
+      "stationID": "6009a1420060ed0b",
+      "stationName": "石排",
+      "stationNameEn": "Shek Pai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "170"
+        }
+      ]
+    },
+    {
+      "stationID": "607235f274aaffbc",
+      "stationName": "利東",
+      "stationNameEn": "Lei Tung",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LET"
+        }
+      ]
+    },
+    {
+      "stationID": "608ece056deaec25",
+      "stationName": "荃灣西",
+      "stationNameEn": "Tsuen Wan West",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TWW"
+        }
+      ]
+    },
+    {
+      "stationID": "61af5a7ba97b0374",
+      "stationName": "香港大學",
+      "stationNameEn": "HKU",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HKU"
+        }
+      ]
+    },
+    {
+      "stationID": "61e0c0adff62ab83",
+      "stationName": "建安",
+      "stationNameEn": "Kin On",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "60"
+        }
+      ]
+    },
+    {
+      "stationID": "627fbbb28f04d747",
+      "stationName": "麒麟",
+      "stationNameEn": "Kei Lun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "110"
+        }
+      ]
+    },
+    {
+      "stationID": "68d9f6ed06c51736",
+      "stationName": "尖東",
+      "stationNameEn": "East Tsim Sha Tsui",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "ETS"
+        }
+      ]
+    },
+    {
+      "stationID": "6a410355dffaa12e",
+      "stationName": "青山村",
+      "stationNameEn": "Tsing Shan Tsuen",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "40"
+        }
+      ]
+    },
+    {
+      "stationID": "6a4bb6f00c189b45",
+      "stationName": "黃竹坑",
+      "stationNameEn": "Wong Chuk Hang",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "WCH"
+        }
+      ]
+    },
+    {
+      "stationID": "6cbdfcf403058a6c",
+      "stationName": "天湖",
+      "stationNameEn": "Tin Wu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "450"
+        }
+      ]
+    },
+    {
+      "stationID": "6d048f25c8ad18cc",
+      "stationName": "兆禧",
+      "stationNameEn": "Siu Hei",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "240"
+        }
+      ]
+    },
+    {
+      "stationID": "6d99d6151bdc7cf0",
+      "stationName": "天后",
+      "stationNameEn": "Tin Hau",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TIH"
+        }
+      ]
+    },
+    {
+      "stationID": "7246244615f7b488",
+      "stationName": "柴灣",
+      "stationNameEn": "Chai Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CHW"
+        }
+      ]
+    },
+    {
+      "stationID": "743629a8b5469bd2",
+      "stationName": "火炭",
+      "stationNameEn": "Fo Tan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "FOT"
+        }
+      ]
+    },
+    {
+      "stationID": "76d08e779d50dbff",
+      "stationName": "銅鑼灣",
+      "stationNameEn": "Causeway Bay",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CAB"
+        }
+      ]
+    },
+    {
+      "stationID": "7774eef80a2fd663",
+      "stationName": "元朗",
+      "stationNameEn": "Yuen Long",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "YUL"
+        },
+        {
+          "mode": "lightRail",
+          "stationCode": "600"
+        }
+      ]
+    },
+    {
+      "stationID": "77f5cb001ddd7eff",
+      "stationName": "土瓜灣",
+      "stationNameEn": "To Kwa Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TKW"
+        }
+      ]
+    },
+    {
+      "stationID": "789826511d5cdb8b",
+      "stationName": "朗屏",
+      "stationNameEn": "Long Ping",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LOP"
+        }
+      ]
+    },
+    {
+      "stationID": "79cc8fa989050b23",
+      "stationName": "油麻地",
+      "stationNameEn": "Yau Ma Tei",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "YMT"
+        }
+      ]
+    },
+    {
+      "stationID": "79fc0753c0922a24",
+      "stationName": "海皇路",
+      "stationNameEn": "Hoi Wong Road",
+      "aliases": [
+        "Tuen Mun Swimming Pool",
+        "屯門泳池"
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "250"
+        }
+      ]
+    },
+    {
+      "stationID": "7f5518bbd9044a10",
+      "stationName": "大水坑",
+      "stationNameEn": "Tai Shui Hang",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TSH"
+        }
+      ]
+    },
+    {
+      "stationID": "8254b0df5a72f03c",
+      "stationName": "市中心",
+      "stationNameEn": "Town Centre",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "280"
+        }
+      ]
+    },
+    {
+      "stationID": "82b89142f25b7761",
+      "stationName": "天悅",
+      "stationNameEn": "Tin Yuet",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "510"
+        }
+      ]
+    },
+    {
+      "stationID": "83c21626bd6c6ee0",
+      "stationName": "深水埗",
+      "stationNameEn": "Sham Shui Po",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SSP"
+        }
+      ]
+    },
+    {
+      "stationID": "8618016077f61aeb",
+      "stationName": "觀塘",
+      "stationNameEn": "Kwun Tong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KWT"
+        }
+      ]
+    },
+    {
+      "stationID": "86b712c928c9b6dc",
+      "stationName": "青松",
+      "stationNameEn": "Ching Chung",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "120"
+        }
+      ]
+    },
+    {
+      "stationID": "8927f00a331bf208",
+      "stationName": "何福堂",
+      "stationNameEn": "Hoh Fuk Tong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "310"
+        }
+      ]
+    },
+    {
+      "stationID": "8ca8511218c651f8",
+      "stationName": "洪水橋",
+      "stationNameEn": "Hung Shui Kiu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "380"
+        }
+      ]
+    },
+    {
+      "stationID": "902a13764813a064",
+      "stationName": "康樂路",
+      "stationNameEn": "Hong Lok Road",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "580"
+        }
+      ]
+    },
+    {
+      "stationID": "90ed71cb3a89e298",
+      "stationName": "天秀",
+      "stationNameEn": "Tin Sau",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "520"
+        }
+      ]
+    },
+    {
+      "stationID": "9166cd346bb390fd",
+      "stationName": "美樂",
+      "stationNameEn": "Melody Garden",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "10"
+        }
+      ]
+    },
+    {
+      "stationID": "91950d225082fba9",
+      "stationName": "天逸",
+      "stationNameEn": "Tin Yat",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "550"
+        }
+      ]
+    },
+    {
+      "stationID": "925ce785c013ca54",
+      "stationName": "建生",
+      "stationNameEn": "Kin Sang",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "130"
+        }
+      ]
+    },
+    {
+      "stationID": "95c1750fc9ec1d21",
+      "stationName": "將軍澳",
+      "stationNameEn": "Tseung Kwan O",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TKO"
+        }
+      ]
+    },
+    {
+      "stationID": "9a0c09056f8d6b58",
+      "stationName": "太子",
+      "stationNameEn": "Prince Edward",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "PRE"
+        }
+      ]
+    },
+    {
+      "stationID": "9a913b614df06ad4",
+      "stationName": "欣澳",
+      "stationNameEn": "Sunny Bay",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SUN"
+        }
+      ]
+    },
+    {
+      "stationID": "9b338a3d04d47d34",
+      "stationName": "筲箕灣",
+      "stationNameEn": "Shau Kei Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SKW"
+        }
+      ]
+    },
+    {
+      "stationID": "9b43a3632a57eec4",
+      "stationName": "恆安",
+      "stationNameEn": "Heng On",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HEO"
+        }
+      ]
+    },
+    {
+      "stationID": "9cd718ee395970e9",
+      "stationName": "豐年路",
+      "stationNameEn": "Fung Nin Road",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "570"
+        }
+      ]
+    },
+    {
+      "stationID": "9e701a481dce8b03",
+      "stationName": "銀圍",
+      "stationNameEn": "Ngan Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "230"
+        }
+      ]
+    },
+    {
+      "stationID": "9e9773b81654931d",
+      "stationName": "天水圍",
+      "stationNameEn": "Tin Shui Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TIS"
+        },
+        {
+          "mode": "lightRail",
+          "stationCode": "430"
+        }
+      ]
+    },
+    {
+      "stationID": "a08671a8860848c6",
+      "stationName": "太古",
+      "stationNameEn": "Tai Koo",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TAK"
+        }
+      ]
+    },
+    {
+      "stationID": "a0aa50b2c2e25329",
+      "stationName": "天恒",
+      "stationNameEn": "Tin Heng",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "540"
+        }
+      ]
+    },
+    {
+      "stationID": "a135d2d93b0b119f",
+      "stationName": "兆康",
+      "stationNameEn": "Siu Hong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SIH"
+        },
+        {
+          "mode": "lightRail",
+          "stationCode": "100"
+        }
+      ]
+    },
+    {
+      "stationID": "a1a2e9c1afd85b78",
+      "stationName": "奧運",
+      "stationNameEn": "Olympic",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "OLY"
+        }
+      ]
+    },
+    {
+      "stationID": "a36d428005f8bfbb",
+      "stationName": "南昌",
+      "stationNameEn": "Nam Cheong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "NAC"
+        }
+      ]
+    },
+    {
+      "stationID": "a4ac249fb417491a",
+      "stationName": "豐景園",
+      "stationNameEn": "Goodview Garden",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "260"
+        }
+      ]
+    },
+    {
+      "stationID": "a55cb7d258b33b71",
+      "stationName": "車公廟",
+      "stationNameEn": "Che Kung Temple",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CKT"
+        }
+      ]
+    },
+    {
+      "stationID": "a7e7b5b573108add",
+      "stationName": "天榮",
+      "stationNameEn": "Tin Wing",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "500"
+        }
+      ]
+    },
+    {
+      "stationID": "a8883422584bb2c8",
+      "stationName": "藍地",
+      "stationNameEn": "Lam Tei",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "350"
+        }
+      ]
+    },
+    {
+      "stationID": "aac70d6c51ea0a74",
+      "stationName": "沙田圍",
+      "stationNameEn": "Sha Tin Wai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "STW"
+        }
+      ]
+    },
+    {
+      "stationID": "ad77711cd9f246ed",
+      "stationName": "鑽石山",
+      "stationNameEn": "Diamond Hill",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "DIH"
+        }
+      ]
+    },
+    {
+      "stationID": "ae8c055bbdb28e6d",
+      "stationName": "友愛",
+      "stationNameEn": "Yau Oi",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "275"
+        }
+      ]
+    },
+    {
+      "stationID": "af5b683fdaed6c89",
+      "stationName": "第一城",
+      "stationNameEn": "City One",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CIO"
+        }
+      ]
+    },
+    {
+      "stationID": "b0d0f841a88903da",
+      "stationName": "寶琳",
+      "stationNameEn": "Po Lam",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "POA"
+        }
+      ]
+    },
+    {
+      "stationID": "b48d4aa0f62645b3",
+      "stationName": "柯士甸",
+      "stationNameEn": "Austin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "AUS"
+        }
+      ]
+    },
+    {
+      "stationID": "b49888436822fbb4",
+      "stationName": "錦上路",
+      "stationNameEn": "Kam Sheung Road",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KSR"
+        }
+      ]
+    },
+    {
+      "stationID": "b6777c48adef5e4e",
+      "stationName": "天富",
+      "stationNameEn": "Tin Fu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "480"
+        }
+      ]
+    },
+    {
+      "stationID": "ba06a8813805fcb7",
+      "stationName": "良景",
+      "stationNameEn": "Leung King",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "150"
+        }
+      ]
+    },
+    {
+      "stationID": "bc7490c06895e85a",
+      "stationName": "田景",
+      "stationNameEn": "Tin King",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "140"
+        }
+      ]
+    },
+    {
+      "stationID": "bf2fa154246e0f2a",
+      "stationName": "坑尾村",
+      "stationNameEn": "Hang Mei Tsuen",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "425"
+        }
+      ]
+    },
+    {
+      "stationID": "bfe436b99124151a",
+      "stationName": "西灣河",
+      "stationNameEn": "Sai Wan Ho",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SWH"
+        }
+      ]
+    },
+    {
+      "stationID": "c032db87c9c9ac32",
+      "stationName": "佐敦",
+      "stationNameEn": "Jordan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "JOR"
+        }
+      ]
+    },
+    {
+      "stationID": "c0fbae04468a49b2",
+      "stationName": "粉嶺",
+      "stationNameEn": "Fanling",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "FAN"
+        }
+      ]
+    },
+    {
+      "stationID": "c505035fd49a1177",
+      "stationName": "落馬洲",
+      "stationNameEn": "Lok Ma Chau",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LMC"
+        }
+      ]
+    },
+    {
+      "stationID": "c5ec994d532af6e1",
+      "stationName": "葵芳",
+      "stationNameEn": "Kwai Fong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KWF"
+        }
+      ]
+    },
+    {
+      "stationID": "c75cc88cd0f2b692",
+      "stationName": "大埔墟",
+      "stationNameEn": "Tai Po Market",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TAP"
+        }
+      ]
+    },
+    {
+      "stationID": "c8508213a416f182",
+      "stationName": "天瑞",
+      "stationNameEn": "Tin Shui",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "460"
+        }
+      ]
+    },
+    {
+      "stationID": "ca458a95589ae06a",
+      "stationName": "杏花邨",
+      "stationNameEn": "Heng Fa Chuen",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "HFC"
+        }
+      ]
+    },
+    {
+      "stationID": "ccae579e62ea8150",
+      "stationName": "三聖",
+      "stationNameEn": "Sam Shing",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "920"
+        }
+      ]
+    },
+    {
+      "stationID": "ce8b7b5ed01c18f4",
+      "stationName": "烏溪沙",
+      "stationNameEn": "Wu Kai Sha",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "WKS"
+        }
+      ]
+    },
+    {
+      "stationID": "d10795743611cdcd",
+      "stationName": "油塘",
+      "stationNameEn": "Yau Tong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "YAT"
+        }
+      ]
+    },
+    {
+      "stationID": "d4bd50f2dd3c3a5f",
+      "stationName": "山景 (南)",
+      "stationNameEn": "Shan King (South)",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "190"
+        }
+      ]
+    },
+    {
+      "stationID": "d5143985d5388abd",
+      "stationName": "山景 (北)",
+      "stationNameEn": "Shan King (North)",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "180"
+        }
+      ]
+    },
+    {
+      "stationID": "d5c9d05e54851522",
+      "stationName": "長沙灣",
+      "stationNameEn": "Cheung Sha Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CSW"
+        }
+      ]
+    },
+    {
+      "stationID": "d6fe2d74cee5656b",
+      "stationName": "金鐘",
+      "stationNameEn": "Admiralty",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "ADM"
+        }
+      ]
+    },
+    {
+      "stationID": "dc4eccfe29064e0f",
+      "stationName": "東涌",
+      "stationNameEn": "Tung Chung",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TUC"
+        }
+      ]
+    },
+    {
+      "stationID": "de0682d34c987c27",
+      "stationName": "景峰",
+      "stationNameEn": "Prime View",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "330"
+        }
+      ]
+    },
+    {
+      "stationID": "e0c5d323f0689bea",
+      "stationName": "蝴蝶",
+      "stationNameEn": "Butterfly",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "15"
+        }
+      ]
+    },
+    {
+      "stationID": "e182a5d9fd05e342",
+      "stationName": "上環",
+      "stationNameEn": "Sheung Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SHW"
+        }
+      ]
+    },
+    {
+      "stationID": "e5055abba66ebab3",
+      "stationName": "羅湖",
+      "stationNameEn": "Lo Wu",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LOW"
+        }
+      ]
+    },
+    {
+      "stationID": "e6a70b3c4de6756d",
+      "stationName": "濕地公園",
+      "stationNameEn": "Wetland Park",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "530"
+        }
+      ]
+    },
+    {
+      "stationID": "e92d588db1c1a3ef",
+      "stationName": "荃灣",
+      "stationNameEn": "Tsuen Wan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TSW"
+        }
+      ]
+    },
+    {
+      "stationID": "ebf7be041d4092fd",
+      "stationName": "大學",
+      "stationNameEn": "University",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "UNI"
+        }
+      ]
+    },
+    {
+      "stationID": "ecb2a6abfd7c9e4e",
+      "stationName": "青衣",
+      "stationNameEn": "Tsing Yi",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TSY"
+        }
+      ]
+    },
+    {
+      "stationID": "ef62723013a486ac",
+      "stationName": "藍田",
+      "stationNameEn": "Lam Tin",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "LAT"
+        }
+      ]
+    },
+    {
+      "stationID": "ef877d0ca0c1a455",
+      "stationName": "大興 (北)",
+      "stationNameEn": "Tai Hing (North)",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "212"
+        }
+      ]
+    },
+    {
+      "stationID": "f02479a4a2642fa9",
+      "stationName": "尖沙咀",
+      "stationNameEn": "Tsim Sha Tsui",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "TST"
+        }
+      ]
+    },
+    {
+      "stationID": "f4c724d609249136",
+      "stationName": "石門",
+      "stationNameEn": "Shek Mun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "SHM"
+        }
+      ]
+    },
+    {
+      "stationID": "f8039a3210e0f0a9",
+      "stationName": "堅尼地城",
+      "stationNameEn": "Kennedy Town",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KET"
+        }
+      ]
+    },
+    {
+      "stationID": "f84e41fafad22bd2",
+      "stationName": "彩虹",
+      "stationNameEn": "Choi Hung",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CHH"
+        }
+      ]
+    },
+    {
+      "stationID": "f906d0273f8be940",
+      "stationName": "灣仔",
+      "stationNameEn": "Wan Chai",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "WAC"
+        }
+      ]
+    },
+    {
+      "stationID": "f9b3ca3901efdc7f",
+      "stationName": "屏山",
+      "stationNameEn": "Ping Shan",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "400"
+        }
+      ]
+    },
+    {
+      "stationID": "f9cae0884b80b670",
+      "stationName": "炮台山",
+      "stationNameEn": "Fortress Hill",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "FOH"
+        }
+      ]
+    },
+    {
+      "stationID": "fb64cb0d59e32a0a",
+      "stationName": "青雲",
+      "stationNameEn": "Tsing Wun",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "50"
+        }
+      ]
+    },
+    {
+      "stationID": "fe9f0e376a174ff1",
+      "stationName": "九龍塘",
+      "stationNameEn": "Kowloon Tong",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "KOT"
+        }
+      ]
+    },
+    {
+      "stationID": "fead5c256df8f0ec",
+      "stationName": "鍾屋村",
+      "stationNameEn": "Chung Uk Tsuen",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "370"
+        }
+      ]
+    },
+    {
+      "stationID": "feda84848b4c6987",
+      "stationName": "美孚",
+      "stationNameEn": "Mei Foo",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "MEF"
+        }
+      ]
+    },
+    {
+      "stationID": "ff4edceffc1d6697",
+      "stationName": "天慈",
+      "stationNameEn": "Tin Tsz",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "stationCode": "435"
+        }
+      ]
+    },
+    {
+      "stationID": "ffeff722858ce102",
+      "stationName": "中環",
+      "stationNameEn": "Central",
+      "aliases": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "heavyRail",
+          "stationCode": "CEN"
+        }
+      ]
+    }
+  ]
+}

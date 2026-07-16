@@ -23,7 +23,7 @@ final class DIContainer {
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
-    let accessibilityReportService: AccessibilityReportService
+    let aiReportService: AIReportProviding
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let comfortForecastService: ComfortForecastService
@@ -40,7 +40,7 @@ final class DIContainer {
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
-        accessibilityReportService: AccessibilityReportService,
+        aiReportService: AIReportProviding,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         comfortForecastService: ComfortForecastService,
@@ -57,7 +57,7 @@ final class DIContainer {
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
-        self.accessibilityReportService = accessibilityReportService
+        self.aiReportService = aiReportService
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.comfortForecastService = comfortForecastService
@@ -127,7 +127,19 @@ final class DIContainer {
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
-        let officialStationData = OfficialCityPackService(metroNetworks: metroNetworkProvider)
+        let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
+        let officialResourceCatalog: OfficialTransitResourceCatalog
+        do {
+            officialResourceCatalog = try .bundled()
+        } catch {
+            AppLog.data.error("Bundled official-resource catalog failed validation: \(String(describing: error), privacy: .public)")
+            officialResourceCatalog = .empty
+        }
+        let officialStationData = OfficialCityPackService(
+            metroNetworks: metroNetworkProvider,
+            realtimeArrivals: realtimeArrivalProvider,
+            officialResourceCatalog: officialResourceCatalog
+        )
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()
         let stationSearchService = StationSearchService(
@@ -144,7 +156,7 @@ final class DIContainer {
             comfortForecastService: comfortForecastService
         )
         let tripMemoryService = TripMemoryService()
-        let accessibilityReportService = AccessibilityReportService()
+        let aiReportService = AIReportService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
@@ -158,7 +170,7 @@ final class DIContainer {
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,
-            accessibilityReportService: accessibilityReportService,
+            aiReportService: aiReportService,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             comfortForecastService: comfortForecastService,

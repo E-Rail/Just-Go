@@ -546,7 +546,7 @@ struct CityPickerView: View {
                                 .lineLimit(1)
                         }
 
-                        CityCapabilityTags(city: city)
+                        CityCapabilityTags(coverage: city.dataCapabilities.coverage)
                     }
                     .padding(.vertical, 4)
                 }

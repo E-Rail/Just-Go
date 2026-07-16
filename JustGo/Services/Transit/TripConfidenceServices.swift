@@ -189,7 +189,8 @@ struct LiveGoTripBuilder {
                     stopCount: 0,
                     walkingDistance: segment.distance,
                     duration: segment.duration,
-                    walkingPathCoordinates: segment.polylineCoordinates
+                    walkingPathCoordinates: segment.polylineCoordinates,
+                    segmentIndex: index
                 ))
             case .transfer:
                 // The transfer segment's own stationStops is always empty by construction —
@@ -209,7 +210,9 @@ struct LiveGoTripBuilder {
                     stopCount: 0,
                     walkingDistance: 0,
                     duration: segment.duration,
-                    transferCoordinate: transferStop?.coordinate
+                    transferCoordinate: transferStop?.coordinate,
+                    segmentIndex: index,
+                    transferContext: segment.transferContext
                 ))
             case .subway, .transit:
                 steps.append(TripStep(
@@ -222,7 +225,8 @@ struct LiveGoTripBuilder {
                     stopCount: segment.stops,
                     walkingDistance: 0,
                     duration: segment.duration,
-                    exitHint: arrivalExit(for: segment.toStationName, in: route)
+                    exitHint: arrivalExit(for: segment.toStationName, in: route),
+                    segmentIndex: index
                 ))
             }
         }

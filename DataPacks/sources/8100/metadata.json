@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 2,
+  "cityID": "8100",
+  "snapshotAt": "2026-07-15T00:00:00Z",
+  "rightsID": "data-gov-hk-mtr",
+  "termsURL": "https://data.gov.hk/en/terms-and-conditions",
+  "dataLicense": {
+    "rightsID": "data-gov-hk-mtr",
+    "datasetName": "MTR routes, stations, accessibility, and real-time MTR and Light Rail arrivals",
+    "termsURL": "https://data.gov.hk/en/terms-and-conditions",
+    "attribution": "MTR Corporation Limited and DATA.GOV.HK",
+    "snapshotDate": "2026-07-15",
+    "redistributionEvidenceURL": "https://data.gov.hk/en/terms-and-conditions",
+    "redistributionEvidence": "Official DATA.GOV.HK Terms of Use v1.2 reviewed for reuse, redistribution, attribution, and source-identification conditions."
+  },
+  "realtimeAPIs": [
+    {
+      "mode": "heavyRail",
+      "endpointURL": "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-data2-nexttrain-data",
+      "dataDictionaryURL": "https://opendata.mtr.com.hk/doc/Next_Train_DataDictionary_v1.7.pdf",
+      "rightsID": "data-gov-hk-mtr",
+      "attribution": "MTR Corporation Limited and DATA.GOV.HK"
+    },
+    {
+      "mode": "lightRail",
+      "endpointURL": "https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-lrnt_data-light-rail-nexttrain-data",
+      "dataDictionaryURL": "https://opendata.mtr.com.hk/doc/LR_Next_Train_DataDictionary_v1.1.pdf",
+      "rightsID": "data-gov-hk-mtr",
+      "attribution": "MTR Corporation Limited and DATA.GOV.HK"
+    }
+  ],
+  "explicitCanonicalReferences": [
+    {
+      "stationCode": "RAC",
+      "stationNumber": "70",
+      "lineCode": "EAL",
+      "canonicalStationID": "5100239bb9315f24",
+      "stationName": "馬場",
+      "stationNameEn": "Racecourse",
+      "evidenceURL": "https://opendata.mtr.com.hk/doc/Next_Train_DataDictionary_v1.7.pdf"
+    }
+  ],
+  "resources": [
+    {
+      "fileName": "mtr_lines_and_stations.csv",
+      "sourceURL": "https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "sizeBytes": 14161,
+      "sha256": "e0e781152e2e6c5f6d7763262acbae76577b71ca4c66b4b7b72a97252175e0c3",
+      "csvRecordCount": 273,
+      "dataRowCount": 270,
+      "stationCount": 97
+    },
+    {
+      "fileName": "light_rail_routes_and_stops.csv",
+      "sourceURL": "https://opendata.mtr.com.hk/data/light_rail_routes_and_stops.csv",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "sizeBytes": 14204,
+      "sha256": "f2fec60de38b72f38d3478fcdeecea4e3332b300b73c23bf41b22d412a2c2066",
+      "csvRecordCount": 382,
+      "dataRowCount": 382,
+      "stationCount": 68
+    },
+    {
+      "fileName": "barrier_free_facilities.csv",
+      "sourceURL": "https://opendata.mtr.com.hk/data/barrier_free_facilities.csv",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "sizeBytes": 93709,
+      "sha256": "f220d56aab3fc129aec4d6ca5ebb57b6e1db70491eb23d1e5d2cc041b8c66daf",
+      "csvRecordCount": 3564,
+      "dataRowCount": 3564,
+      "stationGroupCount": 99
+    },
+    {
+      "fileName": "barrier_free_facility_category.csv",
+      "sourceURL": "https://opendata.mtr.com.hk/data/barrier_free_facility_category.csv",
+      "datasetLandingPageURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "sizeBytes": 4604,
+      "sha256": "84ba231566dab0a7ae3f87f9a702f234040fb8b1aea95faf6fe135ab5973f963",
+      "csvRecordCount": 36,
+      "dataRowCount": 36,
+      "categoryCount": 36
+    }
+  ]
+}

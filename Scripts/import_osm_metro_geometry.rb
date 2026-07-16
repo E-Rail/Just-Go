@@ -472,6 +472,10 @@ def wgs84_to_gcj02(latitude, longitude)
   [latitude + delta_latitude, longitude + delta_longitude]
 end
 
+def output_coordinate(city_id, latitude, longitude)
+  city_id == "8100" ? [latitude, longitude] : wgs84_to_gcj02(latitude, longitude)
+end
+
 def meters_between(a, b)
   latitude = (a[0] + b[0]) / 2 * PI / 180
   x = (b[1] - a[1]) * PI / 180 * Math.cos(latitude)
@@ -801,7 +805,9 @@ def build_network(city_id, city, source)
     node_paths = join_way_paths(member_ways).select { |path| seen_paths.add?(canonical_path_key(path)) }
     track_station_patterns = physical_station_patterns(node_paths, pattern_station_nodes)
     coordinate_paths = node_paths.map do |path|
-      coordinates = path.map { |node_id| nodes[node_id] }.compact.map { |coordinate| wgs84_to_gcj02(*coordinate) }
+      coordinates = path.map { |node_id| nodes[node_id] }.compact.map do |coordinate|
+        output_coordinate(city_id, *coordinate)
+      end
       next if coordinates.length < 2
       simplify(coordinates).map { |latitude, longitude| { "latitude" => latitude.round(6), "longitude" => longitude.round(6) } }
     end.compact
@@ -875,7 +881,7 @@ def build_network(city_id, city, source)
     next if station["lineIDs"].empty?
     latitude = station["coordinates"].sum { |coordinate| coordinate[0] } / station["coordinates"].length
     longitude = station["coordinates"].sum { |coordinate| coordinate[1] } / station["coordinates"].length
-    latitude, longitude = wgs84_to_gcj02(latitude, longitude)
+    latitude, longitude = output_coordinate(city_id, latitude, longitude)
     {
       "id" => Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16],
       "name" => station["name"],
@@ -922,7 +928,7 @@ def build_network(city_id, city, source)
     "attribution" => ATTRIBUTION,
     "licenseURL" => LICENSE_URL,
     "sourceSnapshot" => Date.today.iso8601,
-    "coordinateSystem" => "gcj02",
+    "coordinateSystem" => city_id == "8100" ? "wgs84" : "gcj02",
     "sourceURLs" => [SOURCE_URL, *OVERPASS_URLS.map(&:to_s)],
     "lines" => lines.sort_by { |line| line["name"] },
     "stations" => stations.sort_by { |station| station["name"] }
@@ -980,6 +986,8 @@ def self_test
   fail_with("disconnected path test failed") unless joined.any? { |path| path == [8, 9] }
   xidan = wgs84_to_gcj02(39.9057386, 116.3682035)
   fail_with("WGS84 to GCJ-02 test failed") unless meters_between(xidan, [39.9071187, 116.3744198]) < 1
+  hong_kong = [22.397643, 114.207797]
+  fail_with("Hong Kong must remain WGS84") unless output_coordinate("8100", *hong_kong) == hong_kong
   fixture_elements = {
     "node:10" => { "tags" => { "name" => "A" } },
     "node:11" => { "tags" => { "name" => "B" } },

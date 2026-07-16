@@ -15,7 +15,6 @@ struct RouteDetailView: View {
     let tripAnchor: TripTimeAnchor
     let accessibilityFilter: AccessibilityFilter
     @State var selectedRouteID: UUID
-    @State var showRouteReport = false
     @State var showTripNote = false
     @State var showExpandedRouteMap = false
     @State var showLiveGo = false
@@ -24,8 +23,6 @@ struct RouteDetailView: View {
     @State private var showReminderDenied = false
     @State private var showReminderTooLate = false
     @State var tripNote = ""
-    @State var routeReportNote = ""
-    @State var routeReportSeverity: AccessibilityReportSeverity = .medium
     @State var detailDestination: RouteDetailDestination?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
     // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
@@ -34,7 +31,6 @@ struct RouteDetailView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
-    @Environment(AccessibilityReportService.self) var accessibilityReportService
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
 
     var body: some View {
@@ -49,19 +45,18 @@ struct RouteDetailView: View {
                 if alternatives.count > 1 {
                     RouteTabs(routes: alternatives, selection: $selectedRouteID)
                 }
-                routeSummaryCard
-                liveGoButton
-                tripEssentialsCard
+                routeDecisionHeader(feasibility: feasibility, confidence: confidence, forecast: forecast)
                 if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
-                ServiceStatusBanner(status: route.serviceStatus)
-                serviceHoursRow
-                tripConfidenceCard(confidence)
                 routeMapPreview
-                accessGuidanceCard
-                if forecast.hasSignal { RouteComfortCard(forecast: forecast) }
-                routeFeasibilityCard(feasibility)
                 segmentsTimeline
                 stationsCard
+                serviceHoursRow
+                ServiceStatusBanner(status: route.serviceStatus)
+                tripEssentialsCard
+                accessGuidanceCard
+                tripConfidenceCard(confidence)
+                if forecast.hasSignal { RouteComfortCard(forecast: forecast) }
+                routeFeasibilityCard(feasibility)
                 reminderSection
                 riderTrustActions
             }
@@ -80,9 +75,6 @@ struct RouteDetailView: View {
                 showLiveGo = true
             }
         }
-        .sheet(isPresented: $showRouteReport) {
-            routeReportSheet
-        }
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
         }
@@ -96,7 +88,8 @@ struct RouteDetailView: View {
                     transferSegment: segment,
                     nextTransitSegment: nextTransitSegment(after: segment),
                     cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
-                    crowdControl: route.crowdControl
+                    crowdControl: route.crowdControl,
+                    accessibilityFilter: accessibilityFilter
                 )
             case .station(let stop):
                 RouteStationGuideSheet(
@@ -109,7 +102,7 @@ struct RouteDetailView: View {
             FullScreenRouteMapView(route: route)
         }
         .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
-            LiveGoView(plan: LiveGoTripBuilder().plan(for: route))
+            LiveGoView(route: route)
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false
@@ -119,8 +112,13 @@ struct RouteDetailView: View {
         }
         .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
             boardingServiceWindows = []
-            guard let cityID = route.networkCityID ?? appState.selectedCity?.id else { return }
-            await loadServiceHours(cityID: cityID)
+            async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
+                for: route
+            )
+            if let cityID = route.networkCityID ?? appState.selectedCity?.id {
+                await loadServiceHours(cityID: cityID)
+            }
+            await transferAssets
         }
     }
 
@@ -195,62 +193,103 @@ struct RouteDetailView: View {
         .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
     }
 
-    private var routeSummaryCard: some View {
+    private func routeDecisionHeader(
+        feasibility: RouteFeasibility,
+        confidence: RouteConfidence,
+        forecast: RouteComfortForecast
+    ) -> some View {
         GlassCard {
-            VStack(spacing: 16) {
-                HStack {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(route.origin)
+                        Text("\(route.origin) → \(route.destination)")
                             .font(.headline)
-                        Text(AppLocalization.localized("Origin"))
+                            .lineLimit(2)
+                        HStack(spacing: 8) {
+                            Text(route.formattedDuration)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text(AppLocalization.text(
+                                english: "\(route.totalStops) stops",
+                                simplified: "\(route.totalStops)站",
+                                traditional: "\(route.totalStops)站"
+                            ))
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            Text(route.formattedTransfers)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
-
                     Spacer()
+                    DataConfidenceChip(confidence: decisionDataConfidence, compact: true)
+                }
 
-                    Image(systemName: "arrow.right")
-                        .foregroundStyle(.secondary)
-
-                    Spacer()
-
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text(route.destination)
-                            .font(.headline)
-                        Text(AppLocalization.localized("Destination"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        routeStatusChip(confidence.level.title, icon: confidenceIcon(for: confidence.level), tint: confidence.level.color)
+                        routeStatusChip(feasibility.title, icon: feasibility.level.iconName, tint: feasibility.level.color)
+                        if forecast.hasSignal {
+                            routeStatusChip(forecast.summaryTitle, icon: forecast.level.iconName, tint: forecast.level.uiColor)
+                        }
+                        if route.isFullyAccessible {
+                            routeStatusChip(AppLocalization.localized("Fully Accessible Route"), icon: "figure.roll", tint: .green)
+                        }
                     }
                 }
 
-                Divider()
-
-                HStack(spacing: 20) {
-                    StatItem(title: AppLocalization.localized("Duration"), value: route.formattedDuration, icon: "clock")
-                    StatItem(title: AppLocalization.localized("Stops"), value: "\(route.totalStops)", icon: "tram")
-                    StatItem(title: AppLocalization.localized("Transfers"), value: "\(route.transferCount)", icon: "arrow.triangle.2.circlepath")
-                    if let fare = route.estimatedFare {
-                        StatItem(
-                            title: AppLocalization.text(english: "Fare (est.)", simplified: "票价(估)", traditional: "票價(估)"),
-                            value: fare.formatted,
-                            icon: "yensign.circle"
-                        )
-                    }
+                Button {
+                    ActiveTripStore.save(route)
+                    showLiveGo = true
+                } label: {
+                    Label(
+                        AppLocalization.text(english: "Navigate", simplified: "开始导航", traditional: "開始導航"),
+                        systemImage: "figure.walk.circle.fill"
+                    )
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 10))
+                    .foregroundStyle(.white)
                 }
-
-                if route.isFullyAccessible {
-                    HStack {
-                        Image(systemName: "figure.roll")
-                            .foregroundStyle(.green)
-                        Text(AppLocalization.localized("Fully Accessible Route"))
-                            .font(.subheadline)
-                            .foregroundStyle(.green)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.green.opacity(0.1), in: Capsule())
-                }
+                .buttonStyle(.plain)
             }
+        }
+    }
+
+    private func routeStatusChip(_ title: String, icon: String, tint: Color) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption2)
+            .fontWeight(.medium)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(tint.opacity(0.12), in: Capsule())
+            .foregroundStyle(tint)
+    }
+
+    private var decisionDataConfidence: DataConfidence {
+        let coverage = route.dataCoverage
+        if coverage.scheduleConfidence == .official,
+           coverage.accessibilityConfidence == .official,
+           coverage.stationMapConfidence == .official {
+            return .official
+        }
+        if coverage.hasOfficialCoreData {
+            return .sourcePending
+        }
+        return .unavailable
+    }
+
+    private func confidenceIcon(for level: RouteConfidenceLevel) -> String {
+        switch level {
+        case .high:
+            return "checkmark.seal.fill"
+        case .medium:
+            return "exclamationmark.triangle.fill"
+        case .low:
+            return "exclamationmark.octagon.fill"
         }
     }
 
@@ -289,15 +328,6 @@ struct RouteDetailView: View {
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                }
-
-                Button {
-                    routeReportNote = ""
-                    routeReportSeverity = .medium
-                    showRouteReport = true
-                } label: {
-                    Label(AppLocalization.localized("Report route issue"), systemImage: "exclamationmark.bubble")
-                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }
@@ -389,24 +419,6 @@ struct RouteDetailView: View {
         }
     }
 
-    private var liveGoButton: some View {
-        Button {
-            ActiveTripStore.save(route)
-            showLiveGo = true
-        } label: {
-            Label(
-                AppLocalization.text(english: "Navigate step-by-step", simplified: "开始分步导航", traditional: "開始分步導航"),
-                systemImage: "figure.walk.circle.fill"
-            )
-            .font(.headline)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
-            .foregroundStyle(.white)
-        }
-        .buttonStyle(.plain)
-    }
-
     @ViewBuilder
     private var reminderSection: some View {
         if let departurePlan {
@@ -486,7 +498,7 @@ struct RouteDetailView: View {
     func currentFeasibility(comfort: RouteComfortForecast) -> RouteFeasibility {
         container.routeFeasibilityService.feasibility(
             for: route,
-            personalReports: accessibilityReportService.reports(affecting: route),
+            aiReportInsights: container.aiReportService.insights(affecting: route),
             comfort: comfort
         )
     }

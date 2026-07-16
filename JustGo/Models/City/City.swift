@@ -24,10 +24,14 @@ struct CityDataCapabilities: Equatable {
     let accessibility: CityDataCapabilityStatus
     let stationEssentials: CityDataCapabilityStatus
     let stationMap: CityDataCapabilityStatus
+    let coverage: CityDataCoverage
 
     static func forCity(_ cityID: String) -> CityDataCapabilities {
         manifestCapabilities[cityID] ?? CityDataCapabilities(
-            accessibility: .pending, stationEssentials: .pending, stationMap: .pending
+            accessibility: .pending,
+            stationEssentials: .pending,
+            stationMap: .pending,
+            coverage: .empty
         )
     }
 
@@ -39,10 +43,18 @@ struct CityDataCapabilities: Equatable {
         }
         return Dictionary(
             manifest.cities.map { city in
-                (city.cityID, CityDataCapabilities(
-                    accessibility: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility),
-                    stationEssentials: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules),
-                    stationMap: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
+                let coverage = city.coverage ?? .empty
+                return (city.cityID, CityDataCapabilities(
+                    accessibility: coverage.accessibility.status(
+                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility)
+                    ),
+                    stationEssentials: coverage.bestTimesStatus(
+                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules)
+                    ),
+                    stationMap: coverage.externalLayouts.status(
+                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
+                    ),
+                    coverage: coverage
                 ))
             },
             uniquingKeysWith: { first, _ in first }
@@ -50,7 +62,51 @@ struct CityDataCapabilities: Equatable {
     }()
 }
 
-enum CityDataCapabilityStatus: String, Codable {
+struct CityDataCoverage: Codable, Equatable, Sendable {
+    let networkStations: Int
+    let matchedStations: CityCoverageMetric
+    let accessibility: CityCoverageMetric
+    let staticSchedules: CityCoverageMetric
+    let liveArrivals: CityCoverageMetric
+    let externalLayouts: CityCoverageMetric
+    let licensedMedia: CityCoverageMetric
+    let verifiedTransferContexts: CityCoverageMetric
+
+    static let empty = CityDataCoverage(
+        networkStations: 0,
+        matchedStations: .zero,
+        accessibility: .zero,
+        staticSchedules: .zero,
+        liveArrivals: .zero,
+        externalLayouts: .zero,
+        licensedMedia: .zero,
+        verifiedTransferContexts: .zero
+    )
+
+    func bestTimesStatus(fallback: CityDataCapabilityStatus) -> CityDataCapabilityStatus {
+        let best = liveArrivals.covered >= staticSchedules.covered ? liveArrivals : staticSchedules
+        return best.status(fallback: fallback)
+    }
+}
+
+struct CityCoverageMetric: Codable, Equatable, Sendable {
+    let covered: Int
+    let total: Int
+
+    static let zero = CityCoverageMetric(covered: 0, total: 0)
+
+    var displayText: String {
+        total > 0 ? "\(covered)/\(total)" : "0"
+    }
+
+    func status(fallback: CityDataCapabilityStatus = .pending) -> CityDataCapabilityStatus {
+        guard total > 0 else { return fallback }
+        guard covered > 0 else { return .pending }
+        return covered >= total ? .available : .partial
+    }
+}
+
+enum CityDataCapabilityStatus: String, Codable, Sendable {
     case available
     case partial
     case pending
@@ -82,6 +138,7 @@ private struct PackManifest: Decodable {
 private struct PackManifestCity: Decodable {
     let cityID: String
     let capabilities: PackCapabilities
+    let coverage: CityDataCoverage?
 }
 
 private struct PackCapabilities: Decodable {

@@ -3,84 +3,97 @@
 [![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
 [![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
-[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-0071e3?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/E-Rail/JustGo?style=flat&logo=github)](https://github.com/E-Rail/JustGo/stargazers)
-[![Last commit](https://img.shields.io/github/last-commit/E-Rail/JustGo?logo=git&logoColor=white)](https://github.com/E-Rail/JustGo/commits)
+[![License: MIT](https://img.shields.io/badge/software-MIT-green.svg)](LICENSE)
 
-[English](https://github.com/E-Rail/JustGo/blob/main/README.md) | 中文
+[English](README.md) | 中文
 
-**网站：** [e-rail.github.io/justgo](https://e-rail.github.io/justgo)
+JustGo 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路线规划、车站信息和透明的
+数据可信度说明。应用结合内置地铁路线、Apple 地图地点搜索与步行路段、带有明确署名的
+地铁网络几何，以及范围严格受控
+的官方城市数据。缺失的时刻表、车站布局、换乘通道和车门位置会明确显示为不可用，不会推测。
 
-JustGo 是一款面向中国城市轨道交通的“出行信心”应用。它不只告诉你该坐哪条路线，还会在进站前帮助你判断这趟行程是否顺畅、是否容易理解、是否可靠。JustGo 将路线规划、官方时刻表、车站地图、无障碍信息、出入口指引和透明的数据来源标签结合在一起，让每一次出行少一点意外。
+## 内置内容
 
-无障碍不是一个单独模式，而是 JustGo 的设计基准。它让轮椅使用者、老年乘客、游客、携带行李的人、带孩子出行的家庭、第一次坐地铁的人和日常通勤者都能获得更清楚、更安心的体验。
+- Apple 地图地点搜索、步行路线和地图渲染。
+- 58 个目录城市，其中 46 个包含按 ODbL 1.0 单独署名和授权的 OpenStreetMap 地铁网络基础数据，
+  另有 12 个仅保留城市目录信息。
+- 北京和香港两个内置离线城市数据基础包。
+- 香港港铁和轻铁的线路、车站、无障碍及实时查询标识，来源为 DATA.GOV.HK，并适用其
+  自定义重用条款。
+- 通过香港政府交通 API 获取港铁和轻铁实时到站信息，并处理超时、缓存、请求合并和限流。
+- 面向全部 58 个目录城市的内置官方资源目录，包含 330 个已审核的乘客地图、出行、
+  无障碍和帮助链接。
+- 两张内置试点照片：Ian Holton 的建国门照片采用 CC BY 2.0，Qqhhss 的香港中环照片采用
+  CC0 1.0。
+- 从照片或文件导入的私人车站图片，经标准化后仅保存在设备上。
 
-> 地图告诉你往哪里走。JustGo 告诉你这趟行程到底能不能顺利完成。
+当前内置覆盖如下：
 
-## 功能
+| 城市 | 网络车站 | 已匹配 | 无障碍 | 实时到站 | 外部地图 | 媒体 | 已核实换乘 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 北京 | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
+| 香港 | 162 | 162 | 98 | 162 | 0 | 1 | 0 |
 
-- **地铁出行信心规划**：出发前了解路线是否顺畅、是否容易迷路、是否步行较多，或是否存在数据不足
-- **以人为中心的路线模式**：最快、少步行、少换乘、少迷路、适合行李、适合老人、无障碍优先，以及官方数据优先等选择
-- **车站信息**：出入口、车站地图、时刻表、无障碍详情和实用车站上下文
-- **透明的数据可信度**：清楚标注官方数据、Apple 地图路线数据、估算数据、来源待接入字段和不可用的实时数据
-- **通用出行支持**：无台阶信息、VoiceOver 支持、清晰指引和易读界面，帮助所有乘客
-- **MapKit 集成**：原生地点搜索、点到点公交路线、步行步骤和准确路线几何
-- **Apple 地图渲染**：使用原生 MapKit 显示地图和路线覆盖层
-- **官方城市数据包**：在有公开官方来源的城市，下载城市级官方车站数据
+其余 56 个城市数据包处于来源待接入状态，其中 44 个城市保留带署名的网络基础数据，12 个仅有目录信息。
+轨道路线由内置地铁网络计算，不依赖可选城市数据包；Apple 地图用于地点搜索和步行路段。
+应用不会把当前任何城市包描述为可下载内容。
 
-## 要求
+## 官方资源目录
 
-- iOS 18.0+
-- iPadOS 18.0+
-- Xcode 16.0+
-- Swift 5.9+
+链接目录独立于城市数据包：43 个城市至少包含一个已核实官方资源，15 个城市保留带日期的
+“未找到已核实资源”审核结果。330 个链接包括 275 个地图链接、28 个出行链接、6 个无障碍
+链接和 21 个帮助链接。这些链接不计入内置地图、离线内容或已核实换乘指引。
+
+香港部分来自港铁官方网站索引，包括 1 张系统图、98 张独立位置图、98 张独立车站布局图和
+14 张独立轻铁街道图，并包含当前乘客服务页面。澳门的结构化数据仍待接入，但会链接到官方
+路线、票价和客户服务页面。
+
+所有资源都只会在乘客点按后通过系统浏览器打开。JustGo 仅保存事实性 URL 元数据，不会获取、
+内嵌、预览、缓存、预取或再分发运营方网页、PDF 或图片。只有乘客主动选择时，浏览器才可能
+下载链接文件。
+
+## 站内指引
+
+应用保留了站内图引擎、检查点扫描、持久化和 Live Go 接入，以便未来承载经核实的数据。
+当前版本包含 0 个经核实的换乘上下文，也不宣称提供通用 3D 地图、站内路线、上车车厢、
+车门位置或换乘通道。没有经核实指引时，Live Go 会保留普通换乘步骤并明确说明不可用。
 
 ## 设置
 
-1. 克隆仓库
-2. 在 Xcode 中打开 `JustGo.xcworkspace`
-3. 可选：在 `JustGo/Config/Secrets.xcconfig` 中添加 `CITY_PACK_SECRET_BASE_URL = your_public_static_data_url`，以使用你自己的城市数据包托管地址
-4. 开发和 beta 测试时，应用会回退到 jsDelivr 的 GitHub CDN
-5. 构建并运行
+1. 克隆仓库。
+2. 在 Xcode 中打开 `JustGo.xcodeproj`。
+3. 构建 `JustGo` scheme。
 
-应用使用原生 MapKit 进行地点搜索和公交路线规划，因此不需要付费路线 API 密钥。
-丰富的车站无障碍信息、官方时刻表和车站地图资源会在打开城市时按城市数据包下载，不会打包进应用二进制文件。
-城市数据包托管契约见 `DataPacks/README.md`。
+Release 构建默认只使用内置基础数据；只有配置第一方城市数据源后才会启用远程更新。
+Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用明确配置的开发源；
+可通过 `CITY_PACK_SECRET_MAINLAND_MIRROR_URL` 配置第一方中国大陆镜像，本仓库默认未配置镜像。
 
-## 架构
+使用仓库中已经审核并固化的输入重新生成和验证数据：
 
-应用采用 Clean Architecture 与 MVVM：
+```sh
+ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/generate_official_transit_resources.rb
+ruby Scripts/validate_data_rights.rb
+ruby Scripts/validate_city_packs.rb
+ruby Scripts/validate_official_transit_resources.rb
+```
 
-- **Models**：车站、路线和无障碍数据的 SwiftData 模型
-- **Services**：MapKit 提供方、官方城市数据包、定位、无障碍和出行可信度服务
-- **ViewModels**：业务逻辑和状态管理
-- **Views**：基于 SwiftUI 和玻璃质感组件的界面
+数据结构、来源、校验和和授权说明见 [DataPacks/README.md](DataPacks/README.md)、
+[DataPacks/RIGHTS.md](DataPacks/RIGHTS.md) 和
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
-## 支持城市
+## 隐私与联网
 
-只要 Apple 地图提供公交路线，MapKit 就可以支持点到点公交规划。当前清单中已有 9 个城市提供官方数据包下载，用于补充更丰富的车站信息：北京、上海、广州、深圳、成都、重庆、西安、苏州和杭州。
-
-## 通用出行支持
-
-### 行动能力
-- 轮椅无障碍路线规划
-- 电梯状态追踪
-- 无台阶导航
-
-### 视觉支持
-- VoiceOver 支持
-- 盲道信息
-
-### 听觉支持
-- 在可用时显示官方视觉提示信息
-
-### 清晰指引
-- 易读的路线说明
-- 出发前车站摘要
-- 清楚的视觉层级
+- 私人车站媒体保存在 Application Support 中并排除备份，不会用于推断路线、无障碍、
+  站内通道或车门位置。
+- 外部运营方资源只会在用户主动操作后打开。JustGo 不会获取、内嵌、预览、预取、缓存或存储
+  这些网页和文件，也不会把它们计入离线内容；文件下载由乘客使用的浏览器处理。
+- 香港实时到站请求使用官方线路和车站标识访问 `rt.data.gov.hk`，不会包含私人媒体或
+  乘客位置。
+- 应用链接到已发布的[隐私政策](https://e-rail.github.io/justgo/docs/privacy/)和
+  [服务条款](https://e-rail.github.io/justgo/docs/terms/)。
 
 ## 许可证
 
-MIT License - 详见 LICENSE 文件
+JustGo 原创软件源代码采用 MIT 许可证。第三方数据和媒体不包含在 MIT 授权中，其条款记录在
+`DataPacks/rights_inventory.json` 和 `THIRD_PARTY_NOTICES.md`。

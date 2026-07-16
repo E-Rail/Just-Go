@@ -6,6 +6,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     private var pendingLocationContinuations: [UUID: CheckedContinuation<CLLocation, Error>] = [:]
     private var locationRequestGeneration = UUID()
+    /// Screens that need a continuous stream (live navigation) hold a session here; a
+    /// one-shot request resolving must not stop the hardware while a session is active.
+    private var continuousSessionCount = 0
 
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
@@ -80,6 +83,20 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
     }
 
+    /// Keep the location stream running until the matching `endContinuousUpdates()` —
+    /// balanced calls, e.g. from a live-navigation screen's appear/disappear.
+    func beginContinuousUpdates() {
+        continuousSessionCount += 1
+        startUpdatingLocation()
+    }
+
+    func endContinuousUpdates() {
+        continuousSessionCount = max(0, continuousSessionCount - 1)
+        if continuousSessionCount == 0, pendingLocationContinuations.isEmpty {
+            manager.stopUpdatingLocation()
+        }
+    }
+
     /// Warm the location cache with a single fix without leaving continuous updates running.
     /// `requestLocation()` delivers one update (via `didUpdateLocations`) then auto-stops, so
     /// opening a screen that pre-warms doesn't drain the battery. No-op (and no permission
@@ -106,9 +123,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         authorizationStatus = manager.authorizationStatus
 
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            // Only start acquiring when a request is actually waiting — granting permission
-            // alone shouldn't leave a continuous stream running for the app's lifetime.
-            if !pendingLocationContinuations.isEmpty {
+            // Only start acquiring when a request is actually waiting (or a navigation
+            // session is active) — granting permission alone shouldn't leave a continuous
+            // stream running for the app's lifetime.
+            if !pendingLocationContinuations.isEmpty || continuousSessionCount > 0 {
                 startUpdatingLocation()
             }
         } else {
@@ -145,7 +163,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private func finishPendingLocationRequests(with result: Result<CLLocation, Error>) {
         // Tear down the continuous stream once the request(s) it was acquiring for resolve —
         // success, failure, or timeout — so GPS doesn't keep running for the app's lifetime.
-        manager.stopUpdatingLocation()
+        // Unless a live-navigation session holds it open.
+        if continuousSessionCount == 0 {
+            manager.stopUpdatingLocation()
+        }
 
         let continuations = Array(pendingLocationContinuations.values)
         pendingLocationContinuations.removeAll()
@@ -163,7 +184,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private func cancelPendingLocationRequest(_ requestID: UUID) {
         guard let continuation = pendingLocationContinuations.removeValue(forKey: requestID) else { return }
         continuation.resume(throwing: CancellationError())
-        if pendingLocationContinuations.isEmpty {
+        if pendingLocationContinuations.isEmpty, continuousSessionCount == 0 {
             manager.stopUpdatingLocation()
         }
     }

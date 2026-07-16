@@ -22,13 +22,62 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate source, data, and rights
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --check "${{ github.event.pull_request.base.sha }}...HEAD"
+          elif git cat-file -e "${{ github.event.before }}^{commit}" 2>/dev/null; then
+            git diff --check "${{ github.event.before }}..HEAD"
+          else
+            git diff --check HEAD^
+          fi
+          ruby Scripts/test_oss_city_pack_pipeline.rb
+          ruby Scripts/test_oss_data_validators.rb
+          ruby Scripts/test_official_transit_resource_importer.rb
+          ruby Scripts/test_official_transit_resource_catalog.rb
+          ruby Scripts/import_osm_metro_geometry.rb --self-test
+          ruby Scripts/import_licensed_station_media.rb
+          ruby Scripts/validate_data_rights.rb --history
+          ruby Scripts/validate_runtime_data_policy.rb
+          ruby Scripts/validate_official_transit_resources.rb
+          ruby Scripts/validate_city_packs.rb
+          ruby Scripts/validate_schedule_colors.rb
+          ruby Scripts/validate_localizations.rb
+          ruby Scripts/validate_metro_networks.rb
+          ruby Scripts/validate_indoor_maps.rb
+          bash Scripts/check_no_legacy_map_provider.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_personal_station_media.sh
+
+      - name: Verify deterministic generated data
+        run: |
+          ruby Scripts/generate_city_pack_manifest.rb
+          ruby Scripts/generate_city_pack_manifest.rb
+          ruby Scripts/generate_official_transit_resources.rb
+          ruby Scripts/generate_official_transit_resources.rb
+          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json JustGo/Resources/BundledCityPacks
 
       - name: Build for iOS Simulator
         run: |
-          xcodebuild build \
+          xcodebuild clean build \
             -project JustGo.xcodeproj \
             -scheme JustGo \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Build Release policy configuration
+        run: |
+          xcodebuild build \
+            -project JustGo.xcodeproj \
+            -scheme JustGo \
+            -configuration Release \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData-Release" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO

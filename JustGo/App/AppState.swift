@@ -14,7 +14,7 @@ final class AppState {
         let role: RouteInputField
         /// The place's home city when the sender knows it (station-originated inputs);
         /// nil for map POIs, which carry no city. The planner switches to this city on
-        /// apply so a cross-city favorite doesn't plan against the wrong network.
+        /// apply so a cross-city quick tag doesn't plan against the wrong network.
         let cityID: String?
     }
     var pendingRouteInput: PendingRouteInput?

@@ -1,14 +1,17 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require "set"
+
 ROOT = File.expand_path("..", __dir__)
 LOCALES = %w[en zh-Hans zh-Hant].freeze
 REQUIRED_INFO_KEYS = %w[
   NSLocationWhenInUseUsageDescription
-  NSLocationAlwaysAndWhenInUseUsageDescription
+  NSCameraUsageDescription
 ].freeze
 ENTRY_PATTERN = /^\s*"((?:\\.|[^"])*)"\s*=\s*"((?:\\.|[^"])*)";\s*$/
 PLACEHOLDER_PATTERN = /%(?:\d+\$)?[@dfius]/
+LITERAL_LOCALIZATION_PATTERN = /AppLocalization\.localized\(\s*"((?:\\.|[^"])*)"\s*\)/m
 SWIFT_DIR = File.join(ROOT, "JustGo")
 VISIBLE_LITERAL_PATTERN = /
   \b(?:Text|Label|Button|Section|Picker|Toggle|ContentUnavailableView)\s*\(\s*"([^"]*[A-Za-z][^"]*)" |
@@ -77,18 +80,27 @@ end
 
 swift_files = Dir[File.join(SWIFT_DIR, "**", "*.swift")]
 english_keys = localizations.fetch("en")
+used_localization_keys = Set.new
 
 swift_files.each do |path|
+  source = File.read(path)
+
+  source.to_enum(:scan, LITERAL_LOCALIZATION_PATTERN).each do
+    match = Regexp.last_match
+    key = match[1]
+    line_number = source[0...match.begin(0)].count("\n") + 1
+    fail_with("#{path}:#{line_number} uses missing localization key #{key.inspect}") unless english_keys.key?(key)
+    used_localization_keys << key
+  end
+
+  source.to_enum(:scan, DYNAMIC_LOCALIZATION_PATTERN).each do
+    match = Regexp.last_match
+    line_number = source[0...match.begin(0)].count("\n") + 1
+    fail_with("#{path}:#{line_number} uses dynamic localization key #{match[1]}")
+  end
+
   property_depth = nil
-  File.foreach(path).with_index(1) do |line, line_number|
-    line.scan(/AppLocalization\.localized\(\s*"((?:\\.|[^"])*)"\s*\)/).flatten.each do |key|
-      fail_with("#{path}:#{line_number} uses missing localization key #{key.inspect}") unless english_keys.key?(key)
-    end
-
-    if (match = line.match(DYNAMIC_LOCALIZATION_PATTERN))
-      fail_with("#{path}:#{line_number} uses dynamic localization key #{match[1]}")
-    end
-
+  source.each_line.with_index(1) do |line, line_number|
     line.scan(VISIBLE_LITERAL_PATTERN).each do |captures|
       literal = captures.compact.first
       next if literal.include?("\\(")
@@ -109,6 +121,9 @@ swift_files.each do |path|
     property_depth = nil if property_depth <= 0
   end
 end
+
+unused_keys = reference_keys.reject { |key| used_localization_keys.include?(key) }
+fail_with("Localizable.strings contains unused keys: #{unused_keys.inspect}") unless unused_keys.empty?
 
 localization_source = File.read(File.join(SWIFT_DIR, "Core", "Localization.swift"))
 unless localization_source.scan(/AppLocalization\.isChinese\s*\?\s*nil\s*:\s*name/).length == 3

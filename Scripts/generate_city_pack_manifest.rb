@@ -1,69 +1,28 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "digest"
-require "json"
-require "time"
+require "optparse"
+require_relative "lib/oss_city_pack_pipeline"
 
-ROOT = File.expand_path("..", __dir__)
-DATA_PACKS_DIR = File.join(ROOT, "DataPacks")
-OUTPUT_PATH = File.join(DATA_PACKS_DIR, "manifest.json")
-PRIMARY_HOST = nil
-
-def city_pack_entry(city_id)
-  pack_dirs = Dir.glob(File.join(DATA_PACKS_DIR, "packs", city_id, "*"))
-    .select { |path| File.directory?(path) }
-    .sort
-  latest_dir = pack_dirs.last
-  return nil unless latest_dir
-
-  pack_path = File.join(latest_dir, "city_pack.json")
-  return nil unless File.exist?(pack_path)
-
-  data = File.binread(pack_path)
-  pack = JSON.parse(data)
-  version = File.basename(latest_dir)
-  capabilities = pack.fetch("capabilities")
-  {
-    "cityID" => city_id,
-    "version" => version,
-    "sizeBytes" => data.bytesize,
-    "sha256" => Digest::SHA256.hexdigest(data),
-    "downloadURL" => "packs/#{city_id}/#{version}/city_pack.json",
-    "sourceURLs" => pack.fetch("sourceURLs", []),
-    "capabilities" => capabilities
-  }
-end
-
-existing_ids = if File.exist?(OUTPUT_PATH)
-  JSON.parse(File.read(OUTPUT_PATH)).fetch("cities", []).map { |city| city.fetch("cityID") }
-else
-  []
-end
-pack_ids = Dir.glob(File.join(DATA_PACKS_DIR, "packs", "*")).select { |path| File.directory?(path) }.map { |path| File.basename(path) }
-city_ids = existing_ids + (pack_ids - existing_ids).sort
-manifest = {
-  "schemaVersion" => 1,
-  "generatedAt" => Time.now.utc.iso8601,
-  "primaryHost" => PRIMARY_HOST,
-  "cities" => city_ids.map do |city_id|
-    city_pack_entry(city_id) || {
-      "cityID" => city_id,
-      "version" => "source-pending",
-      "sizeBytes" => 0,
-      "sha256" => nil,
-      "downloadURL" => nil,
-      "sourceURLs" => [],
-      "capabilities" => {
-        "accessibility" => "source_pending",
-        "schedules" => "source_pending",
-        "liveArrivals" => "source_pending",
-        "stationMaps" => "source_pending"
-      }
-    }
-  end
+options = {
+  snapshot_dir: "/private/tmp",
+  refresh_sources: false
 }
+OptionParser.new do |parser|
+  parser.banner = "Usage: generate_city_pack_manifest.rb [options]"
+  parser.on("--snapshot-dir DIR", "Directory containing the four justgo-*.csv snapshots") do |value|
+    options[:snapshot_dir] = value
+  end
+  parser.on("--refresh-sources", "Replace vendored CSVs from --snapshot-dir") do
+    options[:refresh_sources] = true
+  end
+end.parse!
 
-Dir.mkdir(DATA_PACKS_DIR) unless Dir.exist?(DATA_PACKS_DIR)
-File.write(OUTPUT_PATH, "#{JSON.pretty_generate(manifest)}\n")
-puts "Wrote #{OUTPUT_PATH} (#{manifest["cities"].length} cities)"
+builder = OSSCityPackPipeline::Builder.new(snapshot_dir: options.fetch(:snapshot_dir))
+summary = builder.run(refresh_sources: options.fetch(:refresh_sources))
+puts "OSS city-pack build complete: " \
+  "catalog=#{summary.fetch(:city_count)} " \
+  "bundled=#{summary.fetch(:bundled_city_count)} " \
+  "beijing=#{summary.fetch(:beijing_station_count)} " \
+  "hong_kong=#{summary.fetch(:hong_kong_station_count)} " \
+  "accessibility_source_groups=#{summary.fetch(:hong_kong_accessibility_source_groups)}"

@@ -19,6 +19,18 @@ Data provider: MTR Corporation Limited. Distribution portal: DATA.GOV.HK. Reuse 
 by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
 https://data.gov.hk/en/terms-and-conditions
 
+## Official Transit Resource Links
+
+The bundled official-resource catalog contains reviewed factual link metadata for transit
+operators and government transport authorities. Linked pages, PDFs, and images remain with
+their providers. JustGo opens them in the system browser only after user action and does not
+copy, fetch, preview, cache, or prefetch their content.
+
+Hong Kong map metadata is reviewed from the official MTR System Map and Light Rail Street
+Map indexes:
+https://www.mtr.com.hk/en/customer/services/system_map.html
+https://www.mtr.com.hk/en/customer/services/stmap_index.html
+
 ## Jianguomen Station Photo
 
 Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.

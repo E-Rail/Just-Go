@@ -23,23 +23,39 @@ shown as unavailable rather than inferred.
   DATA.GOV.HK under its custom reuse terms.
 - Official Hong Kong live arrivals from the government transport API, with timeout, cache,
   request-coalescing, and rate-limit handling.
-- Official operator landing-page links that open only after a rider taps them.
+- A bundled official-resource directory for all 58 catalog cities, with 330 reviewed links to
+  rider-facing maps, travel information, accessibility resources, and help pages.
 - Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
   Qqhhss under CC0 1.0.
 - Private station images imported from Photos or Files, normalized and stored only on-device.
 
 The current bundled coverage is:
 
-| City | Network | Matched | Accessibility | Live arrivals | Layout links | Media | Verified transfers |
+| City | Network | Matched | Accessibility | Live arrivals | External maps | Media | Verified transfers |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Beijing | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
-| Hong Kong | 162 | 162 | 98 | 162 | 98 | 1 | 0 |
+| Hong Kong | 162 | 162 | 98 | 162 | 0 | 1 | 0 |
 
-The other 56 catalog cities are source-pending. Of those, 44 retain an attributed network
+The other 56 city packs are source-pending. Of those cities, 44 retain an attributed network
 baseline and 12 are catalog-only. Included metro topology powers rail routing independently of
-optional city-pack details; Apple Maps supplies place search and walking legs.
-No current city pack is presented as downloadable. Macau remains source-pending and exposes only
-the official Macao Light Rapid Transit homepage as a tap-only operator link.
+optional city-pack details; Apple Maps supplies place search and walking legs. No current city
+pack is presented as downloadable.
+
+## Official Resource Directory
+
+The link catalog is independent of city packs: 43 cities have at least one verified official
+resource and 15 carry an explicit dated no-resource review. Its 330 links comprise 275 map links,
+28 travel links, 6 accessibility links, and 21 help links. Links do not count as bundled maps,
+offline content, or verified transfer guidance.
+
+Hong Kong contributes 1 system map, 98 distinct Location Maps, 98 distinct Station Layouts, and
+14 distinct Light Rail Street Maps from the official MTR indexes, plus current rider-service
+pages. Macau remains source-pending for structured data but links to its official route, fare,
+and customer-service pages.
+
+Every resource opens through the system browser after a rider taps it. JustGo stores factual URL
+metadata only: it does not fetch, render, preview, cache, prefetch, or redistribute operator pages,
+PDFs, or images. A browser may download a linked file only if the rider chooses to do so.
 
 ## Indoor Guidance
 
@@ -63,8 +79,10 @@ Regenerate and validate data from the vendored, reviewed inputs:
 
 ```sh
 ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/generate_official_transit_resources.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
+ruby Scripts/validate_official_transit_resources.rb
 ```
 
 See [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md), and
@@ -75,8 +93,9 @@ license treatment.
 
 - Personal station media stays in Application Support, is excluded from backup, and is never
   used to infer routing, accessibility, indoor paths, or doors.
-- External operator resources open only after a user action. JustGo does not render, prefetch,
-  cache, or count those pages as offline content.
+- External operator resources open only after a user action. JustGo does not fetch, render,
+  preview, prefetch, cache, store, or count those pages and files as offline content. Any file
+  download is handled by the rider's browser.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)

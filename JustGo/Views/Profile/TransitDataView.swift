@@ -4,7 +4,8 @@ import SwiftUI
 private final class TransitDataState: ObservableObject {
     @Published var packStatus: [String: CityPackLoadStatus] = [:]
     @Published var coverage: [String: CityDataCoverage] = [:]
-    @Published var cityResources: [String: [ExternalTransitResource]] = [:]
+    @Published var officialResourceCities: [OfficialTransitResourceCity] = []
+    @Published var didLoadOfficialResources = false
     @Published var downloading: Set<String> = []
     @Published var opCompletedCityIDs: Set<String> = []
 }
@@ -41,6 +42,55 @@ struct TransitDataView: View {
                 }
 
                 Section {
+                    if state.officialResourceCities.isEmpty && !state.didLoadOfficialResources {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    } else if state.officialResourceCities.isEmpty {
+                        Label(
+                            AppLocalization.text(
+                                english: "Official resource catalog unavailable",
+                                simplified: "官方资源目录不可用",
+                                traditional: "官方資源目錄不可用"
+                            ),
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .foregroundStyle(.secondary)
+                    } else {
+                        NavigationLink {
+                            OfficialResourcesDirectoryView(cities: state.officialResourceCities)
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "link")
+                                    .foregroundStyle(Color.accentColor)
+                                    .frame(width: 24)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(AppLocalization.text(
+                                        english: "Official Resources",
+                                        simplified: "官方资源",
+                                        traditional: "官方資源"
+                                    ))
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                    Text(AppLocalization.text(
+                                        english: "Maps, travel information, accessibility, and help for 58 reviewed cities",
+                                        simplified: "58 个已审核城市的地图、出行信息、无障碍服务与帮助",
+                                        traditional: "58 個已審核城市的地圖、出行資訊、無障礙服務與協助"
+                                    ))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                } footer: {
+                    Text(AppLocalization.text(
+                        english: "Links open official operator pages in your browser. JustGo does not download or verify their files as indoor guidance.",
+                        simplified: "链接会在浏览器中打开运营方官网。JustGo 不会下载这些文件，也不会将其视为站内指引。",
+                        traditional: "連結會在瀏覽器中開啟營運方官網。JustGo 不會下載這些檔案，也不會將其視為站內指引。"
+                    ))
+                }
+
+                Section {
                     dataCapabilityRow(
                         icon: "map.fill",
                         title: AppLocalization.localized("Map, station search, and routes"),
@@ -73,9 +123,9 @@ struct TransitDataView: View {
                             traditional: "車站佈局與媒體"
                         ),
                         detail: AppLocalization.text(
-                            english: "Official landing links, licensed media, and private on-device photos are kept separate",
-                            simplified: "官方页面链接、许可媒体与设备上的私人照片分别管理",
-                            traditional: "官方頁面連結、授權媒體與裝置上的私人照片分別管理"
+                            english: "Official browser links, licensed media, and private on-device photos are kept separate",
+                            simplified: "官方浏览器链接、许可媒体与设备上的私人照片分别管理",
+                            traditional: "官方瀏覽器連結、授權媒體與裝置上的私人照片分別管理"
                         )
                     )
                 } header: {
@@ -124,9 +174,6 @@ struct TransitDataView: View {
                                 CityCapabilityTags(
                                     coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage
                                 )
-                                ForEach(state.cityResources[city.id] ?? []) { resource in
-                                    cityResourceLink(resource)
-                                }
                             }
                             Spacer()
                             cityPackControl(for: city)
@@ -227,9 +274,13 @@ struct TransitDataView: View {
     private func refreshPackStatuses() async {
         state.opCompletedCityIDs = []
         let cityIDs = cities.map(\.id)
-        let statuses = await container.officialStationData.cityPackStatuses(for: cityIDs)
-        let coverage = await container.officialStationData.cityDataCoverage(for: cityIDs)
-        let resources = await container.officialStationData.cityExternalResources(for: cityIDs)
+        async let statusLoad = container.officialStationData.cityPackStatuses(for: cityIDs)
+        async let coverageLoad = container.officialStationData.cityDataCoverage(for: cityIDs)
+        async let resourceLoad = container.officialStationData.officialResourceCatalogCities()
+        state.officialResourceCities = await resourceLoad
+        state.didLoadOfficialResources = true
+        let statuses = await statusLoad
+        let coverage = await coverageLoad
         // Merge per city, skipping any the user operated on while this snapshot was in
         // flight (completed ops wrote fresher statuses; in-flight ones will).
         var updatedStatuses = state.packStatus
@@ -240,7 +291,6 @@ struct TransitDataView: View {
         }
         state.packStatus = updatedStatuses
         state.coverage = coverage
-        state.cityResources = resources
     }
 
     private func isDownloadedStatus(_ status: CityPackLoadStatus?) -> Bool {
@@ -292,26 +342,6 @@ struct TransitDataView: View {
         .padding(.vertical, 3)
     }
 
-    @ViewBuilder
-    private func cityResourceLink(_ resource: ExternalTransitResource) -> some View {
-        if let url = resource.url {
-            Link(destination: url) {
-                Label {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(resource.title)
-                            .font(.caption)
-                        Text(resource.provider)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                } icon: {
-                    Image(systemName: "safari")
-                }
-                .foregroundStyle(Color.accentColor)
-            }
-        }
-    }
-
     private func attributionLink(title: String, detail: String, url: URL) -> some View {
         Link(destination: url) {
             HStack(spacing: 12) {
@@ -332,6 +362,242 @@ struct TransitDataView: View {
                     .foregroundStyle(.secondary)
             }
             .contentShape(Rectangle())
+        }
+    }
+}
+
+struct OfficialResourcesDirectoryView: View {
+    let cities: [OfficialTransitResourceCity]
+    @State private var searchText = ""
+
+    private var filteredCities: [OfficialTransitResourceCity] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return cities }
+        return cities.filter { city in
+            city.localizedName.localizedCaseInsensitiveContains(query) ||
+                city.name.localizedCaseInsensitiveContains(query) ||
+                city.nameEn.localizedCaseInsensitiveContains(query) ||
+                city.allResources.contains { resource in
+                    resource.provider.localizedCaseInsensitiveContains(query) ||
+                        resource.kind.localizedTitle.localizedCaseInsensitiveContains(query)
+                } ||
+                city.stationResources.contains { station in
+                    station.localizedName.localizedCaseInsensitiveContains(query) ||
+                        station.stationName.localizedCaseInsensitiveContains(query) ||
+                        station.stationNameEn.localizedCaseInsensitiveContains(query)
+                }
+        }
+    }
+
+    var body: some View {
+        List {
+            ForEach(filteredCities) { city in
+                NavigationLink {
+                    OfficialResourceCityView(city: city)
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(city.localizedName)
+                            .font(.body)
+                            .fontWeight(.medium)
+                        HStack(spacing: 6) {
+                            resourceCountBadge(
+                                icon: "map",
+                                count: city.coverage.maps
+                            )
+                            resourceCountBadge(
+                                icon: "tram.fill",
+                                count: city.coverage.travel
+                            )
+                            resourceCountBadge(
+                                icon: "accessibility",
+                                count: city.coverage.accessibility
+                            )
+                            resourceCountBadge(
+                                icon: "questionmark.circle",
+                                count: city.coverage.help
+                            )
+                        }
+                        if city.reviewStatus == .noVerifiedOfficialResource {
+                            Text(AppLocalization.text(
+                                english: "No verified official rider resource found in the latest review",
+                                simplified: "最近一次审核未找到可核实的官方乘客资源",
+                                traditional: "最近一次審核未找到可核實的官方乘客資源"
+                            ))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 3)
+                }
+            }
+        }
+        .overlay {
+            if filteredCities.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+        .navigationTitle(AppLocalization.text(
+            english: "Official Resources",
+            simplified: "官方资源",
+            traditional: "官方資源"
+        ))
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(
+            text: $searchText,
+            prompt: AppLocalization.text(
+                english: "City, station, or provider",
+                simplified: "城市、车站或运营方",
+                traditional: "城市、車站或營運方"
+            )
+        )
+    }
+
+    private func resourceCountBadge(icon: String, count: Int) -> some View {
+        Label("\(count)", systemImage: icon)
+            .font(.caption2)
+            .foregroundStyle(count == 0 ? Color.secondary : Color.accentColor)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(Color.secondary.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
+private struct OfficialResourcePresentation: Identifiable {
+    let resource: ExternalTransitResource
+    let stationName: String?
+
+    var id: String { "\(stationName ?? "city")|\(resource.id)" }
+}
+
+private struct OfficialResourceCityView: View {
+    let city: OfficialTransitResourceCity
+
+    private var presentations: [OfficialResourcePresentation] {
+        city.resources.map { OfficialResourcePresentation(resource: $0, stationName: nil) } +
+            city.stationResources.flatMap { station in
+                station.resources.map {
+                    OfficialResourcePresentation(resource: $0, stationName: station.localizedName)
+                }
+            }
+    }
+
+    var body: some View {
+        List {
+            if city.reviewStatus == .noVerifiedOfficialResource {
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(
+                            english: "No Verified Official Links",
+                            simplified: "暂无已核实的官方链接",
+                            traditional: "暫無已核實的官方連結"
+                        ),
+                        systemImage: "link.badge.plus"
+                    )
+                } description: {
+                    Text(city.reviewNote ?? "")
+                }
+            } else {
+                ForEach(ExternalTransitResourceKind.Group.allCases) { group in
+                    let items = presentations
+                        .filter { $0.resource.kind.group == group }
+                        .sorted {
+                            ($0.stationName ?? $0.resource.title).localizedStandardCompare(
+                                $1.stationName ?? $1.resource.title
+                            ) == .orderedAscending
+                        }
+                    if !items.isEmpty {
+                        Section(group.title) {
+                            ForEach(items) { item in
+                                OfficialTransitResourceLink(
+                                    resource: item.resource,
+                                    stationName: item.stationName
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Section {
+                Text(AppLocalization.text(
+                    english: "Reviewed \(city.verifiedAt). External maps remain operator content and do not establish a verified indoor path or door position in JustGo.",
+                    simplified: "审核日期：\(city.verifiedAt)。外部地图仍属于运营方内容，并不代表 JustGo 已核实站内路径或车门位置。",
+                    traditional: "審核日期：\(city.verifiedAt)。外部地圖仍屬於營運方內容，並不代表 JustGo 已核實站內路徑或車門位置。"
+                ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle(city.localizedName)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct OfficialTransitResourceLink: View {
+    let resource: ExternalTransitResource
+    var stationName: String? = nil
+    var compact = false
+
+    private var displayTitle: String {
+        guard let stationName else { return resource.kind.localizedTitle }
+        return "\(stationName) · \(resource.kind.localizedTitle)"
+    }
+
+    var body: some View {
+        if let url = resource.url {
+            Link(destination: url) {
+                HStack(alignment: .center, spacing: 10) {
+                    Image(systemName: iconName)
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 22)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(displayTitle)
+                            .font(compact ? .caption : .subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+                        HStack(spacing: 5) {
+                            Text(resource.format.badgeTitle)
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1)
+                                .background(Color.secondary.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 3))
+                            Text(resource.provider)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(compact ? 1 : 2)
+                        }
+                    }
+                    Spacer(minLength: 4)
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                }
+                .contentShape(Rectangle())
+            }
+            .accessibilityLabel(AppLocalization.text(
+                english: "\(displayTitle), \(resource.format.badgeTitle), opens \(resource.provider) in your browser",
+                simplified: "\(displayTitle)，\(resource.format.badgeTitle)，在浏览器中打开 \(resource.provider)",
+                traditional: "\(displayTitle)，\(resource.format.badgeTitle)，在瀏覽器中開啟 \(resource.provider)"
+            ))
+        }
+    }
+
+    private var iconName: String {
+        switch resource.kind.group {
+        case .maps:
+            return "map"
+        case .travel:
+            return "tram.fill"
+        case .accessibility:
+            return "accessibility"
+        case .help:
+            return "questionmark.circle"
         }
     }
 }
@@ -358,7 +624,7 @@ struct CityCapabilityTags: View {
                 metric: coverage.liveArrivals
             )
             coverageTag(
-                title: AppLocalization.text(english: "Layout links", simplified: "布局链接", traditional: "佈局連結"),
+                title: AppLocalization.text(english: "Offline maps", simplified: "离线地图", traditional: "離線地圖"),
                 metric: coverage.externalLayouts
             )
             coverageTag(

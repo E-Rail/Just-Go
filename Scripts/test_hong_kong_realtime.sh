@@ -23,6 +23,7 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-hong-kong-realtime" \
+    "$ROOT/JustGo/Core/Logging.swift" \
     "$ROOT/JustGo/Models/Transit/RealTimeArrival.swift" \
     "$ROOT/JustGo/Services/Transit/HongKongRealtimeArrivalProvider.swift" \
     "$ROOT/Scripts/test_hong_kong_realtime.swift"

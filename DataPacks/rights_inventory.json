@@ -61,6 +61,16 @@
       "redistribution": "Only factual link metadata is bundled. Linked content remains with its provider."
     },
     {
+      "id": "official-transit-resource-links",
+      "kind": "linkMetadata",
+      "scope": "Reviewed HTTPS target URLs, source-page URLs, providers, formats, scopes, and verification dates in the official transit resource catalog",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.mtr.com.hk/en/customer/services/system_map.html",
+      "sourceURL": "https://www.mtr.com.hk/en/customer/services/system_map.html",
+      "attribution": "Official transit operators and government transport authorities identified per catalog record",
+      "redistribution": "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
+    },
+    {
       "id": "media-jianguomen-ian-holton",
       "kind": "mediaMetadata",
       "scope": "LicensedMedia/beijing-jianguomen.jpg",
@@ -116,6 +126,15 @@
       ]
     },
     {
+      "path": "DataPacks/official_transit_resources.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
       "path": "DataPacks/rights_inventory.json",
       "rightsIDs": [
         "justgo-generated-catalog"
@@ -150,6 +169,23 @@
       "path": "DataPacks/sources/8100/mtr_lines_and_stations.csv",
       "rightsIDs": [
         "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/hong_kong_index.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
+      "rightsIDs": [
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "osm-metro-networks"
       ]
     },
     {

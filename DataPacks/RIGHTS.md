@@ -23,22 +23,31 @@ The exact source URLs, byte counts, CSV record counts, and SHA-256 checksums are
 their DATA.GOV.HK landing pages and MTR data dictionaries, plus the explicit `EAL/RAC`
 Racecourse binding. The generated `DataLicenseMetadata` contract records the terms
 URL, attribution, snapshot date, and official terms page used as redistribution evidence.
-Generated Hong Kong JSON contains only the fields needed for
-canonical matching, accessibility, official live lookup identifiers, and official layout
-landing links. It contains no static schedules.
+Generated Hong Kong JSON contains only the fields needed for canonical matching,
+accessibility, official live lookup identifiers, and schema-compatibility link fields. Runtime
+code ignores city-pack links and trusts only the separately reviewed bundled resource catalog.
+It contains no static schedules.
 
 This inventory is a conservative engineering control, not a legal guarantee. Custom or
 ambiguous terms require legal review before new data is bundled.
 
-## Official Landing Links
+## Official External Resource Links
 
-Beijing content is limited to canonical OpenStreetMap station identity plus HTTPS links to
-official Beijing Subway and Beijing MTR landing pages. No page text, station facts, maps,
-PDFs, images, or schedules are copied. Hong Kong layout resources likewise point to the MTR
-system-map landing page rather than directly to layout PDFs.
+`official_transit_resources.json` contains factual URL metadata only: exact target and source-page
+URLs, provider, city or station scope, format, and review date. Its 58 dated city reviews currently
+contain 330 links across 43 cities and explicit no-resource results for the other 15. No linked
+page, PDF, or image is copied into the repository or app bundle.
 
-Macau remains source-pending. Its catalog entry contains only the official Macao Light Rapid
-Transit Corporation homepage (`https://www.mlm.com.mo/en/`) as a user-initiated external link.
+Hong Kong's refresh-only developer importer reads the official MTR System Map and Light Rail
+Street Map indexes and stores URL metadata, not document contents. The catalog exposes 1 system
+map, 98 Location Maps, 98 Station Layouts, and 14 Light Rail Street Maps, all hosted by MTR. Macau
+remains source-pending for structured data and exposes official route, fare, and customer-service
+links.
+
+Resources open only after a user taps an ordinary system-browser link. JustGo does not fetch,
+preview, cache, prefetch, or store operator content, and external maps do not count as offline
+coverage or evidence of an indoor path or door position. Browser downloads remain the user's
+choice. Hyperlinking is a conservative engineering policy, not a legal guarantee.
 
 ## Pilot Media
 

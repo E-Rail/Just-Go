@@ -69,7 +69,7 @@ class OSSCityPackPipelineTest < Minitest::Test
         "accessibility" => { "covered" => 98, "total" => 162 },
         "staticSchedules" => { "covered" => 0, "total" => 162 },
         "liveArrivals" => { "covered" => 162, "total" => 162 },
-        "externalLayouts" => { "covered" => 98, "total" => 162 },
+        "externalLayouts" => { "covered" => 0, "total" => 162 },
         "licensedMedia" => { "covered" => 1, "total" => 162 },
         "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
       },

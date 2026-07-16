@@ -2657,8 +2657,8 @@
     {
       "cityID": "8100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 741161,
-      "sha256": "3fec125564c10ebf26a93b9f388b6801fa63b50fd89d5680aedb590cc41bbe28",
+      "sizeBytes": 741160,
+      "sha256": "f65410df953d90582a0b1868049aaf89940411966cdc642b3e7cab7cb81772ae",
       "bundledResource": "BundledCityPacks/8100.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -2696,7 +2696,7 @@
           "total": 162
         },
         "externalLayouts": {
-          "covered": 98,
+          "covered": 0,
           "total": 162
         },
         "licensedMedia": {

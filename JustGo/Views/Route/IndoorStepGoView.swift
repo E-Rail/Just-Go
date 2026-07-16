@@ -42,6 +42,7 @@ struct IndoorStepGoView: View {
     let routeEdgeIDs: [String]
     let transferContext: TransferContext?
     let boardingZoneGuidance: IndoorBoardingZoneGuidance?
+    let externalResources: [ExternalTransitResource]
     let onComplete: (() -> Void)?
     let onBack: (() -> Void)?
 
@@ -68,6 +69,7 @@ struct IndoorStepGoView: View {
         destinationLineName: String?,
         transferContext: TransferContext? = nil,
         boardingZoneGuidance: IndoorBoardingZoneGuidance? = nil,
+        externalResources: [ExternalTransitResource] = [],
         onComplete: (() -> Void)? = nil,
         onBack: (() -> Void)? = nil
     ) {
@@ -78,6 +80,7 @@ struct IndoorStepGoView: View {
         self.routeEdgeIDs = routeEdgeIDs
         self.transferContext = transferContext
         self.boardingZoneGuidance = boardingZoneGuidance
+        self.externalResources = externalResources
         self.onComplete = onComplete
         self.onBack = onBack
         _viewModel = State(initialValue: IndoorStepGoViewModel(
@@ -135,6 +138,9 @@ struct IndoorStepGoView: View {
     private var walkthroughContent: some View {
         VStack(spacing: 0) {
             disclaimerBanner
+            if externalResources.contains(where: { $0.kind.isTransferRelevant }) {
+                externalResourceRail
+            }
             if let boardingZoneGuidance {
                 boardingZoneBanner(boardingZoneGuidance)
             }
@@ -153,6 +159,41 @@ struct IndoorStepGoView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
+    }
+
+    private var externalResourceRail: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(externalResources.filter(\.kind.isTransferRelevant)) { resource in
+                    if let url = resource.url {
+                        Link(destination: url) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.up.right.square")
+                                    .accessibilityHidden(true)
+                                Text(resource.kind.localizedTitle)
+                                    .lineLimit(1)
+                                Text(resource.format.badgeTitle)
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                            }
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .frame(minHeight: 36)
+                            .background(Color.secondary.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                        .accessibilityLabel(AppLocalization.text(
+                            english: "\(resource.kind.localizedTitle), opens \(resource.provider) in your browser",
+                            simplified: "\(resource.kind.localizedTitle)，在浏览器中打开 \(resource.provider)",
+                            traditional: "\(resource.kind.localizedTitle)，在瀏覽器中開啟 \(resource.provider)"
+                        ))
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.vertical, 6)
+        .background(Color.appBackground)
     }
 
     /// This remains visible throughout the walkthrough because verified static topology is not

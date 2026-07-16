@@ -124,6 +124,27 @@ class OSSDataValidatorsTest < Minitest::Test
     assert_match(%r{DataPacks/packs content is forbidden}, error.message)
   end
 
+  def test_history_check_ignores_parent_data_packs_trees
+    initialize_fixture_repository
+
+    assert rights_validator.validate_history!
+  end
+
+  def test_history_check_rejects_removed_legacy_pack_objects
+    initialize_fixture_repository
+    path = File.join(@root, "DataPacks", "packs", "legacy.json")
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, "{}\n")
+    git("add", "DataPacks/packs/legacy.json")
+    git("commit", "-m", "add legacy pack")
+    FileUtils.rm_rf(File.join(@root, "DataPacks", "packs"))
+    git("add", "-A")
+    git("commit", "-m", "remove legacy pack")
+
+    error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate_history! }
+    assert_match(/Git history still contains DataPacks\/packs objects/, error.message)
+  end
+
   def test_rejects_incorrect_rights_assignment
     inventory = read_json("DataPacks/rights_inventory.json")
     entry = inventory.fetch("files").find do |item|
@@ -167,6 +188,18 @@ class OSSDataValidatorsTest < Minitest::Test
 
   def rights_validator
     OSSDataValidators::RightsValidator.new(root: @root)
+  end
+
+  def initialize_fixture_repository
+    git("init")
+    git("config", "user.email", "tests@example.com")
+    git("config", "user.name", "JustGo Tests")
+    git("add", ".")
+    git("commit", "-m", "fixture")
+  end
+
+  def git(*arguments)
+    system("git", *arguments, chdir: @root, out: File::NULL, err: File::NULL, exception: true)
   end
 
   def city_validator

@@ -74,13 +74,23 @@ struct TransferStationSheet: View {
                     routeEdgeIDs: transferPath.routeEdgeIDs,
                     destinationLineName: nextTransitSegment?.lineName,
                     transferContext: transferSegment.transferContext,
-                    boardingZoneGuidance: boardingZoneGuidance
+                    boardingZoneGuidance: boardingZoneGuidance,
+                    externalResources: externalResources
                 )
             }
         }
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }
+            let initialLookupStation = Station(
+                stationID: transferSegment.toStationID ?? stationName,
+                name: stationName,
+                nameEn: nil,
+                latitude: transferStopCoordinate?.latitude ?? 0,
+                longitude: transferStopCoordinate?.longitude ?? 0,
+                cityID: cityID
+            )
+            async let initialResourceLoad = container.officialStationData.externalResources(for: initialLookupStation)
             // Match only when the route carries the real transfer-station coordinate
             // (provider-built routes always do). With a (0,0) placeholder, same-named
             // stations disambiguate by distance to Null Island and pick an arbitrary one —
@@ -101,15 +111,13 @@ struct TransferStationSheet: View {
                     cityID: cityID,
                     stationNames: [stationName]
                 ))[stationName]
-                let mapLookupStation = enrichedStation ?? Station(
-                    stationID: transferSegment.toStationID ?? stationName,
-                    name: stationName,
-                    nameEn: nil,
-                    latitude: transferStopCoordinate?.latitude ?? 0,
-                    longitude: transferStopCoordinate?.longitude ?? 0,
-                    cityID: cityID
-                )
-                externalResources = await container.officialStationData.externalResources(for: mapLookupStation)
+                let mapLookupStation = enrichedStation ?? initialLookupStation
+                let initialResources = await initialResourceLoad
+                if initialResources.isEmpty, enrichedStation != nil {
+                    externalResources = await container.officialStationData.externalResources(for: mapLookupStation)
+                } else {
+                    externalResources = initialResources
+                }
                 indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
                 if let transferContext = transferSegment.transferContext {
                     transferPath = await container.officialStationData.transferPath(
@@ -500,15 +508,15 @@ struct TransferStationSheet: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 10) {
                 Text(AppLocalization.text(
-                    english: "Station Layout",
-                    simplified: "车站布局",
-                    traditional: "車站佈局"
+                    english: "Official Station Resources",
+                    simplified: "官方车站资源",
+                    traditional: "官方車站資源"
                 ))
                 .font(.subheadline)
                 .fontWeight(.medium)
 
-                let layoutResources = externalResources.filter { $0.kind == .stationLayout }
-                if layoutResources.isEmpty {
+                let relevantResources = externalResources.filter(\.kind.isTransferRelevant)
+                if relevantResources.isEmpty {
                     Label {
                         Text(AppLocalization.text(
                             english: "No verified indoor layout or door positions are available.",
@@ -522,21 +530,16 @@ struct TransferStationSheet: View {
                             .foregroundStyle(.secondary)
                     }
                 } else {
-                    ForEach(layoutResources) { resource in
-                        if let url = resource.url {
-                            Link(destination: url) {
-                                HStack {
-                                    Label(resource.title, systemImage: "safari")
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right")
-                                        .font(.caption)
-                                }
-                            }
-                            Text(resource.provider)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
+                    ForEach(relevantResources) { resource in
+                        OfficialTransitResourceLink(resource: resource, compact: true)
                     }
+                    Text(AppLocalization.text(
+                        english: "These links open operator information. They do not mean JustGo has verified the indoor path or train-door position.",
+                        simplified: "这些链接会打开运营方信息，并不代表 JustGo 已核实站内路径或车门位置。",
+                        traditional: "這些連結會開啟營運方資訊，並不代表 JustGo 已核實站內路徑或車門位置。"
+                    ))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

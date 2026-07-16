@@ -1,0 +1,1788 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-15",
+  "sourcePages": [
+    "https://www.mtr.com.hk/en/customer/services/system_map.html",
+    "https://www.mtr.com.hk/en/customer/services/stmap_index.html"
+  ],
+  "systemMap": "https://www.mtr.com.hk/archive/en/services/routemap.pdf",
+  "heavyRailStations": [
+    {
+      "stationID": "09a35a437b8ad930",
+      "stationName": "啟德",
+      "stationNameEn": "Kai Tak",
+      "aliases": [
+
+      ],
+      "stationCode": "KAT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kat.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kat.pdf"
+    },
+    {
+      "stationID": "0af4b25f4b0e0624",
+      "stationName": "大圍",
+      "stationNameEn": "Tai Wai",
+      "aliases": [
+
+      ],
+      "stationCode": "TAW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/taw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/taw.pdf"
+    },
+    {
+      "stationID": "0e542d7d3801c627",
+      "stationName": "紅磡",
+      "stationNameEn": "Hung Hom",
+      "aliases": [
+
+      ],
+      "stationCode": "HUH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/huh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/huh.pdf"
+    },
+    {
+      "stationID": "0f4723c4f5ab31f8",
+      "stationName": "坑口",
+      "stationNameEn": "Hang Hau",
+      "aliases": [
+
+      ],
+      "stationCode": "HAH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hah.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hah.pdf"
+    },
+    {
+      "stationID": "10555697e0c72133",
+      "stationName": "上水",
+      "stationNameEn": "Sheung Shui",
+      "aliases": [
+
+      ],
+      "stationCode": "SHS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/shs.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/shs.pdf"
+    },
+    {
+      "stationID": "1078a493e93235d7",
+      "stationName": "牛頭角",
+      "stationNameEn": "Ngau Tau Kok",
+      "aliases": [
+
+      ],
+      "stationCode": "NTK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ntk.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ntk.pdf"
+    },
+    {
+      "stationID": "10d482539db90fe3",
+      "stationName": "顯徑",
+      "stationNameEn": "Hin Keng",
+      "aliases": [
+
+      ],
+      "stationCode": "HIK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hik.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hik.pdf"
+    },
+    {
+      "stationID": "17120deb49c6d358",
+      "stationName": "海怡半島",
+      "stationNameEn": "South Horizons",
+      "aliases": [
+
+      ],
+      "stationCode": "SOH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/soh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/soh.pdf"
+    },
+    {
+      "stationID": "19bcccbafba0d7f4",
+      "stationName": "海洋公園",
+      "stationNameEn": "Ocean Park",
+      "aliases": [
+
+      ],
+      "stationCode": "OCP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ocp.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ocp.pdf"
+    },
+    {
+      "stationID": "1b2b1a713317f034",
+      "stationName": "北角",
+      "stationNameEn": "North Point",
+      "aliases": [
+
+      ],
+      "stationCode": "NOP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/nop.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/nop.pdf"
+    },
+    {
+      "stationID": "1be01c1e57931646",
+      "stationName": "會展",
+      "stationNameEn": "Exhibition Centre",
+      "aliases": [
+
+      ],
+      "stationCode": "EXC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/exc.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/exc.pdf"
+    },
+    {
+      "stationID": "1c17c6762455491a",
+      "stationName": "旺角東",
+      "stationNameEn": "Mong Kok East",
+      "aliases": [
+
+      ],
+      "stationCode": "MKK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/mkk.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/mkk.pdf"
+    },
+    {
+      "stationID": "1df53903b616ded1",
+      "stationName": "九龍灣",
+      "stationNameEn": "Kowloon Bay",
+      "aliases": [
+
+      ],
+      "stationCode": "KOB",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kob.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kob.pdf"
+    },
+    {
+      "stationID": "224c84764f118115",
+      "stationName": "黃大仙",
+      "stationNameEn": "Wong Tai Sin",
+      "aliases": [
+
+      ],
+      "stationCode": "WTS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/wts.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/wts.pdf"
+    },
+    {
+      "stationID": "234fee1662378e22",
+      "stationName": "黃埔",
+      "stationNameEn": "Whampoa",
+      "aliases": [
+
+      ],
+      "stationCode": "WHA",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/wha.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/wha.pdf"
+    },
+    {
+      "stationID": "29843c9b3a1ba230",
+      "stationName": "旺角",
+      "stationNameEn": "Mong Kok",
+      "aliases": [
+
+      ],
+      "stationCode": "MOK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/mok.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/mok.pdf"
+    },
+    {
+      "stationID": "29e1da6af63e5169",
+      "stationName": "迪士尼",
+      "stationNameEn": "Disneyland Resort",
+      "aliases": [
+
+      ],
+      "stationCode": "DIS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/dis.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/dis.pdf"
+    },
+    {
+      "stationID": "2a4de894d1250ee9",
+      "stationName": "荔枝角",
+      "stationNameEn": "Lai Chi Kok",
+      "aliases": [
+        "茘枝角"
+      ],
+      "stationCode": "LCK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lck.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lck.pdf"
+    },
+    {
+      "stationID": "2c6c7f592af20bd5",
+      "stationName": "何文田",
+      "stationNameEn": "Ho Man Tin",
+      "aliases": [
+
+      ],
+      "stationCode": "HOM",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hom.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hom.pdf"
+    },
+    {
+      "stationID": "2f788e1f9927d298",
+      "stationName": "大窩口",
+      "stationNameEn": "Tai Wo Hau",
+      "aliases": [
+
+      ],
+      "stationCode": "TWH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/twh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/twh.pdf"
+    },
+    {
+      "stationID": "2fe5a3b7d92a4bac",
+      "stationName": "荔景",
+      "stationNameEn": "Lai King",
+      "aliases": [
+        "茘景"
+      ],
+      "stationCode": "LAK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lak.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lak.pdf"
+    },
+    {
+      "stationID": "32ca624a7c4e90e3",
+      "stationName": "九龍",
+      "stationNameEn": "Kowloon",
+      "aliases": [
+
+      ],
+      "stationCode": "KOW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kow.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kow.pdf"
+    },
+    {
+      "stationID": "342908557fccae02",
+      "stationName": "調景嶺",
+      "stationNameEn": "Tiu Keng Leng",
+      "aliases": [
+
+      ],
+      "stationCode": "TIK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tik.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tik.pdf"
+    },
+    {
+      "stationID": "361b9bc9da98f72d",
+      "stationName": "鰂魚涌",
+      "stationNameEn": "Quarry Bay",
+      "aliases": [
+
+      ],
+      "stationCode": "QUB",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/qub.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/qub.pdf"
+    },
+    {
+      "stationID": "362d5a07b2d1c999",
+      "stationName": "馬鞍山",
+      "stationNameEn": "Ma On Shan",
+      "aliases": [
+
+      ],
+      "stationCode": "MOS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/mos.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/mos.pdf"
+    },
+    {
+      "stationID": "39f59d6900ec190a",
+      "stationName": "葵興",
+      "stationNameEn": "Kwai Hing",
+      "aliases": [
+
+      ],
+      "stationCode": "KWH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kwh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kwh.pdf"
+    },
+    {
+      "stationID": "3ac853f4faeb37a9",
+      "stationName": "宋皇臺",
+      "stationNameEn": "Sung Wong Toi",
+      "aliases": [
+
+      ],
+      "stationCode": "SUW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/suw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/suw.pdf"
+    },
+    {
+      "stationID": "3aeda716d0d599d1",
+      "stationName": "博覽館",
+      "stationNameEn": "AsiaWorld-Expo",
+      "aliases": [
+
+      ],
+      "stationCode": "AWE",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/awe.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/awe.pdf"
+    },
+    {
+      "stationID": "3da25ad7c7f93371",
+      "stationName": "石硤尾",
+      "stationNameEn": "Shek Kip Mei",
+      "aliases": [
+
+      ],
+      "stationCode": "SKM",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/skm.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/skm.pdf"
+    },
+    {
+      "stationID": "41ff5ab9ea0d6cd9",
+      "stationName": "香港",
+      "stationNameEn": "Hong Kong",
+      "aliases": [
+
+      ],
+      "stationCode": "HOK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hok.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hok.pdf"
+    },
+    {
+      "stationID": "429663b8eba7b2e8",
+      "stationName": "屯門",
+      "stationNameEn": "Tuen Mun",
+      "aliases": [
+
+      ],
+      "stationCode": "TUM",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tum.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tum.pdf"
+    },
+    {
+      "stationID": "42d0a669b76fabbb",
+      "stationName": "康城",
+      "stationNameEn": "LOHAS Park",
+      "aliases": [
+
+      ],
+      "stationCode": "LHP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lhp.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lhp.pdf"
+    },
+    {
+      "stationID": "45a3e50bc4319386",
+      "stationName": "樂富",
+      "stationNameEn": "Lok Fu",
+      "aliases": [
+
+      ],
+      "stationCode": "LOF",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lof.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lof.pdf"
+    },
+    {
+      "stationID": "47d3321090c9795a",
+      "stationName": "西營盤",
+      "stationNameEn": "Sai Ying Pun",
+      "aliases": [
+
+      ],
+      "stationCode": "SYP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/syp.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/syp.pdf"
+    },
+    {
+      "stationID": "48aa6b05014673c6",
+      "stationName": "機場",
+      "stationNameEn": "Airport",
+      "aliases": [
+
+      ],
+      "stationCode": "AIR",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/air.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/air.pdf"
+    },
+    {
+      "stationID": "4b25eb47d5dc2842",
+      "stationName": "太和",
+      "stationNameEn": "Tai Wo",
+      "aliases": [
+
+      ],
+      "stationCode": "TWO",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/two.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/two.pdf"
+    },
+    {
+      "stationID": "50d026cf2fa590aa",
+      "stationName": "沙田",
+      "stationNameEn": "Sha Tin",
+      "aliases": [
+
+      ],
+      "stationCode": "SHT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/sht.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/sht.pdf"
+    },
+    {
+      "stationID": "5100239bb9315f24",
+      "stationName": "馬場",
+      "stationNameEn": "Racecourse",
+      "aliases": [
+
+      ],
+      "stationCode": "RAC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/rac.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/rac.pdf"
+    },
+    {
+      "stationID": "607235f274aaffbc",
+      "stationName": "利東",
+      "stationNameEn": "Lei Tung",
+      "aliases": [
+
+      ],
+      "stationCode": "LET",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/let.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/let.pdf"
+    },
+    {
+      "stationID": "608ece056deaec25",
+      "stationName": "荃灣西",
+      "stationNameEn": "Tsuen Wan West",
+      "aliases": [
+
+      ],
+      "stationCode": "TWW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tww.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tww.pdf"
+    },
+    {
+      "stationID": "61af5a7ba97b0374",
+      "stationName": "香港大學",
+      "stationNameEn": "HKU",
+      "aliases": [
+
+      ],
+      "stationCode": "HKU",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hku.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hku.pdf"
+    },
+    {
+      "stationID": "68d9f6ed06c51736",
+      "stationName": "尖東",
+      "stationNameEn": "East Tsim Sha Tsui",
+      "aliases": [
+
+      ],
+      "stationCode": "ETS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ets.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ets.pdf"
+    },
+    {
+      "stationID": "6a4bb6f00c189b45",
+      "stationName": "黃竹坑",
+      "stationNameEn": "Wong Chuk Hang",
+      "aliases": [
+
+      ],
+      "stationCode": "WCH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/wch.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/wch.pdf"
+    },
+    {
+      "stationID": "6d99d6151bdc7cf0",
+      "stationName": "天后",
+      "stationNameEn": "Tin Hau",
+      "aliases": [
+
+      ],
+      "stationCode": "TIH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tih.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tih.pdf"
+    },
+    {
+      "stationID": "7246244615f7b488",
+      "stationName": "柴灣",
+      "stationNameEn": "Chai Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "CHW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/chw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/chw.pdf"
+    },
+    {
+      "stationID": "743629a8b5469bd2",
+      "stationName": "火炭",
+      "stationNameEn": "Fo Tan",
+      "aliases": [
+
+      ],
+      "stationCode": "FOT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/fot.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/fot.pdf"
+    },
+    {
+      "stationID": "76d08e779d50dbff",
+      "stationName": "銅鑼灣",
+      "stationNameEn": "Causeway Bay",
+      "aliases": [
+
+      ],
+      "stationCode": "CAB",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/cab.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/cab.pdf"
+    },
+    {
+      "stationID": "7774eef80a2fd663",
+      "stationName": "元朗",
+      "stationNameEn": "Yuen Long",
+      "aliases": [
+
+      ],
+      "stationCode": "YUL",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/yul.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/yul.pdf"
+    },
+    {
+      "stationID": "77f5cb001ddd7eff",
+      "stationName": "土瓜灣",
+      "stationNameEn": "To Kwa Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "TKW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tkw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tkw.pdf"
+    },
+    {
+      "stationID": "789826511d5cdb8b",
+      "stationName": "朗屏",
+      "stationNameEn": "Long Ping",
+      "aliases": [
+
+      ],
+      "stationCode": "LOP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lop.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lop.pdf"
+    },
+    {
+      "stationID": "79cc8fa989050b23",
+      "stationName": "油麻地",
+      "stationNameEn": "Yau Ma Tei",
+      "aliases": [
+
+      ],
+      "stationCode": "YMT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ymt.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ymt.pdf"
+    },
+    {
+      "stationID": "7f5518bbd9044a10",
+      "stationName": "大水坑",
+      "stationNameEn": "Tai Shui Hang",
+      "aliases": [
+
+      ],
+      "stationCode": "TSH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tsh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tsh.pdf"
+    },
+    {
+      "stationID": "83c21626bd6c6ee0",
+      "stationName": "深水埗",
+      "stationNameEn": "Sham Shui Po",
+      "aliases": [
+
+      ],
+      "stationCode": "SSP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ssp.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ssp.pdf"
+    },
+    {
+      "stationID": "8618016077f61aeb",
+      "stationName": "觀塘",
+      "stationNameEn": "Kwun Tong",
+      "aliases": [
+
+      ],
+      "stationCode": "KWT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kwt.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kwt.pdf"
+    },
+    {
+      "stationID": "95c1750fc9ec1d21",
+      "stationName": "將軍澳",
+      "stationNameEn": "Tseung Kwan O",
+      "aliases": [
+
+      ],
+      "stationCode": "TKO",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tko.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tko.pdf"
+    },
+    {
+      "stationID": "9a0c09056f8d6b58",
+      "stationName": "太子",
+      "stationNameEn": "Prince Edward",
+      "aliases": [
+
+      ],
+      "stationCode": "PRE",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/pre.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/pre.pdf"
+    },
+    {
+      "stationID": "9a913b614df06ad4",
+      "stationName": "欣澳",
+      "stationNameEn": "Sunny Bay",
+      "aliases": [
+
+      ],
+      "stationCode": "SUN",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/sun.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/sun.pdf"
+    },
+    {
+      "stationID": "9b338a3d04d47d34",
+      "stationName": "筲箕灣",
+      "stationNameEn": "Shau Kei Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "SKW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/skw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/skw.pdf"
+    },
+    {
+      "stationID": "9b43a3632a57eec4",
+      "stationName": "恆安",
+      "stationNameEn": "Heng On",
+      "aliases": [
+
+      ],
+      "stationCode": "HEO",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/heo.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/heo.pdf"
+    },
+    {
+      "stationID": "9e9773b81654931d",
+      "stationName": "天水圍",
+      "stationNameEn": "Tin Shui Wai",
+      "aliases": [
+
+      ],
+      "stationCode": "TIS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tis.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tis.pdf"
+    },
+    {
+      "stationID": "a08671a8860848c6",
+      "stationName": "太古",
+      "stationNameEn": "Tai Koo",
+      "aliases": [
+
+      ],
+      "stationCode": "TAK",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tak.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tak.pdf"
+    },
+    {
+      "stationID": "a135d2d93b0b119f",
+      "stationName": "兆康",
+      "stationNameEn": "Siu Hong",
+      "aliases": [
+
+      ],
+      "stationCode": "SIH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/sih.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/sih.pdf"
+    },
+    {
+      "stationID": "a1a2e9c1afd85b78",
+      "stationName": "奧運",
+      "stationNameEn": "Olympic",
+      "aliases": [
+
+      ],
+      "stationCode": "OLY",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/oly.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/oly.pdf"
+    },
+    {
+      "stationID": "a36d428005f8bfbb",
+      "stationName": "南昌",
+      "stationNameEn": "Nam Cheong",
+      "aliases": [
+
+      ],
+      "stationCode": "NAC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/nac.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/nac.pdf"
+    },
+    {
+      "stationID": "a55cb7d258b33b71",
+      "stationName": "車公廟",
+      "stationNameEn": "Che Kung Temple",
+      "aliases": [
+
+      ],
+      "stationCode": "CKT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ckt.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ckt.pdf"
+    },
+    {
+      "stationID": "aac70d6c51ea0a74",
+      "stationName": "沙田圍",
+      "stationNameEn": "Sha Tin Wai",
+      "aliases": [
+
+      ],
+      "stationCode": "STW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/stw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/stw.pdf"
+    },
+    {
+      "stationID": "ad77711cd9f246ed",
+      "stationName": "鑽石山",
+      "stationNameEn": "Diamond Hill",
+      "aliases": [
+
+      ],
+      "stationCode": "DIH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/dih.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/dih.pdf"
+    },
+    {
+      "stationID": "af5b683fdaed6c89",
+      "stationName": "第一城",
+      "stationNameEn": "City One",
+      "aliases": [
+
+      ],
+      "stationCode": "CIO",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/cio.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/cio.pdf"
+    },
+    {
+      "stationID": "b0d0f841a88903da",
+      "stationName": "寶琳",
+      "stationNameEn": "Po Lam",
+      "aliases": [
+
+      ],
+      "stationCode": "POA",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/poa.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/poa.pdf"
+    },
+    {
+      "stationID": "b48d4aa0f62645b3",
+      "stationName": "柯士甸",
+      "stationNameEn": "Austin",
+      "aliases": [
+
+      ],
+      "stationCode": "AUS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/aus.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/aus.pdf"
+    },
+    {
+      "stationID": "b49888436822fbb4",
+      "stationName": "錦上路",
+      "stationNameEn": "Kam Sheung Road",
+      "aliases": [
+
+      ],
+      "stationCode": "KSR",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ksr.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ksr.pdf"
+    },
+    {
+      "stationID": "bfe436b99124151a",
+      "stationName": "西灣河",
+      "stationNameEn": "Sai Wan Ho",
+      "aliases": [
+
+      ],
+      "stationCode": "SWH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/swh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/swh.pdf"
+    },
+    {
+      "stationID": "c032db87c9c9ac32",
+      "stationName": "佐敦",
+      "stationNameEn": "Jordan",
+      "aliases": [
+
+      ],
+      "stationCode": "JOR",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/jor.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/jor.pdf"
+    },
+    {
+      "stationID": "c0fbae04468a49b2",
+      "stationName": "粉嶺",
+      "stationNameEn": "Fanling",
+      "aliases": [
+
+      ],
+      "stationCode": "FAN",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/fan.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/fan.pdf"
+    },
+    {
+      "stationID": "c505035fd49a1177",
+      "stationName": "落馬洲",
+      "stationNameEn": "Lok Ma Chau",
+      "aliases": [
+
+      ],
+      "stationCode": "LMC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lmc.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lmc.pdf"
+    },
+    {
+      "stationID": "c5ec994d532af6e1",
+      "stationName": "葵芳",
+      "stationNameEn": "Kwai Fong",
+      "aliases": [
+
+      ],
+      "stationCode": "KWF",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kwf.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kwf.pdf"
+    },
+    {
+      "stationID": "c75cc88cd0f2b692",
+      "stationName": "大埔墟",
+      "stationNameEn": "Tai Po Market",
+      "aliases": [
+
+      ],
+      "stationCode": "TAP",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tap.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tap.pdf"
+    },
+    {
+      "stationID": "ca458a95589ae06a",
+      "stationName": "杏花邨",
+      "stationNameEn": "Heng Fa Chuen",
+      "aliases": [
+
+      ],
+      "stationCode": "HFC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/hfc.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/hfc.pdf"
+    },
+    {
+      "stationID": "ce8b7b5ed01c18f4",
+      "stationName": "烏溪沙",
+      "stationNameEn": "Wu Kai Sha",
+      "aliases": [
+
+      ],
+      "stationCode": "WKS",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/wks.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/wks.pdf"
+    },
+    {
+      "stationID": "d10795743611cdcd",
+      "stationName": "油塘",
+      "stationNameEn": "Yau Tong",
+      "aliases": [
+
+      ],
+      "stationCode": "YAT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/yat.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/yat.pdf"
+    },
+    {
+      "stationID": "d5c9d05e54851522",
+      "stationName": "長沙灣",
+      "stationNameEn": "Cheung Sha Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "CSW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/csw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/csw.pdf"
+    },
+    {
+      "stationID": "d6fe2d74cee5656b",
+      "stationName": "金鐘",
+      "stationNameEn": "Admiralty",
+      "aliases": [
+
+      ],
+      "stationCode": "ADM",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/adm.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/adm.pdf"
+    },
+    {
+      "stationID": "dc4eccfe29064e0f",
+      "stationName": "東涌",
+      "stationNameEn": "Tung Chung",
+      "aliases": [
+
+      ],
+      "stationCode": "TUC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tuc.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tuc.pdf"
+    },
+    {
+      "stationID": "e182a5d9fd05e342",
+      "stationName": "上環",
+      "stationNameEn": "Sheung Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "SHW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/shw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/shw.pdf"
+    },
+    {
+      "stationID": "e5055abba66ebab3",
+      "stationName": "羅湖",
+      "stationNameEn": "Lo Wu",
+      "aliases": [
+
+      ],
+      "stationCode": "LOW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/low.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/low.pdf"
+    },
+    {
+      "stationID": "e92d588db1c1a3ef",
+      "stationName": "荃灣",
+      "stationNameEn": "Tsuen Wan",
+      "aliases": [
+
+      ],
+      "stationCode": "TSW",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tsw.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tsw.pdf"
+    },
+    {
+      "stationID": "ebf7be041d4092fd",
+      "stationName": "大學",
+      "stationNameEn": "University",
+      "aliases": [
+
+      ],
+      "stationCode": "UNI",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/uni.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/uni.pdf"
+    },
+    {
+      "stationID": "ecb2a6abfd7c9e4e",
+      "stationName": "青衣",
+      "stationNameEn": "Tsing Yi",
+      "aliases": [
+
+      ],
+      "stationCode": "TSY",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tsy.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tsy.pdf"
+    },
+    {
+      "stationID": "ef62723013a486ac",
+      "stationName": "藍田",
+      "stationNameEn": "Lam Tin",
+      "aliases": [
+
+      ],
+      "stationCode": "LAT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/lat.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/lat.pdf"
+    },
+    {
+      "stationID": "f02479a4a2642fa9",
+      "stationName": "尖沙咀",
+      "stationNameEn": "Tsim Sha Tsui",
+      "aliases": [
+
+      ],
+      "stationCode": "TST",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/tst.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/tst.pdf"
+    },
+    {
+      "stationID": "f4c724d609249136",
+      "stationName": "石門",
+      "stationNameEn": "Shek Mun",
+      "aliases": [
+
+      ],
+      "stationCode": "SHM",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/shm.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/shm.pdf"
+    },
+    {
+      "stationID": "f8039a3210e0f0a9",
+      "stationName": "堅尼地城",
+      "stationNameEn": "Kennedy Town",
+      "aliases": [
+
+      ],
+      "stationCode": "KET",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/ket.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/ket.pdf"
+    },
+    {
+      "stationID": "f84e41fafad22bd2",
+      "stationName": "彩虹",
+      "stationNameEn": "Choi Hung",
+      "aliases": [
+
+      ],
+      "stationCode": "CHH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/chh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/chh.pdf"
+    },
+    {
+      "stationID": "f906d0273f8be940",
+      "stationName": "灣仔",
+      "stationNameEn": "Wan Chai",
+      "aliases": [
+
+      ],
+      "stationCode": "WAC",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/wac.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/wac.pdf"
+    },
+    {
+      "stationID": "f9cae0884b80b670",
+      "stationName": "炮台山",
+      "stationNameEn": "Fortress Hill",
+      "aliases": [
+
+      ],
+      "stationCode": "FOH",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/foh.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/foh.pdf"
+    },
+    {
+      "stationID": "fe9f0e376a174ff1",
+      "stationName": "九龍塘",
+      "stationNameEn": "Kowloon Tong",
+      "aliases": [
+
+      ],
+      "stationCode": "KOT",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/kot.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/kot.pdf"
+    },
+    {
+      "stationID": "feda84848b4c6987",
+      "stationName": "美孚",
+      "stationNameEn": "Mei Foo",
+      "aliases": [
+
+      ],
+      "stationCode": "MEF",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/mef.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/mef.pdf"
+    },
+    {
+      "stationID": "ffeff722858ce102",
+      "stationName": "中環",
+      "stationNameEn": "Central",
+      "aliases": [
+
+      ],
+      "stationCode": "CEN",
+      "locationMapURL": "https://www.mtr.com.hk/archive/ch/services/maps/cen.pdf",
+      "stationLayoutURL": "https://www.mtr.com.hk/archive/ch/services/layouts/cen.pdf"
+    }
+  ],
+  "lightRailMaps": [
+    {
+      "mapNumber": 1,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_01.pdf",
+      "stops": [
+        {
+          "stationID": "088ef3ab658cfdbd",
+          "stationName": "輕鐵車廠",
+          "stationNameEn": "Light Rail Depot",
+          "aliases": [
+
+          ],
+          "sourceName": "Light Rail Depot"
+        },
+        {
+          "stationID": "58489a5c93aa2192",
+          "stationName": "屯門碼頭",
+          "stationNameEn": "Tuen Mun Ferry Pier",
+          "aliases": [
+
+          ],
+          "sourceName": "Tuen Mun Ferry Pier"
+        },
+        {
+          "stationID": "6d048f25c8ad18cc",
+          "stationName": "兆禧",
+          "stationNameEn": "Siu Hei",
+          "aliases": [
+
+          ],
+          "sourceName": "Siu Hei"
+        },
+        {
+          "stationID": "79fc0753c0922a24",
+          "stationName": "海皇路",
+          "stationNameEn": "Hoi Wong Road",
+          "aliases": [
+            "Tuen Mun Swimming Pool",
+            "屯門泳池"
+          ],
+          "sourceName": "Hoi Wong Road"
+        },
+        {
+          "stationID": "9166cd346bb390fd",
+          "stationName": "美樂",
+          "stationNameEn": "Melody Garden",
+          "aliases": [
+
+          ],
+          "sourceName": "Melody Garden"
+        },
+        {
+          "stationID": "e0c5d323f0689bea",
+          "stationName": "蝴蝶",
+          "stationNameEn": "Butterfly",
+          "aliases": [
+
+          ],
+          "sourceName": "Butterfly"
+        }
+      ]
+    },
+    {
+      "mapNumber": 2,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_02.pdf",
+      "stops": [
+        {
+          "stationID": "0757fe7e6afe4ad1",
+          "stationName": "兆麟",
+          "stationNameEn": "Siu Lun",
+          "aliases": [
+
+          ],
+          "sourceName": "Siu Lun"
+        },
+        {
+          "stationID": "0a3a7b50afa7cd65",
+          "stationName": "安定",
+          "stationNameEn": "On Ting",
+          "aliases": [
+
+          ],
+          "sourceName": "On Ting"
+        },
+        {
+          "stationID": "a4ac249fb417491a",
+          "stationName": "豐景園",
+          "stationNameEn": "Goodview Garden",
+          "aliases": [
+
+          ],
+          "sourceName": "Goodview Garden"
+        },
+        {
+          "stationID": "ae8c055bbdb28e6d",
+          "stationName": "友愛",
+          "stationNameEn": "Yau Oi",
+          "aliases": [
+
+          ],
+          "sourceName": "Yau Oi"
+        },
+        {
+          "stationID": "ccae579e62ea8150",
+          "stationName": "三聖",
+          "stationNameEn": "Sam Shing",
+          "aliases": [
+
+          ],
+          "sourceName": "Sam Shing"
+        }
+      ]
+    },
+    {
+      "mapNumber": 3,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_03.pdf",
+      "stops": [
+        {
+          "stationID": "4a1a1453d25432e7",
+          "stationName": "龍門",
+          "stationNameEn": "Lung Mun",
+          "aliases": [
+
+          ],
+          "sourceName": "Lung Mun"
+        },
+        {
+          "stationID": "61e0c0adff62ab83",
+          "stationName": "建安",
+          "stationNameEn": "Kin On",
+          "aliases": [
+
+          ],
+          "sourceName": "Kin On"
+        },
+        {
+          "stationID": "6a410355dffaa12e",
+          "stationName": "青山村",
+          "stationNameEn": "Tsing Shan Tsuen",
+          "aliases": [
+
+          ],
+          "sourceName": "Tsing Shan Tsuen"
+        },
+        {
+          "stationID": "fb64cb0d59e32a0a",
+          "stationName": "青雲",
+          "stationNameEn": "Tsing Wun",
+          "aliases": [
+
+          ],
+          "sourceName": "Tsing Wun"
+        }
+      ]
+    },
+    {
+      "mapNumber": 4,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_04.pdf",
+      "stops": [
+        {
+          "stationID": "1bab5363f0518029",
+          "stationName": "新墟",
+          "stationNameEn": "San Hui",
+          "aliases": [
+
+          ],
+          "sourceName": "San Hui"
+        },
+        {
+          "stationID": "25d5ad9d91ded7e4",
+          "stationName": "河田",
+          "stationNameEn": "Ho Tin",
+          "aliases": [
+
+          ],
+          "sourceName": "Ho Tin"
+        },
+        {
+          "stationID": "3b32b9d6a3fe89de",
+          "stationName": "大興 (南)",
+          "stationNameEn": "Tai Hing (South)",
+          "aliases": [
+
+          ],
+          "sourceName": "Tai Hing (South)"
+        },
+        {
+          "stationID": "429663b8eba7b2e8",
+          "stationName": "屯門",
+          "stationNameEn": "Tuen Mun",
+          "aliases": [
+
+          ],
+          "sourceName": "Tuen Mun"
+        },
+        {
+          "stationID": "4422eedc5d38d8b1",
+          "stationName": "蔡意橋",
+          "stationNameEn": "Choy Yee Bridge",
+          "aliases": [
+
+          ],
+          "sourceName": "Choy Yee Bridge"
+        },
+        {
+          "stationID": "4d30de3bda7bbd09",
+          "stationName": "杯渡",
+          "stationNameEn": "Pui To",
+          "aliases": [
+
+          ],
+          "sourceName": "Pui To"
+        },
+        {
+          "stationID": "8254b0df5a72f03c",
+          "stationName": "市中心",
+          "stationNameEn": "Town Centre",
+          "aliases": [
+
+          ],
+          "sourceName": "Town Centre"
+        },
+        {
+          "stationID": "8927f00a331bf208",
+          "stationName": "何福堂",
+          "stationNameEn": "Hoh Fuk Tong",
+          "aliases": [
+
+          ],
+          "sourceName": "Hoh Fuk Tong"
+        },
+        {
+          "stationID": "9e701a481dce8b03",
+          "stationName": "銀圍",
+          "stationNameEn": "Ngan Wai",
+          "aliases": [
+
+          ],
+          "sourceName": "Ngan Wai"
+        }
+      ]
+    },
+    {
+      "mapNumber": 5,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_05.pdf",
+      "stops": [
+        {
+          "stationID": "1020b7e29a9ff636",
+          "stationName": "鳴琴",
+          "stationNameEn": "Ming Kum",
+          "aliases": [
+
+          ],
+          "sourceName": "Ming Kum"
+        },
+        {
+          "stationID": "6009a1420060ed0b",
+          "stationName": "石排",
+          "stationNameEn": "Shek Pai",
+          "aliases": [
+
+          ],
+          "sourceName": "Shek Pai"
+        },
+        {
+          "stationID": "d4bd50f2dd3c3a5f",
+          "stationName": "山景 (南)",
+          "stationNameEn": "Shan King (South)",
+          "aliases": [
+
+          ],
+          "sourceName": "Shan King (South)"
+        },
+        {
+          "stationID": "d5143985d5388abd",
+          "stationName": "山景 (北)",
+          "stationNameEn": "Shan King (North)",
+          "aliases": [
+
+          ],
+          "sourceName": "Shan King (North)"
+        }
+      ]
+    },
+    {
+      "mapNumber": 6,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_06.pdf",
+      "stops": [
+        {
+          "stationID": "1b5e93f9e02a732e",
+          "stationName": "澤豐",
+          "stationNameEn": "Affluence",
+          "aliases": [
+
+          ],
+          "sourceName": "Affluence"
+        },
+        {
+          "stationID": "2b133d15571fe1e5",
+          "stationName": "鳳地",
+          "stationNameEn": "Fung Tei",
+          "aliases": [
+
+          ],
+          "sourceName": "Fung Tei"
+        },
+        {
+          "stationID": "4d878364ca53fc02",
+          "stationName": "屯門醫院",
+          "stationNameEn": "Tuen Mun Hospital",
+          "aliases": [
+
+          ],
+          "sourceName": "Tuen Mun Hospital"
+        },
+        {
+          "stationID": "627fbbb28f04d747",
+          "stationName": "麒麟",
+          "stationNameEn": "Kei Lun",
+          "aliases": [
+
+          ],
+          "sourceName": "Kei Lun"
+        },
+        {
+          "stationID": "86b712c928c9b6dc",
+          "stationName": "青松",
+          "stationNameEn": "Ching Chung",
+          "aliases": [
+
+          ],
+          "sourceName": "Ching Chung"
+        },
+        {
+          "stationID": "a135d2d93b0b119f",
+          "stationName": "兆康",
+          "stationNameEn": "Siu Hong",
+          "aliases": [
+
+          ],
+          "sourceName": "Siu Hong"
+        },
+        {
+          "stationID": "de0682d34c987c27",
+          "stationName": "景峰",
+          "stationNameEn": "Prime View",
+          "aliases": [
+
+          ],
+          "sourceName": "Prime View"
+        }
+      ]
+    },
+    {
+      "mapNumber": 7,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_07.pdf",
+      "stops": [
+        {
+          "stationID": "4275dd1c9db0d9b5",
+          "stationName": "新圍",
+          "stationNameEn": "San Wai",
+          "aliases": [
+
+          ],
+          "sourceName": "San Wai"
+        },
+        {
+          "stationID": "925ce785c013ca54",
+          "stationName": "建生",
+          "stationNameEn": "Kin Sang",
+          "aliases": [
+
+          ],
+          "sourceName": "Kin Sang"
+        },
+        {
+          "stationID": "ba06a8813805fcb7",
+          "stationName": "良景",
+          "stationNameEn": "Leung King",
+          "aliases": [
+
+          ],
+          "sourceName": "Leung King"
+        },
+        {
+          "stationID": "bc7490c06895e85a",
+          "stationName": "田景",
+          "stationNameEn": "Tin King",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin King"
+        },
+        {
+          "stationID": "ef877d0ca0c1a455",
+          "stationName": "大興 (北)",
+          "stationNameEn": "Tai Hing (North)",
+          "aliases": [
+
+          ],
+          "sourceName": "Tai Hing (North)"
+        }
+      ]
+    },
+    {
+      "mapNumber": 8,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_08.pdf",
+      "stops": [
+        {
+          "stationID": "561363634b909f8c",
+          "stationName": "泥圍",
+          "stationNameEn": "Nai Wai",
+          "aliases": [
+
+          ],
+          "sourceName": "Nai Wai"
+        },
+        {
+          "stationID": "8ca8511218c651f8",
+          "stationName": "洪水橋",
+          "stationNameEn": "Hung Shui Kiu",
+          "aliases": [
+
+          ],
+          "sourceName": "Hung Shui Kiu"
+        },
+        {
+          "stationID": "a8883422584bb2c8",
+          "stationName": "藍地",
+          "stationNameEn": "Lam Tei",
+          "aliases": [
+
+          ],
+          "sourceName": "Lam Tei"
+        },
+        {
+          "stationID": "fead5c256df8f0ec",
+          "stationName": "鍾屋村",
+          "stationNameEn": "Chung Uk Tsuen",
+          "aliases": [
+
+          ],
+          "sourceName": "Chung Uk Tsuen"
+        }
+      ]
+    },
+    {
+      "mapNumber": 9,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_09.pdf",
+      "stops": [
+        {
+          "stationID": "080789fe9b024e29",
+          "stationName": "塘坊村",
+          "stationNameEn": "Tong Fong Tsuen",
+          "aliases": [
+
+          ],
+          "sourceName": "Tong Fong Tsuen"
+        },
+        {
+          "stationID": "bf2fa154246e0f2a",
+          "stationName": "坑尾村",
+          "stationNameEn": "Hang Mei Tsuen",
+          "aliases": [
+
+          ],
+          "sourceName": "Hang Mei Tsuen"
+        },
+        {
+          "stationID": "f9b3ca3901efdc7f",
+          "stationName": "屏山",
+          "stationNameEn": "Ping Shan",
+          "aliases": [
+
+          ],
+          "sourceName": "Ping Shan"
+        }
+      ]
+    },
+    {
+      "mapNumber": 10,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_10.pdf",
+      "stops": [
+        {
+          "stationID": "387075c58fa96ac1",
+          "stationName": "水邊圍",
+          "stationNameEn": "Shui Pin Wai",
+          "aliases": [
+
+          ],
+          "sourceName": "Shui Pin Wai"
+        },
+        {
+          "stationID": "9cd718ee395970e9",
+          "stationName": "豐年路",
+          "stationNameEn": "Fung Nin Road",
+          "aliases": [
+
+          ],
+          "sourceName": "Fung Nin Road"
+        }
+      ]
+    },
+    {
+      "mapNumber": 11,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_11.pdf",
+      "stops": [
+        {
+          "stationID": "4eeef34ed3149fb9",
+          "stationName": "大棠路",
+          "stationNameEn": "Tai Tong Road",
+          "aliases": [
+
+          ],
+          "sourceName": "Tai Tong Road"
+        },
+        {
+          "stationID": "7774eef80a2fd663",
+          "stationName": "元朗",
+          "stationNameEn": "Yuen Long",
+          "aliases": [
+
+          ],
+          "sourceName": "Yuen Long"
+        },
+        {
+          "stationID": "902a13764813a064",
+          "stationName": "康樂路",
+          "stationNameEn": "Hong Lok Road",
+          "aliases": [
+
+          ],
+          "sourceName": "Hong Lok Road"
+        }
+      ]
+    },
+    {
+      "mapNumber": 12,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_12.pdf",
+      "stops": [
+        {
+          "stationID": "241c7970cccd7966",
+          "stationName": "樂湖",
+          "stationNameEn": "Locwood",
+          "aliases": [
+
+          ],
+          "sourceName": "Locwood"
+        },
+        {
+          "stationID": "5d3075df7e84d1f3",
+          "stationName": "天耀",
+          "stationNameEn": "Tin Yiu",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Yiu"
+        },
+        {
+          "stationID": "9e9773b81654931d",
+          "stationName": "天水圍",
+          "stationNameEn": "Tin Shui Wai",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Shui Wai"
+        },
+        {
+          "stationID": "ff4edceffc1d6697",
+          "stationName": "天慈",
+          "stationNameEn": "Tin Tsz",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Tsz"
+        }
+      ]
+    },
+    {
+      "mapNumber": 13,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_13.pdf",
+      "stops": [
+        {
+          "stationID": "1645c287e62f2ad0",
+          "stationName": "銀座",
+          "stationNameEn": "Ginza",
+          "aliases": [
+
+          ],
+          "sourceName": "Ginza"
+        },
+        {
+          "stationID": "5bc3abf623f9fc3d",
+          "stationName": "翠湖",
+          "stationNameEn": "Chestwood",
+          "aliases": [
+
+          ],
+          "sourceName": "Chestwood"
+        },
+        {
+          "stationID": "6cbdfcf403058a6c",
+          "stationName": "天湖",
+          "stationNameEn": "Tin Wu",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Wu"
+        },
+        {
+          "stationID": "a7e7b5b573108add",
+          "stationName": "天榮",
+          "stationNameEn": "Tin Wing",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Wing"
+        },
+        {
+          "stationID": "c8508213a416f182",
+          "stationName": "天瑞",
+          "stationNameEn": "Tin Shui",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Shui"
+        }
+      ]
+    },
+    {
+      "mapNumber": 14,
+      "pdfURL": "https://www.mtr.com.hk/archive/en/services/lrt_14.pdf",
+      "stops": [
+        {
+          "stationID": "0b30297a035a15e5",
+          "stationName": "頌富",
+          "stationNameEn": "Chung Fu",
+          "aliases": [
+
+          ],
+          "sourceName": "Chung Fu"
+        },
+        {
+          "stationID": "82b89142f25b7761",
+          "stationName": "天悅",
+          "stationNameEn": "Tin Yuet",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Yuet"
+        },
+        {
+          "stationID": "90ed71cb3a89e298",
+          "stationName": "天秀",
+          "stationNameEn": "Tin Sau",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Sau"
+        },
+        {
+          "stationID": "91950d225082fba9",
+          "stationName": "天逸",
+          "stationNameEn": "Tin Yat",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Yat"
+        },
+        {
+          "stationID": "a0aa50b2c2e25329",
+          "stationName": "天恒",
+          "stationNameEn": "Tin Heng",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Heng"
+        },
+        {
+          "stationID": "b6777c48adef5e4e",
+          "stationName": "天富",
+          "stationNameEn": "Tin Fu",
+          "aliases": [
+
+          ],
+          "sourceName": "Tin Fu"
+        },
+        {
+          "stationID": "e6a70b3c4de6756d",
+          "stationName": "濕地公園",
+          "stationNameEn": "Wetland Park",
+          "aliases": [
+
+          ],
+          "sourceName": "Wetland Park"
+        }
+      ]
+    }
+  ]
+}

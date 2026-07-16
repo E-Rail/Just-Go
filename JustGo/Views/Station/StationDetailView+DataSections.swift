@@ -53,7 +53,9 @@ extension StationDetailView {
                         }
                     }
 
-                    if viewModel?.externalResources.contains(where: { $0.kind == .stationLayout }) == true {
+                    if viewModel?.externalResources.contains(where: {
+                        [.locationMap, .streetMap, .stationLayout].contains($0.kind)
+                    }) == true {
                         Text(AppLocalization.text(
                             english: "Use the official link below to view the operator's current layout information.",
                             simplified: "可使用下方官方链接查看运营方当前的布局信息。",
@@ -190,7 +192,7 @@ extension StationDetailView {
                         ProgressView()
                     } else {
                         ForEach(resources) { resource in
-                            externalResourceRow(resource)
+                            OfficialTransitResourceLink(resource: resource, compact: true)
                         }
 
                         ForEach(media) { item in
@@ -239,34 +241,6 @@ extension StationDetailView {
                     ))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func externalResourceRow(_ resource: ExternalTransitResource) -> some View {
-        Group {
-            if let url = resource.url {
-                Link(destination: url) {
-                    HStack(spacing: 10) {
-                        Image(systemName: resource.kind == .stationLayout ? "safari" : "arrow.up.right.square")
-                            .foregroundStyle(Color.accentColor)
-                            .frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(resource.title)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Text(resource.provider)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .contentShape(Rectangle())
                 }
             }
         }

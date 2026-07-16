@@ -1,0 +1,23 @@
+name: Official Transit Link Audit
+
+on:
+  schedule:
+    - cron: "17 4 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Non-blocking live link audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check official targets and source pages
+        run: ruby Scripts/audit_official_transit_links.rb

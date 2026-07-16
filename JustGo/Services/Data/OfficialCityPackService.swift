@@ -48,23 +48,6 @@ enum CityPackLoadStatus: Equatable {
     case failed
 }
 
-enum ExternalTransitResourceKind: String, Codable, Sendable {
-    case stationLayout
-    case timetable
-    case accessibility
-    case operatorInformation
-}
-
-struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
-    let kind: ExternalTransitResourceKind
-    let title: String
-    let landingPageURL: String
-    let provider: String
-
-    var id: String { "\(kind.rawValue)|\(landingPageURL)" }
-    var url: URL? { URL(string: landingPageURL) }
-}
-
 enum LicensedStationMediaKind: String, Codable, Sendable {
     case stationPhoto
 }
@@ -128,6 +111,7 @@ struct CityPackServiceStatus: Codable, Equatable {
 protocol OfficialStationDataProviding {
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func cityDataCoverage(for cityIDs: [String]) async -> [String: CityDataCoverage]
+    func officialResourceCatalogCities() async -> [OfficialTransitResourceCity]
     func cityExternalResources(for cityIDs: [String]) async -> [String: [ExternalTransitResource]]
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus
     func downloadCityPack(for cityID: String) async -> CityPackLoadStatus
@@ -208,6 +192,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
     private let realtimeArrivals: any RealtimeArrivalProviding
+    private let officialResourceCatalog: OfficialTransitResourceCatalog
     private let diskStore = CityPackDiskStore()
     private var manifests: [URL: OfficialManifest] = [:]
     private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
@@ -263,11 +248,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     init(
         session: URLSession = .shared,
         metroNetworks: MetroNetworkProviding,
-        realtimeArrivals: any RealtimeArrivalProviding = HongKongRealtimeArrivalProvider()
+        realtimeArrivals: any RealtimeArrivalProviding = HongKongRealtimeArrivalProvider(),
+        officialResourceCatalog: OfficialTransitResourceCatalog = .empty
     ) {
         self.session = session
         self.metroNetworks = metroNetworks
         self.realtimeArrivals = realtimeArrivals
+        self.officialResourceCatalog = officialResourceCatalog
     }
 
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus] {
@@ -298,17 +285,14 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return result
     }
 
+    func officialResourceCatalogCities() async -> [OfficialTransitResourceCity] {
+        officialResourceCatalog.cities
+    }
+
     func cityExternalResources(for cityIDs: [String]) async -> [String: [ExternalTransitResource]] {
-        guard let manifest = bundledManifest() else { return [:] }
-        let requested = Set(cityIDs)
-        return manifest.cities.reduce(into: [:]) { result, entry in
-            guard requested.contains(entry.cityID) else { return }
-            let resources = entry.externalResources.filter {
-                Self.isAllowedExternalResource($0, cityID: entry.cityID)
-            }
-            if !resources.isEmpty {
-                result[entry.cityID] = resources
-            }
+        Set(cityIDs).reduce(into: [:]) { result, cityID in
+            let resources = officialResourceCatalog.cityResources(cityID)
+            if !resources.isEmpty { result[cityID] = resources }
         }
     }
 
@@ -542,10 +526,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func externalResources(for station: Station) async -> [ExternalTransitResource] {
-        _ = await loadCityPack(for: station.cityID)
-        return stationRecord(for: station)?
-            .externalResources
-            .filter { Self.isAllowedExternalResource($0, cityID: station.cityID) } ?? []
+        let stationResources = officialResourceCatalog.stationResources(
+            cityID: station.cityID,
+            stationID: networkStationID(station.stationID),
+            stationName: station.name,
+            stationNameEn: station.nameEn
+        )
+        let cityResources = officialResourceCatalog.cityResources(station.cityID)
+        var seen = Set<String>()
+        return (stationResources + cityResources).filter { seen.insert($0.id).inserted }
     }
 
     func licensedMedia(for station: Station) async -> [LicensedStationMedia] {
@@ -800,7 +789,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             stationCount: names.count,
             officialAccessibilityCount: stations.filter { $0.accessibility != nil }.count,
             officialScheduleCount: stations.filter { !$0.schedules.isEmpty }.count,
-            officialStationMapCount: stations.filter { $0.externalResources.contains(where: { $0.kind == .stationLayout }) }.count,
+            // Browser links are catalog coverage, not route evidence. They must never raise
+            // feasibility or confidence as though JustGo bundled a verified station map.
+            officialStationMapCount: 0,
             officialFacilityCount: stations.filter { !$0.stationFacilities.isEmpty || !($0.accessibility?.facilityNotes ?? []).isEmpty }.count
         )
     }
@@ -1419,9 +1410,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               coverage.accessibility.covered == stations.filter({ $0.accessibility != nil }).count,
               coverage.staticSchedules.covered == stations.filter({ !$0.schedules.isEmpty }).count,
               coverage.liveArrivals.covered == stations.filter({ !$0.liveArrivalReferences.isEmpty }).count,
-              coverage.externalLayouts.covered == stations.filter({ station in
-                  station.externalResources.contains(where: { $0.kind == .stationLayout })
-              }).count,
+              coverage.externalLayouts.covered == 0,
               coverage.licensedMedia.covered == stations.filter({ !$0.licensedMedia.isEmpty }).count else {
             return false
         }

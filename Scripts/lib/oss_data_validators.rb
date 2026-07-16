@@ -58,6 +58,7 @@ module OSSDataValidators
     opendatacommons.org
     www.bjsubway.com
     www.mlm.com.mo
+    www.mtr.com.hk
     www.openstreetmap.org
   ].freeze
   class BaseValidator
@@ -147,11 +148,14 @@ module OSSDataValidators
 
     def validate_history!
       output, error, status = Open3.capture3(
-        "git", "rev-list", "--objects", "--all", "--", "DataPacks/packs",
+        "git", "rev-list", "--objects", "--all",
         chdir: root
       )
       fail_validation("could not inspect Git history: #{error.strip}") unless status.success?
-      historical = output.lines.map(&:strip).reject(&:empty?)
+      historical = output.lines.each_with_object([]) do |line, result|
+        _object_id, path = line.strip.split(" ", 2)
+        result << path if path == "DataPacks/packs" || path&.start_with?("DataPacks/packs/")
+      end
       unless historical.empty?
         fail_validation("Git history still contains DataPacks/packs objects (#{historical.length})")
       end
@@ -393,6 +397,17 @@ module OSSDataValidators
           osm-metro-networks
         ].sort,
         "DataPacks/rights_inventory.json" => ["justgo-generated-catalog"],
+        "DataPacks/official_transit_resources.json" => %w[
+          data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+          osm-metro-networks
+        ].sort,
+        "DataPacks/sources/official-resources/hong_kong_index.json" => %w[
+          data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+          osm-metro-networks
+        ].sort,
+        "DataPacks/sources/official-resources/hong_kong_station_bindings.json" => %w[
+          data-gov-hk-mtr justgo-generated-catalog osm-metro-networks
+        ].sort,
         "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr justgo-generated-catalog].sort,
         "THIRD_PARTY_NOTICES.md" => ["justgo-generated-catalog"],
         "JustGo/Resources/BundledCityPacks/1100.json" => %w[
@@ -671,7 +686,7 @@ module OSSDataValidators
           "accessibility" => { "covered" => 98, "total" => 162 },
           "staticSchedules" => { "covered" => 0, "total" => 162 },
           "liveArrivals" => { "covered" => 162, "total" => 162 },
-          "externalLayouts" => { "covered" => 98, "total" => 162 },
+          "externalLayouts" => { "covered" => 0, "total" => 162 },
           "licensedMedia" => { "covered" => 1, "total" => 162 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
         }
@@ -687,9 +702,7 @@ module OSSDataValidators
         "accessibility" => metric.call(stations.count { |station| !station["accessibility"].nil? }),
         "staticSchedules" => metric.call(stations.count { |station| !station.fetch("schedules").empty? }),
         "liveArrivals" => metric.call(stations.count { |station| !station.fetch("liveArrivalReferences").empty? }),
-        "externalLayouts" => metric.call(stations.count do |station|
-          station.fetch("externalResources").any? { |resource| resource["kind"] == "stationLayout" }
-        end),
+        "externalLayouts" => metric.call(0),
         "licensedMedia" => metric.call(stations.count { |station| !station.fetch("licensedMedia").empty? }),
         "verifiedTransferContexts" => metric.call(0)
       }

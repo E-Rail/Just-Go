@@ -89,7 +89,12 @@ final class StationDetailViewModel {
             }
         }
 
-        let status = await officialStationData.loadCityPack(for: station.cityID)
+        async let statusLoad = officialStationData.loadCityPack(for: station.cityID)
+        async let resourceLoad = officialStationData.externalResources(for: station)
+        let loadedExternalResources = await resourceLoad
+        guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+        externalResources = loadedExternalResources
+        let status = await statusLoad
         guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         cityPackLoadStatus = status
         switch status {
@@ -103,10 +108,6 @@ final class StationDetailViewModel {
             let enrichedStation = await officialStationData.enrichStation(station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             self.station = enrichedStation
-
-            let loadedExternalResources = await officialStationData.externalResources(for: station)
-            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
-            externalResources = loadedExternalResources
 
             let loadedLicensedMedia = await officialStationData.licensedMedia(for: station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
@@ -123,11 +124,11 @@ final class StationDetailViewModel {
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             accessGuidance = loadedGuidance
 
-            if externalResources.contains(where: { $0.kind == .stationLayout }) {
+            if externalResources.contains(where: { [.locationMap, .streetMap, .stationLayout].contains($0.kind) }) {
                 stationLayoutStatusMessage = AppLocalization.text(
-                    english: "An official station-layout page is available.",
-                    simplified: "可打开官方车站布局页面。",
-                    traditional: "可開啟官方車站佈局頁面。"
+                    english: "Official external map links are available; verified indoor paths and door positions remain separate.",
+                    simplified: "可打开官方外部地图链接；经核实的站内路径与车门位置仍单独标示。",
+                    traditional: "可開啟官方外部地圖連結；經核實的站內路徑與車門位置仍單獨標示。"
                 )
             } else {
                 stationLayoutStatusMessage = AppLocalization.text(
@@ -186,9 +187,7 @@ final class StationDetailViewModel {
     }
 
     var stationMapConfidence: DataConfidence {
-        externalResources.contains(where: { $0.kind == .stationLayout })
-            ? .official
-            : cityPackPendingConfidence
+        cityPackPendingConfidence
     }
 
     var accessibilityConfidence: DataConfidence {

@@ -4,8 +4,8 @@
 download catalog: every `downloadURL` is `null`, and the only available packs point to
 `JustGo/Resources/BundledCityPacks/1100.json` and `8100.json` through `bundledResource`.
 The other 56 catalog cities are intentionally `source_pending`.
-Macau (`8200`) additionally exposes the official Macao Light Rapid Transit homepage as a
-catalog-level, tap-only link; it remains non-downloadable and has no copied operator dataset.
+The separate official-resource catalog exposes reviewed tap-only links without changing a
+city's pack status or copying an operator dataset.
 
 ## Build
 
@@ -13,9 +13,11 @@ Run the standard-library Ruby pipeline from the repository root:
 
 ```sh
 ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/generate_official_transit_resources.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_runtime_data_policy.rb
 ruby Scripts/validate_city_packs.rb
+ruby Scripts/validate_official_transit_resources.rb
 ruby Scripts/import_licensed_station_media.rb
 ```
 
@@ -35,6 +37,30 @@ re-encoding, and refuses any output that differs from the reviewed checksum.
 operator timetable images, scraped schedules, and operator-derived Beijing station facts are
 not part of this baseline.
 
+## Official Resource Catalog
+
+`official_transit_resources.json` is a deterministic bundled catalog of factual link metadata,
+independent of city packs. It contains one dated review record for every one of the 58 catalog
+cities. The current output has 330 links: 275 maps, 28 travel resources, 6 accessibility
+resources, and 21 help resources. Forty-three cities have verified links; 15 have an explicit
+`noVerifiedOfficialResource` result.
+
+Hong Kong URL metadata is refreshed only by an intentional developer command:
+
+```sh
+ruby Scripts/import_hong_kong_official_resources.rb --refresh
+```
+
+The importer parses the official MTR System Map and Light Rail Street Map indexes, maps their
+links to 162 canonical station records through explicit bindings, and stores no PDF content. The
+generated catalog exposes 197 distinct heavy-rail PDFs and 14 distinct Light Rail PDFs. Normal
+generation and CI are offline and read the reviewed snapshot.
+
+Runtime code trusts links only from this bundled catalog. City-pack `externalResources` fields
+remain decodable for schema-v2 compatibility but are ignored, and downloaded packs cannot inject
+URLs. All links open through the system browser after a user tap; JustGo does not fetch, preview,
+cache, prefetch, or store the linked operator files.
+
 ## Schema V2
 
 Each bundled pack contains `schemaVersion`, `cityID`, `version`, `generatedAt`, `rightsIDs`,
@@ -43,7 +69,8 @@ official heavy-rail destination codes.
 
 Station IDs are the raw IDs from the corresponding canonical `MetroNetworks` resource.
 Every station record includes names, aliases, accessibility, an empty `schedules` array,
-facilities, external landing resources, licensed media, and live-arrival references.
+facilities, compatibility-only external resource fields, licensed media, and live-arrival
+references.
 
 Coverage metrics always use the canonical network station count as `total`:
 
@@ -51,7 +78,8 @@ Coverage metrics always use the canonical network station count as `total`:
 - `accessibility`: represented stations with official accessibility data.
 - `staticSchedules`: represented stations with static schedule rows; always zero here.
 - `liveArrivals`: represented stations with an official API lookup reference.
-- `externalLayouts`: represented stations with an allowlisted official layout landing page.
+- `externalLayouts`: always zero. Operator hyperlinks are counted only in the separate official
+  resource catalog and never as included pack coverage.
 - `licensedMedia`: represented stations with a validated, locally bundled licensed image.
 - `verifiedTransferContexts`: on-site verified transfer contexts; always zero here.
 
@@ -60,7 +88,7 @@ Current exact coverage is:
 | City | Network | Matched | Accessibility | Static schedules | Live arrivals | External layouts | Licensed media | Verified transfers |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Beijing | 444 | 444 | 0 | 0 | 0 | 0 | 1 | 0 |
-| Hong Kong | 162 | 162 | 98 | 0 | 162 | 98 | 1 | 0 |
+| Hong Kong | 162 | 162 | 98 | 0 | 162 | 0 | 1 | 0 |
 
 Racecourse is bound explicitly to canonical station `5100239bb9315f24`, accessibility group
 `70`, and realtime code `EAL/RAC` using the reviewed MTR realtime dictionary. The compatibility

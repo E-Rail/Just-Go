@@ -128,9 +128,17 @@ final class DIContainer {
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
+        let officialResourceCatalog: OfficialTransitResourceCatalog
+        do {
+            officialResourceCatalog = try .bundled()
+        } catch {
+            AppLog.data.error("Bundled official-resource catalog failed validation: \(String(describing: error), privacy: .public)")
+            officialResourceCatalog = .empty
+        }
         let officialStationData = OfficialCityPackService(
             metroNetworks: metroNetworkProvider,
-            realtimeArrivals: realtimeArrivalProvider
+            realtimeArrivals: realtimeArrivalProvider,
+            officialResourceCatalog: officialResourceCatalog
         )
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()

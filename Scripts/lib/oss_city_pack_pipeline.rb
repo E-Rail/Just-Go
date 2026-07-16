@@ -510,6 +510,16 @@ module OSSCityPackPipeline
             "redistribution" => "Only factual link metadata is bundled. Linked content remains with its provider."
           },
           {
+            "id" => "official-transit-resource-links",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed HTTPS target URLs, source-page URLs, providers, formats, scopes, and verification dates in the official transit resource catalog",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://www.mtr.com.hk/en/customer/services/system_map.html",
+            "sourceURL" => "https://www.mtr.com.hk/en/customer/services/system_map.html",
+            "attribution" => "Official transit operators and government transport authorities identified per catalog record",
+            "redistribution" => "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
+          },
+          {
             "id" => "media-jianguomen-ian-holton",
             "kind" => "mediaMetadata",
             "scope" => MEDIA.fetch("jianguomen").fetch("relativePath"),
@@ -604,6 +614,24 @@ module OSSCityPackPipeline
           "rightsIDs" => ["justgo-generated-catalog"]
         },
         {
+          "path" => "DataPacks/official_transit_resources.json",
+          "rightsIDs" => %w[
+            data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+            osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/hong_kong_index.json",
+          "rightsIDs" => %w[
+            data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+            osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
+          "rightsIDs" => %w[data-gov-hk-mtr justgo-generated-catalog osm-metro-networks].sort
+        },
+        {
           "path" => "DataPacks/sources/8100/metadata.json",
           "rightsIDs" => %w[justgo-generated-catalog data-gov-hk-mtr].sort
         },
@@ -672,6 +700,18 @@ module OSSCityPackPipeline
         Data provider: MTR Corporation Limited. Distribution portal: DATA.GOV.HK. Reuse is governed
         by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
         https://data.gov.hk/en/terms-and-conditions
+
+        ## Official Transit Resource Links
+
+        The bundled official-resource catalog contains reviewed factual link metadata for transit
+        operators and government transport authorities. Linked pages, PDFs, and images remain with
+        their providers. JustGo opens them in the system browser only after user action and does not
+        copy, fetch, preview, cache, or prefetch their content.
+
+        Hong Kong map metadata is reviewed from the official MTR System Map and Light Rail Street
+        Map indexes:
+        https://www.mtr.com.hk/en/customer/services/system_map.html
+        https://www.mtr.com.hk/en/customer/services/stmap_index.html
 
         ## Jianguomen Station Photo
 
@@ -933,9 +973,9 @@ module OSSCityPackPipeline
         "accessibility" => metric.call(stations.count { |station| !station["accessibility"].nil? }),
         "staticSchedules" => metric.call(stations.count { |station| !station.fetch("schedules").empty? }),
         "liveArrivals" => metric.call(stations.count { |station| !station.fetch("liveArrivalReferences").empty? }),
-        "externalLayouts" => metric.call(stations.count do |station|
-          station.fetch("externalResources").any? { |resource| resource["kind"] == "stationLayout" }
-        end),
+        # Operator hyperlinks live in the independent bundled resource catalog.
+        # Compatibility URL fields in a city pack never count as included coverage.
+        "externalLayouts" => metric.call(0),
         "licensedMedia" => metric.call(stations.count { |station| !station.fetch("licensedMedia").empty? }),
         "verifiedTransferContexts" => metric.call(stations.count do |station|
           !Array(station["verifiedTransferContexts"]).empty?

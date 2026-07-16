@@ -241,6 +241,7 @@ struct LiveGoView: View {
             destinationLineName: guidance.destinationLineName,
             transferContext: guidance.transferContext,
             boardingZoneGuidance: transferGuidance.boardingZoneGuidance,
+            externalResources: transferGuidance.externalResources,
             onComplete: {
                 completeIndoorGuidance(for: transferGuidance.stepID)
             },
@@ -298,20 +299,18 @@ struct LiveGoView: View {
                 if let indoorMap = guidance.indoorMap {
                     DataConfidenceChip(confidence: indoorMap.confidence, compact: true)
                 }
-                ForEach(guidance.externalResources.filter { $0.kind == .stationLayout }) { resource in
-                    if let url = resource.url {
-                        Link(destination: url) {
-                            Label(
-                                AppLocalization.text(
-                                    english: "Open official station-layout page",
-                                    simplified: "打开官方车站布局页面",
-                                    traditional: "開啟官方車站佈局頁面"
-                                ),
-                                systemImage: "safari"
-                            )
-                            .font(.subheadline)
-                        }
-                    }
+                ForEach(guidance.externalResources.filter(\.kind.isTransferRelevant)) { resource in
+                    OfficialTransitResourceLink(resource: resource, compact: true)
+                }
+                if guidance.externalResources.contains(where: { $0.kind.isTransferRelevant }) {
+                    Text(AppLocalization.text(
+                        english: "Official links are reference material only. No indoor path or door position has been inferred from them.",
+                        simplified: "官方链接仅供参考；JustGo 不会据此推断站内路径或车门位置。",
+                        traditional: "官方連結僅供參考；JustGo 不會據此推斷站內路徑或車門位置。"
+                    ))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
                 }
             }
             .padding(24)

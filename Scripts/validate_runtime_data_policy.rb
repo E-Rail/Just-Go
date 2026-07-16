@@ -110,8 +110,15 @@ end
 errors << "remote packs must reject unproven service status" unless policy_source.include?("station.serviceStatus == nil")
 errors << "schema-v2 manifests must reject indoor downloads" unless policy_source.include?("!hasIndoorMapsURL")
 
+official_catalog_path = File.join(ROOT, "JustGo/Services/Data/OfficialTransitResourceCatalog.swift")
 swift_sources.each do |absolute_path, source|
   next if absolute_path == policy_path
+
+  if absolute_path == official_catalog_path
+    defensive_guard = 'target.host?.lowercased() != "commons.wikimedia.org"'
+    errors << "official-resource catalog must reject runtime Commons links" unless source.include?(defensive_guard)
+    source = source.sub(defensive_guard, "")
+  end
 
   %w[jsdelivr.net wikimedia.org wikipedia.org githubusercontent.com].each do |host|
     errors << "runtime source references forbidden media/data host #{host}: #{absolute_path.delete_prefix("#{ROOT}/")}" if source.include?(host)
@@ -135,7 +142,7 @@ errors << "Hong Kong live arrivals must use HTTPS" unless realtime_source.includ
 errors << "Hong Kong live arrivals must use DATA.GOV.HK" unless realtime_source.include?('components.host = "rt.data.gov.hk"')
 
 project = read.call("JustGo.xcodeproj/project.pbxproj")
-%w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md].each do |resource|
+%w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
   errors << "Xcode resources are missing #{resource}" unless project.include?(resource)
 end
 %w[indoor_maps.json JustGo-Privacy.plist].each do |retired_resource|

@@ -310,7 +310,7 @@ struct OfficialTransitResourceViewer: View {
             }
             .buttonStyle(.borderedProminent)
 
-            if let url = resource.url {
+            if resource.kind != .stationInformation, let url = resource.url {
                 Button {
                     openURL(url)
                 } label: {
@@ -649,10 +649,20 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
+        if resource.kind == .stationInformation {
+            configuration.userContentController.addUserScript(
+                WKUserScript(
+                    source: Self.stationInformationReaderScript,
+                    injectionTime: .atDocumentEnd,
+                    forMainFrameOnly: true
+                )
+            )
+        }
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
+        webView.allowsLinkPreview = false
         webView.scrollView.contentInsetAdjustmentBehavior = .automatic
         context.coordinator.loadInitialResource(in: webView)
         return webView
@@ -668,6 +678,176 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
         webView.navigationDelegate = nil
         coordinator.detach(from: webView)
     }
+
+    private static let stationInformationReaderScript = """
+    (() => {
+      const viewport = document.querySelector('meta[name="viewport"]') || document.createElement('meta');
+      viewport.name = 'viewport';
+      viewport.content = 'width=device-width, initial-scale=1, maximum-scale=5';
+      if (!viewport.parentNode) document.head.appendChild(viewport);
+
+      const style = document.createElement('style');
+      style.id = 'justgo-station-reader';
+      style.textContent = `
+        :root { color-scheme: light; }
+        html, body {
+          width: 100% !important;
+          min-width: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow-x: hidden !important;
+          background: #f2f2f7 !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
+          -webkit-text-size-adjust: 100% !important;
+        }
+        .wrap, .content, .siteinfo, .firstcartime, .firstcartime_time {
+          box-sizing: border-box !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          max-width: none !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          float: none !important;
+        }
+        #header, .header, .here, #sider, .side, #footer, .bottom,
+        .locbox, body > script, .content + * {
+          display: none !important;
+        }
+        .content { display: block !important; }
+        .firstcartime_sitename {
+          box-sizing: border-box !important;
+          width: 100% !important;
+          height: auto !important;
+          padding: 18px 16px 10px !important;
+          color: #111111 !important;
+          font-size: 26px !important;
+          font-weight: 700 !important;
+          line-height: 1.2 !important;
+          background: transparent !important;
+        }
+        #tabs, .tabs {
+          box-sizing: border-box !important;
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 1px !important;
+          width: calc(100% - 24px) !important;
+          height: auto !important;
+          margin: 0 12px !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+          border: 1px solid #d1d1d6 !important;
+          border-radius: 8px !important;
+          background: #d1d1d6 !important;
+        }
+        #tabs li, .tabs li {
+          box-sizing: border-box !important;
+          width: auto !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          float: none !important;
+          list-style: none !important;
+          background: #ffffff !important;
+        }
+        #tabs li a, .tabs li a {
+          box-sizing: border-box !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-height: 44px !important;
+          padding: 8px !important;
+          color: #1c1c1e !important;
+          font-size: 14px !important;
+          line-height: 1.2 !important;
+          text-align: center !important;
+          text-decoration: none !important;
+          background: transparent !important;
+        }
+        #tabs li.thistab, .tabs li.thistab {
+          background: #e8f1f7 !important;
+        }
+        .tab-content {
+          box-sizing: border-box !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          padding: 12px !important;
+          color: #3a3a3c !important;
+          background: transparent !important;
+        }
+        .tab-panel, .card, .card-content, .direction-section {
+          box-sizing: border-box !important;
+          min-width: 0 !important;
+          max-width: 100% !important;
+        }
+        .card {
+          overflow: hidden !important;
+          border-radius: 8px !important;
+          background: #ffffff !important;
+        }
+        .card-content { display: block !important; }
+        .card-content .direction-section {
+          width: 100% !important;
+          border-right: 0 !important;
+          border-bottom: 1px solid #e5e5ea !important;
+        }
+        .card-content .direction-section:last-child { border-bottom: 0 !important; }
+        .direction-title, .time-value { overflow-wrap: anywhere !important; }
+        .exit-container, .facility-list {
+          box-sizing: border-box !important;
+          display: grid !important;
+          grid-template-columns: minmax(0, 1fr) !important;
+          gap: 12px !important;
+          width: 100% !important;
+        }
+        .exit-item, .facility-item {
+          box-sizing: border-box !important;
+          min-width: 0 !important;
+          padding: 10px !important;
+          border-radius: 8px !important;
+          background: #ffffff !important;
+        }
+        .exit-item-info, .facility-item-right {
+          min-width: 0 !important;
+          overflow-wrap: anywhere !important;
+        }
+        #map {
+          box-sizing: border-box !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          height: 320px !important;
+          border-radius: 8px !important;
+          overflow: hidden !important;
+        }
+        img, .schedule-pic {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+        table {
+          display: block !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        a, button, [role="button"] { min-height: 44px; }
+        @media (min-width: 620px) {
+          #tabs, .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+          .card-content { display: flex !important; }
+          .card-content .direction-section {
+            width: auto !important;
+            border-right: 1px solid #e5e5ea !important;
+            border-bottom: 0 !important;
+          }
+          .card-content .direction-section:last-child { border-right: 0 !important; }
+          .exit-container, .facility-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    })();
+    """
 
     @MainActor
     final class Coordinator: NSObject, WKNavigationDelegate {

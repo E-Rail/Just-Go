@@ -10,6 +10,7 @@ final class StationDetailViewModel {
     var errorMessage: String?
     var stationLayoutStatusMessage: String?
     var externalResources: [ExternalTransitResource] = []
+    var officialResourceReview: OfficialTransitResourceStation?
     var licensedMedia: [LicensedStationMedia] = []
     var serviceStatus: CityPackServiceStatus?
     var cityPackLoadStatus: CityPackLoadStatus?
@@ -80,6 +81,7 @@ final class StationDetailViewModel {
         isLoadingCityPack = true
         stationLayoutStatusMessage = nil
         externalResources = []
+        officialResourceReview = nil
         licensedMedia = []
         serviceStatus = nil
         accessGuidance = nil
@@ -91,9 +93,13 @@ final class StationDetailViewModel {
 
         async let statusLoad = officialStationData.loadCityPack(for: station.cityID)
         async let resourceLoad = officialStationData.externalResources(for: station)
+        async let reviewLoad = officialStationData.officialResourceReview(for: station)
         let loadedExternalResources = await resourceLoad
         guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         externalResources = loadedExternalResources
+        let loadedReview = await reviewLoad
+        guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+        officialResourceReview = loadedReview
         let status = await statusLoad
         guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         cityPackLoadStatus = status

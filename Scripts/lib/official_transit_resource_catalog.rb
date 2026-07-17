@@ -15,10 +15,14 @@ module OfficialTransitResourceCatalogBuilder
   ].freeze
   RESOURCE_KINDS = %w[
     systemMap locationMap streetMap stationLayout serviceStatus journeyPlanner timetable
-    fareInformation accessibility stationFacilities customerService operatorInformation
+    fareInformation stationInformation accessibility stationFacilities customerService
+    operatorInformation
   ].freeze
   RESOURCE_FORMATS = %w[webPage pdf image].freeze
   REVIEW_STATUSES = %w[verifiedResources noVerifiedOfficialResource].freeze
+  STATION_INFORMATION_STATUSES = %w[
+    exactPage officialContextOnly notOpenForPassengerService noCurrentPassengerService
+  ].freeze
   REDIRECT_QUERY_KEYS = %w[
     continue destination redirect redirect_uri redirect_url return return_to target url uri
   ].freeze
@@ -30,12 +34,18 @@ module OfficialTransitResourceCatalogBuilder
       @root = File.expand_path(root)
     end
 
-    def build(cities: reviewed_cities, hong_kong: JSON.parse(File.read(hong_kong_source_path)))
+    def build(
+      cities: reviewed_cities,
+      beijing: JSON.parse(File.read(beijing_source_path)),
+      hong_kong: JSON.parse(File.read(hong_kong_source_path))
+    )
       validate_city_sources!(cities)
 
       built_cities = cities.map do |city|
         city = deep_copy(city)
-        if city.fetch("cityID") == "8100"
+        if city.fetch("cityID") == "1100"
+          add_beijing_resources!(city, beijing)
+        elsif city.fetch("cityID") == "8100"
           add_hong_kong_resources!(city, hong_kong)
         end
         city["stationResources"] ||= []
@@ -46,13 +56,14 @@ module OfficialTransitResourceCatalogBuilder
 
       {
         "schemaVersion" => 1,
-        "generatedAt" => "2026-07-15T00:00:00Z",
+        "generatedAt" => "2026-07-17T00:00:00Z",
         "cities" => built_cities
       }
     end
 
     def reviewed_cities
       OfficialTransitCityReviews::CITY_REVIEWS.map do |city_id, name, name_en, name_traditional, source_resources, review_note|
+        verified_at = city_id == "1100" ? "2026-07-17" : VERIFIED_AT
         resources = source_resources.map do |kind, title, target_url, provider, source_page_url|
           resource(
             kind: kind,
@@ -61,7 +72,8 @@ module OfficialTransitResourceCatalogBuilder
             source_page_url: source_page_url || target_url,
             provider: provider,
             scope: "city",
-            format: "webPage"
+            format: "webPage",
+            verified_at: verified_at
           )
         end
         domains = resources.flat_map do |item|
@@ -73,7 +85,7 @@ module OfficialTransitResourceCatalogBuilder
           "nameEn" => name_en,
           "nameTraditional" => name_traditional,
           "reviewStatus" => resources.empty? ? "noVerifiedOfficialResource" : "verifiedResources",
-          "verifiedAt" => VERIFIED_AT,
+          "verifiedAt" => verified_at,
           "reviewNote" => review_note,
           "officialDomains" => domains,
           "resources" => resources
@@ -82,6 +94,118 @@ module OfficialTransitResourceCatalogBuilder
     end
 
     private
+
+    def add_beijing_resources!(city, source)
+      unless source.fetch("schemaVersion") == 1 &&
+             source.fetch("verifiedAt") == city.fetch("verifiedAt") &&
+             source.fetch("sourceIndexURL") == "https://www.bjsubway.com/api/guanwang/v2/lineStations" &&
+             source.fetch("sourceDirectoryURL") == "https://www.bjsubway.com/station/" &&
+             source.fetch("mappedStationCount") == source.fetch("stations").length &&
+             source.fetch("stationPageCount") ==
+               source.fetch("stations").length + source.fetch("legacyStationPages").length &&
+             source.fetch("stationPageGapCount") ==
+               source.fetch("canonicalStationCount") - source.fetch("stationPageCount")
+        raise BuildError, "Beijing station-information source is invalid"
+      end
+
+      city.fetch("resources") << resource(
+        kind: "stationInformation",
+        title: "Beijing Subway station directory",
+        target_url: source.fetch("sourceDirectoryURL"),
+        source_page_url: source.fetch("sourceDirectoryURL"),
+        provider: source.fetch("provider"),
+        scope: "city",
+        format: "webPage",
+        verified_at: city.fetch("verifiedAt")
+      )
+      structured_stations = source.fetch("stations").map do |station|
+        station_id = station.fetch("stationID")
+        {
+          "stationID" => station_id,
+          "stationName" => station.fetch("stationName"),
+          "stationNameEn" => station.fetch("stationNameEn"),
+          "aliases" => station.fetch("aliases"),
+          "stationInformationStatus" => "exactPage",
+          "resources" => [
+            resource(
+              kind: "stationInformation",
+              title: "#{station.fetch('stationNameEn')} Official Station Information",
+              target_url: station.fetch("sourcePageURL"),
+              source_page_url: source.fetch("sourceDirectoryURL"),
+              provider: source.fetch("provider"),
+              scope: "station",
+              format: "webPage",
+              station_id: station_id,
+              verified_at: city.fetch("verifiedAt")
+            )
+          ]
+        }
+      end
+      legacy_stations = source.fetch("legacyStationPages").map do |station|
+        station_id = station.fetch("stationID")
+        {
+          "stationID" => station_id,
+          "stationName" => station.fetch("stationName"),
+          "stationNameEn" => station.fetch("stationNameEn"),
+          "aliases" => station.fetch("aliases"),
+          "stationInformationStatus" => "exactPage",
+          "resources" => [
+            resource(
+              kind: "stationInformation",
+              title: "#{station.fetch('stationNameEn')} Official Station Information",
+              target_url: station.fetch("sourcePageURL"),
+              source_page_url: station.fetch("sourcePageURL"),
+              provider: source.fetch("provider"),
+              scope: "station",
+              format: "webPage",
+              station_id: station_id,
+              verified_at: city.fetch("verifiedAt")
+            )
+          ]
+        }
+      end
+      legacy_ids = legacy_stations.map { |station| station.fetch("stationID") }
+      reviewed_gap_stations = source.fetch("canonicalCoverageGaps").each_with_object([]) do |station, records|
+        next if legacy_ids.include?(station.fetch("stationID"))
+
+        station_id = station.fetch("stationID")
+        status = station.fetch("informationStatus")
+        unless STATION_INFORMATION_STATUSES.include?(status)
+          raise BuildError, "Beijing station #{station.fetch('stationName')} has an invalid review status"
+        end
+        records << {
+          "stationID" => station_id,
+          "stationName" => station.fetch("stationName"),
+          "stationNameEn" => station.fetch("stationNameEn"),
+          "aliases" => [],
+          "stationInformationStatus" => status,
+          "resources" => station.fetch("resources").map do |item|
+            resource(
+              kind: item.fetch("kind"),
+              title: item.fetch("title"),
+              target_url: item.fetch("targetURL"),
+              source_page_url: item.fetch("sourcePageURL"),
+              provider: item.fetch("provider"),
+              scope: "station",
+              format: item.fetch("format"),
+              station_id: station_id,
+              verified_at: city.fetch("verifiedAt")
+            )
+          end
+        }
+      end
+      city["stationResources"] = (structured_stations + legacy_stations + reviewed_gap_stations)
+        .sort_by { |station| station.fetch("stationID") }
+      city["resources"] = city.fetch("resources")
+        .sort_by { |item| [RESOURCE_KINDS.index(item.fetch("kind")), item.fetch("targetURL")] }
+      city["officialDomains"] = (
+        city.fetch("officialDomains") +
+        (city.fetch("resources") + city.fetch("stationResources").flat_map { |station| station.fetch("resources") })
+          .flat_map { |item| [URI(item.fetch("targetURL")).host, URI(item.fetch("sourcePageURL")).host] }
+          .compact
+          .map(&:downcase)
+      ).uniq.sort
+    end
 
     def add_hong_kong_resources!(city, source)
       source_pages = source.fetch("sourcePages")
@@ -94,7 +218,8 @@ module OfficialTransitResourceCatalogBuilder
         source_page_url: system_source,
         provider: "MTR Corporation Limited",
         scope: "city",
-        format: "pdf"
+        format: "pdf",
+        verified_at: city.fetch("verifiedAt")
       )
 
       stations = {}
@@ -108,7 +233,8 @@ module OfficialTransitResourceCatalogBuilder
           provider: "MTR Corporation Limited",
           scope: "station",
           format: "pdf",
-          station_id: station.fetch("stationID")
+          station_id: station.fetch("stationID"),
+          verified_at: city.fetch("verifiedAt")
         )
         station_record.fetch("resources") << resource(
           kind: "stationLayout",
@@ -118,7 +244,8 @@ module OfficialTransitResourceCatalogBuilder
           provider: "MTR Corporation Limited",
           scope: "station",
           format: "pdf",
-          station_id: station.fetch("stationID")
+          station_id: station.fetch("stationID"),
+          verified_at: city.fetch("verifiedAt")
         )
       end
 
@@ -133,7 +260,8 @@ module OfficialTransitResourceCatalogBuilder
             provider: "MTR Corporation Limited",
             scope: "station",
             format: "pdf",
-            station_id: station.fetch("stationID")
+            station_id: station.fetch("stationID"),
+            verified_at: city.fetch("verifiedAt")
           )
         end
       end
@@ -152,7 +280,17 @@ module OfficialTransitResourceCatalogBuilder
       }
     end
 
-    def resource(kind:, title:, target_url:, source_page_url:, provider:, scope:, format:, station_id: nil)
+    def resource(
+      kind:,
+      title:,
+      target_url:,
+      source_page_url:,
+      provider:,
+      scope:,
+      format:,
+      station_id: nil,
+      verified_at: VERIFIED_AT
+    )
       value = {
         "kind" => kind,
         "title" => title,
@@ -161,7 +299,7 @@ module OfficialTransitResourceCatalogBuilder
         "provider" => provider,
         "scope" => scope,
         "format" => format,
-        "verifiedAt" => VERIFIED_AT
+        "verifiedAt" => verified_at
       }
       value["stationID"] = station_id if station_id
       value
@@ -173,7 +311,9 @@ module OfficialTransitResourceCatalogBuilder
       {
         "totalLinks" => resources.length,
         "maps" => %w[systemMap locationMap streetMap stationLayout].sum { |kind| counts.fetch(kind) },
-        "travel" => %w[serviceStatus journeyPlanner timetable fareInformation].sum { |kind| counts.fetch(kind) },
+        "travel" => %w[
+          serviceStatus journeyPlanner timetable fareInformation stationInformation
+        ].sum { |kind| counts.fetch(kind) },
         "accessibility" => %w[accessibility stationFacilities].sum { |kind| counts.fetch(kind) },
         "help" => %w[customerService operatorInformation].sum { |kind| counts.fetch(kind) }
       }
@@ -187,7 +327,9 @@ module OfficialTransitResourceCatalogBuilder
       cities.each do |city|
         status = city.fetch("reviewStatus")
         raise BuildError, "#{city.fetch('cityID')} has unknown review status" unless REVIEW_STATUSES.include?(status)
-        raise BuildError, "#{city.fetch('cityID')} has no verification date" unless city.fetch("verifiedAt") == VERIFIED_AT
+        unless city.fetch("verifiedAt").match?(/\A\d{4}-\d{2}-\d{2}\z/)
+          raise BuildError, "#{city.fetch('cityID')} has an invalid verification date"
+        end
         %w[name nameEn nameTraditional].each do |key|
           raise BuildError, "#{city.fetch('cityID')} has blank #{key}" if city.fetch(key).strip.empty?
         end
@@ -211,7 +353,9 @@ module OfficialTransitResourceCatalogBuilder
       raise BuildError, "#{city.fetch('cityID')} unknown kind" unless RESOURCE_KINDS.include?(resource.fetch("kind"))
       raise BuildError, "#{city.fetch('cityID')} unknown format" unless RESOURCE_FORMATS.include?(resource.fetch("format"))
       raise BuildError, "#{city.fetch('cityID')} seed resources must be city-scoped" unless resource.fetch("scope") == "city"
-      raise BuildError, "#{city.fetch('cityID')} resource verification date mismatch" unless resource.fetch("verifiedAt") == VERIFIED_AT
+      unless resource.fetch("verifiedAt") == city.fetch("verifiedAt")
+        raise BuildError, "#{city.fetch('cityID')} resource verification date mismatch"
+      end
 
       [resource.fetch("targetURL"), resource.fetch("sourcePageURL")].each do |value|
         url = URI(value)
@@ -236,6 +380,16 @@ module OfficialTransitResourceCatalogBuilder
 
     def hong_kong_source_path
       File.join(@root, "DataPacks", "sources", "official-resources", "hong_kong_index.json")
+    end
+
+    def beijing_source_path
+      File.join(
+        @root,
+        "DataPacks",
+        "sources",
+        "official-resources",
+        "beijing_station_information.json"
+      )
     end
   end
 end

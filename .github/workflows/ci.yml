@@ -37,6 +37,7 @@ jobs:
           ruby Scripts/test_oss_city_pack_pipeline.rb
           ruby Scripts/test_oss_data_validators.rb
           ruby Scripts/test_official_transit_resource_importer.rb
+          ruby Scripts/test_beijing_station_information_importer.rb
           ruby Scripts/test_official_transit_resource_catalog.rb
           ruby Scripts/import_osm_metro_geometry.rb --self-test
           ruby Scripts/import_licensed_station_media.rb

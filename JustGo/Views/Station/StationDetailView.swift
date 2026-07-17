@@ -22,6 +22,7 @@ struct StationDetailView: View {
                 planRouteSection
                 linesSection
                 beforeYouGoSection
+                officialStationInformationSection
                 accessibilitySection
                 stationEssentialsSection
                 stationGuideSection

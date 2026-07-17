@@ -13,6 +13,7 @@ Run the standard-library Ruby pipeline from the repository root:
 
 ```sh
 ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_runtime_data_policy.rb
@@ -41,9 +42,19 @@ not part of this baseline.
 
 `official_transit_resources.json` is a deterministic bundled catalog of factual link metadata,
 independent of city packs. It contains one dated review record for every one of the 58 catalog
-cities. The current output has 330 links: 275 maps, 28 travel resources, 6 accessibility
-resources, and 21 help resources. Forty-three cities have verified links; 15 have an explicit
+cities. The current output has 770 links: 275 maps, 447 travel resources, 6 accessibility
+resources, and 42 help resources. Forty-three cities have verified links; 15 have an explicit
 `noVerifiedOfficialResource` result.
+
+Beijing's refresh-only importer maps the official directory to canonical OSM station IDs with
+exact names and four reviewed aliases. It emits 416 current station bindings, one reviewed legacy
+station page, one reviewed 12306 station guide, 28 canonical source gaps, 27 Beijing Subway
+direct-page gaps, and only a count for seven source-only stations. All 444 canonical app stations
+receive an explicit state: 418 exact pages, 18 official-context-only records, 3 stations not open
+for passenger service, and 5 points without current passenger service. No source-only station is
+attached to an invented canonical ID. The committed output is factual URL/ID metadata only; it
+contains no operator schedules, facilities, exits, coordinates, images, timetable data, or page
+text.
 
 Hong Kong URL metadata is refreshed only by an intentional developer command:
 
@@ -61,7 +72,9 @@ remain decodable for schema-v2 compatibility but are ignored, and downloaded pac
 URLs. After a user tap, reviewed pages use a non-persistent WebKit session and reviewed PDFs or
 images use memory-only native viewers with a 50 MB limit. JustGo does not prefetch, persist, or
 redistribute linked operator content, and an unsupported resource can leave the app only through
-an explicit rider-selected browser fallback.
+an explicit rider-selected browser fallback. Beijing station-information pages remain in JustGo
+and expose only an in-app retry on failure. Their temporary reader applies responsive styling to
+the provider page but does not extract or persist its text.
 
 ## Schema V2
 

@@ -35,8 +35,17 @@ ambiguous terms require legal review before new data is bundled.
 
 `official_transit_resources.json` contains factual URL metadata only: exact target and source-page
 URLs, provider, city or station scope, format, and review date. Its 58 dated city reviews currently
-contain 330 links across 43 cities and explicit no-resource results for the other 15. No linked
+contain 770 links across 43 cities and explicit no-resource results for the other 15. No linked
 page, PDF, or image is copied into the repository or app bundle.
+
+The Beijing station binding snapshot covers all 444 canonical app stations: 416 current Beijing
+Subway station-page bindings, one reviewed legacy page, one official 12306 station guide, 18
+official-context-only records, 3 stations not open for passenger service, and 5 points without
+current passenger service. It stores canonical OSM station IDs, opaque operator IDs, exact URLs,
+four explicit aliases, and typed review outcomes. It does not store operator API responses,
+schedules, destinations, facilities, exits, nearby places, coordinates, events, images, timetables,
+or page text. No published compatible reuse license was found for that content, so JustGo does not
+call the undocumented detail API or republish its response as native/offline data.
 
 Hong Kong's refresh-only developer importer reads the official MTR System Map and Light Rail
 Street Map indexes and stores URL metadata, not document contents. The catalog exposes 1 system
@@ -51,6 +60,12 @@ maps do not count as offline coverage or evidence of an indoor path or door posi
 receives the user-initiated network request and applies its own privacy terms. Unsupported resources
 offer an explicit browser fallback. Linking and user-initiated rendering are conservative
 engineering controls, not a legal guarantee.
+
+Beijing station and context pages may load provider-selected third-party web services. Those
+services can receive ordinary web-request metadata after the rider taps. JustGo does not prefetch
+the page, send its content to a JustGo server, retain the temporary web session, or offer a Safari
+fallback for exact station-information pages. Responsive reader styling changes presentation only;
+it does not extract, persist, or relicense provider text.
 
 ## Pilot Media
 

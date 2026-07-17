@@ -32,6 +32,17 @@ Map indexes:
 https://www.mtr.com.hk/en/customer/services/system_map.html
 https://www.mtr.com.hk/en/customer/services/stmap_index.html
 
+Beijing station-page metadata is reviewed from official Beijing Subway, 12306, municipal
+transport, development, and construction sources. All canonical app stations receive an
+exact-page or typed review outcome. The bundle contains URL metadata, not operator page
+text, schedules, facilities, exits, coordinates, images, or layouts:
+https://www.bjsubway.com/station/
+https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html
+https://jtw.beijing.gov.cn/sjtl/202111/t20211118_2540164.html
+https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
+https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
+https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
+
 ## Jianguomen Station Photo
 
 Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.

@@ -1,6 +1,161 @@
 import SwiftUI
 
 extension StationDetailView {
+    @ViewBuilder
+    var officialStationInformationSection: some View {
+        if displayedStation.cityID == "1100" {
+            let review = viewModel?.officialResourceReview
+            let resource = review?.resources.first {
+                $0.kind == .stationInformation && $0.scope == .station
+            }
+            let contextResources = review?.resources.filter { $0.kind != .stationInformation } ?? []
+            let provider = resource?.provider
+                ?? contextResources.first?.provider
+                ?? AppLocalization.text(
+                    english: "Reviewed official sources",
+                    simplified: "已审核官方来源",
+                    traditional: "已審核官方來源"
+                )
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(AppLocalization.text(
+                                english: "Official Station Information",
+                                simplified: "官方车站信息",
+                                traditional: "官方車站資訊"
+                            ))
+                            .font(.headline)
+                            Text(provider)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 8)
+                        DataConfidenceChip(
+                            confidence: viewModel == nil || viewModel?.isLoadingCityPack == true
+                                ? .unknown
+                                : officialStationInformationConfidence(review?.stationInformationStatus),
+                            compact: true
+                        )
+                    }
+
+                    if viewModel == nil || viewModel?.isLoadingCityPack == true {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text(AppLocalization.text(
+                                english: "Matching this station to the official directory",
+                                simplified: "正在匹配官方车站目录",
+                                traditional: "正在比對官方車站目錄"
+                            ))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    } else if let resource {
+                        Text(AppLocalization.text(
+                            english: "Read this station's exact official information inside JustGo. The phone reader keeps train times, exits, nearby places, and facilities readable without opening Safari.",
+                            simplified: "直接在 JustGo 内阅读本站对应的官方信息。手机阅读模式会清晰呈现首末车、出入口、周边地点与服务设施，无需打开 Safari。",
+                            traditional: "直接在 JustGo 內閱讀本站對應的官方資訊。手機閱讀模式會清楚呈現首末班車、出入口、周邊地點與服務設施，無需開啟 Safari。"
+                        ))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                        OfficialTransitResourceButton(resource: resource)
+
+                        Text(AppLocalization.text(
+                            english: "Official text loads only after you tap, remains in a temporary in-app session, and is never copied into the offline city pack.",
+                            simplified: "官方文字仅在点按后加载，只存在于应用内临时会话中，不会复制到离线城市数据包。",
+                            traditional: "官方文字僅在點按後載入，只存在於 App 內臨時工作階段中，不會複製到離線城市資料包。"
+                        ))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    } else if let review {
+                        Label {
+                            Text(officialStationInformationStatusText(review.stationInformationStatus))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        } icon: {
+                            Image(systemName: "info.circle")
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if !contextResources.isEmpty {
+                            Divider()
+                            ForEach(contextResources) { contextResource in
+                                OfficialTransitResourceButton(resource: contextResource)
+                            }
+                            Text(AppLocalization.text(
+                                english: "This is official context, not an exact station-information page. It opens in the same temporary JustGo reader.",
+                                simplified: "这是官方背景资料，并非本站的精确车站信息页。内容会在同一临时 JustGo 阅读器中打开。",
+                                traditional: "這是官方背景資料，並非本站的精確車站資訊頁。內容會在同一臨時 JustGo 閱讀器中開啟。"
+                            ))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text(AppLocalization.text(
+                            english: "No reviewed official station-information record is available.",
+                            simplified: "暂无已审核的官方车站信息记录。",
+                            traditional: "暫無已審核的官方車站資訊記錄。"
+                        ))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    private func officialStationInformationConfidence(
+        _ status: OfficialTransitStationInformationStatus?
+    ) -> DataConfidence {
+        switch status {
+        case .exactPage, .officialContextOnly:
+            return .official
+        case .notOpenForPassengerService, .noCurrentPassengerService:
+            return .unavailable
+        case nil:
+            return .unknown
+        }
+    }
+
+    private func officialStationInformationStatusText(
+        _ status: OfficialTransitStationInformationStatus?
+    ) -> String {
+        switch status {
+        case .exactPage:
+            return AppLocalization.text(
+                english: "An exact official station page is available.",
+                simplified: "已有与本站精确匹配的官方车站页面。",
+                traditional: "已有與本站精確匹配的官方車站頁面。"
+            )
+        case .officialContextOnly:
+            return AppLocalization.text(
+                english: "The responsible source publishes current line or operator information, but no stable page dedicated to this station.",
+                simplified: "相关官方来源发布了当前线路或运营信息，但没有专属于本站的稳定页面。",
+                traditional: "相關官方來源發布了目前路線或營運資訊，但沒有專屬於本站的穩定頁面。"
+            )
+        case .notOpenForPassengerService:
+            return AppLocalization.text(
+                english: "This station is not open for passenger service. The reviewed official project or opening status appears below.",
+                simplified: "本站尚未开放客运服务。下方提供已审核的官方工程或开通状态。",
+                traditional: "本站尚未開放客運服務。下方提供已審核的官方工程或開通狀態。"
+            )
+        case .noCurrentPassengerService:
+            return AppLocalization.text(
+                english: "The latest official review does not list this point as a current passenger stop. JustGo will not invent a station page.",
+                simplified: "最新官方审核未将此地点列为当前客运停靠站。JustGo 不会虚构车站页面。",
+                traditional: "最新官方審核未將此地點列為目前客運停靠站。JustGo 不會虛構車站頁面。"
+            )
+        case nil:
+            return AppLocalization.text(
+                english: "No reviewed exact station page is available.",
+                simplified: "暂无已审核的精确车站页面。",
+                traditional: "暫無已審核的精確車站頁面。"
+            )
+        }
+    }
+
     /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
     /// platform hints, labeled with a confidence chip. Sits above Train Times.
     @ViewBuilder
@@ -176,7 +331,9 @@ extension StationDetailView {
 
     @ViewBuilder
     var stationMapSection: some View {
-        let resources = viewModel?.externalResources ?? []
+        let resources = (viewModel?.externalResources ?? []).filter {
+            $0.kind != .stationInformation
+        }
         let media = viewModel?.licensedMedia ?? []
         if viewModel?.isLoadingCityPack == true || !resources.isEmpty || !media.isEmpty || viewModel?.stationLayoutStatusMessage != nil {
             GlassCard {

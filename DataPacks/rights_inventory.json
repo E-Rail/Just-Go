@@ -43,12 +43,12 @@
     {
       "id": "beijing-official-landing-links",
       "kind": "linkMetadata",
-      "scope": "HTTPS landing-page links only; no operator facts or media are copied",
+      "scope": "Reviewed coverage states and official page/context URLs for all canonical Beijing app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
       "licenseSPDX": "LicenseRef-External-Link-Only",
-      "licenseURL": "https://www.bjsubway.com/",
-      "sourceURL": "https://www.bjsubway.com/",
-      "attribution": "Beijing Subway and Beijing MTR",
-      "redistribution": "Only factual link metadata is bundled. Linked content remains with its provider."
+      "licenseURL": "https://www.bjsubway.com/station/",
+      "sourceURL": "https://www.bjsubway.com/station/",
+      "attribution": "Beijing Subway, Beijing MTR, China Railway 12306, and the identified Beijing municipal authorities",
+      "redistribution": "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only after a user tap."
     },
     {
       "id": "macau-official-landing-link",
@@ -128,6 +128,7 @@
     {
       "path": "DataPacks/official_transit_resources.json",
       "rightsIDs": [
+        "beijing-official-landing-links",
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "official-transit-resource-links",
@@ -169,6 +170,15 @@
       "path": "DataPacks/sources/8100/mtr_lines_and_stations.csv",
       "rightsIDs": [
         "data-gov-hk-mtr"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/beijing_station_information.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "justgo-generated-catalog",
+        "official-transit-resource-links",
+        "osm-metro-networks"
       ]
     },
     {

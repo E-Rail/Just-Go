@@ -139,11 +139,15 @@ else
     maximumBinaryBytes
     fullScreenCover
     canShowMIMEType
+    stationInformationReaderScript
+    WKUserScript
   ].each do |marker|
     errors << "official-resource viewer is missing #{marker}" unless official_viewer_source.include?(marker)
   end
   errors << "official resources must not use a direct SwiftUI Link" if
     official_viewer_source.include?("Link(destination:")
+  errors << "station information must not offer a Safari fallback" unless
+    official_viewer_source.include?("resource.kind != .stationInformation")
 end
 
 required_official_resource_callers = %w[

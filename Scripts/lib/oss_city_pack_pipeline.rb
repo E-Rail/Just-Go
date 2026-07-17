@@ -492,12 +492,12 @@ module OSSCityPackPipeline
           {
             "id" => "beijing-official-landing-links",
             "kind" => "linkMetadata",
-            "scope" => "HTTPS landing-page links only; no operator facts or media are copied",
+            "scope" => "Reviewed coverage states and official page/context URLs for all canonical Beijing app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
             "licenseSPDX" => "LicenseRef-External-Link-Only",
-            "licenseURL" => "https://www.bjsubway.com/",
-            "sourceURL" => "https://www.bjsubway.com/",
-            "attribution" => "Beijing Subway and Beijing MTR",
-            "redistribution" => "Only factual link metadata is bundled. Linked content remains with its provider."
+            "licenseURL" => "https://www.bjsubway.com/station/",
+            "sourceURL" => "https://www.bjsubway.com/station/",
+            "attribution" => "Beijing Subway, Beijing MTR, China Railway 12306, and the identified Beijing municipal authorities",
+            "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only after a user tap."
           },
           {
             "id" => "macau-official-landing-link",
@@ -616,8 +616,8 @@ module OSSCityPackPipeline
         {
           "path" => "DataPacks/official_transit_resources.json",
           "rightsIDs" => %w[
-            data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
-            osm-metro-networks
+            beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+            official-transit-resource-links osm-metro-networks
           ].sort
         },
         {
@@ -630,6 +630,13 @@ module OSSCityPackPipeline
         {
           "path" => "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
           "rightsIDs" => %w[data-gov-hk-mtr justgo-generated-catalog osm-metro-networks].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/beijing_station_information.json",
+          "rightsIDs" => %w[
+            beijing-official-landing-links justgo-generated-catalog
+            official-transit-resource-links osm-metro-networks
+          ].sort
         },
         {
           "path" => "DataPacks/sources/8100/metadata.json",
@@ -713,6 +720,17 @@ module OSSCityPackPipeline
         Map indexes:
         https://www.mtr.com.hk/en/customer/services/system_map.html
         https://www.mtr.com.hk/en/customer/services/stmap_index.html
+
+        Beijing station-page metadata is reviewed from official Beijing Subway, 12306, municipal
+        transport, development, and construction sources. All canonical app stations receive an
+        exact-page or typed review outcome. The bundle contains URL metadata, not operator page
+        text, schedules, facilities, exits, coordinates, images, or layouts:
+        https://www.bjsubway.com/station/
+        https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html
+        https://jtw.beijing.gov.cn/sjtl/202111/t20211118_2540164.html
+        https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
+        https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
+        https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
 
         ## Jianguomen Station Photo
 

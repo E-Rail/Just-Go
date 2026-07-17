@@ -119,6 +119,7 @@ protocol OfficialStationDataProviding {
     func enrichStation(_ station: Station) async -> Station
     func enrichStations(_ stations: [Station]) async -> [Station]
     func externalResources(for station: Station) async -> [ExternalTransitResource]
+    func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation?
     func licensedMedia(for station: Station) async -> [LicensedStationMedia]
     func serviceStatus(for station: Station) async -> CityPackServiceStatus?
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot
@@ -535,6 +536,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let cityResources = officialResourceCatalog.cityResources(station.cityID)
         var seen = Set<String>()
         return (stationResources + cityResources).filter { seen.insert($0.id).inserted }
+    }
+
+    func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation? {
+        officialResourceCatalog.stationResourceRecord(
+            cityID: station.cityID,
+            stationID: networkStationID(station.stationID),
+            stationName: station.name,
+            stationNameEn: station.nameEn
+        )
     }
 
     func licensedMedia(for station: Station) async -> [LicensedStationMedia] {

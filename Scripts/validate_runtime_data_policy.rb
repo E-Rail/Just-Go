@@ -125,6 +125,40 @@ swift_sources.each do |absolute_path, source|
   end
 end
 
+official_viewer_path = File.join(ROOT, "JustGo/Views/Components/Web/OfficialTransitResourceViewer.swift")
+unless File.file?(official_viewer_path)
+  errors << "official-resource in-app viewer is missing"
+else
+  official_viewer_source = File.read(official_viewer_path, encoding: "UTF-8")
+  %w[
+    WKWebsiteDataStore.nonPersistent
+    URLSessionConfiguration.ephemeral
+    reloadIgnoringLocalAndRemoteCacheData
+    OfficialTransitResourceButton
+    PDFView
+    maximumBinaryBytes
+    fullScreenCover
+    canShowMIMEType
+  ].each do |marker|
+    errors << "official-resource viewer is missing #{marker}" unless official_viewer_source.include?(marker)
+  end
+  errors << "official resources must not use a direct SwiftUI Link" if
+    official_viewer_source.include?("Link(destination:")
+end
+
+required_official_resource_callers = %w[
+  JustGo/Views/Profile/TransitDataView.swift
+  JustGo/Views/Route/IndoorStepGoView.swift
+  JustGo/Views/Route/LiveGoView.swift
+  JustGo/Views/Route/TransferStationSheet.swift
+  JustGo/Views/Station/StationDetailView+DataSections.swift
+].freeze
+required_official_resource_callers.each do |relative_path|
+  source = swift_sources.fetch(File.join(ROOT, relative_path))
+  errors << "#{relative_path} must use the shared in-app official-resource button" unless
+    source.include?("OfficialTransitResourceButton(")
+end
+
 download_callers = swift_sources.each_with_object([]) do |(absolute_path, source), callers|
   relative_path = absolute_path.delete_prefix("#{ROOT}/")
   callers << relative_path if source.include?("downloadCityPack(") && absolute_path != policy_path
@@ -145,6 +179,8 @@ project = read.call("JustGo.xcodeproj/project.pbxproj")
 %w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
   errors << "Xcode resources are missing #{resource}" unless project.include?(resource)
 end
+errors << "Xcode project is missing OfficialTransitResourceViewer.swift" unless
+  project.include?("OfficialTransitResourceViewer.swift")
 %w[indoor_maps.json JustGo-Privacy.plist].each do |retired_resource|
   errors << "Xcode project still references #{retired_resource}" if project.include?(retired_resource)
 end
@@ -170,4 +206,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1"
+puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral"

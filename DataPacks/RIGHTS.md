@@ -44,10 +44,13 @@ map, 98 Location Maps, 98 Station Layouts, and 14 Light Rail Street Maps, all ho
 remains source-pending for structured data and exposes official route, fare, and customer-service
 links.
 
-Resources open only after a user taps an ordinary system-browser link. JustGo does not fetch,
-preview, cache, prefetch, or store operator content, and external maps do not count as offline
-coverage or evidence of an indoor path or door position. Browser downloads remain the user's
-choice. Hyperlinking is a conservative engineering policy, not a legal guarantee.
+Resources render only after a user taps them. Pages use an ephemeral WebKit data store; PDFs and
+images use memory-only native renderers with a 50 MB response limit. Their state is discarded with
+the presentation. JustGo does not prefetch, persist, or redistribute operator content, and external
+maps do not count as offline coverage or evidence of an indoor path or door position. The operator
+receives the user-initiated network request and applies its own privacy terms. Unsupported resources
+offer an explicit browser fallback. Linking and user-initiated rendering are conservative
+engineering controls, not a legal guarantee.
 
 ## Pilot Media
 

@@ -300,7 +300,7 @@ struct LiveGoView: View {
                     DataConfidenceChip(confidence: indoorMap.confidence, compact: true)
                 }
                 ForEach(guidance.externalResources.filter(\.kind.isTransferRelevant)) { resource in
-                    OfficialTransitResourceLink(resource: resource, compact: true)
+                    OfficialTransitResourceButton(resource: resource, compact: true)
                 }
                 if guidance.externalResources.contains(where: { $0.kind.isTransferRelevant }) {
                     Text(AppLocalization.text(

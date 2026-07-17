@@ -705,8 +705,9 @@ module OSSCityPackPipeline
 
         The bundled official-resource catalog contains reviewed factual link metadata for transit
         operators and government transport authorities. Linked pages, PDFs, and images remain with
-        their providers. JustGo opens them in the system browser only after user action and does not
-        copy, fetch, preview, cache, or prefetch their content.
+        their providers. After user action, JustGo renders reviewed pages in a non-persistent WebKit
+        session and reviewed PDFs or images in memory-only native viewers. It does not copy,
+        prefetch, persist, or redistribute their content.
 
         Hong Kong map metadata is reviewed from the official MTR System Map and Light Rail Street
         Map indexes:

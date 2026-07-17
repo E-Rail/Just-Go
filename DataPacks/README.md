@@ -4,8 +4,8 @@
 download catalog: every `downloadURL` is `null`, and the only available packs point to
 `JustGo/Resources/BundledCityPacks/1100.json` and `8100.json` through `bundledResource`.
 The other 56 catalog cities are intentionally `source_pending`.
-The separate official-resource catalog exposes reviewed tap-only links without changing a
-city's pack status or copying an operator dataset.
+The separate official-resource catalog exposes reviewed user-initiated resources without changing
+a city's pack status or copying an operator dataset.
 
 ## Build
 
@@ -58,8 +58,10 @@ generation and CI are offline and read the reviewed snapshot.
 
 Runtime code trusts links only from this bundled catalog. City-pack `externalResources` fields
 remain decodable for schema-v2 compatibility but are ignored, and downloaded packs cannot inject
-URLs. All links open through the system browser after a user tap; JustGo does not fetch, preview,
-cache, prefetch, or store the linked operator files.
+URLs. After a user tap, reviewed pages use a non-persistent WebKit session and reviewed PDFs or
+images use memory-only native viewers with a 50 MB limit. JustGo does not prefetch, persist, or
+redistribute linked operator content, and an unsupported resource can leave the app only through
+an explicit rider-selected browser fallback.
 
 ## Schema V2
 

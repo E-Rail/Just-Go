@@ -53,9 +53,11 @@ Hong Kong contributes 1 system map, 98 distinct Location Maps, 98 distinct Stati
 pages. Macau remains source-pending for structured data but links to its official route, fare,
 and customer-service pages.
 
-Every resource opens through the system browser after a rider taps it. JustGo stores factual URL
-metadata only: it does not fetch, render, preview, cache, prefetch, or redistribute operator pages,
-PDFs, or images. A browser may download a linked file only if the rider chooses to do so.
+Every resource opens inside JustGo after a rider taps it. The app stores factual URL metadata only:
+pages use an ephemeral WebKit session, while PDFs and images use memory-only native viewers with a
+50 MB limit. JustGo does not prefetch, persist, or redistribute operator content. The operator
+receives the user-initiated request and may process network information under its own policy. An
+explicit browser fallback remains available when a resource cannot render in the app.
 
 ## Indoor Guidance
 
@@ -93,9 +95,10 @@ license treatment.
 
 - Personal station media stays in Application Support, is excluded from backup, and is never
   used to infer routing, accessibility, indoor paths, or doors.
-- External operator resources open only after a user action. JustGo does not fetch, render,
-  preview, prefetch, cache, store, or count those pages and files as offline content. Any file
-  download is handled by the rider's browser.
+- External operator resources render inside non-persistent in-app page and document viewers only
+  after a user action. JustGo does not prefetch, persist, redistribute, or count them as offline
+  content. The operator receives the request; unsupported downloads remain an explicit browser
+  fallback controlled by the rider.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)

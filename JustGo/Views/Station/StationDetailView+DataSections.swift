@@ -192,7 +192,7 @@ extension StationDetailView {
                         ProgressView()
                     } else {
                         ForEach(resources) { resource in
-                            OfficialTransitResourceLink(resource: resource, compact: true)
+                            OfficialTransitResourceButton(resource: resource, compact: true)
                         }
 
                         ForEach(media) { item in

@@ -10,6 +10,9 @@ struct StationDetailView: View {
     @State var showQuickTagDialog = false
     @State var showCustomQuickTagAlert = false
     @State var customQuickTagText = ""
+    @State var pendingQuickTagKind: StationQuickTagKind?
+    @State var showQuickTagReplacementDialog = false
+    @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
 
     private var currentQuickTag: StationQuickTag? {
         tripMemoryService.quickTag(stationID: displayedStation.stationID, cityID: displayedStation.cityID)
@@ -23,10 +26,12 @@ struct StationDetailView: View {
                 linesSection
                 beforeYouGoSection
                 officialStationInformationSection
-                accessibilitySection
-                stationEssentialsSection
-                stationGuideSection
-                arrivalsSection
+                if !usesNativeStationInformationSurface {
+                    accessibilitySection
+                    stationEssentialsSection
+                    stationGuideSection
+                    arrivalsSection
+                }
                 serviceStatusSection
                 stationMapSection
                 if let stationKey = PersonalStationMediaKey(
@@ -64,7 +69,7 @@ struct StationDetailView: View {
             viewModel = container.makeStationDetailViewModel()
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()
-            await viewModel?.loadTrainTimes()
+            await viewModel?.loadRiderInformation()
         }
         .fullScreenCover(item: $selectedStationImage) { image in
             FullScreenStationImageView(image: image)
@@ -73,6 +78,8 @@ struct StationDetailView: View {
             isPresented: $showQuickTagDialog,
             showCustom: $showCustomQuickTagAlert,
             customText: $customQuickTagText,
+            pendingKind: $pendingQuickTagKind,
+            showReplacement: $showQuickTagReplacementDialog,
             station: displayedStation,
             currentQuickTag: currentQuickTag,
             container: container,
@@ -82,6 +89,17 @@ struct StationDetailView: View {
 
     var displayedStation: Station {
         viewModel?.station ?? station
+    }
+
+    var usesNativeStationInformationSurface: Bool {
+        if displayedStation.cityID == "8100" {
+            return true
+        }
+        guard displayedStation.cityID == "1100" else { return false }
+        if viewModel == nil || viewModel?.isLoadingCityPack == true {
+            return true
+        }
+        return viewModel?.usesCategorizedStationInformation == true
     }
 
     private var beforeYouGoSection: some View {
@@ -275,6 +293,8 @@ private extension View {
         isPresented: Binding<Bool>,
         showCustom: Binding<Bool>,
         customText: Binding<String>,
+        pendingKind: Binding<StationQuickTagKind?>,
+        showReplacement: Binding<Bool>,
         station: Station,
         currentQuickTag: StationQuickTag?,
         container: DIContainer,
@@ -286,10 +306,24 @@ private extension View {
             titleVisibility: .visible
         ) {
             Button(StationQuickTagKind.home.title) {
-                saveQuickTag(.home, station: station, container: container, tripMemoryService: tripMemoryService)
+                attemptQuickTagSave(
+                    .home,
+                    station: station,
+                    container: container,
+                    tripMemoryService: tripMemoryService,
+                    pendingKind: pendingKind,
+                    showReplacement: showReplacement
+                )
             }
             Button(StationQuickTagKind.work.title) {
-                saveQuickTag(.work, station: station, container: container, tripMemoryService: tripMemoryService)
+                attemptQuickTagSave(
+                    .work,
+                    station: station,
+                    container: container,
+                    tripMemoryService: tripMemoryService,
+                    pendingKind: pendingKind,
+                    showReplacement: showReplacement
+                )
             }
             Button(AppLocalization.text(english: "Custom…", simplified: "自定义…", traditional: "自訂…")) {
                 customText.wrappedValue = currentQuickTag?.kind.customLabel ?? ""
@@ -314,25 +348,80 @@ private extension View {
             Button(AppLocalization.localized("Save")) {
                 let label = customText.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !label.isEmpty else { return }
-                saveQuickTag(.custom(label), station: station, container: container, tripMemoryService: tripMemoryService)
+                attemptQuickTagSave(
+                    .custom(label),
+                    station: station,
+                    container: container,
+                    tripMemoryService: tripMemoryService,
+                    pendingKind: pendingKind,
+                    showReplacement: showReplacement
+                )
             }
             Button(AppLocalization.localized("Cancel"), role: .cancel) {}
         }
+        .confirmationDialog(
+            AppLocalization.text(
+                english: "Replace a Quick Tag?",
+                simplified: "替换一个快捷标签？",
+                traditional: "取代一個快捷標籤？"
+            ),
+            isPresented: showReplacement,
+            titleVisibility: .visible,
+            presenting: pendingKind.wrappedValue
+        ) { kind in
+            ForEach(tripMemoryService.stationQuickTags) { quickTag in
+                Button("\(quickTag.kind.title) · \(quickTag.displayName)") {
+                    attemptQuickTagSave(
+                        kind,
+                        station: station,
+                        container: container,
+                        tripMemoryService: tripMemoryService,
+                        pendingKind: pendingKind,
+                        showReplacement: showReplacement,
+                        replacing: quickTag.id
+                    )
+                }
+            }
+            Button(AppLocalization.localized("Cancel"), role: .cancel) {
+                pendingKind.wrappedValue = nil
+            }
+        } message: { _ in
+            Text(AppLocalization.text(
+                english: "You can keep up to three Quick Tags. Choose one to replace.",
+                simplified: "最多可保留三个快捷标签。请选择要替换的标签。",
+                traditional: "最多可保留三個快捷標籤。請選擇要取代的標籤。"
+            ))
+        }
     }
 
-    func saveQuickTag(
+    func attemptQuickTagSave(
         _ kind: StationQuickTagKind,
         station: Station,
         container: DIContainer,
-        tripMemoryService: TripMemoryService
+        tripMemoryService: TripMemoryService,
+        pendingKind: Binding<StationQuickTagKind?>,
+        showReplacement: Binding<Bool>,
+        replacing replacementID: String? = nil
     ) {
         let city = container.cityService.getCity(byID: station.cityID)
-        tripMemoryService.setQuickTag(
+        let result = tripMemoryService.setQuickTag(
             station: station,
             cityName: city?.name ?? station.cityID,
             cityNameEn: city?.nameEn,
-            kind: kind
+            kind: kind,
+            replacing: replacementID
         )
+        switch result {
+        case .saved:
+            pendingKind.wrappedValue = nil
+            showReplacement.wrappedValue = false
+        case .replacementRequired:
+            pendingKind.wrappedValue = kind
+            Task { @MainActor in
+                await Task.yield()
+                showReplacement.wrappedValue = true
+            }
+        }
     }
 }
 

@@ -202,6 +202,7 @@ struct OfficialTransitResourceStation: Codable, Equatable, Identifiable, Sendabl
     let stationName: String
     let stationNameEn: String
     let aliases: [String]
+    let providerStationID: String?
     let stationInformationStatus: OfficialTransitStationInformationStatus?
     let resources: [ExternalTransitResource]
 
@@ -360,8 +361,14 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
                 $0.provider == "Beijing Subway" &&
                 URLComponents(string: $0.targetURL)?.path == "/station/"
         }
+        let beijingProviderReferences = beijing.stationResources.compactMap(\.providerStationID)
         guard beijing.stationResources.count == 444,
               beijingStationPages.count == 418,
+              beijingProviderReferences.count == 416,
+              Set(beijingProviderReferences).count == beijingProviderReferences.count,
+              beijingProviderReferences.allSatisfy({
+                  $0.range(of: #"^\d{9}$"#, options: .regularExpression) != nil
+              }),
               beijing.stationResources.count(where: {
                   $0.stationInformationStatus == .exactPage
               }) == 418,
@@ -426,13 +433,19 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
         _ station: OfficialTransitResourceStation
     ) -> Bool {
         let stationInformationCount = station.resources.count { $0.kind == .stationInformation }
+        if let providerStationID = station.providerStationID,
+           providerStationID.range(of: #"^\d{9}$"#, options: .regularExpression) == nil {
+            return false
+        }
         switch station.stationInformationStatus {
         case .exactPage:
             return stationInformationCount == 1
         case .officialContextOnly, .notOpenForPassengerService:
-            return stationInformationCount == 0 && !station.resources.isEmpty
+            return station.providerStationID == nil &&
+                stationInformationCount == 0 &&
+                !station.resources.isEmpty
         case .noCurrentPassengerService:
-            return station.resources.isEmpty
+            return station.providerStationID == nil && station.resources.isEmpty
         case nil:
             return false
         }

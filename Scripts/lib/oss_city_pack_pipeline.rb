@@ -724,7 +724,9 @@ module OSSCityPackPipeline
         Beijing station-page metadata is reviewed from official Beijing Subway, 12306, municipal
         transport, development, and construction sources. All canonical app stations receive an
         exact-page or typed review outcome. The bundle contains URL metadata, not operator page
-        text, schedules, facilities, exits, coordinates, images, or layouts:
+        text, schedules, facilities, exits, coordinates, images, or layouts. For 416 reviewed Beijing
+        Subway IDs, Station Detail may request selected station text from the operator for temporary,
+        non-persistent native display; the response remains subject to the operator's terms:
         https://www.bjsubway.com/station/
         https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html
         https://jtw.beijing.gov.cn/sjtl/202111/t20211118_2540164.html

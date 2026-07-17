@@ -54,7 +54,8 @@ receive an explicit state: 418 exact pages, 18 official-context-only records, 3 
 for passenger service, and 5 points without current passenger service. No source-only station is
 attached to an invented canonical ID. The committed output is factual URL/ID metadata only; it
 contains no operator schedules, facilities, exits, coordinates, images, timetable data, or page
-text.
+text. The 416 reviewed opaque operator IDs are also the allowlist for transient native
+station-information requests.
 
 Hong Kong URL metadata is refreshed only by an intentional developer command:
 
@@ -67,14 +68,15 @@ links to 162 canonical station records through explicit bindings, and stores no 
 generated catalog exposes 197 distinct heavy-rail PDFs and 14 distinct Light Rail PDFs. Normal
 generation and CI are offline and read the reviewed snapshot.
 
-Runtime code trusts links only from this bundled catalog. City-pack `externalResources` fields
-remain decodable for schema-v2 compatibility but are ignored, and downloaded packs cannot inject
-URLs. After a user tap, reviewed pages use a non-persistent WebKit session and reviewed PDFs or
-images use memory-only native viewers with a 50 MB limit. JustGo does not prefetch, persist, or
-redistribute linked operator content, and an unsupported resource can leave the app only through
-an explicit rider-selected browser fallback. Beijing station-information pages remain in JustGo
-and expose only an in-app retry on failure. Their temporary reader applies responsive styling to
-the provider page but does not extract or persist its text.
+Runtime code trusts links and Beijing provider references only from this bundled catalog.
+City-pack `externalResources` fields remain decodable for schema-v2 compatibility but are ignored,
+and downloaded packs cannot inject URLs or online station IDs. Opening one of the 416 supported
+Beijing Station Detail records performs a fixed-host, fixed-path request and displays selected
+first/last, exit, and facility text in native rows. Responses are identity-checked, capped at
+1 MB, cached in memory for five minutes, and never persisted. All other reviewed pages use a
+non-persistent WebKit session after a user tap; reviewed PDFs and images use memory-only native
+viewers with a 50 MB limit. An unsupported resource can leave the app only through an explicit
+rider-selected browser fallback.
 
 ## Schema V2
 

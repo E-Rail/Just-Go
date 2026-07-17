@@ -177,6 +177,14 @@ beijing_station_pages = beijing_station_resources.flat_map { |station| station.f
   .select { |resource| resource.fetch("kind") == "stationInformation" }
 fail_validation("Beijing must review all 444 canonical stations") unless beijing_station_resources.length == 444
 fail_validation("Beijing must expose 418 exact station pages") unless beijing_station_pages.length == 418
+beijing_provider_references = beijing_station_resources.each_with_object([]) do |station, references|
+  references << station["providerStationID"] if station.key?("providerStationID")
+end
+fail_validation("Beijing must expose 416 reviewed native provider references") unless
+  beijing_provider_references.length == 416
+fail_validation("Beijing native provider references must be unique nine-digit IDs") unless
+  beijing_provider_references.uniq.length == 416 &&
+    beijing_provider_references.all? { |station_id| station_id.match?(/\A\d{9}\z/) }
 fail_validation("Beijing source station count changed") unless beijing_source.fetch("sourceStationCount") == 423
 fail_validation("Beijing native mapping count changed") unless beijing_source.fetch("mappedStationCount") == 416
 fail_validation("Beijing Subway station-page coverage changed") unless beijing_source.fetch("stationPageCount") == 417
@@ -236,10 +244,19 @@ fail_validation("Beijing must expose the reviewed official directory fallback") 
 runtime_swift = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift"))
   .map { |path| File.read(path, encoding: "UTF-8") }
   .join("\n")
-fail_validation("runtime must not call the undocumented Beijing station-detail API") if
-  runtime_swift.include?("/api/guanwang/v2/getStationDetail")
-fail_validation("runtime must not parse Beijing operator text into native station models") if
-  runtime_swift.include?("OfficialStationInformationProviding")
+%w[
+  OfficialStationInformationProviding
+  BeijingStationInformationProvider
+  URLSessionConfiguration.ephemeral
+  reloadIgnoringLocalAndRemoteCacheData
+  maximumResponseBytes
+  cacheLifetime
+].each do |marker|
+  fail_validation("native station-information provider is missing #{marker}") unless
+    runtime_swift.include?(marker)
+end
+fail_validation("native provider must use the fixed Beijing station-detail path") unless
+  runtime_swift.include?('"/api/guanwang/v2/getStationDetail"')
 
 hong_kong = cities.find { |city| city.fetch("cityID") == "8100" }
 hk_resources = hong_kong.fetch("resources") + hong_kong.fetch("stationResources").flat_map { |station| station.fetch("resources") }

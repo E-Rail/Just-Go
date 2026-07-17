@@ -3,13 +3,12 @@ import SwiftUI
 extension StationDetailView {
     @ViewBuilder
     var officialStationInformationSection: some View {
-        if displayedStation.cityID == "1100" {
+        if displayedStation.cityID == "1100" || displayedStation.cityID == "8100" {
             let review = viewModel?.officialResourceReview
-            let resource = review?.resources.first {
-                $0.kind == .stationInformation && $0.scope == .station
-            }
+            let resource = viewModel?.officialStationInformationSourceResource
             let contextResources = review?.resources.filter { $0.kind != .stationInformation } ?? []
-            let provider = resource?.provider
+            let provider = viewModel?.officialStationInformation?.source.title
+                ?? resource?.provider
                 ?? contextResources.first?.provider
                 ?? AppLocalization.text(
                     english: "Reviewed official sources",
@@ -32,14 +31,41 @@ extension StationDetailView {
                         }
                         Spacer(minLength: 8)
                         DataConfidenceChip(
-                            confidence: viewModel == nil || viewModel?.isLoadingCityPack == true
-                                ? .unknown
-                                : officialStationInformationConfidence(review?.stationInformationStatus),
+                            confidence: officialStationInformationConfidence(
+                                review?.stationInformationStatus,
+                                cityID: displayedStation.cityID
+                            ),
                             compact: true
                         )
                     }
 
-                    if viewModel == nil || viewModel?.isLoadingCityPack == true {
+                    if usesNativeStationInformationSurface {
+                        Picker(
+                            AppLocalization.text(
+                                english: "Station information category",
+                                simplified: "车站信息类别",
+                                traditional: "車站資訊類別"
+                            ),
+                            selection: $selectedOfficialInformationCategory
+                        ) {
+                            ForEach(OfficialStationInformationCategory.allCases) { category in
+                                Text(category.title(for: displayedStation.cityID))
+                                    .tag(category)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+
+                        nativeOfficialStationInformationContent
+
+                        if let resource {
+                            Divider()
+                            OfficialTransitResourceButton(resource: resource)
+                        }
+
+                        Text(officialStationInformationProvenance)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    } else if viewModel == nil || viewModel?.isLoadingCityPack == true {
                         HStack(spacing: 10) {
                             ProgressView()
                             Text(AppLocalization.text(
@@ -50,25 +76,6 @@ extension StationDetailView {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         }
-                    } else if let resource {
-                        Text(AppLocalization.text(
-                            english: "Read this station's exact official information inside JustGo. The phone reader keeps train times, exits, nearby places, and facilities readable without opening Safari.",
-                            simplified: "直接在 JustGo 内阅读本站对应的官方信息。手机阅读模式会清晰呈现首末车、出入口、周边地点与服务设施，无需打开 Safari。",
-                            traditional: "直接在 JustGo 內閱讀本站對應的官方資訊。手機閱讀模式會清楚呈現首末班車、出入口、周邊地點與服務設施，無需開啟 Safari。"
-                        ))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                        OfficialTransitResourceButton(resource: resource)
-
-                        Text(AppLocalization.text(
-                            english: "Official text loads only after you tap, remains in a temporary in-app session, and is never copied into the offline city pack.",
-                            simplified: "官方文字仅在点按后加载，只存在于应用内临时会话中，不会复制到离线城市数据包。",
-                            traditional: "官方文字僅在點按後載入，只存在於 App 內臨時工作階段中，不會複製到離線城市資料包。"
-                        ))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
                     } else if let review {
                         Label {
                             Text(officialStationInformationStatusText(review.stationInformationStatus))
@@ -106,9 +113,289 @@ extension StationDetailView {
         }
     }
 
+    @ViewBuilder
+    private var nativeOfficialStationInformationContent: some View {
+        if viewModel == nil ||
+            viewModel?.isLoadingOfficialStationInformation == true ||
+            (displayedStation.cityID == "8100" &&
+                viewModel?.officialStationInformation == nil &&
+                viewModel?.isLoading == true) {
+            HStack(spacing: 10) {
+                ProgressView()
+                Text(AppLocalization.text(
+                    english: "Loading official station information",
+                    simplified: "正在加载官方车站信息",
+                    traditional: "正在載入官方車站資訊"
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
+        } else if let snapshot = viewModel?.officialStationInformation {
+            switch selectedOfficialInformationCategory {
+            case .firstLast:
+                officialTrainRows(snapshot.trains)
+            case .exits:
+                officialExitRows(snapshot.exits)
+            case .facilities:
+                officialFacilityRows(snapshot.facilityGroups)
+            }
+        } else if let error = viewModel?.officialStationInformationError {
+            VStack(alignment: .leading, spacing: 10) {
+                Label(error, systemImage: "wifi.exclamationmark")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button {
+                    viewModel?.retryRiderInformation()
+                } label: {
+                    Label(
+                        AppLocalization.text(
+                            english: "Retry",
+                            simplified: "重试",
+                            traditional: "重試"
+                        ),
+                        systemImage: "arrow.clockwise"
+                    )
+                }
+                .buttonStyle(.bordered)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            officialCategoryEmptyState
+        }
+    }
+
+    @ViewBuilder
+    private func officialTrainRows(_ trains: [OfficialStationTrainInformation]) -> some View {
+        if displayedStation.cityID == "8100",
+           viewModel?.isLoading == true,
+           trains.isEmpty {
+            HStack(spacing: 10) {
+                ProgressView()
+                Text(AppLocalization.text(
+                    english: "Loading live trains",
+                    simplified: "正在加载实时列车",
+                    traditional: "正在載入即時列車"
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
+        } else if trains.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                officialCategoryEmptyState
+                if displayedStation.cityID == "8100",
+                   let message = viewModel?.errorMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button {
+                        viewModel?.retryRiderInformation()
+                    } label: {
+                        Label(
+                            AppLocalization.text(
+                                english: "Retry",
+                                simplified: "重试",
+                                traditional: "重試"
+                            ),
+                            systemImage: "arrow.clockwise"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(trains.enumerated()), id: \.element.id) { index, train in
+                    if index > 0 {
+                        Divider()
+                    }
+                    HStack(alignment: .top, spacing: 10) {
+                        Circle()
+                            .fill(train.lineColorHex.map(Color.init(hex:)) ?? Color.accentColor)
+                            .frame(width: 10, height: 10)
+                            .padding(.top, 5)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(train.lineName)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            Text(AppLocalization.text(
+                                english: "Toward \(train.destination)",
+                                simplified: "开往 \(train.destination)",
+                                traditional: "開往 \(train.destination)"
+                            ))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                            if let liveTime = train.liveTime {
+                                Label(liveTime, systemImage: "wave.3.right")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(Color.accentColor)
+                            } else {
+                                HStack(spacing: 16) {
+                                    if let firstTime = train.firstTime {
+                                        trainTimeValue(
+                                            label: AppLocalization.localized("First"),
+                                            value: firstTime
+                                        )
+                                    }
+                                    if let lastTime = train.lastTime {
+                                        trainTimeValue(
+                                            label: AppLocalization.localized("Last"),
+                                            value: lastTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 10)
+                }
+            }
+        }
+    }
+
+    private func trainTimeValue(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .monospacedDigit()
+        }
+    }
+
+    @ViewBuilder
+    private func officialExitRows(_ exits: [OfficialStationExitInformation]) -> some View {
+        if exits.isEmpty {
+            officialCategoryEmptyState
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(exits.enumerated()), id: \.element.id) { index, exit in
+                    if index > 0 {
+                        Divider()
+                    }
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: exit.isAccessible == true
+                            ? "figure.roll"
+                            : "door.left.hand.open")
+                            .foregroundStyle(exit.isAccessible == true ? .green : Color.accentColor)
+                            .frame(width: 22)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(exit.name)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            ForEach(exit.details, id: \.self) { detail in
+                                Text(detail)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 9)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func officialFacilityRows(
+        _ groups: [OfficialStationFacilityGroup]
+    ) -> some View {
+        if groups.isEmpty {
+            officialCategoryEmptyState
+        } else {
+            VStack(alignment: .leading, spacing: 14) {
+                ForEach(groups) { group in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(group.name)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        ForEach(group.items) { item in
+                            let isUnavailable = item.availability == .unavailable
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: isUnavailable
+                                    ? "xmark.circle.fill"
+                                    : "checkmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(isUnavailable ? .red : .green)
+                                    .padding(.top, 2)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.name)
+                                        .font(.subheadline)
+                                    if let location = item.location {
+                                        Text(location)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    } else if isUnavailable {
+                                        Text(AppLocalization.localized("Not available"))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer(minLength: 0)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 6)
+        }
+    }
+
+    private var officialCategoryEmptyState: some View {
+        let categoryTitle = selectedOfficialInformationCategory.title(
+            for: displayedStation.cityID
+        )
+        return Label {
+            Text(AppLocalization.text(
+                english: "The official source has no verified \(categoryTitle.lowercased()) information for this station.",
+                simplified: "官方来源暂无本站的已核实\(categoryTitle)信息。",
+                traditional: "官方來源暫無本站的已核實\(categoryTitle)資訊。"
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: selectedOfficialInformationCategory.icon)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 8)
+    }
+
+    private var officialStationInformationProvenance: String {
+        if displayedStation.cityID == "8100" {
+            return AppLocalization.text(
+                english: "Live trains online · accessibility data included offline",
+                simplified: "列车信息在线获取 · 无障碍数据已离线内置",
+                traditional: "列車資訊線上取得 · 無障礙資料已離線內置"
+            )
+        }
+        return AppLocalization.text(
+            english: "Official online data · temporary · not saved",
+            simplified: "官方在线数据 · 临时加载 · 不保存",
+            traditional: "官方線上資料 · 暫時載入 · 不儲存"
+        )
+    }
+
     private func officialStationInformationConfidence(
-        _ status: OfficialTransitStationInformationStatus?
+        _ status: OfficialTransitStationInformationStatus?,
+        cityID: String
     ) -> DataConfidence {
+        if cityID == "8100" {
+            return viewModel == nil || viewModel?.isLoadingCityPack == true
+                ? .unknown
+                : .official
+        }
         switch status {
         case .exactPage, .officialContextOnly:
             return .official

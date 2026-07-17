@@ -22,6 +22,9 @@ class OfficialTransitResourceCatalogBuilderTest < Minitest::Test
         |resource| resource.fetch("targetURL").include?("/station/siteinfo.html?loc=")
       }
     }
+    assert_equal 416, beijing.fetch("stationResources").count {
+      |station| station.fetch("providerStationID", "").match?(/\A\d{9}\z/)
+    }
     assert_equal 418, beijing.fetch("stationResources").count {
       |station| station.fetch("stationInformationStatus") == "exactPage"
     }

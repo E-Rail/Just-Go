@@ -50,7 +50,9 @@ jobs:
           ruby Scripts/validate_metro_networks.rb
           ruby Scripts/validate_indoor_maps.rb
           bash Scripts/check_no_legacy_map_provider.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_quick_tag_policy.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_personal_station_media.sh
 
       - name: Verify deterministic generated data

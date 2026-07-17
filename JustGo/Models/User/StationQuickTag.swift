@@ -42,6 +42,11 @@ enum StationQuickTagKind: Codable, Equatable, Hashable {
     }
 }
 
+enum StationQuickTagMutationResult: Equatable {
+    case saved
+    case replacementRequired([StationQuickTag])
+}
+
 struct StationQuickTag: Identifiable, Codable, Equatable {
     let id: String
     let stationID: String
@@ -141,5 +146,40 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
             coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
             source: .quickPlace
         )
+    }
+}
+
+enum StationQuickTagPolicy {
+    static let maximumCount = 3
+
+    static func inserting(
+        _ quickTag: StationQuickTag,
+        into currentTags: [StationQuickTag],
+        replacing replacementID: String? = nil
+    ) -> [StationQuickTag]? {
+        var updated = currentTags.filter { tag in
+            tag.id != replacementID &&
+                tag.id != quickTag.id &&
+                !(quickTag.kind.isExclusive && tag.kind == quickTag.kind)
+        }
+        guard updated.count < maximumCount else { return nil }
+        updated.insert(quickTag, at: 0)
+        return normalized(updated)
+    }
+
+    static func normalized(_ tags: [StationQuickTag]) -> [StationQuickTag] {
+        var seenStationIDs = Set<String>()
+        let newestUnique = tags.filter { seenStationIDs.insert($0.id).inserted }
+        let home = newestUnique.first { $0.kind == .home }
+        let work = newestUnique.first { $0.kind == .work }
+        let reservedIDs = Set([home?.id, work?.id].compactMap { $0 })
+        let customs = newestUnique.filter { tag in
+            guard !reservedIDs.contains(tag.id) else { return false }
+            if case .custom = tag.kind {
+                return true
+            }
+            return false
+        }
+        return Array(([home, work].compactMap { $0 } + customs).prefix(maximumCount))
     }
 }

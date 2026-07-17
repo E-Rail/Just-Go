@@ -125,6 +125,7 @@ module OfficialTransitResourceCatalogBuilder
           "stationName" => station.fetch("stationName"),
           "stationNameEn" => station.fetch("stationNameEn"),
           "aliases" => station.fetch("aliases"),
+          "providerStationID" => station.fetch("externalStationID"),
           "stationInformationStatus" => "exactPage",
           "resources" => [
             resource(

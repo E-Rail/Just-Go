@@ -3,11 +3,13 @@ import UIKit
 
 private struct MemoryWarningReleaseTargets: Sendable {
     let officialStationData: OfficialCityPackService?
+    let stationInformationProvider: BeijingStationInformationProvider?
     let metroNetworkProvider: BundledMetroNetworkService?
     let transitRouteProvider: BundledMetroRouteProvider?
 
     func releaseMemory() async {
         await officialStationData?.releaseMemory()
+        await stationInformationProvider?.releaseMemory()
         await metroNetworkProvider?.releaseMemory()
         await transitRouteProvider?.releaseMemory()
     }
@@ -18,6 +20,7 @@ final class DIContainer {
     let locationService: LocationService
     let placeSearchProvider: PlaceSearchProviding
     let officialStationData: OfficialStationDataProviding
+    let officialStationInformationProvider: OfficialStationInformationProviding
     let metroNetworkProvider: MetroNetworkProviding
     let routePlanningService: RoutePlanningService
     let stationSearchService: StationSearchService
@@ -35,6 +38,7 @@ final class DIContainer {
         locationService: LocationService,
         placeSearchProvider: PlaceSearchProviding,
         officialStationData: OfficialStationDataProviding,
+        officialStationInformationProvider: OfficialStationInformationProviding,
         metroNetworkProvider: MetroNetworkProviding,
         routePlanningService: RoutePlanningService,
         stationSearchService: StationSearchService,
@@ -46,12 +50,14 @@ final class DIContainer {
         comfortForecastService: ComfortForecastService,
         tripReminderService: TripReminderService,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
+        memoryManagedStationInformationProvider: BeijingStationInformationProvider? = nil,
         memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
         memoryManagedTransitRouteProvider: BundledMetroRouteProvider? = nil
     ) {
         self.locationService = locationService
         self.placeSearchProvider = placeSearchProvider
         self.officialStationData = officialStationData
+        self.officialStationInformationProvider = officialStationInformationProvider
         self.metroNetworkProvider = metroNetworkProvider
         self.routePlanningService = routePlanningService
         self.stationSearchService = stationSearchService
@@ -64,6 +70,7 @@ final class DIContainer {
         self.tripReminderService = tripReminderService
         self.memoryWarningReleaseTargets = MemoryWarningReleaseTargets(
             officialStationData: memoryManagedOfficialStationData,
+            stationInformationProvider: memoryManagedStationInformationProvider,
             metroNetworkProvider: memoryManagedMetroNetworkProvider,
             transitRouteProvider: memoryManagedTransitRouteProvider
         )
@@ -119,7 +126,10 @@ final class DIContainer {
 
     @MainActor
     func makeStationDetailViewModel() -> StationDetailViewModel {
-        StationDetailViewModel(officialStationData: officialStationData)
+        StationDetailViewModel(
+            officialStationData: officialStationData,
+            officialStationInformationProvider: officialStationInformationProvider
+        )
     }
 
     @MainActor
@@ -128,6 +138,7 @@ final class DIContainer {
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
+        let officialStationInformationProvider = BeijingStationInformationProvider()
         let officialResourceCatalog: OfficialTransitResourceCatalog
         do {
             officialResourceCatalog = try .bundled()
@@ -165,6 +176,7 @@ final class DIContainer {
             locationService: locationService,
             placeSearchProvider: placeSearchProvider,
             officialStationData: officialStationData,
+            officialStationInformationProvider: officialStationInformationProvider,
             metroNetworkProvider: metroNetworkProvider,
             routePlanningService: routePlanningService,
             stationSearchService: stationSearchService,
@@ -176,6 +188,7 @@ final class DIContainer {
             comfortForecastService: comfortForecastService,
             tripReminderService: tripReminderService,
             memoryManagedOfficialStationData: officialStationData,
+            memoryManagedStationInformationProvider: officialStationInformationProvider,
             memoryManagedMetroNetworkProvider: metroNetworkProvider,
             memoryManagedTransitRouteProvider: transitRouteProvider
         )

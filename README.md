@@ -23,6 +23,9 @@ shown as unavailable rather than inferred.
   DATA.GOV.HK under its custom reuse terms.
 - Official Hong Kong live arrivals from the government transport API, with timeout, cache,
   request-coalescing, and rate-limit handling.
+- Native three-category station information for 416 reviewed Beijing Subway stations
+  (First / Last, Exits, Facilities) and all 162 Hong Kong stations
+  (Live Trains, Exits, Facilities).
 - A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
   rider-facing maps, travel information, accessibility resources, and help pages.
 - Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
@@ -61,18 +64,21 @@ Hong Kong contributes 1 system map, 98 distinct Location Maps, 98 distinct Stati
 pages. Macau remains source-pending for structured data but links to its official route, fare,
 and customer-service pages.
 
-Every resource opens inside JustGo after a rider taps it. The app stores factual URL metadata only:
-pages use an ephemeral WebKit session, while PDFs and images use memory-only native viewers with a
-50 MB limit. Beijing's exact station pages receive a phone reader stylesheet so train times, exits,
-nearby places, and facilities fit the Station Detail flow without opening Safari. JustGo does not
-prefetch, persist, or redistribute operator content. The operator receives the user-initiated
-request and may process network information under its own policy. Non-station resources retain an
-explicit browser fallback when they cannot render in the app; exact Beijing station information
-remains in JustGo and offers an in-app retry instead.
+Station Detail presents exactly three compact information categories. For 416 reviewed Beijing
+Subway station IDs, it requests first/last trains, exits, nearby text, and facilities directly from
+the operator when the detail page opens, validates the returned station identity, and renders the
+text as native rows. The response uses an ephemeral session, a 1 MB cap, a five-minute memory cache,
+and is never written to disk or copied into a city pack. The exact official station page remains an
+in-app source and fallback. This endpoint is not a published public API and no compatible content
+reuse license was found, so production distribution still requires operator or legal review.
 
-Beijing station pages follow the same boundary. JustGo does not call the undocumented station
-detail API, prefetch pages when Station Detail opens, or extract operator schedules, exits,
-facilities, coordinates, images, or text into native/offline models.
+Hong Kong uses the same three-category structure for all 162 stations, with Live Trains replacing
+Beijing's First / Last label. Live train rows come from the official government transport API;
+exits and facilities use the included DATA.GOV.HK barrier-free snapshot where available, including
+verified unavailable states. Other reviewed pages, PDFs, and images open inside JustGo only after a
+rider taps them: pages use a non-persistent WebKit session, while documents use memory-only native
+viewers with a 50 MB limit. JustGo does not persist or redistribute operator content. Unsupported
+non-station resources retain an explicit browser fallback.
 
 ## Indoor Guidance
 
@@ -114,10 +120,11 @@ license treatment.
 - External operator resources render inside non-persistent in-app page and document viewers only
   after a user action. JustGo does not prefetch, persist, redistribute, or count them as offline
   content. The operator receives the request; unsupported downloads remain an explicit browser
-  fallback controlled by the rider. Beijing station-information pages do not offer that fallback.
-- Beijing station and reviewed context pages are requested from their recorded official provider
-  only after the rider taps. Page-controlled third-party services may receive ordinary web-request
-  metadata. JustGo does not parse or persist the page content.
+  fallback controlled by the rider.
+- Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
+  station ID to `www.bjsubway.com`. JustGo displays selected response text in memory, does not send
+  it to a JustGo server, and does not persist it. Opening the exact source page may also contact
+  provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)

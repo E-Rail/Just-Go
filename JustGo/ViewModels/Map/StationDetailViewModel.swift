@@ -50,17 +50,19 @@ final class StationDetailViewModel {
         let generation = officialInformationGeneration
         if cityID == "8100" {
             buildHongKongStationInformation()
-        }
-        await loadTrainTimes()
-        guard isCurrentOfficialInformationLoad(
-            stationID: stationID,
-            generation: generation
-        ) else { return }
-        guard cityID != "8100" else {
+            await loadTrainTimes()
+            guard isCurrentOfficialInformationLoad(
+                stationID: stationID,
+                generation: generation
+            ) else { return }
             buildHongKongStationInformation()
             return
         }
-        await loadOnlineStationInformation()
+        // Train times and the official online lookup are independent; awaiting them
+        // in sequence made every station open wait for both round-trips end to end.
+        let onlineInformationLoad = Task { await loadOnlineStationInformation() }
+        await loadTrainTimes()
+        await onlineInformationLoad.value
     }
 
     func loadTrainTimes() async {
@@ -196,7 +198,9 @@ final class StationDetailViewModel {
         let stationID = station.id
         let generation = officialInformationGeneration
         isLoadingOfficialStationInformation = true
-        officialStationInformation = nil
+        // Keep any snapshot already on screen: `loadStation` clears it on a station change,
+        // so anything still here is this station's own data — blanking it during a refresh
+        // just swaps real content for a spinner.
         officialStationInformationError = nil
         defer {
             if isCurrentOfficialInformationLoad(stationID: stationID, generation: generation) {

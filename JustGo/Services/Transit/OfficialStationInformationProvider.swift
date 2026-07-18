@@ -184,7 +184,11 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     private static let endpointPath = "/api/guanwang/v2/getStationDetail"
     private static let maximumResponseBytes = 1_048_576
     private static let requestTimeout: TimeInterval = 5
-    private static let cacheLifetime: TimeInterval = 300
+    // First/last trains, exits, and facilities change rarely; a longer in-session cache
+    // keeps station re-visits instant instead of re-fetching every few minutes. Persisting
+    // responses is deliberately forbidden (validate_runtime_data_policy.rb), so memory is
+    // the only cache tier.
+    private static let cacheLifetime: TimeInterval = 1800
     private static let defaultRateLimitBackoff: TimeInterval = 30
     private static let clock = ContinuousClock()
 

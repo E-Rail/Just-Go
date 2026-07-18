@@ -26,7 +26,7 @@ struct StationDetailView: View {
                 linesSection
                 beforeYouGoSection
                 officialStationInformationSection
-                if !usesNativeStationInformationSurface {
+                if showsBundledStationSections {
                     accessibilitySection
                     stationEssentialsSection
                     stationGuideSection
@@ -100,6 +100,17 @@ struct StationDetailView: View {
             return true
         }
         return viewModel?.usesCategorizedStationInformation == true
+    }
+
+    /// The bundled sections (schedules, accessibility, essentials, guide) return whenever
+    /// the native online surface has nothing to serve — the fetch failed and no snapshot is
+    /// cached — so a blocked or offline network still gets the offline official data instead
+    /// of only an error card.
+    var showsBundledStationSections: Bool {
+        guard usesNativeStationInformationSurface else { return true }
+        return displayedStation.cityID == "1100" &&
+            viewModel?.officialStationInformation == nil &&
+            viewModel?.officialStationInformationError != nil
     }
 
     private var beforeYouGoSection: some View {

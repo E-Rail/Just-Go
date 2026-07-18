@@ -116,7 +116,8 @@ extension StationDetailView {
     @ViewBuilder
     private var nativeOfficialStationInformationContent: some View {
         if viewModel == nil ||
-            viewModel?.isLoadingOfficialStationInformation == true ||
+            (viewModel?.isLoadingOfficialStationInformation == true &&
+                viewModel?.officialStationInformation == nil) ||
             (displayedStation.cityID == "8100" &&
                 viewModel?.officialStationInformation == nil &&
                 viewModel?.isLoading == true) {

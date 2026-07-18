@@ -139,17 +139,12 @@ final class DIContainer {
         let metroNetworkProvider = BundledMetroNetworkService()
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
         let officialStationInformationProvider = BeijingStationInformationProvider()
-        let officialResourceCatalog: OfficialTransitResourceCatalog
-        do {
-            officialResourceCatalog = try .bundled()
-        } catch {
-            AppLog.data.error("Bundled official-resource catalog failed validation: \(String(describing: error), privacy: .public)")
-            officialResourceCatalog = .empty
-        }
+        // The bundled catalog decode + validation is heavy; hand the service a loader so it
+        // runs lazily on the actor instead of blocking app launch on the main thread here.
         let officialStationData = OfficialCityPackService(
             metroNetworks: metroNetworkProvider,
             realtimeArrivals: realtimeArrivalProvider,
-            officialResourceCatalog: officialResourceCatalog
+            officialResourceCatalogLoader: { try .bundled() }
         )
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()

@@ -193,7 +193,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
     private let realtimeArrivals: any RealtimeArrivalProviding
-    private let officialResourceCatalog: OfficialTransitResourceCatalog
+    // Loaded lazily on the actor: the bundled catalog is ~600KB of JSON whose decode +
+    // integrity validation is far too heavy for DIContainer.configure() on the main
+    // thread at launch. First use pays the cost off-main; a failed load degrades to
+    // `.empty` (no official links) rather than crashing.
+    private let officialResourceCatalogLoader: @Sendable () throws -> OfficialTransitResourceCatalog
+    private var cachedOfficialResourceCatalog: OfficialTransitResourceCatalog?
     private let diskStore = CityPackDiskStore()
     private var manifests: [URL: OfficialManifest] = [:]
     private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
@@ -250,12 +255,25 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         session: URLSession = .shared,
         metroNetworks: MetroNetworkProviding,
         realtimeArrivals: any RealtimeArrivalProviding = HongKongRealtimeArrivalProvider(),
-        officialResourceCatalog: OfficialTransitResourceCatalog = .empty
+        officialResourceCatalogLoader: @escaping @Sendable () throws -> OfficialTransitResourceCatalog = { .empty }
     ) {
         self.session = session
         self.metroNetworks = metroNetworks
         self.realtimeArrivals = realtimeArrivals
-        self.officialResourceCatalog = officialResourceCatalog
+        self.officialResourceCatalogLoader = officialResourceCatalogLoader
+    }
+
+    private func officialResourceCatalog() -> OfficialTransitResourceCatalog {
+        if let cachedOfficialResourceCatalog { return cachedOfficialResourceCatalog }
+        let catalog: OfficialTransitResourceCatalog
+        do {
+            catalog = try officialResourceCatalogLoader()
+        } catch {
+            AppLog.data.error("Official transit resource catalog failed to load: \(error)")
+            catalog = .empty
+        }
+        cachedOfficialResourceCatalog = catalog
+        return catalog
     }
 
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus] {
@@ -287,12 +305,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func officialResourceCatalogCities() async -> [OfficialTransitResourceCity] {
-        officialResourceCatalog.cities
+        officialResourceCatalog().cities
     }
 
     func cityExternalResources(for cityIDs: [String]) async -> [String: [ExternalTransitResource]] {
         Set(cityIDs).reduce(into: [:]) { result, cityID in
-            let resources = officialResourceCatalog.cityResources(cityID)
+            let resources = officialResourceCatalog().cityResources(cityID)
             if !resources.isEmpty { result[cityID] = resources }
         }
     }
@@ -527,19 +545,19 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     func externalResources(for station: Station) async -> [ExternalTransitResource] {
-        let stationResources = officialResourceCatalog.stationResources(
+        let stationResources = officialResourceCatalog().stationResources(
             cityID: station.cityID,
             stationID: networkStationID(station.stationID),
             stationName: station.name,
             stationNameEn: station.nameEn
         )
-        let cityResources = officialResourceCatalog.cityResources(station.cityID)
+        let cityResources = officialResourceCatalog().cityResources(station.cityID)
         var seen = Set<String>()
         return (stationResources + cityResources).filter { seen.insert($0.id).inserted }
     }
 
     func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation? {
-        officialResourceCatalog.stationResourceRecord(
+        officialResourceCatalog().stationResourceRecord(
             cityID: station.cityID,
             stationID: networkStationID(station.stationID),
             stationName: station.name,
@@ -1653,6 +1671,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         packs.removeAll()
         bundledBaselinePacks.removeAll()
         indoorMapsByCity.removeAll()
+        cachedOfficialResourceCatalog = nil
         for cityID in releasedCityIDs {
             if loadStatuses[cityID]?.isMaterialized == true {
                 loadStatuses.removeValue(forKey: cityID)

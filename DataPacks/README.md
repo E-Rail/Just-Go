@@ -73,7 +73,10 @@ City-pack `externalResources` fields remain decodable for schema-v2 compatibilit
 and downloaded packs cannot inject URLs or online station IDs. Opening one of the 416 supported
 Beijing Station Detail records performs a fixed-host, fixed-path request and displays selected
 first/last, exit, and facility text in native rows. Responses are identity-checked, capped at
-1 MB, cached in memory for five minutes, and never persisted. All other reviewed pages use a
+1 MB, cached in memory for 30 minutes, and kept as a device-local, backup-excluded last-good
+snapshot for offline access — served labeled as cached only when the service is unreachable,
+and deleted by Settings → Clear Cache and the data-rights epoch cleanup (see RIGHTS.md). All
+other reviewed pages use a
 non-persistent WebKit session after a user tap; reviewed PDFs and images use memory-only native
 viewers with a 50 MB limit. An unsupported resource can leave the app only through an explicit
 rider-selected browser fallback.

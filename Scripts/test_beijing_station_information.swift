@@ -384,6 +384,115 @@ private func testTransportAndResponseLimits() async throws {
     contentSession.invalidateAndCancel()
 }
 
+private actor FakeStationInformationCache: OfficialStationInformationCaching {
+    static let storedDate = Date(timeIntervalSince1970: 1_752_000_000)
+    private var stored: [String: OfficialStationInformationSnapshot] = [:]
+
+    func storedSnapshot(
+        stationID: String,
+        externalStationID: String
+    ) -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)? {
+        guard let snapshot = stored[externalStationID], snapshot.stationID == stationID else {
+            return nil
+        }
+        return (snapshot, Self.storedDate)
+    }
+
+    func store(_ snapshot: OfficialStationInformationSnapshot, externalStationID: String) {
+        stored[externalStationID] = snapshot
+    }
+
+    func clearAll() {
+        stored.removeAll()
+    }
+}
+
+private func waitForStore(
+    in cache: FakeStationInformationCache
+) async throws {
+    // The provider's disk store is fire-and-forget; poll briefly for it to land.
+    for _ in 0..<100 {
+        if await cache.storedSnapshot(
+            stationID: "network-1100-jianguomen",
+            externalStationID: "150995220"
+        ) != nil {
+            return
+        }
+        try await Task.sleep(for: .milliseconds(10))
+    }
+    throw HarnessFailure(description: "successful fetch never reached the injected cache")
+}
+
+private func testStoredSnapshotFallback() async throws {
+    let body = try fixture()
+    MockTransport.install { _, invocation in
+        switch invocation {
+        case 1: return .http(statusCode: 200, body: body)
+        case 2: return .urlError(.notConnectedToInternet)
+        default: return .http(
+            statusCode: 429,
+            headers: ["Content-Type": "application/json", "Retry-After": "60"],
+            body: Data()
+        )
+        }
+    }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let cache = FakeStationInformationCache()
+    let provider = BeijingStationInformationProvider(session: session, diskCache: cache)
+
+    let live = try await provider.information(for: request())
+    try requireEqual(live.freshness, .live, "network snapshots must be live")
+    try await waitForStore(in: cache)
+
+    await provider.releaseMemory()
+    let offline = try await provider.information(for: request())
+    try requireEqual(
+        offline.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "offline must serve the stored snapshot labeled as cached"
+    )
+    try requireEqual(offline.withFreshness(.live), live, "cached payload must match the stored snapshot")
+
+    await provider.releaseMemory()
+    let rateLimited = try await provider.information(for: request())
+    try requireEqual(
+        rateLimited.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "a 429 must serve the stored snapshot instead of erroring"
+    )
+    let duringCooldown = try await provider.information(for: request())
+    try requireEqual(
+        duringCooldown.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "the cooldown window must serve the stored snapshot"
+    )
+    try requireEqual(MockTransport.requestCount, 3, "the cooldown fallback must not hit the network")
+}
+
+private func testContractViolationNeverServesCache() async throws {
+    let good = try fixture()
+    let wrongName = try fixture(stationName: "苹果园")
+    MockTransport.install { _, invocation in
+        .http(statusCode: 200, body: invocation == 1 ? good : wrongName)
+    }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let cache = FakeStationInformationCache()
+    let provider = BeijingStationInformationProvider(session: session, diskCache: cache)
+
+    _ = try await provider.information(for: request())
+    try await waitForStore(in: cache)
+    await provider.releaseMemory()
+
+    let error = try await providerError {
+        _ = try await provider.information(for: request())
+    }
+    guard case .contractViolation = error else {
+        throw HarnessFailure(description: "a station-identity mismatch must never fall back to the cache")
+    }
+}
+
 private func testInvalidReviewedReference() async throws {
     let provider = BeijingStationInformationProvider(session: makeSession())
     let invalidID = try await providerError {
@@ -414,7 +523,11 @@ private enum BeijingStationInformationHarness {
             print("PASS: timeout, rate limit, MIME, and response cap")
             try await testInvalidReviewedReference()
             print("PASS: reviewed reference validation")
-            print("BeijingStationInformationProvider: 5 test groups passed")
+            try await testStoredSnapshotFallback()
+            print("PASS: stored-snapshot fallback for availability failures")
+            try await testContractViolationNeverServesCache()
+            print("PASS: contract violations never serve the cache")
+            print("BeijingStationInformationProvider: 7 test groups passed")
         } catch {
             FileHandle.standardError.write(
                 Data("Beijing station information test failed: \(error)\n".utf8)

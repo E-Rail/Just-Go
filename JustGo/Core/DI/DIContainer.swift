@@ -31,6 +31,7 @@ final class DIContainer {
     let routeConfidenceService: RouteConfidenceService
     let comfortForecastService: ComfortForecastService
     let tripReminderService: TripReminderService
+    let stationInformationDiskCache: OfficialStationInformationDiskCache?
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
     private var memoryWarningObserver: NSObjectProtocol?
 
@@ -49,6 +50,7 @@ final class DIContainer {
         routeConfidenceService: RouteConfidenceService,
         comfortForecastService: ComfortForecastService,
         tripReminderService: TripReminderService,
+        stationInformationDiskCache: OfficialStationInformationDiskCache? = nil,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
         memoryManagedStationInformationProvider: BeijingStationInformationProvider? = nil,
         memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
@@ -68,6 +70,7 @@ final class DIContainer {
         self.routeConfidenceService = routeConfidenceService
         self.comfortForecastService = comfortForecastService
         self.tripReminderService = tripReminderService
+        self.stationInformationDiskCache = stationInformationDiskCache
         self.memoryWarningReleaseTargets = MemoryWarningReleaseTargets(
             officialStationData: memoryManagedOfficialStationData,
             stationInformationProvider: memoryManagedStationInformationProvider,
@@ -138,7 +141,10 @@ final class DIContainer {
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
-        let officialStationInformationProvider = BeijingStationInformationProvider()
+        let stationInformationDiskCache = OfficialStationInformationDiskCache()
+        let officialStationInformationProvider = BeijingStationInformationProvider(
+            diskCache: stationInformationDiskCache
+        )
         // The bundled catalog decode + validation is heavy; hand the service a loader so it
         // runs lazily on the actor instead of blocking app launch on the main thread here.
         let officialStationData = OfficialCityPackService(
@@ -182,6 +188,7 @@ final class DIContainer {
             routeConfidenceService: routeConfidenceService,
             comfortForecastService: comfortForecastService,
             tripReminderService: tripReminderService,
+            stationInformationDiskCache: stationInformationDiskCache,
             memoryManagedOfficialStationData: officialStationData,
             memoryManagedStationInformationProvider: officialStationInformationProvider,
             memoryManagedMetroNetworkProvider: metroNetworkProvider,

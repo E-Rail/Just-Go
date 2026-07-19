@@ -197,6 +197,10 @@ station_information_source = read.call(
   stationDeviceLocation
   expectedNames
   OfficialStationFacilityAvailability
+  OfficialStationInformationCaching
+  diskCache
+  freshness
+  allowsStoredFallback
 ].each do |marker|
   errors << "Beijing station-information provider is missing #{marker}" unless
     station_information_source.include?(marker)
@@ -209,9 +213,37 @@ errors << "Beijing station-information provider must use the fixed detail path" 
   station_information_source.include?('endpointPath = "/api/guanwang/v2/getStationDetail"')
 %w[UserDefaults FileManager write(to: createFile].each do |persistence_marker|
   if station_information_source.include?(persistence_marker)
-    errors << "Beijing station-information responses must not persist via #{persistence_marker}"
+    errors << "Beijing station-information provider must stay storage-free; found #{persistence_marker}"
   end
 end
+
+# The device-only snapshot cache is the single sanctioned storage tier for fetched official
+# station information: Application Support, backup-excluded, size-capped, wiped by both the
+# Clear Cache action and the data-rights epoch cleanup, and never bundled or exported.
+station_information_cache = read.call(
+  "JustGo/Services/Transit/OfficialStationInformationCache.swift"
+)
+%w[
+  StationInformationCache
+  applicationSupportDirectory
+  schemaVersion
+  isExcludedFromBackup
+  maximumEntryBytes
+  clearAll
+  .atomic
+  OfficialStationInformationCaching
+].each do |marker|
+  errors << "station-information cache is missing #{marker}" unless
+    station_information_cache.include?(marker)
+end
+%w[URLSession https http:// AsyncBytes].each do |network_marker|
+  if station_information_cache.include?(network_marker)
+    errors << "station-information cache must be storage-only; found #{network_marker}"
+  end
+end
+app_entry = read.call("JustGo/App/JustGoApp.swift")
+errors << "data-rights epoch cleanup must sweep the station-information cache" unless
+  app_entry.include?("StationInformationCacheLocation")
 
 station_detail_model = read.call("JustGo/ViewModels/Map/StationDetailViewModel.swift")
 errors << "Hong Kong station information must preserve verified unavailable facilities" unless
@@ -240,6 +272,8 @@ errors << "Xcode project is missing OfficialTransitResourceViewer.swift" unless
   project.include?("OfficialTransitResourceViewer.swift")
 errors << "Xcode project is missing OfficialStationInformationProvider.swift" unless
   project.include?("OfficialStationInformationProvider.swift")
+errors << "Xcode project is missing OfficialStationInformationCache.swift" unless
+  project.include?("OfficialStationInformationCache.swift")
 %w[indoor_maps.json JustGo-Privacy.plist].each do |retired_resource|
   errors << "Xcode project still references #{retired_resource}" if project.include?(retired_resource)
 end
@@ -265,4 +299,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=transient quick_tags=unlimited_custom"
+puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=cached_device_only quick_tags=unlimited_custom"

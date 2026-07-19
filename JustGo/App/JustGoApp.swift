@@ -81,6 +81,9 @@ struct JustGoApp: App {
             }
         }
         guard cleanupSucceeded else { return }
+        // The station-information cache holds fetched official data, so a rights-epoch
+        // bump must sweep it together with the city packs.
+        try? fileManager.removeItem(at: StationInformationCacheLocation.rootURL(fileManager: fileManager))
         URLCache.shared.removeAllCachedResponses()
         defaults.set(currentEpoch, forKey: key)
     }

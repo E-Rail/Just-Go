@@ -48,7 +48,7 @@ enum OfficialStationInformationCategory: String, CaseIterable, Identifiable, Sen
     }
 }
 
-enum OfficialStationInformationSource: Sendable, Equatable {
+enum OfficialStationInformationSource: Sendable, Equatable, Codable {
     case beijingSubwayOnline
     case hongKongGovernment
 
@@ -79,7 +79,7 @@ enum OfficialStationInformationSource: Sendable, Equatable {
     }
 }
 
-struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable {
+struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable, Codable {
     let lineName: String
     let lineColorHex: String?
     let destination: String
@@ -94,7 +94,7 @@ struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable {
     }
 }
 
-struct OfficialStationExitInformation: Identifiable, Sendable, Equatable {
+struct OfficialStationExitInformation: Identifiable, Sendable, Equatable, Codable {
     let name: String
     let details: [String]
     let isAccessible: Bool?
@@ -102,12 +102,12 @@ struct OfficialStationExitInformation: Identifiable, Sendable, Equatable {
     var id: String { "\(name)|\(details.joined(separator: "|"))" }
 }
 
-enum OfficialStationFacilityAvailability: Sendable, Equatable {
+enum OfficialStationFacilityAvailability: Sendable, Equatable, Codable {
     case available
     case unavailable
 }
 
-struct OfficialStationFacilityInformation: Identifiable, Sendable, Equatable {
+struct OfficialStationFacilityInformation: Identifiable, Sendable, Equatable, Codable {
     let name: String
     let location: String?
     let availability: OfficialStationFacilityAvailability?
@@ -115,20 +115,52 @@ struct OfficialStationFacilityInformation: Identifiable, Sendable, Equatable {
     var id: String { "\(name)|\(location ?? "")|\(String(describing: availability))" }
 }
 
-struct OfficialStationFacilityGroup: Identifiable, Sendable, Equatable {
+struct OfficialStationFacilityGroup: Identifiable, Sendable, Equatable, Codable {
     let name: String
     let items: [OfficialStationFacilityInformation]
 
     var id: String { name }
 }
 
-struct OfficialStationInformationSnapshot: Sendable, Equatable {
+/// Whether a snapshot came straight from the official service or from this device's own
+/// last-good copy served while the service was unreachable.
+enum OfficialStationInformationFreshness: Sendable, Equatable, Codable {
+    case live
+    case cached(fetchedAt: Date)
+}
+
+struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
     let stationID: String
     let stationName: String
     let source: OfficialStationInformationSource
+    let freshness: OfficialStationInformationFreshness
     let trains: [OfficialStationTrainInformation]
     let exits: [OfficialStationExitInformation]
     let facilityGroups: [OfficialStationFacilityGroup]
+
+    func withFreshness(_ freshness: OfficialStationInformationFreshness) -> OfficialStationInformationSnapshot {
+        OfficialStationInformationSnapshot(
+            stationID: stationID,
+            stationName: stationName,
+            source: source,
+            freshness: freshness,
+            trains: trains,
+            exits: exits,
+            facilityGroups: facilityGroups
+        )
+    }
+}
+
+/// Device-only persistence for last-good station-information snapshots. Implemented outside
+/// this file (`OfficialStationInformationDiskCache`) so the provider itself stays free of
+/// storage APIs; the runtime data policy validates both files separately.
+protocol OfficialStationInformationCaching: Sendable {
+    func storedSnapshot(
+        stationID: String,
+        externalStationID: String
+    ) async -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)?
+    func store(_ snapshot: OfficialStationInformationSnapshot, externalStationID: String) async
+    func clearAll() async
 }
 
 enum OfficialStationInformationReference: Hashable, Sendable {
@@ -185,9 +217,10 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     private static let maximumResponseBytes = 1_048_576
     private static let requestTimeout: TimeInterval = 5
     // First/last trains, exits, and facilities change rarely; a longer in-session cache
-    // keeps station re-visits instant instead of re-fetching every few minutes. Persisting
-    // responses is deliberately forbidden (validate_runtime_data_policy.rb), so memory is
-    // the only cache tier.
+    // keeps station re-visits instant instead of re-fetching every few minutes. The provider
+    // itself never touches storage APIs — the injected `diskCache` (a separate file with its
+    // own validate_runtime_data_policy.rb rules) keeps a device-only last-good snapshot that
+    // is served, clearly labeled as cached, only when the official service is unreachable.
     private static let cacheLifetime: TimeInterval = 1800
     private static let defaultRateLimitBackoff: TimeInterval = 30
     private static let clock = ContinuousClock()
@@ -209,11 +242,13 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     }
 
     private let session: URLSession
+    private let diskCache: (any OfficialStationInformationCaching)?
     private var cache: [PreparedRequest: CacheEntry] = [:]
     private var inFlight: [PreparedRequest: InFlightRequest] = [:]
     private var rateLimitedUntil: ContinuousClock.Instant?
 
-    init(session: URLSession? = nil) {
+    init(session: URLSession? = nil, diskCache: (any OfficialStationInformationCaching)? = nil) {
+        self.diskCache = diskCache
         if let session {
             self.session = session
         } else {
@@ -243,7 +278,10 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
 
         if let rateLimitedUntil {
             guard rateLimitedUntil <= now else {
-                throw OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
+                return try await servingStoredSnapshot(
+                    for: prepared,
+                    insteadOf: OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
+                )
             }
             self.rateLimitedUntil = nil
         }
@@ -278,6 +316,10 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                     snapshot: snapshot,
                     expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
                 )
+                if let diskCache {
+                    let externalStationID = request.externalStationID
+                    Task { await diskCache.store(snapshot, externalStationID: externalStationID) }
+                }
             }
             return snapshot
         } catch {
@@ -294,7 +336,39 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                     rateLimitedUntil = candidate
                 }
             }
+            return try await servingStoredSnapshot(for: request, insteadOf: error)
+        }
+    }
+
+    /// Availability failures fall back to the last snapshot this device stored, labeled as
+    /// cached. Caller and contract errors never do — a stored copy must not paper over a
+    /// station-identity mismatch or a malformed request.
+    private func servingStoredSnapshot(
+        for request: PreparedRequest,
+        insteadOf error: Error
+    ) async throws -> OfficialStationInformationSnapshot {
+        guard Self.allowsStoredFallback(error),
+              let diskCache,
+              let stored = await diskCache.storedSnapshot(
+                  stationID: request.stationID,
+                  externalStationID: request.externalStationID
+              ) else {
             throw error
+        }
+        return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
+    }
+
+    private static func allowsStoredFallback(_ error: Error) -> Bool {
+        guard let providerError = error as? OfficialStationInformationProviderError else {
+            // Cancellation (and anything else non-provider) propagates untouched.
+            return false
+        }
+        switch providerError {
+        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
+             .rateLimited, .httpStatus, .serviceUnavailable:
+            return true
+        case .invalidRequest, .contractViolation:
+            return false
         }
     }
 
@@ -492,6 +566,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             stationID: request.stationID,
             stationName: stationName,
             source: .beijingSubwayOnline,
+            freshness: .live,
             trains: trains,
             exits: exits,
             facilityGroups: facilityGroups

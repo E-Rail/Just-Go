@@ -47,13 +47,17 @@ schedules, destinations, facilities, exits, nearby places, coordinates, events, 
 or page text.
 
 At runtime, the 416 opaque operator IDs form a bundled allowlist. Opening a matching Station Detail
-record calls the operator's fixed station-detail endpoint and temporarily renders selected
-first/last, exit, nearby-place, and facility text as native UI. The response is capped at 1 MB,
-identity-checked against the reviewed ID and names, cached in memory for five minutes, and never
-written to disk, included in telemetry, or copied into a city pack. No published public API or
-compatible content reuse license was found for this endpoint. Transient display and non-persistence
-reduce data handling but do not resolve permission questions; production distribution requires
-operator consent or legal review.
+record calls the operator's fixed station-detail endpoint and renders selected first/last, exit,
+nearby-place, and facility text as native UI. The response is capped at 1 MB and identity-checked
+against the reviewed ID and names. Beyond a 30-minute in-memory cache, the device keeps its own
+last-good copy of each fetched snapshot on local storage so the rider retains access offline: the
+copy lives under the app's Application Support directory, is excluded from device backups, is
+served only when the official service is unreachable (always labeled as cached with its age), and
+is deleted by the in-app Clear Cache action and the data-rights epoch cleanup. It is never included
+in telemetry, copied into a city pack, bundled, or redistributed. No published public API or
+compatible content reuse license was found for this endpoint. Device-local caching for the
+requesting rider's own continued access is a conservative scope, but it does not resolve permission
+questions; production distribution requires operator consent or legal review.
 
 Hong Kong's refresh-only developer importer reads the official MTR System Map and Light Rail
 Street Map indexes and stores URL metadata, not document contents. The catalog exposes 1 system
@@ -71,8 +75,9 @@ engineering controls, not a legal guarantee.
 
 Beijing source and context pages may load provider-selected third-party web services after the
 rider taps. The native station-information request contacts only `www.bjsubway.com`; JustGo does
-not send the response to a JustGo server or retain it beyond the in-memory cache. The source-page
-reader remains non-persistent and does not relicense provider text.
+not send the response to a JustGo server or retain it beyond the in-memory cache and the rider's
+own device-local, user-clearable snapshot described above. The source-page reader remains
+non-persistent and does not relicense provider text.
 
 ## Pilot Media
 

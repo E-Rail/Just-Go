@@ -122,9 +122,10 @@ license treatment.
   content. The operator receives the request; unsupported downloads remain an explicit browser
   fallback controlled by the rider.
 - Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
-  station ID to `www.bjsubway.com`. JustGo displays selected response text in memory, does not send
-  it to a JustGo server, and does not persist it. Opening the exact source page may also contact
-  provider-selected third-party web services.
+  station ID to `www.bjsubway.com`. JustGo displays selected response text, does not send it to a
+  JustGo server, and keeps only a device-local, backup-excluded copy of the last good snapshot for
+  offline access — served clearly labeled as cached and deletable via Settings → Clear Cache.
+  Opening the exact source page may also contact provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)

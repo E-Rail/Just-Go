@@ -378,6 +378,7 @@ final class StationDetailViewModel {
             stationID: stationID,
             stationName: station.name,
             source: .hongKongGovernment,
+            freshness: .live,
             trains: trains,
             exits: exits,
             facilityGroups: facilityGroups

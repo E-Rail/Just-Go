@@ -381,10 +381,18 @@ extension StationDetailView {
                 traditional: "列車資訊線上取得 · 無障礙資料已離線內置"
             )
         }
+        if case .cached(let fetchedAt) = viewModel?.officialStationInformation?.freshness {
+            let age = fetchedAt.formatted(.relative(presentation: .named))
+            return AppLocalization.text(
+                english: "Official data saved on this device · updated \(age) · service unreachable",
+                simplified: "本机保存的官方数据 · 更新于\(age) · 官方服务暂时无法访问",
+                traditional: "本機儲存的官方資料 · 更新於\(age) · 官方服務暫時無法連線"
+            )
+        }
         return AppLocalization.text(
-            english: "Official online data · temporary · not saved",
-            simplified: "官方在线数据 · 临时加载 · 不保存",
-            traditional: "官方線上資料 · 暫時載入 · 不儲存"
+            english: "Official online data · cached on this device · clear it in Settings",
+            simplified: "官方在线数据 · 已缓存到本机 · 可在设置中清除",
+            traditional: "官方線上資料 · 已快取到本機 · 可在設定中清除"
         )
     }
 

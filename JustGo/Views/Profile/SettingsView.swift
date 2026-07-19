@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
@@ -9,6 +10,8 @@ struct SettingsView: View {
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
     @State private var showTour = false
     @State private var showQuickTags = false
+    @State private var showClearCacheConfirmation = false
+    @State private var didClearCache = false
 
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
 
@@ -200,11 +203,43 @@ struct SettingsView: View {
         Section {
             LabeledContent(AppLocalization.localized("Route and Search Provider"), value: AppLocalization.localized("Apple Maps"))
             LabeledContent(AppLocalization.localized("Official Station Details"), value: AppLocalization.localized("City Packs"))
+            Button(role: .destructive) {
+                showClearCacheConfirmation = true
+            } label: {
+                Label(clearCacheTitle, systemImage: "trash")
+            }
+            .alert(clearCacheTitle, isPresented: $showClearCacheConfirmation) {
+                Button(clearCacheTitle, role: .destructive) {
+                    Task {
+                        await container.clearAllCaches()
+                        didClearCache = true
+                    }
+                }
+                Button(AppLocalization.localized("Cancel"), role: .cancel) {}
+            } message: {
+                Text(AppLocalization.text(
+                    english: "Downloaded city packs, saved official station information, and temporary web data will be deleted and must be downloaded again. Your tags, trips, records, photos, and settings are not affected.",
+                    simplified: "已下载的城市数据包、已保存的官方车站信息和临时网页数据将被删除，需要重新下载。您的标签、行程、记录、照片和设置不受影响。",
+                    traditional: "已下載的城市資料包、已儲存的官方車站資訊和暫存網頁資料將被刪除，需要重新下載。您的標籤、行程、記錄、照片和設定不受影響。"
+                ))
+            }
         } header: {
             Text(AppLocalization.localized("Transit Data"))
         } footer: {
-            Text(AppLocalization.localized("Route planning and place search use Apple Maps. Station facts use official city packs when available."))
+            if didClearCache {
+                Text(AppLocalization.text(
+                    english: "Cache cleared. Data downloads again as you use the app.",
+                    simplified: "缓存已清除。使用应用时将重新下载数据。",
+                    traditional: "快取已清除。使用應用程式時將重新下載資料。"
+                ))
+            } else {
+                Text(AppLocalization.localized("Route planning and place search use Apple Maps. Station facts use official city packs when available."))
+            }
         }
+    }
+
+    private var clearCacheTitle: String {
+        AppLocalization.text(english: "Clear Cache", simplified: "清除缓存", traditional: "清除快取")
     }
 
     // MARK: - Accessibility

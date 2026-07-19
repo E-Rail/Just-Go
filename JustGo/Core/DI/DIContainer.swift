@@ -85,6 +85,16 @@ final class DIContainer {
         }
     }
 
+    /// Settings → Clear Cache. Deletes every downloaded/cached tier — city packs on disk and
+    /// in memory, the device-local station-information snapshots, and URL caches — while
+    /// leaving user data (tags, trips, records, personal media, preferences) untouched.
+    func clearAllCaches() async {
+        await memoryWarningReleaseTargets.officialStationData?.clearAllCaches()
+        await stationInformationDiskCache?.clearAll()
+        await memoryWarningReleaseTargets.releaseMemory()
+        URLCache.shared.removeAllCachedResponses()
+    }
+
     @MainActor
     func installMemoryWarningReleaseHandler() {
         guard memoryWarningObserver == nil else { return }

@@ -245,6 +245,14 @@ app_entry = read.call("JustGo/App/JustGoApp.swift")
 errors << "data-rights epoch cleanup must sweep the station-information cache" unless
   app_entry.include?("StationInformationCacheLocation")
 
+# Clear Cache must stay wired end to end: the pack service exposes the full-clear API and
+# Settings actually calls it (through DIContainer.clearAllCaches).
+errors << "city-pack service must expose clearAllCaches" unless
+  policy_source.include?("func clearAllCaches")
+settings_source = read.call("JustGo/Views/Profile/SettingsView.swift")
+errors << "Settings must expose the Clear Cache action" unless
+  settings_source.include?("clearAllCaches")
+
 station_detail_model = read.call("JustGo/ViewModels/Map/StationDetailViewModel.swift")
 errors << "Hong Kong station information must preserve verified unavailable facilities" unless
   station_detail_model.include?("availability: .unavailable")

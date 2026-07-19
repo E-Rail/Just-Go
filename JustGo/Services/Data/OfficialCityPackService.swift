@@ -434,6 +434,33 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return await cityPackStatus(for: cityID)
     }
 
+    /// Settings → Clear Cache: drop every disk and memory tier at once. Bundled baselines
+    /// reload lazily from the app bundle, so included cities keep working; downloaded packs
+    /// return to their not-downloaded state until the user downloads them again.
+    func clearAllCaches() async {
+        for cityID in Set(loadGenerations.keys).union(inFlightLoads.keys) {
+            _ = advanceLoadGeneration(for: cityID)
+            inFlightLoads.removeValue(forKey: cityID)?.task.cancel()
+        }
+        for task in inFlightManifests.values {
+            task.cancel()
+        }
+        inFlightManifests.removeAll()
+        do {
+            try diskStore.deleteAll()
+        } catch {
+            AppLog.data.error("City pack cache clear failed: \(error)")
+        }
+        manifests.removeAll()
+        failedManifestCooldownUntil.removeAll()
+        packs.removeAll()
+        bundledBaselinePacks.removeAll()
+        loadStatuses.removeAll()
+        failedCooldownUntil.removeAll()
+        indoorMapsByCity.removeAll()
+        cachedOfficialResourceCatalog = nil
+    }
+
     private func performDownload(for cityID: String, generation: Int) async -> CityPackLoadStatus {
         let current = packs[cityID]
         let installed = await validatedInstalledPack(for: cityID)
@@ -2200,6 +2227,11 @@ private struct CityPackDiskStore {
         let url = rootURL.appendingPathComponent(safeComponent(cityID), isDirectory: true)
         guard fileManager.fileExists(atPath: url.path) else { return }
         try fileManager.removeItem(at: url)
+    }
+
+    func deleteAll() throws {
+        guard fileManager.fileExists(atPath: rootURL.path) else { return }
+        try fileManager.removeItem(at: rootURL)
     }
 
     private func validatedData(

@@ -10,7 +10,6 @@ final class TripMemoryService {
     private let obsoleteFavoriteStationsKey = "favoriteStations"
     private let maxSavedTrips = 50
     private let maxTripRecords = 300
-    private let maxStationQuickTags = 50
 
     private(set) var savedTrips: [SavedTrip]
     private(set) var tripRecords: [TripRecord]
@@ -20,8 +19,16 @@ final class TripMemoryService {
         self.userDefaults = userDefaults
         savedTrips = userDefaults.codableValue(forKey: savedTripsKey, as: [SavedTrip].self, default: [])
         tripRecords = userDefaults.codableValue(forKey: tripRecordsKey, as: [TripRecord].self, default: [])
-        stationQuickTags = userDefaults.codableValue(forKey: stationQuickTagsKey, as: [StationQuickTag].self, default: [])
+        let storedQuickTags = userDefaults.codableValue(
+            forKey: stationQuickTagsKey,
+            as: [StationQuickTag].self,
+            default: []
+        )
+        stationQuickTags = StationQuickTagPolicy.normalized(storedQuickTags)
         userDefaults.removeObject(forKey: obsoleteFavoriteStationsKey)
+        if stationQuickTags != storedQuickTags {
+            userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
+        }
     }
 
     func createSavedTrip(
@@ -141,19 +148,30 @@ final class TripMemoryService {
         userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
     }
 
-    func setQuickTag(station: Station, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
+    @discardableResult
+    func setQuickTag(
+        station: Station,
+        cityName: String,
+        cityNameEn: String? = nil,
+        kind: StationQuickTagKind,
+        replacing replacementID: String? = nil
+    ) -> StationQuickTagMutationResult {
         var quickTag = StationQuickTag(station: station, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
         if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
             quickTag = existing
                 .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
                 .withKind(kind)
         }
-        stationQuickTags.removeAll { tag in
-            tag.id == quickTag.id || (kind.isExclusive && tag.kind == kind)
+        guard let updated = StationQuickTagPolicy.inserting(
+            quickTag,
+            into: stationQuickTags,
+            replacing: replacementID
+        ) else {
+            return .replacementRequired(stationQuickTags)
         }
-        stationQuickTags.insert(quickTag, at: 0)
-        stationQuickTags = Array(stationQuickTags.prefix(maxStationQuickTags))
+        stationQuickTags = updated
         persistStationQuickTags()
+        return .saved
     }
 
     func deleteQuickTag(id: String) {
@@ -168,7 +186,7 @@ final class TripMemoryService {
             quickTag.id != id && !(kind.isExclusive && quickTag.kind == kind)
         }
         updated.insert(updatedTag, at: 0)
-        stationQuickTags = updated
+        stationQuickTags = StationQuickTagPolicy.normalized(updated)
         persistStationQuickTags()
     }
 
@@ -178,6 +196,35 @@ final class TripMemoryService {
 
     func isQuickTagged(stationID: String, cityID: String) -> Bool {
         quickTag(stationID: stationID, cityID: cityID) != nil
+    }
+
+    /// Re-syncs each tag's frozen station snapshot (station ID, coordinates, line
+    /// names/colors, English names) against the current bundled network data. Tags capture
+    /// this data at save time, and data refreshes regenerate the content-hash station IDs —
+    /// without this pass, tags saved before a refresh drift out of sync with what the rest
+    /// of the app shows for the same station.
+    func repairQuickTagStationData(stationLookup: @MainActor (StationQuickTag) async -> Station?) async {
+        let original = stationQuickTags
+        var repaired = original
+        var didRepair = false
+        for (index, quickTag) in original.enumerated() {
+            guard let station = await stationLookup(quickTag) else { continue }
+            let rebuilt = StationQuickTag(
+                station: station,
+                cityName: quickTag.cityName,
+                cityNameEn: quickTag.cityNameEn,
+                kind: quickTag.kind
+            )
+            if rebuilt != quickTag {
+                repaired[index] = rebuilt
+                didRepair = true
+            }
+        }
+        // A user mutation while a lookup was in flight wins — drop this pass instead of
+        // clobbering it; the next launch repairs whatever is still stale.
+        guard didRepair, stationQuickTags == original else { return }
+        stationQuickTags = StationQuickTagPolicy.normalized(repaired)
+        persistStationQuickTags()
     }
 
     func repairQuickTagCityMetadata(cityLookup: (String) -> City?) {
@@ -190,7 +237,7 @@ final class TripMemoryService {
             didRepair = true
         }
         if didRepair {
-            stationQuickTags = repaired
+            stationQuickTags = StationQuickTagPolicy.normalized(repaired)
             persistStationQuickTags()
         }
     }

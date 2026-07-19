@@ -35,8 +35,25 @@ ambiguous terms require legal review before new data is bundled.
 
 `official_transit_resources.json` contains factual URL metadata only: exact target and source-page
 URLs, provider, city or station scope, format, and review date. Its 58 dated city reviews currently
-contain 330 links across 43 cities and explicit no-resource results for the other 15. No linked
+contain 770 links across 43 cities and explicit no-resource results for the other 15. No linked
 page, PDF, or image is copied into the repository or app bundle.
+
+The Beijing station binding snapshot covers all 444 canonical app stations: 416 current Beijing
+Subway station-page bindings, one reviewed legacy page, one official 12306 station guide, 18
+official-context-only records, 3 stations not open for passenger service, and 5 points without
+current passenger service. It stores canonical OSM station IDs, opaque operator IDs, exact URLs,
+four explicit aliases, and typed review outcomes. It does not store operator API responses,
+schedules, destinations, facilities, exits, nearby places, coordinates, events, images, timetables,
+or page text.
+
+At runtime, the 416 opaque operator IDs form a bundled allowlist. Opening a matching Station Detail
+record calls the operator's fixed station-detail endpoint and temporarily renders selected
+first/last, exit, nearby-place, and facility text as native UI. The response is capped at 1 MB,
+identity-checked against the reviewed ID and names, cached in memory for five minutes, and never
+written to disk, included in telemetry, or copied into a city pack. No published public API or
+compatible content reuse license was found for this endpoint. Transient display and non-persistence
+reduce data handling but do not resolve permission questions; production distribution requires
+operator consent or legal review.
 
 Hong Kong's refresh-only developer importer reads the official MTR System Map and Light Rail
 Street Map indexes and stores URL metadata, not document contents. The catalog exposes 1 system
@@ -44,10 +61,18 @@ map, 98 Location Maps, 98 Station Layouts, and 14 Light Rail Street Maps, all ho
 remains source-pending for structured data and exposes official route, fare, and customer-service
 links.
 
-Resources open only after a user taps an ordinary system-browser link. JustGo does not fetch,
-preview, cache, prefetch, or store operator content, and external maps do not count as offline
-coverage or evidence of an indoor path or door position. Browser downloads remain the user's
-choice. Hyperlinking is a conservative engineering policy, not a legal guarantee.
+Linked resources render only after a user taps them. Pages use an ephemeral WebKit data store; PDFs and
+images use memory-only native renderers with a 50 MB response limit. Their state is discarded with
+the presentation. JustGo does not prefetch, persist, or redistribute operator content, and external
+maps do not count as offline coverage or evidence of an indoor path or door position. The operator
+receives the user-initiated network request and applies its own privacy terms. Unsupported resources
+offer an explicit browser fallback. Linking and user-initiated rendering are conservative
+engineering controls, not a legal guarantee.
+
+Beijing source and context pages may load provider-selected third-party web services after the
+rider taps. The native station-information request contacts only `www.bjsubway.com`; JustGo does
+not send the response to a JustGo server or retain it beyond the in-memory cache. The source-page
+reader remains non-persistent and does not relicense provider text.
 
 ## Pilot Media
 

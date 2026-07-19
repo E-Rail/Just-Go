@@ -9,6 +9,13 @@ require_relative "lib/official_transit_resource_catalog"
 ROOT = File.expand_path("..", __dir__)
 CATALOG_PATH = File.join(ROOT, "DataPacks", "official_transit_resources.json")
 BINDINGS_PATH = File.join(ROOT, "DataPacks", "sources", "official-resources", "hong_kong_station_bindings.json")
+BEIJING_SOURCE_PATH = File.join(
+  ROOT,
+  "DataPacks",
+  "sources",
+  "official-resources",
+  "beijing_station_information.json"
+)
 SERVICE_PATH = File.join(ROOT, "JustGo", "Services", "Data", "OfficialCityPackService.swift")
 DIRECT_EXTENSIONS = %w[.pdf .jpg .jpeg .png .webp .gif .svg].freeze
 REDIRECT_QUERY_KEYS = OfficialTransitResourceCatalogBuilder::REDIRECT_QUERY_KEYS
@@ -87,7 +94,9 @@ cities.each do |city|
   coverage = city.fetch("coverage")
   grouped = scoped.group_by { |resource| resource.fetch("kind") }
   maps = %w[systemMap locationMap streetMap stationLayout].sum { |kind| grouped.fetch(kind, []).length }
-  travel = %w[serviceStatus journeyPlanner timetable fareInformation].sum { |kind| grouped.fetch(kind, []).length }
+  travel = %w[
+    serviceStatus journeyPlanner timetable fareInformation stationInformation
+  ].sum { |kind| grouped.fetch(kind, []).length }
   access = %w[accessibility stationFacilities].sum { |kind| grouped.fetch(kind, []).length }
   help = %w[customerService operatorInformation].sum { |kind| grouped.fetch(kind, []).length }
   fail_validation("#{city_id} coverage is not derived from links") unless coverage == {
@@ -98,6 +107,156 @@ cities.each do |city|
     "help" => help
   }
 end
+
+beijing_source = JSON.parse(File.read(BEIJING_SOURCE_PATH))
+expected_beijing_source_keys = %w[
+  canonicalCoverageGaps canonicalStationCount detailPageURL legacyStationPages
+  mappedStationCount provider schemaVersion sourceDirectoryURL sourceIndexURL
+  sourceIndexSHA256 sourceOnlyStationCount sourceStationCount stationPageCount
+  stationPageGapCount stations verifiedAt
+]
+fail_validation("Beijing source contains undeclared fields") unless
+  beijing_source.keys.sort == expected_beijing_source_keys.sort
+fail_validation("Beijing source-index checksum is invalid") unless
+  beijing_source.fetch("sourceIndexSHA256").match?(/\A[0-9a-f]{64}\z/)
+beijing_source.fetch("stations").each do |station|
+  fail_validation("#{station.fetch('stationName')} binding contains operator content") unless
+    station.keys.sort == %w[
+      aliases externalStationID sourcePageURL stationID stationName stationNameEn
+    ].sort
+  fail_validation("#{station.fetch('stationName')} has invalid official station ID") unless
+    station.fetch("externalStationID").match?(/\A\d+\z/)
+  source_page = URI(station.fetch("sourcePageURL"))
+  query = URI.decode_www_form(source_page.query.to_s)
+  fail_validation("#{station.fetch('stationName')} has an invalid direct station page") unless
+    source_page.scheme == "https" &&
+      source_page.host == "www.bjsubway.com" &&
+      source_page.path == "/station/siteinfo.html" &&
+      query == [["loc", station.fetch("externalStationID")]]
+end
+beijing_source.fetch("legacyStationPages").each do |station|
+  fail_validation("#{station.fetch('stationName')} legacy page contains undeclared fields") unless
+    station.keys.sort == %w[
+      aliases reason sourcePageURL stationID stationName stationNameEn
+    ].sort
+end
+beijing_source.fetch("canonicalCoverageGaps").each do |station|
+  fail_validation("#{station.fetch('stationName')} gap contains undeclared fields") unless
+    station.keys.sort == %w[
+      informationStatus reason resources stationID stationName stationNameEn
+    ].sort
+  unless OfficialTransitResourceCatalogBuilder::STATION_INFORMATION_STATUSES.include?(
+    station.fetch("informationStatus")
+  )
+    fail_validation("#{station.fetch('stationName')} gap has invalid station-information status")
+  end
+  station.fetch("resources").each do |resource|
+    fail_validation("#{station.fetch('stationName')} gap resource contains undeclared fields") unless
+      resource.keys.sort == %w[
+        format kind provider sourcePageURL targetURL title
+      ].sort
+    fail_validation("#{station.fetch('stationName')} gap resource has invalid kind") unless
+      OfficialTransitResourceCatalogBuilder::RESOURCE_KINDS.include?(resource.fetch("kind"))
+    fail_validation("#{station.fetch('stationName')} gap resource must be a webpage") unless
+      resource.fetch("format") == "webPage"
+  end
+end
+forbidden_beijing_content_keys = %w[
+  contentDesc destStationName events exits facilitys firstTime fixedPosition
+  guideUrl lastTime lineNames remind trainSchedules
+]
+serialized_beijing_source = JSON.generate(beijing_source)
+forbidden_beijing_content_keys.each do |key|
+  fail_validation("Beijing binding snapshot contains forbidden operator content key #{key}") if
+    serialized_beijing_source.include?(%("#{key}"))
+end
+
+beijing = cities.find { |city| city.fetch("cityID") == "1100" }
+beijing_station_resources = beijing.fetch("stationResources")
+beijing_station_pages = beijing_station_resources.flat_map { |station| station.fetch("resources") }
+  .select { |resource| resource.fetch("kind") == "stationInformation" }
+fail_validation("Beijing must review all 444 canonical stations") unless beijing_station_resources.length == 444
+fail_validation("Beijing must expose 418 exact station pages") unless beijing_station_pages.length == 418
+beijing_provider_references = beijing_station_resources.each_with_object([]) do |station, references|
+  references << station["providerStationID"] if station.key?("providerStationID")
+end
+fail_validation("Beijing must expose 416 reviewed native provider references") unless
+  beijing_provider_references.length == 416
+fail_validation("Beijing native provider references must be unique nine-digit IDs") unless
+  beijing_provider_references.uniq.length == 416 &&
+    beijing_provider_references.all? { |station_id| station_id.match?(/\A\d{9}\z/) }
+fail_validation("Beijing source station count changed") unless beijing_source.fetch("sourceStationCount") == 423
+fail_validation("Beijing native mapping count changed") unless beijing_source.fetch("mappedStationCount") == 416
+fail_validation("Beijing Subway station-page coverage changed") unless beijing_source.fetch("stationPageCount") == 417
+fail_validation("Beijing station-page gap count changed") unless beijing_source.fetch("stationPageGapCount") == 27
+fail_validation("Beijing station-page counts are inconsistent") unless
+  beijing_source.fetch("stationPageCount") + beijing_source.fetch("stationPageGapCount") ==
+    beijing_source.fetch("canonicalStationCount")
+fail_validation("Beijing canonical gap count changed") unless beijing_source.fetch("canonicalCoverageGaps").length == 28
+fail_validation("Beijing official-only station count changed") unless beijing_source.fetch("sourceOnlyStationCount") == 7
+expected_beijing_ids = (
+  beijing_source.fetch("stations") +
+  beijing_source.fetch("legacyStationPages") +
+  beijing_source.fetch("canonicalCoverageGaps")
+).map { |station| station.fetch("stationID") }.uniq.sort
+catalog_beijing_ids = beijing_station_resources.map { |station| station.fetch("stationID") }.sort
+fail_validation("Beijing canonical station mapping drifted") unless catalog_beijing_ids == expected_beijing_ids
+beijing_station_resources.each do |station|
+  resources = station.fetch("resources")
+  station_information_count = resources.count { |resource| resource.fetch("kind") == "stationInformation" }
+  case station.fetch("stationInformationStatus")
+  when "exactPage"
+    fail_validation("#{station.fetch('stationName')} must have one exact station page") unless
+      station_information_count == 1
+  when "officialContextOnly", "notOpenForPassengerService"
+    fail_validation("#{station.fetch('stationName')} must have official context but no exact page") unless
+      station_information_count.zero? && !resources.empty?
+  when "noCurrentPassengerService"
+    fail_validation("#{station.fetch('stationName')} must not expose invented rider resources") unless
+      resources.empty?
+  else
+    fail_validation("#{station.fetch('stationName')} has an unknown review status")
+  end
+end
+status_counts = beijing_station_resources
+  .group_by { |station| station.fetch("stationInformationStatus") }
+  .transform_values(&:length)
+expected_status_counts = {
+  "exactPage" => 418,
+  "officialContextOnly" => 18,
+  "notOpenForPassengerService" => 3,
+  "noCurrentPassengerService" => 5
+}
+fail_validation("Beijing station review statuses changed") unless status_counts == expected_status_counts
+beijing_north = beijing_station_resources.find { |station| station.fetch("stationName") == "北京北" }
+beijing_north_page = beijing_north&.fetch("resources", [])&.find {
+  |resource| resource.fetch("kind") == "stationInformation"
+}
+fail_validation("Beijing North must use its exact official China Railway guide") unless
+  beijing_north_page&.fetch("targetURL") ==
+    "https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html"
+beijing_directory = beijing.fetch("resources").find do |resource|
+  resource.fetch("kind") == "stationInformation" && resource.fetch("scope") == "city"
+end
+fail_validation("Beijing must expose the reviewed official directory fallback") unless
+  beijing_directory&.fetch("targetURL") == beijing_source.fetch("sourceDirectoryURL")
+
+runtime_swift = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift"))
+  .map { |path| File.read(path, encoding: "UTF-8") }
+  .join("\n")
+%w[
+  OfficialStationInformationProviding
+  BeijingStationInformationProvider
+  URLSessionConfiguration.ephemeral
+  reloadIgnoringLocalAndRemoteCacheData
+  maximumResponseBytes
+  cacheLifetime
+].each do |marker|
+  fail_validation("native station-information provider is missing #{marker}") unless
+    runtime_swift.include?(marker)
+end
+fail_validation("native provider must use the fixed Beijing station-detail path") unless
+  runtime_swift.include?('"/api/guanwang/v2/getStationDetail"')
 
 hong_kong = cities.find { |city| city.fetch("cityID") == "8100" }
 hk_resources = hong_kong.fetch("resources") + hong_kong.fetch("stationResources").flat_map { |station| station.fetch("resources") }

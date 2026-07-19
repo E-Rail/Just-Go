@@ -23,7 +23,10 @@ shown as unavailable rather than inferred.
   DATA.GOV.HK under its custom reuse terms.
 - Official Hong Kong live arrivals from the government transport API, with timeout, cache,
   request-coalescing, and rate-limit handling.
-- A bundled official-resource directory for all 58 catalog cities, with 330 reviewed links to
+- Native three-category station information for 416 reviewed Beijing Subway stations
+  (First / Last, Exits, Facilities) and all 162 Hong Kong stations
+  (Live Trains, Exits, Facilities).
+- A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
   rider-facing maps, travel information, accessibility resources, and help pages.
 - Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
   Qqhhss under CC0 1.0.
@@ -44,18 +47,38 @@ pack is presented as downloadable.
 ## Official Resource Directory
 
 The link catalog is independent of city packs: 43 cities have at least one verified official
-resource and 15 carry an explicit dated no-resource review. Its 330 links comprise 275 map links,
-28 travel links, 6 accessibility links, and 21 help links. Links do not count as bundled maps,
+resource and 15 carry an explicit dated no-resource review. Its 770 links comprise 275 map links,
+447 travel links, 6 accessibility links, and 42 help links. Links do not count as bundled maps,
 offline content, or verified transfer guidance.
+
+Every one of Beijing's 444 canonical app stations has a reviewed station-information state.
+There are 418 exact pages: 416 current Beijing Subway directory bindings, the operator's retained
+legacy page for the temporarily closed Bajiao Amusement Park station, and the official 12306
+Beijing North station guide. Of the remaining stations, 18 have route- or operator-specific
+official context, 3 are not open for passenger service, and 5 are not current passenger stops.
+Seven newer stations in the official directory are not silently attached to stale OSM IDs because
+they do not yet have canonical entries in the bundled network snapshot.
 
 Hong Kong contributes 1 system map, 98 distinct Location Maps, 98 distinct Station Layouts, and
 14 distinct Light Rail Street Maps from the official MTR indexes, plus current rider-service
 pages. Macau remains source-pending for structured data but links to its official route, fare,
 and customer-service pages.
 
-Every resource opens through the system browser after a rider taps it. JustGo stores factual URL
-metadata only: it does not fetch, render, preview, cache, prefetch, or redistribute operator pages,
-PDFs, or images. A browser may download a linked file only if the rider chooses to do so.
+Station Detail presents exactly three compact information categories. For 416 reviewed Beijing
+Subway station IDs, it requests first/last trains, exits, nearby text, and facilities directly from
+the operator when the detail page opens, validates the returned station identity, and renders the
+text as native rows. The response uses an ephemeral session, a 1 MB cap, a five-minute memory cache,
+and is never written to disk or copied into a city pack. The exact official station page remains an
+in-app source and fallback. This endpoint is not a published public API and no compatible content
+reuse license was found, so production distribution still requires operator or legal review.
+
+Hong Kong uses the same three-category structure for all 162 stations, with Live Trains replacing
+Beijing's First / Last label. Live train rows come from the official government transport API;
+exits and facilities use the included DATA.GOV.HK barrier-free snapshot where available, including
+verified unavailable states. Other reviewed pages, PDFs, and images open inside JustGo only after a
+rider taps them: pages use a non-persistent WebKit session, while documents use memory-only native
+viewers with a 50 MB limit. JustGo does not persist or redistribute operator content. Unsupported
+non-station resources retain an explicit browser fallback.
 
 ## Indoor Guidance
 
@@ -79,6 +102,7 @@ Regenerate and validate data from the vendored, reviewed inputs:
 
 ```sh
 ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
@@ -93,9 +117,14 @@ license treatment.
 
 - Personal station media stays in Application Support, is excluded from backup, and is never
   used to infer routing, accessibility, indoor paths, or doors.
-- External operator resources open only after a user action. JustGo does not fetch, render,
-  preview, prefetch, cache, store, or count those pages and files as offline content. Any file
-  download is handled by the rider's browser.
+- External operator resources render inside non-persistent in-app page and document viewers only
+  after a user action. JustGo does not prefetch, persist, redistribute, or count them as offline
+  content. The operator receives the request; unsupported downloads remain an explicit browser
+  fallback controlled by the rider.
+- Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
+  station ID to `www.bjsubway.com`. JustGo displays selected response text in memory, does not send
+  it to a JustGo server, and does not persist it. Opening the exact source page may also contact
+  provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)

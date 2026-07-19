@@ -502,7 +502,7 @@ struct TransferStationSheet: View {
         }
     }
 
-    /// Official pages remain ordinary user-initiated links and never become route geometry.
+    /// Official pages remain user-initiated reference material and never become route geometry.
     @ViewBuilder
     private var stationMapSection: some View {
         GlassCard {
@@ -531,12 +531,12 @@ struct TransferStationSheet: View {
                     }
                 } else {
                     ForEach(relevantResources) { resource in
-                        OfficialTransitResourceLink(resource: resource, compact: true)
+                        OfficialTransitResourceButton(resource: resource, compact: true)
                     }
                     Text(AppLocalization.text(
-                        english: "These links open operator information. They do not mean JustGo has verified the indoor path or train-door position.",
-                        simplified: "这些链接会打开运营方信息，并不代表 JustGo 已核实站内路径或车门位置。",
-                        traditional: "這些連結會開啟營運方資訊，並不代表 JustGo 已核實站內路徑或車門位置。"
+                        english: "These official resources are displayed inside JustGo. They do not mean JustGo has verified the indoor path or train-door position.",
+                        simplified: "这些官方资源会在 JustGo 内显示，但并不表示 JustGo 已核实站内路径或车门位置。",
+                        traditional: "這些官方資源會在 JustGo 內顯示，但並不表示 JustGo 已核實站內路徑或車門位置。"
                     ))
                         .font(.caption2)
                         .foregroundStyle(.secondary)

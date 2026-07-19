@@ -4,8 +4,8 @@
 download catalog: every `downloadURL` is `null`, and the only available packs point to
 `JustGo/Resources/BundledCityPacks/1100.json` and `8100.json` through `bundledResource`.
 The other 56 catalog cities are intentionally `source_pending`.
-The separate official-resource catalog exposes reviewed tap-only links without changing a
-city's pack status or copying an operator dataset.
+The separate official-resource catalog exposes reviewed user-initiated resources without changing
+a city's pack status or copying an operator dataset.
 
 ## Build
 
@@ -13,6 +13,7 @@ Run the standard-library Ruby pipeline from the repository root:
 
 ```sh
 ruby Scripts/generate_city_pack_manifest.rb
+ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_runtime_data_policy.rb
@@ -41,9 +42,20 @@ not part of this baseline.
 
 `official_transit_resources.json` is a deterministic bundled catalog of factual link metadata,
 independent of city packs. It contains one dated review record for every one of the 58 catalog
-cities. The current output has 330 links: 275 maps, 28 travel resources, 6 accessibility
-resources, and 21 help resources. Forty-three cities have verified links; 15 have an explicit
+cities. The current output has 770 links: 275 maps, 447 travel resources, 6 accessibility
+resources, and 42 help resources. Forty-three cities have verified links; 15 have an explicit
 `noVerifiedOfficialResource` result.
+
+Beijing's refresh-only importer maps the official directory to canonical OSM station IDs with
+exact names and four reviewed aliases. It emits 416 current station bindings, one reviewed legacy
+station page, one reviewed 12306 station guide, 28 canonical source gaps, 27 Beijing Subway
+direct-page gaps, and only a count for seven source-only stations. All 444 canonical app stations
+receive an explicit state: 418 exact pages, 18 official-context-only records, 3 stations not open
+for passenger service, and 5 points without current passenger service. No source-only station is
+attached to an invented canonical ID. The committed output is factual URL/ID metadata only; it
+contains no operator schedules, facilities, exits, coordinates, images, timetable data, or page
+text. The 416 reviewed opaque operator IDs are also the allowlist for transient native
+station-information requests.
 
 Hong Kong URL metadata is refreshed only by an intentional developer command:
 
@@ -56,10 +68,15 @@ links to 162 canonical station records through explicit bindings, and stores no 
 generated catalog exposes 197 distinct heavy-rail PDFs and 14 distinct Light Rail PDFs. Normal
 generation and CI are offline and read the reviewed snapshot.
 
-Runtime code trusts links only from this bundled catalog. City-pack `externalResources` fields
-remain decodable for schema-v2 compatibility but are ignored, and downloaded packs cannot inject
-URLs. All links open through the system browser after a user tap; JustGo does not fetch, preview,
-cache, prefetch, or store the linked operator files.
+Runtime code trusts links and Beijing provider references only from this bundled catalog.
+City-pack `externalResources` fields remain decodable for schema-v2 compatibility but are ignored,
+and downloaded packs cannot inject URLs or online station IDs. Opening one of the 416 supported
+Beijing Station Detail records performs a fixed-host, fixed-path request and displays selected
+first/last, exit, and facility text in native rows. Responses are identity-checked, capped at
+1 MB, cached in memory for five minutes, and never persisted. All other reviewed pages use a
+non-persistent WebKit session after a user tap; reviewed PDFs and images use memory-only native
+viewers with a 50 MB limit. An unsupported resource can leave the app only through an explicit
+rider-selected browser fallback.
 
 ## Schema V2
 

@@ -9,6 +9,7 @@ enum ExternalTransitResourceKind: String, Codable, CaseIterable, Sendable {
     case journeyPlanner
     case timetable
     case fareInformation
+    case stationInformation
     case accessibility
     case stationFacilities
     case customerService
@@ -40,7 +41,7 @@ enum ExternalTransitResourceKind: String, Codable, CaseIterable, Sendable {
         switch self {
         case .systemMap, .locationMap, .streetMap, .stationLayout:
             return .maps
-        case .serviceStatus, .journeyPlanner, .timetable, .fareInformation:
+        case .serviceStatus, .journeyPlanner, .timetable, .fareInformation, .stationInformation:
             return .travel
         case .accessibility, .stationFacilities:
             return .accessibility
@@ -67,6 +68,12 @@ enum ExternalTransitResourceKind: String, Codable, CaseIterable, Sendable {
             return AppLocalization.text(english: "Timetables", simplified: "时刻表", traditional: "時刻表")
         case .fareInformation:
             return AppLocalization.text(english: "Fares", simplified: "票价", traditional: "票價")
+        case .stationInformation:
+            return AppLocalization.text(
+                english: "Station Information",
+                simplified: "车站信息",
+                traditional: "車站資訊"
+            )
         case .accessibility:
             return AppLocalization.text(english: "Accessibility", simplified: "无障碍服务", traditional: "無障礙服務")
         case .stationFacilities:
@@ -183,11 +190,20 @@ struct OfficialTransitResourceCoverage: Codable, Equatable, Sendable {
     let help: Int
 }
 
+enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
+    case exactPage
+    case officialContextOnly
+    case notOpenForPassengerService
+    case noCurrentPassengerService
+}
+
 struct OfficialTransitResourceStation: Codable, Equatable, Identifiable, Sendable {
     let stationID: String
     let stationName: String
     let stationNameEn: String
     let aliases: [String]
+    let providerStationID: String?
+    let stationInformationStatus: OfficialTransitStationInformationStatus?
     let resources: [ExternalTransitResource]
 
     var id: String { stationID }
@@ -272,17 +288,31 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
         stationName: String?,
         stationNameEn: String?
     ) -> [ExternalTransitResource] {
-        guard let city = city(cityID) else { return [] }
+        stationResourceRecord(
+            cityID: cityID,
+            stationID: stationID,
+            stationName: stationName,
+            stationNameEn: stationNameEn
+        )?.resources ?? []
+    }
+
+    func stationResourceRecord(
+        cityID: String,
+        stationID: String,
+        stationName: String?,
+        stationNameEn: String?
+    ) -> OfficialTransitResourceStation? {
+        guard let city = city(cityID) else { return nil }
         if let exact = city.stationResources.first(where: { $0.stationID == stationID }) {
-            return exact.resources
+            return exact
         }
         let names = [stationName, stationNameEn].compactMap { $0 }.map(Self.normalizedName)
-        guard !names.isEmpty else { return [] }
+        guard !names.isEmpty else { return nil }
         let matches = city.stationResources.filter { station in
             let candidates = [station.stationName, station.stationNameEn] + station.aliases
             return !Set(candidates.map(Self.normalizedName)).isDisjoint(with: names)
         }
-        return matches.count == 1 ? matches[0].resources : []
+        return matches.count == 1 ? matches[0] : nil
     }
 
     private var isValid: Bool {
@@ -293,7 +323,7 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
         for city in cities {
             let stationIDs = city.stationResources.map(\.stationID)
             let allResources = city.allResources
-            guard city.verifiedAt == "2026-07-15",
+            guard Self.isISODate(city.verifiedAt),
                   city.officialDomains == Array(Set(city.officialDomains)).sorted(),
                   Set(stationIDs).count == stationIDs.count,
                   Set(allResources.map(\.id)).count == allResources.count,
@@ -319,6 +349,40 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
                       city.reviewNote?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else { return false }
             }
         }
+
+        guard let beijing = city("1100") else { return false }
+        let beijingStationPages = beijing.stationResources.flatMap(\.resources).filter {
+            $0.kind == .stationInformation && $0.scope == .station
+        }
+        let beijingDirectory = beijing.resources.first {
+                $0.kind == .stationInformation &&
+                $0.scope == .city &&
+                $0.targetURL == $0.sourcePageURL &&
+                $0.provider == "Beijing Subway" &&
+                URLComponents(string: $0.targetURL)?.path == "/station/"
+        }
+        let beijingProviderReferences = beijing.stationResources.compactMap(\.providerStationID)
+        guard beijing.stationResources.count == 444,
+              beijingStationPages.count == 418,
+              beijingProviderReferences.count == 416,
+              Set(beijingProviderReferences).count == beijingProviderReferences.count,
+              beijingProviderReferences.allSatisfy({
+                  $0.range(of: #"^\d{9}$"#, options: .regularExpression) != nil
+              }),
+              beijing.stationResources.count(where: {
+                  $0.stationInformationStatus == .exactPage
+              }) == 418,
+              beijing.stationResources.count(where: {
+                  $0.stationInformationStatus == .officialContextOnly
+              }) == 18,
+              beijing.stationResources.count(where: {
+                  $0.stationInformationStatus == .notOpenForPassengerService
+              }) == 3,
+              beijing.stationResources.count(where: {
+                  $0.stationInformationStatus == .noCurrentPassengerService
+              }) == 5,
+              beijing.stationResources.allSatisfy(validatesBeijingStationReview),
+              beijingDirectory != nil else { return false }
 
         guard let hongKong = city("8100") else { return false }
         let hongKongResources = hongKong.allResources
@@ -362,6 +426,28 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
             return target.pathExtension.lowercased() == "pdf" && target != source
         case .image:
             return ["jpg", "jpeg", "png", "webp"].contains(target.pathExtension.lowercased()) && target != source
+        }
+    }
+
+    private func validatesBeijingStationReview(
+        _ station: OfficialTransitResourceStation
+    ) -> Bool {
+        let stationInformationCount = station.resources.count { $0.kind == .stationInformation }
+        if let providerStationID = station.providerStationID,
+           providerStationID.range(of: #"^\d{9}$"#, options: .regularExpression) == nil {
+            return false
+        }
+        switch station.stationInformationStatus {
+        case .exactPage:
+            return stationInformationCount == 1
+        case .officialContextOnly, .notOpenForPassengerService:
+            return station.providerStationID == nil &&
+                stationInformationCount == 0 &&
+                !station.resources.isEmpty
+        case .noCurrentPassengerService:
+            return station.providerStationID == nil && station.resources.isEmpty
+        case nil:
+            return false
         }
     }
 
@@ -419,5 +505,12 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
             .filter(CharacterSet.alphanumerics.contains)
             .map(String.init)
             .joined()
+    }
+
+    private static func isISODate(_ value: String) -> Bool {
+        value.range(
+            of: #"^\d{4}-\d{2}-\d{2}$"#,
+            options: .regularExpression
+        ) != nil
     }
 }

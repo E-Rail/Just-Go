@@ -37,6 +37,7 @@ jobs:
           ruby Scripts/test_oss_city_pack_pipeline.rb
           ruby Scripts/test_oss_data_validators.rb
           ruby Scripts/test_official_transit_resource_importer.rb
+          ruby Scripts/test_beijing_station_information_importer.rb
           ruby Scripts/test_official_transit_resource_catalog.rb
           ruby Scripts/import_osm_metro_geometry.rb --self-test
           ruby Scripts/import_licensed_station_media.rb
@@ -49,7 +50,9 @@ jobs:
           ruby Scripts/validate_metro_networks.rb
           ruby Scripts/validate_indoor_maps.rb
           bash Scripts/check_no_legacy_map_provider.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
+          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_quick_tag_policy.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_personal_station_media.sh
 
       - name: Verify deterministic generated data

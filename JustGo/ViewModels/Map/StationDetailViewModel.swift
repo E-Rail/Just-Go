@@ -1,6 +1,7 @@
 import Foundation
 
 @Observable
+@MainActor
 final class StationDetailViewModel {
     var station: Station?
     var arrivals: [RealTimeArrival] = []
@@ -10,23 +11,58 @@ final class StationDetailViewModel {
     var errorMessage: String?
     var stationLayoutStatusMessage: String?
     var externalResources: [ExternalTransitResource] = []
+    var officialResourceReview: OfficialTransitResourceStation?
     var licensedMedia: [LicensedStationMedia] = []
     var serviceStatus: CityPackServiceStatus?
     var cityPackLoadStatus: CityPackLoadStatus?
     var accessGuidance: StationAccessGuidance?
+    var officialStationInformation: OfficialStationInformationSnapshot?
+    var isLoadingOfficialStationInformation = false
+    var officialStationInformationError: String?
 
     private let officialStationData: OfficialStationDataProviding
+    private let officialStationInformationProvider: OfficialStationInformationProviding
     private var trainTimesGeneration = 0
     private var cityPackGeneration = 0
+    private var officialInformationGeneration = 0
 
-    init(officialStationData: OfficialStationDataProviding) {
+    init(
+        officialStationData: OfficialStationDataProviding,
+        officialStationInformationProvider: OfficialStationInformationProviding
+    ) {
         self.officialStationData = officialStationData
+        self.officialStationInformationProvider = officialStationInformationProvider
     }
 
     func loadStation(_ station: Station) {
         trainTimesGeneration += 1
         cityPackGeneration += 1
+        officialInformationGeneration += 1
         self.station = station
+        officialStationInformation = nil
+        officialStationInformationError = nil
+        isLoadingOfficialStationInformation = false
+    }
+
+    func loadRiderInformation() async {
+        guard let stationID = station?.id,
+              let cityID = station?.cityID else { return }
+        let generation = officialInformationGeneration
+        if cityID == "8100" {
+            buildHongKongStationInformation()
+            await loadTrainTimes()
+            guard isCurrentOfficialInformationLoad(
+                stationID: stationID,
+                generation: generation
+            ) else { return }
+            buildHongKongStationInformation()
+            return
+        }
+        // Train times and the official online lookup are independent; awaiting them
+        // in sequence made every station open wait for both round-trips end to end.
+        let onlineInformationLoad = Task { await loadOnlineStationInformation() }
+        await loadTrainTimes()
+        await onlineInformationLoad.value
     }
 
     func loadTrainTimes() async {
@@ -80,6 +116,7 @@ final class StationDetailViewModel {
         isLoadingCityPack = true
         stationLayoutStatusMessage = nil
         externalResources = []
+        officialResourceReview = nil
         licensedMedia = []
         serviceStatus = nil
         accessGuidance = nil
@@ -91,9 +128,13 @@ final class StationDetailViewModel {
 
         async let statusLoad = officialStationData.loadCityPack(for: station.cityID)
         async let resourceLoad = officialStationData.externalResources(for: station)
+        async let reviewLoad = officialStationData.officialResourceReview(for: station)
         let loadedExternalResources = await resourceLoad
         guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         externalResources = loadedExternalResources
+        let loadedReview = await reviewLoad
+        guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
+        officialResourceReview = loadedReview
         let status = await statusLoad
         guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
         cityPackLoadStatus = status
@@ -148,12 +189,262 @@ final class StationDetailViewModel {
         }
     }
 
+    func loadOnlineStationInformation() async {
+        guard let station,
+              station.cityID == "1100",
+              let review = officialResourceReview,
+              let providerStationID = review.providerStationID else { return }
+
+        let stationID = station.id
+        let generation = officialInformationGeneration
+        isLoadingOfficialStationInformation = true
+        // Keep any snapshot already on screen: `loadStation` clears it on a station change,
+        // so anything still here is this station's own data — blanking it during a refresh
+        // just swaps real content for a spinner.
+        officialStationInformationError = nil
+        defer {
+            if isCurrentOfficialInformationLoad(stationID: stationID, generation: generation) {
+                isLoadingOfficialStationInformation = false
+            }
+        }
+
+        let expectedNames = [
+            station.name,
+            station.nameEn,
+            review.stationName,
+            review.stationNameEn
+        ].compactMap { $0 } + review.aliases
+        let request = OfficialStationInformationRequest(
+            stationID: stationID,
+            reference: .beijing(
+                externalStationID: providerStationID,
+                expectedNames: expectedNames
+            )
+        )
+
+        do {
+            let snapshot = try await officialStationInformationProvider.information(for: request)
+            guard isCurrentOfficialInformationLoad(
+                stationID: stationID,
+                generation: generation
+            ) else { return }
+            officialStationInformation = snapshot
+        } catch is CancellationError {
+            return
+        } catch {
+            guard isCurrentOfficialInformationLoad(
+                stationID: stationID,
+                generation: generation
+            ) else { return }
+            officialStationInformationError = stationInformationErrorMessage(error)
+        }
+    }
+
+    func retryRiderInformation() {
+        Task {
+            await loadRiderInformation()
+        }
+    }
+
+    var usesCategorizedStationInformation: Bool {
+        guard let station else { return false }
+        if station.cityID == "8100" {
+            return true
+        }
+        return station.cityID == "1100" && officialResourceReview?.providerStationID != nil
+    }
+
+    var officialStationInformationSourceResource: ExternalTransitResource? {
+        officialResourceReview?.resources.first {
+            $0.kind == .stationInformation && $0.scope == .station
+        }
+    }
+
+    private func buildHongKongStationInformation() {
+        guard let station, station.cityID == "8100" else { return }
+        let stationID = station.id
+        let accessibility = station.accessibility
+        let accessibleEntrances = accessibility?.accessibleEntrances ?? []
+        let elevatorLocations = accessibility?.elevatorLocations ?? []
+        var seenExitNames = Set<String>()
+        var exits: [OfficialStationExitInformation] = []
+
+        for entrance in accessibleEntrances where seenExitNames.insert(entrance).inserted {
+            var details = [
+                AppLocalization.text(
+                    english: "Step-free entrance",
+                    simplified: "无障碍出入口",
+                    traditional: "無障礙出入口"
+                )
+            ]
+            if elevatorLocations.contains(entrance) {
+                details.append(AppLocalization.text(
+                    english: "Lift access",
+                    simplified: "设有升降机",
+                    traditional: "設有升降機"
+                ))
+            }
+            exits.append(OfficialStationExitInformation(
+                name: entrance,
+                details: details,
+                isAccessible: true
+            ))
+        }
+        for location in elevatorLocations where seenExitNames.insert(location).inserted {
+            exits.append(OfficialStationExitInformation(
+                name: location,
+                details: [
+                    AppLocalization.text(
+                        english: "Lift location",
+                        simplified: "升降机位置",
+                        traditional: "升降機位置"
+                    )
+                ],
+                isAccessible: true
+            ))
+        }
+
+        let statusItems: [OfficialStationFacilityInformation] = accessibility.map {
+            [
+                accessibilityFacility(
+                    name: AppLocalization.localized("Elevator"),
+                    availability: $0.elevatorAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Escalator"),
+                    availability: $0.escalatorAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Wheelchair Ramp"),
+                    availability: $0.wheelchairRampAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Accessible Restroom"),
+                    availability: $0.accessibleRestroomAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Tactile Path"),
+                    availability: $0.tactilePathAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Audio Announcement"),
+                    availability: $0.audioAnnouncementAvailability
+                ),
+                accessibilityFacility(
+                    name: AppLocalization.localized("Visual Display"),
+                    availability: $0.visualAnnouncementAvailability
+                )
+            ].compactMap { $0 }
+        } ?? []
+        let facilityItems = (accessibility?.facilityNotes ?? []).map {
+            OfficialStationFacilityInformation(
+                name: $0,
+                location: nil,
+                availability: .available
+            )
+        }
+        var facilityGroups: [OfficialStationFacilityGroup] = []
+        if !statusItems.isEmpty {
+            facilityGroups.append(OfficialStationFacilityGroup(
+                name: AppLocalization.text(
+                    english: "Accessibility status",
+                    simplified: "无障碍状态",
+                    traditional: "無障礙狀態"
+                ),
+                items: statusItems
+            ))
+        }
+        if !facilityItems.isEmpty {
+            facilityGroups.append(OfficialStationFacilityGroup(
+                name: AppLocalization.text(
+                    english: "Barrier-free facilities",
+                    simplified: "无障碍设施",
+                    traditional: "無障礙設施"
+                ),
+                items: facilityItems
+            ))
+        }
+        let trains = arrivals.map {
+            OfficialStationTrainInformation(
+                lineName: $0.lineName,
+                lineColorHex: $0.lineColorHex,
+                destination: $0.destination,
+                firstTime: nil,
+                lastTime: nil,
+                liveTime: $0.formattedArrival
+            )
+        }
+        officialStationInformation = OfficialStationInformationSnapshot(
+            stationID: stationID,
+            stationName: station.name,
+            source: .hongKongGovernment,
+            trains: trains,
+            exits: exits,
+            facilityGroups: facilityGroups
+        )
+        officialStationInformationError = nil
+        isLoadingOfficialStationInformation = false
+    }
+
+    private func accessibilityFacility(
+        name: String,
+        availability: AccessibilityAvailability
+    ) -> OfficialStationFacilityInformation? {
+        switch availability {
+        case .available:
+            return OfficialStationFacilityInformation(
+                name: name,
+                location: nil,
+                availability: .available
+            )
+        case .unavailable:
+            return OfficialStationFacilityInformation(
+                name: name,
+                location: nil,
+                availability: .unavailable
+            )
+        case .unknown:
+            return nil
+        }
+    }
+
+    private func stationInformationErrorMessage(_ error: Error) -> String {
+        guard let providerError = error as? OfficialStationInformationProviderError else {
+            return AppLocalization.text(
+                english: "Official station information is temporarily unavailable.",
+                simplified: "官方车站信息暂时不可用。",
+                traditional: "官方車站資訊暫時不可用。"
+            )
+        }
+        switch providerError {
+        case .timedOut, .transport, .rateLimited, .httpStatus, .serviceUnavailable:
+            return AppLocalization.text(
+                english: "The official service is temporarily unavailable. Try again shortly.",
+                simplified: "官方服务暂时不可用，请稍后重试。",
+                traditional: "官方服務暫時不可用，請稍後重試。"
+            )
+        case .invalidRequest, .invalidResponse, .responseTooLarge, .contractViolation:
+            return AppLocalization.text(
+                english: "The official response could not be verified for this station.",
+                simplified: "无法核实此车站的官方响应。",
+                traditional: "無法核實此車站的官方回應。"
+            )
+        }
+    }
+
     private func isCurrentTrainTimesLoad(stationID: String, generation: Int) -> Bool {
         station?.id == stationID && trainTimesGeneration == generation
     }
 
     private func isCurrentCityPackLoad(stationID: String, generation: Int) -> Bool {
         station?.id == stationID && cityPackGeneration == generation
+    }
+
+    private func isCurrentOfficialInformationLoad(
+        stationID: String,
+        generation: Int
+    ) -> Bool {
+        station?.id == stationID && officialInformationGeneration == generation
     }
 
     var trainTimeStatusMessage: String? {

@@ -125,6 +125,44 @@ swift_sources.each do |absolute_path, source|
   end
 end
 
+official_viewer_path = File.join(ROOT, "JustGo/Views/Components/Web/OfficialTransitResourceViewer.swift")
+unless File.file?(official_viewer_path)
+  errors << "official-resource in-app viewer is missing"
+else
+  official_viewer_source = File.read(official_viewer_path, encoding: "UTF-8")
+  %w[
+    WKWebsiteDataStore.nonPersistent
+    URLSessionConfiguration.ephemeral
+    reloadIgnoringLocalAndRemoteCacheData
+    OfficialTransitResourceButton
+    PDFView
+    maximumBinaryBytes
+    fullScreenCover
+    canShowMIMEType
+    stationInformationReaderScript
+    WKUserScript
+  ].each do |marker|
+    errors << "official-resource viewer is missing #{marker}" unless official_viewer_source.include?(marker)
+  end
+  errors << "official resources must not use a direct SwiftUI Link" if
+    official_viewer_source.include?("Link(destination:")
+  errors << "station information must not offer a Safari fallback" unless
+    official_viewer_source.include?("resource.kind != .stationInformation")
+end
+
+required_official_resource_callers = %w[
+  JustGo/Views/Profile/TransitDataView.swift
+  JustGo/Views/Route/IndoorStepGoView.swift
+  JustGo/Views/Route/LiveGoView.swift
+  JustGo/Views/Route/TransferStationSheet.swift
+  JustGo/Views/Station/StationDetailView+DataSections.swift
+].freeze
+required_official_resource_callers.each do |relative_path|
+  source = swift_sources.fetch(File.join(ROOT, relative_path))
+  errors << "#{relative_path} must use the shared in-app official-resource button" unless
+    source.include?("OfficialTransitResourceButton(")
+end
+
 download_callers = swift_sources.each_with_object([]) do |(absolute_path, source), callers|
   relative_path = absolute_path.delete_prefix("#{ROOT}/")
   callers << relative_path if source.include?("downloadCityPack(") && absolute_path != policy_path
@@ -141,10 +179,61 @@ realtime_source = read.call("JustGo/Services/Transit/HongKongRealtimeArrivalProv
 errors << "Hong Kong live arrivals must use HTTPS" unless realtime_source.include?('components.scheme = "https"')
 errors << "Hong Kong live arrivals must use DATA.GOV.HK" unless realtime_source.include?('components.host = "rt.data.gov.hk"')
 
+station_information_source = read.call(
+  "JustGo/Services/Transit/OfficialStationInformationProvider.swift"
+)
+%w[
+  URLSessionConfiguration.ephemeral
+  reloadIgnoringLocalAndRemoteCacheData
+  httpCookieStorage
+  httpShouldSetCookies
+  BeijingStationInformationRedirectDelegate
+  maximumResponseBytes
+  cacheLifetime
+  defaultRateLimitBackoff
+  rateLimitedUntil
+  Retry-After
+  releaseMemory
+  stationDeviceLocation
+  expectedNames
+  OfficialStationFacilityAvailability
+].each do |marker|
+  errors << "Beijing station-information provider is missing #{marker}" unless
+    station_information_source.include?(marker)
+end
+errors << "Beijing station-information provider must use HTTPS" unless
+  station_information_source.include?('components.scheme = "https"')
+errors << "Beijing station-information provider must use the fixed official host" unless
+  station_information_source.include?('host = "www.bjsubway.com"')
+errors << "Beijing station-information provider must use the fixed detail path" unless
+  station_information_source.include?('endpointPath = "/api/guanwang/v2/getStationDetail"')
+%w[UserDefaults FileManager write(to: createFile].each do |persistence_marker|
+  if station_information_source.include?(persistence_marker)
+    errors << "Beijing station-information responses must not persist via #{persistence_marker}"
+  end
+end
+
+station_detail_model = read.call("JustGo/ViewModels/Map/StationDetailViewModel.swift")
+errors << "Hong Kong station information must preserve verified unavailable facilities" unless
+  station_detail_model.include?("availability: .unavailable")
+
+quick_tag_model = read.call("JustGo/Models/User/StationQuickTag.swift")
+quick_tag_service = read.call("JustGo/Services/Data/TripMemoryService.swift")
+errors << "Quick Tags must have an exact three-item policy" unless
+  quick_tag_model.include?("static let maximumCount = 3")
+errors << "legacy Quick Tags must be normalized on startup" unless
+  quick_tag_service.include?("StationQuickTagPolicy.normalized(storedQuickTags)")
+errors << "a fourth Quick Tag must require explicit replacement" unless
+  quick_tag_service.include?(".replacementRequired(stationQuickTags)")
+
 project = read.call("JustGo.xcodeproj/project.pbxproj")
 %w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
   errors << "Xcode resources are missing #{resource}" unless project.include?(resource)
 end
+errors << "Xcode project is missing OfficialTransitResourceViewer.swift" unless
+  project.include?("OfficialTransitResourceViewer.swift")
+errors << "Xcode project is missing OfficialStationInformationProvider.swift" unless
+  project.include?("OfficialStationInformationProvider.swift")
 %w[indoor_maps.json JustGo-Privacy.plist].each do |retired_resource|
   errors << "Xcode project still references #{retired_resource}" if project.include?(retired_resource)
 end
@@ -170,4 +259,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1"
+puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=transient quick_tags=3"

@@ -84,9 +84,9 @@ struct TransitDataView: View {
                     }
                 } footer: {
                     Text(AppLocalization.text(
-                        english: "Links open official operator pages in your browser. JustGo does not download or verify their files as indoor guidance.",
-                        simplified: "链接会在浏览器中打开运营方官网。JustGo 不会下载这些文件，也不会将其视为站内指引。",
-                        traditional: "連結會在瀏覽器中開啟營運方官網。JustGo 不會下載這些檔案，也不會將其視為站內指引。"
+                        english: "Official pages open inside JustGo after you tap. The temporary viewer does not retain browsing data, and operator files are not treated as verified indoor guidance.",
+                        simplified: "点按后，官方页面会在 JustGo 内打开。临时查看器不会保留浏览数据，运营方文件也不会被视为已核实的站内指引。",
+                        traditional: "點按後，官方頁面會在 JustGo 內開啟。臨時檢視器不會保留瀏覽資料，營運方檔案也不會被視為已核實的站內指引。"
                     ))
                 }
 
@@ -123,9 +123,9 @@ struct TransitDataView: View {
                             traditional: "車站佈局與媒體"
                         ),
                         detail: AppLocalization.text(
-                            english: "Official browser links, licensed media, and private on-device photos are kept separate",
-                            simplified: "官方浏览器链接、许可媒体与设备上的私人照片分别管理",
-                            traditional: "官方瀏覽器連結、授權媒體與裝置上的私人照片分別管理"
+                            english: "In-app official resources, licensed media, and private on-device photos are kept separate",
+                            simplified: "应用内官方资源、许可媒体与设备上的私人照片分别管理",
+                            traditional: "App 內官方資源、授權媒體與裝置上的私人照片分別管理"
                         )
                     )
                 } header: {
@@ -509,7 +509,7 @@ private struct OfficialResourceCityView: View {
                     if !items.isEmpty {
                         Section(group.title) {
                             ForEach(items) { item in
-                                OfficialTransitResourceLink(
+                                OfficialTransitResourceButton(
                                     resource: item.resource,
                                     stationName: item.stationName
                                 )
@@ -531,74 +531,6 @@ private struct OfficialResourceCityView: View {
         }
         .navigationTitle(city.localizedName)
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct OfficialTransitResourceLink: View {
-    let resource: ExternalTransitResource
-    var stationName: String? = nil
-    var compact = false
-
-    private var displayTitle: String {
-        guard let stationName else { return resource.kind.localizedTitle }
-        return "\(stationName) · \(resource.kind.localizedTitle)"
-    }
-
-    var body: some View {
-        if let url = resource.url {
-            Link(destination: url) {
-                HStack(alignment: .center, spacing: 10) {
-                    Image(systemName: iconName)
-                        .foregroundStyle(Color.accentColor)
-                        .frame(width: 22)
-                        .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(displayTitle)
-                            .font(compact ? .caption : .subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-                        HStack(spacing: 5) {
-                            Text(resource.format.badgeTitle)
-                                .font(.caption2)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 1)
-                                .background(Color.secondary.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 3))
-                            Text(resource.provider)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(compact ? 1 : 2)
-                        }
-                    }
-                    Spacer(minLength: 4)
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .accessibilityHidden(true)
-                }
-                .contentShape(Rectangle())
-            }
-            .accessibilityLabel(AppLocalization.text(
-                english: "\(displayTitle), \(resource.format.badgeTitle), opens \(resource.provider) in your browser",
-                simplified: "\(displayTitle)，\(resource.format.badgeTitle)，在浏览器中打开 \(resource.provider)",
-                traditional: "\(displayTitle)，\(resource.format.badgeTitle)，在瀏覽器中開啟 \(resource.provider)"
-            ))
-        }
-    }
-
-    private var iconName: String {
-        switch resource.kind.group {
-        case .maps:
-            return "map"
-        case .travel:
-            return "tram.fill"
-        case .accessibility:
-            return "accessibility"
-        case .help:
-            return "questionmark.circle"
-        }
     }
 }
 

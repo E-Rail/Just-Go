@@ -398,8 +398,12 @@ module OSSDataValidators
         ].sort,
         "DataPacks/rights_inventory.json" => ["justgo-generated-catalog"],
         "DataPacks/official_transit_resources.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
-          osm-metro-networks
+          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          official-transit-resource-links osm-metro-networks
+        ].sort,
+        "DataPacks/sources/official-resources/beijing_station_information.json" => %w[
+          beijing-official-landing-links justgo-generated-catalog
+          official-transit-resource-links osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hong_kong_index.json" => %w[
           data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links

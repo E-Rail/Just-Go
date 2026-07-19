@@ -1,3 +1,4 @@
+import CoreLocation
 import SwiftUI
 
 @main
@@ -21,6 +22,22 @@ struct JustGoApp: App {
                 .environment(container.tripMemoryService)
                 .task {
                     appState.initialize(container: container)
+                    await container.tripMemoryService.repairQuickTagStationData { quickTag in
+                        guard let network = await container.metroNetworkProvider.network(
+                            for: quickTag.cityID
+                        ) else { return nil }
+                        let coordinate = CLLocationCoordinate2D(
+                            latitude: quickTag.latitude,
+                            longitude: quickTag.longitude
+                        )
+                        guard let match = network.matchingStation(named: quickTag.name, near: coordinate)
+                            ?? quickTag.nameEn.flatMap({
+                                network.matchingStation(named: $0, near: coordinate)
+                            }) else { return nil }
+                        return await container.stationSearchService.enrichStation(
+                            network.displayStation(match)
+                        )
+                    }
                 }
         }
     }

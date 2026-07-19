@@ -680,6 +680,26 @@ module OSSCityPackPipeline
           "rightsIDs" => ["osm-metro-networks"]
         }
       end
+      # DataPacks/universal/ republishes the catalog, networks, packs, and rights data as
+      # one developer-facing document per city (Scripts/generate_universal_city_data.rb),
+      # so every file carries the union of the aggregated sources' rights. The per-city
+      # subset is embedded in each document and cross-checked by
+      # Scripts/validate_universal_city_data.rb.
+      universal_rights = %w[
+        beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+        macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
+        official-transit-resource-links osm-metro-networks
+      ].sort
+      files << {
+        "path" => "DataPacks/universal/index.json",
+        "rightsIDs" => universal_rights
+      }
+      CATALOG_CITY_IDS.each do |city_id|
+        files << {
+          "path" => "DataPacks/universal/#{city_id}.json",
+          "rightsIDs" => universal_rights
+        }
+      end
       files.sort_by { |entry| entry.fetch("path") }
     end
 

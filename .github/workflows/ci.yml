@@ -49,6 +49,7 @@ jobs:
           ruby Scripts/validate_localizations.rb
           ruby Scripts/validate_metro_networks.rb
           ruby Scripts/validate_indoor_maps.rb
+          ruby Scripts/validate_universal_city_data.rb
           bash Scripts/check_no_legacy_map_provider.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
@@ -61,7 +62,9 @@ jobs:
           ruby Scripts/generate_city_pack_manifest.rb
           ruby Scripts/generate_official_transit_resources.rb
           ruby Scripts/generate_official_transit_resources.rb
-          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json JustGo/Resources/BundledCityPacks
+          ruby Scripts/generate_universal_city_data.rb
+          ruby Scripts/generate_universal_city_data.rb
+          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal JustGo/Resources/BundledCityPacks
 
       - name: Build for iOS Simulator
         run: |

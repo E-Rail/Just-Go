@@ -389,6 +389,15 @@ module OSSDataValidators
     def expected_rights_for(path)
       return ["osm-metro-networks"] if path.match?(%r{\AJustGo/Resources/MetroNetworks/[^/]+\.json\z})
       return ["data-gov-hk-mtr"] if path.match?(%r{\ADataPacks/sources/8100/[^/]+\.csv\z})
+      # Universal city documents aggregate every reviewed source, so each carries the full
+      # rights union; the per-city subset lives inside the document itself.
+      if path.match?(%r{\ADataPacks/universal/[^/]+\.json\z})
+        return %w[
+          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
+          official-transit-resource-links osm-metro-networks
+        ].sort
+      end
 
       {
         "DataPacks/manifest.json" => %w[

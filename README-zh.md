@@ -90,10 +90,16 @@ Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用�
 ruby Scripts/generate_city_pack_manifest.rb
 ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
+ruby Scripts/generate_universal_city_data.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
 ruby Scripts/validate_official_transit_resources.rb
+ruby Scripts/validate_universal_city_data.rb
 ```
+
+面向开发者的统一城市数据格式见 [`DataPacks/universal/`](DataPacks/universal/)——58 个城市
+以同一套带版本号和完整性索引的 JSON 结构发布，格式说明见
+[DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md)。
 
 数据结构、来源、校验和和授权说明见 [DataPacks/README.md](DataPacks/README.md)、
 [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md) 和

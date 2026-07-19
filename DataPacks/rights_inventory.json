@@ -199,6 +199,773 @@
       ]
     },
     {
+      "path": "DataPacks/universal/1100.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/1200.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/1301.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/1401.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/1501.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/2101.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/2102.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/2201.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/2301.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3100.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3201.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3202.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3203.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3204.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3205.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3206.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3301.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3302.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3303.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3306.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3307.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3310.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3401.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3402.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3411.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3501.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3502.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3601.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3701.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/3702.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4101.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4103.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4110.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4201.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4207.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4301.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4303.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4331.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4401.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4403.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4406.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4418.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4419.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/4501.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/5000.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/5101.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/5120.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/5201.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/5301.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/6101.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/6201.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/6501.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/7101.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/7102.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/7104.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/7106.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/8100.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/8200.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/universal/index.json",
+      "rightsIDs": [
+        "beijing-official-landing-links",
+        "data-gov-hk-mtr",
+        "justgo-generated-catalog",
+        "macau-official-landing-link",
+        "media-central-qqhhss",
+        "media-jianguomen-ian-holton",
+        "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
       "path": "JustGo/Resources/BundledCityPacks/1100.json",
       "rightsIDs": [
         "beijing-official-landing-links",

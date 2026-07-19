@@ -104,10 +104,17 @@ Regenerate and validate data from the vendored, reviewed inputs:
 ruby Scripts/generate_city_pack_manifest.rb
 ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
+ruby Scripts/generate_universal_city_data.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
 ruby Scripts/validate_official_transit_resources.rb
+ruby Scripts/validate_universal_city_data.rb
 ```
+
+Developers consuming JustGo's data can use the Universal City Data Format —
+[`DataPacks/universal/`](DataPacks/universal/) publishes all 58 cities in one versioned,
+integrity-indexed JSON schema documented in
+[DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md).
 
 See [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md), and
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for schema, provenance, checksums, and exact

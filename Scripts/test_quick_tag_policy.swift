@@ -45,12 +45,32 @@ final class Station {
 
 enum TransitPlaceSource {
     case quickPlace
+    case mapKit
 }
 
 struct TransitPlace {
     let name: String
     let coordinate: CLLocationCoordinate2D
+    let address: String?
     let source: TransitPlaceSource
+
+    init(
+        name: String,
+        coordinate: CLLocationCoordinate2D,
+        address: String? = nil,
+        source: TransitPlaceSource = .mapKit
+    ) {
+        self.name = name
+        self.coordinate = coordinate
+        self.address = address
+        self.source = source
+    }
+
+    // Mirrors the app target's TransitPlace.id — StationQuickTag.placeIdentifier(for:)
+    // builds place-tag identity from it.
+    var id: String {
+        "\(name)-\(String(format: "%.6f", coordinate.latitude))-\(String(format: "%.6f", coordinate.longitude))"
+    }
 }
 
 private struct HarnessFailure: Error, CustomStringConvertible {
@@ -144,6 +164,47 @@ private func testUnlimitedCustomInsertion() throws {
     try require(tags.last?.stationID == "gym", "oldest custom must survive at the end")
 }
 
+private func testLegacyStoredTagDecodesAsStation() throws {
+    // A verbatim pre-place-support payload: no targetType, no address.
+    let legacyJSON = """
+    {"id":"8100|abc123","stationID":"abc123","name":"站 abc123","nameEn":"Station abc123",\
+    "latitude":22,"longitude":114,"cityID":"8100","cityName":"香港","cityNameEn":"Hong Kong",\
+    "lineNames":["東涌綫"],"lineNamesEn":["Tung Chung Line"],"lineIDs":["tcl"],\
+    "lineColorsHex":["#F7943E"],"kind":{"home":{}}}
+    """
+    let decoded = try JSONDecoder().decode(StationQuickTag.self, from: Data(legacyJSON.utf8))
+    try require(decoded.resolvedTargetType == .station, "legacy tags must resolve as station tags")
+    try require(decoded.targetType == nil, "legacy tags must not invent a stored targetType")
+    try require(decoded.address == nil, "legacy tags must not invent an address")
+    try require(decoded.kind == .home, "legacy kind decoding changed")
+}
+
+private func testPlaceTagRoundTrip() throws {
+    let place = TransitPlace(
+        name: "Victoria Park",
+        coordinate: CLLocationCoordinate2D(latitude: 22.28213, longitude: 114.18919),
+        address: "1 Hing Fat Street, Causeway Bay"
+    )
+    let tag = StationQuickTag(
+        place: place,
+        cityID: "8100",
+        cityName: "香港",
+        cityNameEn: "Hong Kong",
+        kind: .custom("Picnic")
+    )
+    try require(tag.resolvedTargetType == .place, "place tag must resolve as a place")
+    try require(tag.stationID == StationQuickTag.placeIdentifier(for: place), "place identity drifted")
+    try require(tag.lineNames.isEmpty, "place tags must not carry line data")
+    try require(tag.address == place.address, "place address was dropped")
+
+    let decoded = try JSONDecoder().decode(
+        StationQuickTag.self,
+        from: JSONEncoder().encode(tag)
+    )
+    try require(decoded == tag, "place tag did not survive a Codable round trip")
+    try require(decoded.resolvedTargetType == .place, "decoded place tag lost its target type")
+}
+
 private func testExclusiveReassignment() throws {
     let current = [
         tag("home-old", kind: .home),
@@ -169,9 +230,13 @@ private enum QuickTagPolicyHarness {
             print("PASS: unlimited customs survive normalization")
             try testUnlimitedCustomInsertion()
             print("PASS: unlimited custom insertion")
+            try testLegacyStoredTagDecodesAsStation()
+            print("PASS: legacy stored tags decode as station tags")
+            try testPlaceTagRoundTrip()
+            print("PASS: place tag Codable round trip")
             try testExclusiveReassignment()
             print("PASS: exclusive Home reassignment")
-            print("StationQuickTagPolicy: 5 test groups passed")
+            print("StationQuickTagPolicy: 7 test groups passed")
         } catch {
             FileHandle.standardError.write(Data("Quick Tag policy test failed: \(error)\n".utf8))
             exit(EXIT_FAILURE)

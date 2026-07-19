@@ -25,9 +25,11 @@ private struct SearchBarBottomYKey: PreferenceKey {
 struct MapContainerView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var viewModel: MapViewModel?
     @State private var selectedStation: Station?
     @State private var tappedPlace: TappedPlace?
+    @State private var showPlaceTagDialog = false
     @State private var showCityPicker = false
     @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
@@ -151,6 +153,15 @@ struct MapContainerView: View {
         // explicit `tappedPlace = nil` closure would fire for the OLD sheet's dismissal —
         // clobbering a new tap's sheet presented while the old one was still animating out.
         .sheet(item: $tappedPlace) { place in
+            // Keep the tag identity anchored to the tapped annotation's name/coordinate, not
+            // the resolved MKMapItem's — resolution can shift both slightly, and a tag saved
+            // before resolution must keep matching the same place afterward.
+            let taggedPlace = TransitPlace(
+                name: place.name,
+                coordinate: place.coordinate,
+                address: place.resolvedItem?.placemark.title,
+                source: .mapKit
+            )
             Group {
                 if let item = place.resolvedItem {
                     MapItemDetailSheet(mapItem: item) {
@@ -162,14 +173,28 @@ struct MapContainerView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                PlanRouteButtons(
-                    place: TransitPlace(name: place.name, coordinate: place.coordinate, source: .mapKit),
-                    onSelected: { tappedPlace = nil }
-                )
+                HStack(spacing: 10) {
+                    PlanRouteButtons(
+                        place: taggedPlace,
+                        onSelected: { tappedPlace = nil }
+                    )
+                    placeTagButton(for: taggedPlace)
+                }
                 .padding(.horizontal)
                 .padding(.vertical, 10)
                 .background(.regularMaterial)
             }
+            .quickTagEditor(
+                isPresented: $showPlaceTagDialog,
+                title: place.name,
+                currentQuickTag: tripMemoryService.quickTag(place: taggedPlace),
+                onSave: { kind in savePlaceTag(taggedPlace, kind: kind) },
+                onDelete: {
+                    if let existing = tripMemoryService.quickTag(place: taggedPlace) {
+                        tripMemoryService.deleteQuickTag(id: existing.id)
+                    }
+                }
+            )
             // No selection binding here defaults to the SMALLEST detent (.medium, half
             // screen) on every presentation and requires a manual drag to reach .large —
             // that drag can get eaten by the embedded MKMapItemDetailViewController's own
@@ -212,6 +237,44 @@ struct MapContainerView: View {
             onStationSelected: openStation,
             onPlaceTapped: handlePlaceTapped,
             onPlaceResolved: handlePlaceResolved
+        )
+    }
+
+    private func placeTagButton(for place: TransitPlace) -> some View {
+        let currentQuickTag = tripMemoryService.quickTag(place: place)
+        return Button {
+            showPlaceTagDialog = true
+        } label: {
+            Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.accentColor.opacity(0.4), lineWidth: 1)
+                )
+                .foregroundStyle(Color.accentColor)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(currentQuickTag == nil
+            ? AppLocalization.localized("Add Quick Tag")
+            : AppLocalization.localized("Edit Quick Tag")
+        )
+    }
+
+    private func savePlaceTag(_ place: TransitPlace, kind: StationQuickTagKind) {
+        let location = CLLocation(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
+        guard let city = container.cityService.findNearestCity(to: location) ?? appState.selectedCity else {
+            return
+        }
+        tripMemoryService.setQuickTag(
+            place: place,
+            cityID: city.id,
+            cityName: city.name,
+            cityNameEn: city.nameEn,
+            kind: kind
         )
     }
 

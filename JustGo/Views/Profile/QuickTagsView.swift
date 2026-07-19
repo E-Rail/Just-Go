@@ -34,8 +34,14 @@ struct QuickTagsView: View {
                     } else {
                         ForEach(tripMemoryService.stationQuickTags) { quickTag in
                             HStack(spacing: 10) {
-                                NavigationLink(destination: StationDetailView(station: quickTag.toStation())) {
+                                if quickTag.resolvedTargetType == .station {
+                                    NavigationLink(destination: StationDetailView(station: quickTag.toStation())) {
+                                        quickTagRow(quickTag)
+                                    }
+                                } else {
+                                    // Map-place tags have no station page to open.
                                     quickTagRow(quickTag)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
 
                                 Button {
@@ -185,6 +191,12 @@ struct QuickTagsView: View {
                 Text(quickTag.displayCityName)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if let address = quickTag.address, !address.isEmpty {
+                    Text(address)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
                 if !quickTag.lineNames.isEmpty {
                     Text(quickTag.displayLineNames.joined(separator: " • "))
                         .font(.caption)

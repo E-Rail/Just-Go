@@ -223,6 +223,8 @@ errors << "Home/Work Quick Tags must stay single-slot via kind exclusivity" unle
   quick_tag_model.include?("var isExclusive: Bool")
 errors << "legacy Quick Tags must be normalized on startup" unless
   quick_tag_service.include?("StationQuickTagPolicy.normalized(storedQuickTags)")
+errors << "Quick Tag station repair must skip map-place tags" unless
+  quick_tag_service.include?("resolvedTargetType == .station")
 %w[maximumCount replacementRequired].each do |retired_cap_marker|
   [quick_tag_model, quick_tag_service].each do |source|
     errors << "custom Quick Tags are unlimited; #{retired_cap_marker} must not return" if

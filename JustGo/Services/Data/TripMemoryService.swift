@@ -164,6 +164,31 @@ final class TripMemoryService {
         persistStationQuickTags()
     }
 
+    func setQuickTag(
+        place: TransitPlace,
+        cityID: String,
+        cityName: String,
+        cityNameEn: String? = nil,
+        kind: StationQuickTagKind
+    ) {
+        var quickTag = StationQuickTag(place: place, cityID: cityID, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
+        if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
+            quickTag = existing
+                .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
+                .withKind(kind)
+        }
+        stationQuickTags = StationQuickTagPolicy.inserting(quickTag, into: stationQuickTags)
+        persistStationQuickTags()
+    }
+
+    /// Matched on the place identity alone (not cityID): the city stamped on a POI tag comes
+    /// from a nearest-city guess, so requiring it to match again would hide the tagged state
+    /// whenever that guess shifts.
+    func quickTag(place: TransitPlace) -> StationQuickTag? {
+        let identifier = StationQuickTag.placeIdentifier(for: place)
+        return stationQuickTags.first { $0.stationID == identifier }
+    }
+
     func deleteQuickTag(id: String) {
         stationQuickTags.removeAll { $0.id == id }
         persistStationQuickTags()
@@ -198,6 +223,7 @@ final class TripMemoryService {
         var repaired = original
         var didRepair = false
         for (index, quickTag) in original.enumerated() {
+            guard quickTag.resolvedTargetType == .station else { continue }
             guard let station = await stationLookup(quickTag) else { continue }
             let rebuilt = StationQuickTag(
                 station: station,

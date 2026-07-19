@@ -8,8 +8,6 @@ struct StationDetailView: View {
     @State var viewModel: StationDetailViewModel?
     @State var selectedStationImage: FullScreenStationImage?
     @State var showQuickTagDialog = false
-    @State var showCustomQuickTagAlert = false
-    @State var customQuickTagText = ""
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
 
     private var currentQuickTag: StationQuickTag? {
@@ -74,12 +72,23 @@ struct StationDetailView: View {
         }
         .quickTagEditor(
             isPresented: $showQuickTagDialog,
-            showCustom: $showCustomQuickTagAlert,
-            customText: $customQuickTagText,
-            station: displayedStation,
+            title: displayedStation.localizedName,
             currentQuickTag: currentQuickTag,
-            container: container,
-            tripMemoryService: tripMemoryService
+            onSave: { kind in
+                let station = displayedStation
+                let city = container.cityService.getCity(byID: station.cityID)
+                tripMemoryService.setQuickTag(
+                    station: station,
+                    cityName: city?.name ?? station.cityID,
+                    cityNameEn: city?.nameEn,
+                    kind: kind
+                )
+            },
+            onDelete: {
+                if let currentQuickTag {
+                    tripMemoryService.deleteQuickTag(id: currentQuickTag.id)
+                }
+            }
         )
     }
 
@@ -295,71 +304,6 @@ struct StationDetailView: View {
     }
 }
 
-private extension View {
-    func quickTagEditor(
-        isPresented: Binding<Bool>,
-        showCustom: Binding<Bool>,
-        customText: Binding<String>,
-        station: Station,
-        currentQuickTag: StationQuickTag?,
-        container: DIContainer,
-        tripMemoryService: TripMemoryService
-    ) -> some View {
-        confirmationDialog(
-            station.localizedName,
-            isPresented: isPresented,
-            titleVisibility: .visible
-        ) {
-            Button(StationQuickTagKind.home.title) {
-                saveQuickTag(.home, station: station, container: container, tripMemoryService: tripMemoryService)
-            }
-            Button(StationQuickTagKind.work.title) {
-                saveQuickTag(.work, station: station, container: container, tripMemoryService: tripMemoryService)
-            }
-            Button(AppLocalization.text(english: "Custom…", simplified: "自定义…", traditional: "自訂…")) {
-                customText.wrappedValue = currentQuickTag?.kind.customLabel ?? ""
-                showCustom.wrappedValue = true
-            }
-            if let currentQuickTag {
-                Button(AppLocalization.localized("Delete Quick Tag"), role: .destructive) {
-                    tripMemoryService.deleteQuickTag(id: currentQuickTag.id)
-                }
-            }
-        } message: {
-            Text(AppLocalization.localized("Quick Tags appear as one-tap chips in Route Planner."))
-        }
-        .alert(
-            AppLocalization.text(english: "Custom Tag", simplified: "自定义标签", traditional: "自訂標籤"),
-            isPresented: showCustom
-        ) {
-            TextField(
-                AppLocalization.text(english: "Tag name", simplified: "标签名称", traditional: "標籤名稱"),
-                text: customText
-            )
-            Button(AppLocalization.localized("Save")) {
-                let label = customText.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !label.isEmpty else { return }
-                saveQuickTag(.custom(label), station: station, container: container, tripMemoryService: tripMemoryService)
-            }
-            Button(AppLocalization.localized("Cancel"), role: .cancel) {}
-        }
-    }
-
-    func saveQuickTag(
-        _ kind: StationQuickTagKind,
-        station: Station,
-        container: DIContainer,
-        tripMemoryService: TripMemoryService
-    ) {
-        let city = container.cityService.getCity(byID: station.cityID)
-        tripMemoryService.setQuickTag(
-            station: station,
-            cityName: city?.name ?? station.cityID,
-            cityNameEn: city?.nameEn,
-            kind: kind
-        )
-    }
-}
 
 /// The "From here" / "To here" route-planning pair shown on a station or place popup.
 /// Tapping a button pre-fills the route planner (origin/destination), switches to the Route tab,

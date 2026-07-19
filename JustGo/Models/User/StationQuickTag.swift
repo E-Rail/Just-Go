@@ -42,6 +42,11 @@ enum StationQuickTagKind: Codable, Equatable, Hashable {
     }
 }
 
+enum QuickTagTargetType: String, Codable, Equatable {
+    case station
+    case place
+}
+
 struct StationQuickTag: Identifiable, Codable, Equatable {
     let id: String
     let stationID: String
@@ -59,6 +64,12 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     let lineIDs: [String]?
     let lineColorsHex: [String]?
     var kind: StationQuickTagKind
+    // Both nil on tags stored before place support existed; `resolvedTargetType` maps
+    // that legacy shape back to `.station` so old data keeps decoding untouched.
+    let targetType: QuickTagTargetType?
+    let address: String?
+
+    var resolvedTargetType: QuickTagTargetType { targetType ?? .station }
 
     init(station: Station, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
         self.id = "\(station.cityID)|\(station.stationID)"
@@ -77,6 +88,34 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
         self.lineIDs = station.lines.map(\.lineID)
         self.lineColorsHex = station.lines.map(\.colorHex)
         self.kind = kind
+        self.targetType = .station
+        self.address = nil
+    }
+
+    init(place: TransitPlace, cityID: String, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
+        let identifier = Self.placeIdentifier(for: place)
+        self.id = "\(cityID)|\(identifier)"
+        self.stationID = identifier
+        self.name = place.name
+        self.nameEn = nil
+        self.latitude = place.coordinate.latitude
+        self.longitude = place.coordinate.longitude
+        self.cityID = cityID
+        self.cityName = cityName
+        self.cityNameEn = cityNameEn
+        self.lineNames = []
+        self.lineNamesEn = nil
+        self.lineIDs = nil
+        self.lineColorsHex = nil
+        self.kind = kind
+        self.targetType = .place
+        self.address = place.address
+    }
+
+    /// Stable identity for a tagged map place. Reuses `TransitPlace.id` (name + rounded
+    /// coordinates) under a `place|` prefix so it can never collide with a station ID.
+    static func placeIdentifier(for place: TransitPlace) -> String {
+        "place|\(place.id)"
     }
 
     func withCityMetadata(cityName: String, cityNameEn: String?) -> StationQuickTag {
@@ -139,6 +178,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
         TransitPlace(
             name: displayName,
             coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+            address: address,
             source: .quickPlace
         )
     }

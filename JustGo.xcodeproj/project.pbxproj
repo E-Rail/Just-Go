@@ -113,6 +113,7 @@
 		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
 		A1000309 /* User/StationQuickTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/StationQuickTag.swift */; };
 		A1000310 /* Profile/QuickTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/QuickTagsView.swift */; };
+		A1000605 /* Profile/QuickTagAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000605 /* Profile/QuickTagAddView.swift */; };
 		A1000311 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000311 /* manifest.json */; };
 /* End PBXBuildFile section */
 
@@ -230,6 +231,7 @@
 		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
 		A2000309 /* User/StationQuickTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/StationQuickTag.swift; sourceTree = "<group>"; };
 		A2000310 /* Profile/QuickTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagsView.swift; sourceTree = "<group>"; };
+		A2000605 /* Profile/QuickTagAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagAddView.swift; sourceTree = "<group>"; };
 		A2000311 /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = manifest.json; path = DataPacks/manifest.json; sourceTree = SOURCE_ROOT; };
 		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -395,6 +397,7 @@
 				A2000014 /* Profile/TransitDataView.swift */,
 				A2000057 /* Profile/TripMemoryView.swift */,
 				A2000310 /* Profile/QuickTagsView.swift */,
+				A2000605 /* Profile/QuickTagAddView.swift */,
 				A2000015 /* Accessibility/AccessibilitySettingsView.swift */,
 				A2000401 /* Onboarding/OnboardingTourView.swift */,
 				A2000017 /* Components/Transit/StationRow.swift */,
@@ -602,6 +605,7 @@
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000058 /* Transit/IndoorNavigation.swift in Sources */,
 				A1000310 /* Profile/QuickTagsView.swift in Sources */,
+				A1000605 /* Profile/QuickTagAddView.swift in Sources */,
 				A1000033 /* Extensions/Color+Hex.swift in Sources */,
 				A100005C /* Extensions/CLLocationCoordinate2D+Distance.swift in Sources */,
 				A100005D /* Extensions/Sequence+Uniqued.swift in Sources */,

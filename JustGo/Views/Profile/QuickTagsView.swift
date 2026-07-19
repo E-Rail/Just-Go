@@ -7,6 +7,7 @@ struct QuickTagsView: View {
     @State private var editingQuickTag: StationQuickTag?
     @State private var customQuickTag: StationQuickTag?
     @State private var customTagText = ""
+    @State private var showAddTag = false
 
     private var tagActionTitle: String {
         AppLocalization.text(english: "Tag", simplified: "标签", traditional: "標籤")
@@ -24,7 +25,11 @@ struct QuickTagsView: View {
                             Text(AppLocalization.localized("No Quick Tags yet"))
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
-                            Text(AppLocalization.localized("Open a station and tap the tag button to create Home, Work, or a custom quick tag."))
+                            Text(AppLocalization.text(
+                                english: "Tap + to search and tag stations or places, or open a station and tap the tag button.",
+                                simplified: "点击 + 搜索并标记车站或地点，也可打开车站后点击标签按钮。",
+                                traditional: "點擊 + 搜尋並標記車站或地點，也可開啟車站後點擊標籤按鈕。"
+                            ))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
@@ -110,9 +115,20 @@ struct QuickTagsView: View {
             .navigationTitle(AppLocalization.localized("Quick Tags"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showAddTag = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(AppLocalization.localized("Done")) { dismiss() }
                 }
+            }
+            .sheet(isPresented: $showAddTag) {
+                QuickTagAddView()
             }
             .confirmationDialog(
                 editingQuickTag?.displayName ?? tagActionTitle,

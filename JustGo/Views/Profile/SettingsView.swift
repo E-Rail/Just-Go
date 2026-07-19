@@ -2,11 +2,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
     @State private var showTour = false
+    @State private var showQuickTags = false
 
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
 
@@ -16,6 +18,7 @@ struct SettingsView: View {
                 themeSection
                 languageSection
                 notificationsSection
+                tagsSection
                 dataSection
                 accessibilitySection
                 helpSection
@@ -29,6 +32,9 @@ struct SettingsView: View {
             }
             .fullScreenCover(isPresented: $showTour) {
                 OnboardingTourView { showTour = false }
+            }
+            .sheet(isPresented: $showQuickTags) {
+                QuickTagsView()
             }
         }
     }
@@ -154,6 +160,36 @@ struct SettingsView: View {
                 english: "When you set a departure reminder, you'll be notified this many minutes before you need to leave.",
                 simplified: "设置出发提醒后，将在出发前提前此时间通知您。",
                 traditional: "設定出發提醒後，將在出發前提前此時間通知您。"
+            ))
+        }
+    }
+
+    // MARK: - Tags
+
+    private var tagsSection: some View {
+        Section {
+            Button {
+                showQuickTags = true
+            } label: {
+                HStack {
+                    Label(AppLocalization.localized("Quick Tags"), systemImage: "tag.fill")
+                    Spacer()
+                    Text("\(tripMemoryService.stationQuickTags.count)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .foregroundStyle(.primary)
+        } header: {
+            Text(AppLocalization.text(english: "Tags", simplified: "标签", traditional: "標籤"))
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Add and manage Home, Work, and unlimited custom tags for stations and places.",
+                simplified: "添加并管理家、公司以及任意数量的车站和地点自定义标签。",
+                traditional: "新增並管理家、公司以及任意數量的車站和地點自訂標籤。"
             ))
         }
     }

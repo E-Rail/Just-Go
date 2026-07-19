@@ -172,7 +172,9 @@ struct TransitDataView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                 CityCapabilityTags(
-                                    coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage
+                                    coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage,
+                                    hasOfficialOnlineStationInformation:
+                                        BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
                                 )
                             }
                             Spacer()
@@ -536,6 +538,10 @@ private struct OfficialResourceCityView: View {
 
 struct CityCapabilityTags: View {
     let coverage: CityDataCoverage
+    /// True for cities whose accessibility/facility facts are served live from the official
+    /// operator (Beijing) — the bundled coverage metric honestly reads 0 there, but showing
+    /// "0" would contradict the online facilities every station page renders.
+    var hasOfficialOnlineStationInformation: Bool = false
 
     var body: some View {
         LazyVGrid(
@@ -547,10 +553,21 @@ struct CityCapabilityTags: View {
                 title: AppLocalization.text(english: "Matched", simplified: "匹配", traditional: "匹配"),
                 metric: coverage.matchedStations
             )
-            coverageTag(
-                title: AppLocalization.localized("Access"),
-                metric: coverage.accessibility
-            )
+            if hasOfficialOnlineStationInformation {
+                capabilityTag(
+                    title: AppLocalization.text(
+                        english: "Access · Online",
+                        simplified: "无障碍 · 在线",
+                        traditional: "無障礙 · 線上"
+                    ),
+                    status: .available
+                )
+            } else {
+                coverageTag(
+                    title: AppLocalization.localized("Access"),
+                    metric: coverage.accessibility
+                )
+            }
             coverageTag(
                 title: AppLocalization.text(english: "Live", simplified: "实时", traditional: "即時"),
                 metric: coverage.liveArrivals

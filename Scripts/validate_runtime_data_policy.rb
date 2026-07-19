@@ -245,6 +245,18 @@ app_entry = read.call("JustGo/App/JustGoApp.swift")
 errors << "data-rights epoch cleanup must sweep the station-information cache" unless
   app_entry.include?("StationInformationCacheLocation")
 
+# Online station information is a display surface only: route feasibility, planning, and
+# confidence must keep deriving accessibility truth from bundled reviewed data.
+%w[
+  JustGo/Services/Transit/RoutePlanningService.swift
+  JustGo/Services/Transit/RouteFeasibilityService.swift
+  JustGo/Services/Transit/RouteConfidenceService.swift
+].each do |routing_path|
+  if read.call(routing_path).include?("OfficialStationInformation")
+    errors << "#{routing_path} must not consume online station information"
+  end
+end
+
 # Clear Cache must stay wired end to end: the pack service exposes the full-clear API and
 # Settings actually calls it (through DIContainer.clearAllCaches).
 errors << "city-pack service must expose clearAllCaches" unless

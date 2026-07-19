@@ -212,6 +212,13 @@ private final class BeijingStationInformationRedirectDelegate:
 }
 
 actor BeijingStationInformationProvider: OfficialStationInformationProviding {
+    /// Cities whose station accessibility/facility facts come from this official online
+    /// surface rather than the bundled pack — coverage UI uses this to avoid claiming the
+    /// data doesn't exist while every station page renders it.
+    static func servesStationInformation(forCityID cityID: String) -> Bool {
+        cityID == "1100"
+    }
+
     fileprivate static let host = "www.bjsubway.com"
     private static let endpointPath = "/api/guanwang/v2/getStationDetail"
     private static let maximumResponseBytes = 1_048_576

@@ -483,7 +483,18 @@ final class StationDetailViewModel {
     }
 
     var accessibilityConfidence: DataConfidence {
-        station?.accessibility?.hasVerifiedAccessibilityData == true ? .official : cityPackPendingConfidence
+        if station?.accessibility?.hasVerifiedAccessibilityData == true {
+            return .official
+        }
+        // Beijing's accessibility facts come from the official online surface, not the
+        // bundled pack — while that surface is showing facility data (live or cached), the
+        // "Before You Go" chip must agree with it instead of claiming nothing exists.
+        if let information = officialStationInformation,
+           information.source == .beijingSubwayOnline,
+           !information.facilityGroups.isEmpty {
+            return .official
+        }
+        return cityPackPendingConfidence
     }
 
     var liveArrivalConfidence: DataConfidence {

@@ -69,9 +69,20 @@ enum AppLocalization {
         localizationBundle.localizedString(forKey: key, value: key, table: nil)
     }
 
+    // Every `localizedName` on City/Station/SubwayLine/MetroLine funnels through here for
+    // Traditional Chinese users; the underlying set of names is small and finite, so caching
+    // the transform avoids re-running it on every row render.
+    private static let hansToHantCache = NSCache<NSString, NSString>()
+
     static func chinese(_ simplified: String) -> String {
         guard isTraditionalChinese else { return simplified }
-        return simplified.applyingTransform(StringTransform("Hans-Hant"), reverse: false) ?? simplified
+        let key = simplified as NSString
+        if let cached = hansToHantCache.object(forKey: key) {
+            return cached as String
+        }
+        let converted = simplified.applyingTransform(StringTransform("Hans-Hant"), reverse: false) ?? simplified
+        hansToHantCache.setObject(converted as NSString, forKey: key)
+        return converted
     }
 
     static func text(english: String, chinese: String) -> String {

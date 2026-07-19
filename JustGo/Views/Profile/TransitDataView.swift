@@ -159,6 +159,7 @@ struct TransitDataView: View {
                                     hasOfficialOnlineStationInformation:
                                         BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
                                 )
+                                .equatable()
                             }
                             Spacer()
                             cityPackControl(for: city)
@@ -354,9 +355,11 @@ struct TransitDataView: View {
 struct OfficialResourcesDirectoryView: View {
     let cities: [OfficialTransitResourceCity]
     @State private var searchText = ""
+    @State private var debouncedQuery = ""
+    @State private var debounceTask: Task<Void, Never>?
 
     private var filteredCities: [OfficialTransitResourceCity] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let query = debouncedQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return cities }
         return cities.filter { city in
             city.localizedName.localizedCaseInsensitiveContains(query) ||
@@ -435,6 +438,14 @@ struct OfficialResourcesDirectoryView: View {
                 traditional: "城市、車站或營運方"
             )
         )
+        .onChange(of: searchText) { _, newValue in
+            debounceTask?.cancel()
+            debounceTask = Task {
+                try? await Task.sleep(for: .milliseconds(200))
+                guard !Task.isCancelled else { return }
+                debouncedQuery = newValue
+            }
+        }
     }
 
     private func resourceCountBadge(icon: String, count: Int) -> some View {
@@ -519,7 +530,7 @@ private struct OfficialResourceCityView: View {
     }
 }
 
-struct CityCapabilityTags: View {
+struct CityCapabilityTags: View, Equatable {
     let coverage: CityDataCoverage
     /// True for cities whose accessibility/facility facts are served live from the official
     /// operator (Beijing) — the bundled coverage metric honestly reads 0 there, but showing

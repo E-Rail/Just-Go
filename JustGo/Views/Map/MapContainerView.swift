@@ -556,13 +556,15 @@ struct CityPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(DIContainer.self) private var container
     @State private var searchText = ""
+    @State private var debouncedQuery = ""
+    @State private var debounceTask: Task<Void, Never>?
 
     private var cities: [City] {
         container.cityService.getAllCities()
     }
 
     private var filteredCities: [City] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let query = debouncedQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !query.isEmpty else { return cities }
         return cities.filter { city in
             [
@@ -614,6 +616,7 @@ struct CityPickerView: View {
                             hasOfficialOnlineStationInformation:
                                 BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
                         )
+                        .equatable()
                     }
                     .padding(.vertical, 4)
                 }
@@ -622,6 +625,14 @@ struct CityPickerView: View {
             .navigationTitle(AppLocalization.localized("Select City"))
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: AppLocalization.localized("Search cities"))
+            .onChange(of: searchText) { _, newValue in
+                debounceTask?.cancel()
+                debounceTask = Task {
+                    try? await Task.sleep(for: .milliseconds(200))
+                    guard !Task.isCancelled else { return }
+                    debouncedQuery = newValue
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(AppLocalization.localized("Cancel")) { dismiss() }

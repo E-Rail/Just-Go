@@ -276,6 +276,14 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         let prepared = try Self.prepare(request)
         let now = Self.clock.now
 
+        // Entries otherwise only leave `cache` when that same station is looked up again after
+        // expiring — over a session visiting many distinct stations it only ever shrinks on an
+        // OS memory warning. Sweep proactively; bounded by the reviewed station count, so this
+        // is cheap even every call.
+        if !cache.isEmpty {
+            cache = cache.filter { $0.value.expiresAt > now }
+        }
+
         if let cached = cache[prepared] {
             if cached.expiresAt > now {
                 return cached.snapshot

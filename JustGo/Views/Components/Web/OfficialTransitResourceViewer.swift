@@ -468,6 +468,10 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
         loadTask?.cancel()
         loadTask = nil
         isLoading = false
+        // Release the decoded binary immediately on dismiss instead of leaving a near-50MB
+        // PDF/image referenced until this object itself deallocates.
+        pdfDocument = nil
+        image = nil
     }
 }
 

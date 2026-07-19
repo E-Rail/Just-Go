@@ -34,7 +34,6 @@
 "Hearing" = "听力";
 "Hearing Impairment" = "听力障碍";
 "High Contrast Mode" = "高对比度模式";
-"JustGo uses the selected language instead of the system language." = "JustGo 使用所选语言，而不是系统语言。";
 "Language" = "语言";
 "Language changes take effect after restarting JustGo." = "语言更改将在重新启动 JustGo 后生效。";
 "Large Text" = "大号文字";
@@ -83,7 +82,6 @@
 "Enter a starting station and destination to search" = "输入出发站和目的站后即可搜索";
 "Settings" = "设置";
 "Show Accessibility Badges" = "显示无障碍标记";
-"Shows first/last train times, not live arrival countdowns." = "显示首末班时刻，不是实时到站倒计时。";
 "Simplified UI" = "简化界面";
 "Station not found. Try another station name." = "未找到车站。请尝试其他车站名称。";
 "Station accessibility data is missing" = "缺少车站无障碍数据";
@@ -104,7 +102,6 @@
 "Accessibility and station facilities" = "无障碍与车站设施";
 "Official city packs when public sources exist" = "有公开官方来源时使用官方城市数据包";
 "Official first/last schedules; live countdown only when an official provider exists" = "官方首末班时刻；只有接入官方来源时才显示实时倒计时";
-"Unavailable data is shown honestly instead of guessed." = "不可用的数据会明确说明，不会猜测。";
 "Route and Search Provider" = "路线与搜索提供方";
 "Official Station Details" = "官方车站详情";
 "City Packs" = "城市数据包";
@@ -222,8 +219,6 @@
 "AI issue reported" = "AI 报告了问题";
 "Try clearing filters or loading official city data." = "请尝试清除筛选条件，或加载官方城市数据。";
 "Rider Notes" = "乘客备注";
-"Route planning and place search use Apple Maps. Station facts use official city packs when available." = "路线规划和地点搜索使用 Apple 地图；车站信息在可用时使用官方城市数据包。";
-"Routes use Apple Maps; station facts use included official city data where available." = "路线使用 Apple 地图；车站信息在可用时使用内置的官方城市数据。";
 "Save" = "保存";
 "Save Trip" = "保存行程";
 "Saved Trip" = "已保存行程";
@@ -239,7 +234,6 @@
 "Step-free likely from available station data." = "根据现有车站数据，可能支持无台阶通行。";
 "Step-free not confirmed" = "无台阶通行未确认";
 "System Default" = "跟随系统";
-"System Default follows the language configured in iOS Settings." = "跟随系统会使用 iOS 设置中配置的语言。";
 "English" = "英语";
 "Simplified Chinese" = "简体中文";
 "Traditional Chinese" = "繁體中文";
@@ -260,7 +254,6 @@
 "Avg duration" = "平均时长";
 "Trip Preferences" = "行程偏好";
 "My Activity" = "我的活动";
-"Saved trips, history, and quick tags stay on this device." = "行程、历史和快捷标签均保存在本设备。";
 "Total trips" = "总行程";
 "This month" = "本月";
 "Your stats" = "我的统计";

@@ -26,17 +26,8 @@ struct TransitDataView: View {
                     HStack {
                         Image(systemName: "antenna.radiowaves.left.and.right")
                             .foregroundStyle(.green)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(AppLocalization.localized("Transit Data Sources"))
-                                .font(.headline)
-                            Text(AppLocalization.text(
-                                english: "Included metro networks power rail routes. Apple Maps supplies place search and walking legs; reviewed city packs add station details.",
-                                simplified: "内置地铁网络用于轨道路线；Apple 地图提供地点搜索和步行路段，已审核城市包补充车站详情。",
-                                traditional: "內置地鐵網絡用於軌道路線；Apple 地圖提供地點搜尋和步行路段，已審核城市包補充車站詳情。"
-                            ))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+                        Text(AppLocalization.localized("Transit Data Sources"))
+                            .font(.headline)
                     }
                     .padding(.vertical, 4)
                 }
@@ -82,12 +73,6 @@ struct TransitDataView: View {
                             }
                         }
                     }
-                } footer: {
-                    Text(AppLocalization.text(
-                        english: "Official pages open inside JustGo after you tap. The temporary viewer does not retain browsing data, and operator files are not treated as verified indoor guidance.",
-                        simplified: "点按后，官方页面会在 JustGo 内打开。临时查看器不会保留浏览数据，运营方文件也不会被视为已核实的站内指引。",
-                        traditional: "點按後，官方頁面會在 JustGo 內開啟。臨時檢視器不會保留瀏覽資料，營運方檔案也不會被視為已核實的站內指引。"
-                    ))
                 }
 
                 Section {
@@ -130,8 +115,6 @@ struct TransitDataView: View {
                     )
                 } header: {
                     Text(AppLocalization.localized("Essential Rider Information"))
-                } footer: {
-                    Text(AppLocalization.localized("Unavailable data is shown honestly instead of guessed."))
                 }
 
                 Section {
@@ -199,9 +182,9 @@ struct TransitDataView: View {
                     ))
                 } footer: {
                     Text(AppLocalization.text(
-                        english: "Included baselines work offline. Deleting a downloaded update restores the included version.",
-                        simplified: "内置基础数据可离线使用。删除下载的更新后会恢复内置版本。",
-                        traditional: "內置基礎資料可離線使用。刪除下載的更新後會恢復內置版本。"
+                        english: "Deleting a downloaded update restores the included version.",
+                        simplified: "删除下载的更新后会恢复内置版本。",
+                        traditional: "刪除下載的更新後會恢復內置版本。"
                     ))
                 }
             }

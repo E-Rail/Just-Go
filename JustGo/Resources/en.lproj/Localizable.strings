@@ -34,7 +34,6 @@
 "Hearing" = "Hearing";
 "Hearing Impairment" = "Hearing Impairment";
 "High Contrast Mode" = "High Contrast Mode";
-"JustGo uses the selected language instead of the system language." = "JustGo uses the selected language instead of the system language.";
 "Language" = "Language";
 "Language changes take effect after restarting JustGo." = "Language changes take effect after restarting JustGo.";
 "Large Text" = "Large Text";
@@ -83,7 +82,6 @@
 "Enter a starting station and destination to search" = "Enter a starting station and destination to search";
 "Settings" = "Settings";
 "Show Accessibility Badges" = "Show Accessibility Badges";
-"Shows first/last train times, not live arrival countdowns." = "Shows first/last train times, not live arrival countdowns.";
 "Simplified UI" = "Simplified UI";
 "Station not found. Try another station name." = "Station not found. Try another station name.";
 "Station accessibility data is missing" = "Station accessibility data is missing";
@@ -104,7 +102,6 @@
 "Accessibility and station facilities" = "Accessibility and station facilities";
 "Official city packs when public sources exist" = "Official city packs when public sources exist";
 "Official first/last schedules; live countdown only when an official provider exists" = "Official first/last schedules; live countdown only when an official provider exists";
-"Unavailable data is shown honestly instead of guessed." = "Unavailable data is shown honestly instead of guessed.";
 "Route and Search Provider" = "Route and Search Provider";
 "Official Station Details" = "Official Station Details";
 "City Packs" = "City Packs";
@@ -222,8 +219,6 @@
 "AI issue reported" = "AI issue reported";
 "Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Rider Notes" = "Rider Notes";
-"Route planning and place search use Apple Maps. Station facts use official city packs when available." = "Route planning and place search use Apple Maps. Station facts use official city packs when available.";
-"Routes use Apple Maps; station facts use included official city data where available." = "Routes use Apple Maps; station facts use included official city data where available.";
 "Save" = "Save";
 "Save Trip" = "Save Trip";
 "Saved Trip" = "Saved Trip";
@@ -239,7 +234,6 @@
 "Step-free likely from available station data." = "Step-free likely from available station data.";
 "Step-free not confirmed" = "Step-free not confirmed";
 "System Default" = "System Default";
-"System Default follows the language configured in iOS Settings." = "System Default follows the language configured in iOS Settings.";
 "English" = "English";
 "Simplified Chinese" = "Simplified Chinese";
 "Traditional Chinese" = "Traditional Chinese";
@@ -260,7 +254,6 @@
 "Avg duration" = "Avg duration";
 "Trip Preferences" = "Trip Preferences";
 "My Activity" = "My Activity";
-"Saved trips, history, and quick tags stay on this device." = "Saved trips, history, and quick tags stay on this device.";
 "Total trips" = "Total trips";
 "This month" = "This month";
 "Your stats" = "Your stats";

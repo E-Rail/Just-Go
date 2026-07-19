@@ -26,9 +26,9 @@ struct QuickTagsView: View {
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
                             Text(AppLocalization.text(
-                                english: "Tap + to search and tag stations or places, or open a station and tap the tag button.",
-                                simplified: "点击 + 搜索并标记车站或地点，也可打开车站后点击标签按钮。",
-                                traditional: "點擊 + 搜尋並標記車站或地點，也可開啟車站後點擊標籤按鈕。"
+                                english: "Tap + to add one.",
+                                simplified: "点击 + 添加。",
+                                traditional: "點擊 + 新增。"
                             ))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -102,12 +102,6 @@ struct QuickTagsView: View {
                         Text("\(tripMemoryService.stationQuickTags.count)")
                             .monospacedDigit()
                     }
-                } footer: {
-                    Text(AppLocalization.text(
-                        english: "One Home, one Work, and as many custom tags as you like — all one tap away in the route planner.",
-                        simplified: "一个家、一个公司，以及任意数量的自定义标签——都可在路线规划中一键填入。",
-                        traditional: "一個家、一個公司，以及任意數量的自訂標籤——都可在路線規劃中一鍵填入。"
-                    ))
                 }
             }
             .listStyle(.plain)

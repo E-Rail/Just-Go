@@ -94,8 +94,6 @@ struct ProfileView: View {
             }
         } header: {
             Text(AppLocalization.localized("Data Source"))
-        } footer: {
-            Text(AppLocalization.localized("Routes use Apple Maps; station facts use included official city data where available."))
         }
     }
 
@@ -130,8 +128,6 @@ struct ProfileView: View {
 
         } header: {
             Text(AppLocalization.localized("My Activity"))
-        } footer: {
-            Text(AppLocalization.localized("Saved trips, history, and quick tags stay on this device."))
         }
     }
 

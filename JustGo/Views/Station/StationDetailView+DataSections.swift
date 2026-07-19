@@ -92,9 +92,9 @@ extension StationDetailView {
                                 OfficialTransitResourceButton(resource: contextResource)
                             }
                             Text(AppLocalization.text(
-                                english: "This is official context, not an exact station-information page. It opens in the same temporary JustGo reader.",
-                                simplified: "这是官方背景资料，并非本站的精确车站信息页。内容会在同一临时 JustGo 阅读器中打开。",
-                                traditional: "這是官方背景資料，並非本站的精確車站資訊頁。內容會在同一臨時 JustGo 閱讀器中開啟。"
+                                english: "Official context, not a dedicated station page.",
+                                simplified: "官方背景资料，非本站专属页面。",
+                                traditional: "官方背景資料，非本站專屬頁面。"
                             ))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -384,15 +384,15 @@ extension StationDetailView {
         if case .cached(let fetchedAt) = viewModel?.officialStationInformation?.freshness {
             let age = fetchedAt.formatted(.relative(presentation: .named))
             return AppLocalization.text(
-                english: "Official data saved on this device · updated \(age) · service unreachable",
-                simplified: "本机保存的官方数据 · 更新于\(age) · 官方服务暂时无法访问",
-                traditional: "本機儲存的官方資料 · 更新於\(age) · 官方服務暫時無法連線"
+                english: "Cached · \(age)",
+                simplified: "已缓存 · \(age)",
+                traditional: "已快取 · \(age)"
             )
         }
         return AppLocalization.text(
-            english: "Official online data · cached on this device · clear it in Settings",
-            simplified: "官方在线数据 · 已缓存到本机 · 可在设置中清除",
-            traditional: "官方線上資料 · 已快取到本機 · 可在設定中清除"
+            english: "Live · saved offline",
+            simplified: "实时 · 已离线保存",
+            traditional: "即時 · 已離線保存"
         )
     }
 
@@ -421,33 +421,33 @@ extension StationDetailView {
         switch status {
         case .exactPage:
             return AppLocalization.text(
-                english: "An exact official station page is available.",
-                simplified: "已有与本站精确匹配的官方车站页面。",
-                traditional: "已有與本站精確匹配的官方車站頁面。"
+                english: "Exact official station page available.",
+                simplified: "已有本站的精确官方页面。",
+                traditional: "已有本站的精確官方頁面。"
             )
         case .officialContextOnly:
             return AppLocalization.text(
-                english: "The responsible source publishes current line or operator information, but no stable page dedicated to this station.",
-                simplified: "相关官方来源发布了当前线路或运营信息，但没有专属于本站的稳定页面。",
-                traditional: "相關官方來源發布了目前路線或營運資訊，但沒有專屬於本站的穩定頁面。"
+                english: "Official line/operator context only — no dedicated station page.",
+                simplified: "仅有官方线路或运营背景资料，没有本站专属页面。",
+                traditional: "僅有官方路線或營運背景資料，沒有本站專屬頁面。"
             )
         case .notOpenForPassengerService:
             return AppLocalization.text(
-                english: "This station is not open for passenger service. The reviewed official project or opening status appears below.",
-                simplified: "本站尚未开放客运服务。下方提供已审核的官方工程或开通状态。",
-                traditional: "本站尚未開放客運服務。下方提供已審核的官方工程或開通狀態。"
+                english: "Not yet open for passenger service.",
+                simplified: "尚未开放客运服务。",
+                traditional: "尚未開放客運服務。"
             )
         case .noCurrentPassengerService:
             return AppLocalization.text(
-                english: "The latest official review does not list this point as a current passenger stop. JustGo will not invent a station page.",
-                simplified: "最新官方审核未将此地点列为当前客运停靠站。JustGo 不会虚构车站页面。",
-                traditional: "最新官方審核未將此地點列為目前客運停靠站。JustGo 不會虛構車站頁面。"
+                english: "Not a current passenger stop.",
+                simplified: "非当前客运停靠站。",
+                traditional: "非目前客運停靠站。"
             )
         case nil:
             return AppLocalization.text(
-                english: "No reviewed exact station page is available.",
-                simplified: "暂无已审核的精确车站页面。",
-                traditional: "暫無已審核的精確車站頁面。"
+                english: "No official station page available.",
+                simplified: "暂无官方车站页面。",
+                traditional: "暫無官方車站頁面。"
             )
         }
     }
@@ -504,18 +504,6 @@ extension StationDetailView {
                         }
                     }
 
-                    if viewModel?.externalResources.contains(where: {
-                        [.locationMap, .streetMap, .stationLayout].contains($0.kind)
-                    }) == true {
-                        Text(AppLocalization.text(
-                            english: "Use the official link below to view the operator's current layout information.",
-                            simplified: "可使用下方官方链接查看运营方当前的布局信息。",
-                            traditional: "可使用下方官方連結查看營運方目前的佈局資訊。"
-                        ))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    }
-
                 }
             }
         }
@@ -568,12 +556,6 @@ extension StationDetailView {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-
-                    if arrivals.contains(where: \.isLiveArrival) == false {
-                        Text(AppLocalization.localized("Shows first/last train times, not live arrival countdowns."))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
                 }
             }
         }
@@ -592,10 +574,6 @@ extension StationDetailView {
                     ForEach(facilities) { facility in
                         facilityRow(facility)
                     }
-
-                    Text(AppLocalization.localized("Official city data"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -686,14 +664,6 @@ extension StationDetailView {
                         ))
                         .font(.subheadline)
                     }
-
-                    Text(AppLocalization.text(
-                        english: "Status details are separate from train-arrival countdowns.",
-                        simplified: "车站状态信息与列车到站倒计时相互独立。",
-                        traditional: "車站狀態資訊與列車到站倒數相互獨立。"
-                    ))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
             }
         }

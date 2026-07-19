@@ -56,12 +56,6 @@ struct SettingsView: View {
             }
         } header: {
             Text(AppLocalization.text(english: "Help", simplified: "帮助", traditional: "幫助"))
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Replay the walkthrough shown on first launch.",
-                simplified: "重看首次启动时的功能导览。",
-                traditional: "重看首次啟動時的功能導覽。"
-            ))
         }
     }
 
@@ -81,8 +75,6 @@ struct SettingsView: View {
             .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
         } header: {
             Text(AppLocalization.text(english: "App Theme", simplified: "主题颜色", traditional: "主題顏色"))
-        } footer: {
-            Text(AppLocalization.text(english: "Theme color applies to buttons, icons, and highlights throughout the app.", simplified: "主题颜色将应用于整个应用的按钮、图标和高亮元素。", traditional: "主題顏色將應用於整個應用程式的按鈕、圖示和高亮元素。"))
         }
     }
 
@@ -129,18 +121,10 @@ struct SettingsView: View {
         } header: {
             Text(AppLocalization.localized("Language"))
         } footer: {
-            Text(languageFooter)
+            if languagePreference != AppLocalization.launchPreference.rawValue {
+                Text(AppLocalization.localized("Language changes take effect after restarting JustGo."))
+            }
         }
-    }
-
-    private var languageFooter: String {
-        if languagePreference != AppLocalization.launchPreference.rawValue {
-            return AppLocalization.localized("Language changes take effect after restarting JustGo.")
-        }
-        if languagePreference == AppLanguagePreference.system.rawValue {
-            return AppLocalization.localized("System Default follows the language configured in iOS Settings.")
-        }
-        return AppLocalization.localized("JustGo uses the selected language instead of the system language.")
     }
 
     // MARK: - Notifications
@@ -158,12 +142,6 @@ struct SettingsView: View {
             }
         } header: {
             Text(AppLocalization.localized("Notifications"))
-        } footer: {
-            Text(AppLocalization.text(
-                english: "When you set a departure reminder, you'll be notified this many minutes before you need to leave.",
-                simplified: "设置出发提醒后，将在出发前提前此时间通知您。",
-                traditional: "設定出發提醒後，將在出發前提前此時間通知您。"
-            ))
         }
     }
 
@@ -188,12 +166,6 @@ struct SettingsView: View {
             .foregroundStyle(.primary)
         } header: {
             Text(AppLocalization.text(english: "Tags", simplified: "标签", traditional: "標籤"))
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Add and manage Home, Work, and unlimited custom tags for stations and places.",
-                simplified: "添加并管理家、公司以及任意数量的车站和地点自定义标签。",
-                traditional: "新增並管理家、公司以及任意數量的車站和地點自訂標籤。"
-            ))
         }
     }
 
@@ -228,12 +200,10 @@ struct SettingsView: View {
         } footer: {
             if didClearCache {
                 Text(AppLocalization.text(
-                    english: "Cache cleared. Data downloads again as you use the app.",
-                    simplified: "缓存已清除。使用应用时将重新下载数据。",
-                    traditional: "快取已清除。使用應用程式時將重新下載資料。"
+                    english: "Cache cleared.",
+                    simplified: "缓存已清除。",
+                    traditional: "快取已清除。"
                 ))
-            } else {
-                Text(AppLocalization.localized("Route planning and place search use Apple Maps. Station facts use official city packs when available."))
             }
         }
     }
@@ -249,12 +219,6 @@ struct SettingsView: View {
             Toggle(AppLocalization.localized("Show Accessibility Badges"), isOn: $showBadges)
         } header: {
             Text(AppLocalization.localized("Accessibility"))
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Shows elevator, ramp, and wheelchair icons on station pins in the map and on station rows in search results.",
-                simplified: "在地图站点标注和搜索结果中显示电梯、坡道和轮椅图标。",
-                traditional: "在地圖站點標註和搜尋結果中顯示電梯、坡道和輪椅圖示。"
-            ))
         }
     }
 

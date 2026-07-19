@@ -412,7 +412,30 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         }
     }
 
+    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+    /// connection that trickles data indefinitely (observed on throttled routes to this host)
+    /// never triggers it, so the byte-by-byte read below could hang well past `requestTimeout`
+    /// and leave the loading spinner stuck. Race the whole fetch against an explicit deadline,
+    /// mirroring `withMapKitTimeout` in MapKitProviders.swift, so it is always bounded.
     private static func fetch(
+        _ request: PreparedRequest,
+        using session: URLSession
+    ) async throws -> OfficialStationInformationSnapshot {
+        try await withThrowingTaskGroup(of: OfficialStationInformationSnapshot.self) { group in
+            group.addTask { try await performFetch(request, using: session) }
+            group.addTask {
+                try await Task.sleep(for: .seconds(requestTimeout))
+                throw OfficialStationInformationProviderError.timedOut
+            }
+            defer { group.cancelAll() }
+            guard let result = try await group.next() else {
+                throw OfficialStationInformationProviderError.timedOut
+            }
+            return result
+        }
+    }
+
+    private static func performFetch(
         _ request: PreparedRequest,
         using session: URLSession
     ) async throws -> OfficialStationInformationSnapshot {

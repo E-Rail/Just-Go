@@ -543,53 +543,95 @@ struct CityCapabilityTags: View {
     /// "0" would contradict the online facilities every station page renders.
     var hasOfficialOnlineStationInformation: Bool = false
 
+    /// Cap held to 3: a city row is a compact summary, not the full coverage table (that
+    /// detail lives on the city's own page) — more than a handful of chips just wraps and
+    /// crowds every other row in the list.
+    private static let maximumTagCount = 3
+
+    private struct Tag: Identifiable {
+        let id: String
+        let title: String
+        let status: CityDataCapabilityStatus
+    }
+
+    private var tags: [Tag] {
+        var result: [Tag] = [
+            Tag(
+                id: "matched",
+                title: coverageTitle(
+                    AppLocalization.text(english: "Matched", simplified: "匹配", traditional: "匹配"),
+                    metric: coverage.matchedStations
+                ),
+                status: coverage.matchedStations.status()
+            )
+        ]
+        if hasOfficialOnlineStationInformation {
+            result.append(Tag(
+                id: "access",
+                title: AppLocalization.text(
+                    english: "Access · Online",
+                    simplified: "无障碍 · 在线",
+                    traditional: "無障礙 · 線上"
+                ),
+                status: .available
+            ))
+        } else {
+            result.append(Tag(
+                id: "access",
+                title: coverageTitle(AppLocalization.localized("Access"), metric: coverage.accessibility),
+                status: coverage.accessibility.status()
+            ))
+        }
+        result.append(Tag(
+            id: "live",
+            title: coverageTitle(
+                AppLocalization.text(english: "Live", simplified: "实时", traditional: "即時"),
+                metric: coverage.liveArrivals
+            ),
+            status: coverage.liveArrivals.status()
+        ))
+        result.append(Tag(
+            id: "offlineMaps",
+            title: coverageTitle(
+                AppLocalization.text(english: "Offline maps", simplified: "离线地图", traditional: "離線地圖"),
+                metric: coverage.externalLayouts
+            ),
+            status: coverage.externalLayouts.status()
+        ))
+        result.append(Tag(
+            id: "media",
+            title: coverageTitle(
+                AppLocalization.text(english: "Media", simplified: "媒体", traditional: "媒體"),
+                metric: coverage.licensedMedia
+            ),
+            status: coverage.licensedMedia.status()
+        ))
+        result.append(Tag(
+            id: "indoor",
+            title: coverageTitle(
+                AppLocalization.text(english: "Indoor", simplified: "站内", traditional: "站內"),
+                metric: coverage.verifiedTransferContexts
+            ),
+            status: coverage.verifiedTransferContexts.status()
+        ))
+        return result
+    }
+
     var body: some View {
         LazyVGrid(
             columns: [GridItem(.adaptive(minimum: 86), spacing: 6)],
             alignment: .leading,
             spacing: 6
         ) {
-            coverageTag(
-                title: AppLocalization.text(english: "Matched", simplified: "匹配", traditional: "匹配"),
-                metric: coverage.matchedStations
-            )
-            if hasOfficialOnlineStationInformation {
-                capabilityTag(
-                    title: AppLocalization.text(
-                        english: "Access · Online",
-                        simplified: "无障碍 · 在线",
-                        traditional: "無障礙 · 線上"
-                    ),
-                    status: .available
-                )
-            } else {
-                coverageTag(
-                    title: AppLocalization.localized("Access"),
-                    metric: coverage.accessibility
-                )
+            ForEach(tags.prefix(Self.maximumTagCount)) { tag in
+                capabilityTag(title: tag.title, status: tag.status)
             }
-            coverageTag(
-                title: AppLocalization.text(english: "Live", simplified: "实时", traditional: "即時"),
-                metric: coverage.liveArrivals
-            )
-            coverageTag(
-                title: AppLocalization.text(english: "Offline maps", simplified: "离线地图", traditional: "離線地圖"),
-                metric: coverage.externalLayouts
-            )
-            coverageTag(
-                title: AppLocalization.text(english: "Media", simplified: "媒体", traditional: "媒體"),
-                metric: coverage.licensedMedia
-            )
-            coverageTag(
-                title: AppLocalization.text(english: "Indoor", simplified: "站内", traditional: "站內"),
-                metric: coverage.verifiedTransferContexts
-            )
         }
         .padding(.top, 2)
     }
 
-    private func coverageTag(title: String, metric: CityCoverageMetric) -> some View {
-        capabilityTag(title: "\(title) \(metric.displayText)", status: metric.status())
+    private func coverageTitle(_ title: String, metric: CityCoverageMetric) -> String {
+        "\(title) \(metric.displayText)"
     }
 
     private func capabilityTag(title: String, status: CityDataCapabilityStatus) -> some View {

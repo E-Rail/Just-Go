@@ -609,7 +609,11 @@ struct CityPickerView: View {
                                 .lineLimit(1)
                         }
 
-                        CityCapabilityTags(coverage: city.dataCapabilities.coverage)
+                        CityCapabilityTags(
+                            coverage: city.dataCapabilities.coverage,
+                            hasOfficialOnlineStationInformation:
+                                BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
+                        )
                     }
                     .padding(.vertical, 4)
                 }

@@ -150,7 +150,10 @@ final class DIContainer {
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
-        let realtimeArrivalProvider = HongKongRealtimeArrivalProvider()
+        // Dedicated ephemeral sessions (no cookies, no shared cache) instead of `URLSession.shared`
+        // — a stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
+        // traffic, matching the pattern already used for the Beijing station-info provider.
+        let realtimeArrivalProvider = HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
         let stationInformationDiskCache = OfficialStationInformationDiskCache()
         let officialStationInformationProvider = BeijingStationInformationProvider(
             diskCache: stationInformationDiskCache
@@ -158,6 +161,7 @@ final class DIContainer {
         // The bundled catalog decode + validation is heavy; hand the service a loader so it
         // runs lazily on the actor instead of blocking app launch on the main thread here.
         let officialStationData = OfficialCityPackService(
+            session: Self.makeEphemeralSession(),
             metroNetworks: metroNetworkProvider,
             realtimeArrivals: realtimeArrivalProvider,
             officialResourceCatalogLoader: { try .bundled() }
@@ -206,5 +210,14 @@ final class DIContainer {
         )
         container.installMemoryWarningReleaseHandler()
         return container
+    }
+
+    private static func makeEphemeralSession() -> URLSession {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.httpShouldSetCookies = false
+        configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        return URLSession(configuration: configuration)
     }
 }

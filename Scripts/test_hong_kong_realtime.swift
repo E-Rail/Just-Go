@@ -621,6 +621,39 @@ private func testRequestIdentityIsolation() async throws {
     try requireEqual(MockTransport.requestCount, 2, "late response must not replace another cache entry")
 }
 
+private func testDeadlineExceededBeforeSlowResponse() async throws {
+    // `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+    // connection that trickles/stalls indefinitely never trips it. This proves the explicit
+    // deadline race resolves near the 5s `requestTimeout` instead of waiting out a slow response.
+    let body = try heavyRailFixture(
+        lineCode: "TCL",
+        stationCode: "HOK",
+        up: [["ttnt": "3", "valid": "Y", "dest": "TSY"]]
+    )
+    MockTransport.install { _, _ in
+        .http(statusCode: 200, body: body, delay: 6)
+    }
+
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let provider = HongKongRealtimeArrivalProvider(session: session)
+
+    let clock = ContinuousClock()
+    let start = clock.now
+    let error = try await providerError {
+        _ = try await provider.arrivals(for: heavyRequest())
+    }
+    let elapsed = clock.now - start
+
+    guard case .timedOut = error else {
+        throw HarnessFailure(description: "Expected timedOut for a stalled connection, got \(error)")
+    }
+    try require(
+        elapsed < .milliseconds(5_500),
+        "deadline race must resolve near the 5s requestTimeout, not the mock's 6s delay (took \(elapsed))"
+    )
+}
+
 private func requireArrival(
     destination: String,
     in arrivals: [RealTimeArrival]
@@ -677,6 +710,9 @@ private struct HongKongRealtimeTestHarness {
             },
             await runTest("request identity isolation") {
                 try await testRequestIdentityIsolation()
+            },
+            await runTest("deadline exceeded before a slow response") {
+                try await testDeadlineExceededBeforeSlowResponse()
             }
         ] {
             if result {

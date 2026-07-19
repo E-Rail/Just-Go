@@ -232,9 +232,19 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(for: urlRequest)
+            // `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+            // connection that trickles data indefinitely never trips it, so an unguarded fetch
+            // could hang well past `requestTimeout`. Race the fetch against an explicit deadline.
+            (data, response) = try await withDeadline(
+                seconds: requestTimeout,
+                onTimeout: { RealtimeArrivalProviderError.timedOut }
+            ) {
+                try await session.data(for: urlRequest)
+            }
         } catch is CancellationError {
             throw CancellationError()
+        } catch let error as RealtimeArrivalProviderError {
+            throw error
         } catch let error as URLError where error.code == .timedOut {
             throw RealtimeArrivalProviderError.timedOut
         } catch let error as URLError where error.code == .cancelled && Task.isCancelled {

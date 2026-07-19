@@ -1596,27 +1596,36 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         guard maximumBytes > 0,
               maximumBytes <= Self.maximumPackBytes,
               Self.isAllowedRemoteDataURL(url) else { throw RoutePlanningError.networkError }
-        let request = URLRequest(url: url, timeoutInterval: 15)
-        let redirectDelegate = SameOriginRedirectDelegate(originURL: url)
-        let (bytes, response) = try await session.bytes(for: request, delegate: redirectDelegate)
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200,
-              let finalURL = httpResponse.url,
-              Self.isAllowedRemoteDataURL(finalURL),
-              finalURL.host?.lowercased() == url.host?.lowercased(),
-              httpResponse.expectedContentLength <= 0 ||
-                httpResponse.expectedContentLength <= Int64(maximumBytes) else {
-            throw RoutePlanningError.networkError
+        let session = self.session
+        // `timeoutInterval` above only fires when no bytes arrive for the interval — a
+        // connection that trickles data indefinitely never trips it, so the byte-by-byte read
+        // below could hang well past 15s. Race the whole fetch against an explicit deadline.
+        return try await withDeadline(
+            seconds: 15,
+            onTimeout: { RoutePlanningError.networkError }
+        ) {
+            let request = URLRequest(url: url, timeoutInterval: 15)
+            let redirectDelegate = SameOriginRedirectDelegate(originURL: url)
+            let (bytes, response) = try await session.bytes(for: request, delegate: redirectDelegate)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200,
+                  let finalURL = httpResponse.url,
+                  Self.isAllowedRemoteDataURL(finalURL),
+                  finalURL.host?.lowercased() == url.host?.lowercased(),
+                  httpResponse.expectedContentLength <= 0 ||
+                    httpResponse.expectedContentLength <= Int64(maximumBytes) else {
+                throw RoutePlanningError.networkError
+            }
+            var data = Data()
+            if httpResponse.expectedContentLength > 0 {
+                data.reserveCapacity(Int(httpResponse.expectedContentLength))
+            }
+            for try await byte in bytes {
+                guard data.count < maximumBytes else { throw RoutePlanningError.networkError }
+                data.append(byte)
+            }
+            return data
         }
-        var data = Data()
-        if httpResponse.expectedContentLength > 0 {
-            data.reserveCapacity(Int(httpResponse.expectedContentLength))
-        }
-        for try await byte in bytes {
-            guard data.count < maximumBytes else { throw RoutePlanningError.networkError }
-            data.append(byte)
-        }
-        return data
     }
 
     nonisolated private static func isAllowedRemoteDataURL(_ url: URL) -> Bool {

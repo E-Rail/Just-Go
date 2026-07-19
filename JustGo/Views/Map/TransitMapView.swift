@@ -114,7 +114,10 @@ struct TransitMapView: UIViewRepresentable {
             networkOverlays = []
 
             for network in parent.metroNetworks {
-                addNetwork(network, to: mapView)
+                addNetwork(network)
+            }
+            if !networkOverlays.isEmpty {
+                mapView.addOverlays(networkOverlays, level: .aboveRoads)
             }
         }
 
@@ -161,7 +164,10 @@ struct TransitMapView: UIViewRepresentable {
             clearOverlayMetadata(routeOverlays)
             routeOverlays = []
             if let route = parent.route {
-                addRoute(route, to: mapView)
+                addRoute(route)
+            }
+            if !routeOverlays.isEmpty {
+                mapView.addOverlays(routeOverlays, level: .aboveLabels)
             }
         }
 
@@ -172,23 +178,21 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        private func addNetwork(_ network: MetroNetwork, to mapView: MKMapView) {
+        private func addNetwork(_ network: MetroNetwork) {
             for line in network.lines {
                 for path in line.paths where path.count >= 2 {
                     addPolyline(
                         path.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) },
                         colorHex: line.colorHex,
                         lineWidth: 4,
-                        level: .aboveRoads,
                         simplify: false,
-                        collection: &networkOverlays,
-                        to: mapView
+                        collection: &networkOverlays
                     )
                 }
             }
         }
 
-        private func addRoute(_ route: Route, to mapView: MKMapView) {
+        private func addRoute(_ route: Route) {
             for segment in route.segments {
                 let polylineCoordinates = segment.polylineCoordinates.map {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
@@ -203,10 +207,8 @@ struct TransitMapView: UIViewRepresentable {
                     coordinates,
                     colorHex: routeColorHex(for: segment),
                     lineWidth: 6,
-                    level: .aboveLabels,
                     simplify: true,
-                    collection: &routeOverlays,
-                    to: mapView
+                    collection: &routeOverlays
                 )
             }
         }
@@ -222,21 +224,23 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
+        // Builds the polyline and records it for a single batched `addOverlays(_:level:)` call
+        // by the caller (`addNetwork`/`addRoute`) once their loop finishes — adding overlays
+        // one at a time triggers MapKit's per-insertion layout/renderer bookkeeping for every
+        // line segment, which is a visible hitch the first time a large city (e.g. Beijing's
+        // 33 lines) syncs.
         private func addPolyline(
             _ coordinates: [CLLocationCoordinate2D],
             colorHex: String,
             lineWidth: CGFloat,
-            level: MKOverlayLevel,
             simplify: Bool,
-            collection: inout [MKOverlay],
-            to mapView: MKMapView
+            collection: inout [MKOverlay]
         ) {
             let displayCoordinates = simplify ? simplifiedCoordinates(coordinates) : coordinates
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))
             overlayWidths[ObjectIdentifier(polyline)] = lineWidth
             collection.append(polyline)
-            mapView.addOverlay(polyline, level: level)
         }
 
         private func simplifiedCoordinates(

@@ -338,7 +338,7 @@ struct PersonalStationMediaSection: View {
                     )
                 ))
             } label: {
-                StationAssetImage(url: item.fileURL) { image in
+                StationAssetImage(url: item.fileURL, targetDimension: 240) { image in
                     image
                         .resizable()
                         .scaledToFill()

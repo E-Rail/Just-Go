@@ -1,17 +1,80 @@
+import ImageIO
 import SwiftUI
 
-/// Renders only bundled or privately persisted station media.
+// Swift forbids static stored properties on generic types, and this cache must be shared across
+// every `StationAssetImage<Content, Failure>` specialization, so it lives at file scope instead.
+private let stationAssetImageCache = NSCache<NSString, UIImage>()
+
+/// Renders only bundled or privately persisted station media. Decodes off the main actor and,
+/// when `targetDimension` is given, downsamples via ImageIO instead of decoding full resolution
+/// — a grid of multi-MB personal photos would otherwise stall scrolling with per-cell,
+/// main-thread, full-size decodes. Results are cached (bounded by `NSCache`'s own eviction).
 struct StationAssetImage<Content: View, Failure: View>: View {
     let url: URL
+    var targetDimension: CGFloat?
     @ViewBuilder let content: (Image) -> Content
     @ViewBuilder let failure: () -> Failure
 
+    @State private var loadedImage: UIImage?
+    @State private var didFail = false
+
     var body: some View {
-        if url.isFileURL, let image = UIImage(contentsOfFile: url.path) {
-            content(Image(uiImage: image))
-        } else {
-            failure()
+        Group {
+            if let loadedImage {
+                content(Image(uiImage: loadedImage))
+            } else if didFail {
+                failure()
+            } else {
+                Color.clear
+            }
         }
+        .task(id: url) {
+            await load()
+        }
+    }
+
+    private var cacheKey: NSString {
+        "\(url.absoluteString)#\(targetDimension.map { String(Int($0)) } ?? "full")" as NSString
+    }
+
+    private func load() async {
+        guard url.isFileURL else {
+            didFail = true
+            return
+        }
+        if let cached = stationAssetImageCache.object(forKey: cacheKey) {
+            loadedImage = cached
+            return
+        }
+        let dimension = targetDimension
+        let decoded = await Task.detached(priority: .userInitiated) {
+            Self.decode(url: url, targetDimension: dimension)
+        }.value
+        guard !Task.isCancelled else { return }
+        guard let decoded else {
+            didFail = true
+            return
+        }
+        stationAssetImageCache.setObject(decoded, forKey: cacheKey)
+        loadedImage = decoded
+    }
+
+    private static func decode(url: URL, targetDimension: CGFloat?) -> UIImage? {
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+        if let targetDimension {
+            let maxPixelSize = Int(targetDimension * UIScreen.main.scale)
+            let options: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+                kCGImageSourceCreateThumbnailWithTransform: true
+            ]
+            guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            return UIImage(cgImage: cgImage)
+        }
+        guard let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
 }
 

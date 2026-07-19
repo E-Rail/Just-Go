@@ -107,11 +107,9 @@ struct ProfileView: View {
                         .foregroundStyle(Color.accentColor)
                     Text(AppLocalization.localized("Quick Tags"))
                     Spacer()
-                    Text(
-                        "\(tripMemoryService.stationQuickTags.count)/\(StationQuickTagPolicy.maximumCount)"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    Text("\(tripMemoryService.stationQuickTags.count)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Image(systemName: "chevron.right")
                         .font(.caption)
                         .foregroundStyle(.secondary)

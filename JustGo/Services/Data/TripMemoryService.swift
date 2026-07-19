@@ -148,30 +148,20 @@ final class TripMemoryService {
         userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
     }
 
-    @discardableResult
     func setQuickTag(
         station: Station,
         cityName: String,
         cityNameEn: String? = nil,
-        kind: StationQuickTagKind,
-        replacing replacementID: String? = nil
-    ) -> StationQuickTagMutationResult {
+        kind: StationQuickTagKind
+    ) {
         var quickTag = StationQuickTag(station: station, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
         if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
             quickTag = existing
                 .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
                 .withKind(kind)
         }
-        guard let updated = StationQuickTagPolicy.inserting(
-            quickTag,
-            into: stationQuickTags,
-            replacing: replacementID
-        ) else {
-            return .replacementRequired(stationQuickTags)
-        }
-        stationQuickTags = updated
+        stationQuickTags = StationQuickTagPolicy.inserting(quickTag, into: stationQuickTags)
         persistStationQuickTags()
-        return .saved
     }
 
     func deleteQuickTag(id: String) {

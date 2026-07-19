@@ -219,12 +219,16 @@ errors << "Hong Kong station information must preserve verified unavailable faci
 
 quick_tag_model = read.call("JustGo/Models/User/StationQuickTag.swift")
 quick_tag_service = read.call("JustGo/Services/Data/TripMemoryService.swift")
-errors << "Quick Tags must have an exact three-item policy" unless
-  quick_tag_model.include?("static let maximumCount = 3")
+errors << "Home/Work Quick Tags must stay single-slot via kind exclusivity" unless
+  quick_tag_model.include?("var isExclusive: Bool")
 errors << "legacy Quick Tags must be normalized on startup" unless
   quick_tag_service.include?("StationQuickTagPolicy.normalized(storedQuickTags)")
-errors << "a fourth Quick Tag must require explicit replacement" unless
-  quick_tag_service.include?(".replacementRequired(stationQuickTags)")
+%w[maximumCount replacementRequired].each do |retired_cap_marker|
+  [quick_tag_model, quick_tag_service].each do |source|
+    errors << "custom Quick Tags are unlimited; #{retired_cap_marker} must not return" if
+      source.include?(retired_cap_marker)
+  end
+end
 
 project = read.call("JustGo.xcodeproj/project.pbxproj")
 %w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
@@ -259,4 +263,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=transient quick_tags=3"
+puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=transient quick_tags=unlimited_custom"

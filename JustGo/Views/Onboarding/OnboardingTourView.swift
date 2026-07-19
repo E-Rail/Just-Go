@@ -83,9 +83,9 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Make it yours", simplified: "打造您的专属", traditional: "打造您的專屬"),
                 points: [
                     ("tag.fill", AppLocalization.text(
-                        english: "Keep up to three stations as Home, Work, or custom tags, then fill them with one tap in the planner.",
-                        simplified: "最多将三个车站设为家、公司或自定义标签，即可在路线规划中一键填入。",
-                        traditional: "最多將三個車站設為家、公司或自訂標籤，即可在路線規劃中一鍵填入。"
+                        english: "Save Home, Work, and unlimited custom tags, then fill them with one tap in the planner.",
+                        simplified: "保存家、公司以及任意数量的自定义标签，即可在路线规划中一键填入。",
+                        traditional: "儲存家、公司以及任意數量的自訂標籤，即可在路線規劃中一鍵填入。"
                     )),
                     ("bookmark.fill", AppLocalization.text(
                         english: "Save trips you repeat — they come back as one-tap cards, morning and evening.",

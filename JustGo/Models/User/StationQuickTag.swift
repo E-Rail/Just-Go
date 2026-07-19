@@ -42,11 +42,6 @@ enum StationQuickTagKind: Codable, Equatable, Hashable {
     }
 }
 
-enum StationQuickTagMutationResult: Equatable {
-    case saved
-    case replacementRequired([StationQuickTag])
-}
-
 struct StationQuickTag: Identifiable, Codable, Equatable {
     let id: String
     let stationID: String
@@ -149,20 +144,17 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     }
 }
 
+/// Home and Work are single-slot (`isExclusive`) — saving a new one silently takes over the
+/// slot, the way "set as Home" behaves elsewhere on iOS. Custom tags are unlimited.
 enum StationQuickTagPolicy {
-    static let maximumCount = 3
-
     static func inserting(
         _ quickTag: StationQuickTag,
-        into currentTags: [StationQuickTag],
-        replacing replacementID: String? = nil
-    ) -> [StationQuickTag]? {
+        into currentTags: [StationQuickTag]
+    ) -> [StationQuickTag] {
         var updated = currentTags.filter { tag in
-            tag.id != replacementID &&
-                tag.id != quickTag.id &&
+            tag.id != quickTag.id &&
                 !(quickTag.kind.isExclusive && tag.kind == quickTag.kind)
         }
-        guard updated.count < maximumCount else { return nil }
         updated.insert(quickTag, at: 0)
         return normalized(updated)
     }
@@ -180,6 +172,6 @@ enum StationQuickTagPolicy {
             }
             return false
         }
-        return Array(([home, work].compactMap { $0 } + customs).prefix(maximumCount))
+        return [home, work].compactMap { $0 } + customs
     }
 }

@@ -88,14 +88,14 @@ struct QuickTagsView: View {
                             traditional: "已儲存標籤"
                         ))
                         Spacer()
-                        Text("\(tripMemoryService.stationQuickTags.count) / \(StationQuickTagPolicy.maximumCount)")
+                        Text("\(tripMemoryService.stationQuickTags.count)")
                             .monospacedDigit()
                     }
                 } footer: {
                     Text(AppLocalization.text(
-                        english: "Keep up to three one-tap places in the route planner.",
-                        simplified: "在路线规划中最多保留三个一键地点。",
-                        traditional: "在路線規劃中最多保留三個一鍵地點。"
+                        english: "One Home, one Work, and as many custom tags as you like — all one tap away in the route planner.",
+                        simplified: "一个家、一个公司，以及任意数量的自定义标签——都可在路线规划中一键填入。",
+                        traditional: "一個家、一個公司，以及任意數量的自訂標籤——都可在路線規劃中一鍵填入。"
                     ))
                 }
             }

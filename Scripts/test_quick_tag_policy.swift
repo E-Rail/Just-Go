@@ -87,7 +87,7 @@ private func tag(
     )
 }
 
-private func testThreeItemLimitAndCanonicalOrder() throws {
+private func testSingleSlotHomeWorkAndCanonicalOrder() throws {
     let tags = [
         tag("custom-new", kind: .custom("Gym")),
         tag("work-new", kind: .work),
@@ -97,9 +97,12 @@ private func testThreeItemLimitAndCanonicalOrder() throws {
         tag("home-old", kind: .home)
     ]
     let normalized = StationQuickTagPolicy.normalized(tags)
-    try require(StationQuickTagPolicy.maximumCount == 3, "maximum must be exactly three")
-    try require(normalized.count == 3, "normalization exceeded three")
-    try require(normalized.map(\.stationID) == ["home-new", "work-new", "custom-new"], "canonical order changed")
+    try require(
+        normalized.map(\.stationID) == ["home-new", "work-new", "custom-new", "custom-old"],
+        "canonical order changed or single-slot Home/Work was not enforced"
+    )
+    try require(normalized.filter { $0.kind == .home }.count == 1, "Home must stay single-slot")
+    try require(normalized.filter { $0.kind == .work }.count == 1, "Work must stay single-slot")
 }
 
 private func testNewestStationIdentityWins() throws {
@@ -111,52 +114,34 @@ private func testNewestStationIdentityWins() throws {
         tag("custom", kind: .custom("Other")),
         older
     ])
-    try require(normalized.count == 3, "deduplication changed the cap")
+    try require(normalized.count == 3, "deduplication produced the wrong count")
     try require(normalized.filter { $0.stationID == "same" }.count == 1, "duplicate station survived")
     try require(normalized.contains { $0.kind == .custom("Newest") }, "newest station state did not win")
 }
 
-private func testStableCustomRecency() throws {
-    let normalized = StationQuickTagPolicy.normalized([
-        tag("custom-1", kind: .custom("One")),
-        tag("custom-2", kind: .custom("Two")),
-        tag("custom-3", kind: .custom("Three")),
-        tag("custom-4", kind: .custom("Four"))
-    ])
+private func testUnlimitedCustomsSurviveNormalization() throws {
+    let customs = (1...12).map { tag("custom-\($0)", kind: .custom("Tag \($0)")) }
+    let normalized = StationQuickTagPolicy.normalized(customs)
     try require(
-        normalized.map(\.stationID) == ["custom-1", "custom-2", "custom-3"],
-        "custom recency was not stable"
+        normalized.map(\.stationID) == customs.map(\.stationID),
+        "every custom tag must survive normalization in recency order"
     )
 }
 
-private func testCapacityAndReplacement() throws {
-    let current = [
+private func testUnlimitedCustomInsertion() throws {
+    var tags = [
         tag("home", kind: .home),
         tag("work", kind: .work),
         tag("gym", kind: .custom("Gym"))
     ]
-    let fourth = tag("school", kind: .custom("School"))
-    try require(
-        StationQuickTagPolicy.inserting(fourth, into: current) == nil,
-        "a fourth tag must not mutate the collection without replacement"
-    )
-    try require(
-        StationQuickTagPolicy.inserting(
-            fourth,
-            into: current,
-            replacing: "8100|missing"
-        ) == nil,
-        "a stale replacement ID must not bypass capacity"
-    )
-
-    let replaced = StationQuickTagPolicy.inserting(
-        fourth,
-        into: current,
-        replacing: current[2].id
-    )
-    try require(replaced?.count == 3, "explicit replacement changed the cap")
-    try require(replaced?.contains { $0.id == fourth.id } == true, "new tag was not saved")
-    try require(replaced?.contains { $0.id == current[2].id } == false, "selected tag survived replacement")
+    for index in 1...10 {
+        tags = StationQuickTagPolicy.inserting(tag("extra-\(index)", kind: .custom("Extra \(index)")), into: tags)
+    }
+    try require(tags.count == 13, "custom insertions must never be capped")
+    try require(tags[0].stationID == "home", "Home must stay first")
+    try require(tags[1].stationID == "work", "Work must stay second")
+    try require(tags[2].stationID == "extra-10", "newest custom must lead the customs")
+    try require(tags.last?.stationID == "gym", "oldest custom must survive at the end")
 }
 
 private func testExclusiveReassignment() throws {
@@ -167,23 +152,23 @@ private func testExclusiveReassignment() throws {
     ]
     let newHome = tag("home-new", kind: .home)
     let updated = StationQuickTagPolicy.inserting(newHome, into: current)
-    try require(updated?.count == 3, "Home reassignment should reuse its exclusive slot")
-    try require(updated?.first?.id == newHome.id, "new Home did not replace the old Home")
-    try require(updated?.contains { $0.id == current[0].id } == false, "old Home survived reassignment")
+    try require(updated.count == 3, "Home reassignment should reuse its exclusive slot")
+    try require(updated.first?.id == newHome.id, "new Home did not replace the old Home")
+    try require(updated.contains { $0.id == current[0].id } == false, "old Home survived reassignment")
 }
 
 @main
 private enum QuickTagPolicyHarness {
     static func main() {
         do {
-            try testThreeItemLimitAndCanonicalOrder()
-            print("PASS: exact three-item limit and Home/Work/custom order")
+            try testSingleSlotHomeWorkAndCanonicalOrder()
+            print("PASS: single-slot Home/Work and canonical order")
             try testNewestStationIdentityWins()
             print("PASS: newest station identity wins")
-            try testStableCustomRecency()
-            print("PASS: stable custom-tag recency")
-            try testCapacityAndReplacement()
-            print("PASS: fourth-tag rejection and explicit replacement")
+            try testUnlimitedCustomsSurviveNormalization()
+            print("PASS: unlimited customs survive normalization")
+            try testUnlimitedCustomInsertion()
+            print("PASS: unlimited custom insertion")
             try testExclusiveReassignment()
             print("PASS: exclusive Home reassignment")
             print("StationQuickTagPolicy: 5 test groups passed")

@@ -394,7 +394,23 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
             defer { session.invalidateAndCancel() }
 
             do {
-                let (data, response) = try await session.data(for: request)
+                // `timeoutIntervalForRequest`/`timeoutIntervalForResource` only fire when no
+                // bytes arrive for the interval — a connection that trickles data indefinitely
+                // never trips them, so a buffered `session.data(for:)` can hang well past the
+                // declared 30s and leave the viewer looking frozen. Race it against an explicit
+                // deadline, mirroring the fix in OfficialStationInformationProvider.swift.
+                let (data, response) = try await withThrowingTaskGroup(of: (Data, URLResponse).self) { group in
+                    group.addTask { try await session.data(for: request) }
+                    group.addTask {
+                        try await Task.sleep(for: .seconds(30))
+                        throw OfficialTransitBinaryLoadError.timedOut
+                    }
+                    defer { group.cancelAll() }
+                    guard let result = try await group.next() else {
+                        throw OfficialTransitBinaryLoadError.timedOut
+                    }
+                    return result
+                }
                 try Task.checkCancellation()
                 guard loadGeneration == generation else { return }
                 guard let response = response as? HTTPURLResponse else {
@@ -413,14 +429,23 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
 
                 switch resource.format {
                 case .pdf:
-                    guard let document = PDFDocument(data: data), document.pageCount > 0 else {
+                    // Decoding a near-50MB PDF/image is real CPU work; keep it off the main
+                    // actor so it can't stall the UI, matching the pattern already used for
+                    // heavy decode work elsewhere in this codebase.
+                    guard let document = await Task.detached(priority: .userInitiated, operation: {
+                        PDFDocument(data: data)
+                    }).value, document.pageCount > 0 else {
                         throw OfficialTransitBinaryLoadError.invalidPDF
                     }
+                    guard loadGeneration == generation else { return }
                     pdfDocument = document
                 case .image:
-                    guard let loadedImage = UIImage(data: data) else {
+                    guard let loadedImage = await Task.detached(priority: .userInitiated, operation: {
+                        UIImage(data: data)
+                    }).value else {
                         throw OfficialTransitBinaryLoadError.invalidImage
                     }
+                    guard loadGeneration == generation else { return }
                     image = loadedImage
                 case .webPage:
                     throw OfficialTransitBinaryLoadError.invalidResponse
@@ -453,9 +478,16 @@ private enum OfficialTransitBinaryLoadError: LocalizedError {
     case tooLarge
     case invalidPDF
     case invalidImage
+    case timedOut
 
     var errorDescription: String? {
         switch self {
+        case .timedOut:
+            return AppLocalization.text(
+                english: "The operator did not respond in time.",
+                simplified: "运营方响应超时。",
+                traditional: "營運方回應逾時。"
+            )
         case .invalidResponse:
             return AppLocalization.text(
                 english: "The operator returned an invalid response.",

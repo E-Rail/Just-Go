@@ -87,9 +87,11 @@ struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable, Codab
     let lastTime: String?
     let liveTime: String?
 
+    /// Positional, not `compactMap`-ed: dropping nils before joining made
+    /// `(first: "5:27", last: nil)` and `(first: nil, last: "5:27")` collide on one id, and the
+    /// `uniqued(by:)` in `parse` then silently deleted the second row.
     var id: String {
-        [lineName, destination, firstTime, lastTime, liveTime]
-            .compactMap { $0 }
+        [lineName, destination, firstTime ?? "", lastTime ?? "", liveTime ?? ""]
             .joined(separator: "|")
     }
 }
@@ -556,22 +558,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             )
         }
 
-        let trains = (responseData.lines ?? []).compactMap { line in
-            guard let lineName = trimmed(line.lineName),
-                  let destination = trimmed(line.terminalStationName)
-                    ?? trimmed(line.destStationName) else { return nil }
-            let first = trimmed(line.firstTime)
-            let last = trimmed(line.lastTime)
-            guard first != nil || last != nil else { return nil }
-            return OfficialStationTrainInformation(
-                lineName: lineName,
-                lineColorHex: normalizedColor(line.lineColor),
-                destination: destination,
-                firstTime: first,
-                lastTime: last,
-                liveTime: nil
-            )
-        }.uniqued(by: \OfficialStationTrainInformation.id)
+        let trains = groupedTrains(responseData.lines ?? [])
 
         let exits = (station.exits ?? []).compactMap { exit in
             guard let name = trimmed(exit.name) else { return nil }
@@ -609,6 +596,81 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             exits: exits,
             facilityGroups: facilityGroups
         )
+    }
+
+    /// The upstream returns one record per *service*, not per direction: `terminalStationName`
+    /// is a direction marker (the next station toward that end of the line) while
+    /// `destStationName` is that individual service's terminus. A direction served by several
+    /// short-turn services therefore yields several records sharing a line name, a direction and
+    /// a first-train time, differing only in the last-train digits — which rendered as visually
+    /// identical duplicate rows. Observed at 宋家庄 line 10 (three records, all "开往 石榴庄",
+    /// all first 5:07, last 21:44/22:05/23:28) and at 西直门 line 2.
+    ///
+    /// Collapse each (line, direction) to a single row spanning the whole service window:
+    /// earliest first train, latest last train — which is what platform signage shows.
+    private static func groupedTrains(_ lines: [BeijingLine]) -> [OfficialStationTrainInformation] {
+        var order: [String] = []
+        var grouped: [String: OfficialStationTrainInformation] = [:]
+
+        for line in lines {
+            guard let lineName = trimmed(line.lineName),
+                  let direction = trimmed(line.terminalStationName)
+                    ?? trimmed(line.destStationName) else { continue }
+            let first = trimmed(line.firstTime)
+            let last = trimmed(line.lastTime)
+            guard first != nil || last != nil else { continue }
+
+            let key = "\(lineName)|\(direction)"
+            guard let existing = grouped[key] else {
+                order.append(key)
+                grouped[key] = OfficialStationTrainInformation(
+                    lineName: lineName,
+                    lineColorHex: normalizedColor(line.lineColor),
+                    destination: direction,
+                    firstTime: first,
+                    lastTime: last,
+                    liveTime: nil
+                )
+                continue
+            }
+            grouped[key] = OfficialStationTrainInformation(
+                lineName: existing.lineName,
+                lineColorHex: existing.lineColorHex ?? normalizedColor(line.lineColor),
+                destination: existing.destination,
+                firstTime: preferredServiceTime(existing.firstTime, first, earliest: true),
+                lastTime: preferredServiceTime(existing.lastTime, last, earliest: false),
+                liveTime: nil
+            )
+        }
+
+        return order.compactMap { grouped[$0] }
+    }
+
+    /// Minutes into the *service* day. A metro service day runs past midnight, so a last train
+    /// at "0:21" is later than one at "23:39" — comparing the raw strings, or a plain clock
+    /// time, would rank it as the earliest of the day and discard the real last train.
+    private static func serviceMinutes(_ value: String) -> Int? {
+        let parts = value.split(separator: ":")
+        guard parts.count == 2,
+              let hour = Int(parts[0]),
+              let minute = Int(parts[1]),
+              (0..<24).contains(hour),
+              (0..<60).contains(minute) else { return nil }
+        return (hour < 4 ? hour + 24 : hour) * 60 + minute
+    }
+
+    private static func preferredServiceTime(
+        _ lhs: String?,
+        _ rhs: String?,
+        earliest: Bool
+    ) -> String? {
+        guard let lhs else { return rhs }
+        guard let rhs else { return lhs }
+        // An unparseable time keeps the side we can reason about rather than winning by accident.
+        guard let lhsMinutes = serviceMinutes(lhs) else { return rhs }
+        guard let rhsMinutes = serviceMinutes(rhs) else { return lhs }
+        let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
+        return preferLhs ? lhs : rhs
     }
 
     private static func trimmed(_ value: String?) -> String? {

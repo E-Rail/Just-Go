@@ -509,12 +509,87 @@ private func testInvalidReviewedReference() async throws {
     }
 }
 
+/// Regression test for the duplicate first/last rows users saw on Beijing station pages.
+///
+/// The payload here is the real shape captured from the live endpoint for 宋家庄 (line 10) and
+/// 西直门 (line 2): `terminalStationName` is a *direction* marker, not a terminus, so one
+/// direction served by several short-turn services returns several records that share a line
+/// name, direction and first-train time and differ only in the last-train digits. Those rendered
+/// as visually identical duplicate rows.
+private func testDirectionGroupingCollapsesDuplicateRows() async throws {
+    let payload = try JSONSerialization.data(withJSONObject: [
+        "status": 200,
+        "message": "成功",
+        "data": [
+            "lines": [
+                // 宋家庄 line 10: three services in the 石榴庄 direction.
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "21:44", "terminalStationName": "石榴庄", "destStationName": "车道沟"],
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "22:05", "terminalStationName": "石榴庄", "destStationName": "成寿寺"],
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "23:28", "terminalStationName": "石榴庄", "destStationName": "巴沟"],
+                // Opposite direction must survive as its own row.
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:36",
+                 "lastTime": "23:22", "terminalStationName": "成寿寺", "destStationName": "车道沟"],
+                // Past-midnight last train must win over a 23:xx one, not be treated as earliest.
+                ["lineName": "1号线八通线", "lineColor": "BE3631", "firstTime": "5:37",
+                 "lastTime": "23:39", "terminalStationName": "四惠东", "destStationName": "四惠东"],
+                ["lineName": "1号线八通线", "lineColor": "BE3631", "firstTime": "5:37",
+                 "lastTime": "0:21", "terminalStationName": "四惠东", "destStationName": "四惠东"]
+            ],
+            "station": [
+                "stationName": "建国门",
+                "stationDeviceLocation": 150_995_220,
+                "exits": [["name": "A", "nearby": ["建国门内大街北侧"]]]
+            ]
+        ]
+    ], options: [.sortedKeys])
+
+    MockTransport.install { _, _ in .http(statusCode: 200, body: payload) }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let provider = BeijingStationInformationProvider(session: session)
+    let snapshot = try await provider.information(for: request())
+
+    let identities = snapshot.trains.map { "\($0.lineName)|\($0.destination)" }
+    guard Set(identities).count == identities.count else {
+        throw HarnessFailure(description: "Duplicate line/direction rows survived: \(identities)")
+    }
+    guard snapshot.trains.count == 3 else {
+        throw HarnessFailure(
+            description: "Expected 3 grouped rows, got \(snapshot.trains.count): \(identities)"
+        )
+    }
+
+    guard let shiliuzhuang = snapshot.trains.first(where: { $0.destination == "石榴庄" }) else {
+        throw HarnessFailure(description: "石榴庄 direction row missing")
+    }
+    guard shiliuzhuang.firstTime == "5:07", shiliuzhuang.lastTime == "23:28" else {
+        throw HarnessFailure(
+            description: "石榴庄 window should span 5:07–23:28, got "
+                + "\(shiliuzhuang.firstTime ?? "nil")–\(shiliuzhuang.lastTime ?? "nil")"
+        )
+    }
+
+    guard let sihuidong = snapshot.trains.first(where: { $0.destination == "四惠东" }) else {
+        throw HarnessFailure(description: "四惠东 direction row missing")
+    }
+    guard sihuidong.lastTime == "0:21" else {
+        throw HarnessFailure(
+            description: "Past-midnight last train should win, got \(sihuidong.lastTime ?? "nil")"
+        )
+    }
+}
+
 @main
 private enum BeijingStationInformationHarness {
     static func main() async {
         do {
             try await testParsingAndRequestContract()
             print("PASS: native categories and request contract")
+            try await testDirectionGroupingCollapsesDuplicateRows()
+            print("PASS: direction grouping collapses duplicate first/last rows")
             try await testCacheCoalescingAndRelease()
             print("PASS: cache, coalescing, and memory release")
             try await testIdentityAndServiceValidation()
@@ -527,7 +602,7 @@ private enum BeijingStationInformationHarness {
             print("PASS: stored-snapshot fallback for availability failures")
             try await testContractViolationNeverServesCache()
             print("PASS: contract violations never serve the cache")
-            print("BeijingStationInformationProvider: 7 test groups passed")
+            print("BeijingStationInformationProvider: 8 test groups passed")
         } catch {
             FileHandle.standardError.write(
                 Data("Beijing station information test failed: \(error)\n".utf8)

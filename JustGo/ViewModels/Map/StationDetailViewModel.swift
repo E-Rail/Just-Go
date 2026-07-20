@@ -364,6 +364,9 @@ final class StationDetailViewModel {
                 items: facilityItems
             ))
         }
+        // Both times are nil here, so a row's identity collapses to line|destination|arrival —
+        // two trains on the same line and destination showing the same countdown produce
+        // duplicate ForEach ids, which is undefined behavior in SwiftUI.
         let trains = arrivals.map {
             OfficialStationTrainInformation(
                 lineName: $0.lineName,
@@ -373,7 +376,7 @@ final class StationDetailViewModel {
                 lastTime: nil,
                 liveTime: $0.formattedArrival
             )
-        }
+        }.uniqued(by: \OfficialStationTrainInformation.id)
         officialStationInformation = OfficialStationInformationSnapshot(
             stationID: stationID,
             stationName: station.name,

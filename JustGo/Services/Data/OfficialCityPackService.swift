@@ -295,7 +295,11 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             let installed = packs[cityID] == nil
                 ? await validatedInstalledPack(for: cityID)
                 : nil
-            let active = packs[cityID] ?? installed ?? bundledBaselinePack(for: cityID)
+            let active = if let existing = packs[cityID] ?? installed {
+                existing
+            } else {
+                await bundledBaselinePack(for: cityID)
+            }
             if let coverage = active?.data.coverage
                 ?? catalog?.cities.first(where: { $0.cityID == cityID })?.coverage {
                 result[cityID] = coverage
@@ -327,7 +331,11 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let installed = packs[cityID] == nil
             ? await validatedInstalledPack(for: cityID)
             : nil
-        let localPack = packs[cityID] ?? installed ?? bundledBaselinePack(for: cityID)
+        let localPack = if let existing = packs[cityID] ?? installed {
+            existing
+        } else {
+            await bundledBaselinePack(for: cityID)
+        }
         let catalogEntry = bundledManifest()?.cities.first(where: { $0.cityID == cityID })
         guard !Self.manifestURLs.isEmpty else {
             return localPack?.loadStatus
@@ -361,7 +369,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func status(for entry: OfficialManifestCity) -> CityPackLoadStatus {
         if entry.hasBundledPack {
-            return validatedBundledPack(for: entry) == nil
+            return Self.validatedBundledPack(for: entry) == nil
                 ? .failed
                 : .included(version: entry.version)
         }
@@ -381,7 +389,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             cacheStatus(installed.loadStatus, for: cityID)
             return installed.loadStatus
         }
-        if let baseline = bundledBaselinePack(for: cityID) {
+        if let baseline = await bundledBaselinePack(for: cityID) {
             packs[cityID] = baseline
             cacheStatus(baseline.loadStatus, for: cityID)
             return baseline.loadStatus
@@ -464,7 +472,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private func performDownload(for cityID: String, generation: Int) async -> CityPackLoadStatus {
         let current = packs[cityID]
         let installed = await validatedInstalledPack(for: cityID)
-        let baseline = bundledBaselinePack(for: cityID)
+        let baseline = await bundledBaselinePack(for: cityID)
         var pendingStatus: CityPackLoadStatus?
         let remoteManifests = await loadRemoteManifests()
 
@@ -649,7 +657,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     func licensedMedia(for station: Station) async -> [LicensedStationMedia] {
         _ = await loadCityPack(for: station.cityID)
-        guard let baseline = bundledBaselinePack(for: station.cityID) else { return [] }
+        guard let baseline = await bundledBaselinePack(for: station.cityID) else { return [] }
         let canonicalStationID = networkStationID(station.stationID)
         return (baseline.stationsByID[canonicalStationID]
             ?? baseline.uniqueStation(exactName: station.name)
@@ -1368,22 +1376,32 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private func validatedInstalledPack(for cityID: String) async -> LoadedPack? {
-        guard let installed = diskStore.installedPack(for: cityID),
-              Self.isAllowedRemoteDataURL(installed.manifestURL),
-              Self.validatesManifestEntry(installed.entry),
-              installed.entry.hasValidDownloadContract,
-              let pack = try? Self.decodeValidatedPack(
-                installed.data,
-                matching: installed.entry,
-                origin: .downloaded
-              ),
-              await validatesCanonicalMembership(pack) else {
-            return nil
-        }
+        // A downloaded pack can be as large as the bundled Beijing/Hong Kong ones — read +
+        // decode + validate off this actor's own execution context so it can't pin every
+        // other officialStationData caller behind it (same reasoning as bundledBaselinePack).
+        // Only the disk read, decode, and self-contained validation move; the canonical-
+        // membership check below still needs `metroNetworks`, so it stays on the actor.
+        let diskStore = self.diskStore
+        let decoded: (pack: OfficialPack, manifestURL: URL, entry: OfficialManifestCity)? =
+            await Task.detached(priority: .userInitiated, operation: {
+                guard let installed = diskStore.installedPack(for: cityID),
+                      Self.isAllowedRemoteDataURL(installed.manifestURL),
+                      Self.validatesManifestEntry(installed.entry),
+                      installed.entry.hasValidDownloadContract,
+                      let pack = try? Self.decodeValidatedPack(
+                        installed.data,
+                        matching: installed.entry,
+                        origin: .downloaded
+                      ) else {
+                    return nil
+                }
+                return (pack, installed.manifestURL, installed.entry)
+            }).value
+        guard let decoded, await validatesCanonicalMembership(decoded.pack) else { return nil }
         return LoadedPack(
-            data: pack,
-            manifestURL: installed.manifestURL,
-            manifestEntry: installed.entry,
+            data: decoded.pack,
+            manifestURL: decoded.manifestURL,
+            manifestEntry: decoded.entry,
             origin: .downloaded
         )
     }
@@ -1398,10 +1416,19 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
     }
 
-    private func bundledBaselinePack(for cityID: String) -> LoadedPack? {
+    private func bundledBaselinePack(for cityID: String) async -> LoadedPack? {
         if let cached = bundledBaselinePacks[cityID] { return cached }
-        guard let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }),
-              let bundled = validatedBundledPack(for: entry) else { return nil }
+        guard let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }) else { return nil }
+        // The bundled Beijing/Hong Kong packs are large (up to ~740KB) — decoding and
+        // validating one synchronously on this actor pins every other officialStationData
+        // caller (a different station's arrivals, another city's pack status, ...) behind it
+        // for the duration. Detach the CPU work; two concurrent callers racing here (e.g. a
+        // pack-status sweep and a coverage sweep right after Clear Cache) just redundantly
+        // decode once each — cheap and safe, same trade-off already made elsewhere in this
+        // actor (see performDownload's candidate racing).
+        guard let bundled = await Task.detached(priority: .userInitiated, operation: {
+            Self.validatedBundledPack(for: entry)
+        }).value else { return nil }
         let loaded = LoadedPack(
             data: bundled.pack,
             manifestURL: Bundle.main.url(forResource: "manifest", withExtension: "json") ?? bundled.url,
@@ -1572,7 +1599,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return reference.lineCode == nil || reference.lineCode?.isEmpty == false
     }
 
-    private func validatedBundledPack(
+    nonisolated private static func validatedBundledPack(
         for entry: OfficialManifestCity
     ) -> (pack: OfficialPack, url: URL)? {
         guard let relativePath = entry.bundledResource,

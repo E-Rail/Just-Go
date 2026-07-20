@@ -35,6 +35,15 @@ struct CityDataCapabilities: Equatable {
         )
     }
 
+    /// `manifestCapabilities` is a lazily-computed `static let` — its first touch decodes
+    /// `manifest.json` synchronously. `forCity` is called directly from SwiftUI view bodies
+    /// (city list rows), so an un-prewarmed first access blocks the main thread mid-render.
+    /// Call this once, off the main thread, during app launch so the lazy static is already
+    /// populated (a cheap dictionary lookup) by the time any view needs it.
+    static func prewarm() {
+        _ = manifestCapabilities
+    }
+
     private static let manifestCapabilities: [String: CityDataCapabilities] = {
         guard let url = Bundle.main.url(forResource: "manifest", withExtension: "json"),
               let data = try? Data(contentsOf: url),

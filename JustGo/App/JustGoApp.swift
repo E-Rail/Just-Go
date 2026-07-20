@@ -30,6 +30,12 @@ struct JustGoApp: App {
                         try? await Task.sleep(for: .milliseconds(300))
                         await MapKitPrewarmer.prewarm()
                     }
+                    // Same reasoning for the city-capabilities manifest decode: pay it here,
+                    // off the main thread, instead of letting the first city-list row (city
+                    // picker, Transit Data settings) block the main thread decoding it mid-render.
+                    Task.detached(priority: .utility) {
+                        CityDataCapabilities.prewarm()
+                    }
                     await container.tripMemoryService.repairQuickTagStationData { quickTag in
                         guard let network = await container.metroNetworkProvider.network(
                             for: quickTag.cityID

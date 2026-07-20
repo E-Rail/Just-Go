@@ -22,6 +22,14 @@ struct JustGoApp: App {
                 .environment(container.tripMemoryService)
                 .task {
                     appState.initialize(container: container)
+                    // The app opens on the Route tab (selectedTab = 1), so there's headroom to
+                    // pay MapKit's one-time first-`MKMapView` warm-up cost here instead of on
+                    // the user's first tap into the Map tab. Low priority and a short yield so
+                    // it never competes with the launch screen's first frame.
+                    Task.detached(priority: .utility) {
+                        try? await Task.sleep(for: .milliseconds(300))
+                        await MapKitPrewarmer.prewarm()
+                    }
                     await container.tripMemoryService.repairQuickTagStationData { quickTag in
                         guard let network = await container.metroNetworkProvider.network(
                             for: quickTag.cityID

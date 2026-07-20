@@ -307,6 +307,9 @@ struct MapContainerView: View {
                                 .frame(width: 28, height: 28)
                         }
                         .buttonStyle(.plain)
+                        // Grow only the tap target (28pt visible frame -> 44pt hit area),
+                        // not the visible icon, so the compact search row doesn't shift.
+                        .contentShape(Rectangle().inset(by: -8))
                     }
 
                     Spacer(minLength: 8)

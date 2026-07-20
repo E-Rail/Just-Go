@@ -403,6 +403,9 @@ struct PersonalStationMediaSection: View {
                         Image(systemName: "trash")
                             .frame(width: 32, height: 32)
                     }
+                    // Grow only the tap target (32pt visible frame -> 44pt hit area),
+                    // not the visible icon, so the tight grid-corner layout doesn't shift.
+                    .contentShape(Rectangle().inset(by: -6))
                     .accessibilityLabel(AppLocalization.text(
                         english: "Delete personal image",
                         simplified: "删除个人图片",

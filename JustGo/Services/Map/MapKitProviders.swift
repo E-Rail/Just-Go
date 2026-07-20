@@ -68,9 +68,11 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
         // instance and cancels a prior request when a new one starts, so a shared instance
         // would make overlapping reverse-geocodes (e.g. quick Current-Location taps across
         // fields) cancel each other. Reverse-geocode is one-shot, not a hot path.
-        let placemarks = try await CLGeocoder().reverseGeocodeLocation(
-            CLLocation(latitude: location.latitude, longitude: location.longitude)
-        )
+        let placemarks = try await withMapKitTimeout {
+            try await CLGeocoder().reverseGeocodeLocation(
+                CLLocation(latitude: location.latitude, longitude: location.longitude)
+            )
+        }
         let placemark = placemarks.first
         return TransitPlace(
             name: name ?? placemark?.name ?? AppLocalization.localized("Current Location"),

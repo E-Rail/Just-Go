@@ -467,54 +467,109 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let baseline = bundledBaselinePack(for: cityID)
         var pendingStatus: CityPackLoadStatus?
         let remoteManifests = await loadRemoteManifests()
+
+        // Same-version candidates (e.g. the international base URL vs. a mainland mirror) are
+        // interchangeable, so they're raced together; remoteEntries already sorts newest-version
+        // first, and groups are only tried in that order, so a real update is never skipped in
+        // favor of a faster old one.
+        var groups: [[RemoteManifestEntry]] = []
         for candidate in remoteEntries(for: cityID, in: remoteManifests) {
-            let manifestURL = candidate.url
+            if groups.last?.first?.entry.version == candidate.entry.version {
+                groups[groups.count - 1].append(candidate)
+            } else {
+                groups.append([candidate])
+            }
+        }
+
+        for group in groups {
             guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-            do {
+
+            // Disk-cache short-circuit first, in priority order across the whole group — cheap,
+            // local, and exactly as fresh from any candidate sharing this version.
+            for candidate in group {
+                let manifestURL = candidate.url
                 let entry = candidate.entry
                 pendingStatus = status(for: entry)
                 guard entry.hasValidDownloadContract else { continue }
-                guard let downloadURL = resolvedURL(entry.downloadURL, relativeTo: manifestURL) else {
+                guard resolvedURL(entry.downloadURL, relativeTo: manifestURL) != nil else {
                     pendingStatus = .failed
                     continue
                 }
-                if let data = diskStore.validatedPackData(for: entry),
-                   let decoded = try? Self.decodeValidatedPack(data, matching: entry, origin: .downloaded),
-                   await validatesCanonicalMembership(decoded) {
-                    guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
+                guard let data = diskStore.validatedPackData(for: entry),
+                      let decoded = try? Self.decodeValidatedPack(data, matching: entry, origin: .downloaded),
+                      await validatesCanonicalMembership(decoded) else { continue }
+                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
+                do {
                     try diskStore.storePackData(data, for: entry, manifestURL: manifestURL)
-                    let loaded = LoadedPack(
-                        data: decoded,
-                        manifestURL: manifestURL,
-                        manifestEntry: entry,
-                        origin: .downloaded
-                    )
-                    packs[cityID] = loaded
-                    return loaded.loadStatus
+                } catch {
+                    continue
                 }
-                guard let maximumBytes = entry.sizeBytes,
-                      maximumBytes > 0,
-                      maximumBytes <= Self.maximumPackBytes else { continue }
-                let data = try await download(from: downloadURL, maximumBytes: maximumBytes)
-                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-                guard entry.validatesPackData(data) else { continue }
-                let decoded = try Self.decodeValidatedPack(data, matching: entry, origin: .downloaded)
-                guard await validatesCanonicalMembership(decoded) else { continue }
-                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-                try diskStore.storePackData(data, for: entry, manifestURL: manifestURL)
-                packs[cityID] = LoadedPack(
+                let loaded = LoadedPack(
                     data: decoded,
                     manifestURL: manifestURL,
                     manifestEntry: entry,
                     origin: .downloaded
                 )
-                return .loaded(version: decoded.version)
+                packs[cityID] = loaded
+                return loaded.loadStatus
+            }
+
+            // No cached hit for this version — race the real downloads, so a stalled or
+            // black-holed source (an international base URL is a known offender on some
+            // mainland networks) can't force a healthy mirror to wait behind it.
+            let downloadable: [(manifestURL: URL, entry: OfficialManifestCity, downloadURL: URL, maximumBytes: Int)] =
+                group.compactMap { candidate in
+                    let entry = candidate.entry
+                    guard entry.hasValidDownloadContract,
+                          let downloadURL = resolvedURL(entry.downloadURL, relativeTo: candidate.url),
+                          let maximumBytes = entry.sizeBytes,
+                          maximumBytes > 0, maximumBytes <= Self.maximumPackBytes else { return nil }
+                    return (candidate.url, entry, downloadURL, maximumBytes)
+                }
+            guard !downloadable.isEmpty else { continue }
+
+            typealias DownloadWin = (data: Data, decoded: OfficialPack, entry: OfficialManifestCity, manifestURL: URL)
+            let winner: DownloadWin? = await withThrowingTaskGroup(of: DownloadWin.self) { taskGroup in
+                defer { taskGroup.cancelAll() }
+                for candidate in downloadable {
+                    taskGroup.addTask { [self] in
+                        let data = try await download(from: candidate.downloadURL, maximumBytes: candidate.maximumBytes)
+                        guard candidate.entry.validatesPackData(data) else {
+                            throw CityPackCandidateFailed()
+                        }
+                        let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry, origin: .downloaded)
+                        guard await validatesCanonicalMembership(decoded) else {
+                            throw CityPackCandidateFailed()
+                        }
+                        return (data, decoded, candidate.entry, candidate.manifestURL)
+                    }
+                }
+                while true {
+                    do {
+                        guard let value = try await taskGroup.next() else { return nil }
+                        return value
+                    } catch {
+                        AppLog.data.warning("City pack candidate failed for \(cityID, privacy: .public): \(error)")
+                    }
+                }
+            }
+
+            guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
+            guard let winner else { continue }
+            do {
+                try diskStore.storePackData(winner.data, for: winner.entry, manifestURL: winner.manifestURL)
             } catch {
-                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-                AppLog.data.warning("City pack load failed for \(cityID, privacy: .public) via \(manifestURL.absoluteString, privacy: .public): \(error)")
                 continue
             }
+            packs[cityID] = LoadedPack(
+                data: winner.decoded,
+                manifestURL: winner.manifestURL,
+                manifestEntry: winner.entry,
+                origin: .downloaded
+            )
+            return .loaded(version: winner.decoded.version)
         }
+
         guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
         if let installed {
             packs[cityID] = installed
@@ -1817,6 +1872,10 @@ private struct RemoteManifestEntry {
     let entry: OfficialManifestCity
     let priority: Int
 }
+
+/// Thrown by a single racing candidate in `performDownload` — validation failed or the data
+/// didn't match its manifest entry. Never surfaces beyond the task group; siblings keep racing.
+private struct CityPackCandidateFailed: Error {}
 
 private struct RemoteManifestLoadResult: Sendable {
     let url: URL

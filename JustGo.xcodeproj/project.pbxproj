@@ -12,6 +12,7 @@
 		A1000003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AppState.swift */; };
 		A1000004 /* DI/DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* DI/DIContainer.swift */; };
 		A1000607 /* Concurrency/Deadline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000607 /* Concurrency/Deadline.swift */; };
+		A1000608 /* Map/MapKitPrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000608 /* Map/MapKitPrewarmer.swift */; };
 		A1000005 /* Map/MapContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* Map/MapContainerView.swift */; };
 		A1000006 /* Map/MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* Map/MapViewModel.swift */; };
 		A1000008 /* Station/StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* Station/StationDetailView.swift */; };
@@ -125,6 +126,7 @@
 		A2000003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		A2000004 /* DI/DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DI/DIContainer.swift; sourceTree = "<group>"; };
 		A2000607 /* Concurrency/Deadline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concurrency/Deadline.swift; sourceTree = "<group>"; };
+		A2000608 /* Map/MapKitPrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapKitPrewarmer.swift; sourceTree = "<group>"; };
 		A2000005 /* Map/MapContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapContainerView.swift; sourceTree = "<group>"; };
 		A2000006 /* Map/MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapViewModel.swift; sourceTree = "<group>"; };
 		A2000008 /* Station/StationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationDetailView.swift; sourceTree = "<group>"; };
@@ -337,6 +339,7 @@
 				A2000305 /* Transit/TripConfidenceServices.swift */,
 				A2000306 /* Notifications/TripReminderService.swift */,
 				A200001B /* Map/MapKitProviders.swift */,
+				A2000608 /* Map/MapKitPrewarmer.swift */,
 				A200004A /* Data/OfficialCityPackService.swift */,
 				A2000501 /* Data/PersonalStationMediaService.swift */,
 				A200005A /* Data/BundledMetroNetworkService.swift */,
@@ -544,6 +547,7 @@
 				A1000003 /* AppState.swift in Sources */,
 				A1000004 /* DI/DIContainer.swift in Sources */,
 				A1000607 /* Concurrency/Deadline.swift in Sources */,
+				A1000608 /* Map/MapKitPrewarmer.swift in Sources */,
 				A1000005 /* Map/MapContainerView.swift in Sources */,
 				A1000006 /* Map/MapViewModel.swift in Sources */,
 				A1000040 /* Map/TransitMapView.swift in Sources */,

@@ -56,6 +56,21 @@ extension Color {
     }
 }
 
+extension Color {
+    /// Picks black or white — whichever contrasts better by WCAG relative luminance — for
+    /// text drawn on a solid `hex` fill. For data-driven colors (real transit line branding,
+    /// which spans everything from pale yellow to near-black) a fixed white/black choice
+    /// isn't safe the way it is for this app's own curated theme/status colors.
+    static func legibleText(onHex hex: String) -> Color {
+        let (r, g, b) = rgbComponents(hex: hex)
+        func linear(_ channel: CGFloat) -> CGFloat {
+            channel <= 0.03928 ? channel / 12.92 : pow((channel + 0.055) / 1.055, 2.4)
+        }
+        let luminance = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b)
+        return luminance > 0.35 ? .black : .white
+    }
+}
+
 private extension UIColor {
     /// Blends the color toward white just enough to reach `targetLuminance`, leaving
     /// already-light colors unchanged. Perceptual luma keeps the lift even across hues.

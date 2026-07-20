@@ -363,7 +363,10 @@ struct PlanRouteButtons: View {
                 .fontWeight(.medium)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(themeColor, in: RoundedRectangle(cornerRadius: 12))
+                // Raw hex, not `themeColor`: this is a solid fill under white text, and
+                // `Color.adaptive` lightens toward white in dark mode specifically for
+                // *foreground* legibility — used as a fill it collapses contrast instead.
+                .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

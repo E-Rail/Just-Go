@@ -423,7 +423,10 @@ struct IndoorStepGoView: View {
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(themeColor, in: RoundedRectangle(cornerRadius: 8))
+            // Raw hex, not `themeColor`: this is a solid fill under white text, and
+            // `Color.adaptive` lightens toward white in dark mode specifically for
+            // *foreground* legibility — used as a fill it collapses contrast instead.
+            .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 8))
             .foregroundStyle(.white)
         }
         .buttonStyle(.plain)
@@ -531,7 +534,7 @@ struct IndoorStepGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(themeColor, in: RoundedRectangle(cornerRadius: 8))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 8))
         .accessibilityElement(children: .combine)
     }
 }

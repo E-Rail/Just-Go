@@ -25,6 +25,10 @@ struct RouteDetailView: View {
     @State var tripNote = ""
     @State var detailDestination: RouteDetailDestination?
     @State private var boardingServiceWindows: [StationServiceWindow] = []
+    // Raw theme hex for the "Navigate" button's solid fill — see RoutePlannerView's
+    // identical declaration for why `Color.accentColor` (dark-mode-lightened for
+    // foreground use) isn't used as a fill under white text.
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
     // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
     // navigator re-fires onAppear, and a reset would immediately re-present it.
     @State private var didAutoPresentLiveGo = false
@@ -250,7 +254,7 @@ struct RouteDetailView: View {
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
-                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 10))
+                    .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 10))
                     .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)

@@ -959,7 +959,10 @@ struct LiveGoView: View {
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(themeColor, in: RoundedRectangle(cornerRadius: 8))
+            // Raw hex, not `themeColor`: this is a solid fill under white text, and
+            // `Color.adaptive` lightens toward white in dark mode specifically for
+            // *foreground* legibility — used as a fill it collapses contrast instead.
+            .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 8))
             .foregroundStyle(.white)
         }
         .buttonStyle(.plain)
@@ -1004,7 +1007,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func noticeBanner(text: String, icon: String, showsSpinner: Bool = false) -> some View {
@@ -1024,7 +1027,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }
 
@@ -1062,7 +1065,7 @@ struct LiveGoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(themeColor, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }

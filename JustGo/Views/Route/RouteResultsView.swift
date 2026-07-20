@@ -6,6 +6,10 @@ struct RouteResultsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var selectedRouteID: UUID?
     @State private var showRouteDetail = false
+    // Raw theme hex for the solid-fill chip below — see RoutePlannerView's identical
+    // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
+    // isn't used as a fill under white text.
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
     var body: some View {
         List {
@@ -104,7 +108,7 @@ struct RouteResultsView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
-        .background(Color.accentColor, in: Capsule())
+        .background(Color(hex: selectedThemeHex), in: Capsule())
         .foregroundStyle(.white)
     }
 

@@ -185,7 +185,10 @@ struct DataConfidenceChip: View {
         .padding(.horizontal, compact ? 6 : 8)
         .padding(.vertical, compact ? 2 : 4)
         .background(confidence.color, in: Capsule())
-        .foregroundStyle(.white)
+        // Black, not white: these are iOS system green/orange/red/gray, all mid-luminance
+        // colors that fail WCAG AA contrast against white text (verified ~2.2-3.6:1) but
+        // pass comfortably against black (~5.9-9.6:1), in both light and dark appearance.
+        .foregroundStyle(.black)
         .accessibilityElement(children: .combine)
     }
 }

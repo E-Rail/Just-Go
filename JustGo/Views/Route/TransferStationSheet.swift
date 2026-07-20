@@ -170,7 +170,7 @@ struct TransferStationSheet: View {
                     let colorHex = nextTransitSegment?.lineColorHex ?? "#888888"
                     Label(nextLine, systemImage: "tram.fill")
                         .font(.caption)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.legibleText(onHex: colorHex))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(Color(hex: colorHex), in: Capsule())

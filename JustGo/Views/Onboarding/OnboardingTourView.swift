@@ -6,6 +6,10 @@ import SwiftUI
 struct OnboardingTourView: View {
     let onFinish: () -> Void
     @State private var pageIndex = 0
+    // Raw theme hex for the Continue/Get Started button's solid fill — see
+    // RoutePlannerView's identical declaration for why `Color.accentColor`
+    // (dark-mode-lightened for foreground use) isn't used as a fill under white text.
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
     private struct TourPage {
         let icon: String
@@ -136,7 +140,7 @@ struct OnboardingTourView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+                    .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

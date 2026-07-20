@@ -26,6 +26,11 @@ struct RoutePlannerView: View {
     @State private var showResumeLiveGo = false
     @State private var keyboardHeight: CGFloat = 0
     @State private var suggestionListTopY: CGFloat = 0
+    // Raw theme hex for solid-fill buttons/banners below — `Color.accentColor` (the global
+    // tint, set from `Color.adaptive(hex:)` in ContentView) lightens toward white in dark
+    // mode for *foreground* legibility; used as a fill under white text that collapses
+    // contrast instead, so those specific spots use this raw value.
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
     var body: some View {
         NavigationStack {
@@ -262,7 +267,7 @@ struct RoutePlannerView: View {
             .accessibilityLabel(AppLocalization.text(english: "Dismiss", simplified: "关闭", traditional: "關閉"))
         }
         .padding()
-        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
     }
 
     private var searchHint: String? {
@@ -549,7 +554,7 @@ struct RoutePlannerView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 48)
-            .background(viewModel?.canSearch == true ? Color.accentColor : Color.gray)
+            .background(viewModel?.canSearch == true ? Color(hex: selectedThemeHex) : Color.gray)
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }

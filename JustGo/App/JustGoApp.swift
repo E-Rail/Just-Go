@@ -7,6 +7,9 @@ struct JustGoApp: App {
     @State private var container: DIContainer
 
     init() {
+        #if DEBUG
+        MainThreadHangMonitor.start()
+        #endif
         Self.applyDataRightsEpochIfNeeded()
         let container = DIContainer.configure()
         _container = State(initialValue: container)
@@ -22,17 +25,9 @@ struct JustGoApp: App {
                 .environment(container.tripMemoryService)
                 .task {
                     appState.initialize(container: container)
-                    // The app opens on the Route tab (selectedTab = 1), so there's headroom to
-                    // pay MapKit's one-time first-`MKMapView` warm-up cost here instead of on
-                    // the user's first tap into the Map tab. Low priority and a short yield so
-                    // it never competes with the launch screen's first frame.
-                    Task.detached(priority: .utility) {
-                        try? await Task.sleep(for: .milliseconds(300))
-                        await MapKitPrewarmer.prewarm()
-                    }
-                    // Same reasoning for the city-capabilities manifest decode: pay it here,
-                    // off the main thread, instead of letting the first city-list row (city
-                    // picker, Transit Data settings) block the main thread decoding it mid-render.
+                    // The city-capabilities manifest is a lazily-decoded static that SwiftUI
+                    // city-list rows touch during render — decode it here, off the main thread,
+                    // rather than letting the first row pay for it mid-render.
                     Task.detached(priority: .utility) {
                         CityDataCapabilities.prewarm()
                     }

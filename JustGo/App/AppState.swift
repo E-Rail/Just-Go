@@ -7,7 +7,13 @@ final class AppState {
     private let accessibilityPreferenceKey = "accessibilityPreference"
 
     var selectedCity: City?
+    #if DEBUG
+    // Lets a headless diagnostic launch open straight onto a given tab, since this
+    // environment has no way to inject a tap.
+    var selectedTab: Int = ProcessInfo.processInfo.environment["JUSTGO_START_TAB"].flatMap(Int.init) ?? 1
+    #else
     var selectedTab: Int = 1
+    #endif
 
     struct PendingRouteInput: Equatable {
         let place: TransitPlace

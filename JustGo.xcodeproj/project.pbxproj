@@ -90,6 +90,7 @@
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
 		A1000400 /* Route/StepMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000400 /* Route/StepMapPreview.swift */; };
 		A1000401 /* Onboarding/OnboardingTourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000401 /* Onboarding/OnboardingTourView.swift */; };
+		A1000075 /* Onboarding/LaunchStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000075 /* Onboarding/LaunchStageView.swift */; };
 		A1000402 /* Transit/IndoorStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000402 /* Transit/IndoorStep.swift */; };
 		A1000403 /* Route/IndoorStepGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000403 /* Route/IndoorStepGoView.swift */; };
 		A1000404 /* Vision/StationSignRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000404 /* Vision/StationSignRecognizer.swift */; };
@@ -213,6 +214,7 @@
 		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000400 /* Route/StepMapPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/StepMapPreview.swift; sourceTree = "<group>"; };
 		A2000401 /* Onboarding/OnboardingTourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/OnboardingTourView.swift; sourceTree = "<group>"; };
+		A2000075 /* Onboarding/LaunchStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/LaunchStageView.swift; sourceTree = "<group>"; };
 		A2000402 /* Transit/IndoorStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/IndoorStep.swift; sourceTree = "<group>"; };
 		A2000403 /* Route/IndoorStepGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/IndoorStepGoView.swift; sourceTree = "<group>"; };
 		A2000404 /* Vision/StationSignRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision/StationSignRecognizer.swift; sourceTree = "<group>"; };
@@ -413,6 +415,7 @@
 				A2000605 /* Profile/QuickTagAddView.swift */,
 				A2000015 /* Accessibility/AccessibilitySettingsView.swift */,
 				A2000401 /* Onboarding/OnboardingTourView.swift */,
+				A2000075 /* Onboarding/LaunchStageView.swift */,
 				A2000017 /* Components/Transit/StationRow.swift */,
 				A2000018 /* Components/Glass/GlassCard.swift */,
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
@@ -639,6 +642,7 @@
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 				A1000400 /* Route/StepMapPreview.swift in Sources */,
 				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,
+				A1000075 /* Onboarding/LaunchStageView.swift in Sources */,
 				A1000402 /* Transit/IndoorStep.swift in Sources */,
 				A1000403 /* Route/IndoorStepGoView.swift in Sources */,
 				A1000404 /* Vision/StationSignRecognizer.swift in Sources */,

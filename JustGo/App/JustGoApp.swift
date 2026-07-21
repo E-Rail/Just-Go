@@ -1,6 +1,12 @@
 import CoreLocation
 import SwiftUI
 
+/// Thrown when a gated launch stage outruns its budget, so the app hands off to the UI rather
+/// than holding the launch screen on work the first screen can live without.
+enum LaunchStageTimeout: Error {
+    case overran
+}
+
 @main
 struct JustGoApp: App {
     @State private var appState = AppState()
@@ -25,35 +31,78 @@ struct JustGoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(appState)
-                .environment(container)
-                .environment(container.tripMemoryService)
-                .task {
-                    appState.initialize(container: container)
-                    // The city-capabilities manifest is a lazily-decoded static that SwiftUI
-                    // city-list rows touch during render — decode it here, off the main thread,
-                    // rather than letting the first row pay for it mid-render.
-                    Task.detached(priority: .utility) {
-                        CityDataCapabilities.prewarm()
-                    }
-                    await container.tripMemoryService.repairQuickTagStationData { quickTag in
-                        guard let network = await container.metroNetworkProvider.network(
-                            for: quickTag.cityID
-                        ) else { return nil }
-                        let coordinate = CLLocationCoordinate2D(
-                            latitude: quickTag.latitude,
-                            longitude: quickTag.longitude
-                        )
-                        guard let match = network.matchingStation(named: quickTag.name, near: coordinate)
-                            ?? quickTag.nameEn.flatMap({
-                                network.matchingStation(named: $0, near: coordinate)
-                            }) else { return nil }
-                        return await container.stationSearchService.enrichStation(
-                            network.displayStation(match)
-                        )
-                    }
+            Group {
+                if appState.isLaunching {
+                    LaunchStageView(stage: appState.launchStage, progress: appState.launchProgress)
+                        .transition(.opacity)
+                } else {
+                    ContentView()
+                        .transition(.opacity)
                 }
+            }
+            // On a fast device the essentials finish in a few hundred ms; dissolve rather than
+            // snap so that reads as a handoff instead of a flash.
+            .animation(.easeInOut(duration: 0.28), value: appState.isLaunching)
+            .environment(appState)
+            .environment(container)
+            .environment(container.tripMemoryService)
+            .task { await runLaunchStages() }
+        }
+    }
+
+    /// Loads what the first screen genuinely needs, one stage at a time, and hands off to the
+    /// tab UI as soon as those are done. Work nothing on screen is waiting for runs afterwards,
+    /// behind the live UI, rather than holding the launch screen up.
+    private func runLaunchStages() async {
+        guard appState.isLaunching else { return }
+
+        // Stage 1 — services. `DIContainer.configure()` already ran in `init`; the city
+        // capabilities manifest is the remaining piece, and it is what the city rows render from.
+        appState.advanceLaunch(to: .loadingCities)
+        await Task.detached(priority: .userInitiated) {
+            CityDataCapabilities.prewarm()
+        }.value
+
+        // Stage 2 — resolve the city, then decode its network so the Map tab opens with its
+        // geometry already in memory instead of paying for the decode on first appearance.
+        // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
+        // is a warmup — if it overruns, hand off and let it land in the actor's cache behind us.
+        appState.initialize(container: container)
+        appState.advanceLaunch(to: .loadingMapData)
+        if let cityID = appState.selectedCity?.id {
+            let provider = container.metroNetworkProvider
+            _ = try? await withDeadline(seconds: 8) {
+                LaunchStageTimeout.overran
+            } operation: {
+                await provider.network(for: cityID)
+            }
+        }
+
+        // Essentials done — hand off.
+        appState.advanceLaunch(to: .ready)
+
+        // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
+        // repair touches a network decode and a city-pack load per tag, and the rows it
+        // repairs are several taps away.
+        await repairQuickTags()
+    }
+
+    private func repairQuickTags() async {
+        await container.tripMemoryService.repairQuickTagStationData { quickTag in
+            guard let network = await container.metroNetworkProvider.network(
+                for: quickTag.cityID
+            ) else { return nil }
+            let coordinate = CLLocationCoordinate2D(
+                latitude: quickTag.latitude,
+                longitude: quickTag.longitude
+            )
+            guard let match = network.matchingStation(named: quickTag.name, near: coordinate)
+                ?? quickTag.nameEn.flatMap({
+                    network.matchingStation(named: $0, near: coordinate)
+                }) else { return nil }
+            return await container.stationSearchService.enrichStation(
+                network.displayStation(match)
+            )
         }
     }
 

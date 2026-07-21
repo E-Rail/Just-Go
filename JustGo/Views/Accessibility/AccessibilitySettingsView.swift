@@ -38,8 +38,6 @@ struct AccessibilitySettingsView: View {
             }
         } header: {
             Text(AppLocalization.localized("Primary Disability Category"))
-        } footer: {
-            Text(AppLocalization.localized("This helps us customize the app experience for you"))
         }
     }
 

@@ -10,48 +10,56 @@ enum LaunchStageTimeout: Error {
 @main
 struct JustGoApp: App {
     @State private var appState = AppState()
-    /// Optional, and built in the launch task rather than in `init`. Everything `init` does runs
-    /// before SwiftUI can draw anything at all, so constructing ~15 services here — two of which
-    /// (`CLLocationManager`, `UNUserNotificationCenter`) are synchronous XPC handshakes with
-    /// system daemons — kept the launch screen itself off screen for as long as that took.
-    @State private var container: DIContainer?
+    @State private var container: DIContainer
 
     init() {
         #if DEBUG
         MainThreadHangMonitor.start()
         LaunchClock.mark("app.init")
         #endif
+        Self.applyDataRightsEpochIfNeeded()
+        #if DEBUG
+        LaunchClock.mark("dataRightsEpoch.done")
+        #endif
+        let container = DIContainer.configure()
+        #if DEBUG
+        LaunchClock.mark("container.ready")
+        #endif
+        _container = State(initialValue: container)
+        // Both sweeps walk directories whose size the app doesn't control, and nothing waits
+        // on their results — keep them off the main thread, which is otherwise blocked here
+        // until the first frame. Measured at 8ms on an empty container but 82ms with 4,200
+        // temp entries, i.e. bounded only by how much junk has accumulated.
+        Task.detached(priority: .utility) {
+            Self.removeObsoleteRouteCaches()
+            Self.removeOrphanedPhotoImportTempFiles()
+        }
     }
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if let container, !appState.isLaunching {
-                    ContentView()
-                        .environment(container)
-                        .environment(container.tripMemoryService)
-                        .transition(.opacity)
-                } else {
+                if appState.isLaunching {
                     LaunchStageView(stage: appState.launchStage, progress: appState.launchProgress)
                         .transition(.opacity)
-                        // `onAppear`, not `.task`: tasks queue behind the launch task on the
-                        // main actor, so a `.task` here would time when the launch work let go
-                        // of the main thread rather than when this screen actually appeared.
-                        .onAppear { firstFrameDidRender() }
+                        .onAppear {
+                            #if DEBUG
+                            LaunchClock.mark("firstFrame")
+                            #endif
+                        }
+                } else {
+                    ContentView()
+                        .transition(.opacity)
                 }
             }
             // On a fast device the essentials finish in a few hundred ms; dissolve rather than
             // snap so that reads as a handoff instead of a flash.
             .animation(.easeInOut(duration: 0.28), value: appState.isLaunching)
             .environment(appState)
+            .environment(container)
+            .environment(container.tripMemoryService)
             .task { await runLaunchStages() }
         }
-    }
-
-    private func firstFrameDidRender() {
-        #if DEBUG
-        LaunchClock.mark("firstFrame")
-        #endif
     }
 
     /// Loads what the first screen genuinely needs, one stage at a time, and hands off to the
@@ -60,36 +68,14 @@ struct JustGoApp: App {
     private func runLaunchStages() async {
         guard appState.isLaunching else { return }
 
-        // Let SwiftUI commit the launch screen's first frame before this task occupies the main
-        // actor with synchronous service construction. `.task` bodies start running *ahead* of
-        // that commit, so without this the screen the user is waiting to see would only appear
-        // after the very work it exists to cover — measured, not assumed.
-        await Task.yield()
-
-        // Stage 1 — services. Runs here, not in `init`, so the launch screen is already on
-        // screen while it happens. The rights-epoch sweep must precede it: it can delete the
-        // city-pack tree, and the pack service must not read a tree that is about to vanish.
-        Self.applyDataRightsEpochIfNeeded()
-        let container = DIContainer.configure()
-        self.container = container
-        #if DEBUG
-        LaunchClock.mark("container.ready")
-        #endif
-
-        // Both sweeps walk directories whose size the app doesn't control, and nothing waits on
-        // their results.
-        Task.detached(priority: .utility) {
-            Self.removeObsoleteRouteCaches()
-            Self.removeOrphanedPhotoImportTempFiles()
-        }
-
-        // Stage 2 — the city capabilities manifest, which the city rows render from.
+        // Stage 1 — services. `DIContainer.configure()` already ran in `init`; the city
+        // capabilities manifest is the remaining piece, and it is what the city rows render from.
         appState.advanceLaunch(to: .loadingCities)
         await Task.detached(priority: .userInitiated) {
             CityDataCapabilities.prewarm()
         }.value
 
-        // Stage 3 — resolve the city, then decode its network so the Map tab opens with its
+        // Stage 2 — resolve the city, then decode its network so the Map tab opens with its
         // geometry already in memory instead of paying for the decode on first appearance.
         // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
         // is a warmup — if it overruns, hand off and let it land in the actor's cache behind us.
@@ -107,13 +93,13 @@ struct JustGoApp: App {
         // Essentials done — hand off.
         appState.advanceLaunch(to: .ready)
 
-        // Stage 4 — runs after the handoff, so it never holds the first screen. Quick-tag
+        // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
         // repair touches a network decode and a city-pack load per tag, and the rows it
         // repairs are several taps away.
-        await repairQuickTags(container: container)
+        await repairQuickTags()
     }
 
-    private func repairQuickTags(container: DIContainer) async {
+    private func repairQuickTags() async {
         await container.tripMemoryService.repairQuickTagStationData { quickTag in
             guard let network = await container.metroNetworkProvider.network(
                 for: quickTag.cityID

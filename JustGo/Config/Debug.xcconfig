@@ -4,3 +4,13 @@ CITY_PACK_BASE_URL = $(CITY_PACK_SECRET_BASE_URL)
 CITY_PACK_MAINLAND_MIRROR_URL = $(CITY_PACK_SECRET_MAINLAND_MIRROR_URL)
 CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
 CITY_PACK_FALLBACK_BASE_URL =
+
+// Xcode 16 defaults Debug app targets to the "debug dylib" layout for SwiftUI Previews: the
+// executable becomes a 40 KB stub and all ~23 MB of app code moves into JustGo.debug.dylib,
+// which dyld must map and bind before main — outside the shared cache, unoptimised. On device
+// that dominated launch (the app was reaching the ~20s launch watchdog and getting SIGKILLed
+// in dyld, before any of our code ran).
+//
+// This codebase contains zero #Preview / PreviewProvider declarations, so the feature is pure
+// cost here. NO restores a single normally-linked executable, matching the Release layout.
+ENABLE_DEBUG_DYLIB = NO

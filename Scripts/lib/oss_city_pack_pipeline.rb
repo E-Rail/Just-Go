@@ -5,6 +5,7 @@ require "csv"
 require "digest"
 require "fileutils"
 require "json"
+require_relative "gcj02"
 
 module OSSCityPackPipeline
   GENERATED_AT = "2026-07-15T00:00:00Z"
@@ -122,6 +123,24 @@ module OSSCityPackPipeline
     "verifiedTransferContexts" => "source_pending"
   }.freeze
 
+  # data.taipei publishes exits for the Taipei Metro proper but not for the New Taipei light-rail
+  # and branch lines that share the same rider-facing network, so accessibility coverage is
+  # partial by construction rather than pending.
+  TAIPEI_CAPABILITIES = {
+    "accessibility" => "partial_static",
+    "schedules" => "source_pending",
+    "liveArrivals" => "source_pending",
+    "stationMaps" => "source_pending",
+    "licensedMedia" => "source_pending",
+    "verifiedTransferContexts" => "source_pending"
+  }.freeze
+
+  TAIPEI_SOURCE_FILES = %w[station_exits.csv stations.csv].freeze
+
+  # "頂埔站出口1" → 頂埔 / 1. Taipei Main Station's exits are lettered without the 站出口 form.
+  TAIPEI_EXIT_PATTERN = /\A(?<station>.+?)站(?:出入口|出口)(?<label>.*)\z/
+  TAIPEI_MAIN_STATION = "台北車站"
+
   PENDING_CAPABILITIES = {
     "accessibility" => "source_pending",
     "schedules" => "source_pending",
@@ -190,7 +209,8 @@ module OSSCityPackPipeline
 
       packs = {
         "1100" => build_beijing_pack,
-        "8100" => build_hong_kong_pack
+        "8100" => build_hong_kong_pack,
+        "7101" => build_taipei_pack
       }
       packs.each { |city_id, pack| write_json(pack_path(city_id), pack) }
       write_json(manifest_path, build_manifest(packs))
@@ -356,6 +376,94 @@ module OSSCityPackPipeline
       }
     end
 
+    # Taipei's pack carries station exits: name, position and whether the exit is the barrier-free
+    # one. The app already renders these (StationDetailView, TransferStationSheet) and had no
+    # source for any city until now. Only facts present in the open data are emitted — in
+    # particular an accessible exit is recorded as an accessible entrance and nothing is inferred
+    # about lifts or ramps, which the dataset does not state.
+    def build_taipei_pack
+      network = load_network("7101")
+      canonical_index = canonical_station_index(network.fetch("stations"))
+      records = {}
+
+      taipei_exit_rows.each do |row|
+        source_name = row.fetch("出入口名稱").to_s.strip
+        station_name, label = split_taipei_exit_name(source_name)
+        candidates = canonical_index[normalize_name(station_name)]
+        if candidates.length != 1
+          raise BuildError,
+            "Taipei exit #{source_name.inspect} matched #{candidates.length} canonical stations"
+        end
+        canonical = candidates.first
+        record = records[canonical.fetch("id")] ||= base_station(canonical).merge(
+          "stationAccessPoints" => []
+        )
+
+        latitude = Float(row.fetch("緯度"))
+        longitude = Float(row.fetch("經度"))
+        # The open data is WGS-84; everything the app draws is GCJ-02 (see Scripts/lib/gcj02.rb).
+        latitude, longitude = GCJ02.from_wgs84(latitude, longitude)
+        accessible = row.fetch("是否為無障礙用").to_s.strip == "是"
+        record.fetch("stationAccessPoints") << {
+          "id" => "#{canonical.fetch("id")}-#{label.empty? ? "exit" : label}",
+          "name" => source_name,
+          "kind" => "exit",
+          "latitude" => latitude.round(6),
+          "longitude" => longitude.round(6),
+          "isAccessible" => accessible,
+          "source" => "specificEntrance"
+        }
+      end
+
+      stations = records.values.map do |record|
+        record["stationAccessPoints"] = record.fetch("stationAccessPoints")
+          .uniq { |point| point.fetch("id") }
+          .sort_by { |point| point.fetch("id") }
+        accessible_entrances = record.fetch("stationAccessPoints")
+          .select { |point| point.fetch("isAccessible") }
+          .map { |point| point.fetch("name") }
+        unless accessible_entrances.empty?
+          record["accessibility"] = {
+            "source" => "data.taipei/taipei-metro-station-exits",
+            "hasElevator" => nil,
+            "hasEscalator" => nil,
+            "hasWheelchairRamp" => nil,
+            "hasTactilePath" => nil,
+            "hasAccessibleRestroom" => nil,
+            "elevatorLocations" => [],
+            "accessibleEntrances" => accessible_entrances,
+            "facilityNotes" => []
+          }
+        end
+        normalize_station_arrays!(record)
+      end.sort_by { |record| record.fetch("stationID") }
+
+      {
+        "schemaVersion" => 2,
+        "cityID" => "7101",
+        "version" => VERSION,
+        "generatedAt" => GENERATED_AT,
+        "rightsIDs" => %w[osm-metro-networks taipei-open-data].sort,
+        "capabilities" => deep_copy(TAIPEI_CAPABILITIES),
+        "coverage" => coverage_for(network.fetch("stations").length, stations),
+        "stations" => stations
+      }
+    end
+
+    def split_taipei_exit_name(value)
+      return [TAIPEI_MAIN_STATION, value.delete_prefix(TAIPEI_MAIN_STATION)] if
+        value.start_with?(TAIPEI_MAIN_STATION)
+
+      match = TAIPEI_EXIT_PATTERN.match(value)
+      raise BuildError, "unparsable Taipei exit name #{value.inspect}" unless match
+
+      [match[:station], match[:label].to_s.strip]
+    end
+
+    def taipei_exit_rows
+      @taipei_exit_rows ||= read_csv(File.join(root, "DataPacks", "sources", "7101", "station_exits.csv"))
+    end
+
     def build_manifest(packs)
       pack_bytes = packs.to_h do |city_id, _pack|
         path = pack_path(city_id)
@@ -454,6 +562,7 @@ module OSSCityPackPipeline
           "MIT",
           "ODbL-1.0",
           "LicenseRef-DATA-GOV-HK-1.2",
+          "LicenseRef-OGDL-TW-1.0",
           "LicenseRef-External-Link-Only",
           "CC-BY-2.0",
           "CC0-1.0"
@@ -488,6 +597,16 @@ module OSSCityPackPipeline
             "sourceURL" => "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
             "attribution" => "MTR Corporation Limited and DATA.GOV.HK",
             "redistribution" => "Custom DATA.GOV.HK Terms of Use v1.2 apply; attribution and source identification are required."
+          },
+          {
+            "id" => "taipei-open-data",
+            "kind" => "dataset",
+            "scope" => "DataPacks/sources/7101 Taipei Metro station and station-exit datasets, and the exit names, positions and barrier-free flags derived from them",
+            "licenseSPDX" => "LicenseRef-OGDL-TW-1.0",
+            "licenseURL" => "https://data.gov.tw/license",
+            "sourceURL" => "https://data.gov.tw/dataset/128428",
+            "attribution" => "臺北大眾捷運股份有限公司 / 臺北市資料大平臺 (data.taipei)",
+            "redistribution" => "Open Government Data License, Taiwan, version 1.0 permits redistribution, commercial use and derivative works. Attribution is mandatory: omitting it voids the licence grant retroactively."
           },
           {
             "id" => "beijing-official-landing-links",
@@ -606,7 +725,7 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[
             justgo-generated-catalog osm-metro-networks data-gov-hk-mtr
             beijing-official-landing-links macau-official-landing-link
-            media-jianguomen-ian-holton media-central-qqhhss
+            media-jianguomen-ian-holton media-central-qqhhss taipei-open-data
           ].sort
         },
         {
@@ -643,6 +762,14 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[justgo-generated-catalog data-gov-hk-mtr].sort
         },
         {
+          "path" => "DataPacks/sources/7101/metadata.json",
+          "rightsIDs" => %w[justgo-generated-catalog taipei-open-data].sort
+        },
+        {
+          "path" => "JustGo/Resources/BundledCityPacks/7101.json",
+          "rightsIDs" => %w[justgo-generated-catalog osm-metro-networks taipei-open-data].sort
+        },
+        {
           "path" => "THIRD_PARTY_NOTICES.md",
           "rightsIDs" => ["justgo-generated-catalog"]
         },
@@ -674,6 +801,12 @@ module OSSCityPackPipeline
           "rightsIDs" => ["data-gov-hk-mtr"]
         }
       end
+      TAIPEI_SOURCE_FILES.each do |file_name|
+        files << {
+          "path" => "DataPacks/sources/7101/#{file_name}",
+          "rightsIDs" => ["taipei-open-data"]
+        }
+      end
       Dir.glob(File.join(root, "JustGo", "Resources", "MetroNetworks", "*.json")).sort.each do |path|
         files << {
           "path" => path.delete_prefix("#{root}/"),
@@ -688,7 +821,7 @@ module OSSCityPackPipeline
       universal_rights = %w[
         beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
         macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
-        official-transit-resource-links osm-metro-networks
+        official-transit-resource-links osm-metro-networks taipei-open-data
       ].sort
       files << {
         "path" => "DataPacks/universal/index.json",
@@ -727,6 +860,16 @@ module OSSCityPackPipeline
         Data provider: MTR Corporation Limited. Distribution portal: DATA.GOV.HK. Reuse is governed
         by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
         https://data.gov.hk/en/terms-and-conditions
+
+        ## Taipei Metro Open Data Via data.taipei
+
+        The Taipei city pack is derived from the vendored 臺北捷運車站出入口座標 and 臺北捷運車站資料
+        snapshots: station entrance names, positions, and whether an entrance is the barrier-free one.
+
+        Data provider: 臺北大眾捷運股份有限公司 (Taipei Rapid Transit Corporation). Distribution portal:
+        臺北市資料大平臺 (data.taipei). Reuse is governed by the Open Government Data License, Taiwan,
+        version 1.0, which requires this attribution to be retained:
+        https://data.gov.tw/license
 
         ## Official Transit Resource Links
 

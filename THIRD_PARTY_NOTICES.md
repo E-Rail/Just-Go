@@ -19,6 +19,16 @@ Data provider: MTR Corporation Limited. Distribution portal: DATA.GOV.HK. Reuse 
 by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
 https://data.gov.hk/en/terms-and-conditions
 
+## Taipei Metro Open Data Via data.taipei
+
+The Taipei city pack is derived from the vendored 臺北捷運車站出入口座標 and 臺北捷運車站資料
+snapshots: station entrance names, positions, and whether an entrance is the barrier-free one.
+
+Data provider: 臺北大眾捷運股份有限公司 (Taipei Rapid Transit Corporation). Distribution portal:
+臺北市資料大平臺 (data.taipei). Reuse is governed by the Open Government Data License, Taiwan,
+version 1.0, which requires this attribution to be retained:
+https://data.gov.tw/license
+
 ## Official Transit Resource Links
 
 The bundled official-resource catalog contains reviewed factual link metadata for transit

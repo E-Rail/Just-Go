@@ -13,9 +13,11 @@ class OSSCityPackPipelineTest < Minitest::Test
     "DataPacks/manifest.json",
     "DataPacks/rights_inventory.json",
     "DataPacks/sources/8100/metadata.json",
+    "DataPacks/sources/7101/metadata.json",
     "THIRD_PARTY_NOTICES.md",
     "JustGo/Resources/BundledCityPacks/1100.json",
-    "JustGo/Resources/BundledCityPacks/8100.json"
+    "JustGo/Resources/BundledCityPacks/8100.json",
+    "JustGo/Resources/BundledCityPacks/7101.json"
   ].freeze
 
   def test_exact_schema_and_generated_counts
@@ -36,7 +38,7 @@ class OSSCityPackPipelineTest < Minitest::Test
     bundled_city_ids = manifest.fetch("cities").map do |city|
       city["cityID"] if city["bundledResource"]
     end.compact
-    assert_equal %w[1100 8100], bundled_city_ids
+    assert_equal %w[1100 8100 7101], bundled_city_ids
     assert manifest.fetch("cities").all? { |city| city["downloadURL"].nil? }
     assert_equal 53, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
     assert_equal 5, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
@@ -75,6 +77,59 @@ class OSSCityPackPipelineTest < Minitest::Test
       },
       hong_kong.fetch("coverage")
     )
+  end
+
+  # The exits arrive as WGS-84 and everything the app draws is GCJ-02. An unconverted pack still
+  # parses and still validates structurally, so the regression is pinned by distance: converted,
+  # exits sit tens of metres from their station; unconverted, none is closer than ~330 m.
+  def test_taipei_exits_are_converted_to_the_app_coordinate_frame
+    pack = json("JustGo/Resources/BundledCityPacks/7101.json")
+    network = json("JustGo/Resources/MetroNetworks/7101.json")
+    positions = network.fetch("stations").to_h { |station| [station.fetch("id"), station] }
+
+    points = pack.fetch("stations").flat_map do |station|
+      canonical = positions.fetch(station.fetch("stationID"))
+      station.fetch("stationAccessPoints").map do |point|
+        metres_between(
+          point.fetch("latitude"), point.fetch("longitude"),
+          canonical.fetch("latitude"), canonical.fetch("longitude")
+        )
+      end
+    end
+
+    assert_equal 388, points.length
+    assert_operator points.min, :<, 40, "no exit is close to its station; coordinates look unconverted"
+    assert_operator points.sort[points.length / 2], :<, 150, "median exit distance is too large"
+    assert_operator points.max, :<, 800, "an exit is implausibly far from its station"
+  end
+
+  def test_taipei_pack_only_claims_what_the_open_data_states
+    pack = json("JustGo/Resources/BundledCityPacks/7101.json")
+
+    assert_equal %w[osm-metro-networks taipei-open-data], pack.fetch("rightsIDs")
+    assert_equal "partial_static", pack.fetch("capabilities").fetch("accessibility")
+    assert_equal 118, pack.fetch("stations").length
+
+    pack.fetch("stations").each do |station|
+      assert_empty station.fetch("schedules"), "the exit dataset carries no timetable"
+      assert_empty station.fetch("licensedMedia")
+      accessibility = station.fetch("accessibility")
+      next if accessibility.nil?
+
+      # The dataset states only whether an exit is the barrier-free one; lifts, ramps and
+      # accessible toilets are not stated and must stay unknown rather than be inferred.
+      assert_nil accessibility.fetch("hasElevator")
+      assert_nil accessibility.fetch("hasWheelchairRamp")
+      assert_nil accessibility.fetch("hasAccessibleRestroom")
+      refute_empty accessibility.fetch("accessibleEntrances")
+    end
+  end
+
+  def metres_between(latitude_a, longitude_a, latitude_b, longitude_b)
+    mean_latitude = (latitude_a + latitude_b) / 2 * Math::PI / 180
+    delta_y = (latitude_a - latitude_b) * Math::PI / 180 * 6_371_000.0
+    delta_x = (longitude_a - longitude_b) * Math::PI / 180 * 6_371_000.0 * Math.cos(mean_latitude)
+    Math.sqrt(delta_x * delta_x + delta_y * delta_y)
   end
 
   def test_racecourse_reference_and_hoi_wong_road_rename_are_explicit

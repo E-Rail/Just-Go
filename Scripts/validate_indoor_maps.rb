@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "lib/oss_data_validators"
 
 ROOT = File.expand_path("..", __dir__)
 PACK_PATTERN = File.join(ROOT, "JustGo", "Resources", "BundledCityPacks", "*.json")
@@ -26,7 +27,11 @@ project = File.read(File.join(ROOT, "JustGo.xcodeproj", "project.pbxproj"), enco
 fail_with("Xcode still references indoor_maps.json") if project.include?("indoor_maps.json")
 
 pack_paths = Dir.glob(PACK_PATTERN).sort
-fail_with("expected exactly two reviewed bundled packs") unless pack_paths.length == 2
+expected_packs = OSSDataValidators::BUNDLED_CITY_IDS
+found_packs = pack_paths.map { |path| File.basename(path, ".json") }.sort
+unless found_packs == expected_packs
+  fail_with("expected the reviewed bundled packs #{expected_packs.join(", ")}, found #{found_packs.join(", ")}")
+end
 
 station_count = 0
 pack_paths.each do |path|

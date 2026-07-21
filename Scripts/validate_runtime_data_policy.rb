@@ -68,6 +68,7 @@ expected_web_literals = Set.new([
   ["JustGo/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/privacy/"],
   ["JustGo/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/terms/"],
   ["JustGo/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
+  ["JustGo/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["JustGo/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],
   ["JustGo/Services/Data/OfficialCityPackService.swift", "https://www.bjsubway.com/station/xltcx/"],
   ["JustGo/Services/Data/OfficialCityPackService.swift", "https://www.mtr.bj.cn/service/line/"],

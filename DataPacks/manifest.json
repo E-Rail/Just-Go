@@ -2876,19 +2876,20 @@
     },
     {
       "cityID": "7101",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 200075,
+      "sha256": "4dad1fdc90c18ad70240ac61b684798065f03a5e23c4e681d6bf863cd272f163",
+      "bundledResource": "BundledCityPacks/7101.json",
       "downloadURL": null,
       "rightsIDs": [
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ],
       "externalResources": [
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -2898,11 +2899,11 @@
       "coverage": {
         "networkStations": 151,
         "matchedStations": {
-          "covered": 0,
+          "covered": 118,
           "total": 151
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 118,
           "total": 151
         },
         "staticSchedules": {

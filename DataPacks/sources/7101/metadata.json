@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "platform": "臺北市資料大平臺 (data.taipei)",
+  "provider": "臺北大眾捷運股份有限公司 Taipei Rapid Transit Corporation",
+  "rightsID": "taipei-open-data",
+  "licenseName": "Open Government Data License, Taiwan, version 1.0",
+  "licenseURL": "https://data.gov.tw/license",
+  "attribution": "臺北大眾捷運股份有限公司 / 臺北市資料大平臺 (data.taipei)",
+  "resources": [
+    {
+      "cityID": "7101",
+      "fileName": "station_exits.csv",
+      "description": "臺北捷運車站出入口座標",
+      "sourceURL": "https://data.taipei/api/dataset/cfa4778c-62c1-497b-b704-756231de348b/resource/307a7f61-e302-4108-a817-877ccbfca7c1/download",
+      "datasetLandingPageURL": "https://data.gov.tw/dataset/128428",
+      "sourceEncoding": "BIG5",
+      "sizeBytes": 20257,
+      "sha256": "90b44ea006babc4ac50271e6fc026def6578760cf359a6610981c364c6d1c504",
+      "csvRecordCount": 388,
+      "headers": [
+        "項次",
+        "出入口名稱",
+        "出入口編號",
+        "經度",
+        "緯度",
+        "是否為無障礙用"
+      ]
+    },
+    {
+      "cityID": "7101",
+      "fileName": "stations.csv",
+      "description": "臺北捷運車站資料",
+      "sourceURL": "https://data.taipei/api/dataset/1eefa68d-7c8d-491b-8e75-66a161947426/resource/c77e91bf-067c-475e-917b-545ff62b7d76/download",
+      "datasetLandingPageURL": "https://data.gov.tw/dataset/131734",
+      "sourceEncoding": "UTF-8",
+      "sizeBytes": 13656,
+      "sha256": "54df946e16e4566856250162102a6d1fe500de22ec84a4a43402bfbb190587c6",
+      "csvRecordCount": 109,
+      "headers": [
+        "SEQNO",
+        "StationID",
+        "StationName",
+        "StationPosition",
+        "StationAddress",
+        "BikeAllowOnHoliday",
+        "UpdateTime"
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@
     "MIT",
     "ODbL-1.0",
     "LicenseRef-DATA-GOV-HK-1.2",
+    "LicenseRef-OGDL-TW-1.0",
     "LicenseRef-External-Link-Only",
     "CC-BY-2.0",
     "CC0-1.0"
@@ -39,6 +40,16 @@
       "sourceURL": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
       "attribution": "MTR Corporation Limited and DATA.GOV.HK",
       "redistribution": "Custom DATA.GOV.HK Terms of Use v1.2 apply; attribution and source identification are required."
+    },
+    {
+      "id": "taipei-open-data",
+      "kind": "dataset",
+      "scope": "DataPacks/sources/7101 Taipei Metro station and station-exit datasets, and the exit names, positions and barrier-free flags derived from them",
+      "licenseSPDX": "LicenseRef-OGDL-TW-1.0",
+      "licenseURL": "https://data.gov.tw/license",
+      "sourceURL": "https://data.gov.tw/dataset/128428",
+      "attribution": "臺北大眾捷運股份有限公司 / 臺北市資料大平臺 (data.taipei)",
+      "redistribution": "Open Government Data License, Taiwan, version 1.0 permits redistribution, commercial use and derivative works. Attribution is mandatory: omitting it voids the licence grant retroactively."
     },
     {
       "id": "beijing-official-landing-links",
@@ -122,7 +133,8 @@
         "macau-official-landing-link",
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -139,6 +151,25 @@
       "path": "DataPacks/rights_inventory.json",
       "rightsIDs": [
         "justgo-generated-catalog"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/7101/metadata.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "taipei-open-data"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/7101/station_exits.csv",
+      "rightsIDs": [
+        "taipei-open-data"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/7101/stations.csv",
+      "rightsIDs": [
+        "taipei-open-data"
       ]
     },
     {
@@ -208,7 +239,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -221,7 +253,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -234,7 +267,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -247,7 +281,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -260,7 +295,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -273,7 +309,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -286,7 +323,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -299,7 +337,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -312,7 +351,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -325,7 +365,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -338,7 +379,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -351,7 +393,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -364,7 +407,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -377,7 +421,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -390,7 +435,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -403,7 +449,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -416,7 +463,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -429,7 +477,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -442,7 +491,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -455,7 +505,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -468,7 +519,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -481,7 +533,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -494,7 +547,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -507,7 +561,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -520,7 +575,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -533,7 +589,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -546,7 +603,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -559,7 +617,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -572,7 +631,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -585,7 +645,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -598,7 +659,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -611,7 +673,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -624,7 +687,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -637,7 +701,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -650,7 +715,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -663,7 +729,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -676,7 +743,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -689,7 +757,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -702,7 +771,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -715,7 +785,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -728,7 +799,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -741,7 +813,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -754,7 +827,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -767,7 +841,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -780,7 +855,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -793,7 +869,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -806,7 +883,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -819,7 +897,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -832,7 +911,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -845,7 +925,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -858,7 +939,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -871,7 +953,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -884,7 +967,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -897,7 +981,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -910,7 +995,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -923,7 +1009,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -936,7 +1023,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -949,7 +1037,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -962,7 +1051,8 @@
         "media-central-qqhhss",
         "media-jianguomen-ian-holton",
         "official-transit-resource-links",
-        "osm-metro-networks"
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {
@@ -972,6 +1062,14 @@
         "justgo-generated-catalog",
         "media-jianguomen-ian-holton",
         "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/7101.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks",
+        "taipei-open-data"
       ]
     },
     {

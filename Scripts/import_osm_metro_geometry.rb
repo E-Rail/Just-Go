@@ -8,6 +8,7 @@ require "json"
 require "net/http"
 require "set"
 require "uri"
+require_relative "lib/gcj02"
 
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-metro")
@@ -132,8 +133,6 @@ CITIES = {
 
 EARTH_RADIUS = 6_371_000.0
 PI = Math::PI
-GCJ_A = 6_378_245.0
-GCJ_EE = 0.006693421622965943
 
 def fail_with(message)
   warn "OSM metro import failed: #{message}"
@@ -538,35 +537,8 @@ def fetch_source(city_id, city, refresh:)
   JSON.parse(response.body)
 end
 
-def outside_china?(latitude, longitude)
-  longitude < 72.004 || longitude > 137.8347 || latitude < 0.8293 || latitude > 55.8271
-end
-
-def transform_latitude(x, y)
-  -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(x.abs) +
-    (20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2 / 3 +
-    (20 * Math.sin(y * PI) + 40 * Math.sin(y / 3 * PI)) * 2 / 3 +
-    (160 * Math.sin(y / 12 * PI) + 320 * Math.sin(y * PI / 30)) * 2 / 3
-end
-
-def transform_longitude(x, y)
-  300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(x.abs) +
-    (20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2 / 3 +
-    (20 * Math.sin(x * PI) + 40 * Math.sin(x / 3 * PI)) * 2 / 3 +
-    (150 * Math.sin(x / 12 * PI) + 300 * Math.sin(x / 30 * PI)) * 2 / 3
-end
-
 def wgs84_to_gcj02(latitude, longitude)
-  return [latitude, longitude] if outside_china?(latitude, longitude)
-
-  delta_latitude = transform_latitude(longitude - 105, latitude - 35)
-  delta_longitude = transform_longitude(longitude - 105, latitude - 35)
-  radians = latitude / 180 * PI
-  magic = 1 - GCJ_EE * Math.sin(radians)**2
-  sqrt_magic = Math.sqrt(magic)
-  delta_latitude = delta_latitude * 180 / ((GCJ_A * (1 - GCJ_EE)) / (magic * sqrt_magic) * PI)
-  delta_longitude = delta_longitude * 180 / (GCJ_A / sqrt_magic * Math.cos(radians) * PI)
-  [latitude + delta_latitude, longitude + delta_longitude]
+  GCJ02.from_wgs84(latitude, longitude)
 end
 
 def meters_between(a, b)

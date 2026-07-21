@@ -136,6 +136,17 @@ struct TransitDataView: View {
                         ),
                         url: URL(string: "https://data.gov.hk/en/terms-and-conditions")!
                     )
+                    // The Open Government Data License requires naming the providing agency and
+                    // linking the licence; the grant is void without it, so this row is not optional.
+                    attributionLink(
+                        title: "臺北大眾捷運股份有限公司 · data.taipei",
+                        detail: AppLocalization.text(
+                            english: "Open Government Data License, Taiwan, v1.0",
+                            simplified: "政府资料开放授权条款第 1 版",
+                            traditional: "政府資料開放授權條款第 1 版"
+                        ),
+                        url: URL(string: "https://data.gov.tw/license")!
+                    )
                 } header: {
                     Text(AppLocalization.text(
                         english: "Data Attribution",

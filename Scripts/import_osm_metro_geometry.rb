@@ -277,6 +277,19 @@ def combined_service?(combined, component, evidence)
   evidence[:stationContainment] >= 0.9 || evidence[:trackContainment] >= 0.5
 end
 
+# A through-running service split into two logical lines with no shared name at all (e.g.
+# Shenzhen 2号线/8号线): neither `same_named_service?` nor `combined_service?` can fire because
+# there is no textual overlap to key on. The identical station set plus identical published
+# line colour is what a rider actually uses to recognise "this is one line" — and unlike name
+# matching, an exact station-set match is definitionally the same physical corridor, so this
+# rule is safe to apply generally rather than special-casing any one city.
+def same_corridor_service?(left, right)
+  return false if left[:stations].empty? || left[:stations] != right[:stations]
+  return false if left[:color].nil? || left[:color] != right[:color]
+
+  network_compatible?(left, right)
+end
+
 def profile_summary(profile)
   {
     "relationID" => profile[:id],
@@ -308,6 +321,7 @@ def canonicalize_relations(relations, elements_by_key, ways)
   end
   accepted = []
   rejected = []
+  same_corridor_indices = Set.new
 
   profiles.each_index.to_a.combination(2) do |left_index, right_index|
     left = profiles[left_index]
@@ -319,9 +333,12 @@ def canonicalize_relations(relations, elements_by_key, ways)
                "sameName"
              elsif combined_service?(left, right, evidence) || combined_service?(right, left, evidence)
                "combinedService"
+             elsif same_corridor_service?(left, right)
+               "sameCorridor"
              end
     if reason
       union.call(left_index, right_index)
+      same_corridor_indices.merge([left_index, right_index]) if reason == "sameCorridor"
       accepted << {
         "left" => profile_summary(left),
         "right" => profile_summary(right),
@@ -344,9 +361,14 @@ def canonicalize_relations(relations, elements_by_key, ways)
     end
   end
 
-  groups = profiles.each_index.group_by { |index| find.call(index) }.values.map do |indices|
-    indices.map { |index| profiles[index] }
-  end
+  index_groups = profiles.each_index.group_by { |index| find.call(index) }.values
+  groups = index_groups.map { |indices| indices.map { |index| profiles[index] } }
+  # Whether this group's *only* connection to a same-name-covering profile is the sameCorridor
+  # rule — used to gate `display_line_name` synthesis so an ordinary two-direction line (whose
+  # direction relations already merge via `structuredIdentity`/`sameName` and happen to share a
+  # station set too) keeps its single representative name instead of getting every direction's
+  # raw OSM name concatenated together.
+  same_corridor_groups = index_groups.map { |indices| indices.any? { |index| same_corridor_indices.include?(index) } }
   structured_groups = {}
   groups.each_with_index do |group, group_index|
     group.each do |profile|
@@ -359,7 +381,7 @@ def canonicalize_relations(relations, elements_by_key, ways)
   end
   ambiguous = rejected.select { |candidate| candidate["ambiguous"] }
   fail_with("ambiguous logical-line candidates: #{ambiguous.map { |candidate| "#{candidate.dig("left", "relationID")}/#{candidate.dig("right", "relationID")}" }.join(", ")}") unless ambiguous.empty?
-  [groups, { "acceptedMerges" => accepted, "rejectedCandidates" => rejected }]
+  [groups, same_corridor_groups, { "acceptedMerges" => accepted, "rejectedCandidates" => rejected }]
 end
 
 def canonical_profile(profiles)
@@ -394,6 +416,28 @@ def canonical_route_reference(profiles, canonical)
   counts = Hash.new(0)
   profiles.each { |profile| counts[profile[:route_ref]] += 1 unless profile[:route_ref].empty? }
   counts.max_by { |reference, count| [count, reference.length, reference] }&.first.to_s
+end
+
+# Existing merges (`sameName`, `structuredIdentity`, `combinedService`) always leave a single
+# profile whose own name already covers every merged profile — either they all share one name,
+# or (for `combinedService`) one relation is tagged with the slash-joined name already, and
+# `canonical_profile` prefers it for having the most name tokens. `sameCorridor` is the one
+# merge kind where no profile's name covers the others (Shenzhen's 2号线 and 8号线 relations
+# each carry only their own single-token name), so the display name has to be synthesised.
+def display_line_name(profiles, canonical, same_corridor)
+  return canonical[:name] if canonical[:name_tokens].length > 1
+  # Only synthesise a combined name for a group that merged *because of* the sameCorridor rule
+  # (two logical lines with no textual overlap, unioned solely on identical stations + colour,
+  # e.g. Shenzhen 2号线/8号线). An ordinary two-direction line's relations already merge via
+  # `structuredIdentity`/`sameName` and also happen to share a station set — synthesising there
+  # would concatenate every direction's raw OSM name (seen on Taiyuan/Changzhou/Hefei/Luoyang
+  # etc., whose direction relations are tagged with distinct from/to-suffixed names).
+  return canonical[:name] unless same_corridor
+
+  by_key = profiles.each_with_object({}) { |profile, names| names[profile[:name_key]] ||= profile[:name] }
+  return canonical[:name] if by_key.length <= 1
+
+  by_key.values.sort_by { |name| [name.length, name] }.join("/")
 end
 
 def line_id(city_id, key)
@@ -734,6 +778,7 @@ def select_service_relations(relations, elements_by_key, ways)
   patterns = passenger_service_patterns(relations, elements_by_key)
   selected_nodes = Set.new
   decisions = []
+  extra_geometry_ways = []
   selections = patterns.map do |pattern|
     candidates = pattern[:candidates]
     selected = candidates.max_by do |relation|
@@ -756,10 +801,24 @@ def select_service_relations(relations, elements_by_key, ways)
       "uniqueTrackNodes" => (nodes - selected_nodes).length
     }
     selected_nodes.merge(nodes)
+
+    # Rendering-only recovery. A candidate lands in this group either because it shares the
+    # group's founding station set exactly (a plain reverse-direction duplicate — same stops,
+    # parallel track, already fully represented by whichever direction got selected) or because
+    # it was folded in by `passenger_service_patterns`'s subset/terminal merge despite having a
+    # *different* station set (it skips or adds a stop the other direction doesn't — physically
+    # divergent track, e.g. an airport line's one-way loop through a second terminal). Only the
+    # latter's track is missing from the map today, so only it gets unioned back in.
+    candidates.each do |candidate|
+      next if candidate.equal?(selected)
+      next if relation_station_names(candidate, elements_by_key).to_set == pattern[:stations]
+
+      extra_geometry_ways.concat(relation_track_ways(candidate, ways))
+    end
     selected
   end
   validate_selected_corridors!(selections, elements_by_key, ways)
-  [selections, patterns.length, decisions]
+  [selections, patterns.length, decisions, extra_geometry_ways.uniq { |way| way["id"] }.sort_by { |way| way["id"] }]
 end
 
 def canonical_path_key(path)
@@ -781,11 +840,11 @@ def build_network(city_id, city, source)
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
   end
-  groups, canonicalization_report = canonicalize_relations(passenger_relations, elements_by_key, ways)
+  groups, same_corridor_groups, canonicalization_report = canonicalize_relations(passenger_relations, elements_by_key, ways)
   service_pattern_decisions = []
 
   station_groups = {}
-  lines = groups.map do |profiles|
+  lines = groups.zip(same_corridor_groups).map do |profiles, same_corridor|
     canonical = canonical_profile(profiles)
     direction_relations = profiles.map { |profile| profile[:relation] }
     canonical_network = canonical[:network].empty? ? "unknown" : canonical[:network]
@@ -796,7 +855,7 @@ def build_network(city_id, city, source)
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
-    selected_relations, service_pattern_count, pattern_decisions =
+    selected_relations, service_pattern_count, pattern_decisions, extra_geometry_ways =
       select_service_relations(direction_relations, elements_by_key, ways)
     service_pattern_decisions.concat(pattern_decisions.map { |decision| decision.merge("logicalLineID" => id) })
     member_ways = selected_relations.flat_map { |relation| relation_track_ways(relation, ways) }
@@ -804,7 +863,17 @@ def build_network(city_id, city, source)
     seen_paths = Set.new
     node_paths = join_way_paths(member_ways).select { |path| seen_paths.add?(canonical_path_key(path)) }
     track_station_patterns = physical_station_patterns(node_paths, pattern_station_nodes)
-    coordinate_paths = node_paths.map do |path|
+    # Rendering geometry only: `extra_geometry_ways` is the track belonging to a direction
+    # relation that select_service_relations folded away because it shares a group with the
+    # selected relation, but which physically diverges from it (see the comment there) — e.g.
+    # 首都机场线's one-way loop through T2 that the selected direction never visits. Union it in
+    # here so the drawn line is complete. `track_station_patterns` above (and hence the routing
+    # graph) is computed from `selected_relations` alone and is untouched by this.
+    geometry_ways = (member_ways + extra_geometry_ways).uniq { |way| way["id"] }.sort_by { |way| way["id"] }
+    geometry_seen_paths = Set.new
+    geometry_node_paths = join_way_paths(geometry_ways)
+      .select { |path| geometry_seen_paths.add?(canonical_path_key(path)) }
+    coordinate_paths = geometry_node_paths.map do |path|
       coordinates = path.map { |node_id| nodes[node_id] }.compact.map do |coordinate|
         output_coordinate(city_id, *coordinate)
       end
@@ -849,7 +918,7 @@ def build_network(city_id, city, source)
       "logicalLineID" => id,
       "networkIdentity" => canonical_network,
       "routeReference" => route_reference,
-      "name" => canonical[:name],
+      "name" => display_line_name(profiles, canonical, same_corridor),
       "nameEn" => canonical[:relation].dig("tags", "name:en")&.split(/[:→]/, 2)&.first&.strip,
       "colorHex" => canonical_color(profiles, canonical),
       "stationIDs" => [],

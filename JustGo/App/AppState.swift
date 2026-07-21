@@ -92,9 +92,6 @@ final class AppState {
     func advanceLaunch(to stage: LaunchStage) {
         guard stage > launchStage else { return }
         launchStage = stage
-        #if DEBUG
-        MainThreadHangMonitor.mark("launch.\(stage)")
-        #endif
     }
 
     init(userDefaults: UserDefaults = .standard) {

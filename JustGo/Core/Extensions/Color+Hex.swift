@@ -3,8 +3,6 @@ import UIKit
 import Foundation
 
 extension Color {
-    static let appAccent = Color(hex: "#2D7055")
-
     static let appBackground = Color(UIColor { traits in
         traits.userInterfaceStyle == .dark
             ? UIColor(red: 0.06, green: 0.12, blue: 0.08, alpha: 1)   // #0F1F14 dark forest

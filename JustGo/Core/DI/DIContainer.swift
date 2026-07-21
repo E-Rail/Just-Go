@@ -147,52 +147,19 @@ final class DIContainer {
 
     @MainActor
     static func configure() -> DIContainer {
-        // Per-service marks: `DIContainer.configure()` measured 1551ms on a physical device but
-        // only tens of ms in the simulator, so which service costs that has to be read off real
-        // hardware rather than inferred here. DEBUG-only, no behaviour attached.
-        #if DEBUG
-        let locationService = MainThreadHangMonitor.measure("svc.LocationService") { LocationService() }
-        let placeSearchProvider = MainThreadHangMonitor.measure("svc.PlaceSearch") { MapKitPlaceSearchProvider() }
-        let metroNetworkProvider = MainThreadHangMonitor.measure("svc.MetroNetwork") { BundledMetroNetworkService() }
-        #else
         let locationService = LocationService()
         let placeSearchProvider = MapKitPlaceSearchProvider()
         let metroNetworkProvider = BundledMetroNetworkService()
-        #endif
         // Dedicated ephemeral sessions (no cookies, no shared cache) instead of `URLSession.shared`
         // — a stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
         // traffic, matching the pattern already used for the Beijing station-info provider.
-        #if DEBUG
-        let realtimeArrivalProvider = MainThreadHangMonitor.measure("svc.RealtimeArrivals") {
-            HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
-        }
-        let stationInformationDiskCache = MainThreadHangMonitor.measure("svc.StationInfoDiskCache") {
-            OfficialStationInformationDiskCache()
-        }
-        let officialStationInformationProvider = MainThreadHangMonitor.measure("svc.BeijingStationInfo") {
-            BeijingStationInformationProvider(diskCache: stationInformationDiskCache)
-        }
-        #else
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
         let stationInformationDiskCache = OfficialStationInformationDiskCache()
         let officialStationInformationProvider = BeijingStationInformationProvider(
             diskCache: stationInformationDiskCache
         )
-        #endif
         // The bundled catalog decode + validation is heavy; hand the service a loader so it
         // runs lazily on the actor instead of blocking app launch on the main thread here.
-        #if DEBUG
-        let officialStationData = MainThreadHangMonitor.measure("svc.OfficialCityPack") {
-            OfficialCityPackService(
-                session: Self.makeEphemeralSession(),
-                metroNetworks: metroNetworkProvider,
-                realtimeArrivals: realtimeArrivalProvider,
-                officialResourceCatalogLoader: { try .bundled() }
-            )
-        }
-        let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
-        let cityService = MainThreadHangMonitor.measure("svc.CityService") { CityService() }
-        #else
         let officialStationData = OfficialCityPackService(
             session: Self.makeEphemeralSession(),
             metroNetworks: metroNetworkProvider,
@@ -201,7 +168,6 @@ final class DIContainer {
         )
         let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
         let cityService = CityService()
-        #endif
         let stationSearchService = StationSearchService(
             placeSearchProvider: placeSearchProvider,
             officialStationData: officialStationData,
@@ -215,19 +181,11 @@ final class DIContainer {
             officialStationData: officialStationData,
             comfortForecastService: comfortForecastService
         )
-        #if DEBUG
-        let tripMemoryService = MainThreadHangMonitor.measure("svc.TripMemory") { TripMemoryService() }
-        #else
         let tripMemoryService = TripMemoryService()
-        #endif
         let aiReportService = AIReportService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
-        #if DEBUG
-        let tripReminderService = MainThreadHangMonitor.measure("svc.TripReminder") { TripReminderService() }
-        #else
         let tripReminderService = TripReminderService()
-        #endif
 
         let container = DIContainer(
             locationService: locationService,

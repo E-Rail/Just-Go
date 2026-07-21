@@ -104,13 +104,6 @@ final class StationSearchService {
         return await officialStationData.matchingStation(place: place, cityID: city)
     }
 
-    func stationDetails(stationID: String, city: String) async throws -> Station {
-        guard let station = try await search(keyword: stationID, city: city).first else {
-            throw RoutePlanningError.stationNotFound
-        }
-        return await officialStationData.enrichStation(station)
-    }
-
     func filterStations(
         _ stations: [Station],
         by filter: StationFilter

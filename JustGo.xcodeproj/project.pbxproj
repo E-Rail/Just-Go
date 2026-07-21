@@ -89,7 +89,6 @@
 		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
 		A1000313 /* Map/MapItemDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000313 /* Map/MapItemDetailSheet.swift */; };
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
-		A1000400 /* Route/StepMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000400 /* Route/StepMapPreview.swift */; };
 		A1000401 /* Onboarding/OnboardingTourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000401 /* Onboarding/OnboardingTourView.swift */; };
 		A1000075 /* Onboarding/LaunchStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000075 /* Onboarding/LaunchStageView.swift */; };
 		A1000402 /* Transit/IndoorStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000402 /* Transit/IndoorStep.swift */; };
@@ -214,7 +213,6 @@
 		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
 		A2000313 /* Map/MapItemDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapItemDetailSheet.swift; sourceTree = "<group>"; };
 		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
-		A2000400 /* Route/StepMapPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/StepMapPreview.swift; sourceTree = "<group>"; };
 		A2000401 /* Onboarding/OnboardingTourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/OnboardingTourView.swift; sourceTree = "<group>"; };
 		A2000075 /* Onboarding/LaunchStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/LaunchStageView.swift; sourceTree = "<group>"; };
 		A2000402 /* Transit/IndoorStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/IndoorStep.swift; sourceTree = "<group>"; };
@@ -391,7 +389,6 @@
 				A2000308 /* Route/LiveGoView.swift */,
 				A2000070 /* Route/SmartCommuteCard.swift */,
 				A2000072 /* Route/TransferStationSheet.swift */,
-				A2000400 /* Route/StepMapPreview.swift */,
 				A2000403 /* Route/IndoorStepGoView.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
@@ -644,7 +641,6 @@
 				A1000071 /* Map/NetworkLineStatusView.swift in Sources */,
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
-				A1000400 /* Route/StepMapPreview.swift in Sources */,
 				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,
 				A1000075 /* Onboarding/LaunchStageView.swift in Sources */,
 				A1000402 /* Transit/IndoorStep.swift in Sources */,

@@ -52,9 +52,6 @@ struct MapContainerView: View {
             mapContent
         }
         .task(id: appState.selectedCity?.id) {
-            #if DEBUG
-            LaunchClock.mark("map.task.begin")
-            #endif
             if viewModel == nil {
                 viewModel = container.makeMapViewModel()
             }

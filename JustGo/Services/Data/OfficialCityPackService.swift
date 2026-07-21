@@ -1917,10 +1917,6 @@ private struct OfficialManifestCity: Codable, Sendable {
         hasDownload && hasValidPackIntegrity
     }
 
-    var hasValidIndoorMapsContract: Bool {
-        hasValidIntegrityMetadata(sizeBytes: indoorMapsSizeBytes, sha256: indoorMapsSHA256)
-    }
-
     var hasBundledPack: Bool {
         bundledResource?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }

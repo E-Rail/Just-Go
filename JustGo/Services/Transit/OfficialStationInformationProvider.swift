@@ -69,14 +69,6 @@ enum OfficialStationInformationSource: Sendable, Equatable, Codable {
         }
     }
 
-    var isOnline: Bool {
-        switch self {
-        case .beijingSubwayOnline:
-            return true
-        case .hongKongGovernment:
-            return true
-        }
-    }
 }
 
 struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable, Codable {

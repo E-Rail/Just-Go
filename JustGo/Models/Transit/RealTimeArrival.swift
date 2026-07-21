@@ -137,7 +137,4 @@ struct RealTimeArrival: Identifiable, Codable, Sendable, Equatable {
         source == .liveCountdown
     }
 
-    var hasLiveCountdown: Bool {
-        isLiveArrival && minutesRemaining != nil
-    }
 }

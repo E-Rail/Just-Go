@@ -124,26 +124,6 @@ struct FullScreenRouteMapView: View {
     }
 }
 
-struct StatItem: View {
-    let title: String
-    let value: String
-    let icon: String
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline)
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 /// Single source of truth for how a `DataConfidence` reads visually — fixed semantic
 /// indicators (official/verified = green, anything estimated/pending/personal = orange,
 /// unavailable = red, unknown = gray), intentionally not theme-tinted. Shared by

@@ -163,7 +163,6 @@ private final class NormalizedStationIndexBox {
 
 protocol MetroNetworkProviding {
     func network(for cityID: String) async -> MetroNetwork?
-    func networks() async -> [MetroNetwork]
     func networkSummaries() async -> [MetroNetworkSummary]
     func stations(in cityID: String) async -> [Station]
 }
@@ -171,10 +170,6 @@ protocol MetroNetworkProviding {
 extension MetroNetworkProviding {
     func stations(in cityID: String) async -> [Station] {
         await network(for: cityID)?.displayStations ?? []
-    }
-
-    func networks() async -> [MetroNetwork] {
-        []
     }
 
     func networkSummaries() async -> [MetroNetworkSummary] {
@@ -219,10 +214,6 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             missingCityIDs.insert(cityID)
             return nil
         }
-    }
-
-    func networks() async -> [MetroNetwork] {
-        await fanOut { await self.network(for: $0) }
     }
 
     func stations(in cityID: String) async -> [Station] {

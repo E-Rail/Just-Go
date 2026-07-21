@@ -51,20 +51,5 @@ enum MainThreadHangMonitor {
         }
         return try work()
     }
-
-    /// Logs elapsed wall-clock since `start`, unconditionally. `measure` can only wrap a
-    /// synchronous scope, so async stages — which is most of the launch and map load — need
-    /// this instead, and they need it even when they come in fast (an ordering claim is only
-    /// evidence if the quick case is logged too).
-    static func note(_ label: String, since start: Date) {
-        let elapsed = Date().timeIntervalSince(start) * 1000
-        log.error("JUSTGOSTAGE \(label, privacy: .public) \(Int(elapsed))ms")
-    }
-
-    /// Timestamps a point-in-time event. Used to establish ordering between stages that each
-    /// take no measurable time themselves but must land in a particular sequence.
-    static func mark(_ label: String) {
-        log.error("JUSTGOMARK \(label, privacy: .public)")
-    }
 }
 #endif

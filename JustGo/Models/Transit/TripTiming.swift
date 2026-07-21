@@ -53,21 +53,6 @@ enum RouteServiceStatus: Equatable {
     case notYetStarted(startsAtText: String?)
     case unknown
 
-    var isServiceUsable: Bool {
-        switch self {
-        case .running, .lastTrainSoon:
-            return true
-        case .serviceEndedToday, .notYetStarted, .unknown:
-            return false
-        }
-    }
-
-    /// True for any state that should influence confidence/feasibility/UI (i.e. not `.unknown`).
-    var affectsConfidence: Bool {
-        if case .unknown = self { return false }
-        return true
-    }
-
     /// The warning type to surface on the route, if any.
     var warningType: RouteWarning.WarningType? {
         switch self {

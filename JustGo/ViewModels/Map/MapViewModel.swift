@@ -72,10 +72,6 @@ final class MapViewModel {
         markerRefreshTask?.cancel()
     }
 
-    var userLocation: CLLocationCoordinate2D? {
-        locationService.currentLocation?.coordinate
-    }
-
     func loadStations(for city: City) async {
         activeCityID = city.id
         let keepUserCamera = pendingUserCameraCityID == city.id
@@ -274,9 +270,6 @@ final class MapViewModel {
         metroNetworks = loadedByCity.values
             .filter { $0.bounds.intersects(region) }
             .sorted { $0.cityID < $1.cityID }
-        #if DEBUG
-        MainThreadHangMonitor.mark("map.lines gen=\(generation) cities=\(metroNetworks.count)")
-        #endif
 
         // Stage 2 — station markers.
         var loadedStationsByCity: [String: [Station]] = [:]
@@ -296,9 +289,6 @@ final class MapViewModel {
         stationsByCity.merge(loadedStationsByCity) { _, new in new }
         stationsByCity = stationsByCity.filter { requested.contains($0.key) }
         refreshVisibleStations()
-        #if DEBUG
-        MainThreadHangMonitor.mark("map.markers gen=\(generation) stations=\(stations.count)")
-        #endif
     }
 
     /// Debounce the viewport-driven refresh so it runs once panning briefly settles instead of

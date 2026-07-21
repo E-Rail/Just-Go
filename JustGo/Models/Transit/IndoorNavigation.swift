@@ -280,27 +280,6 @@ struct MapImageCalibration: Codable, Equatable {
     let scaleMetersPerPoint: Double
 }
 
-struct PlatformStopProfile: Codable, Equatable {
-    let stationID: String
-    let lineName: String
-    let directionText: String?
-    let platformID: String
-    let carCount: Int
-    let doorsPerCar: Int
-    let stoppingOffsetMeters: Double
-    let doorPositions: [PlatformDoorPosition]
-    let accessibleBoardingZones: [String]
-    let confidence: DataConfidence
-}
-
-struct PlatformDoorPosition: Identifiable, Codable, Equatable {
-    let id: String
-    let carNumber: Int
-    let doorNumber: Int
-    let nodeID: String?
-    let offsetMeters: Double
-}
-
 struct TransferPathHint: Codable, Equatable {
     let stationID: String
     let fromLineName: String?

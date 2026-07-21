@@ -410,10 +410,6 @@ final class RoutePlannerViewModel {
         route.departurePlan(anchor: tripAnchor)
     }
 
-    func tripTimeContext(for route: Route) -> TripTimeContext {
-        TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
-    }
-
     func swapOriginDestination() {
         invalidateInFlightSearch()
         suggestionTask?.cancel()
@@ -466,11 +462,6 @@ final class RoutePlannerViewModel {
         }
         let trimmed = destinationName.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : TransitPlaceSnapshot(name: trimmed)
-    }
-
-    func deleteRecentRoutes(at offsets: IndexSet) {
-        recentRoutes.remove(atOffsets: offsets)
-        UserDefaults.standard.setCodable(recentRoutes, forKey: recentRoutesKey)
     }
 
     private var accessibilityPreferences: AccessibilityPreference {

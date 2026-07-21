@@ -37,14 +37,28 @@ struct TransitMapView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> MKMapView {
+        #if DEBUG
+        let mapView = MainThreadHangMonitor.measure("MKMapView.init") { MKMapView(frame: .zero) }
+        #else
         let mapView = MKMapView(frame: .zero)
+        #endif
         mapView.delegate = context.coordinator
         mapView.showsCompass = true
         mapView.showsScale = true
         mapView.pointOfInterestFilter = .includingAll
         mapView.selectableMapFeatures = [.pointsOfInterest]
+        #if DEBUG
+        MainThreadHangMonitor.measure("MKMapView.configure") {
+            mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
+        }
+        MainThreadHangMonitor.measure("MKMapView.firstSync") {
+            context.coordinator.sync(parent: self, on: mapView)
+        }
+        LaunchClock.mark("map.makeUIView.end")
+        #else
         mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
         context.coordinator.sync(parent: self, on: mapView)
+        #endif
         return mapView
     }
 

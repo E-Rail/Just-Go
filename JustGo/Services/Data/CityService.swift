@@ -52,8 +52,15 @@ final class CityService {
         City(id: "3402", name: "芜湖", nameEn: "Wuhu", namePinyin: "wuhu", latitude: 31.3526, longitude: 118.4331, stationCount: 35, lineCount: 2),
         City(id: "3206", name: "南通", nameEn: "Nantong", namePinyin: "nantong", latitude: 31.9802, longitude: 120.8943, stationCount: 28, lineCount: 1),
         City(id: "3310", name: "台州", nameEn: "Taizhou", namePinyin: "taizhou", latitude: 28.656, longitude: 121.4208, stationCount: 15, lineCount: 1),
+        City(id: "3307", name: "金华", nameEn: "Jinhua", namePinyin: "jinhua", latitude: 29.0784, longitude: 119.6474, stationCount: 30, lineCount: 2),
+        City(id: "4110", name: "许昌", nameEn: "Xuchang", namePinyin: "xuchang", latitude: 34.0357, longitude: 113.8526, stationCount: 26, lineCount: 1),
+        City(id: "3411", name: "滁州", nameEn: "Chuzhou", namePinyin: "chuzhou", latitude: 32.3017, longitude: 118.3068, stationCount: 14, lineCount: 1),
         City(id: "8100", name: "香港", nameEn: "Hong Kong", namePinyin: "xianggang", latitude: 22.3193, longitude: 114.1694, stationCount: 162, lineCount: 22),
-        City(id: "8200", name: "澳门", nameEn: "Macau", namePinyin: "aomen", latitude: 22.1987, longitude: 113.5439, stationCount: 15, lineCount: 3)
+        City(id: "8200", name: "澳门", nameEn: "Macau", namePinyin: "aomen", latitude: 22.1987, longitude: 113.5439, stationCount: 15, lineCount: 3),
+        City(id: "7101", name: "台北", nameEn: "Taipei", namePinyin: "taibei", latitude: 25.033, longitude: 121.5654, stationCount: 151, lineCount: 10),
+        City(id: "7102", name: "高雄", nameEn: "Kaohsiung", namePinyin: "gaoxiong", latitude: 22.6273, longitude: 120.3014, stationCount: 75, lineCount: 3),
+        City(id: "7106", name: "桃园", nameEn: "Taoyuan", namePinyin: "taoyuan", latitude: 24.9937, longitude: 121.301, stationCount: 22, lineCount: 1),
+        City(id: "7104", name: "台中", nameEn: "Taichung", namePinyin: "taizhong", latitude: 24.1477, longitude: 120.6736, stationCount: 18, lineCount: 1)
     ]
 
     func getAllCities() -> [City] {

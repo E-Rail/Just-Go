@@ -1116,6 +1116,12 @@
       ]
     },
     {
+      "path": "JustGo/Resources/MetroNetworks/3307.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
       "path": "JustGo/Resources/MetroNetworks/3310.json",
       "rightsIDs": [
         "osm-metro-networks"
@@ -1129,6 +1135,12 @@
     },
     {
       "path": "JustGo/Resources/MetroNetworks/3402.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/3411.json",
       "rightsIDs": [
         "osm-metro-networks"
       ]
@@ -1171,6 +1183,12 @@
     },
     {
       "path": "JustGo/Resources/MetroNetworks/4103.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/4110.json",
       "rightsIDs": [
         "osm-metro-networks"
       ]
@@ -1255,6 +1273,30 @@
     },
     {
       "path": "JustGo/Resources/MetroNetworks/6501.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/7101.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/7102.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/7104.json",
+      "rightsIDs": [
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/MetroNetworks/7106.json",
       "rightsIDs": [
         "osm-metro-networks"
       ]

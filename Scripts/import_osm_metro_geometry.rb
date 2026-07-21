@@ -100,7 +100,34 @@ CITIES = {
   "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
   "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"], own_unknown_lines: [] },
   "8100" => { name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [] },
-  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] }
+  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] },
+  # Taipei's three busiest lines (板南, 文湖, 淡水信義) carry no network/operator tag in OSM and
+  # exist *only* as untagged relations — without naming them here the city would import with its
+  # core network missing. They are listed rather than `allow_unknown` because the same bbox also
+  # holds the untagged 貓空纜車 gondola, which is not rail. 新北捷運/淡海輕軌 are the New Taipei
+  # half of the same metro system; 桃園捷運 is excluded here and imported as Taoyuan (7106).
+  "7101" => {
+    name: "Taipei", bbox: [24.90, 121.30, 25.30, 121.80],
+    networks: ["臺北捷運", "台北捷運", "新北捷運", "淡海輕軌"],
+    own_unknown_lines: [
+      "臺北捷運 南港-板橋-土城線",
+      "捷運文湖線",
+      "淡水信義線",
+      "臺北捷運 淡水線-信義線"
+    ]
+  },
+  "7102" => { name: "Kaohsiung", bbox: [22.45, 120.15, 22.85, 120.50], networks: ["高雄捷運", "環狀輕軌"], own_unknown_lines: [] },
+  "7104" => { name: "Taichung", bbox: [24.05, 120.55, 24.35, 120.80], networks: ["臺中捷運", "台中捷運"], own_unknown_lines: [] },
+  # The bbox reaches Taipei Main Station because the Airport MRT terminates there; the
+  # allowlist keeps Taipei's own lines out.
+  "7106" => { name: "Taoyuan", bbox: [24.90, 121.15, 25.12, 121.55], networks: ["桃園捷運"], own_unknown_lines: [] },
+  # The only route relations in this bbox are the city's own 金义东线, so untagged ones are safe.
+  "3307" => { name: "Jinhua", bbox: [28.85, 119.50, 29.45, 120.45], networks: ["浙中都市圈城际轨道交通", "金华轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  # 宁滁线 is Chuzhou-operated and tagged as such; the rest of this bbox is Nanjing Metro, so
+  # untagged relations are *not* allowed through here.
+  "3411" => { name: "Chuzhou", bbox: [31.95, 118.15, 32.45, 118.70], networks: ["滁州轨道交通"], own_unknown_lines: [] },
+  # 郑许线 carries no network tag and is the only rail in the bbox.
+  "4110" => { name: "Xuchang", bbox: [33.95, 113.60, 34.45, 114.05], networks: ["许昌轨道交通", "郑许线"], allow_unknown: true, own_unknown_lines: [] }
 }.freeze
 
 EARTH_RADIUS = 6_371_000.0
@@ -137,11 +164,37 @@ def source_color(value)
   color.match?(/\A#[0-9A-F]{6}\z/) ? color : nil
 end
 
+DIRECTION_WORDS =
+  "順向|逆向|顺向|順行|逆行|顺行|上行|下行|南向|北向|東向|西向|东向|往程|返程|去程|回程|順時針|逆時針|方向"
+
+# A running direction is not a line a rider can board separately — the two directions are
+# already merged into one logical line, so carrying the annotation into the display name would
+# label the merged line with one of its halves. Matches the parenthesised forms, e.g.
+# "捷運文湖線(順向)" and "北京市郊铁路S2线 (黄土店至沙城方向)".
+LINE_DIRECTION_SUFFIX = /\s*[\(（]\s*[^()（）]*?(?:#{DIRECTION_WORDS})\s*[\)）]\s*\z/
+
+# The unparenthesised form, e.g. "臺中捷運綠線北屯總站方向". Anchored to the 線/线 that ends the
+# line name so only the trailing terminal-plus-方向 is removed.
+LINE_DIRECTION_TAIL = /(?<=線|线)[^線线]*方向\z/
+
+ROUTE_ARROW = /-->|→|=>|->/
+
 def passenger_line_name(tags)
   value = tags["name:zh"] || tags["name"] || tags["ref"] || "Metro"
   value = value.split(/[:：]/, 2).first
-  value = value.gsub(/\s*[\(（][^()（）]*(?:→|=>|->)[^()（）]*[\)）]\s*\z/, "")
-  value.split(/(?:→|=>|->)/, 2).first.strip.gsub(/\A地铁\s*/, "")
+  value = value.gsub(/\s*[\(（][^()（）]*#{ROUTE_ARROW}[^()（）]*[\)）]\s*\z/, "")
+  # "<line> <origin>→<destination>" names the run, not the line: keep only the line. Requires
+  # the arrow, so genuinely spaced names ("市郊铁路 怀密线") are left intact.
+  value = if value =~ /\A(.+?)[[:space:]]+[^[:space:]]+[[:space:]]*#{ROUTE_ARROW}/
+    Regexp.last_match(1)
+  else
+    value.split(ROUTE_ARROW, 2).first
+  end
+  value.strip
+    .gsub(/\A地铁\s*/, "")
+    .gsub(LINE_DIRECTION_SUFFIX, "")
+    .sub(LINE_DIRECTION_TAIL, "")
+    .strip
 end
 
 def line_name_tokens(value)
@@ -516,10 +569,6 @@ def wgs84_to_gcj02(latitude, longitude)
   [latitude + delta_latitude, longitude + delta_longitude]
 end
 
-def output_coordinate(city_id, latitude, longitude)
-  city_id == "8100" ? [latitude, longitude] : wgs84_to_gcj02(latitude, longitude)
-end
-
 def meters_between(a, b)
   latitude = (a[0] + b[0]) / 2 * PI / 180
   x = (b[1] - a[1]) * PI / 180 * Math.cos(latitude)
@@ -875,7 +924,7 @@ def build_network(city_id, city, source)
       .select { |path| geometry_seen_paths.add?(canonical_path_key(path)) }
     coordinate_paths = geometry_node_paths.map do |path|
       coordinates = path.map { |node_id| nodes[node_id] }.compact.map do |coordinate|
-        output_coordinate(city_id, *coordinate)
+        wgs84_to_gcj02(*coordinate)
       end
       next if coordinates.length < 2
       simplify(coordinates).map { |latitude, longitude| { "latitude" => latitude.round(6), "longitude" => longitude.round(6) } }
@@ -950,7 +999,7 @@ def build_network(city_id, city, source)
     next if station["lineIDs"].empty?
     latitude = station["coordinates"].sum { |coordinate| coordinate[0] } / station["coordinates"].length
     longitude = station["coordinates"].sum { |coordinate| coordinate[1] } / station["coordinates"].length
-    latitude, longitude = output_coordinate(city_id, latitude, longitude)
+    latitude, longitude = wgs84_to_gcj02(latitude, longitude)
     {
       "id" => Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16],
       "name" => station["name"],
@@ -997,7 +1046,7 @@ def build_network(city_id, city, source)
     "attribution" => ATTRIBUTION,
     "licenseURL" => LICENSE_URL,
     "sourceSnapshot" => Date.today.iso8601,
-    "coordinateSystem" => city_id == "8100" ? "wgs84" : "gcj02",
+    "coordinateSystem" => "gcj02",
     "sourceURLs" => [SOURCE_URL, *OVERPASS_URLS.map(&:to_s)],
     "lines" => lines.sort_by { |line| line["name"] },
     "stations" => stations.sort_by { |station| station["name"] }
@@ -1055,8 +1104,12 @@ def self_test
   fail_with("disconnected path test failed") unless joined.any? { |path| path == [8, 9] }
   xidan = wgs84_to_gcj02(39.9057386, 116.3682035)
   fail_with("WGS84 to GCJ-02 test failed") unless meters_between(xidan, [39.9071187, 116.3744198]) < 1
+  # Apple's basemap is GCJ-02 across the whole of Greater China — the mainland, Hong Kong, Macau
+  # and Taiwan alike — so no city is exempt. Hong Kong was previously left in WGS-84 on the
+  # assumption that the SARs are surveyed unshifted; measured against MapKit that placed all 162
+  # Hong Kong stations about 600 m off the basemap they are drawn on.
   hong_kong = [22.397643, 114.207797]
-  fail_with("Hong Kong must remain WGS84") unless output_coordinate("8100", *hong_kong) == hong_kong
+  fail_with("Hong Kong must convert to GCJ-02") if wgs84_to_gcj02(*hong_kong) == hong_kong
   fixture_elements = {
     "node:10" => { "tags" => { "name" => "A" } },
     "node:11" => { "tags" => { "name" => "B" } },

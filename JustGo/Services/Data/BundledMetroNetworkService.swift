@@ -53,7 +53,7 @@ struct MetroStation: Codable, Equatable, Identifiable {
 
 /// Just enough of a network file to run the bounds-distance city match — decoding this instead
 /// of the full `MetroNetwork` skips allocating every candidate city's station/line/polyline
-/// arrays (the bulk of the file) for the ~44 cities that don't end up matching a given search.
+/// arrays (the bulk of the file) for the ~50 cities that don't end up matching a given search.
 struct MetroNetworkSummary: Decodable {
     let cityID: String
     let bounds: MetroBounds
@@ -178,7 +178,7 @@ extension MetroNetworkProviding {
 }
 
 actor BundledMetroNetworkService: MetroNetworkProviding {
-    private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301", "1200", "5000", "4201", "3201", "6101", "3205", "4101", "4301", "2101", "3702", "2102", "3302", "3202", "5301", "3601", "3501", "3502", "3401", "1301", "5201", "2301", "2201", "4501", "6201", "6501", "1501", "1401", "4419", "4406", "3303", "3306", "3203", "3204", "3701", "4103", "3402", "3206", "3310", "8100", "8200"]
+    private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301", "1200", "5000", "4201", "3201", "6101", "3205", "4101", "4301", "2101", "3702", "2102", "3302", "3202", "5301", "3601", "3501", "3502", "3401", "1301", "5201", "2301", "2201", "4501", "6201", "6501", "1501", "1401", "4419", "4406", "3303", "3306", "3203", "3204", "3701", "4103", "3402", "3206", "3310", "3307", "4110", "3411", "8100", "8200", "7101", "7102", "7106", "7104"]
     private var networks: [String: MetroNetwork] = [:]
     private var stationsByCity: [String: [Station]] = [:]
     private var summaries: [String: MetroNetworkSummary] = [:]
@@ -228,7 +228,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
 
     /// Cheap bounds-only pass over every supported city, for callers (route search) that need
     /// to find the nearest matching network without paying to decode-and-permanently-cache all
-    /// 46 cities' full station/line/polyline data just to compare bounding boxes.
+    /// 53 cities' full station/line/polyline data just to compare bounding boxes.
     func networkSummaries() async -> [MetroNetworkSummary] {
         await fanOut { await self.networkSummary(for: $0) }
     }

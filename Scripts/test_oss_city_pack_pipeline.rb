@@ -38,8 +38,8 @@ class OSSCityPackPipelineTest < Minitest::Test
     end.compact
     assert_equal %w[1100 8100], bundled_city_ids
     assert manifest.fetch("cities").all? { |city| city["downloadURL"].nil? }
-    assert_equal 46, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
-    assert_equal 12, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
+    assert_equal 53, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
+    assert_equal 5, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
 
     macau = manifest.fetch("cities").find { |city| city.fetch("cityID") == "8200" }
     assert_equal "source-pending", macau.fetch("version")

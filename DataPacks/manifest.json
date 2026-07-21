@@ -754,7 +754,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -768,34 +768,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 26,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 26
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 26
         }
       }
     },
@@ -1496,7 +1496,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -1510,34 +1510,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 14,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 14
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 14
         }
       }
     },
@@ -1761,7 +1761,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -1775,34 +1775,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 30,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 30
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 30
         }
       }
     },
@@ -2882,7 +2882,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -2896,34 +2896,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 151,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 151
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 151
         }
       }
     },
@@ -2935,7 +2935,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -2949,34 +2949,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 75,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 75
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 75
         }
       }
     },
@@ -2988,7 +2988,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -3002,34 +3002,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 22,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 22
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 22
         }
       }
     },
@@ -3041,7 +3041,7 @@
       "bundledResource": null,
       "downloadURL": null,
       "rightsIDs": [
-
+        "osm-metro-networks"
       ],
       "externalResources": [
 
@@ -3055,34 +3055,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 0,
+        "networkStations": 18,
         "matchedStations": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "accessibility": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 0
+          "total": 18
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 0
+          "total": 18
         }
       }
     }

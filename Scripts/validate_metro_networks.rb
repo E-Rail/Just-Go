@@ -11,7 +11,7 @@ abort "metro network validation failed: no assets" if paths.empty?
 city_service_source = File.read(File.join(ROOT, "JustGo", "Services", "Data", "CityService.swift"))
 route_picker_city_ids = city_service_source.scan(/City\(id: "(\d+)"/).flatten
 network_city_ids = paths.map { |path| File.basename(path, ".json") }
-abort "metro network validation failed: route picker must contain exactly 46 unique cities" unless route_picker_city_ids.length == 46 && route_picker_city_ids.uniq.length == 46
+abort "metro network validation failed: route picker must contain exactly 53 unique cities" unless route_picker_city_ids.length == 53 && route_picker_city_ids.uniq.length == 53
 unless route_picker_city_ids.to_set == network_city_ids.to_set
   abort "metro network validation failed: route-picker and metro-network city sets differ"
 end
@@ -45,10 +45,7 @@ paths.each do |path|
   abort "#{city}: attribution missing" unless network["attribution"].to_s.include?("OpenStreetMap")
   abort "#{city}: license missing" if network["licenseURL"].to_s.empty?
   abort "#{city}: snapshot missing" if network["sourceSnapshot"].to_s.empty?
-  expected_coordinate_system = city == "8100" ? "wgs84" : "gcj02"
-  unless network["coordinateSystem"] == expected_coordinate_system
-    abort "#{city}: coordinate system must be #{expected_coordinate_system}"
-  end
+  abort "#{city}: coordinate system must be gcj02" unless network["coordinateSystem"] == "gcj02"
 
   stations = network.fetch("stations")
   station_ids = stations.map { |station| station.fetch("id") }.to_set

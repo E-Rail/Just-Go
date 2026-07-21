@@ -292,7 +292,7 @@ extension RouteDetailView {
                     .foregroundStyle(segmentColor(segment))
                     .padding(6)
                     .background(Color.gray.opacity(0.2), in: Circle())
-            case .subway, .transit:
+            case .subway:
                 Image(systemName: "tram.fill")
                     .foregroundStyle(segmentColor(segment))
                     .padding(6)
@@ -310,7 +310,7 @@ extension RouteDetailView {
         switch segment.type {
         case .walking:
             return .gray
-        case .subway, .transit:
+        case .subway:
             return Color.adaptive(hex: segment.lineColorHex ?? "#007AFF")
         case .transfer:
             return .orange

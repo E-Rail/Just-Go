@@ -370,19 +370,8 @@ struct IndoorStepGoView: View {
         )
     }
 
-    @ViewBuilder
     private var controls: some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            VStack(spacing: 10) {
-                nextButton
-                backButton
-            }
-        } else {
-            HStack(spacing: 14) {
-                backButton
-                nextButton
-            }
-        }
+        StepControlPair(back: { backButton }, next: { nextButton })
     }
 
     private var backButton: some View {
@@ -394,13 +383,10 @@ struct IndoorStepGoView: View {
                 onBack?()
             }
         } label: {
-            Label(
-                AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"),
+            StepSecondaryButtonLabel(
+                title: AppLocalization.text(english: "Back", simplified: "上一步", traditional: "上一步"),
                 systemImage: "chevron.left"
             )
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
-            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
         .disabled(!canGoBack)
@@ -415,19 +401,13 @@ struct IndoorStepGoView: View {
                 finishIndoorGuidance()
             }
         } label: {
-            Label(
-                viewModel.canAdvance
+            StepPrimaryButtonLabel(
+                title: viewModel.canAdvance
                     ? AppLocalization.text(english: "Next", simplified: "下一步", traditional: "下一步")
                     : AppLocalization.localized("Done"),
-                systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark"
+                systemImage: viewModel.canAdvance ? "chevron.right" : "checkmark",
+                fillHex: selectedThemeHex
             )
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
-            // Raw hex, not `themeColor`: this is a solid fill under white text, and
-            // `Color.adaptive` lightens toward white in dark mode specifically for
-            // *foreground* legibility — used as a fill it collapses contrast instead.
-            .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 8))
-            .foregroundStyle(.white)
         }
         .buttonStyle(.plain)
     }

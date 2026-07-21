@@ -224,7 +224,7 @@ extension RouteSegment {
                 english: "Walk \(AppLocalization.distance(distance))",
                 chinese: "步行 \(AppLocalization.distance(distance))"
             )
-        case .subway, .transit:
+        case .subway:
             return "\(lineName ?? AppLocalization.localized("Transit")) • \(AppLocalization.stops(stops))"
         case .transfer:
             return AppLocalization.localized("Transfer")

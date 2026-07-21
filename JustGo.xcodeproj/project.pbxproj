@@ -81,6 +81,8 @@
 		A1000068 /* Route/RoutePlannerView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000068 /* Route/RoutePlannerView+Sections.swift */; };
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006B /* Components/Transit/RouteStationTimeline.swift */; };
+		A1000073 /* Components/Transit/PlatformHintRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000073 /* Components/Transit/PlatformHintRow.swift */; };
+		A1000074 /* Components/Transit/StepControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000074 /* Components/Transit/StepControls.swift */; };
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
 		A1000070 /* Route/SmartCommuteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070 /* Route/SmartCommuteCard.swift */; };
 		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
@@ -202,6 +204,8 @@
 		A2000068 /* Route/RoutePlannerView+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RoutePlannerView+Sections.swift"; sourceTree = "<group>"; };
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A200006B /* Components/Transit/RouteStationTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteStationTimeline.swift; sourceTree = "<group>"; };
+		A2000073 /* Components/Transit/PlatformHintRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/PlatformHintRow.swift; sourceTree = "<group>"; };
+		A2000074 /* Components/Transit/StepControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StepControls.swift; sourceTree = "<group>"; };
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
 		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
@@ -414,6 +418,8 @@
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
 				A200006A /* Components/Transit/RouteTabs.swift */,
 				A200006B /* Components/Transit/RouteStationTimeline.swift */,
+				A2000073 /* Components/Transit/PlatformHintRow.swift */,
+				A2000074 /* Components/Transit/StepControls.swift */,
 				A2000602 /* Components/Web/OfficialTransitResourceViewer.swift */,
 				A2000604 /* Components/QuickTagEditorSheet.swift */,
 			);
@@ -576,6 +582,8 @@
 				A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */,
 				A100006A /* Components/Transit/RouteTabs.swift in Sources */,
 				A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */,
+				A1000073 /* Components/Transit/PlatformHintRow.swift in Sources */,
+				A1000074 /* Components/Transit/StepControls.swift in Sources */,
 				A100001B /* Map/MapKitProviders.swift in Sources */,
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,
 				A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */,

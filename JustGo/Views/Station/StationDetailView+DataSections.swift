@@ -500,36 +500,12 @@ extension StationDetailView {
                             .font(.subheadline)
                             .fontWeight(.medium)
                         ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
-                            platformHintRow(hint)
+                            PlatformHintRow(hint: hint)
                         }
                     }
 
                 }
             }
-        }
-    }
-
-    private func platformHintRow(_ hint: StationPlatformHint) -> some View {
-        let parts = [hint.lineName, hint.directionText, hint.boardingCarText, hint.doorSideText]
-            .compactMap { $0 }
-            .filter { !$0.isEmpty }
-        return HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "tram.fill")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 22)
-            VStack(alignment: .leading, spacing: 2) {
-                if !parts.isEmpty {
-                    Text(parts.joined(separator: " · "))
-                        .font(.subheadline)
-                }
-                ForEach(hint.notes, id: \.self) { note in
-                    Text(note)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Spacer()
         }
     }
 

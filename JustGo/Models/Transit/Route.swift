@@ -558,11 +558,11 @@ enum TransitPlaceSource: String, Codable {
 enum SegmentType: String, Codable {
     case walking
     case subway
-    case transit
     case transfer
 
+    /// True for the segments a rider actually rides, as opposed to walking to/between them.
     var isTransit: Bool {
-        self == .transit || self == .subway
+        self == .subway
     }
 }
 

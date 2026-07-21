@@ -214,7 +214,7 @@ struct LiveGoTripBuilder {
                     segmentIndex: index,
                     transferContext: segment.transferContext
                 ))
-            case .subway, .transit:
+            case .subway:
                 steps.append(TripStep(
                     id: steps.count,
                     kind: .ride,

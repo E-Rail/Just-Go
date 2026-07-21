@@ -217,7 +217,7 @@ struct TransitMapView: UIViewRepresentable {
             switch segment.type {
             case .walking:
                 return "#8E8E93"
-            case .subway, .transit:
+            case .subway:
                 return segment.lineColorHex ?? "#007AFF"
             case .transfer:
                 return "#FF9500"

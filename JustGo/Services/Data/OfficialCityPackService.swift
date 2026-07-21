@@ -495,7 +495,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                     pendingStatus = .failed
                     continue
                 }
-                guard let data = diskStore.validatedPackData(for: entry),
+                guard let data = diskStore.packData(for: entry),
                       let decoded = try? Self.decodeValidatedPack(data, matching: entry, origin: .downloaded),
                       await validatesCanonicalMembership(decoded) else { continue }
                 guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
@@ -534,9 +534,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 for candidate in downloadable {
                     taskGroup.addTask { [self] in
                         let data = try await download(from: candidate.downloadURL, maximumBytes: candidate.maximumBytes)
-                        guard candidate.entry.validatesPackData(data) else {
-                            throw CityPackCandidateFailed()
-                        }
+                        // No size/SHA guard here: `decodeValidatedPack` checks both before it
+                        // parses anything, so the downloaded bytes are still verified ahead of
+                        // the decode — hashing here too meant a second full pass over them.
                         let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry, origin: .downloaded)
                         guard await validatesCanonicalMembership(decoded) else {
                             throw CityPackCandidateFailed()
@@ -2242,11 +2242,12 @@ private struct CityPackDiskStore {
         rootURL = CityPackStorageLocation.rootURL(fileManager: fileManager)
     }
 
-    func validatedPackData(for entry: OfficialManifestCity) -> Data? {
-        validatedData(
-            at: versionDirectory(for: entry).appendingPathComponent("city_pack.json"),
-            validator: entry.validatesPackData
-        )
+    /// Deliberately does not hash. Every caller hands the bytes straight to
+    /// `decodeValidatedPack`, whose first act is the size + SHA-256 check — so the bytes are
+    /// still verified before anything parses them, just once instead of twice. Hashing here as
+    /// well cost a second full pass over the file (741 KB for Hong Kong, 383 KB for Beijing).
+    func packData(for entry: OfficialManifestCity) -> Data? {
+        try? Data(contentsOf: versionDirectory(for: entry).appendingPathComponent("city_pack.json"))
     }
 
     func installedPack(for cityID: String) -> (
@@ -2261,7 +2262,7 @@ private struct CityPackDiskStore {
               metadata.schemaVersion == 1,
               metadata.entry.cityID == cityID,
               let manifestURL = URL(string: metadata.manifestURL),
-              let data = validatedPackData(for: metadata.entry) else { return nil }
+              let data = packData(for: metadata.entry) else { return nil }
         return (data, metadata.entry, manifestURL)
     }
 

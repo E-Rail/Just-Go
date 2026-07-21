@@ -46,6 +46,10 @@ final class MapViewModel {
     private var pendingUserCameraCityID: String?
     private var viewportLoadTask: Task<Void, Never>?
     private var cityLoadTask: Task<Void, Never>?
+    // Publish token. A load only writes its results if no newer load has started since,
+    // which lets the city load and a viewport load coexist without either cancelling the
+    // other — the newest request simply wins. See `viewportChanged`.
+    private var networkLoadGeneration = 0
     private var searchTask: Task<Void, Never>?
     private var markerRefreshTask: Task<Void, Never>?
 
@@ -87,8 +91,10 @@ final class MapViewModel {
         }
         metroNetworks = []
         stations = []
+        networkLoadGeneration += 1
+        let generation = networkLoadGeneration
         cityLoadTask = Task { [weak self] in
-            await self?.loadNetworks(cityIDs: [city.id])
+            await self?.loadNetworks(cityIDs: [city.id], generation: generation)
         }
     }
 
@@ -151,7 +157,11 @@ final class MapViewModel {
 
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
-        cityLoadTask?.cancel()
+        // Deliberately does NOT cancel `cityLoadTask`. Setting the camera in `loadStations`
+        // makes MKMapView answer with `regionDidChangeAnimated`, which lands here — cancelling
+        // on that killed the very load that draws the lines, and every further frame of the
+        // opening animation cancelled the debounced retry too, so nothing drew until the map
+        // stopped moving. The generation token below supersedes stale results instead.
         viewportLoadTask?.cancel()
         scheduleVisibleStationsRefresh()
 
@@ -170,7 +180,11 @@ final class MapViewModel {
                 .filter { $0.bounds.intersects(region) }
                 .map(\.cityID)
             let visibleCityIDs = Array(Set(centerCityIDs + intersectingLoadedCityIDs))
-            await loadNetworks(cityIDs: visibleCityIDs)
+            // Claim the token only now, once this load is actually starting — during the
+            // debounce window an in-flight city load is still the freshest thing there is
+            // and must be allowed to publish.
+            networkLoadGeneration += 1
+            await loadNetworks(cityIDs: visibleCityIDs, generation: networkLoadGeneration)
         }
     }
 
@@ -228,39 +242,63 @@ final class MapViewModel {
         }
     }
 
-    private func loadNetworks(cityIDs: [String]) async {
+    /// Two stages on purpose. Line geometry is published the moment the networks decode, so the
+    /// map draws its lines without waiting on `stations(in:)` — which builds a `Station` object
+    /// per station (444 for Beijing) on the same actor and so runs strictly after the decode.
+    /// Markers then fill in behind the lines.
+    private func loadNetworks(cityIDs: [String], generation: Int) async {
         let requested = Set(cityIDs)
         let retained = metroNetworks.filter { requested.contains($0.cityID) }
         var loadedByCity = Dictionary(retained.map { ($0.cityID, $0) }, uniquingKeysWith: { first, _ in first })
 
-        await withTaskGroup(of: (MetroNetwork?, [Station]).self) { group in
+        await withTaskGroup(of: MetroNetwork?.self) { group in
             for cityID in requested where loadedByCity[cityID] == nil {
                 group.addTask { [metroNetworkProvider] in
-                    async let network = metroNetworkProvider.network(for: cityID)
-                    async let stations = metroNetworkProvider.stations(in: cityID)
-                    return await (network, stations)
+                    await metroNetworkProvider.network(for: cityID)
                 }
             }
-            for await (network, stations) in group {
-                guard !Task.isCancelled else { continue }
-                if let network {
-                    loadedByCity[network.cityID] = network
-                    stationsByCity[network.cityID] = stations
-                }
+            for await network in group {
+                guard let network, !Task.isCancelled else { continue }
+                loadedByCity[network.cityID] = network
             }
         }
 
-        guard !Task.isCancelled else { return }
-        stationsByCity = stationsByCity.filter { requested.contains($0.key) }
+        guard !Task.isCancelled, generation == networkLoadGeneration else { return }
         guard let region = visibleRegion, region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
             if !stations.isEmpty { stations = [] }
             return
         }
+
+        // Stage 1 — lines.
         metroNetworks = loadedByCity.values
             .filter { $0.bounds.intersects(region) }
             .sorted { $0.cityID < $1.cityID }
+        #if DEBUG
+        MainThreadHangMonitor.mark("map.lines gen=\(generation) cities=\(metroNetworks.count)")
+        #endif
+
+        // Stage 2 — station markers.
+        var loadedStationsByCity: [String: [Station]] = [:]
+        await withTaskGroup(of: (String, [Station]).self) { group in
+            for cityID in loadedByCity.keys where stationsByCity[cityID] == nil {
+                group.addTask { [metroNetworkProvider] in
+                    (cityID, await metroNetworkProvider.stations(in: cityID))
+                }
+            }
+            for await (cityID, cityStations) in group {
+                guard !Task.isCancelled else { continue }
+                loadedStationsByCity[cityID] = cityStations
+            }
+        }
+
+        guard !Task.isCancelled, generation == networkLoadGeneration else { return }
+        stationsByCity.merge(loadedStationsByCity) { _, new in new }
+        stationsByCity = stationsByCity.filter { requested.contains($0.key) }
         refreshVisibleStations()
+        #if DEBUG
+        MainThreadHangMonitor.mark("map.markers gen=\(generation) stations=\(stations.count)")
+        #endif
     }
 
     /// Debounce the viewport-driven refresh so it runs once panning briefly settles instead of

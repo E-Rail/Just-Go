@@ -136,7 +136,7 @@ extension StationDetailView {
         } else if let snapshot = viewModel?.officialStationInformation {
             switch selectedOfficialInformationCategory {
             case .firstLast:
-                officialTrainRows(snapshot.trains)
+                officialLineRows(snapshot.lines)
             case .exits:
                 officialExitRows(snapshot.exits)
             case .facilities:
@@ -168,10 +168,10 @@ extension StationDetailView {
     }
 
     @ViewBuilder
-    private func officialTrainRows(_ trains: [OfficialStationTrainInformation]) -> some View {
+    private func officialLineRows(_ lines: [OfficialStationLineInformation]) -> some View {
         if displayedStation.cityID == "8100",
            viewModel?.isLoading == true,
-           trains.isEmpty {
+           lines.isEmpty {
             HStack(spacing: 10) {
                 ProgressView()
                 Text(AppLocalization.text(
@@ -184,7 +184,7 @@ extension StationDetailView {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
-        } else if trains.isEmpty {
+        } else if lines.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 officialCategoryEmptyState
                 if displayedStation.cityID == "8100",
@@ -208,46 +208,52 @@ extension StationDetailView {
                 }
             }
         } else {
+            // One block per line holding every direction it serves, rather than a flat list that
+            // repeated the line name and its colour on each direction.
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(trains.enumerated()), id: \.element.id) { index, train in
+                ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                     if index > 0 {
                         Divider()
                     }
                     HStack(alignment: .top, spacing: 10) {
                         Circle()
-                            .fill(train.lineColorHex.map(Color.init(hex:)) ?? Color.accentColor)
+                            .fill(line.lineColorHex.map(Color.init(hex:)) ?? Color.accentColor)
                             .frame(width: 10, height: 10)
                             .padding(.top, 5)
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(train.lineName)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(line.lineName)
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                            Text(AppLocalization.text(
-                                english: "Toward \(train.destination)",
-                                simplified: "开往 \(train.destination)",
-                                traditional: "開往 \(train.destination)"
-                            ))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            ForEach(line.services) { service in
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text(AppLocalization.text(
+                                        english: "Toward \(service.direction)",
+                                        simplified: "开往 \(service.direction)",
+                                        traditional: "開往 \(service.direction)"
+                                    ))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
 
-                            if let liveTime = train.liveTime {
-                                Label(liveTime, systemImage: "wave.3.right")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(Color.accentColor)
-                            } else {
-                                HStack(spacing: 16) {
-                                    if let firstTime = train.firstTime {
-                                        trainTimeValue(
-                                            label: AppLocalization.localized("First"),
-                                            value: firstTime
-                                        )
-                                    }
-                                    if let lastTime = train.lastTime {
-                                        trainTimeValue(
-                                            label: AppLocalization.localized("Last"),
-                                            value: lastTime
-                                        )
+                                    if let liveTime = service.liveTime {
+                                        Label(liveTime, systemImage: "wave.3.right")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(Color.accentColor)
+                                    } else {
+                                        HStack(spacing: 16) {
+                                            if let firstTrain = service.firstTrain {
+                                                trainTimeValue(
+                                                    label: AppLocalization.localized("First"),
+                                                    value: firstTrain
+                                                )
+                                            }
+                                            if let lastTrain = service.lastTrain {
+                                                trainTimeValue(
+                                                    label: AppLocalization.localized("Last"),
+                                                    value: lastTrain
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

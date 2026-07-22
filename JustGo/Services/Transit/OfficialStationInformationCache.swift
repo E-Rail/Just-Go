@@ -18,7 +18,10 @@ enum StationInformationCacheLocation {
 /// bundled into the app or exported; wiped by both Settings → Clear Cache and the
 /// data-rights epoch cleanup at launch.
 actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
-    static let schemaVersion = 1
+    /// v2 nests services under their line and gives every enum a stable string wire value; see
+    /// `DataPacks/STATION_INFORMATION_SCHEMA.md`. A stored v1 entry fails the version check in
+    /// `storedSnapshot` and is simply refetched, so no migration is needed.
+    static let schemaVersion = 2
     // Mirrors the provider's network response cap: anything larger than a legitimate
     // response has no business being read back either.
     private static let maximumEntryBytes = 1_048_576

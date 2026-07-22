@@ -243,6 +243,34 @@ station_information_cache = read.call(
   errors << "station-information cache is missing #{marker}" unless
     station_information_cache.include?(marker)
 end
+# The cache format is a published interchange contract, so the document and the code have to move
+# together: a reader implementing the schema against a version the app no longer writes gets silent
+# mismatches rather than an error.
+station_information_schema = read.call("DataPacks/STATION_INFORMATION_SCHEMA.md")
+cache_schema_version = station_information_cache[/static let schemaVersion = (\d+)/, 1]
+documented_version = station_information_schema[/^# Station Information Schema \(v(\d+)\)/, 1]
+if cache_schema_version.nil?
+  errors << "station-information cache must declare a schemaVersion"
+elsif cache_schema_version != documented_version
+  errors << "STATION_INFORMATION_SCHEMA.md documents v#{documented_version.inspect} " \
+            "but the cache writes v#{cache_schema_version}"
+end
+# Every field the schema promises must exist on the Swift types that produce it.
+provider_source = read.call("JustGo/Services/Transit/OfficialStationInformationProvider.swift")
+%w[
+  lineName lineColorHex services direction firstTrain lastTrain liveTime
+  stationID stationName source freshness lines exits facilityGroups
+  isAccessible availability
+].each do |field|
+  errors << "station-information schema documents #{field}, which the provider does not define" unless
+    provider_source.include?(field)
+  errors << "station-information schema is missing documented field #{field}" unless
+    station_information_schema.include?(field)
+end
+# The schema is publishable precisely because it carries no operator content. Keep it that way.
+errors << "STATION_INFORMATION_SCHEMA.md must state the link-only licence boundary" unless
+  station_information_schema.include?("LicenseRef-External-Link-Only")
+
 %w[URLSession https http:// AsyncBytes].each do |network_marker|
   if station_information_cache.include?(network_marker)
     errors << "station-information cache must be storage-only; found #{network_marker}"

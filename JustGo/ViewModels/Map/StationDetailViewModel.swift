@@ -364,25 +364,42 @@ final class StationDetailViewModel {
                 items: facilityItems
             ))
         }
-        // Both times are nil here, so a row's identity collapses to line|destination|arrival —
+        // Both service times are nil here, so a row's identity collapses to direction|arrival —
         // two trains on the same line and destination showing the same countdown produce
-        // duplicate ForEach ids, which is undefined behavior in SwiftUI.
-        let trains = arrivals.map {
-            OfficialStationTrainInformation(
-                lineName: $0.lineName,
-                lineColorHex: $0.lineColorHex,
-                destination: $0.destination,
-                firstTime: nil,
-                lastTime: nil,
-                liveTime: $0.formattedArrival
+        // duplicate ForEach ids, which is undefined behavior in SwiftUI. Uniquing happens within
+        // a line, since the line name is no longer part of the row's identity.
+        var lineOrder: [String] = []
+        var colorsByLine: [String: String?] = [:]
+        var servicesByLine: [String: [OfficialStationServiceInformation]] = [:]
+        for arrival in arrivals {
+            if servicesByLine[arrival.lineName] == nil {
+                lineOrder.append(arrival.lineName)
+                servicesByLine[arrival.lineName] = []
+                colorsByLine[arrival.lineName] = arrival.lineColorHex
+            }
+            servicesByLine[arrival.lineName]?.append(
+                OfficialStationServiceInformation(
+                    direction: arrival.destination,
+                    firstTrain: nil,
+                    lastTrain: nil,
+                    liveTime: arrival.formattedArrival
+                )
             )
-        }.uniqued(by: \OfficialStationTrainInformation.id)
+        }
+        let serviceLines = lineOrder.map { lineName in
+            OfficialStationLineInformation(
+                lineName: lineName,
+                lineColorHex: colorsByLine[lineName] ?? nil,
+                services: (servicesByLine[lineName] ?? [])
+                    .uniqued(by: \OfficialStationServiceInformation.id)
+            )
+        }
         officialStationInformation = OfficialStationInformationSnapshot(
             stationID: stationID,
             stationName: station.name,
             source: .hongKongGovernment,
             freshness: .live,
-            trains: trains,
+            lines: serviceLines,
             exits: exits,
             facilityGroups: facilityGroups
         )

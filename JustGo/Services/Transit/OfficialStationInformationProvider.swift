@@ -48,7 +48,7 @@ enum OfficialStationInformationCategory: String, CaseIterable, Identifiable, Sen
     }
 }
 
-enum OfficialStationInformationSource: Sendable, Equatable, Codable {
+enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
     case beijingSubwayOnline
     case hongKongGovernment
 
@@ -71,21 +71,32 @@ enum OfficialStationInformationSource: Sendable, Equatable, Codable {
 
 }
 
-struct OfficialStationTrainInformation: Identifiable, Sendable, Equatable, Codable {
-    let lineName: String
-    let lineColorHex: String?
-    let destination: String
-    let firstTime: String?
-    let lastTime: String?
+/// One direction of travel from this station: the service window a rider sees on the platform
+/// sign, plus a live countdown where an operator publishes one.
+struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Codable {
+    let direction: String
+    let firstTrain: String?
+    let lastTrain: String?
     let liveTime: String?
 
     /// Positional, not `compactMap`-ed: dropping nils before joining made
     /// `(first: "5:27", last: nil)` and `(first: nil, last: "5:27")` collide on one id, and the
-    /// `uniqued(by:)` in `parse` then silently deleted the second row.
+    /// `uniqued(by:)` at the call sites then silently deleted the second row.
     var id: String {
-        [lineName, destination, firstTime ?? "", lastTime ?? "", liveTime ?? ""]
-            .joined(separator: "|")
+        [direction, firstTrain ?? "", lastTrain ?? "", liveTime ?? ""].joined(separator: "|")
     }
+}
+
+/// Services grouped under the line that runs them. Nesting rather than repeating `lineName` on
+/// every row is what makes the payload usable by anyone other than this app: a consumer reads one
+/// line's whole service picture without regrouping a flat list, and the line's colour is stated
+/// once instead of once per direction.
+struct OfficialStationLineInformation: Identifiable, Sendable, Equatable, Codable {
+    let lineName: String
+    let lineColorHex: String?
+    let services: [OfficialStationServiceInformation]
+
+    var id: String { lineName }
 }
 
 struct OfficialStationExitInformation: Identifiable, Sendable, Equatable, Codable {
@@ -96,7 +107,7 @@ struct OfficialStationExitInformation: Identifiable, Sendable, Equatable, Codabl
     var id: String { "\(name)|\(details.joined(separator: "|"))" }
 }
 
-enum OfficialStationFacilityAvailability: Sendable, Equatable, Codable {
+enum OfficialStationFacilityAvailability: String, Sendable, Equatable, Codable {
     case available
     case unavailable
 }
@@ -118,9 +129,44 @@ struct OfficialStationFacilityGroup: Identifiable, Sendable, Equatable, Codable 
 
 /// Whether a snapshot came straight from the official service or from this device's own
 /// last-good copy served while the service was unreachable.
+/// Encoded as `{"state": "live"}` / `{"state": "cached", "fetchedAt": "…"}` rather than the
+/// synthesised `{"live": {}}` / `{"cached": {"fetchedAt": …}}`: this type is part of a published
+/// interchange contract (`DataPacks/STATION_INFORMATION_SCHEMA.md`), and a payload keyed by its
+/// own case name is not something another implementation can reasonably produce.
 enum OfficialStationInformationFreshness: Sendable, Equatable, Codable {
     case live
     case cached(fetchedAt: Date)
+
+    private enum CodingKeys: String, CodingKey {
+        case state
+        case fetchedAt
+    }
+
+    private enum State: String, Codable {
+        case live
+        case cached
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .live:
+            try container.encode(State.live, forKey: .state)
+        case .cached(let fetchedAt):
+            try container.encode(State.cached, forKey: .state)
+            try container.encode(fetchedAt, forKey: .fetchedAt)
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        switch try container.decode(State.self, forKey: .state) {
+        case .live:
+            self = .live
+        case .cached:
+            self = .cached(fetchedAt: try container.decode(Date.self, forKey: .fetchedAt))
+        }
+    }
 }
 
 struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
@@ -128,7 +174,7 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
     let stationName: String
     let source: OfficialStationInformationSource
     let freshness: OfficialStationInformationFreshness
-    let trains: [OfficialStationTrainInformation]
+    let lines: [OfficialStationLineInformation]
     let exits: [OfficialStationExitInformation]
     let facilityGroups: [OfficialStationFacilityGroup]
 
@@ -138,7 +184,7 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
             stationName: stationName,
             source: source,
             freshness: freshness,
-            trains: trains,
+            lines: lines,
             exits: exits,
             facilityGroups: facilityGroups
         )
@@ -550,7 +596,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             )
         }
 
-        let trains = groupedTrains(responseData.lines ?? [])
+        let serviceLines = groupedLines(responseData.lines ?? [])
 
         let exits = (station.exits ?? []).compactMap { exit in
             guard let name = trimmed(exit.name) else { return nil }
@@ -584,7 +630,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             stationName: stationName,
             source: .beijingSubwayOnline,
             freshness: .live,
-            trains: trains,
+            lines: serviceLines,
             exits: exits,
             facilityGroups: facilityGroups
         )
@@ -600,9 +646,13 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     ///
     /// Collapse each (line, direction) to a single row spanning the whole service window:
     /// earliest first train, latest last train — which is what platform signage shows.
-    private static func groupedTrains(_ lines: [BeijingLine]) -> [OfficialStationTrainInformation] {
-        var order: [String] = []
-        var grouped: [String: OfficialStationTrainInformation] = [:]
+    /// The two directions then nest under their line, so a rider (and any other consumer of the
+    /// schema) sees one block per line holding both of its service windows.
+    private static func groupedLines(_ lines: [BeijingLine]) -> [OfficialStationLineInformation] {
+        var lineOrder: [String] = []
+        var colors: [String: String] = [:]
+        var directionOrder: [String: [String]] = [:]
+        var services: [String: [String: OfficialStationServiceInformation]] = [:]
 
         for line in lines {
             guard let lineName = trimmed(line.lineName),
@@ -612,30 +662,40 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             let last = trimmed(line.lastTime)
             guard first != nil || last != nil else { continue }
 
-            let key = "\(lineName)|\(direction)"
-            guard let existing = grouped[key] else {
-                order.append(key)
-                grouped[key] = OfficialStationTrainInformation(
-                    lineName: lineName,
-                    lineColorHex: normalizedColor(line.lineColor),
-                    destination: direction,
-                    firstTime: first,
-                    lastTime: last,
+            if services[lineName] == nil {
+                lineOrder.append(lineName)
+                services[lineName] = [:]
+                directionOrder[lineName] = []
+            }
+            if colors[lineName] == nil, let color = normalizedColor(line.lineColor) {
+                colors[lineName] = color
+            }
+
+            guard let existing = services[lineName]?[direction] else {
+                directionOrder[lineName]?.append(direction)
+                services[lineName]?[direction] = OfficialStationServiceInformation(
+                    direction: direction,
+                    firstTrain: first,
+                    lastTrain: last,
                     liveTime: nil
                 )
                 continue
             }
-            grouped[key] = OfficialStationTrainInformation(
-                lineName: existing.lineName,
-                lineColorHex: existing.lineColorHex ?? normalizedColor(line.lineColor),
-                destination: existing.destination,
-                firstTime: preferredServiceTime(existing.firstTime, first, earliest: true),
-                lastTime: preferredServiceTime(existing.lastTime, last, earliest: false),
+            services[lineName]?[direction] = OfficialStationServiceInformation(
+                direction: existing.direction,
+                firstTrain: preferredServiceTime(existing.firstTrain, first, earliest: true),
+                lastTrain: preferredServiceTime(existing.lastTrain, last, earliest: false),
                 liveTime: nil
             )
         }
 
-        return order.compactMap { grouped[$0] }
+        return lineOrder.map { lineName in
+            OfficialStationLineInformation(
+                lineName: lineName,
+                lineColorHex: colors[lineName],
+                services: (directionOrder[lineName] ?? []).compactMap { services[lineName]?[$0] }
+            )
+        }
     }
 
     /// Minutes into the *service* day. A metro service day runs past midnight, so a last train

@@ -2623,34 +2623,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 44,
+        "networkStations": 23,
         "matchedStations": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "accessibility": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 44
+          "total": 23
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 44
+          "total": 23
         }
       }
     },

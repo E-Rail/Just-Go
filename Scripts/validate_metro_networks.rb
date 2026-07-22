@@ -16,6 +16,25 @@ unless route_picker_city_ids.to_set == network_city_ids.to_set
   abort "metro network validation failed: route-picker and metro-network city sets differ"
 end
 
+# `City.stationCount`/`lineCount` are hand-written literals that the city list and the transit-data
+# screen print verbatim, so they silently drift from the geometry they claim to describe: Urumqi
+# advertised 44 stations and 3 lines while shipping 23 and 1, and Shenzhen advertised one line more
+# than the map draws. Pin them to the asset rather than trusting them to be re-typed.
+counts = city_service_source.scan(
+  /City\(id: "(\d+)".*?stationCount: (\d+), lineCount: (\d+)\)/
+).to_h { |city_id, stations, lines| [city_id, [stations.to_i, lines.to_i]] }
+paths.each do |path|
+  network = JSON.parse(File.read(path))
+  city_id = network.fetch("cityID")
+  declared = counts[city_id]
+  actual = [network.fetch("stations").length, network.fetch("lines").length]
+  abort "metro network validation failed: #{city_id} has no declared counts" if declared.nil?
+  next if declared == actual
+
+  abort "metro network validation failed: #{city_id} declares #{declared[0]} stations/#{declared[1]} " \
+        "lines but ships #{actual[0]}/#{actual[1]}"
+end
+
 def point_segment_distance(point, start_point, end_point)
   latitude = (start_point["latitude"] + end_point["latitude"]) / 2 * Math::PI / 180
   scale_x = EARTH_RADIUS * Math::PI / 180 * Math.cos(latitude)

@@ -9,6 +9,7 @@ require "net/http"
 require "set"
 require "uri"
 require_relative "lib/gcj02"
+require_relative "lib/line_names"
 
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-metro")
@@ -163,37 +164,15 @@ def source_color(value)
   color.match?(/\A#[0-9A-F]{6}\z/) ? color : nil
 end
 
-DIRECTION_WORDS =
-  "順向|逆向|顺向|順行|逆行|顺行|上行|下行|南向|北向|東向|西向|东向|往程|返程|去程|回程|順時針|逆時針|方向"
-
-# A running direction is not a line a rider can board separately — the two directions are
-# already merged into one logical line, so carrying the annotation into the display name would
-# label the merged line with one of its halves. Matches the parenthesised forms, e.g.
-# "捷運文湖線(順向)" and "北京市郊铁路S2线 (黄土店至沙城方向)".
-LINE_DIRECTION_SUFFIX = /\s*[\(（]\s*[^()（）]*?(?:#{DIRECTION_WORDS})\s*[\)）]\s*\z/
-
-# The unparenthesised form, e.g. "臺中捷運綠線北屯總站方向". Anchored to the 線/线 that ends the
-# line name so only the trailing terminal-plus-方向 is removed.
-LINE_DIRECTION_TAIL = /(?<=線|线)[^線线]*方向\z/
-
-ROUTE_ARROW = /-->|→|=>|->/
-
 def passenger_line_name(tags)
-  value = tags["name:zh"] || tags["name"] || tags["ref"] || "Metro"
-  value = value.split(/[:：]/, 2).first
-  value = value.gsub(/\s*[\(（][^()（）]*#{ROUTE_ARROW}[^()（）]*[\)）]\s*\z/, "")
-  # "<line> <origin>→<destination>" names the run, not the line: keep only the line. Requires
-  # the arrow, so genuinely spaced names ("市郊铁路 怀密线") are left intact.
-  value = if value =~ /\A(.+?)[[:space:]]+[^[:space:]]+[[:space:]]*#{ROUTE_ARROW}/
-    Regexp.last_match(1)
-  else
-    value.split(ROUTE_ARROW, 2).first
-  end
-  value.strip
-    .gsub(/\A地铁\s*/, "")
-    .gsub(LINE_DIRECTION_SUFFIX, "")
-    .sub(LINE_DIRECTION_TAIL, "")
-    .strip
+  reference = tags["ref"].to_s.strip
+  value = LineNames.clean(tags["name:zh"]) || LineNames.clean(tags["name"])
+  # Guiyang's relations name the run ("1 窦官 - 小孟工业园") and carry the line only as `ref`, so
+  # the reduction leaves a bare number. Every other mainland city in the catalog displays
+  # "<n>号线"; rendering it here keeps the map legend consistent instead of showing a lone digit.
+  return "#{reference}号线" if !reference.empty? && value == reference && reference.match?(/\A\d+\z/)
+
+  value || (reference.empty? ? "Metro" : reference)
 end
 
 def line_name_tokens(value)
@@ -220,13 +199,16 @@ end
 # is matched against the city's normalized allowlist. Lines with no network/operator are kept
 # only if explicitly whitelisted by name (the city's own untagged lines); anything else —
 # a neighbouring city's metro, an intercity service, Hong Kong MTR, etc. — is rejected.
-def city_owns_line?(city, network_identity, name)
+def city_owns_line?(city, network_identity, name, mode: nil)
   allowed = (city[:networks] || []).map { |value| normalized(value) }
   return true if allowed.include?(network_identity)
   if network_identity == "unknown"
     # Isolated systems whose OSM relations carry no network/operator tag: there is no
     # neighbouring metro inside the bbox to confuse them with, so keep their untagged lines.
-    return true if city[:allow_unknown]
+    # `allow_unknown` covers urban modes only. Unidentified heavy rail inside a city bbox is
+    # national or cross-border rail, not that city's metro — Urumqi's bbox holds the
+    # "13/14 乌鲁木齐<=>Алматы" sleeper to Almaty, tagged route=train network=unknown.
+    return true if city[:allow_unknown] && mode != "train"
     return (city[:own_unknown_lines] || []).include?(name)
   end
 
@@ -236,7 +218,7 @@ end
 def relation_owned_by_city?(city, relation)
   tags = relation.fetch("tags", {})
   identity = network_identity(tags)
-  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags))
+  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags), mode: tags["route"])
 end
 
 def supported_route_relation?(relation)
@@ -848,7 +830,19 @@ def canonical_path_key(path)
   forward < reverse ? forward : reverse
 end
 
+# The OSM base timestamp of the Overpass response the city was built from. Cities are refreshed
+# individually, so their snapshots genuinely differ (Beijing's cache predates Taipei's by five
+# weeks); stamping `Date.today` instead would have every file claim a provenance date it does not
+# have. Overpass always returns this, so a response without it is a truncated read, not an old one.
+def source_snapshot(city, source)
+  timestamp = source.dig("osm3s", "timestamp_osm_base").to_s
+  fail_with("#{city[:name]} source has no osm3s.timestamp_osm_base; refetch it") unless
+    timestamp =~ /\A(\d{4})-(\d{2})-(\d{2})T/
+  "#{Regexp.last_match(1)}-#{Regexp.last_match(2)}-#{Regexp.last_match(3)}"
+end
+
 def build_network(city_id, city, source)
+  snapshot = source_snapshot(city, source)
   elements = source.fetch("elements")
   nodes = elements.select { |item| item["type"] == "node" }.to_h do |node|
     [node["id"], [node["lat"], node["lon"]]]
@@ -872,7 +866,12 @@ def build_network(city_id, city, source)
     # Drop lines that belong to another city's system (pulled in via the bbox / a cross-border
     # transfer station). Skipping the group here means its line and its not-shared stations are
     # never emitted, and a shared transfer station keeps only this city's line IDs.
-    next unless city_owns_line?(city, canonical_network, canonical[:name])
+    next unless city_owns_line?(
+      city,
+      canonical_network,
+      canonical[:name],
+      mode: canonical[:relation].dig("tags", "route")
+    )
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
@@ -940,7 +939,7 @@ def build_network(city_id, city, source)
       "networkIdentity" => canonical_network,
       "routeReference" => route_reference,
       "name" => display_line_name(profiles, canonical, same_corridor),
-      "nameEn" => canonical[:relation].dig("tags", "name:en")&.split(/[:→]/, 2)&.first&.strip,
+      "nameEn" => LineNames.clean(canonical[:relation].dig("tags", "name:en")),
       "colorHex" => canonical_color(profiles, canonical),
       "stationIDs" => [],
       "servicePatterns" => service_patterns.map do |pattern|
@@ -1006,7 +1005,7 @@ def build_network(city_id, city, source)
   fail_with("#{city[:name]} produced no physical paths") if all_coordinates.empty?
   network = {
     "cityID" => city_id,
-    "version" => "osm-#{Date.today.strftime("%Y%m%d")}",
+    "version" => "osm-#{snapshot.delete("-")}",
     "bounds" => {
       "minLatitude" => all_coordinates.map { |point| point["latitude"] }.min,
       "minLongitude" => all_coordinates.map { |point| point["longitude"] }.min,
@@ -1017,7 +1016,7 @@ def build_network(city_id, city, source)
     "geometryKind" => "physicalTrack",
     "attribution" => ATTRIBUTION,
     "licenseURL" => LICENSE_URL,
-    "sourceSnapshot" => Date.today.iso8601,
+    "sourceSnapshot" => snapshot,
     "coordinateSystem" => "gcj02",
     "sourceURLs" => [SOURCE_URL, *OVERPASS_URLS.map(&:to_s)],
     "lines" => lines.sort_by { |line| line["name"] },
@@ -1025,7 +1024,7 @@ def build_network(city_id, city, source)
   }
   report = canonicalization_report.merge(
     "cityID" => city_id,
-    "sourceSnapshot" => Date.today.iso8601,
+    "sourceSnapshot" => snapshot,
     "canonicalLines" => lines.map do |line|
       {
         "logicalLineID" => line["logicalLineID"],
@@ -1064,9 +1063,26 @@ def self_test
   fail_with("intercity line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际")
   fail_with("own untagged line should be kept") unless city_owns_line?(CITIES.fetch("3100"), "unknown", "磁浮线")
   fail_with("foreign untagged line must be dropped") if city_owns_line?(CITIES.fetch("4401"), "unknown", "华为松山湖有轨电车1号线")
+  fail_with("untagged urban line should be kept under allow_unknown") unless city_owns_line?(
+    CITIES.fetch("6501"), "unknown", "1号线", mode: "subway"
+  )
+  fail_with("untagged heavy rail must not enter a city") if city_owns_line?(
+    CITIES.fetch("6501"), "unknown", "13/14", mode: "train"
+  )
   fail_with("direction suffix line-name test failed") unless passenger_line_name(
     "name" => "Light Rail 505 (A → B)"
   ) == "Light Rail 505"
+  # The English label used to get a weaker reduction of its own, which is how names such as
+  # "Light Rail 614P (Tuen Mun Ferry Pier" — cut mid-bracket by an arrow split — reached the app.
+  fail_with("English line-name reduction test failed") unless
+    LineNames.clean("Light Rail 614P (Tuen Mun Ferry Pier → Siu Hong)") == "Light Rail 614P"
+  fail_with("nested-bracket run annotation test failed") unless
+    LineNames.clean("呼和浩特地铁1号线（坝堰（机场）→伊利健康谷）") == "呼和浩特地铁1号线"
+  fail_with("hyphenated line name must survive") unless
+    LineNames.clean("臺北捷運 南港-板橋-土城線") == "臺北捷運 南港-板橋-土城線"
+  fail_with("terminus pair test failed") unless LineNames.clean("常州地铁2号线 五一路-青枫公园") == "常州地铁2号线"
+  fail_with("bare-ref line name test failed") unless
+    passenger_line_name("name" => "1 窦官 - 小孟工业园", "ref" => "1") == "1号线"
   joined = join_way_paths([
     { "id" => 1, "nodes" => [1, 2, 3] },
     { "id" => 2, "nodes" => [5, 4, 3] },

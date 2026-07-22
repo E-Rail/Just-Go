@@ -194,6 +194,13 @@ class OSSDataValidatorsTest < Minitest::Test
     git("init")
     git("config", "user.email", "tests@example.com")
     git("config", "user.name", "JustGo Tests")
+    # `git commit` forks background maintenance once the fixture's loose objects pass gc.auto, and
+    # it keeps writing into .git after commit returns — teardown's remove_entry then races it and
+    # dies with ENOTEMPTY. How close the fixture sits to that threshold depends on how many
+    # distinct blobs the bundled data happens to have, so leaving it on makes an unrelated data
+    # change able to turn this suite red.
+    git("config", "gc.auto", "0")
+    git("config", "maintenance.auto", "false")
     git("add", ".")
     git("commit", "-m", "fixture")
   end

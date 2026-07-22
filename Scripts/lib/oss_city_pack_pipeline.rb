@@ -619,6 +619,16 @@ module OSSCityPackPipeline
             "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only after a user tap."
           },
           {
+            "id" => "shanghai-official-landing-links",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed coverage states, official station identifiers, and official page URLs for canonical Shanghai app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://service.shmetro.com/czxx/index.htm",
+            "sourceURL" => "https://service.shmetro.com/czxx/index.htm",
+            "attribution" => "Shanghai Shentong Metro Group (Shanghai Metro)",
+            "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only on the rider device after a user tap."
+          },
+          {
             "id" => "macau-official-landing-link",
             "kind" => "linkMetadata",
             "scope" => "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
@@ -755,6 +765,13 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[
             beijing-official-landing-links justgo-generated-catalog
             official-transit-resource-links osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/shanghai_station_information.json",
+          "rightsIDs" => %w[
+            justgo-generated-catalog official-transit-resource-links
+            osm-metro-networks shanghai-official-landing-links
           ].sort
         },
         {

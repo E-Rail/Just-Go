@@ -1,0 +1,6049 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-22",
+  "sourceIndexURL": "https://m.shmetro.com/core/shmetro/mdstationinfoback_new.ashx?act=getAllStations",
+  "sourceIndexSHA256": "547e2e72fc92903c5c9523971e9782bb417536dfb774ed7dfb7736b6fd75ca39",
+  "sourceDirectoryURL": "https://service.shmetro.com/czxx/index.htm",
+  "detailPageURL": "https://service.shmetro.com/czxx/index.htm",
+  "provider": "Shanghai Metro",
+  "canonicalStationCount": 471,
+  "sourceStationCount": 530,
+  "mappedStationCount": 415,
+  "stationPageCount": 415,
+  "stationPageGapCount": 56,
+  "stations": [
+    {
+      "stationID": "006748dccef091f2",
+      "stationName": "东城一路",
+      "stationNameEn": "Dongchengyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "4105",
+      "lineStationIDs": [
+        "4105"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=4105"
+    },
+    {
+      "stationID": "0150cc08f54a50ff",
+      "stationName": "锦秋路",
+      "stationNameEn": "Jinqiu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1549",
+      "lineStationIDs": [
+        "1549"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1549"
+    },
+    {
+      "stationID": "01eb9cf4b5ffd77d",
+      "stationName": "顾唐路",
+      "stationNameEn": "Gutang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0950",
+      "lineStationIDs": [
+        "0950"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0950"
+    },
+    {
+      "stationID": "026d8ef2c102d891",
+      "stationName": "陆家嘴",
+      "stationNameEn": "Lujiazui",
+      "aliases": [
+
+      ],
+      "externalStationID": "0247",
+      "lineStationIDs": [
+        "0247",
+        "1438"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0247"
+    },
+    {
+      "stationID": "03ba1daaae788989",
+      "stationName": "陈翔公路",
+      "stationNameEn": "Chenxiang Highway",
+      "aliases": [
+
+      ],
+      "externalStationID": "1136",
+      "lineStationIDs": [
+        "1136"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1136"
+    },
+    {
+      "stationID": "03fa47a9d4de0447",
+      "stationName": "学林路",
+      "stationNameEn": "Xuelin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1350",
+      "lineStationIDs": [
+        "1350"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1350"
+    },
+    {
+      "stationID": "049af409499aec1c",
+      "stationName": "罗山路",
+      "stationNameEn": "Luoshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1160",
+      "lineStationIDs": [
+        "1160",
+        "1623"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1160"
+    },
+    {
+      "stationID": "04bcdcccef91fa8a",
+      "stationName": "华夏东路",
+      "stationNameEn": "East Huaxia Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0258",
+      "lineStationIDs": [
+        "0258"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0258"
+    },
+    {
+      "stationID": "05e2c8ab5642830d",
+      "stationName": "上南路",
+      "stationNameEn": "Shangnan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0623",
+      "lineStationIDs": [
+        "0623"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0623"
+    },
+    {
+      "stationID": "05f3648bb5910df6",
+      "stationName": "上海汽车城",
+      "stationNameEn": "Shanghai Automobile City",
+      "aliases": [
+
+      ],
+      "externalStationID": "1118",
+      "lineStationIDs": [
+        "1118"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1118"
+    },
+    {
+      "stationID": "061f2c0b7d4c2b58",
+      "stationName": "蟠龙路",
+      "stationNameEn": "Panlong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1723",
+      "lineStationIDs": [
+        "1723"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1723"
+    },
+    {
+      "stationID": "078314c47a97d070",
+      "stationName": "姚虹路",
+      "stationNameEn": "Yaohong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1536",
+      "lineStationIDs": [
+        "1536"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1536"
+    },
+    {
+      "stationID": "07ef54cbe28c18d4",
+      "stationName": "乐秀路",
+      "stationNameEn": "Lexiu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1422",
+      "lineStationIDs": [
+        "1422"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1422"
+    },
+    {
+      "stationID": "0adbdb901c3b5d3c",
+      "stationName": "浦航路",
+      "stationNameEn": "Puhang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "4104",
+      "lineStationIDs": [
+        "4104"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=4104"
+    },
+    {
+      "stationID": "0bf355f6dfd9fada",
+      "stationName": "新江湾城",
+      "stationNameEn": "Xinjiangwancheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "1068",
+      "lineStationIDs": [
+        "1068"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1068"
+    },
+    {
+      "stationID": "0c5f36d322cf5d6e",
+      "stationName": "洲海路",
+      "stationNameEn": "Zhouhai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0644",
+      "lineStationIDs": [
+        "0644"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0644"
+    },
+    {
+      "stationID": "0def2f57183c521a",
+      "stationName": "塘桥",
+      "stationNameEn": "Tangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0420",
+      "lineStationIDs": [
+        "0420"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0420"
+    },
+    {
+      "stationID": "0e2466290ecbc171",
+      "stationName": "黄兴路",
+      "stationNameEn": "Huangxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0844",
+      "lineStationIDs": [
+        "0844"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0844"
+    },
+    {
+      "stationID": "0e2f9c996a8c59b9",
+      "stationName": "浦江镇",
+      "stationNameEn": "Pujiang Town",
+      "aliases": [
+
+      ],
+      "externalStationID": "0823",
+      "lineStationIDs": [
+        "0823"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0823"
+    },
+    {
+      "stationID": "0f60b9c47c9e981e",
+      "stationName": "桃浦新村",
+      "stationNameEn": "Taopu Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "1138",
+      "lineStationIDs": [
+        "1138"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1138"
+    },
+    {
+      "stationID": "10c1f3f8fdecfadc",
+      "stationName": "大场镇",
+      "stationNameEn": "Dachang Town",
+      "aliases": [
+
+      ],
+      "externalStationID": "0731",
+      "lineStationIDs": [
+        "0731"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0731"
+    },
+    {
+      "stationID": "110a2b9fe1067117",
+      "stationName": "嘉定新城",
+      "stationNameEn": "Jiading Xincheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "1134",
+      "lineStationIDs": [
+        "1134"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1134"
+    },
+    {
+      "stationID": "119b7ee04298ee48",
+      "stationName": "张江路",
+      "stationNameEn": "Zhangjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1351",
+      "lineStationIDs": [
+        "1351"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1351"
+    },
+    {
+      "stationID": "12dae5c132b4a01a",
+      "stationName": "曹杨路",
+      "stationNameEn": "Caoyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0320",
+      "lineStationIDs": [
+        "0320",
+        "0407",
+        "1145",
+        "1431"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0320"
+    },
+    {
+      "stationID": "1318c53c8dfe3008",
+      "stationName": "三林南",
+      "stationNameEn": "South Sanlin",
+      "aliases": [
+
+      ],
+      "externalStationID": "5134",
+      "lineStationIDs": [
+        "5134"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=5134"
+    },
+    {
+      "stationID": "13730e2435666ab1",
+      "stationName": "杨思",
+      "stationNameEn": "Yangsi",
+      "aliases": [
+
+      ],
+      "externalStationID": "0827",
+      "lineStationIDs": [
+        "0827"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0827"
+    },
+    {
+      "stationID": "13f5baf51a28feec",
+      "stationName": "书院",
+      "stationNameEn": "Shuyuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "1631",
+      "lineStationIDs": [
+        "1631"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1631"
+    },
+    {
+      "stationID": "143237b0f43801be",
+      "stationName": "临洮路",
+      "stationNameEn": "Lintao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1423",
+      "lineStationIDs": [
+        "1423"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1423"
+    },
+    {
+      "stationID": "145b13f804d519f6",
+      "stationName": "三林东",
+      "stationNameEn": "East Sanlin",
+      "aliases": [
+
+      ],
+      "externalStationID": "1156",
+      "lineStationIDs": [
+        "1156"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1156"
+    },
+    {
+      "stationID": "14a8ad35d0d13e03",
+      "stationName": "邮电新村",
+      "stationNameEn": "Youdian Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "1060",
+      "lineStationIDs": [
+        "1060"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1060"
+    },
+    {
+      "stationID": "164590d1dd794b02",
+      "stationName": "惠南东",
+      "stationNameEn": "East Huinan",
+      "aliases": [
+
+      ],
+      "externalStationID": "1630",
+      "lineStationIDs": [
+        "1630"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1630"
+    },
+    {
+      "stationID": "1675469f51983834",
+      "stationName": "惠南",
+      "stationNameEn": "Huinan",
+      "aliases": [
+
+      ],
+      "externalStationID": "1629",
+      "lineStationIDs": [
+        "1629"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1629"
+    },
+    {
+      "stationID": "16c0b788358d2008",
+      "stationName": "大世界",
+      "stationNameEn": "Dashijie",
+      "aliases": [
+
+      ],
+      "externalStationID": "0834",
+      "lineStationIDs": [
+        "0834",
+        "1436"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0834"
+    },
+    {
+      "stationID": "1812336f409db3e8",
+      "stationName": "延长路",
+      "stationNameEn": "Yanchang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0128",
+      "lineStationIDs": [
+        "0128"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0128"
+    },
+    {
+      "stationID": "188fa075fa5c74b4",
+      "stationName": "松江体育中心",
+      "stationNameEn": "Songjiang Sports Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "0920",
+      "lineStationIDs": [
+        "0920"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0920"
+    },
+    {
+      "stationID": "1964d4b085de102e",
+      "stationName": "光明路",
+      "stationNameEn": "Guangming Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1115",
+      "lineStationIDs": [
+        "1115"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1115"
+    },
+    {
+      "stationID": "19ad07a00eb97bf8",
+      "stationName": "上海赛车场",
+      "stationNameEn": "Shanghai Circuit",
+      "aliases": [
+
+      ],
+      "externalStationID": "1120",
+      "lineStationIDs": [
+        "1120"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1120"
+    },
+    {
+      "stationID": "19c3bd48591f7032",
+      "stationName": "南翔",
+      "stationNameEn": "Nanxiang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1137",
+      "lineStationIDs": [
+        "1137"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1137"
+    },
+    {
+      "stationID": "1a8981025f083c9e",
+      "stationName": "友谊西路",
+      "stationNameEn": "West Youyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0137",
+      "lineStationIDs": [
+        "0137"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0137"
+    },
+    {
+      "stationID": "1b02604fe6e7ad0a",
+      "stationName": "上海松江站",
+      "stationNameEn": "Shanghai Songjiang Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "0918",
+      "lineStationIDs": [
+        "0918"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0918"
+    },
+    {
+      "stationID": "1ce5d89e6b355094",
+      "stationName": "中潭路",
+      "stationNameEn": "Zhongtan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0322",
+      "lineStationIDs": [
+        "0322",
+        "0409"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0322"
+    },
+    {
+      "stationID": "1e57de2beb7cb7f6",
+      "stationName": "平凉路",
+      "stationNameEn": "Pingliang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1838",
+      "lineStationIDs": [
+        "1838"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1838"
+    },
+    {
+      "stationID": "1ea03e7c6a222d0c",
+      "stationName": "罗南新村",
+      "stationNameEn": "Luonan Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0722",
+      "lineStationIDs": [
+        "0722"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0722"
+    },
+    {
+      "stationID": "1ebd68a806af5159",
+      "stationName": "浦东南路",
+      "stationNameEn": "South Pudong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0248",
+      "lineStationIDs": [
+        "0248",
+        "1439"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0248"
+    },
+    {
+      "stationID": "1fe14af739647a69",
+      "stationName": "金粤路",
+      "stationNameEn": "Jinyue Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1450",
+      "lineStationIDs": [
+        "1450"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1450"
+    },
+    {
+      "stationID": "209b5a7fa12ae812",
+      "stationName": "双江路",
+      "stationNameEn": "Shuangjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1070",
+      "lineStationIDs": [
+        "1070"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1070"
+    },
+    {
+      "stationID": "21fde701975d11c9",
+      "stationName": "大连路",
+      "stationNameEn": "Dalian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0414",
+      "lineStationIDs": [
+        "0414",
+        "1240"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0414"
+    },
+    {
+      "stationID": "22218e7006fb0e21",
+      "stationName": "四平路",
+      "stationNameEn": "Siping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0841",
+      "lineStationIDs": [
+        "0841",
+        "1061"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0841"
+    },
+    {
+      "stationID": "225431bc50d02c77",
+      "stationName": "芦恒路",
+      "stationNameEn": "Luheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0824",
+      "lineStationIDs": [
+        "0824"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0824"
+    },
+    {
+      "stationID": "22a450f9f948a7d0",
+      "stationName": "海伦路",
+      "stationNameEn": "Hailun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0412",
+      "lineStationIDs": [
+        "0412",
+        "1059"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0412"
+    },
+    {
+      "stationID": "23a11cd037cf9039",
+      "stationName": "文井路",
+      "stationNameEn": "Wenjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0512",
+      "lineStationIDs": [
+        "0512"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0512"
+    },
+    {
+      "stationID": "240596453f37d8c1",
+      "stationName": "隆德路",
+      "stationNameEn": "Longde Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1146",
+      "lineStationIDs": [
+        "1146",
+        "1328"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1146"
+    },
+    {
+      "stationID": "243b63498a761056",
+      "stationName": "古浪路",
+      "stationNameEn": "Gulang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1545",
+      "lineStationIDs": [
+        "1545"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1545"
+    },
+    {
+      "stationID": "24dcc61f339631d4",
+      "stationName": "世纪大道",
+      "stationNameEn": "Century Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "0249",
+      "lineStationIDs": [
+        "0249",
+        "0417",
+        "0632",
+        "0942"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0249"
+    },
+    {
+      "stationID": "251c049ad7695722",
+      "stationName": "伊犁路",
+      "stationNameEn": "Yili Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1047",
+      "lineStationIDs": [
+        "1047"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1047"
+    },
+    {
+      "stationID": "252cccf02a27fc8c",
+      "stationName": "奉贤新城",
+      "stationNameEn": "Fengxian Xincheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "0538",
+      "lineStationIDs": [
+        "0538"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0538"
+    },
+    {
+      "stationID": "25db897f426d054c",
+      "stationName": "浦东大道",
+      "stationNameEn": "Pudong Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "0416",
+      "lineStationIDs": [
+        "0416",
+        "1440"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0416"
+    },
+    {
+      "stationID": "26ef3c7c3f045ffb",
+      "stationName": "顾村公园",
+      "stationNameEn": "Gucun Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0725",
+      "lineStationIDs": [
+        "0725",
+        "1550"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0725"
+    },
+    {
+      "stationID": "27225ffdd9941ff8",
+      "stationName": "康文路",
+      "stationNameEn": "Kangwen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1852",
+      "lineStationIDs": [
+        "1852"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1852"
+    },
+    {
+      "stationID": "27a1bd754dc6e8f7",
+      "stationName": "南大路",
+      "stationNameEn": "Nanda Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1547",
+      "lineStationIDs": [
+        "1547"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1547"
+    },
+    {
+      "stationID": "2835b28bbbff8e01",
+      "stationName": "市光路",
+      "stationNameEn": "Shiguang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0849",
+      "lineStationIDs": [
+        "0849"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0849"
+    },
+    {
+      "stationID": "287440de64236dd2",
+      "stationName": "罗秀路",
+      "stationNameEn": "Luoxiu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1530",
+      "lineStationIDs": [
+        "1530"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1530"
+    },
+    {
+      "stationID": "28acdc3b24202314",
+      "stationName": "长江西路",
+      "stationNameEn": "长江西路",
+      "aliases": [
+
+      ],
+      "externalStationID": "1848",
+      "lineStationIDs": [
+        "1848"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1848"
+    },
+    {
+      "stationID": "2913169c302d1b01",
+      "stationName": "江浦公园",
+      "stationNameEn": "Jiangpu Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "1241",
+      "lineStationIDs": [
+        "1241",
+        "1839"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1241"
+    },
+    {
+      "stationID": "2938d50994cfd8f7",
+      "stationName": "东兰路",
+      "stationNameEn": "Donglan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1223",
+      "lineStationIDs": [
+        "1223"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1223"
+    },
+    {
+      "stationID": "29cd7b80a5e8a2a0",
+      "stationName": "北洋泾路",
+      "stationNameEn": "Beiyangjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0635",
+      "lineStationIDs": [
+        "0635"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0635"
+    },
+    {
+      "stationID": "29df439e6092b789",
+      "stationName": "爱辉路",
+      "stationNameEn": "爱辉路",
+      "aliases": [
+
+      ],
+      "externalStationID": "1850",
+      "lineStationIDs": [
+        "1850"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1850"
+    },
+    {
+      "stationID": "2a8640332288f194",
+      "stationName": "基隆路",
+      "stationNameEn": "Jilong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1074",
+      "lineStationIDs": [
+        "1074"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1074"
+    },
+    {
+      "stationID": "2b8acaa2c25d679f",
+      "stationName": "国际客运中心",
+      "stationNameEn": "International Cruise Terminal",
+      "aliases": [
+
+      ],
+      "externalStationID": "1238",
+      "lineStationIDs": [
+        "1238"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1238"
+    },
+    {
+      "stationID": "2c81a7b71c27f0bf",
+      "stationName": "向城路",
+      "stationNameEn": "Xiangcheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0418",
+      "lineStationIDs": [
+        "0418"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0418"
+    },
+    {
+      "stationID": "2ee8a815f65bdd13",
+      "stationName": "鞍山新村",
+      "stationNameEn": "Anshan Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0842",
+      "lineStationIDs": [
+        "0842"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0842"
+    },
+    {
+      "stationID": "3070b0db35e72c8c",
+      "stationName": "外高桥保税区南",
+      "stationNameEn": "South Waigaoqiao Free Trade Zone",
+      "aliases": [
+
+      ],
+      "externalStationID": "0645",
+      "lineStationIDs": [
+        "0645"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0645"
+    },
+    {
+      "stationID": "30b07d5dd833fc73",
+      "stationName": "东方体育中心",
+      "stationNameEn": "Oriental Sports Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "0621",
+      "lineStationIDs": [
+        "0621",
+        "0826",
+        "1154"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0621"
+    },
+    {
+      "stationID": "3158ba0da4195a6c",
+      "stationName": "高桥西",
+      "stationNameEn": "West Gaoqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1071",
+      "lineStationIDs": [
+        "1071"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1071"
+    },
+    {
+      "stationID": "31ae551a8e254527",
+      "stationName": "西藏南路",
+      "stationNameEn": "South Xizang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0422",
+      "lineStationIDs": [
+        "0422",
+        "0831"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0422"
+    },
+    {
+      "stationID": "31cb738fa664386b",
+      "stationName": "刘行",
+      "stationNameEn": "Liuhang",
+      "aliases": [
+
+      ],
+      "externalStationID": "0724",
+      "lineStationIDs": [
+        "0724"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0724"
+    },
+    {
+      "stationID": "322285d8ca3c70b0",
+      "stationName": "迪士尼",
+      "stationNameEn": "Disney Resort",
+      "aliases": [
+
+      ],
+      "externalStationID": "1163",
+      "lineStationIDs": [
+        "1163"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1163"
+    },
+    {
+      "stationID": "32ecf1f16e34bf37",
+      "stationName": "东方绿舟",
+      "stationNameEn": "Oriental Land",
+      "aliases": [
+
+      ],
+      "externalStationID": "1733",
+      "lineStationIDs": [
+        "1733"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1733"
+    },
+    {
+      "stationID": "337e4a88cc57123d",
+      "stationName": "杨树浦路",
+      "stationNameEn": "Yangshupu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0415",
+      "lineStationIDs": [
+        "0415"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0415"
+    },
+    {
+      "stationID": "33b9f5f5a150dd2d",
+      "stationName": "通河新村",
+      "stationNameEn": "Tonghe Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0133",
+      "lineStationIDs": [
+        "0133"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0133"
+    },
+    {
+      "stationID": "345f0ad62aa8a5dd",
+      "stationName": "民生路",
+      "stationNameEn": "Minsheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0634",
+      "lineStationIDs": [
+        "0634",
+        "1835"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0634"
+    },
+    {
+      "stationID": "3533dd5418bea688",
+      "stationName": "白银路",
+      "stationNameEn": "Baiyin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1133",
+      "lineStationIDs": [
+        "1133"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1133"
+    },
+    {
+      "stationID": "356a0d83cd6a607d",
+      "stationName": "莲花路",
+      "stationNameEn": "Lianhua Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0113",
+      "lineStationIDs": [
+        "0113"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0113"
+    },
+    {
+      "stationID": "358a1060e0b28a23",
+      "stationName": "颛桥",
+      "stationNameEn": "Zhuanqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0505",
+      "lineStationIDs": [
+        "0505"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0505"
+    },
+    {
+      "stationID": "35e870d9ff81ed66",
+      "stationName": "龙柏新村",
+      "stationNameEn": "Longbai Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "1020",
+      "lineStationIDs": [
+        "1020"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1020"
+    },
+    {
+      "stationID": "374f116478cd513d",
+      "stationName": "豫园",
+      "stationNameEn": "Yuyuan Garden",
+      "aliases": [
+
+      ],
+      "externalStationID": "1055",
+      "lineStationIDs": [
+        "1055",
+        "1437"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1055"
+    },
+    {
+      "stationID": "38e3549a4e40b7e8",
+      "stationName": "德平路",
+      "stationNameEn": "Deping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0636",
+      "lineStationIDs": [
+        "0636"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0636"
+    },
+    {
+      "stationID": "38f456dc583ba19d",
+      "stationName": "浦三路",
+      "stationNameEn": "Pusan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1157",
+      "lineStationIDs": [
+        "1157"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1157"
+    },
+    {
+      "stationID": "39ff81a3b6018743",
+      "stationName": "上海西站",
+      "stationNameEn": "Shanghai West Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "1142",
+      "lineStationIDs": [
+        "1142",
+        "1543"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1142"
+    },
+    {
+      "stationID": "3a9db825b293bd2f",
+      "stationName": "四川北路",
+      "stationNameEn": "North Sichuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1058",
+      "lineStationIDs": [
+        "1058"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1058"
+    },
+    {
+      "stationID": "3b583f1aeb90f0d1",
+      "stationName": "梅岭北路",
+      "stationNameEn": "North Meiling Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1541",
+      "lineStationIDs": [
+        "1541"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1541"
+    },
+    {
+      "stationID": "3b9cc91d5b298696",
+      "stationName": "南京西路",
+      "stationNameEn": "West Nanjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0244",
+      "lineStationIDs": [
+        "0244",
+        "1234",
+        "1334"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0244"
+    },
+    {
+      "stationID": "3be4c739822f22da",
+      "stationName": "大华三路",
+      "stationNameEn": "Dahuasan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0733",
+      "lineStationIDs": [
+        "0733"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0733"
+    },
+    {
+      "stationID": "3c44de3cd50e68df",
+      "stationName": "成山路",
+      "stationNameEn": "Chengshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0828",
+      "lineStationIDs": [
+        "0828",
+        "1341"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0828"
+    },
+    {
+      "stationID": "3c9a1a2e4af78ae7",
+      "stationName": "中山北路",
+      "stationNameEn": "North Zhongshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0127",
+      "lineStationIDs": [
+        "0127"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0127"
+    },
+    {
+      "stationID": "3cb3379ebc470e71",
+      "stationName": "永德路",
+      "stationNameEn": "Yongde Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1522",
+      "lineStationIDs": [
+        "1522"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1522"
+    },
+    {
+      "stationID": "3d93550bd80193a2",
+      "stationName": "莲溪路",
+      "stationNameEn": "Lianxi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1347",
+      "lineStationIDs": [
+        "1347",
+        "1829"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1347"
+    },
+    {
+      "stationID": "3dd647fb2ae12377",
+      "stationName": "嘉松中路",
+      "stationNameEn": "Middle Jiasong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1726",
+      "lineStationIDs": [
+        "1726"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1726"
+    },
+    {
+      "stationID": "3e0b0cbc40f12a8d",
+      "stationName": "真北路",
+      "stationNameEn": "Zhenbei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1325",
+      "lineStationIDs": [
+        "1325"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1325"
+    },
+    {
+      "stationID": "3e823e5263749c86",
+      "stationName": "周浦",
+      "stationNameEn": "Zhoupu",
+      "aliases": [
+
+      ],
+      "externalStationID": "1826",
+      "lineStationIDs": [
+        "1826"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1826"
+    },
+    {
+      "stationID": "3ea88f675f464a00",
+      "stationName": "殷高路",
+      "stationNameEn": "Yingao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1845",
+      "lineStationIDs": [
+        "1845"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1845"
+    },
+    {
+      "stationID": "3efca3aaaea46cfc",
+      "stationName": "大木桥路",
+      "stationNameEn": "Damuqiao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0424",
+      "lineStationIDs": [
+        "0424",
+        "1231"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0424"
+    },
+    {
+      "stationID": "3f23877a61db185b",
+      "stationName": "下沙",
+      "stationNameEn": "Xiasha",
+      "aliases": [
+
+      ],
+      "externalStationID": "1822",
+      "lineStationIDs": [
+        "1822"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1822"
+    },
+    {
+      "stationID": "3f50bbe16aede6cc",
+      "stationName": "歇浦路",
+      "stationNameEn": "Xiepu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1443",
+      "lineStationIDs": [
+        "1443"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1443"
+    },
+    {
+      "stationID": "3f8ee6801e0afb08",
+      "stationName": "浦东1号2号航站楼",
+      "stationNameEn": "Pudong Airport Terminal 1&2",
+      "aliases": [
+
+      ],
+      "externalStationID": "0263",
+      "lineStationIDs": [
+        "0263",
+        "5137"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0263"
+    },
+    {
+      "stationID": "403898988260423e",
+      "stationName": "上海科技馆",
+      "stationNameEn": "Shanghai Science and Technology Museum",
+      "aliases": [
+
+      ],
+      "externalStationID": "0250",
+      "lineStationIDs": [
+        "0250"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0250"
+    },
+    {
+      "stationID": "406fcdfa5c0b4e37",
+      "stationName": "金沙江路",
+      "stationNameEn": "Jinshajiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0319",
+      "lineStationIDs": [
+        "0319",
+        "0406",
+        "1327"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0319"
+    },
+    {
+      "stationID": "4098c9426639fcdc",
+      "stationName": "国家会展中心",
+      "stationNameEn": "National Exhibiation and Convention Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "0234",
+      "lineStationIDs": [
+        "0234",
+        "1722"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0234"
+    },
+    {
+      "stationID": "418dfe3d348611d1",
+      "stationName": "五角场",
+      "stationNameEn": "Wujiaochang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1064",
+      "lineStationIDs": [
+        "1064"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1064"
+    },
+    {
+      "stationID": "422395cbe1887bbd",
+      "stationName": "秀沿路",
+      "stationNameEn": "Xiuyan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1161",
+      "lineStationIDs": [
+        "1161"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1161"
+    },
+    {
+      "stationID": "42cf305bf273d8cd",
+      "stationName": "长清路",
+      "stationNameEn": "Changqing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0745",
+      "lineStationIDs": [
+        "0745",
+        "1340"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0745"
+    },
+    {
+      "stationID": "435366486bc64bad",
+      "stationName": "金运路",
+      "stationNameEn": "Jinyun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1321",
+      "lineStationIDs": [
+        "1321"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1321"
+    },
+    {
+      "stationID": "43599534c5f7008c",
+      "stationName": "金京路",
+      "stationNameEn": "Jinjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1249",
+      "lineStationIDs": [
+        "1249"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1249"
+    },
+    {
+      "stationID": "44134aef2bf39dec",
+      "stationName": "友谊路",
+      "stationNameEn": "Youyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0337",
+      "lineStationIDs": [
+        "0337"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0337"
+    },
+    {
+      "stationID": "46d101b7887a97a4",
+      "stationName": "老西门",
+      "stationNameEn": "Laoximen",
+      "aliases": [
+
+      ],
+      "externalStationID": "0833",
+      "lineStationIDs": [
+        "0833",
+        "1054"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0833"
+    },
+    {
+      "stationID": "472e1e0e65778e9a",
+      "stationName": "虹桥路",
+      "stationNameEn": "Hongqiao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0316",
+      "lineStationIDs": [
+        "0316",
+        "0403",
+        "1049"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0316"
+    },
+    {
+      "stationID": "4847afd62cb714aa",
+      "stationName": "三门路",
+      "stationNameEn": "Sanmen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1066",
+      "lineStationIDs": [
+        "1066"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1066"
+    },
+    {
+      "stationID": "48539a40c41c4c98",
+      "stationName": "定边路",
+      "stationNameEn": "Dingbian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1425",
+      "lineStationIDs": [
+        "1425"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1425"
+    },
+    {
+      "stationID": "4b29741699961d47",
+      "stationName": "嘉怡路",
+      "stationNameEn": "Jiayi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1424",
+      "lineStationIDs": [
+        "1424"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1424"
+    },
+    {
+      "stationID": "4b92d262978d1b1e",
+      "stationName": "水产路",
+      "stationNameEn": "Shuichan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0335",
+      "lineStationIDs": [
+        "0335"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0335"
+    },
+    {
+      "stationID": "4cd40d328443c834",
+      "stationName": "桂林公园",
+      "stationNameEn": "Guilin Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "1226",
+      "lineStationIDs": [
+        "1226",
+        "1533"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1226"
+    },
+    {
+      "stationID": "4d5c14eaa418aa29",
+      "stationName": "红宝石路",
+      "stationNameEn": "Hongbaoshi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1537",
+      "lineStationIDs": [
+        "1537"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1537"
+    },
+    {
+      "stationID": "4db94258b1744fe3",
+      "stationName": "龙溪路",
+      "stationNameEn": "Longxi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1045",
+      "lineStationIDs": [
+        "1045"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1045"
+    },
+    {
+      "stationID": "4dfd77e1f6949c29",
+      "stationName": "虹桥火车站",
+      "stationNameEn": "Hongqiao Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "0235",
+      "lineStationIDs": [
+        "0235",
+        "1041",
+        "1721"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0235"
+    },
+    {
+      "stationID": "4f1568c34554f95a",
+      "stationName": "凌空路",
+      "stationNameEn": "Lingkong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0260",
+      "lineStationIDs": [
+        "0260"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0260"
+    },
+    {
+      "stationID": "4fe958f9cc93e9fd",
+      "stationName": "双柏路",
+      "stationNameEn": "Shuangbai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1524",
+      "lineStationIDs": [
+        "1524"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1524"
+    },
+    {
+      "stationID": "4ffd6d6a186c0084",
+      "stationName": "世纪公园",
+      "stationNameEn": "Century Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0251",
+      "lineStationIDs": [
+        "0251"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0251"
+    },
+    {
+      "stationID": "50218fee2c6a7d42",
+      "stationName": "联航路",
+      "stationNameEn": "Lianhang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0821",
+      "lineStationIDs": [
+        "0821"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0821"
+    },
+    {
+      "stationID": "5280e9eb8f0b9bf7",
+      "stationName": "凌兆新村",
+      "stationNameEn": "Lingzhao Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0825",
+      "lineStationIDs": [
+        "0825"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0825"
+    },
+    {
+      "stationID": "5327d71351b57fbb",
+      "stationName": "嘉定北",
+      "stationNameEn": "North Jiading",
+      "aliases": [
+
+      ],
+      "externalStationID": "1131",
+      "lineStationIDs": [
+        "1131"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1131"
+    },
+    {
+      "stationID": "536b349a56695fa6",
+      "stationName": "复旦大学",
+      "stationNameEn": "Fudan University",
+      "aliases": [
+
+      ],
+      "externalStationID": "1843",
+      "lineStationIDs": [
+        "1843"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1843"
+    },
+    {
+      "stationID": "547a552dd1237d27",
+      "stationName": "真新新村",
+      "stationNameEn": "Zhenxin Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "1426",
+      "lineStationIDs": [
+        "1426"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1426"
+    },
+    {
+      "stationID": "54dae2d80abf98b4",
+      "stationName": "镇坪路",
+      "stationNameEn": "Zhenping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0321",
+      "lineStationIDs": [
+        "0321",
+        "0408",
+        "0736"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0321"
+    },
+    {
+      "stationID": "55230d71052e9c7c",
+      "stationName": "长寿路",
+      "stationNameEn": "Changshou Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0737",
+      "lineStationIDs": [
+        "0737",
+        "1330"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0737"
+    },
+    {
+      "stationID": "5539eee5935b198f",
+      "stationName": "景洪路",
+      "stationNameEn": "Jinghong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1528",
+      "lineStationIDs": [
+        "1528",
+        "5133"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1528"
+    },
+    {
+      "stationID": "553ae4c7b3524a7d",
+      "stationName": "黄兴公园",
+      "stationNameEn": "Huangxing Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0846",
+      "lineStationIDs": [
+        "0846"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0846"
+    },
+    {
+      "stationID": "55724239c54964c8",
+      "stationName": "临平路",
+      "stationNameEn": "Linping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0413",
+      "lineStationIDs": [
+        "0413"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0413"
+    },
+    {
+      "stationID": "5684174d17e2ba2d",
+      "stationName": "闵行开发区",
+      "stationNameEn": "Minhang Development Zone",
+      "aliases": [
+
+      ],
+      "externalStationID": "0513",
+      "lineStationIDs": [
+        "0513"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0513"
+    },
+    {
+      "stationID": "569f3127142988fd",
+      "stationName": "康桥东",
+      "stationNameEn": "East Kangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "5135",
+      "lineStationIDs": [
+        "5135"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=5135"
+    },
+    {
+      "stationID": "579a6437d032d10f",
+      "stationName": "嘉定西",
+      "stationNameEn": "West Jiading",
+      "aliases": [
+
+      ],
+      "externalStationID": "1132",
+      "lineStationIDs": [
+        "1132"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1132"
+    },
+    {
+      "stationID": "588febeaab708706",
+      "stationName": "淞发路",
+      "stationNameEn": "Songfa Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0332",
+      "lineStationIDs": [
+        "0332"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0332"
+    },
+    {
+      "stationID": "58aec19aa438c9bc",
+      "stationName": "金桥",
+      "stationNameEn": "Jinqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0947",
+      "lineStationIDs": [
+        "0947"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0947"
+    },
+    {
+      "stationID": "58e3accc8cba4606",
+      "stationName": "江宁路",
+      "stationNameEn": "Jiangning Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1331",
+      "lineStationIDs": [
+        "1331"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1331"
+    },
+    {
+      "stationID": "591f2a849dcffc54",
+      "stationName": "青浦新城",
+      "stationNameEn": "Qingpu Xincheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "1729",
+      "lineStationIDs": [
+        "1729"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1729"
+    },
+    {
+      "stationID": "5932e3a1045abd83",
+      "stationName": "昌平路",
+      "stationNameEn": "Changping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0738",
+      "lineStationIDs": [
+        "0738"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0738"
+    },
+    {
+      "stationID": "59798f4f5194cf36",
+      "stationName": "一大会址·黄陂南路",
+      "stationNameEn": "Site of the First CPC National Congress·South Huangpi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0122",
+      "lineStationIDs": [
+        "0122",
+        "1435"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0122"
+    },
+    {
+      "stationID": "5a7890f3f1aaac23",
+      "stationName": "沈梅路",
+      "stationNameEn": "Shenmei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1824",
+      "lineStationIDs": [
+        "1824"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1824"
+    },
+    {
+      "stationID": "5b13507b3474b661",
+      "stationName": "水城路",
+      "stationNameEn": "Shuicheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1046",
+      "lineStationIDs": [
+        "1046"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1046"
+    },
+    {
+      "stationID": "5b2d959375715f80",
+      "stationName": "龙耀路",
+      "stationNameEn": "Longyao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1153",
+      "lineStationIDs": [
+        "1153"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1153"
+    },
+    {
+      "stationID": "5b64e65084adcbdf",
+      "stationName": "昌吉东路",
+      "stationNameEn": "East Changji Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1119",
+      "lineStationIDs": [
+        "1119"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1119"
+    },
+    {
+      "stationID": "5bd9e6a3dea67258",
+      "stationName": "合川路",
+      "stationNameEn": "Hechuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0930",
+      "lineStationIDs": [
+        "0930"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0930"
+    },
+    {
+      "stationID": "5d09e630cd7868be",
+      "stationName": "场中路",
+      "stationNameEn": "Changzhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0730",
+      "lineStationIDs": [
+        "0730"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0730"
+    },
+    {
+      "stationID": "5d0a1e9c128ce90f",
+      "stationName": "康新公路",
+      "stationNameEn": "Kangxin Highway",
+      "aliases": [
+
+      ],
+      "externalStationID": "1162",
+      "lineStationIDs": [
+        "1162"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1162"
+    },
+    {
+      "stationID": "5d68e556bfc72493",
+      "stationName": "提篮桥",
+      "stationNameEn": "Tilanqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1239",
+      "lineStationIDs": [
+        "1239"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1239"
+    },
+    {
+      "stationID": "5e073dd8692691bc",
+      "stationName": "江杨北路",
+      "stationNameEn": "North Jiangyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0339",
+      "lineStationIDs": [
+        "0339"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0339"
+    },
+    {
+      "stationID": "5eb78c30e5e4a39b",
+      "stationName": "曲阜路",
+      "stationNameEn": "Qufu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0836",
+      "lineStationIDs": [
+        "0836",
+        "1236"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0836"
+    },
+    {
+      "stationID": "5ec798c89aa77ac4",
+      "stationName": "花木路",
+      "stationNameEn": "Huamu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0753",
+      "lineStationIDs": [
+        "0753"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0753"
+    },
+    {
+      "stationID": "5ec83ed56ca3f64c",
+      "stationName": "陆家浜路",
+      "stationNameEn": "Lujiabang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0832",
+      "lineStationIDs": [
+        "0832",
+        "0939"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0832"
+    },
+    {
+      "stationID": "5ee0ef8faa127286",
+      "stationName": "彭浦新村",
+      "stationNameEn": "Pengpu Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0131",
+      "lineStationIDs": [
+        "0131"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0131"
+    },
+    {
+      "stationID": "5f595258c679b841",
+      "stationName": "云顺路",
+      "stationNameEn": "Yunshun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1448",
+      "lineStationIDs": [
+        "1448"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1448"
+    },
+    {
+      "stationID": "5f9631fab8dc6e50",
+      "stationName": "新场",
+      "stationNameEn": "Xinchang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1627",
+      "lineStationIDs": [
+        "1627"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1627"
+    },
+    {
+      "stationID": "5fd7b51656e5f7bd",
+      "stationName": "鲁班路",
+      "stationNameEn": "Luban Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0423",
+      "lineStationIDs": [
+        "0423"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0423"
+    },
+    {
+      "stationID": "5fd92868ceeeac81",
+      "stationName": "赵巷",
+      "stationNameEn": "Zhaoxiang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1727",
+      "lineStationIDs": [
+        "1727"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1727"
+    },
+    {
+      "stationID": "6012f6720e2146c1",
+      "stationName": "复兴岛",
+      "stationNameEn": "Fuxing Island",
+      "aliases": [
+
+      ],
+      "externalStationID": "1245",
+      "lineStationIDs": [
+        "1245"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1245"
+    },
+    {
+      "stationID": "603753a4273a2693",
+      "stationName": "桂林路",
+      "stationNameEn": "Guilin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0932",
+      "lineStationIDs": [
+        "0932",
+        "1534"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0932"
+    },
+    {
+      "stationID": "60c915bf56f06598",
+      "stationName": "莘庄",
+      "stationNameEn": "Xinzhuang",
+      "aliases": [
+
+      ],
+      "externalStationID": "0111",
+      "lineStationIDs": [
+        "0111",
+        "0501"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0111"
+    },
+    {
+      "stationID": "60de51aaf09584fa",
+      "stationName": "虹梅路",
+      "stationNameEn": "Hongmei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1224",
+      "lineStationIDs": [
+        "1224"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1224"
+    },
+    {
+      "stationID": "60ebd987f9809aa1",
+      "stationName": "虹桥1号航站楼",
+      "stationNameEn": "Hongqiao Airport Terminal 1",
+      "aliases": [
+
+      ],
+      "externalStationID": "1043",
+      "lineStationIDs": [
+        "1043"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1043"
+    },
+    {
+      "stationID": "60f95407228df4c0",
+      "stationName": "航头东",
+      "stationNameEn": "East Hangtou",
+      "aliases": [
+
+      ],
+      "externalStationID": "1626",
+      "lineStationIDs": [
+        "1626"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1626"
+    },
+    {
+      "stationID": "60fc71bb66b96d4e",
+      "stationName": "国帆路",
+      "stationNameEn": "Guofan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1069",
+      "lineStationIDs": [
+        "1069"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1069"
+    },
+    {
+      "stationID": "61e072c3c33ccaef",
+      "stationName": "汶水路",
+      "stationNameEn": "Wenshui Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0130",
+      "lineStationIDs": [
+        "0130"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0130"
+    },
+    {
+      "stationID": "62ec63ace21c20ce",
+      "stationName": "美兰湖",
+      "stationNameEn": "Meilan Lake",
+      "aliases": [
+
+      ],
+      "externalStationID": "0721",
+      "lineStationIDs": [
+        "0721"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0721"
+    },
+    {
+      "stationID": "62f300a46ead4420",
+      "stationName": "翔殷路",
+      "stationNameEn": "Xiangyin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0847",
+      "lineStationIDs": [
+        "0847"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0847"
+    },
+    {
+      "stationID": "6329c1df2311f20d",
+      "stationName": "高青路",
+      "stationNameEn": "Gaoqing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0625",
+      "lineStationIDs": [
+        "0625"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0625"
+    },
+    {
+      "stationID": "6335bfb6b3f7c80b",
+      "stationName": "马陆",
+      "stationNameEn": "Malu",
+      "aliases": [
+
+      ],
+      "externalStationID": "1135",
+      "lineStationIDs": [
+        "1135"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1135"
+    },
+    {
+      "stationID": "642704620f7b5fdb",
+      "stationName": "浦电路",
+      "stationNameEn": "Pudian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0631",
+      "lineStationIDs": [
+        "0631"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0631"
+    },
+    {
+      "stationID": "6612fffab653e552",
+      "stationName": "武定路",
+      "stationNameEn": "Wuding Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1433",
+      "lineStationIDs": [
+        "1433"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1433"
+    },
+    {
+      "stationID": "661e15d63a875a7b",
+      "stationName": "西岑",
+      "stationNameEn": "Xicen",
+      "aliases": [
+
+      ],
+      "externalStationID": "1734",
+      "lineStationIDs": [
+        "1734"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1734"
+    },
+    {
+      "stationID": "673e04344555dbbb",
+      "stationName": "虹莘路",
+      "stationNameEn": "Hongxin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1221",
+      "lineStationIDs": [
+        "1221"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1221"
+    },
+    {
+      "stationID": "67aec568af34870f",
+      "stationName": "徐泾北城",
+      "stationNameEn": "Xujingbeicheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "1725",
+      "lineStationIDs": [
+        "1725"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1725"
+    },
+    {
+      "stationID": "68315b68b98dd248",
+      "stationName": "富锦路",
+      "stationNameEn": "Fujin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0138",
+      "lineStationIDs": [
+        "0138"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0138"
+    },
+    {
+      "stationID": "687ff6d11b3e843a",
+      "stationName": "九亭",
+      "stationNameEn": "Jiuting",
+      "aliases": [
+
+      ],
+      "externalStationID": "0926",
+      "lineStationIDs": [
+        "0926"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0926"
+    },
+    {
+      "stationID": "6b137ab0402f1d57",
+      "stationName": "漕盈路",
+      "stationNameEn": "Caoying Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1730",
+      "lineStationIDs": [
+        "1730"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1730"
+    },
+    {
+      "stationID": "6c24823104e4e44d",
+      "stationName": "东明路",
+      "stationNameEn": "Dongming Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0626",
+      "lineStationIDs": [
+        "0626",
+        "1342"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0626"
+    },
+    {
+      "stationID": "6c40a22deb237502",
+      "stationName": "金平路",
+      "stationNameEn": "Jinping Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0510",
+      "lineStationIDs": [
+        "0510"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0510"
+    },
+    {
+      "stationID": "6c4145f89feaa651",
+      "stationName": "淞滨路",
+      "stationNameEn": "Songbin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0334",
+      "lineStationIDs": [
+        "0334"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0334"
+    },
+    {
+      "stationID": "6c42b44f174dbd20",
+      "stationName": "博兴路",
+      "stationNameEn": "Boxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0639",
+      "lineStationIDs": [
+        "0639"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0639"
+    },
+    {
+      "stationID": "6e15454c7c89baf4",
+      "stationName": "三林",
+      "stationNameEn": "Sanlin",
+      "aliases": [
+
+      ],
+      "externalStationID": "1155",
+      "lineStationIDs": [
+        "1155"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1155"
+    },
+    {
+      "stationID": "6e4330e9d489a172",
+      "stationName": "铜川路",
+      "stationNameEn": "Tongchuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1428",
+      "lineStationIDs": [
+        "1428",
+        "1542"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1428"
+    },
+    {
+      "stationID": "6edc917d64c17e97",
+      "stationName": "封浜",
+      "stationNameEn": "Fengbang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1421",
+      "lineStationIDs": [
+        "1421"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1421"
+    },
+    {
+      "stationID": "6ff4dbc1db361f79",
+      "stationName": "七莘路",
+      "stationNameEn": "Qixin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1220",
+      "lineStationIDs": [
+        "1220"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1220"
+    },
+    {
+      "stationID": "702734576097c234",
+      "stationName": "上海财经大学",
+      "stationNameEn": "Shanghai University of Finance and Economics",
+      "aliases": [
+
+      ],
+      "externalStationID": "1844",
+      "lineStationIDs": [
+        "1844"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1844"
+    },
+    {
+      "stationID": "7093306ce7f0a01c",
+      "stationName": "景西路",
+      "stationNameEn": "Jingxi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1526",
+      "lineStationIDs": [
+        "1526"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1526"
+    },
+    {
+      "stationID": "712d5481cac18e9f",
+      "stationName": "金海路",
+      "stationNameEn": "Jinhai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0949",
+      "lineStationIDs": [
+        "0949",
+        "1251"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0949"
+    },
+    {
+      "stationID": "71695582710ee0d5",
+      "stationName": "芳甸路",
+      "stationNameEn": "Fangdian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0944",
+      "lineStationIDs": [
+        "0944"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0944"
+    },
+    {
+      "stationID": "72b81c34634c466c",
+      "stationName": "武宁路",
+      "stationNameEn": "Wuning Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1329",
+      "lineStationIDs": [
+        "1329",
+        "1432"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1329"
+    },
+    {
+      "stationID": "72d5a96caf053a84",
+      "stationName": "呼兰路",
+      "stationNameEn": "Hulan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0134",
+      "lineStationIDs": [
+        "0134",
+        "1851"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0134"
+    },
+    {
+      "stationID": "72fd03b3ef4e8ffc",
+      "stationName": "殷高东路",
+      "stationNameEn": "East Yingao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1067",
+      "lineStationIDs": [
+        "1067"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1067"
+    },
+    {
+      "stationID": "732d14fea7395971",
+      "stationName": "杨高北路",
+      "stationNameEn": "North Yanggao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1248",
+      "lineStationIDs": [
+        "1248"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1248"
+    },
+    {
+      "stationID": "73ad0a900dc2deb2",
+      "stationName": "申江路",
+      "stationNameEn": "Shenjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1250",
+      "lineStationIDs": [
+        "1250"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1250"
+    },
+    {
+      "stationID": "74abf47878becb24",
+      "stationName": "创新中路",
+      "stationNameEn": "Middle Chuangxin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0257",
+      "lineStationIDs": [
+        "0257"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0257"
+    },
+    {
+      "stationID": "754daf2ace26b21f",
+      "stationName": "李子园",
+      "stationNameEn": "Liziyuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "1141",
+      "lineStationIDs": [
+        "1141"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1141"
+    },
+    {
+      "stationID": "76bc9357394354c4",
+      "stationName": "丰庄",
+      "stationNameEn": "Fengzhuang",
+      "aliases": [
+
+      ],
+      "externalStationID": "1323",
+      "lineStationIDs": [
+        "1323"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1323"
+    },
+    {
+      "stationID": "76e4feb938d8b106",
+      "stationName": "耀华路",
+      "stationNameEn": "Yaohua Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0746",
+      "lineStationIDs": [
+        "0746",
+        "0829"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0746"
+    },
+    {
+      "stationID": "770cc2aa56811511",
+      "stationName": "后滩",
+      "stationNameEn": "Houtan",
+      "aliases": [
+
+      ],
+      "externalStationID": "0744",
+      "lineStationIDs": [
+        "0744"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0744"
+    },
+    {
+      "stationID": "777345e7f184609c",
+      "stationName": "中科路",
+      "stationNameEn": "Zhongke Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1349",
+      "lineStationIDs": [
+        "1349"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1349"
+    },
+    {
+      "stationID": "77e7612165b3dd0d",
+      "stationName": "金科路",
+      "stationNameEn": "Jinke Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0254",
+      "lineStationIDs": [
+        "0254"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0254"
+    },
+    {
+      "stationID": "78736aa7971cfa9e",
+      "stationName": "南浦大桥",
+      "stationNameEn": "Nanpu Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "0421",
+      "lineStationIDs": [
+        "0421"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0421"
+    },
+    {
+      "stationID": "78a69de92b98e400",
+      "stationName": "源深路",
+      "stationNameEn": "Yuanshen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1441",
+      "lineStationIDs": [
+        "1441"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1441"
+    },
+    {
+      "stationID": "78ff43b0d05ebb1e",
+      "stationName": "汇金路",
+      "stationNameEn": "Huijin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1728",
+      "lineStationIDs": [
+        "1728"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1728"
+    },
+    {
+      "stationID": "798b771c507f47ad",
+      "stationName": "威宁路",
+      "stationNameEn": "Weining Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0239",
+      "lineStationIDs": [
+        "0239"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0239"
+    },
+    {
+      "stationID": "798c8fce96c896bd",
+      "stationName": "康恒路",
+      "stationNameEn": "Kangheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1158",
+      "lineStationIDs": [
+        "1158"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1158"
+    },
+    {
+      "stationID": "7995795488627fee",
+      "stationName": "华宁路",
+      "stationNameEn": "Huaning Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0511",
+      "lineStationIDs": [
+        "0511"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0511"
+    },
+    {
+      "stationID": "79eb5f6064610f7a",
+      "stationName": "沈杜公路",
+      "stationNameEn": "Shendu Highway",
+      "aliases": [
+
+      ],
+      "externalStationID": "0820",
+      "lineStationIDs": [
+        "0820",
+        "4101"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0820"
+    },
+    {
+      "stationID": "7a7313fa4676650f",
+      "stationName": "中宁路",
+      "stationNameEn": "Zhongning Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1430",
+      "lineStationIDs": [
+        "1430"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1430"
+    },
+    {
+      "stationID": "7b1c9b6f768fe312",
+      "stationName": "陈春路",
+      "stationNameEn": "Chenchun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1346",
+      "lineStationIDs": [
+        "1346"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1346"
+    },
+    {
+      "stationID": "7b8c7d5af5398979",
+      "stationName": "淞虹路",
+      "stationNameEn": "Songhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0237",
+      "lineStationIDs": [
+        "0237"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0237"
+    },
+    {
+      "stationID": "7c59a8d1c9396f7e",
+      "stationName": "云山路",
+      "stationNameEn": "Yunshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0637",
+      "lineStationIDs": [
+        "0637",
+        "1445"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0637"
+    },
+    {
+      "stationID": "7c80119885e8ae0c",
+      "stationName": "上海体育馆",
+      "stationNameEn": "Shanghai Indoor Stadium",
+      "aliases": [
+
+      ],
+      "externalStationID": "0117",
+      "lineStationIDs": [
+        "0117",
+        "0401"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0117"
+    },
+    {
+      "stationID": "7d8124c84e189be6",
+      "stationName": "兆丰路",
+      "stationNameEn": "Zhaofeng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1116",
+      "lineStationIDs": [
+        "1116"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1116"
+    },
+    {
+      "stationID": "7f85c5f404f45e6e",
+      "stationName": "临沂新村",
+      "stationNameEn": "Linyi Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0628",
+      "lineStationIDs": [
+        "0628"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0628"
+    },
+    {
+      "stationID": "80db80a8e2081c4e",
+      "stationName": "环城东路",
+      "stationNameEn": "Huanchengdong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0535",
+      "lineStationIDs": [
+        "0535"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0535"
+    },
+    {
+      "stationID": "813f7b56ed753f49",
+      "stationName": "江月路",
+      "stationNameEn": "Jiangyue Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0822",
+      "lineStationIDs": [
+        "0822"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0822"
+    },
+    {
+      "stationID": "81b5979dbf82f902",
+      "stationName": "银都路",
+      "stationNameEn": "Yindu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0503",
+      "lineStationIDs": [
+        "0503"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0503"
+    },
+    {
+      "stationID": "8265da4ddec5c01d",
+      "stationName": "北新泾",
+      "stationNameEn": "Beixinjing",
+      "aliases": [
+
+      ],
+      "externalStationID": "0238",
+      "lineStationIDs": [
+        "0238"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0238"
+    },
+    {
+      "stationID": "83686ce3b98db06e",
+      "stationName": "嫩江路",
+      "stationNameEn": "Nenjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0848",
+      "lineStationIDs": [
+        "0848"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0848"
+    },
+    {
+      "stationID": "8369b5b4fc340e95",
+      "stationName": "桂桥路",
+      "stationNameEn": "Guiqiao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1451",
+      "lineStationIDs": [
+        "1451"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1451"
+    },
+    {
+      "stationID": "83c2b2bf09cb30f4",
+      "stationName": "自然博物馆",
+      "stationNameEn": "Shanghai Natural History Museum",
+      "aliases": [
+
+      ],
+      "externalStationID": "1333",
+      "lineStationIDs": [
+        "1333"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1333"
+    },
+    {
+      "stationID": "84331f1f24a3cc5a",
+      "stationName": "巨峰路",
+      "stationNameEn": "Jufeng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0641",
+      "lineStationIDs": [
+        "0641",
+        "1247"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0641"
+    },
+    {
+      "stationID": "851ec8b842913e11",
+      "stationName": "商城路",
+      "stationNameEn": "Shangcheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0941",
+      "lineStationIDs": [
+        "0941"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0941"
+    },
+    {
+      "stationID": "85a90314538cc789",
+      "stationName": "江浦路",
+      "stationNameEn": "Jiangpu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0843",
+      "lineStationIDs": [
+        "0843",
+        "1840"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0843"
+    },
+    {
+      "stationID": "86259819113cf104",
+      "stationName": "云锦路",
+      "stationNameEn": "Yunjin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1152",
+      "lineStationIDs": [
+        "1152"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1152"
+    },
+    {
+      "stationID": "87a8e432d6f3a58d",
+      "stationName": "新闸路",
+      "stationNameEn": "Xinzha Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0124",
+      "lineStationIDs": [
+        "0124"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0124"
+    },
+    {
+      "stationID": "87a9395d0f83361a",
+      "stationName": "宜山路",
+      "stationNameEn": "Yishan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0315",
+      "lineStationIDs": [
+        "0315",
+        "0402",
+        "0933"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0315"
+    },
+    {
+      "stationID": "87d4992f2f0b3de6",
+      "stationName": "东宝兴路",
+      "stationNameEn": "Dongbaoxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0325",
+      "lineStationIDs": [
+        "0325"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0325"
+    },
+    {
+      "stationID": "88a0b39b37bf2cf4",
+      "stationName": "外高桥保税区北",
+      "stationNameEn": "North Waigaoqiao Free Trade Zone",
+      "aliases": [
+
+      ],
+      "externalStationID": "0647",
+      "lineStationIDs": [
+        "0647"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0647"
+    },
+    {
+      "stationID": "88bc39304b2846dc",
+      "stationName": "国权路",
+      "stationNameEn": "Guoquan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1063",
+      "lineStationIDs": [
+        "1063",
+        "1842"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1063"
+    },
+    {
+      "stationID": "890ada6174bdc26b",
+      "stationName": "西藏北路",
+      "stationNameEn": "North Xizang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0838",
+      "lineStationIDs": [
+        "0838"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0838"
+    },
+    {
+      "stationID": "8a185c16c394a0d4",
+      "stationName": "中华艺术宫",
+      "stationNameEn": "China Art Museum",
+      "aliases": [
+
+      ],
+      "externalStationID": "0830",
+      "lineStationIDs": [
+        "0830"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0830"
+    },
+    {
+      "stationID": "8ac6329b88894e20",
+      "stationName": "灵岩南路",
+      "stationNameEn": "South Lingyan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0622",
+      "lineStationIDs": [
+        "0622"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0622"
+    },
+    {
+      "stationID": "8bc041f0e49dd6ff",
+      "stationName": "大柏树",
+      "stationNameEn": "Dabaishu",
+      "aliases": [
+
+      ],
+      "externalStationID": "0328",
+      "lineStationIDs": [
+        "0328"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0328"
+    },
+    {
+      "stationID": "8bc35de78d9dd34c",
+      "stationName": "龙漕路",
+      "stationNameEn": "Longcao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0313",
+      "lineStationIDs": [
+        "0313",
+        "1228"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0313"
+    },
+    {
+      "stationID": "8c4cc573f328934b",
+      "stationName": "世博大道",
+      "stationNameEn": "Shibo Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "1339",
+      "lineStationIDs": [
+        "1339"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1339"
+    },
+    {
+      "stationID": "8cadc7598b2bf61c",
+      "stationName": "武威东路",
+      "stationNameEn": "East Wuwei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1544",
+      "lineStationIDs": [
+        "1544"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1544"
+    },
+    {
+      "stationID": "8d04472c7f49e228",
+      "stationName": "御桥",
+      "stationNameEn": "Yuqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1159",
+      "lineStationIDs": [
+        "1159",
+        "1828"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1159"
+    },
+    {
+      "stationID": "8d3296a3a934dafe",
+      "stationName": "华夏中路",
+      "stationNameEn": "Middle Huaxia Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1348",
+      "lineStationIDs": [
+        "1348",
+        "1622"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1348"
+    },
+    {
+      "stationID": "8df4582ca53cdf8c",
+      "stationName": "三鲁公路",
+      "stationNameEn": "Sanlu Highway",
+      "aliases": [
+
+      ],
+      "externalStationID": "4102",
+      "lineStationIDs": [
+        "4102"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=4102"
+    },
+    {
+      "stationID": "8ee4f4e888826220",
+      "stationName": "新村路",
+      "stationNameEn": "Xincun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0734",
+      "lineStationIDs": [
+        "0734"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0734"
+    },
+    {
+      "stationID": "8f411591d49b8c86",
+      "stationName": "迎春路",
+      "stationNameEn": "Yingchun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1833",
+      "lineStationIDs": [
+        "1833"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1833"
+    },
+    {
+      "stationID": "8f590e34c0f754f1",
+      "stationName": "延吉中路",
+      "stationNameEn": "Middle Yanji Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0845",
+      "lineStationIDs": [
+        "0845"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0845"
+    },
+    {
+      "stationID": "8f911325179e5a25",
+      "stationName": "长风公园",
+      "stationNameEn": "Changfeng Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "1539",
+      "lineStationIDs": [
+        "1539"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1539"
+    },
+    {
+      "stationID": "8fb991acc0c555dd",
+      "stationName": "行知路",
+      "stationNameEn": "Xingzhi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0732",
+      "lineStationIDs": [
+        "0732"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0732"
+    },
+    {
+      "stationID": "9008e80034d53c2c",
+      "stationName": "高科西路",
+      "stationNameEn": "West Gaoke Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0627",
+      "lineStationIDs": [
+        "0627",
+        "0748"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0627"
+    },
+    {
+      "stationID": "902c77b96f26b78b",
+      "stationName": "外环路",
+      "stationNameEn": "Waihuanlu",
+      "aliases": [
+
+      ],
+      "externalStationID": "0112",
+      "lineStationIDs": [
+        "0112"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0112"
+    },
+    {
+      "stationID": "90ce4830bf88ac5b",
+      "stationName": "西渡",
+      "stationNameEn": "Xidu",
+      "aliases": [
+
+      ],
+      "externalStationID": "0532",
+      "lineStationIDs": [
+        "0532"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0532"
+    },
+    {
+      "stationID": "913519ea9578eb3d",
+      "stationName": "曹路",
+      "stationNameEn": "Caolu",
+      "aliases": [
+
+      ],
+      "externalStationID": "0952",
+      "lineStationIDs": [
+        "0952"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0952"
+    },
+    {
+      "stationID": "91d5e4f735401bd8",
+      "stationName": "南陈路",
+      "stationNameEn": "Nanchen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0728",
+      "lineStationIDs": [
+        "0728"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0728"
+    },
+    {
+      "stationID": "923500c6c7391ce4",
+      "stationName": "龙华中路",
+      "stationNameEn": "Middle Longhua Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0743",
+      "lineStationIDs": [
+        "0743",
+        "1230"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0743"
+    },
+    {
+      "stationID": "92bedeffc7933a94",
+      "stationName": "人民广场",
+      "stationNameEn": "People's Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "0123",
+      "lineStationIDs": [
+        "0123",
+        "0245",
+        "0835"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0123"
+    },
+    {
+      "stationID": "92c56cae37c3df95",
+      "stationName": "蓝天路",
+      "stationNameEn": "Lantian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0945",
+      "lineStationIDs": [
+        "0945",
+        "1446"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0945"
+    },
+    {
+      "stationID": "93d483fa432ac659",
+      "stationName": "抚顺路",
+      "stationNameEn": "Fushun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1841",
+      "lineStationIDs": [
+        "1841"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1841"
+    },
+    {
+      "stationID": "948a9af420bb945e",
+      "stationName": "嘉善路",
+      "stationNameEn": "Jiashan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0936",
+      "lineStationIDs": [
+        "0936",
+        "1232"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0936"
+    },
+    {
+      "stationID": "94b7c696c0b1473f",
+      "stationName": "江川路",
+      "stationNameEn": "Jiangchuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0531",
+      "lineStationIDs": [
+        "0531"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0531"
+    },
+    {
+      "stationID": "94caaf40269bf4be",
+      "stationName": "东陆路",
+      "stationNameEn": "Donglu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1246",
+      "lineStationIDs": [
+        "1246"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1246"
+    },
+    {
+      "stationID": "952605aeac5a4f1d",
+      "stationName": "南京东路",
+      "stationNameEn": "East Nanjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0246",
+      "lineStationIDs": [
+        "0246",
+        "1056"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0246"
+    },
+    {
+      "stationID": "9619269eda6dbf7b",
+      "stationName": "鹤涛路",
+      "stationNameEn": "Hetao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1823",
+      "lineStationIDs": [
+        "1823"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1823"
+    },
+    {
+      "stationID": "988990ac8f174391",
+      "stationName": "紫竹高新区",
+      "stationNameEn": "Zizhu Hi-tech Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "1521",
+      "lineStationIDs": [
+        "1521"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1521"
+    },
+    {
+      "stationID": "99415b6fcecdc519",
+      "stationName": "周浦东",
+      "stationNameEn": "East Zhoupu",
+      "aliases": [
+
+      ],
+      "externalStationID": "1624",
+      "lineStationIDs": [
+        "1624"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1624"
+    },
+    {
+      "stationID": "998c5bb87bed527a",
+      "stationName": "江湾镇",
+      "stationNameEn": "Jiangwan Town",
+      "aliases": [
+
+      ],
+      "externalStationID": "0329",
+      "lineStationIDs": [
+        "0329"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0329"
+    },
+    {
+      "stationID": "9a927ff9d37a826c",
+      "stationName": "滴水湖",
+      "stationNameEn": "Dishui Lake",
+      "aliases": [
+
+      ],
+      "externalStationID": "1633",
+      "lineStationIDs": [
+        "1633"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1633"
+    },
+    {
+      "stationID": "9bbc8e8425cc73f1",
+      "stationName": "长江南路",
+      "stationNameEn": "South Changjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0331",
+      "lineStationIDs": [
+        "0331",
+        "1846"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0331"
+    },
+    {
+      "stationID": "9c1864863830b6bf",
+      "stationName": "江湾体育场",
+      "stationNameEn": "Jiangwan Stadium",
+      "aliases": [
+
+      ],
+      "externalStationID": "1065",
+      "lineStationIDs": [
+        "1065"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1065"
+    },
+    {
+      "stationID": "9d937d53db7b9577",
+      "stationName": "民雷路",
+      "stationNameEn": "Minlei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0951",
+      "lineStationIDs": [
+        "0951"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0951"
+    },
+    {
+      "stationID": "9db3e12d82f2b518",
+      "stationName": "蟠祥路・国家会计学院",
+      "stationNameEn": "Panxiang Road · Shanghai National Accounting Institute",
+      "aliases": [
+        "蟠祥路·国家会计学院"
+      ],
+      "externalStationID": "0233",
+      "lineStationIDs": [
+        "0233"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0233"
+    },
+    {
+      "stationID": "9e9437b95e70cb35",
+      "stationName": "陕西南路",
+      "stationNameEn": "South Shaanxi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0121",
+      "lineStationIDs": [
+        "0121",
+        "1052",
+        "1233"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0121"
+    },
+    {
+      "stationID": "9ecd86cbd59c4d6a",
+      "stationName": "昌邑路",
+      "stationNameEn": "Changyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1442",
+      "lineStationIDs": [
+        "1442",
+        "1836"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1442"
+    },
+    {
+      "stationID": "9f3e25a2a646fda0",
+      "stationName": "华夏西路",
+      "stationNameEn": "West Huaxia Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0624",
+      "lineStationIDs": [
+        "0624"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0624"
+    },
+    {
+      "stationID": "9f445bad1b88c034",
+      "stationName": "爱国路",
+      "stationNameEn": "Aiguo Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1244",
+      "lineStationIDs": [
+        "1244"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1244"
+    },
+    {
+      "stationID": "9f69d2e754cadaba",
+      "stationName": "汇臻路",
+      "stationNameEn": "Huizhen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "4106",
+      "lineStationIDs": [
+        "4106"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=4106"
+    },
+    {
+      "stationID": "a031a53acaf0f6f9",
+      "stationName": "漕宝路",
+      "stationNameEn": "Caobao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0116",
+      "lineStationIDs": [
+        "0116",
+        "1227"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0116"
+    },
+    {
+      "stationID": "a1d9769534358040",
+      "stationName": "鹤沙航城",
+      "stationNameEn": "Heshahangcheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "1625",
+      "lineStationIDs": [
+        "1625"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1625"
+    },
+    {
+      "stationID": "a26166dda3906086",
+      "stationName": "宋园路",
+      "stationNameEn": "Songyuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1048",
+      "lineStationIDs": [
+        "1048"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1048"
+    },
+    {
+      "stationID": "a3934e2b7b2e8d30",
+      "stationName": "顾戴路",
+      "stationNameEn": "Gudai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1222",
+      "lineStationIDs": [
+        "1222"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1222"
+    },
+    {
+      "stationID": "a42091a129a346cf",
+      "stationName": "静安寺",
+      "stationNameEn": "Jing'an Temple",
+      "aliases": [
+
+      ],
+      "externalStationID": "0243",
+      "lineStationIDs": [
+        "0243",
+        "0739",
+        "1434"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0243"
+    },
+    {
+      "stationID": "a452a221ac0dfca0",
+      "stationName": "真光路",
+      "stationNameEn": "Zhenguang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1427",
+      "lineStationIDs": [
+        "1427"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1427"
+    },
+    {
+      "stationID": "a5a00a465f76450c",
+      "stationName": "丰翔路",
+      "stationNameEn": "Fengxiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1548",
+      "lineStationIDs": [
+        "1548"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1548"
+    },
+    {
+      "stationID": "a5f4f6cdf9e5b3ee",
+      "stationName": "星中路",
+      "stationNameEn": "Xingzhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0929",
+      "lineStationIDs": [
+        "0929"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0929"
+    },
+    {
+      "stationID": "a801b5d8fe63a6df",
+      "stationName": "枫桥路",
+      "stationNameEn": "Fengqiao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1144",
+      "lineStationIDs": [
+        "1144"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1144"
+    },
+    {
+      "stationID": "a870111984f1f2ef",
+      "stationName": "上海国际旅游度假区",
+      "stationNameEn": "Shanghai International Resort",
+      "aliases": [
+
+      ],
+      "externalStationID": "5136",
+      "lineStationIDs": [
+        "5136"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=5136"
+    },
+    {
+      "stationID": "a897118149217e7e",
+      "stationName": "宝杨路",
+      "stationNameEn": "Baoyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0336",
+      "lineStationIDs": [
+        "0336"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0336"
+    },
+    {
+      "stationID": "a93aac9fe616ffc7",
+      "stationName": "七宝",
+      "stationNameEn": "Qibao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0928",
+      "lineStationIDs": [
+        "0928"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0928"
+    },
+    {
+      "stationID": "aa055d3ae5f2c5ea",
+      "stationName": "共康路",
+      "stationNameEn": "Gongkang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0132",
+      "lineStationIDs": [
+        "0132"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0132"
+    },
+    {
+      "stationID": "ac6f1be7575b686b",
+      "stationName": "共富新村",
+      "stationNameEn": "Gongfu Xincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "0135",
+      "lineStationIDs": [
+        "0135"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0135"
+    },
+    {
+      "stationID": "acbdd087a26126ca",
+      "stationName": "上海大学",
+      "stationNameEn": "Shanghai University",
+      "aliases": [
+
+      ],
+      "externalStationID": "0727",
+      "lineStationIDs": [
+        "0727"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0727"
+    },
+    {
+      "stationID": "acd4a123e99af6ce",
+      "stationName": "锦江乐园",
+      "stationNameEn": "Jinjiang Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0114",
+      "lineStationIDs": [
+        "0114"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0114"
+    },
+    {
+      "stationID": "ad3dfd68015ec751",
+      "stationName": "上海南站",
+      "stationNameEn": "Shanghai South Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "0115",
+      "lineStationIDs": [
+        "0115",
+        "0311",
+        "1532"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0115"
+    },
+    {
+      "stationID": "ad8ad6d3adfa73dd",
+      "stationName": "中春路",
+      "stationNameEn": "Zhongchun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0927",
+      "lineStationIDs": [
+        "0927",
+        "5132"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0927"
+    },
+    {
+      "stationID": "aef761b149b16879",
+      "stationName": "交通大学",
+      "stationNameEn": "Jiao Tong University",
+      "aliases": [
+
+      ],
+      "externalStationID": "1050",
+      "lineStationIDs": [
+        "1050",
+        "1148"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1050"
+    },
+    {
+      "stationID": "af10c907a0c0720e",
+      "stationName": "航津路",
+      "stationNameEn": "Hangjin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0646",
+      "lineStationIDs": [
+        "0646"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0646"
+    },
+    {
+      "stationID": "afdd179a32b6333e",
+      "stationName": "宝山路",
+      "stationNameEn": "Baoshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0324",
+      "lineStationIDs": [
+        "0324",
+        "0411"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0324"
+    },
+    {
+      "stationID": "b00e06b3f46c5969",
+      "stationName": "唐镇",
+      "stationNameEn": "Tangzhen",
+      "aliases": [
+
+      ],
+      "externalStationID": "0256",
+      "lineStationIDs": [
+        "0256"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0256"
+    },
+    {
+      "stationID": "b190a504ecbc3f8c",
+      "stationName": "康桥",
+      "stationNameEn": "Kangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1827",
+      "lineStationIDs": [
+        "1827"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1827"
+    },
+    {
+      "stationID": "b1d0ed6672f8b86b",
+      "stationName": "虹漕路",
+      "stationNameEn": "Hongcao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1225",
+      "lineStationIDs": [
+        "1225"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1225"
+    },
+    {
+      "stationID": "b244b60d256dd5ad",
+      "stationName": "元江路",
+      "stationNameEn": "Yuanjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1523",
+      "lineStationIDs": [
+        "1523"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1523"
+    },
+    {
+      "stationID": "b2f60a2e11fb6c10",
+      "stationName": "高桥",
+      "stationNameEn": "Gaoqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1072",
+      "lineStationIDs": [
+        "1072"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1072"
+    },
+    {
+      "stationID": "b33f6c9ed4281284",
+      "stationName": "中山公园",
+      "stationNameEn": "Zhongshan Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0241",
+      "lineStationIDs": [
+        "0241",
+        "0318",
+        "0405"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0241"
+    },
+    {
+      "stationID": "b45bef356fc92bd3",
+      "stationName": "张江高科",
+      "stationNameEn": "Zhangjiang Hi-Tech Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0253",
+      "lineStationIDs": [
+        "0253"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0253"
+    },
+    {
+      "stationID": "b4d965a55b8039a8",
+      "stationName": "春申路",
+      "stationNameEn": "Chunshen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0502",
+      "lineStationIDs": [
+        "0502"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0502"
+    },
+    {
+      "stationID": "b51e099fe415b5ac",
+      "stationName": "航中路",
+      "stationNameEn": "Hangzhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1018",
+      "lineStationIDs": [
+        "1018"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1018"
+    },
+    {
+      "stationID": "b536fccee4824185",
+      "stationName": "黄杨路",
+      "stationNameEn": "Huangyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1447",
+      "lineStationIDs": [
+        "1447"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1447"
+    },
+    {
+      "stationID": "b5ad81daf465e7d3",
+      "stationName": "繁荣路",
+      "stationNameEn": "Fanrong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1825",
+      "lineStationIDs": [
+        "1825"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1825"
+    },
+    {
+      "stationID": "b5fb86a9683a0860",
+      "stationName": "蓝村路",
+      "stationNameEn": "Lancun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0419",
+      "lineStationIDs": [
+        "0419",
+        "0630"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0419"
+    },
+    {
+      "stationID": "b63dba70382cd453",
+      "stationName": "大渡河路",
+      "stationNameEn": "Daduhe Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1326",
+      "lineStationIDs": [
+        "1326",
+        "1540"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1326"
+    },
+    {
+      "stationID": "b655c794c59b425e",
+      "stationName": "广兰路",
+      "stationNameEn": "Guanglan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0255",
+      "lineStationIDs": [
+        "0255"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0255"
+    },
+    {
+      "stationID": "b7527d3abf63ae0a",
+      "stationName": "潘广路",
+      "stationNameEn": "Panguang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0723",
+      "lineStationIDs": [
+        "0723"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0723"
+    },
+    {
+      "stationID": "b9e36268f358c9bb",
+      "stationName": "世博会博物馆",
+      "stationNameEn": "World Expo Museum",
+      "aliases": [
+
+      ],
+      "externalStationID": "1338",
+      "lineStationIDs": [
+        "1338"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1338"
+    },
+    {
+      "stationID": "bb50f1fee407a924",
+      "stationName": "常熟路",
+      "stationNameEn": "Changshu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0120",
+      "lineStationIDs": [
+        "0120",
+        "0740"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0120"
+    },
+    {
+      "stationID": "bb7139022fa09216",
+      "stationName": "金桥路",
+      "stationNameEn": "Jinqiao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0638",
+      "lineStationIDs": [
+        "0638"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0638"
+    },
+    {
+      "stationID": "bb9fb7456a4c63bc",
+      "stationName": "杨高中路",
+      "stationNameEn": "Middle Yanggao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0943",
+      "lineStationIDs": [
+        "0943",
+        "1834"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0943"
+    },
+    {
+      "stationID": "bc710c3b051c9e15",
+      "stationName": "吴中路",
+      "stationNameEn": "Wuzhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1535",
+      "lineStationIDs": [
+        "1535"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1535"
+    },
+    {
+      "stationID": "bcaed9900be66e76",
+      "stationName": "源深体育中心",
+      "stationNameEn": "Yuanshen Sports Centre",
+      "aliases": [
+
+      ],
+      "externalStationID": "0633",
+      "lineStationIDs": [
+        "0633"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0633"
+    },
+    {
+      "stationID": "bd01466491a6e426",
+      "stationName": "东川路",
+      "stationNameEn": "Dongchuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0509",
+      "lineStationIDs": [
+        "0509"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0509"
+    },
+    {
+      "stationID": "bd3dadc053f4a967",
+      "stationName": "龙华",
+      "stationNameEn": "Longhua",
+      "aliases": [
+
+      ],
+      "externalStationID": "1151",
+      "lineStationIDs": [
+        "1151",
+        "1229"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1151"
+    },
+    {
+      "stationID": "bdb2887828d2b21b",
+      "stationName": "海天三路",
+      "stationNameEn": "Haitiansan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0262",
+      "lineStationIDs": [
+        "0262"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0262"
+    },
+    {
+      "stationID": "be8c4afb47e023d7",
+      "stationName": "娄山关路",
+      "stationNameEn": "Loushanguan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0240",
+      "lineStationIDs": [
+        "0240",
+        "1538"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0240"
+    },
+    {
+      "stationID": "beb741a5850dacde",
+      "stationName": "华鹏路",
+      "stationNameEn": "Huapeng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1343",
+      "lineStationIDs": [
+        "1343"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1343"
+    },
+    {
+      "stationID": "bef5d7751e2ea0cf",
+      "stationName": "打浦桥",
+      "stationNameEn": "Dapuqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0937",
+      "lineStationIDs": [
+        "0937"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0937"
+    },
+    {
+      "stationID": "bfb2b8aa86c8207a",
+      "stationName": "殷高西路",
+      "stationNameEn": "West Yingao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0330",
+      "lineStationIDs": [
+        "0330"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0330"
+    },
+    {
+      "stationID": "c0c6eed098c06c87",
+      "stationName": "北蔡",
+      "stationNameEn": "Beicai",
+      "aliases": [
+
+      ],
+      "externalStationID": "1345",
+      "lineStationIDs": [
+        "1345"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1345"
+    },
+    {
+      "stationID": "c1e8f0ed2bdcbc3f",
+      "stationName": "五莲路",
+      "stationNameEn": "Wulian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0640",
+      "lineStationIDs": [
+        "0640"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0640"
+    },
+    {
+      "stationID": "c3a7c3d341f4be7f",
+      "stationName": "醉白池",
+      "stationNameEn": "Zuibaichi Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0919",
+      "lineStationIDs": [
+        "0919"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0919"
+    },
+    {
+      "stationID": "c3ce231b271b9f77",
+      "stationName": "野生动物园",
+      "stationNameEn": "Wild Animal Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "1628",
+      "lineStationIDs": [
+        "1628"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1628"
+    },
+    {
+      "stationID": "c40ed6ab33bf5d91",
+      "stationName": "杨高南路",
+      "stationNameEn": "South Yanggao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0749",
+      "lineStationIDs": [
+        "0749"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0749"
+    },
+    {
+      "stationID": "c478aaeabca8e0a4",
+      "stationName": "芳芯路",
+      "stationNameEn": "Fangxin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1831",
+      "lineStationIDs": [
+        "1831"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1831"
+    },
+    {
+      "stationID": "c53a869200ecb1be",
+      "stationName": "龙阳路",
+      "stationNameEn": "Longyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0252",
+      "lineStationIDs": [
+        "0252",
+        "0752",
+        "1621",
+        "1832"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0252"
+    },
+    {
+      "stationID": "c54a71e9eb4e4ea2",
+      "stationName": "泗泾",
+      "stationNameEn": "Sijing",
+      "aliases": [
+
+      ],
+      "externalStationID": "0925",
+      "lineStationIDs": [
+        "0925"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0925"
+    },
+    {
+      "stationID": "c5df9b4446faac97",
+      "stationName": "港城路",
+      "stationNameEn": "Gangcheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0648",
+      "lineStationIDs": [
+        "0648",
+        "1073"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0648"
+    },
+    {
+      "stationID": "c604f816e51d1a58",
+      "stationName": "祁华路",
+      "stationNameEn": "Qihua Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0726",
+      "lineStationIDs": [
+        "0726"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0726"
+    },
+    {
+      "stationID": "c666943bf83bf856",
+      "stationName": "上海体育场",
+      "stationNameEn": "Shanghai Stadium",
+      "aliases": [
+
+      ],
+      "externalStationID": "0426",
+      "lineStationIDs": [
+        "0426"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0426"
+    },
+    {
+      "stationID": "c73ab5cf38f9ddb0",
+      "stationName": "隆昌路",
+      "stationNameEn": "Longchang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1243",
+      "lineStationIDs": [
+        "1243"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1243"
+    },
+    {
+      "stationID": "c7ddcbe35a703907",
+      "stationName": "祁连山路",
+      "stationNameEn": "Qilianshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1140",
+      "lineStationIDs": [
+        "1140"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1140"
+    },
+    {
+      "stationID": "c811618940087ea0",
+      "stationName": "岚皋路",
+      "stationNameEn": "Lan'gao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0735",
+      "lineStationIDs": [
+        "0735"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0735"
+    },
+    {
+      "stationID": "c845ff9c851b43a2",
+      "stationName": "上海图书馆",
+      "stationNameEn": "Shanghai Library",
+      "aliases": [
+
+      ],
+      "externalStationID": "1051",
+      "lineStationIDs": [
+        "1051"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1051"
+    },
+    {
+      "stationID": "c8b6bc0f7bcd299d",
+      "stationName": "金海湖",
+      "stationNameEn": "Jinhai Lake",
+      "aliases": [
+
+      ],
+      "externalStationID": "0537",
+      "lineStationIDs": [
+        "0537"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0537"
+    },
+    {
+      "stationID": "c9807090d23c39d9",
+      "stationName": "曲阳路",
+      "stationNameEn": "Quyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0840",
+      "lineStationIDs": [
+        "0840"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0840"
+    },
+    {
+      "stationID": "ca067e22ea72d2b2",
+      "stationName": "虹桥2号航站楼",
+      "stationNameEn": "Hongqiao Airport Terminal 2",
+      "aliases": [
+
+      ],
+      "externalStationID": "0236",
+      "lineStationIDs": [
+        "0236",
+        "1042",
+        "5131"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0236"
+    },
+    {
+      "stationID": "ca8aad621c576fb6",
+      "stationName": "锦绣路",
+      "stationNameEn": "Jinxiu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0750",
+      "lineStationIDs": [
+        "0750"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0750"
+    },
+    {
+      "stationID": "cae90b244cff78a9",
+      "stationName": "祁安路",
+      "stationNameEn": "Qi'an Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1546",
+      "lineStationIDs": [
+        "1546"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1546"
+    },
+    {
+      "stationID": "cc2790ddfb5d44a1",
+      "stationName": "同济大学",
+      "stationNameEn": "Tongji University",
+      "aliases": [
+
+      ],
+      "externalStationID": "1062",
+      "lineStationIDs": [
+        "1062"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1062"
+    },
+    {
+      "stationID": "cd18773928b685b6",
+      "stationName": "上海马戏城",
+      "stationNameEn": "Shanghai Circus World",
+      "aliases": [
+
+      ],
+      "externalStationID": "0129",
+      "lineStationIDs": [
+        "0129"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0129"
+    },
+    {
+      "stationID": "cd1e27b3c4bc2d1a",
+      "stationName": "临港大道",
+      "stationNameEn": "Lingang Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "1632",
+      "lineStationIDs": [
+        "1632"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1632"
+    },
+    {
+      "stationID": "cde1e8e2bcd81338",
+      "stationName": "汉中路",
+      "stationNameEn": "Hanzhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0125",
+      "lineStationIDs": [
+        "0125",
+        "1235",
+        "1332"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0125"
+    },
+    {
+      "stationID": "cebdb98d4d683ad6",
+      "stationName": "石龙路",
+      "stationNameEn": "Shilong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0312",
+      "lineStationIDs": [
+        "0312"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0312"
+    },
+    {
+      "stationID": "d0ed04970cfb2c9f",
+      "stationName": "东安路",
+      "stationNameEn": "Dong'an Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0425",
+      "lineStationIDs": [
+        "0425",
+        "0742"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0425"
+    },
+    {
+      "stationID": "d15dbe4d6f144d8d",
+      "stationName": "马当路",
+      "stationNameEn": "Madang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0938",
+      "lineStationIDs": [
+        "0938",
+        "1337"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0938"
+    },
+    {
+      "stationID": "d16b17eabfabd7d8",
+      "stationName": "上大路",
+      "stationNameEn": "Shangda Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0729",
+      "lineStationIDs": [
+        "0729"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0729"
+    },
+    {
+      "stationID": "d36c85e3c0af2706",
+      "stationName": "真如",
+      "stationNameEn": "Zhenru",
+      "aliases": [
+
+      ],
+      "externalStationID": "1143",
+      "lineStationIDs": [
+        "1143",
+        "1429"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1143"
+    },
+    {
+      "stationID": "d3b2f1d942669ce5",
+      "stationName": "中兴路",
+      "stationNameEn": "Zhongxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0837",
+      "lineStationIDs": [
+        "0837"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0837"
+    },
+    {
+      "stationID": "d4e1c1370e28de0b",
+      "stationName": "虹口足球场",
+      "stationNameEn": "Hongkou Football Stadium",
+      "aliases": [
+
+      ],
+      "externalStationID": "0326",
+      "lineStationIDs": [
+        "0326",
+        "0839"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0326"
+    },
+    {
+      "stationID": "d4f0d4ebab9ec707",
+      "stationName": "张华浜",
+      "stationNameEn": "Zhanghuabang",
+      "aliases": [
+
+      ],
+      "externalStationID": "0333",
+      "lineStationIDs": [
+        "0333"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0333"
+    },
+    {
+      "stationID": "d5c4e355a3aad1ac",
+      "stationName": "虹梅南路",
+      "stationNameEn": "South Hongmei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1527",
+      "lineStationIDs": [
+        "1527"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1527"
+    },
+    {
+      "stationID": "d602745f30b43599",
+      "stationName": "丹阳路",
+      "stationNameEn": "Danyang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1837",
+      "lineStationIDs": [
+        "1837"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1837"
+    },
+    {
+      "stationID": "d733ac175fe51f44",
+      "stationName": "宝安公路",
+      "stationNameEn": "Bao'an Highway",
+      "aliases": [
+
+      ],
+      "externalStationID": "0136",
+      "lineStationIDs": [
+        "0136"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0136"
+    },
+    {
+      "stationID": "d746e4bafa493bd7",
+      "stationName": "淮海中路",
+      "stationNameEn": "Middle Huaihai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1335",
+      "lineStationIDs": [
+        "1335"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1335"
+    },
+    {
+      "stationID": "d8a6f38eacabc3c5",
+      "stationName": "萧塘",
+      "stationNameEn": "Xiaotang",
+      "aliases": [
+
+      ],
+      "externalStationID": "0533",
+      "lineStationIDs": [
+        "0533"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0533"
+    },
+    {
+      "stationID": "d92748dcd9ec09a7",
+      "stationName": "五洲大道",
+      "stationNameEn": "Wuzhou Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "0643",
+      "lineStationIDs": [
+        "0643"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0643"
+    },
+    {
+      "stationID": "d9754e28d0d678bf",
+      "stationName": "祁连山南路",
+      "stationNameEn": "South Qilianshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1324",
+      "lineStationIDs": [
+        "1324"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1324"
+    },
+    {
+      "stationID": "d9fb89bf345741d9",
+      "stationName": "徐家汇",
+      "stationNameEn": "Xujiahui",
+      "aliases": [
+
+      ],
+      "externalStationID": "0118",
+      "lineStationIDs": [
+        "0118",
+        "0934",
+        "1149"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0118"
+    },
+    {
+      "stationID": "da949cec4e0d8945",
+      "stationName": "朱梅路",
+      "stationNameEn": "Zhumei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1529",
+      "lineStationIDs": [
+        "1529"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1529"
+    },
+    {
+      "stationID": "dea2b5819d60e572",
+      "stationName": "云台路",
+      "stationNameEn": "Yuntai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0747",
+      "lineStationIDs": [
+        "0747"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0747"
+    },
+    {
+      "stationID": "deee044fbb6bc22c",
+      "stationName": "松江新城",
+      "stationNameEn": "Songjiang Xincheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "0921",
+      "lineStationIDs": [
+        "0921"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0921"
+    },
+    {
+      "stationID": "df4f0d29616c2c17",
+      "stationName": "上海动物园",
+      "stationNameEn": "Shanghai Zoo",
+      "aliases": [
+
+      ],
+      "externalStationID": "1044",
+      "lineStationIDs": [
+        "1044"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1044"
+    },
+    {
+      "stationID": "e0b200a210e08fcf",
+      "stationName": "通南路",
+      "stationNameEn": "通南路",
+      "aliases": [
+
+      ],
+      "externalStationID": "1847",
+      "lineStationIDs": [
+        "1847"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1847"
+    },
+    {
+      "stationID": "e10ec58f2d95d582",
+      "stationName": "紫藤路",
+      "stationNameEn": "Ziteng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1019",
+      "lineStationIDs": [
+        "1019"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1019"
+    },
+    {
+      "stationID": "e1c53025a574778e",
+      "stationName": "北中路",
+      "stationNameEn": "Beizhong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1830",
+      "lineStationIDs": [
+        "1830"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1830"
+    },
+    {
+      "stationID": "e1c57cf39358e276",
+      "stationName": "航头",
+      "stationNameEn": "Hangtou",
+      "aliases": [
+
+      ],
+      "externalStationID": "1821",
+      "lineStationIDs": [
+        "1821"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1821"
+    },
+    {
+      "stationID": "e38271d303ef216f",
+      "stationName": "武威路",
+      "stationNameEn": "Wuwei Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1139",
+      "lineStationIDs": [
+        "1139"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1139"
+    },
+    {
+      "stationID": "e392e9057b18e278",
+      "stationName": "漕河泾开发区",
+      "stationNameEn": "Caohejing Hi-Tech Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "0931",
+      "lineStationIDs": [
+        "0931"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0931"
+    },
+    {
+      "stationID": "e3cb153bebf002d5",
+      "stationName": "小南门",
+      "stationNameEn": "Xiaonanmen",
+      "aliases": [
+
+      ],
+      "externalStationID": "0940",
+      "lineStationIDs": [
+        "0940"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0940"
+    },
+    {
+      "stationID": "e45fee2d5718ed31",
+      "stationName": "远东大道",
+      "stationNameEn": "Yuandong Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "0261",
+      "lineStationIDs": [
+        "0261"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0261"
+    },
+    {
+      "stationID": "e52e85e78c739f62",
+      "stationName": "下南路",
+      "stationNameEn": "Xianan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1344",
+      "lineStationIDs": [
+        "1344"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1344"
+    },
+    {
+      "stationID": "e568f5fd6a495bcb",
+      "stationName": "延安西路",
+      "stationNameEn": "West Yan'an Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0317",
+      "lineStationIDs": [
+        "0317",
+        "0404"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0317"
+    },
+    {
+      "stationID": "e69805fc07122bd0",
+      "stationName": "一大会址·新天地",
+      "stationNameEn": "Site of the First CPC National Congress·Xintiandi",
+      "aliases": [
+
+      ],
+      "externalStationID": "1053",
+      "lineStationIDs": [
+        "1053",
+        "1336"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1053"
+    },
+    {
+      "stationID": "e9bc94eeeae1f41a",
+      "stationName": "漕溪路",
+      "stationNameEn": "Caoxi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0314",
+      "lineStationIDs": [
+        "0314"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0314"
+    },
+    {
+      "stationID": "e9c7a1f8d073671b",
+      "stationName": "江苏路",
+      "stationNameEn": "Jiangsu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0242",
+      "lineStationIDs": [
+        "0242",
+        "1147"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0242"
+    },
+    {
+      "stationID": "ea1af0cf6c44c9da",
+      "stationName": "宁国路",
+      "stationNameEn": "Ningguo Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1242",
+      "lineStationIDs": [
+        "1242"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1242"
+    },
+    {
+      "stationID": "ea3a24da599da2be",
+      "stationName": "上海儿童医学中心",
+      "stationNameEn": "Shanghai Children's Medical Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "0629",
+      "lineStationIDs": [
+        "0629"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0629"
+    },
+    {
+      "stationID": "ee472333c2c2411a",
+      "stationName": "徐盈路",
+      "stationNameEn": "Xuying Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1724",
+      "lineStationIDs": [
+        "1724"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1724"
+    },
+    {
+      "stationID": "ef93a70654274ffb",
+      "stationName": "奉浦大道",
+      "stationNameEn": "Fengpu Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "0534",
+      "lineStationIDs": [
+        "0534"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0534"
+    },
+    {
+      "stationID": "f13f13d5c5452255",
+      "stationName": "剑川路",
+      "stationNameEn": "Jianchuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0508",
+      "lineStationIDs": [
+        "0508"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0508"
+    },
+    {
+      "stationID": "f185c9180ac1799c",
+      "stationName": "铁力路",
+      "stationNameEn": "Tieli Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0338",
+      "lineStationIDs": [
+        "0338"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0338"
+    },
+    {
+      "stationID": "f25d87bc9ed45127",
+      "stationName": "天潼路",
+      "stationNameEn": "Tiantong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1057",
+      "lineStationIDs": [
+        "1057",
+        "1237"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1057"
+    },
+    {
+      "stationID": "f2cbd2633968cef3",
+      "stationName": "淀山湖大道",
+      "stationNameEn": "Dianshanhu Avenue",
+      "aliases": [
+
+      ],
+      "externalStationID": "1731",
+      "lineStationIDs": [
+        "1731"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1731"
+    },
+    {
+      "stationID": "f43a4ee039e8e785",
+      "stationName": "川沙",
+      "stationNameEn": "Chuansha",
+      "aliases": [
+
+      ],
+      "externalStationID": "0259",
+      "lineStationIDs": [
+        "0259"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0259"
+    },
+    {
+      "stationID": "f58eb217b39170fc",
+      "stationName": "衡山路",
+      "stationNameEn": "Hengshan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0119",
+      "lineStationIDs": [
+        "0119"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0119"
+    },
+    {
+      "stationID": "f5ea71fb2ab983cf",
+      "stationName": "东靖路",
+      "stationNameEn": "Dongjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0642",
+      "lineStationIDs": [
+        "0642"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0642"
+    },
+    {
+      "stationID": "f608de3c2564edbc",
+      "stationName": "松江大学城",
+      "stationNameEn": "Songjiang University Town",
+      "aliases": [
+
+      ],
+      "externalStationID": "0922",
+      "lineStationIDs": [
+        "0922"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0922"
+    },
+    {
+      "stationID": "f691e3e329345e12",
+      "stationName": "闵瑞路",
+      "stationNameEn": "Minrui Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "4103",
+      "lineStationIDs": [
+        "4103"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=4103"
+    },
+    {
+      "stationID": "f7370a0f0f14b925",
+      "stationName": "金沙江西路",
+      "stationNameEn": "West Jinshajiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1322",
+      "lineStationIDs": [
+        "1322"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1322"
+    },
+    {
+      "stationID": "f7492875b860b93c",
+      "stationName": "上海游泳馆",
+      "stationNameEn": "Shanghai Swimming Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "1150",
+      "lineStationIDs": [
+        "1150"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1150"
+    },
+    {
+      "stationID": "f7bd7ed8a3a6e0b2",
+      "stationName": "华东理工大学",
+      "stationNameEn": "East China University of Science & Technology",
+      "aliases": [
+
+      ],
+      "externalStationID": "1531",
+      "lineStationIDs": [
+        "1531"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1531"
+    },
+    {
+      "stationID": "f94c202d55eb0098",
+      "stationName": "赤峰路",
+      "stationNameEn": "Chifeng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0327",
+      "lineStationIDs": [
+        "0327"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0327"
+    },
+    {
+      "stationID": "f96cb3ecc5ff2108",
+      "stationName": "曙建路",
+      "stationNameEn": "Shujian Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "1525",
+      "lineStationIDs": [
+        "1525"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1525"
+    },
+    {
+      "stationID": "f996d09d877bd2c5",
+      "stationName": "北桥",
+      "stationNameEn": "Beiqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "0507",
+      "lineStationIDs": [
+        "0507"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0507"
+    },
+    {
+      "stationID": "f9d7fcb5df692eb5",
+      "stationName": "花桥",
+      "stationNameEn": "Huaqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1114",
+      "lineStationIDs": [
+        "1114"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1114"
+    },
+    {
+      "stationID": "fa0db0f2623a0a5f",
+      "stationName": "浦东足球场",
+      "stationNameEn": "Pudong Football Stadium",
+      "aliases": [
+
+      ],
+      "externalStationID": "1449",
+      "lineStationIDs": [
+        "1449"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1449"
+    },
+    {
+      "stationID": "faa6f2d8b91c7e54",
+      "stationName": "望园路",
+      "stationNameEn": "Wangyuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0536",
+      "lineStationIDs": [
+        "0536"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0536"
+    },
+    {
+      "stationID": "fb0386a70c3c9192",
+      "stationName": "朱家角",
+      "stationNameEn": "Zhujiajiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "1732",
+      "lineStationIDs": [
+        "1732"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1732"
+    },
+    {
+      "stationID": "fb4196e72973a7eb",
+      "stationName": "台儿庄路",
+      "stationNameEn": "Taierzhuang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0946",
+      "lineStationIDs": [
+        "0946"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0946"
+    },
+    {
+      "stationID": "fba4d8ae36b2392a",
+      "stationName": "安亭",
+      "stationNameEn": "Anting",
+      "aliases": [
+
+      ],
+      "externalStationID": "1117",
+      "lineStationIDs": [
+        "1117"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1117"
+    },
+    {
+      "stationID": "fc3720296241d7f5",
+      "stationName": "洞泾",
+      "stationNameEn": "Dongjing",
+      "aliases": [
+
+      ],
+      "externalStationID": "0923",
+      "lineStationIDs": [
+        "0923"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0923"
+    },
+    {
+      "stationID": "fc38d058dc974974",
+      "stationName": "肇嘉浜路",
+      "stationNameEn": "Zhaojiabang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0741",
+      "lineStationIDs": [
+        "0741",
+        "0935"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0741"
+    },
+    {
+      "stationID": "fd60026dd65d0235",
+      "stationName": "佘山",
+      "stationNameEn": "Sheshan",
+      "aliases": [
+
+      ],
+      "externalStationID": "0924",
+      "lineStationIDs": [
+        "0924"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0924"
+    },
+    {
+      "stationID": "fd6c980574130b71",
+      "stationName": "上海火车站",
+      "stationNameEn": "Shanghai Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "0126",
+      "lineStationIDs": [
+        "0126",
+        "0323",
+        "0410"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0126"
+    },
+    {
+      "stationID": "ff4c8e263a57c5df",
+      "stationName": "芳华路",
+      "stationNameEn": "Fanghua Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "0751",
+      "lineStationIDs": [
+        "0751"
+      ],
+      "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0751"
+    }
+  ],
+  "canonicalCoverageGaps": [
+    {
+      "stationID": "006fe43f989b8bd6",
+      "stationName": "广富林路谷阳北路",
+      "stationNameEn": "广富林路谷阳北路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "03ecb489554d616e",
+      "stationName": "曹农路",
+      "stationNameEn": "曹农路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "0e3f69e4a3e36231",
+      "stationName": "荣乐路通波塘",
+      "stationNameEn": "荣乐路通波塘",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "102868b0cf41be54",
+      "stationName": "仓汇路",
+      "stationNameEn": "仓汇路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "15d13e413c3a71f9",
+      "stationName": "金山卫",
+      "stationNameEn": "Jinshanwei",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "1b0387ce8390cb46",
+      "stationName": "人民北路",
+      "stationNameEn": "人民北路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "1b859d2a35ceb9d8",
+      "stationName": "春申",
+      "stationNameEn": "Chunshen",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "2bd6ad2f1fa99223",
+      "stationName": "T1",
+      "stationNameEn": "T1",
+      "lineNames": [
+        "上海浦东机场旅客捷运系统西线"
+      ],
+      "reason": "airportPeopleMover"
+    },
+    {
+      "stationID": "2c137dd75dbf8b0e",
+      "stationName": "光星路",
+      "stationNameEn": "光星路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "307cb6a0a9e16e48",
+      "stationName": "叶榭",
+      "stationNameEn": "Yexie",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "34b4ad37cba3d101",
+      "stationName": "新站路",
+      "stationNameEn": "新站路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "34cb3e613e78071d",
+      "stationName": "泰晤士小镇西",
+      "stationNameEn": "泰晤士小镇西",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "3601153694480949",
+      "stationName": "龙居路",
+      "stationNameEn": "Longju Road",
+      "lineNames": [
+        "14号线"
+      ],
+      "reason": "notListedByCurrentOfficialDirectory"
+    },
+    {
+      "stationID": "39418e6150a81463",
+      "stationName": "思贤路",
+      "stationNameEn": "思贤路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "398b7a2c902aaeb7",
+      "stationName": "谷阳北路",
+      "stationNameEn": "谷阳北路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "3ee154818da746c8",
+      "stationName": "茸惠路",
+      "stationNameEn": "茸惠路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "43b682ffdec5d65d",
+      "stationName": "荣乐路西林北路",
+      "stationNameEn": "荣乐路西林北路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "475c9349437647d5",
+      "stationName": "东兴路",
+      "stationNameEn": "东兴路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "4f97bc2d1324c961",
+      "stationName": "车墩",
+      "stationNameEn": "Chedun",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "5574bdf9e4b3edd6",
+      "stationName": "江杨南路",
+      "stationNameEn": "South Jiangyang Road",
+      "lineNames": [
+        "18号线"
+      ],
+      "reason": "notListedByCurrentOfficialDirectory"
+    },
+    {
+      "stationID": "5e04b1ddcd4f6f3e",
+      "stationName": "新镇街",
+      "stationNameEn": "新镇街",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "5e99cfd85ca1b182",
+      "stationName": "泰晤士小镇北",
+      "stationNameEn": "泰晤士小镇北",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "6396d6089e7856bb",
+      "stationName": "三新北路",
+      "stationNameEn": "三新北路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "657404be70804db7",
+      "stationName": "人民北路新松江路",
+      "stationNameEn": "人民北路新松江路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "67c4819206c06597",
+      "stationName": "松东路",
+      "stationNameEn": "松东路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "695243dbdbea6d07",
+      "stationName": "漕河路",
+      "stationNameEn": "漕河路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "6d0d0cc3a413b765",
+      "stationName": "茸宁路",
+      "stationNameEn": "茸宁路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "6f8e9c474affdfb9",
+      "stationName": "金山园区",
+      "stationNameEn": "Jinshanyuanqu",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "7d50618b675592f9",
+      "stationName": "仓华路",
+      "stationNameEn": "仓华路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "8853ed65e135251f",
+      "stationName": "龙马路",
+      "stationNameEn": "龙马路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "9899e674459a867f",
+      "stationName": "龙源路",
+      "stationNameEn": "龙源路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "9b693d9eba6394bb",
+      "stationName": "新庙三路",
+      "stationNameEn": "新庙三路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "9e6ff744d13e654c",
+      "stationName": "新松江路西林北路",
+      "stationNameEn": "新松江路西林北路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "a28d477cebbec7b3",
+      "stationName": "江学路",
+      "stationNameEn": "江学路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "a6aed637fa5cfb60",
+      "stationName": "江田东路",
+      "stationNameEn": "江田东路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "a7469b2b20d801c1",
+      "stationName": "上海南",
+      "stationNameEn": "Shanghainan",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "a8c4aa4660656123",
+      "stationName": "文汇路",
+      "stationNameEn": "文汇路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "b9dc27d2c3481cc4",
+      "stationName": "新车公路",
+      "stationNameEn": "新车公路",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "bbccc2074d7b2490",
+      "stationName": "宝胜路",
+      "stationNameEn": "宝胜路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "c1d0e98a222edc59",
+      "stationName": "T2",
+      "stationNameEn": "T2",
+      "lineNames": [
+        "上海浦东机场旅客捷运系统东线"
+      ],
+      "reason": "airportPeopleMover"
+    },
+    {
+      "stationID": "c42f40c0405a53bb",
+      "stationName": "明南路",
+      "stationNameEn": "明南路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "c494a78951f23fca",
+      "stationName": "广富林路",
+      "stationNameEn": "广富林路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "ce1739199b175120",
+      "stationName": "中辰路",
+      "stationNameEn": "中辰路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "d1f74480826fa1f5",
+      "stationName": "梅家浜路",
+      "stationNameEn": "梅家浜路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "d3a58c2224db0643",
+      "stationName": "新桥",
+      "stationNameEn": "Xinqiao",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "d508948a6039b151",
+      "stationName": "文诚路",
+      "stationNameEn": "文诚路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "d58d3ebaa1d8acb3",
+      "stationName": "徐塘路",
+      "stationNameEn": "徐塘路",
+      "lineNames": [
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "d82c488e13a4c486",
+      "stationName": "联阳路",
+      "stationNameEn": "联阳路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "e0458ebccff81de7",
+      "stationName": "松卫公路",
+      "stationNameEn": "松卫公路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "e734444cdb718124",
+      "stationName": "新桥火车站",
+      "stationNameEn": "新桥火车站",
+      "lineNames": [
+        "松江有轨电车1号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "e8a152e743d9dbf1",
+      "stationName": "S2",
+      "stationNameEn": "S2",
+      "lineNames": [
+        "上海浦东机场旅客捷运系统东线"
+      ],
+      "reason": "airportPeopleMover"
+    },
+    {
+      "stationID": "eda09b6c2756e081",
+      "stationName": "亭林",
+      "stationNameEn": "Tinglin",
+      "lineNames": [
+        "金山铁路"
+      ],
+      "reason": "chinaRailwaySuburban"
+    },
+    {
+      "stationID": "ee0944fbf1666b29",
+      "stationName": "方塔北路",
+      "stationNameEn": "方塔北路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "f331fff125402ca2",
+      "stationName": "锦昔路",
+      "stationNameEn": "锦昔路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "f649b73d8b93fb22",
+      "stationName": "玉树路",
+      "stationNameEn": "玉树路",
+      "lineNames": [
+        "松江有轨电车1号线",
+        "松江有轨电车2号线"
+      ],
+      "reason": "songjiangTram"
+    },
+    {
+      "stationID": "f89edc9fcfe0ef7c",
+      "stationName": "S1",
+      "stationNameEn": "S1",
+      "lineNames": [
+        "上海浦东机场旅客捷运系统西线"
+      ],
+      "reason": "airportPeopleMover"
+    }
+  ],
+  "sourceOnlyStationCount": 1,
+  "sourceOnlyStationNames": [
+    "金吉路"
+  ]
+}

@@ -36,8 +36,13 @@ info_plist = read.call("JustGo/JustGo-Info.plist")
 expected_settings.each_key do |key|
   errors << "JustGo-Info.plist is missing #{key}" unless info_plist.include?("$(#{key})")
 end
-%w[NSLocationWhenInUseUsageDescription NSCameraUsageDescription].each do |key|
+%w[NSLocationWhenInUseUsageDescription].each do |key|
   errors << "JustGo-Info.plist is missing #{key}" unless info_plist.include?("<key>#{key}</key>")
+end
+# The camera was only ever reached through the indoor checkpoint scanner. With that feature gone a
+# purpose string would promise App Review a capability no user can exercise.
+if info_plist.include?("NSCameraUsageDescription")
+  errors << "JustGo must not declare camera access it never uses"
 end
 if info_plist.include?("NSLocationAlwaysAndWhenInUseUsageDescription")
   errors << "JustGo must not declare always-on location access"
@@ -102,14 +107,16 @@ end
   allowedExternalLandingPages
   validatesStation
   stationAccessPoints
-  hasIndoorMapsURL
   loadGenerationMatches
   pruneSupersededVersions
 ].each do |marker|
   errors << "city-pack runtime policy is missing #{marker}" unless policy_source.include?(marker)
 end
 errors << "remote packs must reject unproven service status" unless policy_source.include?("station.serviceStatus == nil")
-errors << "schema-v2 manifests must reject indoor downloads" unless policy_source.include?("!hasIndoorMapsURL")
+# Indoor navigation was removed, so there is no longer a manifest field to reject — the runtime
+# has no way to consume an indoor graph at all. Assert the absence instead of the guard.
+errors << "the city-pack runtime must not regain indoor-map handling" if
+  policy_source.downcase.include?("indoormaps")
 
 official_catalog_path = File.join(ROOT, "JustGo/Services/Data/OfficialTransitResourceCatalog.swift")
 swift_sources.each do |absolute_path, source|
@@ -153,7 +160,6 @@ end
 
 required_official_resource_callers = %w[
   JustGo/Views/Profile/TransitDataView.swift
-  JustGo/Views/Route/IndoorStepGoView.swift
   JustGo/Views/Route/LiveGoView.swift
   JustGo/Views/Route/TransferStationSheet.swift
   JustGo/Views/Station/StationDetailView+DataSections.swift

@@ -15,11 +15,6 @@ struct TransferStationSheet: View {
     @State private var lookAroundScene: MKLookAroundScene?
     @State private var guidance: StationAccessGuidance?
     @State private var externalResources: [ExternalTransitResource] = []
-    @State private var indoorMap: StationIndoorMap?
-    @State private var transferPath: TransferPathHint?
-    @State private var boardingZoneGuidance: IndoorBoardingZoneGuidance?
-    @State private var doorGuidance: DoorGuidance?
-    @State private var showIndoorSteps = false
 
     private var stationName: String {
         transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
@@ -27,14 +22,6 @@ struct TransferStationSheet: View {
 
     private var crowdWindows: [String] {
         crowdControl.stations.first { $0.stationName == stationName }?.windows ?? []
-    }
-
-    private var routeCoverageGapLineNames: [String] {
-        guard let indoorMap, let context = transferSegment.transferContext else { return [] }
-        let routeLegs = [context.incoming, context.outgoing]
-        return indoorMap.resolvedLineCoverageGaps.compactMap { gap in
-            routeLegs.first { $0.lineID == gap.lineID }?.lineName
-        }
     }
 
     /// The transfer station's real coordinate. A transfer segment's own stationStops is always
@@ -64,21 +51,6 @@ struct TransferStationSheet: View {
         .background(Color.appBackground)
         .navigationTitle(stationName)
         .navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(isPresented: $showIndoorSteps) {
-            if let indoorMap, let transferPath {
-                IndoorStepGoView(
-                    stationTitle: stationName,
-                    mapImageURL: nil,
-                    indoorMap: indoorMap,
-                    routeNodeIDs: transferPath.routeNodeIDs,
-                    routeEdgeIDs: transferPath.routeEdgeIDs,
-                    destinationLineName: nextTransitSegment?.lineName,
-                    transferContext: transferSegment.transferContext,
-                    boardingZoneGuidance: boardingZoneGuidance,
-                    externalResources: externalResources
-                )
-            }
-        }
         .task {
             isLoadingStation = true
             defer { isLoadingStation = false }
@@ -118,32 +90,6 @@ struct TransferStationSheet: View {
                 } else {
                     externalResources = initialResources
                 }
-                indoorMap = await container.officialStationData.indoorMap(for: mapLookupStation)
-                if let transferContext = transferSegment.transferContext {
-                    transferPath = await container.officialStationData.transferPath(
-                        for: mapLookupStation,
-                        context: transferContext,
-                        accessibilityFilter: accessibilityFilter
-                    )
-                    boardingZoneGuidance = await container.officialStationData.boardingZoneGuidance(
-                        for: mapLookupStation,
-                        context: transferContext,
-                        accessibilityFilter: accessibilityFilter
-                    )
-                } else {
-                    transferPath = await container.officialStationData.transferPath(
-                        for: mapLookupStation,
-                        fromLineName: transferSegment.incomingLineName ?? transferSegment.lineName,
-                        toLineName: nextTransitSegment?.lineName,
-                        accessibilityFilter: accessibilityFilter
-                    )
-                }
-                doorGuidance = await container.officialStationData.doorGuidance(
-                    for: mapLookupStation,
-                    lineName: nextTransitSegment?.lineName,
-                    directionText: nextTransitSegment?.toStationName,
-                    target: .transfer
-                )
             }
             // Street view keys off the route's own coordinate first so it still works when the
             // official pack doesn't list this station (matchingStation returned nil above).
@@ -275,170 +221,8 @@ struct TransferStationSheet: View {
                             PlatformHintRow(hint: hint)
                         }
                     }
-
-                    Divider()
-                    indoorGuidanceStatus
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private var indoorGuidanceStatus: some View {
-        if !routeCoverageGapLineNames.isEmpty {
-            ForEach(routeCoverageGapLineNames, id: \.self) { lineName in
-                Label {
-                    Text(AppLocalization.text(
-                        english: "The verified source does not show the \(lineName) platform, so its position and connected indoor path are unavailable.",
-                        simplified: "已验证的数据源未显示\(lineName)站台，因此暂无法提供其位置和连通站内路径。",
-                        traditional: "已驗證的資料來源未顯示\(lineName)月台，因此暫無法提供其位置和連通站內路徑。"
-                    ))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                } icon: {
-                    Image(systemName: "map.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } else if let transferPath {
-            corridorPathRow(transferPath)
-            if let boardingZoneGuidance {
-                boardingZoneRow(boardingZoneGuidance)
-            }
-        } else if let boardingZoneGuidance {
-            boardingZoneRow(boardingZoneGuidance)
-            Text(AppLocalization.text(
-                english: "A connected indoor corridor path is not verified for this station.",
-                simplified: "本站尚无经验证的连通站内换乘路径。",
-                traditional: "本站尚無經驗證的連通站內轉乘路徑。"
-            ))
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-        } else if indoorMap?.effectiveCoverageMode == .platformCheckpoints {
-            Label {
-                Text(AppLocalization.text(
-                    english: "Verified platform checkpoints are available. A connected corridor path and boarding zone are not verified for this station.",
-                    simplified: "已有经核实的站台检查点；本站尚无经核实的连通换乘路径和上车区域。",
-                    traditional: "已有經核實的月台檢查點；本站尚無經核實的連通轉乘路徑和上車區域。"
-                ))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            } icon: {
-                Image(systemName: "map")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        } else if let doorGuidance {
-            doorGuidanceRow(doorGuidance)
-        } else {
-            Label {
-                Text(AppLocalization.text(
-                    english: "Verified indoor path, boarding position, and door guidance are not available for this station.",
-                    simplified: "本站暂无经核实的站内路径、候车位置和车门指引。",
-                    traditional: "本站暫無經核實的站內路徑、候車位置和車門指引。"
-                ))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            } icon: {
-                Image(systemName: "cube.transparent")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private func boardingZoneRow(_ guidance: IndoorBoardingZoneGuidance) -> some View {
-        return Label {
-            HStack(spacing: 8) {
-                Text(guidance.zone.localizedLabel)
-                    .font(.caption)
-                DataConfidenceChip(confidence: guidance.confidence, compact: true)
-            }
-        } icon: {
-            Image(systemName: "train.side.front.car")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
-        }
-    }
-
-    private func corridorPathRow(_ path: TransferPathHint) -> some View {
-        var parts: [String] = []
-        if let meters = path.walkingMeters {
-            parts.append(AppLocalization.text(
-                english: "about \(Int(meters)) m",
-                simplified: "约\(Int(meters))米",
-                traditional: "約\(Int(meters))米"
-            ))
-        }
-        if let minutes = path.walkingMinutes {
-            parts.append(AppLocalization.minutes(Int(minutes.rounded())))
-        }
-        return Label {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(parts.isEmpty ? AppLocalization.text(english: "Verified indoor transfer path", simplified: "经核实的站内换乘路径", traditional: "經核實的站內轉乘路徑") : parts.joined(separator: " · "))
-                    .font(.caption)
-                if path.routeNodeIDs.count > 1 {
-                    Text(AppLocalization.text(
-                        english: "A verified schematic walkthrough is available.",
-                        simplified: "可使用经核实的示意逐步指引。",
-                        traditional: "可使用經核實的示意逐步指引。"
-                    ))
-                    .font(.caption2)
-                    .foregroundStyle(Color.accentColor)
-
-                    Button {
-                        showIndoorSteps = true
-                    } label: {
-                        Label(
-                            AppLocalization.text(english: "Start step-by-step", simplified: "开始逐步导航", traditional: "開始逐步導航"),
-                            systemImage: "figure.walk.motion"
-                        )
-                        .font(.caption)
-                        .fontWeight(.medium)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.top, 2)
-                }
-                ForEach(path.notes, id: \.self) { note in
-                    Text(note)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } icon: {
-            Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
-        }
-    }
-
-    private func doorGuidanceRow(_ guidance: DoorGuidance) -> some View {
-        let cars = guidance.recommendedCars
-            .map { AppLocalization.text(english: "Car \($0)", simplified: "\($0)车", traditional: "\($0)車") }
-            .joined(separator: " · ")
-        let parts = [
-            cars.isEmpty ? nil : cars,
-            guidance.recommendedDoorText?.nilIfEmpty
-        ].compactMap { $0 }
-        return Label {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(parts.isEmpty
-                    ? AppLocalization.text(english: "Verified door guidance", simplified: "经验证的车门指引", traditional: "經驗證的車門指引")
-                    : parts.joined(separator: " · ")
-                )
-                    .font(.caption)
-                ForEach(guidance.notes, id: \.self) { note in
-                    Text(note)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } icon: {
-            Image(systemName: "tram.fill")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
         }
     }
 
@@ -495,9 +279,9 @@ struct TransferStationSheet: View {
                 if relevantResources.isEmpty {
                     Label {
                         Text(AppLocalization.text(
-                            english: "No verified indoor layout or door positions are available.",
-                            simplified: "暂无经核实的站内布局或车门位置。",
-                            traditional: "暫無經核實的站內佈局或車門位置。"
+                            english: "No official station resources are listed for this station.",
+                            simplified: "本站暂无官方车站资源。",
+                            traditional: "本站暫無官方車站資源。"
                         ))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -510,9 +294,9 @@ struct TransferStationSheet: View {
                         OfficialTransitResourceButton(resource: resource, compact: true)
                     }
                     Text(AppLocalization.text(
-                        english: "These official resources are displayed inside JustGo. They do not mean JustGo has verified the indoor path or train-door position.",
-                        simplified: "这些官方资源会在 JustGo 内显示，但并不表示 JustGo 已核实站内路径或车门位置。",
-                        traditional: "這些官方資源會在 JustGo 內顯示，但並不表示 JustGo 已核實站內路徑或車門位置。"
+                        english: "These official resources are displayed inside JustGo. JustGo does not verify or interpret what they show.",
+                        simplified: "这些官方资源会在 JustGo 内显示；JustGo 不对其内容作核实或解读。",
+                        traditional: "這些官方資源會在 JustGo 內顯示；JustGo 不對其內容作核實或解讀。"
                     ))
                         .font(.caption2)
                         .foregroundStyle(.secondary)

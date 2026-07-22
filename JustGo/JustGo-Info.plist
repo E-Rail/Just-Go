@@ -28,8 +28,6 @@
 	<string>$(CITY_PACK_MANIFEST_URL)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>JustGo uses the camera only when you scan a station sign to confirm an indoor checkpoint. Recognition happens on this device and is not saved.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>JustGo needs your location to find nearby subway stations and provide navigation.</string>
 	<key>UIApplicationSceneManifest</key>

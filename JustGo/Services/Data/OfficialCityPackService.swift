@@ -82,21 +82,6 @@ struct LicensedStationMedia: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-/// Indoor node graphs live in a sibling file to `city_pack.json`, not embedded in it — every
-/// consumer of a city pack (schedules, accessibility, external resources) would otherwise download
-/// and decode dozens of KB of indoor-nav data per authored station even when indoor nav is
-/// never used. Fetched lazily, only when `indoorMap(for:)`/`transferPath(for:)` is called.
-private struct IndoorMapsPack: Decodable {
-    let cityID: String
-    let version: String
-    let stations: [IndoorMapsPackStation]
-}
-
-private struct IndoorMapsPackStation: Decodable {
-    let stationName: String
-    let indoorMap: StationIndoorMap
-}
-
 struct CityPackServiceStatus: Codable, Equatable {
     let accIDs: [String]
     let crowdControlWindows: [String]
@@ -131,31 +116,6 @@ protocol OfficialStationDataProviding {
     /// keyed by the original station name passed in. Official when authored in the pack,
     /// otherwise text-extracted at `.estimated` confidence, otherwise `.empty`/`.unavailable`.
     func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance]
-    func indoorMap(for station: Station) async -> StationIndoorMap?
-    /// The station object supplies the canonical network ID first, with names retained only as
-    /// a compatibility fallback for older packs and ad-hoc map search results.
-    func transferPath(
-        for station: Station,
-        fromLineName: String?,
-        toLineName: String?,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> TransferPathHint?
-    func transferPath(
-        for station: Station,
-        context: TransferContext,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> TransferPathHint?
-    func boardingZoneGuidance(
-        for station: Station,
-        context: TransferContext,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> IndoorBoardingZoneGuidance?
-    func doorGuidance(
-        for station: Station,
-        lineName: String?,
-        directionText: String?,
-        target: DoorGuidanceTarget
-    ) async -> DoorGuidance?
     func prefetchTransferAssets(for route: Route) async
 }
 
@@ -212,9 +172,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private static let failureCooldown: TimeInterval = 45
     private var loadGenerations: [String: Int] = [:]
     private var inFlightLoads: [String: InFlightCityPackLoad] = [:]
-    // Keyed by normalized station name; a city with no indoor_maps.json (or a failed fetch)
-    // caches an empty dictionary so repeat lookups within a session don't re-hit the network.
-    private var indoorMapsByCity: [String: [String: StationIndoorMap]] = [:]
 
     private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
         guard let status = loadStatuses[cityID] else { return nil }
@@ -428,7 +385,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             return .failed
         }
         packs.removeValue(forKey: cityID)
-        indoorMapsByCity.removeValue(forKey: cityID)
         loadStatuses.removeValue(forKey: cityID)
         failedCooldownUntil.removeValue(forKey: cityID)
         return await cityPackStatus(for: cityID)
@@ -457,7 +413,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         bundledBaselinePacks.removeAll()
         loadStatuses.removeAll()
         failedCooldownUntil.removeAll()
-        indoorMapsByCity.removeAll()
         cachedOfficialResourceCatalog = nil
     }
 
@@ -645,6 +600,17 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             stationName: station.name,
             stationNameEn: station.nameEn
         )
+    }
+
+    /// Map-search results carry a synthesised `network-<cityID>-<stationID>` identifier; packs are
+    /// keyed by the bare canonical station ID. Anything else is already canonical.
+    private func networkStationID(_ value: String) -> String {
+        let prefix = "network-"
+        guard value.hasPrefix(prefix),
+              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
+            return value
+        }
+        return String(value[value.index(after: citySeparator)...])
     }
 
     func licensedMedia(for station: Station) async -> [LicensedStationMedia] {
@@ -969,236 +935,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return result
     }
 
-    func indoorMap(for station: Station) async -> StationIndoorMap? {
-        let indoorMaps = await loadIndoorMaps(for: station.cityID)
-        if let nameMatch = indoorMaps[normalizedStationName(station.name)] {
-            return nameMatch
-        }
-        let canonicalStationID = networkStationID(station.stationID)
-        return indoorMaps.values.first { $0.stationID == canonicalStationID }
-    }
-
-    /// Fetches and decodes the city's sibling `indoor_maps.json` the first time any station's
-    /// indoor data is asked for, then caches it (including an empty result) for the rest of the
-    /// session — most cities have none, and this must not turn every station-detail view into a
-    /// second network round trip.
-    private func loadIndoorMaps(for cityID: String) async -> [String: StationIndoorMap] {
-        if let cached = indoorMapsByCity[cityID] { return cached }
-        let generation = currentLoadGeneration(for: cityID)
-
-        // Future verified indoor graphs may be bundled for offline use. No graph is accepted
-        // merely because an operator landing page or station image exists.
-        if let bundled = bundledIndoorMapsPack(for: cityID) {
-            let byName = indoorMapsByStationName(from: bundled)
-            indoorMapsByCity[cityID] = byName
-            return byName
-        }
-
-        if packs[cityID] == nil {
-            _ = await loadCityPack(for: cityID)
-        }
-        guard loadGenerationMatches(for: cityID, generation: generation) else { return [:] }
-        guard let loaded = packs[cityID],
-              let url = resolvedURL(
-                loaded.manifestEntry.indoorMapsDownloadURL,
-                relativeTo: loaded.manifestURL
-              ) else {
-            indoorMapsByCity[cityID] = [:]
-            return [:]
-        }
-        do {
-            let data: Data
-            if let cached = diskStore.validatedIndoorMapsData(for: loaded.manifestEntry) {
-                data = cached
-            } else {
-                guard let maximumBytes = loaded.manifestEntry.indoorMapsSizeBytes,
-                      maximumBytes > 0,
-                      maximumBytes <= Self.maximumPackBytes else {
-                    throw CityPackDiskError.validationFailed
-                }
-                let downloaded = try await download(from: url, maximumBytes: maximumBytes)
-                guard loadGenerationMatches(for: cityID, generation: generation),
-                      packs[cityID]?.data.version == loaded.data.version else { return [:] }
-                guard loaded.manifestEntry.validatesIndoorMapsData(downloaded) else {
-                    throw CityPackDiskError.validationFailed
-                }
-                try diskStore.storeIndoorMapsData(downloaded, for: loaded.manifestEntry)
-                data = downloaded
-            }
-            let decoded = try JSONDecoder().decode(IndoorMapsPack.self, from: data)
-            guard loadGenerationMatches(for: cityID, generation: generation),
-                  packs[cityID]?.data.version == loaded.data.version else { return [:] }
-            guard decoded.cityID == cityID, decoded.version == loaded.manifestEntry.version else {
-                indoorMapsByCity[cityID] = [:]
-                return [:]
-            }
-            let byName = indoorMapsByStationName(from: decoded)
-            indoorMapsByCity[cityID] = byName
-            return byName
-        } catch {
-            AppLog.data.warning("Indoor maps load failed for \(cityID, privacy: .public): \(error)")
-            guard loadGenerationMatches(for: cityID, generation: generation) else { return [:] }
-            indoorMapsByCity[cityID] = [:]
-            return [:]
-        }
-    }
-
-    private func bundledIndoorMapsPack(for cityID: String) -> IndoorMapsPack? {
-        let expectedVersion = packs[cityID]?.data.version
-            ?? bundledManifest()?.cities.first(where: { $0.cityID == cityID })?.version
-        let candidates = Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: nil) ?? []
-        for url in candidates where url.lastPathComponent.hasPrefix("indoor_maps") {
-            guard let data = try? Data(contentsOf: url),
-                  let decoded = try? JSONDecoder().decode(IndoorMapsPack.self, from: data),
-                  decoded.cityID == cityID,
-                  expectedVersion == nil || decoded.version == expectedVersion else { continue }
-            return decoded
-        }
-        return nil
-    }
-
-    private func indoorMapsByStationName(from pack: IndoorMapsPack) -> [String: StationIndoorMap] {
-        Dictionary(
-            pack.stations.map { (normalizedStationName($0.stationName), $0.indoorMap) },
-            uniquingKeysWith: { first, _ in first }
-        )
-    }
-
-    func transferPath(
-        for station: Station,
-        fromLineName: String?,
-        toLineName: String?,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> TransferPathHint? {
-        guard let fromLineName, let toLineName,
-              let indoorMap = await indoorMap(for: station) else { return nil }
-
-        let fromNodes = indoorMap.nodes(kind: .platform, matchingLineName: fromLineName)
-        let toNodes = indoorMap.nodes(kind: .platform, matchingLineName: toLineName)
-        guard !fromNodes.isEmpty, !toNodes.isEmpty else { return nil }
-        return resolvedTransferPath(
-            station: station,
-            indoorMap: indoorMap,
-            fromNodes: fromNodes,
-            toNodes: toNodes,
-            fromLineName: fromLineName,
-            toLineName: toLineName,
-            accessibilityFilter: accessibilityFilter
-        )
-    }
-
-    func transferPath(
-        for station: Station,
-        context: TransferContext,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> TransferPathHint? {
-        guard context.incoming.lineID != context.outgoing.lineID,
-              let indoorMap = await indoorMap(for: station) else { return nil }
-        let fromNodes = indoorMap.platformNodes(for: context.incoming, role: .arrival)
-        let toNodes = indoorMap.platformNodes(for: context.outgoing, role: .departure)
-        guard !fromNodes.isEmpty, !toNodes.isEmpty else { return nil }
-        return resolvedTransferPath(
-            station: station,
-            indoorMap: indoorMap,
-            fromNodes: fromNodes,
-            toNodes: toNodes,
-            fromLineName: context.incoming.lineName,
-            toLineName: context.outgoing.lineName,
-            accessibilityFilter: accessibilityFilter
-        )
-    }
-
-    private func resolvedTransferPath(
-        station: Station,
-        indoorMap: StationIndoorMap,
-        fromNodes: [IndoorNode],
-        toNodes: [IndoorNode],
-        fromLineName: String,
-        toLineName: String,
-        accessibilityFilter: AccessibilityFilter
-    ) -> TransferPathHint? {
-        let fromIDs = fromNodes.map(\.id)
-        let toIDs = toNodes.map(\.id)
-
-        let requiresStepFree = accessibilityFilter.requiresWheelchairAccess
-            || accessibilityFilter.requiresElevator
-            || accessibilityFilter.avoidStairs
-
-        let stepFreeResult = indoorMap.shortestPath(from: fromIDs, to: toIDs, stepFreeOnly: true)
-        let generalResult = requiresStepFree ? stepFreeResult : indoorMap.shortestPath(from: fromIDs, to: toIDs, stepFreeOnly: false)
-        guard let primary = generalResult ?? stepFreeResult else { return nil }
-
-        // Surface a step-free alternative only when the primary route isn't already one.
-        let alternative = (stepFreeResult?.nodeIDs == primary.nodeIDs) ? nil : stepFreeResult
-
-        return TransferPathHint(
-            stationID: station.stationID,
-            fromLineName: fromLineName,
-            fromPlatformID: primary.startNodeID,
-            toLineName: toLineName,
-            toPlatformID: primary.endNodeID,
-            routeNodeIDs: primary.nodeIDs,
-            routeEdgeIDs: primary.edgeIDs,
-            walkingMeters: primary.meters,
-            walkingMinutes: primary.minutes,
-            stepFreeAlternativeNodeIDs: alternative?.nodeIDs ?? [],
-            notes: [],
-            confidence: indoorMap.confidence
-        )
-    }
-
-    func boardingZoneGuidance(
-        for station: Station,
-        context: TransferContext,
-        accessibilityFilter: AccessibilityFilter
-    ) async -> IndoorBoardingZoneGuidance? {
-        guard let indoorMap = await indoorMap(for: station) else { return nil }
-        let arrivalFromID = context.incoming.arrivalPreviousStationID.map(networkStationID)
-        let candidates = indoorMap.resolvedBoardingZoneHints.filter { hint in
-            hint.incomingLineID == context.incoming.lineID
-                && hint.transferToLineID == context.outgoing.lineID
-                && (hint.arrivalFromStationID == nil || hint.arrivalFromStationID == arrivalFromID)
-        }
-        let requiresAccessibleZone = accessibilityFilter.requiresWheelchairAccess
-            || accessibilityFilter.requiresElevator
-        let selected = requiresAccessibleZone
-            ? candidates.first(where: { $0.accessible == true })
-            : candidates.first
-        guard let selected else { return nil }
-        return IndoorBoardingZoneGuidance(
-            stationID: station.stationID,
-            incomingLineID: selected.incomingLineID,
-            transferToLineID: selected.transferToLineID,
-            zone: selected.zone,
-            accessible: selected.accessible,
-            evidenceNodeID: selected.evidenceNodeID,
-            confidence: selected.confidence
-        )
-    }
-
-    private func networkStationID(_ value: String) -> String {
-        let prefix = "network-"
-        guard value.hasPrefix(prefix),
-              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
-            return value
-        }
-        return String(value[value.index(after: citySeparator)...])
-    }
-
-    /// No current verified dataset carries boarding-car/door alignment, so there is nothing
-    /// honest to derive yet. Stays nil rather than guessing from images or public maps.
-    func doorGuidance(
-        for station: Station,
-        lineName: String?,
-        directionText: String?,
-        target: DoorGuidanceTarget
-    ) async -> DoorGuidance? {
-        nil
-    }
-
-    /// Warms only verified indoor graph data. External operator pages and licensed station
-    /// photos are deliberately excluded: links open only after a tap, and photos never drive
-    /// route overlays or indoor guidance.
+    /// Warms the city packs a route's transfer stations belong to, so the transfer sheet opens
+    /// against loaded data. External operator pages and licensed station photos are deliberately
+    /// excluded: links open only after a tap, and photos never drive route overlays.
     func prefetchTransferAssets(for route: Route) async {
         var seen = Set<String>()
         let requests: [(cityID: String, stationName: String)] = route.segments.compactMap { segment in
@@ -1215,7 +954,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
         for request in requests {
             _ = await loadCityPack(for: request.cityID)
-            _ = await loadIndoorMaps(for: request.cityID)
         }
     }
 
@@ -1431,9 +1169,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     nonisolated private static func validatesManifestEntry(_ entry: OfficialManifestCity) -> Bool {
-        let hasIndoorMapsURL = !(entry.indoorMapsDownloadURL ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let hasIndoorMapsIntegrity = entry.indoorMapsSizeBytes != nil || entry.indoorMapsSHA256 != nil
         guard !entry.cityID.isEmpty,
               entry.cityID.allSatisfy(\.isNumber),
               isSafeStorageComponent(entry.version),
@@ -1443,10 +1178,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               entry.externalResources.allSatisfy({
                   isAllowedExternalResource($0, cityID: entry.cityID)
               }),
-              !entry.hasDownload || entry.hasValidDownloadContract,
-              hasIndoorMapsURL == hasIndoorMapsIntegrity,
-              !hasIndoorMapsURL,
-              !hasIndoorMapsIntegrity else {
+              !entry.hasDownload || entry.hasValidDownloadContract else {
             return false
         }
         return true
@@ -1761,7 +1493,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let releasedCityIDs = Array(packs.keys)
         packs.removeAll()
         bundledBaselinePacks.removeAll()
-        indoorMapsByCity.removeAll()
         cachedOfficialResourceCatalog = nil
         for cityID in releasedCityIDs {
             if loadStatuses[cityID]?.isMaterialized == true {
@@ -1899,12 +1630,6 @@ private struct OfficialManifestCity: Codable, Sendable {
     let externalResources: [ExternalTransitResource]
     let capabilities: OfficialCapabilities
     let coverage: CityDataCoverage
-    // Sibling indoor-maps file, mirroring downloadURL/sizeBytes/sha256 — absent entirely for
-    // cities with no authored indoor data yet.
-    let indoorMapsDownloadURL: String?
-    let indoorMapsSizeBytes: Int?
-    let indoorMapsSHA256: String?
-
     var hasDownload: Bool {
         downloadURL?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
@@ -1930,14 +1655,6 @@ private struct OfficialManifestCity: Codable, Sendable {
 
     func validatesPackData(_ data: Data) -> Bool {
         validates(data, expectedSize: sizeBytes, expectedSHA256: sha256)
-    }
-
-    func validatesIndoorMapsData(_ data: Data) -> Bool {
-        validates(
-            data,
-            expectedSize: indoorMapsSizeBytes,
-            expectedSHA256: indoorMapsSHA256
-        )
     }
 
     private func validates(
@@ -2262,13 +1979,6 @@ private struct CityPackDiskStore {
         return (data, metadata.entry, manifestURL)
     }
 
-    func validatedIndoorMapsData(for entry: OfficialManifestCity) -> Data? {
-        validatedData(
-            at: versionDirectory(for: entry).appendingPathComponent("indoor_maps.json"),
-            validator: entry.validatesIndoorMapsData
-        )
-    }
-
     func storePackData(_ data: Data, for entry: OfficialManifestCity, manifestURL: URL) throws {
         guard entry.validatesPackData(data) else { throw CityPackDiskError.validationFailed }
         try store(data, at: versionDirectory(for: entry).appendingPathComponent("city_pack.json"))
@@ -2281,11 +1991,6 @@ private struct CityPackDiskStore {
         let cityDirectory = rootURL.appendingPathComponent(safeComponent(entry.cityID), isDirectory: true)
         try store(metadataData, at: cityDirectory.appendingPathComponent("installed.json"))
         pruneSupersededVersions(for: entry, in: cityDirectory)
-    }
-
-    func storeIndoorMapsData(_ data: Data, for entry: OfficialManifestCity) throws {
-        guard entry.validatesIndoorMapsData(data) else { throw CityPackDiskError.validationFailed }
-        try store(data, at: versionDirectory(for: entry).appendingPathComponent("indoor_maps.json"))
     }
 
     func deleteCity(_ cityID: String) throws {

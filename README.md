@@ -82,10 +82,15 @@ non-station resources retain an explicit browser fallback.
 
 ## Indoor Guidance
 
-The indoor graph, checkpoint scanner, persistence, and Live Go integration remain in the app
-for future verified data. This release contains zero verified transfer contexts. It does not
-claim universal 3D maps, indoor routes, boarding cars, door positions, or transfer corridors.
-When verified guidance is unavailable, Live Go keeps the normal transfer step and says so.
+JustGo does not do indoor navigation. The indoor graph, step planner, checkpoint scanner and
+their Live Go integration were removed rather than kept dormant: no verified source ever
+materialised, so every entry point was unreachable and the camera permission promised a scanner
+no rider could open. JustGo claims no 3D maps, indoor routes, boarding cars, door positions, or
+transfer corridors. On a transfer, Live Go shows the station, any official operator links, and
+tells the rider to follow station signs.
+
+What it does show comes from official open data: exits and entrances where a city publishes them,
+and corridor/platform hints where an operator does.
 
 ## Setup
 

@@ -5,7 +5,6 @@
   "generatedAt": "2026-07-15T00:00:00Z",
   "rightsIDs": [
     "beijing-official-landing-links",
-    "media-jianguomen-ian-holton",
     "osm-metro-networks"
   ],
   "capabilities": {
@@ -13,7 +12,7 @@
     "schedules": "source_pending",
     "liveArrivals": "source_pending",
     "stationMaps": "external_only",
-    "licensedMedia": "metadata_only",
+    "licensedMedia": "source_pending",
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
@@ -39,7 +38,7 @@
       "total": 444
     },
     "licensedMedia": {
-      "covered": 1,
+      "covered": 0,
       "total": 444
     },
     "verifiedTransferContexts": {
@@ -1407,20 +1406,7 @@
         }
       ],
       "licensedMedia": [
-        {
-          "kind": "stationPhoto",
-          "title": "Beijing Subway Jianguomen Station",
-          "relativePath": "LicensedMedia/beijing-jianguomen.jpg",
-          "mimeType": "image/jpeg",
-          "sizeBytes": 470435,
-          "sha256": "54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750",
-          "sourcePageURL": "https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg",
-          "creator": "Ian Holton",
-          "licenseSPDX": "CC-BY-2.0",
-          "licenseURL": "https://creativecommons.org/licenses/by/2.0/",
-          "attribution": "Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.",
-          "modifications": "Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits."
-        }
+
       ],
       "liveArrivalReferences": [
 

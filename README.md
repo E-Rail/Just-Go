@@ -28,16 +28,14 @@ shown as unavailable rather than inferred.
   (Live Trains, Exits, Facilities).
 - A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
   rider-facing maps, travel information, accessibility resources, and help pages.
-- Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
-  Qqhhss under CC0 1.0.
 - Private station images imported from Photos or Files, normalized and stored only on-device.
 
 The current bundled coverage is:
 
 | City | Network | Matched | Accessibility | Live arrivals | External maps | Media | Verified transfers |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Beijing | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
-| Hong Kong | 162 | 162 | 98 | 162 | 0 | 1 | 0 |
+| Beijing | 444 | 444 | 0 | 0 | 0 | 0 | 0 |
+| Hong Kong | 162 | 162 | 98 | 162 | 0 | 0 | 0 |
 
 The other 56 city packs are source-pending. Of those cities, 44 retain an attributed network
 baseline and 12 are catalog-only. Included metro topology powers rail routing independently of

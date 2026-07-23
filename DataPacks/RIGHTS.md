@@ -79,15 +79,10 @@ not send the response to a JustGo server or retain it beyond the in-memory cache
 own device-local, user-clearable snapshot described above. The source-page reader remains
 non-persistent and does not relicense provider text.
 
-## Pilot Media
+## Licensed Media
 
-- `LicensedMedia/beijing-jianguomen.jpg`: "Beijing Subway Jianguomen Station 01.jpg" by Ian
-  Holton, licensed CC BY 2.0. The app-normalized file is 470435 bytes with SHA-256
-  `54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750`.
-- `LicensedMedia/hong-kong-central.jpg`: "Central station in Hong Kong.jpg" by Qqhhss,
-  dedicated under CC0 1.0. The app-normalized file is 955201 bytes with SHA-256
-  `7ef38511d29cee0872787d5ab154bafce6a0089af3bc48508999244ff0840370`.
-
-The normalized files are local bundle resources. Runtime packs may retain Commons description
-page URLs for attribution, but must never use Commons or Wikimedia upload URLs as runtime image
-sources.
+No licensed station photos are bundled. The pack schema retains a `licensedMedia` field and the
+runtime a `licensedMedia` capability, both empty, so attributed Creative Commons photos can be
+added later without a schema change. Any future bundled image must be a local normalized resource:
+runtime packs may retain a Commons description-page URL for attribution but must never use Commons
+or Wikimedia upload URLs as runtime image sources.

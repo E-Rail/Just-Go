@@ -41,7 +41,6 @@ jobs:
           ruby Scripts/test_shanghai_station_information_importer.rb
           ruby Scripts/test_official_transit_resource_catalog.rb
           ruby Scripts/import_osm_metro_geometry.rb --self-test
-          ruby Scripts/import_licensed_station_media.rb
           ruby Scripts/validate_data_rights.rb --history
           ruby Scripts/validate_runtime_data_policy.rb
           ruby Scripts/validate_official_transit_resources.rb

@@ -198,7 +198,6 @@
 "Choose City" = "Choose City";
 "Checking station details..." = "Checking station details...";
 "Complete Trip" = "Complete Trip";
-"Caution" = "Caution";
 "First" = "First";
 "My Trips" = "My Trips";
 "No accessibility concerns found from available data." = "No accessibility concerns found from available data.";
@@ -212,7 +211,6 @@
 "Pending" = "Pending";
 "Personal" = "Personal";
 "Quick Tags" = "Quick Tags";
-"AI report" = "AI report";
 "Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Rider Notes" = "Rider Notes";
 "Save" = "Save";
@@ -260,6 +258,5 @@
 "Edit Quick Tag" = "Edit Quick Tag";
 "Delete Quick Tag" = "Delete Quick Tag";
 "Quick Tags appear as one-tap chips in Route Planner." = "Quick Tags appear as one-tap chips in Route Planner.";
-"Risk" = "Risk";
 "Last" = "Last";
 "Center map on my location" = "Center map on my location";

@@ -146,9 +146,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         "osm-metro-networks",
         "data-gov-hk-mtr",
         "beijing-official-landing-links",
-        "macau-official-landing-link",
-        "media-jianguomen-ian-holton",
-        "media-central-qqhhss"
+        "macau-official-landing-link"
     ]
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding

@@ -90,36 +90,6 @@
       "sourceURL": "https://www.mtr.com.hk/en/customer/services/system_map.html",
       "attribution": "Official transit operators and government transport authorities identified per catalog record",
       "redistribution": "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
-    },
-    {
-      "id": "media-jianguomen-ian-holton",
-      "kind": "mediaMetadata",
-      "scope": "LicensedMedia/beijing-jianguomen.jpg",
-      "licenseSPDX": "CC-BY-2.0",
-      "licenseURL": "https://creativecommons.org/licenses/by/2.0/",
-      "sourceURL": "https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg",
-      "creator": "Ian Holton",
-      "attribution": "Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.",
-      "sourceSizeBytes": 3011512,
-      "sourceSHA1": "682c2dd88704d654c79557a7a5f6d6f518d7f4b8",
-      "bundledSizeBytes": 470435,
-      "bundledSHA256": "54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750",
-      "bundled": true
-    },
-    {
-      "id": "media-central-qqhhss",
-      "kind": "mediaMetadata",
-      "scope": "LicensedMedia/hong-kong-central.jpg",
-      "licenseSPDX": "CC0-1.0",
-      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceURL": "https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg",
-      "creator": "Qqhhss",
-      "attribution": "Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.",
-      "sourceSizeBytes": 4463295,
-      "sourceSHA1": "23ad1d16a17cc4837b960e3606a3e91ee2cdf490",
-      "bundledSizeBytes": 955201,
-      "bundledSHA256": "7ef38511d29cee0872787d5ab154bafce6a0089af3bc48508999244ff0840370",
-      "bundled": true
     }
   ],
   "dataLicenses": [
@@ -141,8 +111,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "osm-metro-networks",
         "taipei-open-data"
       ]
@@ -255,8 +223,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -269,8 +235,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -283,8 +247,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -297,8 +259,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -311,8 +271,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -325,8 +283,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -339,8 +295,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -353,8 +307,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -367,8 +319,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -381,8 +331,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -395,8 +343,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -409,8 +355,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -423,8 +367,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -437,8 +379,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -451,8 +391,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -465,8 +403,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -479,8 +415,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -493,8 +427,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -507,8 +439,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -521,8 +451,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -535,8 +463,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -549,8 +475,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -563,8 +487,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -577,8 +499,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -591,8 +511,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -605,8 +523,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -619,8 +535,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -633,8 +547,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -647,8 +559,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -661,8 +571,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -675,8 +583,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -689,8 +595,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -703,8 +607,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -717,8 +619,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -731,8 +631,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -745,8 +643,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -759,8 +655,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -773,8 +667,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -787,8 +679,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -801,8 +691,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -815,8 +703,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -829,8 +715,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -843,8 +727,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -857,8 +739,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -871,8 +751,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -885,8 +763,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -899,8 +775,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -913,8 +787,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -927,8 +799,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -941,8 +811,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -955,8 +823,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -969,8 +835,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -983,8 +847,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -997,8 +859,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1011,8 +871,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1025,8 +883,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1039,8 +895,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1053,8 +907,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1067,8 +919,6 @@
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
         "macau-official-landing-link",
-        "media-central-qqhhss",
-        "media-jianguomen-ian-holton",
         "official-transit-resource-links",
         "osm-metro-networks",
         "taipei-open-data"
@@ -1079,7 +929,6 @@
       "rightsIDs": [
         "beijing-official-landing-links",
         "justgo-generated-catalog",
-        "media-jianguomen-ian-holton",
         "osm-metro-networks"
       ]
     },
@@ -1096,20 +945,7 @@
       "rightsIDs": [
         "data-gov-hk-mtr",
         "justgo-generated-catalog",
-        "media-central-qqhhss",
         "osm-metro-networks"
-      ]
-    },
-    {
-      "path": "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg",
-      "rightsIDs": [
-        "media-jianguomen-ian-holton"
-      ]
-    },
-    {
-      "path": "JustGo/Resources/LicensedMedia/hong-kong-central.jpg",
-      "rightsIDs": [
-        "media-central-qqhhss"
       ]
     },
     {

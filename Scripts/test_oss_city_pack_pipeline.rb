@@ -72,7 +72,7 @@ class OSSCityPackPipelineTest < Minitest::Test
         "staticSchedules" => { "covered" => 0, "total" => 162 },
         "liveArrivals" => { "covered" => 162, "total" => 162 },
         "externalLayouts" => { "covered" => 0, "total" => 162 },
-        "licensedMedia" => { "covered" => 1, "total" => 162 },
+        "licensedMedia" => { "covered" => 0, "total" => 162 },
         "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
       },
       hong_kong.fetch("coverage")
@@ -153,16 +153,11 @@ class OSSCityPackPipelineTest < Minitest::Test
     refute_includes renamed.fetch("aliases"), "海皇路"
   end
 
-  def test_media_metadata_matches_shared_normalized_files
-    declarations = %w[1100 8100].flat_map do |city_id|
-      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations")
-        .flat_map { |station| station.fetch("licensedMedia") }
-    end
-    assert_equal 2, declarations.length
-    declarations.each do |media|
-      path = File.join(ROOT, "JustGo", "Resources", media.fetch("relativePath"))
-      assert_equal File.size(path), media.fetch("sizeBytes")
-      assert_equal Digest::SHA256.file(path).hexdigest, media.fetch("sha256")
+  def test_no_pack_ships_licensed_media
+    %w[1100 7101 8100].each do |city_id|
+      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+        assert_empty station.fetch("licensedMedia"), "#{city_id} unexpectedly ships licensed media"
+      end
     end
   end
 

@@ -5,13 +5,12 @@
     {
       "cityID": "1100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 383189,
-      "sha256": "e27c6a411776df3b7f2d9773ede65f5a870dcd8b7d79c3a06f00cf71ee04b282",
+      "sizeBytes": 382293,
+      "sha256": "e60beac52dc129c706cdbfa5d8b8463afb91d370ad4d0bdd9edbed107eec418e",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": null,
       "rightsIDs": [
         "beijing-official-landing-links",
-        "media-jianguomen-ian-holton",
         "osm-metro-networks"
       ],
       "externalResources": [
@@ -22,7 +21,7 @@
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "external_only",
-        "licensedMedia": "metadata_only",
+        "licensedMedia": "source_pending",
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
@@ -48,7 +47,7 @@
           "total": 444
         },
         "licensedMedia": {
-          "covered": 1,
+          "covered": 0,
           "total": 444
         },
         "verifiedTransferContexts": {
@@ -2657,13 +2656,12 @@
     {
       "cityID": "8100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 741160,
-      "sha256": "f65410df953d90582a0b1868049aaf89940411966cdc642b3e7cab7cb81772ae",
+      "sizeBytes": 740292,
+      "sha256": "c735260173285e5f269d0fd6c0f0e07a4657878ad8e2bac7030f7c41eae54c0d",
       "bundledResource": "BundledCityPacks/8100.json",
       "downloadURL": null,
       "rightsIDs": [
         "data-gov-hk-mtr",
-        "media-central-qqhhss",
         "osm-metro-networks"
       ],
       "externalResources": [
@@ -2674,7 +2672,7 @@
         "schedules": "source_pending",
         "liveArrivals": "official_live",
         "stationMaps": "external_only",
-        "licensedMedia": "metadata_only",
+        "licensedMedia": "source_pending",
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
@@ -2700,7 +2698,7 @@
           "total": 162
         },
         "licensedMedia": {
-          "covered": 1,
+          "covered": 0,
           "total": 162
         },
         "verifiedTransferContexts": {

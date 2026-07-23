@@ -110,7 +110,7 @@ module OSSCityPackPipeline
     "schedules" => "source_pending",
     "liveArrivals" => "source_pending",
     "stationMaps" => "external_only",
-    "licensedMedia" => "metadata_only",
+    "licensedMedia" => "source_pending",
     "verifiedTransferContexts" => "source_pending"
   }.freeze
 
@@ -119,7 +119,7 @@ module OSSCityPackPipeline
     "schedules" => "source_pending",
     "liveArrivals" => "official_live",
     "stationMaps" => "external_only",
-    "licensedMedia" => "metadata_only",
+    "licensedMedia" => "source_pending",
     "verifiedTransferContexts" => "source_pending"
   }.freeze
 
@@ -159,37 +159,6 @@ module OSSCityPackPipeline
     }
   ].freeze
 
-  MEDIA = {
-    "jianguomen" => {
-      "kind" => "stationPhoto",
-      "title" => "Beijing Subway Jianguomen Station",
-      "relativePath" => "LicensedMedia/beijing-jianguomen.jpg",
-      "mimeType" => "image/jpeg",
-      "sizeBytes" => 470_435,
-      "sha256" => "54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750",
-      "sourcePageURL" => "https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg",
-      "creator" => "Ian Holton",
-      "licenseSPDX" => "CC-BY-2.0",
-      "licenseURL" => "https://creativecommons.org/licenses/by/2.0/",
-      "attribution" => "Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.",
-      "modifications" => "Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits."
-    },
-    "central" => {
-      "kind" => "stationPhoto",
-      "title" => "Central station in Hong Kong",
-      "relativePath" => "LicensedMedia/hong-kong-central.jpg",
-      "mimeType" => "image/jpeg",
-      "sizeBytes" => 955_201,
-      "sha256" => "7ef38511d29cee0872787d5ab154bafce6a0089af3bc48508999244ff0840370",
-      "sourcePageURL" => "https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg",
-      "creator" => "Qqhhss",
-      "licenseSPDX" => "CC0-1.0",
-      "licenseURL" => "https://creativecommons.org/publicdomain/zero/1.0/",
-      "attribution" => "Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.",
-      "modifications" => "Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits."
-    }
-  }.freeze
-
   class BuildError < StandardError; end
 
   class Builder
@@ -227,7 +196,6 @@ module OSSCityPackPipeline
     def build_beijing_pack
       network = load_network("1100")
       stations = network.fetch("stations").sort_by { |station| station.fetch("id") }.map do |station|
-        media = station["nameEn"] == "Jianguomen" ? [deep_copy(MEDIA.fetch("jianguomen"))] : []
         base_station(station).merge(
           "externalResources" => [
             external_resource(
@@ -242,8 +210,7 @@ module OSSCityPackPipeline
               "https://www.bjsubway.com/station/xltcx/",
               "Beijing Subway"
             )
-          ],
-          "licensedMedia" => media
+          ]
         )
       end
 
@@ -253,7 +220,7 @@ module OSSCityPackPipeline
         "cityID" => "1100",
         "version" => VERSION,
         "generatedAt" => GENERATED_AT,
-        "rightsIDs" => %w[osm-metro-networks beijing-official-landing-links media-jianguomen-ian-holton].sort,
+        "rightsIDs" => %w[osm-metro-networks beijing-official-landing-links].sort,
         "capabilities" => deep_copy(BEIJING_CAPABILITIES),
         "coverage" => coverage,
         "stations" => stations
@@ -345,10 +312,6 @@ module OSSCityPackPipeline
         )
       end
 
-      central = records.values.find { |record| record["stationNameEn"] == "Central" }
-      raise BuildError, "Central did not match the canonical network" unless central
-
-      central["licensedMedia"] << deep_copy(MEDIA.fetch("central"))
       stations = records.values.each { |record| normalize_station_arrays!(record) }
         .sort_by { |record| record.fetch("stationID") }
       if stations.length != 162
@@ -368,7 +331,7 @@ module OSSCityPackPipeline
         "cityID" => "8100",
         "version" => VERSION,
         "generatedAt" => GENERATED_AT,
-        "rightsIDs" => %w[osm-metro-networks data-gov-hk-mtr media-central-qqhhss].sort,
+        "rightsIDs" => %w[osm-metro-networks data-gov-hk-mtr].sort,
         "capabilities" => deep_copy(HONG_KONG_CAPABILITIES),
         "coverage" => coverage,
         "destinationNames" => destination_names,
@@ -647,36 +610,6 @@ module OSSCityPackPipeline
             "sourceURL" => "https://www.mtr.com.hk/en/customer/services/system_map.html",
             "attribution" => "Official transit operators and government transport authorities identified per catalog record",
             "redistribution" => "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
-          },
-          {
-            "id" => "media-jianguomen-ian-holton",
-            "kind" => "mediaMetadata",
-            "scope" => MEDIA.fetch("jianguomen").fetch("relativePath"),
-            "licenseSPDX" => "CC-BY-2.0",
-            "licenseURL" => MEDIA.fetch("jianguomen").fetch("licenseURL"),
-            "sourceURL" => MEDIA.fetch("jianguomen").fetch("sourcePageURL"),
-            "creator" => "Ian Holton",
-            "attribution" => MEDIA.fetch("jianguomen").fetch("attribution"),
-            "sourceSizeBytes" => 3_011_512,
-            "sourceSHA1" => "682c2dd88704d654c79557a7a5f6d6f518d7f4b8",
-            "bundledSizeBytes" => MEDIA.fetch("jianguomen").fetch("sizeBytes"),
-            "bundledSHA256" => MEDIA.fetch("jianguomen").fetch("sha256"),
-            "bundled" => true
-          },
-          {
-            "id" => "media-central-qqhhss",
-            "kind" => "mediaMetadata",
-            "scope" => MEDIA.fetch("central").fetch("relativePath"),
-            "licenseSPDX" => "CC0-1.0",
-            "licenseURL" => MEDIA.fetch("central").fetch("licenseURL"),
-            "sourceURL" => MEDIA.fetch("central").fetch("sourcePageURL"),
-            "creator" => "Qqhhss",
-            "attribution" => MEDIA.fetch("central").fetch("attribution"),
-            "sourceSizeBytes" => 4_463_295,
-            "sourceSHA1" => "23ad1d16a17cc4837b960e3606a3e91ee2cdf490",
-            "bundledSizeBytes" => MEDIA.fetch("central").fetch("sizeBytes"),
-            "bundledSHA256" => MEDIA.fetch("central").fetch("sha256"),
-            "bundled" => true
           }
         ],
         "dataLicenses" => [DATA_GOV_HK_LICENSE.to_h],
@@ -735,7 +668,7 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[
             justgo-generated-catalog osm-metro-networks data-gov-hk-mtr
             beijing-official-landing-links macau-official-landing-link
-            media-jianguomen-ian-holton media-central-qqhhss taipei-open-data
+            taipei-open-data
           ].sort
         },
         {
@@ -794,22 +727,13 @@ module OSSCityPackPipeline
           "path" => "JustGo/Resources/BundledCityPacks/1100.json",
           "rightsIDs" => %w[
             justgo-generated-catalog osm-metro-networks beijing-official-landing-links
-            media-jianguomen-ian-holton
           ].sort
         },
         {
           "path" => "JustGo/Resources/BundledCityPacks/8100.json",
           "rightsIDs" => %w[
-            justgo-generated-catalog osm-metro-networks data-gov-hk-mtr media-central-qqhhss
+            justgo-generated-catalog osm-metro-networks data-gov-hk-mtr
           ].sort
-        },
-        {
-          "path" => "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg",
-          "rightsIDs" => ["media-jianguomen-ian-holton"]
-        },
-        {
-          "path" => "JustGo/Resources/LicensedMedia/hong-kong-central.jpg",
-          "rightsIDs" => ["media-central-qqhhss"]
         }
       ]
       SOURCE_FILES.each_key do |file_name|
@@ -837,7 +761,7 @@ module OSSCityPackPipeline
       # Scripts/validate_universal_city_data.rb.
       universal_rights = %w[
         beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
-        macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
+        macau-official-landing-link
         official-transit-resource-links osm-metro-networks taipei-open-data
       ].sort
       files << {
@@ -854,8 +778,6 @@ module OSSCityPackPipeline
     end
 
     def third_party_notices
-      jianguomen = MEDIA.fetch("jianguomen")
-      central = MEDIA.fetch("central")
       <<~MARKDOWN
         # Third-Party Notices
 
@@ -913,22 +835,6 @@ module OSSCityPackPipeline
         https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
         https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
         https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
-
-        ## Jianguomen Station Photo
-
-        #{jianguomen.fetch("attribution")}
-
-        Source description page: #{jianguomen.fetch("sourcePageURL")}
-
-        Modification record: #{jianguomen.fetch("modifications")}
-
-        ## Central Station Photo
-
-        #{central.fetch("attribution")}
-
-        Source description page: #{central.fetch("sourcePageURL")}
-
-        Modification record: #{central.fetch("modifications")}
       MARKDOWN
     end
 

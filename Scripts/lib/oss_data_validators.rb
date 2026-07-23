@@ -406,7 +406,7 @@ module OSSDataValidators
       if path.match?(%r{\ADataPacks/universal/[^/]+\.json\z})
         return %w[
           beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
-          macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
+          macau-official-landing-link
           official-transit-resource-links osm-metro-networks taipei-open-data
         ].sort
       end
@@ -414,7 +414,7 @@ module OSSDataValidators
       {
         "DataPacks/manifest.json" => %w[
           beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
-          macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
+          macau-official-landing-link
           osm-metro-networks taipei-open-data
         ].sort,
         "DataPacks/rights_inventory.json" => ["justgo-generated-catalog"],
@@ -445,13 +445,11 @@ module OSSDataValidators
         "THIRD_PARTY_NOTICES.md" => ["justgo-generated-catalog"],
         "JustGo/Resources/BundledCityPacks/1100.json" => %w[
           beijing-official-landing-links justgo-generated-catalog
-          media-jianguomen-ian-holton osm-metro-networks
+          osm-metro-networks
         ].sort,
         "JustGo/Resources/BundledCityPacks/8100.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog media-central-qqhhss osm-metro-networks
-        ].sort,
-        "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg" => ["media-jianguomen-ian-holton"],
-        "JustGo/Resources/LicensedMedia/hong-kong-central.jpg" => ["media-central-qqhhss"]
+          data-gov-hk-mtr justgo-generated-catalog osm-metro-networks
+        ].sort
       }[path]
     end
   end
@@ -768,7 +766,7 @@ module OSSDataValidators
           "staticSchedules" => { "covered" => 0, "total" => 444 },
           "liveArrivals" => { "covered" => 0, "total" => 444 },
           "externalLayouts" => { "covered" => 0, "total" => 444 },
-          "licensedMedia" => { "covered" => 1, "total" => 444 },
+          "licensedMedia" => { "covered" => 0, "total" => 444 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 444 }
         }
       when "7101"
@@ -816,7 +814,7 @@ module OSSDataValidators
           "staticSchedules" => { "covered" => 0, "total" => 162 },
           "liveArrivals" => { "covered" => 162, "total" => 162 },
           "externalLayouts" => { "covered" => 0, "total" => 162 },
-          "licensedMedia" => { "covered" => 1, "total" => 162 },
+          "licensedMedia" => { "covered" => 0, "total" => 162 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
         }
       end

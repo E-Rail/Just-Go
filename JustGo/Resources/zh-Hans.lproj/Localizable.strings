@@ -198,7 +198,6 @@
 "Choose City" = "选择城市";
 "Checking station details..." = "正在检查车站详情…";
 "Complete Trip" = "完成行程";
-"Caution" = "注意";
 "First" = "首班";
 "My Trips" = "我的行程";
 "No accessibility concerns found from available data." = "现有数据未发现无障碍问题。";
@@ -212,7 +211,6 @@
 "Pending" = "待确认";
 "Personal" = "个人";
 "Quick Tags" = "快捷标签";
-"AI report" = "AI 报告";
 "Try clearing filters or loading official city data." = "请尝试清除筛选条件，或加载官方城市数据。";
 "Rider Notes" = "乘客备注";
 "Save" = "保存";
@@ -260,6 +258,5 @@
 "Edit Quick Tag" = "编辑快捷标签";
 "Delete Quick Tag" = "删除快捷标签";
 "Quick Tags appear as one-tap chips in Route Planner." = "快捷标签会显示在路线规划的一键填入按钮中。";
-"Risk" = "风险";
 "Last" = "末班";
 "Center map on my location" = "将地图居中到我的位置";

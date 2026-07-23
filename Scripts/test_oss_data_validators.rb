@@ -21,7 +21,7 @@ class OSSDataValidatorsTest < Minitest::Test
   end
 
   def test_rejects_undeclared_binary
-    path = File.join(@root, "JustGo", "Resources", "LicensedMedia", "undeclared.jpg")
+    path = File.join(@root, "DataPacks", "sources", "8100", "undeclared.jpg")
     File.binwrite(path, "not declared")
 
     error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
@@ -157,23 +157,6 @@ class OSSDataValidatorsTest < Minitest::Test
     assert_match(/incorrect rights assignment/, error.message)
   end
 
-  def test_rejects_media_rights_evidence_mismatch
-    inventory = read_json("DataPacks/rights_inventory.json")
-    right = inventory.fetch("rights").find { |item| item["id"] == "media-central-qqhhss" }
-    right["bundledSHA256"] = "0" * 64
-    write_json("DataPacks/rights_inventory.json", inventory)
-
-    error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
-    assert_match(/rights evidence checksum mismatch/, error.message)
-  end
-
-  def test_rejects_missing_declared_media
-    FileUtils.rm(File.join(@root, "JustGo", "Resources", "LicensedMedia", "hong-kong-central.jpg"))
-
-    error = assert_raises(OSSDataValidators::ValidationError) { city_validator.validate! }
-    assert_match(/licensed media file is missing|structured\/bundled files missing rights declarations/, error.message)
-  end
-
   private
 
   def copy_fixture
@@ -181,7 +164,6 @@ class OSSDataValidatorsTest < Minitest::Test
     resources = File.join(@root, "JustGo", "Resources")
     FileUtils.mkdir_p(resources)
     FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "BundledCityPacks"), resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "LicensedMedia"), resources)
     FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "MetroNetworks"), resources)
     FileUtils.cp(File.join(SOURCE_ROOT, "THIRD_PARTY_NOTICES.md"), @root)
   end

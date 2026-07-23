@@ -320,7 +320,7 @@ errors << "Quick Tag station repair must skip map-place tags" unless
 end
 
 project = read.call("JustGo.xcodeproj/project.pbxproj")
-%w[BundledCityPacks LicensedMedia PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
+%w[BundledCityPacks PrivacyInfo.xcprivacy THIRD_PARTY_NOTICES.md official_transit_resources.json].each do |resource|
   errors << "Xcode resources are missing #{resource}" unless project.include?(resource)
 end
 errors << "Xcode project is missing OfficialTransitResourceViewer.swift" unless

@@ -54,19 +54,3 @@ https://jtw.beijing.gov.cn/sjtl/202111/t20211118_2540164.html
 https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
 https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
 https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
-
-## Jianguomen Station Photo
-
-Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.
-
-Source description page: https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg
-
-Modification record: Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits.
-
-## Central Station Photo
-
-Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.
-
-Source description page: https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg
-
-Modification record: Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits.

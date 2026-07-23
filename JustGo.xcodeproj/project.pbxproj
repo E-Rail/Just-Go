@@ -93,7 +93,6 @@
 		A1000502 /* Transit/HongKongRealtimeArrivalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */; };
 		A1000503 /* Station/PersonalStationMediaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000503 /* Station/PersonalStationMediaSection.swift */; };
 		A1000504 /* BundledCityPacks in Resources */ = {isa = PBXBuildFile; fileRef = A2000504 /* BundledCityPacks */; };
-		A1000505 /* LicensedMedia in Resources */ = {isa = PBXBuildFile; fileRef = A2000505 /* LicensedMedia */; };
 		A1000506 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000506 /* PrivacyInfo.xcprivacy */; };
 		A1000507 /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = A2000507 /* THIRD_PARTY_NOTICES.md */; };
 		A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000600 /* Data/OfficialTransitResourceCatalog.swift */; };
@@ -210,7 +209,6 @@
 		A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/HongKongRealtimeArrivalProvider.swift; sourceTree = "<group>"; };
 		A2000503 /* Station/PersonalStationMediaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/PersonalStationMediaSection.swift; sourceTree = "<group>"; };
 		A2000504 /* BundledCityPacks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledCityPacks; sourceTree = "<group>"; };
-		A2000505 /* LicensedMedia */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LicensedMedia; sourceTree = "<group>"; };
 		A2000506 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A2000507 /* THIRD_PARTY_NOTICES.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../THIRD_PARTY_NOTICES.md; sourceTree = "<group>"; };
 		A2000600 /* Data/OfficialTransitResourceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/OfficialTransitResourceCatalog.swift; sourceTree = "<group>"; };
@@ -416,7 +414,6 @@
 				A2000311 /* manifest.json */,
 				A2000601 /* official_transit_resources.json */,
 				A2000504 /* BundledCityPacks */,
-				A2000505 /* LicensedMedia */,
 				A2000506 /* PrivacyInfo.xcprivacy */,
 				A2000507 /* THIRD_PARTY_NOTICES.md */,
 				A5000012 /* Localizable.strings */,
@@ -507,7 +504,6 @@
 				A1000311 /* manifest.json in Resources */,
 				A1000601 /* official_transit_resources.json in Resources */,
 				A1000504 /* BundledCityPacks in Resources */,
-				A1000505 /* LicensedMedia in Resources */,
 				A1000506 /* PrivacyInfo.xcprivacy in Resources */,
 				A1000507 /* THIRD_PARTY_NOTICES.md in Resources */,
 				A100003D /* Localizable.strings in Resources */,

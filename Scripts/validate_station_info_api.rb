@@ -129,6 +129,45 @@ if used_sources != stable_sources
   fail_validation("stable sources #{stable_sources.inspect} do not match directory sources #{used_sources.inspect}")
 end
 
+# ---- DataPacks <-> API agreement ----------------------------------------------------------
+# Every stable source must trace back to a reviewed DataPacks catalog and a rights-inventory
+# grant, and the directory must carry exactly that catalog's stations. This is what keeps the
+# published API and the internal DataPacks from drifting apart: add a stable source without a
+# catalog, or let a catalog and the directory diverge by even one station, and this fails.
+STABLE_CATALOGS = {
+  "beijingSubwayOnline" => {
+    catalog: "DataPacks/sources/official-resources/beijing_station_information.json",
+    rightsID: "beijing-official-landing-links"
+  },
+  "shanghaiMetroOnline" => {
+    catalog: "DataPacks/sources/official-resources/shanghai_station_information.json",
+    rightsID: "shanghai-official-landing-links"
+  },
+  "hongKongGovernment" => {
+    catalog: "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
+    rightsID: "data-gov-hk-mtr"
+  }
+}.freeze
+
+unless STABLE_CATALOGS.keys.sort == stable_sources
+  fail_validation("stable sources #{stable_sources.inspect} have no DataPacks catalog mapping " \
+    "(#{STABLE_CATALOGS.keys.sort.inspect}); every stable source needs a reviewed catalog")
+end
+
+rights_ids = load_json(RIGHTS_PATH).fetch("rights").map { |right| right.fetch("id") }
+STABLE_CATALOGS.each do |source_id, binding|
+  catalog = load_json(File.join(ROOT, binding[:catalog]))
+  catalog_ids = catalog.fetch("stations").map { |station| station.fetch("stationID") }.sort
+  directory_ids = stations.select { |_id, entry| entry["sources"].key?(source_id) }.keys.sort
+  unless catalog_ids == directory_ids
+    fail_validation("#{source_id}: directory carries #{directory_ids.length} stations but its " \
+      "DataPacks catalog has #{catalog_ids.length}; they must be the same stations")
+  end
+  unless rights_ids.include?(binding[:rightsID])
+    fail_validation("#{source_id}: rights grant #{binding[:rightsID]} is missing from rights_inventory")
+  end
+end
+
 # ---- Drift --------------------------------------------------------------------------------
 unless system("ruby", File.join(ROOT, "Scripts", "generate_station_info_api.rb"), "--check")
   fail_validation("directory.json is stale relative to the catalogs; regenerate it")

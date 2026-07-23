@@ -63,11 +63,6 @@ final class RouteConfidenceService {
             score -= 10
             warnings.append(feasibility.title)
         }
-        if !feasibility.aiReportInsights.isEmpty {
-            score -= 15
-            warnings.append(AppLocalization.localized("AI issue reported"))
-        }
-
         switch route.serviceStatus {
         case .serviceEndedToday:
             score -= 40

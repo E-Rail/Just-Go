@@ -502,7 +502,6 @@ struct RouteDetailView: View {
     func currentFeasibility(comfort: RouteComfortForecast) -> RouteFeasibility {
         container.routeFeasibilityService.feasibility(
             for: route,
-            aiReportInsights: container.aiReportService.insights(affecting: route),
             comfort: comfort
         )
     }

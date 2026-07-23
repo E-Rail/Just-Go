@@ -168,7 +168,7 @@ struct TransitDataView: View {
                                 CityCapabilityTags(
                                     coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage,
                                     hasOfficialOnlineStationInformation:
-                                        BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
+                                        container.stationInformationDirectory.servesStationInformation(cityID: city.id)
                                 )
                                 .equatable()
                             }

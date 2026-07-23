@@ -93,6 +93,7 @@
 		A1000502 /* Transit/HongKongRealtimeArrivalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */; };
 		A1000503 /* Station/PersonalStationMediaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000503 /* Station/PersonalStationMediaSection.swift */; };
 		A1000504 /* BundledCityPacks in Resources */ = {isa = PBXBuildFile; fileRef = A2000504 /* BundledCityPacks */; };
+		A1000700 /* StationInfo in Resources */ = {isa = PBXBuildFile; fileRef = A2000700 /* StationInfo */; };
 		A1000506 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000506 /* PrivacyInfo.xcprivacy */; };
 		A1000507 /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = A2000507 /* THIRD_PARTY_NOTICES.md */; };
 		A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000600 /* Data/OfficialTransitResourceCatalog.swift */; };
@@ -101,6 +102,8 @@
 		A1000604 /* Components/QuickTagEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000604 /* Components/QuickTagEditorSheet.swift */; };
 		A1000603 /* Transit/OfficialStationInformationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000603 /* Transit/OfficialStationInformationProvider.swift */; };
 		A1000606 /* Transit/OfficialStationInformationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000606 /* Transit/OfficialStationInformationCache.swift */; };
+		A1000710 /* Transit/StationInformationDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000710 /* Transit/StationInformationDirectory.swift */; };
+		A1000711 /* Transit/ShanghaiStationInformationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000711 /* Transit/ShanghaiStationInformationProvider.swift */; };
 		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
 		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
@@ -209,6 +212,7 @@
 		A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/HongKongRealtimeArrivalProvider.swift; sourceTree = "<group>"; };
 		A2000503 /* Station/PersonalStationMediaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/PersonalStationMediaSection.swift; sourceTree = "<group>"; };
 		A2000504 /* BundledCityPacks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledCityPacks; sourceTree = "<group>"; };
+		A2000700 /* StationInfo */ = {isa = PBXFileReference; lastKnownFileType = folder; path = StationInfo; sourceTree = "<group>"; };
 		A2000506 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A2000507 /* THIRD_PARTY_NOTICES.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../THIRD_PARTY_NOTICES.md; sourceTree = "<group>"; };
 		A2000600 /* Data/OfficialTransitResourceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/OfficialTransitResourceCatalog.swift; sourceTree = "<group>"; };
@@ -217,6 +221,8 @@
 		A2000604 /* Components/QuickTagEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/QuickTagEditorSheet.swift; sourceTree = "<group>"; };
 		A2000603 /* Transit/OfficialStationInformationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/OfficialStationInformationProvider.swift; sourceTree = "<group>"; };
 		A2000606 /* Transit/OfficialStationInformationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/OfficialStationInformationCache.swift; sourceTree = "<group>"; };
+		A2000710 /* Transit/StationInformationDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/StationInformationDirectory.swift; sourceTree = "<group>"; };
+		A2000711 /* Transit/ShanghaiStationInformationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/ShanghaiStationInformationProvider.swift; sourceTree = "<group>"; };
 		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
 		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
@@ -333,6 +339,8 @@
 				A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */,
 				A2000603 /* Transit/OfficialStationInformationProvider.swift */,
 				A2000606 /* Transit/OfficialStationInformationCache.swift */,
+				A2000710 /* Transit/StationInformationDirectory.swift */,
+				A2000711 /* Transit/ShanghaiStationInformationProvider.swift */,
 				A200005B /* Transit/BundledMetroRouteProvider.swift */,
 				A200005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift */,
 				A200005E /* Transit/MetroRoutingTypes.swift */,
@@ -414,6 +422,7 @@
 				A2000311 /* manifest.json */,
 				A2000601 /* official_transit_resources.json */,
 				A2000504 /* BundledCityPacks */,
+				A2000700 /* StationInfo */,
 				A2000506 /* PrivacyInfo.xcprivacy */,
 				A2000507 /* THIRD_PARTY_NOTICES.md */,
 				A5000012 /* Localizable.strings */,
@@ -504,6 +513,7 @@
 				A1000311 /* manifest.json in Resources */,
 				A1000601 /* official_transit_resources.json in Resources */,
 				A1000504 /* BundledCityPacks in Resources */,
+				A1000700 /* StationInfo in Resources */,
 				A1000506 /* PrivacyInfo.xcprivacy in Resources */,
 				A1000507 /* THIRD_PARTY_NOTICES.md in Resources */,
 				A100003D /* Localizable.strings in Resources */,
@@ -573,6 +583,8 @@
 				A1000502 /* Transit/HongKongRealtimeArrivalProvider.swift in Sources */,
 				A1000603 /* Transit/OfficialStationInformationProvider.swift in Sources */,
 				A1000606 /* Transit/OfficialStationInformationCache.swift in Sources */,
+				A1000710 /* Transit/StationInformationDirectory.swift in Sources */,
+				A1000711 /* Transit/ShanghaiStationInformationProvider.swift in Sources */,
 				A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */,
 				A100005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift in Sources */,
 				A100005E /* Transit/MetroRoutingTypes.swift in Sources */,

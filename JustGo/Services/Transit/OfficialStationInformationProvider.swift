@@ -50,6 +50,7 @@ enum OfficialStationInformationCategory: String, CaseIterable, Identifiable, Sen
 
 enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
     case beijingSubwayOnline
+    case shanghaiMetroOnline
     case hongKongGovernment
 
     var title: String {
@@ -59,6 +60,12 @@ enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
                 english: "Beijing Subway",
                 simplified: "北京地铁",
                 traditional: "北京地鐵"
+            )
+        case .shanghaiMetroOnline:
+            return AppLocalization.text(
+                english: "Shanghai Metro",
+                simplified: "上海地铁",
+                traditional: "上海地鐵"
             )
         case .hongKongGovernment:
             return AppLocalization.text(
@@ -196,15 +203,23 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
 /// storage APIs; the runtime data policy validates both files separately.
 protocol OfficialStationInformationCaching: Sendable {
     func storedSnapshot(
+        cityID: String,
         stationID: String,
         externalStationID: String
     ) async -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)?
-    func store(_ snapshot: OfficialStationInformationSnapshot, externalStationID: String) async
+    func store(
+        _ snapshot: OfficialStationInformationSnapshot,
+        cityID: String,
+        externalStationID: String
+    ) async
     func clearAll() async
 }
 
 enum OfficialStationInformationReference: Hashable, Sendable {
     case beijing(externalStationID: String, expectedNames: [String])
+    /// Shanghai keys station information per line, so the reference carries every line key the
+    /// station serves (from the bundled directory), not a single ID.
+    case shanghai(lineStationIDs: [String], expectedNames: [String])
 }
 
 struct OfficialStationInformationRequest: Hashable, Sendable {
@@ -259,6 +274,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         cityID == "1100"
     }
 
+    static let cityID = "1100"
     fileprivate static let host = "www.bjsubway.com"
     private static let endpointPath = "/api/guanwang/v2/getStationDetail"
     private static let maximumResponseBytes = 1_048_576
@@ -373,7 +389,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 )
                 if let diskCache {
                     let externalStationID = request.externalStationID
-                    Task { await diskCache.store(snapshot, externalStationID: externalStationID) }
+                    Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: externalStationID) }
                 }
             }
             return snapshot
@@ -405,6 +421,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         guard Self.allowsStoredFallback(error),
               let diskCache,
               let stored = await diskCache.storedSnapshot(
+                  cityID: Self.cityID,
                   stationID: request.stationID,
                   externalStationID: request.externalStationID
               ) else {
@@ -456,6 +473,10 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 stationID: stationID,
                 externalStationID: externalID,
                 expectedNames: names
+            )
+        case .shanghai:
+            throw OfficialStationInformationProviderError.invalidRequest(
+                "Shanghai references are handled by ShanghaiStationInformationProvider"
             )
         }
     }

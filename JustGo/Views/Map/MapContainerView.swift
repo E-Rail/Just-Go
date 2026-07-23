@@ -617,7 +617,7 @@ struct CityPickerView: View {
                         CityCapabilityTags(
                             coverage: city.dataCapabilities.coverage,
                             hasOfficialOnlineStationInformation:
-                                BeijingStationInformationProvider.servesStationInformation(forCityID: city.id)
+                                container.stationInformationDirectory.servesStationInformation(cityID: city.id)
                         )
                         .equatable()
                     }

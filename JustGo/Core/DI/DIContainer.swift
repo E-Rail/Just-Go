@@ -3,7 +3,7 @@ import UIKit
 
 private struct MemoryWarningReleaseTargets: Sendable {
     let officialStationData: OfficialCityPackService?
-    let stationInformationProvider: BeijingStationInformationProvider?
+    let stationInformationProvider: OfficialStationInformationRouter?
     let metroNetworkProvider: BundledMetroNetworkService?
     let transitRouteProvider: BundledMetroRouteProvider?
 
@@ -21,6 +21,7 @@ final class DIContainer {
     let placeSearchProvider: PlaceSearchProviding
     let officialStationData: OfficialStationDataProviding
     let officialStationInformationProvider: OfficialStationInformationProviding
+    let stationInformationDirectory: StationInformationDirectory
     let metroNetworkProvider: MetroNetworkProviding
     let routePlanningService: RoutePlanningService
     let stationSearchService: StationSearchService
@@ -39,6 +40,7 @@ final class DIContainer {
         placeSearchProvider: PlaceSearchProviding,
         officialStationData: OfficialStationDataProviding,
         officialStationInformationProvider: OfficialStationInformationProviding,
+        stationInformationDirectory: StationInformationDirectory,
         metroNetworkProvider: MetroNetworkProviding,
         routePlanningService: RoutePlanningService,
         stationSearchService: StationSearchService,
@@ -50,7 +52,7 @@ final class DIContainer {
         tripReminderService: TripReminderService,
         stationInformationDiskCache: OfficialStationInformationDiskCache? = nil,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
-        memoryManagedStationInformationProvider: BeijingStationInformationProvider? = nil,
+        memoryManagedStationInformationProvider: OfficialStationInformationRouter? = nil,
         memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
         memoryManagedTransitRouteProvider: BundledMetroRouteProvider? = nil
     ) {
@@ -58,6 +60,7 @@ final class DIContainer {
         self.placeSearchProvider = placeSearchProvider
         self.officialStationData = officialStationData
         self.officialStationInformationProvider = officialStationInformationProvider
+        self.stationInformationDirectory = stationInformationDirectory
         self.metroNetworkProvider = metroNetworkProvider
         self.routePlanningService = routePlanningService
         self.stationSearchService = stationSearchService
@@ -138,7 +141,8 @@ final class DIContainer {
     func makeStationDetailViewModel() -> StationDetailViewModel {
         StationDetailViewModel(
             officialStationData: officialStationData,
-            officialStationInformationProvider: officialStationInformationProvider
+            officialStationInformationProvider: officialStationInformationProvider,
+            stationInformationDirectory: stationInformationDirectory
         )
     }
 
@@ -152,9 +156,14 @@ final class DIContainer {
         // traffic, matching the pattern already used for the Beijing station-info provider.
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
         let stationInformationDiskCache = OfficialStationInformationDiskCache()
-        let officialStationInformationProvider = BeijingStationInformationProvider(
-            diskCache: stationInformationDiskCache
+        // One provider per source, dispatched by a router. The app decides which source a station
+        // uses by reading the bundled Station Information API directory, exactly as a third-party
+        // consumer would — no per-city branching at the call sites.
+        let stationInformationRouter = OfficialStationInformationRouter(
+            beijing: BeijingStationInformationProvider(diskCache: stationInformationDiskCache),
+            shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache)
         )
+        let stationInformationDirectory = StationInformationDirectory()
         // The bundled catalog decode + validation is heavy; hand the service a loader so it
         // runs lazily on the actor instead of blocking app launch on the main thread here.
         let officialStationData = OfficialCityPackService(
@@ -187,7 +196,8 @@ final class DIContainer {
             locationService: locationService,
             placeSearchProvider: placeSearchProvider,
             officialStationData: officialStationData,
-            officialStationInformationProvider: officialStationInformationProvider,
+            officialStationInformationProvider: stationInformationRouter,
+            stationInformationDirectory: stationInformationDirectory,
             metroNetworkProvider: metroNetworkProvider,
             routePlanningService: routePlanningService,
             stationSearchService: stationSearchService,
@@ -199,7 +209,7 @@ final class DIContainer {
             tripReminderService: tripReminderService,
             stationInformationDiskCache: stationInformationDiskCache,
             memoryManagedOfficialStationData: officialStationData,
-            memoryManagedStationInformationProvider: officialStationInformationProvider,
+            memoryManagedStationInformationProvider: stationInformationRouter,
             memoryManagedMetroNetworkProvider: metroNetworkProvider,
             memoryManagedTransitRouteProvider: transitRouteProvider
         )

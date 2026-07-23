@@ -22,16 +22,19 @@ final class StationDetailViewModel {
 
     private let officialStationData: OfficialStationDataProviding
     private let officialStationInformationProvider: OfficialStationInformationProviding
+    private let stationInformationDirectory: StationInformationDirectory
     private var trainTimesGeneration = 0
     private var cityPackGeneration = 0
     private var officialInformationGeneration = 0
 
     init(
         officialStationData: OfficialStationDataProviding,
-        officialStationInformationProvider: OfficialStationInformationProviding
+        officialStationInformationProvider: OfficialStationInformationProviding,
+        stationInformationDirectory: StationInformationDirectory
     ) {
         self.officialStationData = officialStationData
         self.officialStationInformationProvider = officialStationInformationProvider
+        self.stationInformationDirectory = stationInformationDirectory
     }
 
     func loadStation(_ station: Station) {
@@ -191,9 +194,8 @@ final class StationDetailViewModel {
 
     func loadOnlineStationInformation() async {
         guard let station,
-              station.cityID == "1100",
-              let review = officialResourceReview,
-              let providerStationID = review.providerStationID else { return }
+              let entry = stationInformationDirectory.onlineEntry(forStationID: station.id),
+              let reference = Self.reference(for: entry, station: station) else { return }
 
         let stationID = station.id
         let generation = officialInformationGeneration
@@ -208,18 +210,9 @@ final class StationDetailViewModel {
             }
         }
 
-        let expectedNames = [
-            station.name,
-            station.nameEn,
-            review.stationName,
-            review.stationNameEn
-        ].compactMap { $0 } + review.aliases
         let request = OfficialStationInformationRequest(
             stationID: stationID,
-            reference: .beijing(
-                externalStationID: providerStationID,
-                expectedNames: expectedNames
-            )
+            reference: reference
         )
 
         do {
@@ -246,12 +239,30 @@ final class StationDetailViewModel {
         }
     }
 
+    /// Builds the source-specific reference from a bundled directory entry. The directory says
+    /// which source and key; this maps that to the provider's typed request.
+    private static func reference(
+        for entry: StationDirectoryEntry,
+        station: Station
+    ) -> OfficialStationInformationReference? {
+        let expectedNames = ([station.name, station.nameEn, entry.name, entry.nameEn]
+            .compactMap { $0 } + entry.aliases)
+        switch entry.source {
+        case "beijingSubwayOnline":
+            return .beijing(externalStationID: entry.externalStationID, expectedNames: expectedNames)
+        case "shanghaiMetroOnline":
+            return .shanghai(lineStationIDs: entry.lineStationIDs, expectedNames: expectedNames)
+        default:
+            return nil
+        }
+    }
+
     var usesCategorizedStationInformation: Bool {
         guard let station else { return false }
         if station.cityID == "8100" {
             return true
         }
-        return station.cityID == "1100" && officialResourceReview?.providerStationID != nil
+        return stationInformationDirectory.onlineEntry(forStationID: station.id) != nil
     }
 
     var officialStationInformationSourceResource: ExternalTransitResource? {

@@ -42,10 +42,11 @@ actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
     }
 
     func storedSnapshot(
+        cityID: String,
         stationID: String,
         externalStationID: String
     ) -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)? {
-        let url = entryURL(externalStationID: externalStationID)
+        let url = entryURL(cityID: cityID, externalStationID: externalStationID)
         guard let data = try? Data(contentsOf: url),
               data.count <= Self.maximumEntryBytes,
               let envelope = try? JSONDecoder().decode(StoredEnvelope.self, from: data),
@@ -57,7 +58,11 @@ actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
         return (envelope.snapshot, envelope.fetchedAt)
     }
 
-    func store(_ snapshot: OfficialStationInformationSnapshot, externalStationID: String) {
+    func store(
+        _ snapshot: OfficialStationInformationSnapshot,
+        cityID: String,
+        externalStationID: String
+    ) {
         let envelope = StoredEnvelope(
             schemaVersion: Self.schemaVersion,
             externalStationID: externalStationID,
@@ -67,12 +72,13 @@ actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
         guard let data = try? JSONEncoder().encode(envelope),
               data.count <= Self.maximumEntryBytes else { return }
         do {
-            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+            let directory = directoryURL(cityID: cityID)
+            try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
             var backupExclusion = URLResourceValues()
             backupExclusion.isExcludedFromBackup = true
             var root = rootURL
             try? root.setResourceValues(backupExclusion)
-            try data.write(to: entryURL(externalStationID: externalStationID), options: .atomic)
+            try data.write(to: entryURL(cityID: cityID, externalStationID: externalStationID), options: .atomic)
         } catch {
             AppLog.data.error("Station information cache write failed: \(error)")
         }
@@ -82,15 +88,21 @@ actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
         try? fileManager.removeItem(at: rootURL)
     }
 
-    private var directoryURL: URL {
-        rootURL.appendingPathComponent("1100", isDirectory: true)
+    /// One subdirectory per city, so a station key that repeats across operators cannot collide.
+    /// Beijing keeps the historical `1100` path, so entries cached before this change stay valid.
+    private func directoryURL(cityID: String) -> URL {
+        let safeCity = cityID.unicodeScalars
+            .filter(CharacterSet.alphanumerics.contains)
+            .map(String.init)
+            .joined()
+        return rootURL.appendingPathComponent(safeCity.isEmpty ? "unknown" : safeCity, isDirectory: true)
     }
 
-    private func entryURL(externalStationID: String) -> URL {
+    private func entryURL(cityID: String, externalStationID: String) -> URL {
         let safeName = externalStationID.unicodeScalars
             .filter(CharacterSet.alphanumerics.contains)
             .map(String.init)
             .joined()
-        return directoryURL.appendingPathComponent("\(safeName).json", isDirectory: false)
+        return directoryURL(cityID: cityID).appendingPathComponent("\(safeName).json", isDirectory: false)
     }
 }

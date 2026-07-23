@@ -20,6 +20,14 @@ module StationInfoAPIGenerator
   ROOT = File.expand_path("..", __dir__)
   SOURCES_DIR = File.join(ROOT, "DataPacks", "sources", "official-resources")
   OUTPUT = File.join(ROOT, "StationInfoAPI", "directory", "directory.json")
+  # The app consumes the published contract, exactly like a third-party developer would, rather
+  # than reaching into DataPacks. It bundles a mirror of the directory (routing) and the source
+  # registry (which cities are served, and how). Both are written from the same source of truth
+  # here so they cannot drift; CI diff-checks the mirror.
+  AUTHORED_SOURCES = File.join(ROOT, "StationInfoAPI", "sources", "sources.json")
+  BUNDLE_DIR = File.join(ROOT, "JustGo", "Resources", "StationInfo")
+  BUNDLED_DIRECTORY = File.join(BUNDLE_DIR, "directory.json")
+  BUNDLED_SOURCES = File.join(BUNDLE_DIR, "sources.json")
 
   module_function
 
@@ -116,22 +124,39 @@ module StationInfoAPIGenerator
     JSON.pretty_generate(build) + "\n"
   end
 
+  # The two files the app bundles: the routing directory and a verbatim copy of the source
+  # registry. Keyed by destination path so `write!` and `check!` share one definition.
+  def bundle_outputs
+    {
+      BUNDLED_DIRECTORY => serialize,
+      BUNDLED_SOURCES => File.read(AUTHORED_SOURCES)
+    }
+  end
+
   def write!
     File.write(OUTPUT, serialize)
+    require "fileutils"
+    FileUtils.mkdir_p(BUNDLE_DIR)
+    bundle_outputs.each { |path, content| File.write(path, content) }
     document = build
     warn(
       "Station info directory: stations=#{document.fetch('stationCount')} " \
-      "sources=#{document.fetch('sources').join(', ')}"
+      "sources=#{document.fetch('sources').join(', ')}; bundled mirror written"
     )
   end
 
   def check!
-    current = File.file?(OUTPUT) ? File.read(OUTPUT) : nil
-    if current == serialize
-      warn "Station info directory is current."
+    stale = []
+    stale << OUTPUT unless (File.file?(OUTPUT) ? File.read(OUTPUT) : nil) == serialize
+    bundle_outputs.each do |path, content|
+      stale << path unless (File.file?(path) ? File.read(path) : nil) == content
+    end
+    if stale.empty?
+      warn "Station info directory and bundled mirror are current."
       true
     else
-      warn "Station info directory is stale; run: ruby Scripts/generate_station_info_api.rb"
+      warn "Station info API is stale (#{stale.map { |p| p.delete_prefix("#{ROOT}/") }.join(', ')}); " \
+           "run: ruby Scripts/generate_station_info_api.rb"
       false
     end
   end

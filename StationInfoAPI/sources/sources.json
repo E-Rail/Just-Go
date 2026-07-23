@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "description": "The source registry: for each supported source, its licence, how to fetch it, and how to map its raw response into ../schema/station-information.schema.json. This is JustGo's own authored normalization knowledge (MIT); the endpoint URLs are links, in the same category as the sourcePageURL values in the directory. It carries no operator content.",
+  "wireSchema": "../schema/station-information.schema.json",
+  "conventions": {
+    "status": {
+      "stable": "Fully supported: a reviewed catalog exists in ../directory/directory.json and the fetch/map recipe below is verified end to end.",
+      "preview": "The fetch/map recipe is verified live, but no reviewed catalog ships yet, so this source has no directory entries. Usable by a developer today; not yet wired into the app."
+    },
+    "redistributable": "false → you MUST fetch on the end-user's own device and must not cache-and-serve the operator's content; true → the licence permits redistribution with attribution.",
+    "access.kind": {
+      "onDeviceFetch": "Live request(s) to the operator, made from the end-user's device.",
+      "bundledDataset": "Static content ships in a redistributable data pack; only live fields (e.g. arrivals) are fetched."
+    },
+    "serviceDay": "Times past midnight belong to the service day: 00:21 is LATER than 23:39. Add 24h to any hour < 4 before comparing first/last trains.",
+    "mergeServices": "Operators often return one record per service run, not per direction. Group by (line, direction) and keep the earliest firstTrain and latest lastTrain; never merge the two directions of a line.",
+    "placeholderHandling": "A source's no-data token (see each source's `placeholders`) means unavailable: emit null for the field, do not copy the token through."
+  },
+  "sources": {
+    "beijingSubwayOnline": {
+      "cityID": "1100",
+      "provider": "Beijing Subway",
+      "attribution": "Beijing Subway (Beijing Mass Transit Railway Operation Corp.)",
+      "license": "LicenseRef-External-Link-Only",
+      "redistributable": false,
+      "status": "stable",
+      "populates": ["lines", "exits", "facilityGroups"],
+      "directoryKey": "externalStationID",
+      "access": {
+        "kind": "onDeviceFetch",
+        "endpoints": {
+          "stationDetail": {
+            "method": "GET",
+            "url": "https://www.bjsubway.com/api/guanwang/v2/getStationDetail?accLocation={externalStationID}",
+            "responseType": "application/json"
+          }
+        }
+      },
+      "map": {
+        "lines": {
+          "from": "data.lines[]",
+          "lineName": "lineName",
+          "lineColorHex": "lineColor",
+          "direction": "terminalStationName || destStationName",
+          "firstTrain": "firstTime",
+          "lastTrain": "lastTime"
+        },
+        "exits": {
+          "from": "data.station.exits[]",
+          "name": "name",
+          "details": "nearby[]",
+          "isAccessible": null
+        },
+        "facilityGroups": {
+          "from": "data.station.facilitys[]",
+          "name": "name",
+          "items": "data[]",
+          "item.name": "name",
+          "item.location": "contentDesc"
+        }
+      },
+      "rules": {
+        "colorHex": "lineColor is RRGGBB or #RRGGBB; normalise to #RRGGBB uppercase, else null.",
+        "identity": "Reject the response unless data.station.stationDeviceLocation equals the requested externalStationID and the station name matches the reviewed catalog.",
+        "placeholders": ["/", "／", "-", "--", "—", "n/a", "na", "none", "null", "无", "沒有", "没有", "暫無", "暂无"]
+      }
+    },
+    "shanghaiMetroOnline": {
+      "cityID": "3100",
+      "provider": "Shanghai Metro",
+      "attribution": "Shanghai Shentong Metro Group (Shanghai Metro)",
+      "license": "LicenseRef-External-Link-Only",
+      "redistributable": false,
+      "status": "stable",
+      "populates": ["lines", "exits", "facilityGroups"],
+      "directoryKey": "lineStationIDs",
+      "access": {
+        "kind": "onDeviceFetch",
+        "endpoints": {
+          "lineColors": {
+            "method": "GET",
+            "url": "https://m.shmetro.com/interface/metromap/metromap.aspx?func=lines",
+            "responseType": "application/json",
+            "note": "Array of {line_no, color}; one call covers the whole network."
+          },
+          "firstLast": {
+            "method": "GET",
+            "url": "https://m.shmetro.com/interface/metromap/metromap.aspx?func=fltime&line={lineNo}",
+            "responseType": "application/json",
+            "note": "Array of rows for the whole line; filter by stat_id."
+          },
+          "stationInfo": {
+            "method": "GET",
+            "url": "https://m.shmetro.com/interface/metromap/metromap.aspx?func=stationInfo&stat_id={lineStationID}",
+            "responseType": "application/json",
+            "note": "entrance_info, toilet_position and elevator are JSON strings that must be parsed again."
+          }
+        }
+      },
+      "map": {
+        "lines": {
+          "from": "firstLast[] where stat_id == lineStationID",
+          "lineName": "\"{line}号线\"",
+          "lineColorHex": "lineColors[line_no].color",
+          "direction": "description",
+          "firstTrain": "first_time",
+          "lastTrain": "last_time"
+        },
+        "exits": {
+          "from": "JSON.parse(stationInfo.entrance_info).line[].entrance[]",
+          "name": "id",
+          "details": "[description]",
+          "isAccessible": "icon2 == 'w_y.png' ? true : (icon2 == 'w_n.png' ? false : null)"
+        },
+        "facilityGroups": {
+          "from": "JSON.parse(stationInfo.toilet_position).toilet[]",
+          "name": "\"卫生间\"",
+          "item.name": "\"卫生间\"",
+          "item.location": "description"
+        }
+      },
+      "rules": {
+        "keyNormalisation": "func=fltime rows carry stat_id without leading zeros (\"111\"); the directory key is four digits (\"0111\"). Left-pad to four before matching.",
+        "colorHex": "color is #rrggbb; uppercase it.",
+        "placeholders": ["--", "/", "／", "-", "—", "n/a", "na", "none", "无", "暂无"],
+        "quirks": [
+          "no-data first/last trains come back as \"--\"; treat as null.",
+          "exit id may be a JSON number (陆家嘴) or a string (莘庄); coerce to string."
+        ]
+      }
+    },
+    "guangzhouMetroOnline": {
+      "cityID": "4401",
+      "provider": "Guangzhou Metro",
+      "attribution": "Guangzhou Metro Group",
+      "license": "LicenseRef-External-Link-Only",
+      "redistributable": false,
+      "status": "preview",
+      "populates": ["lines"],
+      "directoryKey": "stationShowCode",
+      "access": {
+        "kind": "onDeviceFetch",
+        "endpoints": {
+          "lineStation": {
+            "method": "POST",
+            "url": "https://apis.gzmtr.com/app-map/metroweb/linestation",
+            "requestBody": "{}",
+            "responseType": "application/json",
+            "note": "The full network: businessObject[] lines, each with stations[] carrying stationShowCode, names and lineColor. One call yields every stationShowCode."
+          },
+          "firstLast": {
+            "method": "POST",
+            "url": "https://apis.gzmtr.com/app-map/serviceTime/list/{stationShowCode}",
+            "requestBody": "{}",
+            "responseType": "application/json"
+          }
+        }
+      },
+      "map": {
+        "lines": {
+          "from": "firstLast.businessObject[]",
+          "lineName": "lineCn",
+          "lineColorHex": "lineStation lineColor for lineCn",
+          "direction": "\"往{toStationName}\"",
+          "firstTrain": "startTime",
+          "lastTrain": "endTime"
+        }
+      },
+      "rules": {
+        "request": "POST with Content-Type application/json and body {} . No auth token is required (the client's token interceptor is disabled).",
+        "colorHex": "lineColor is 8-digit RRGGBBAA (\"edcf3dff\"); drop the alpha byte, prefix #, uppercase.",
+        "coverage": "Exit and facility endpoints (/station/getLetter, /getDevice, /getService) return null and are not populated; this source is lines-only.",
+        "placeholders": ["/", "-", "无", "暂无"]
+      }
+    },
+    "hongKongGovernment": {
+      "cityID": "8100",
+      "provider": "MTR Corporation Limited / DATA.GOV.HK",
+      "attribution": "MTR Corporation Limited and DATA.GOV.HK",
+      "license": "LicenseRef-DATA-GOV-HK-1.2",
+      "redistributable": true,
+      "status": "stable",
+      "populates": ["exits", "facilityGroups", "liveArrivals"],
+      "directoryKey": "liveArrivalReferences",
+      "access": {
+        "kind": "bundledDataset",
+        "note": "Static station information (barrier-free facilities, from which exits and facility groups are derived) ships in the redistributable Hong Kong data pack under DATA.GOV.HK Terms of Use v1.2; attribution is mandatory. Only live next-train arrivals are fetched.",
+        "dataset": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+        "endpoints": {
+          "heavyRailArrivals": {
+            "method": "GET",
+            "url": "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line={line}&sta={stationCode}",
+            "responseType": "application/json",
+            "note": "For liveArrivalReferences with mode == heavyRail."
+          },
+          "lightRailArrivals": {
+            "method": "GET",
+            "url": "https://rt.data.gov.hk/v1/transport/mtr/lrt/getSchedule?station_id={stationCode}",
+            "responseType": "application/json",
+            "note": "For liveArrivalReferences with mode == lightRail."
+          }
+        }
+      },
+      "map": {
+        "exits": {
+          "from": "bundled barrier-free facilities: accessible entrances and lift locations",
+          "isAccessible": true
+        },
+        "facilityGroups": {
+          "from": "bundled barrier-free facility availability (lift, escalator, ramp, accessible restroom, tactile path, audio, visual)"
+        },
+        "liveArrivals": {
+          "from": "arrivals endpoint keyed by liveArrivalReferences[].stationCode",
+          "into": "service.liveTime"
+        }
+      },
+      "rules": {
+        "attribution": "DATA.GOV.HK Terms of Use v1.2 require attribution and source identification wherever the data is shown."
+      }
+    }
+  }
+}

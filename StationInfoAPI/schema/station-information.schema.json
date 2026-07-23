@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/e-rail/justgo/StationInfoAPI/schema/station-information.schema.json",
+  "title": "Station Information Snapshot",
+  "description": "The normalized shape every source is mapped into, whatever its raw upstream form. This is the machine-readable twin of DataPacks/STATION_INFORMATION_SCHEMA.md (schema version 2). A producer outputs a `snapshot`; the on-device cache wraps it in an `envelope` (see $defs.envelope).",
+  "$comment": "schemaVersion 2. The `source` field is an open string on purpose: adding a city (e.g. shanghaiMetroOnline) is additive and does not bump this schema. The authoritative list of valid source identifiers lives in ../sources/sources.json.",
+  "$ref": "#/$defs/snapshot",
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stationID", "stationName", "source", "freshness", "lines", "exits", "facilityGroups"],
+      "properties": {
+        "stationID": {
+          "type": "string",
+          "description": "Canonical station ID, stable across releases. Keys into ../directory/directory.json."
+        },
+        "stationName": {
+          "type": "string",
+          "description": "Station name as the provider states it."
+        },
+        "source": {
+          "type": "string",
+          "description": "The source this snapshot was produced from. Must be one of the identifiers defined in ../sources/sources.json (e.g. beijingSubwayOnline, shanghaiMetroOnline, guangzhouMetroOnline, hongKongGovernment).",
+          "examples": ["beijingSubwayOnline", "shanghaiMetroOnline", "guangzhouMetroOnline", "hongKongGovernment"]
+        },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "lines": {
+          "type": "array",
+          "description": "Service information grouped by line. One block per line, holding every direction it serves.",
+          "items": { "$ref": "#/$defs/line" }
+        },
+        "exits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/exit" }
+        },
+        "facilityGroups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/facilityGroup" }
+        }
+      }
+    },
+    "freshness": {
+      "description": "Whether the snapshot came straight from the source or from a device's own last-good copy served while the source was unreachable.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state"],
+          "properties": {
+            "state": { "const": "live" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "fetchedAt"],
+          "properties": {
+            "state": { "const": "cached" },
+            "fetchedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 UTC instant the cached copy was retrieved."
+            }
+          }
+        }
+      ]
+    },
+    "line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lineName", "lineColorHex", "services"],
+      "properties": {
+        "lineName": {
+          "type": "string",
+          "description": "Unique within a station; usable as the block's identity."
+        },
+        "lineColorHex": {
+          "type": ["string", "null"],
+          "pattern": "^#[0-9A-F]{6}$",
+          "description": "#RRGGBB, uppercase. Null when the provider states no colour."
+        },
+        "services": {
+          "type": "array",
+          "description": "One entry per direction of travel.",
+          "items": { "$ref": "#/$defs/service" }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "firstTrain", "lastTrain", "liveTime"],
+      "properties": {
+        "direction": {
+          "type": "string",
+          "description": "Direction of travel, as a rider reads it on the platform sign."
+        },
+        "firstTrain": {
+          "type": ["string", "null"],
+          "description": "H:MM or HH:MM, provider-local time. Null when not published.",
+          "examples": ["05:19", "6:04"]
+        },
+        "lastTrain": {
+          "type": ["string", "null"],
+          "description": "Same format as firstTrain. May be past midnight — a last train at 00:21 is LATER than one at 23:39 (service-day ordering).",
+          "examples": ["23:23", "00:21"]
+        },
+        "liveTime": {
+          "type": ["string", "null"],
+          "description": "A live countdown, where the source publishes one (e.g. Hong Kong next-train arrivals)."
+        }
+      }
+    },
+    "exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "details", "isAccessible"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Exit label, e.g. A, B2."
+        },
+        "details": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Landmarks the provider associates with the exit."
+        },
+        "isAccessible": {
+          "type": ["boolean", "null"],
+          "description": "Null means not stated, which is not the same as false."
+        }
+      }
+    },
+    "facilityGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "items"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The provider's own group heading."
+        },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/facility" }
+        }
+      }
+    },
+    "facility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "location", "availability"],
+      "properties": {
+        "name": { "type": "string" },
+        "location": {
+          "type": ["string", "null"],
+          "description": "Where in the station, when stated. A source's no-data placeholder (无, 暂无, /, n/a, …) must become null here, not be copied through."
+        },
+        "availability": {
+          "type": ["string", "null"],
+          "enum": ["available", "unavailable", null],
+          "description": "Null means not stated."
+        }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "description": "The on-disk / on-device stored form: a snapshot plus the retrieval metadata a cache needs. A reader must reject any schemaVersion it does not know.",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "externalStationID", "fetchedAt", "snapshot"],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 2
+        },
+        "externalStationID": {
+          "type": "string",
+          "description": "The upstream source's own station identifier."
+        },
+        "fetchedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "snapshot": { "$ref": "#/$defs/snapshot" }
+      }
+    }
+  }
+}

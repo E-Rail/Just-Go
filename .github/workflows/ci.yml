@@ -38,6 +38,7 @@ jobs:
           ruby Scripts/test_oss_data_validators.rb
           ruby Scripts/test_official_transit_resource_importer.rb
           ruby Scripts/test_beijing_station_information_importer.rb
+          ruby Scripts/test_shanghai_station_information_importer.rb
           ruby Scripts/test_official_transit_resource_catalog.rb
           ruby Scripts/import_osm_metro_geometry.rb --self-test
           ruby Scripts/import_licensed_station_media.rb
@@ -50,6 +51,7 @@ jobs:
           ruby Scripts/validate_metro_networks.rb
           ruby Scripts/validate_indoor_maps.rb
           ruby Scripts/validate_universal_city_data.rb
+          ruby Scripts/validate_station_info_api.rb
           bash Scripts/check_no_legacy_map_provider.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
@@ -64,7 +66,9 @@ jobs:
           ruby Scripts/generate_official_transit_resources.rb
           ruby Scripts/generate_universal_city_data.rb
           ruby Scripts/generate_universal_city_data.rb
-          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal JustGo/Resources/BundledCityPacks
+          ruby Scripts/generate_station_info_api.rb
+          ruby Scripts/generate_station_info_api.rb
+          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal JustGo/Resources/BundledCityPacks StationInfoAPI/directory/directory.json
 
       - name: Build for iOS Simulator
         run: |

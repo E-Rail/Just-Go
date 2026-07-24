@@ -649,34 +649,6 @@ extension StationDetailView {
     }
 
     @ViewBuilder
-    var serviceStatusSection: some View {
-        if let status = viewModel?.serviceStatus, status.hasDisplayableStatus {
-            GlassCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(AppLocalization.localized("Station Status"))
-                        .font(.headline)
-
-                    if let statusColor = status.statusColor, statusColor.isEmpty == false {
-                        Text(AppLocalization.text(
-                            english: "Official live station status: \(statusColor)",
-                            chinese: "官方实时车站状态：\(localizedStatusColor(statusColor))"
-                        ))
-                        .font(.subheadline)
-                    }
-
-                    ForEach(status.crowdControlWindows, id: \.self) { window in
-                        Text(AppLocalization.text(
-                            english: "Crowd-control window: \(window)",
-                            chinese: "限流时段：\(window)"
-                        ))
-                        .font(.subheadline)
-                    }
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
     private func licensedMediaContent(_ media: LicensedStationMedia) -> some View {
         if let url = media.bundledURL {
             VStack(alignment: .leading, spacing: 6) {
@@ -756,21 +728,6 @@ extension StationDetailView {
             ))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-        }
-    }
-
-    private func localizedStatusColor(_ color: String) -> String {
-        switch color.lowercased() {
-        case "green":
-            return AppLocalization.text(english: "green", chinese: "绿色")
-        case "yellow":
-            return AppLocalization.text(english: "yellow", chinese: "黄色")
-        case "red":
-            return AppLocalization.text(english: "red", chinese: "红色")
-        case "black":
-            return AppLocalization.text(english: "black", chinese: "黑色")
-        default:
-            return color
         }
     }
 

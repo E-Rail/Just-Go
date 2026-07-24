@@ -6,19 +6,16 @@ final class RoutePlanningService {
     private let placeSearchProvider: PlaceSearchProviding
     private let routeProvider: TransitRouteProviding
     private let officialStationData: OfficialStationDataProviding
-    private let comfortForecastService: ComfortForecastService
     private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
         placeSearchProvider: PlaceSearchProviding,
         routeProvider: TransitRouteProviding,
-        officialStationData: OfficialStationDataProviding,
-        comfortForecastService: ComfortForecastService
+        officialStationData: OfficialStationDataProviding
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
         self.officialStationData = officialStationData
-        self.comfortForecastService = comfortForecastService
     }
 
     func planRoute(
@@ -88,11 +85,6 @@ final class RoutePlanningService {
                 )
             }
         )
-        async let crowdControlStations = officialStationData.crowdControlWindows(
-            cityID: routeCityID,
-            stationNames: criticalStopNames
-        )
-
         route.dataCoverage = await dataCoverage
         let criticalStations = await criticalStationsResult
         route.stepFreeAssessment = stepFreeAssessment(
@@ -123,7 +115,6 @@ final class RoutePlanningService {
                 route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
             }
         }
-        route.crowdControl = RouteCrowdControl(stations: await crowdControlStations)
 
         // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
         let guidanceByStation = await officialStationData.stationGuidance(
@@ -397,14 +388,7 @@ final class RoutePlanningService {
         if lhs.warnings.count != rhs.warnings.count { return lhs.warnings.count < rhs.warnings.count }
         if lhs.walkingDistance != rhs.walkingDistance { return lhs.walkingDistance < rhs.walkingDistance }
         if lhs.totalDuration != rhs.totalDuration { return lhs.totalDuration < rhs.totalDuration }
-        return comfortPenalty(lhs, tripAnchor: tripAnchor) < comfortPenalty(rhs, tripAnchor: tripAnchor)
-    }
-
-    /// Comfort tie-break (lower is calmer). Applied only after every other ranking key is equal,
-    /// so it never overrides the rider's chosen strategy.
-    private func comfortPenalty(_ route: Route, tripAnchor: TripTimeAnchor) -> Int {
-        let tripTime = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
-        return comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime).level.sortValue
+        return false
     }
 }
 

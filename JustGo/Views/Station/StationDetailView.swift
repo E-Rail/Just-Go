@@ -28,7 +28,6 @@ struct StationDetailView: View {
                     stationGuideSection
                     arrivalsSection
                 }
-                serviceStatusSection
                 stationMapSection
             }
             .padding()

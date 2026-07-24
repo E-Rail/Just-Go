@@ -6,7 +6,6 @@ struct TransferStationSheet: View {
     let transferSegment: RouteSegment
     let nextTransitSegment: RouteSegment?
     let cityID: String
-    let crowdControl: RouteCrowdControl
     let accessibilityFilter: AccessibilityFilter
 
     @Environment(DIContainer.self) private var container
@@ -18,10 +17,6 @@ struct TransferStationSheet: View {
 
     private var stationName: String {
         transferSegment.fromStationName ?? AppLocalization.localized("Transfer station")
-    }
-
-    private var crowdWindows: [String] {
-        crowdControl.stations.first { $0.stationName == stationName }?.windows ?? []
     }
 
     /// The transfer station's real coordinate. A transfer segment's own stationStops is always
@@ -41,9 +36,6 @@ struct TransferStationSheet: View {
                 stationMapSection
                 transferGuideSection
                 accessibilitySection
-                if !crowdWindows.isEmpty {
-                    crowdControlSection
-                }
                 lookAroundSection
             }
             .padding()
@@ -371,25 +363,6 @@ struct TransferStationSheet: View {
         .padding(.vertical, 6)
         .background(tint.opacity(0.1), in: Capsule())
         .accessibilityLabel("\(title): \(available == true ? AppLocalization.localized("Available") : available == false ? AppLocalization.text(english: "Not available", simplified: "无", traditional: "無") : AppLocalization.text(english: "Unknown", simplified: "未知", traditional: "未知"))")
-    }
-
-    private var crowdControlSection: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 8) {
-                Label(
-                    AppLocalization.text(english: "Crowd Control Windows", simplified: "限流时段", traditional: "限流時段"),
-                    systemImage: "person.3.fill"
-                )
-                .font(.subheadline)
-                .fontWeight(.medium)
-
-                ForEach(crowdWindows, id: \.self) { window in
-                    Text(window)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
     }
 
     /// Apple's Look Around has no coverage underground, so this can only ever show the

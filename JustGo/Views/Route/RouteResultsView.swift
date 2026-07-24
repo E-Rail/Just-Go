@@ -282,15 +282,12 @@ struct RouteResultsView: View {
     /// confidence chain the detail screen uses (all synchronous), so the ring's number in the
     /// list never disagrees with the one shown after tapping in.
     private func routeConfidence(for route: Route) -> RouteConfidence {
-        let tripTime = TripTimeContext(anchor: viewModel.tripAnchor, totalDuration: route.totalDuration).departureDate
-        let forecast = container.comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime)
-        let feasibility = container.routeFeasibilityService.feasibility(for: route, comfort: forecast)
+        let feasibility = container.routeFeasibilityService.feasibility(for: route)
         return container.routeConfidenceService.confidence(
             for: route,
             feasibility: feasibility,
             preference: viewModel.sortStrategy,
-            alternatives: viewModel.routes,
-            comfort: forecast
+            alternatives: viewModel.routes
         )
     }
 

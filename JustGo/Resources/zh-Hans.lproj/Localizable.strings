@@ -125,7 +125,6 @@
 "Station Facilities" = "车站设施";
 "Accessible Restroom" = "无障碍卫生间";
 "Accessibility information from official city data." = "无障碍信息来自官方城市数据。";
-"Station Status" = "车站状态";
 "Official city data is not configured; basic station data still works." = "官方城市数据未配置；基础车站数据仍可使用。";
 "Official city data is pending for this city." = "此城市的官方数据源待接入。";
 "Official city data is not available for this city yet." = "此城市暂未提供官方城市数据。";

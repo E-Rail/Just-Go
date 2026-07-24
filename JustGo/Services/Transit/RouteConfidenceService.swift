@@ -5,8 +5,7 @@ final class RouteConfidenceService {
         for route: Route,
         feasibility: RouteFeasibility,
         preference: RoutePreference,
-        alternatives: [Route],
-        comfort: RouteComfortForecast? = nil
+        alternatives: [Route]
     ) -> RouteConfidence {
         var score = 100
         var positives: [String] = []
@@ -79,20 +78,6 @@ final class RouteConfidenceService {
             }
         case .unknown:
             break
-        }
-
-        if let comfort {
-            switch comfort.level {
-            case .busy:
-                score -= 8
-                warnings.append(comfort.summaryTitle)
-            case .moderate:
-                score -= 3
-            case .comfortable:
-                positives.append(comfort.summaryTitle)
-            case .unknown:
-                break
-            }
         }
 
         if let fewestTransfers = alternatives.map(\.transferCount).min(),

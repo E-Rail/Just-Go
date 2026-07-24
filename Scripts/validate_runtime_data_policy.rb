@@ -113,7 +113,11 @@ end
 ].each do |marker|
   errors << "city-pack runtime policy is missing #{marker}" unless policy_source.include?(marker)
 end
-errors << "remote packs must reject unproven service status" unless policy_source.include?("station.serviceStatus == nil")
+# The station-level service-status field (crowd-control windows / live status color) was removed
+# from the pack model entirely, so a remote pack has no way to carry that data at all — a stronger
+# guarantee than the old "reject unproven service status" guard. Assert the absence instead.
+errors << "the city-pack runtime must not regain service-status handling" if
+  policy_source.include?("serviceStatus")
 # Indoor navigation was removed, so there is no longer a manifest field to reject — the runtime
 # has no way to consume an indoor graph at all. Assert the absence instead of the guard.
 errors << "the city-pack runtime must not regain indoor-map handling" if

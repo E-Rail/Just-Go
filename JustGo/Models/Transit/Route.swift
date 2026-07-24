@@ -31,7 +31,6 @@ struct Route: Identifiable, Codable {
     var accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
     var serviceStatus: RouteServiceStatus = .unknown
-    var crowdControl: RouteCrowdControl = .empty
     var stationGuidance: [RouteStationGuidance] = []
 
     var boardingTransitSegment: RouteSegment? {

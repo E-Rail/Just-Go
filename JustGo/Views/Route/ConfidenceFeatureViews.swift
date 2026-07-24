@@ -22,26 +22,6 @@ extension RouteServiceStatus {
     }
 }
 
-extension RouteComfortLevel {
-    var uiColor: Color {
-        switch self {
-        case .comfortable: return .green
-        case .moderate: return .orange
-        case .busy: return .red
-        case .unknown: return .gray
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .comfortable: return "person.fill"
-        case .moderate: return "person.2.fill"
-        case .busy: return "person.3.fill"
-        case .unknown: return "questionmark.circle"
-        }
-    }
-}
-
 /// Compact service-hours banner ("Last train in N min" / "Service ended" / "Starts 5:30").
 struct ServiceStatusBanner: View {
     let status: RouteServiceStatus
@@ -57,35 +37,6 @@ struct ServiceStatusBanner: View {
                 .padding(compact ? 8 : 12)
                 .background(status.uiColor.opacity(0.12), in: RoundedRectangle(cornerRadius: compact ? 8 : 12, style: .continuous))
                 .accessibilityLabel(text)
-        }
-    }
-}
-
-/// Crowding / comfort forecast card.
-struct RouteComfortCard: View {
-    let forecast: RouteComfortForecast
-
-    var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Label(forecast.summaryTitle, systemImage: forecast.level.iconName)
-                    .font(.headline)
-                    .foregroundStyle(forecast.level.uiColor)
-
-                ForEach(forecast.detailLines, id: \.self) { line in
-                    Label(line, systemImage: "person.2.wave.2")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(AppLocalization.text(
-                    english: "Crowding estimate from official windows and typical peak times, not a live measurement.",
-                    simplified: "拥挤情况根据官方限流时段与常规高峰估算，非实时数据。",
-                    traditional: "擁擠情況根據官方限流時段與常規尖峰估算，非即時數據。"
-                ))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            }
         }
     }
 }

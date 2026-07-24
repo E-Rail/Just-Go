@@ -1,7 +1,7 @@
 import Foundation
 
 final class RouteFeasibilityService {
-    func feasibility(for route: Route, comfort: RouteComfortForecast? = nil) -> RouteFeasibility {
+    func feasibility(for route: Route) -> RouteFeasibility {
         var level: RouteFeasibilityLevel = route.stepFreeAssessment.supportsStepFreeTravel ? .good : .unknown
         var reasons: [String] = []
         var unknowns: [String] = []
@@ -76,12 +76,6 @@ final class RouteFeasibilityService {
         }
         if walkingSteps.contains(where: \.hasEscalator) {
             reasons.append(AppLocalization.localized("Apple Maps walking directions mention an escalator."))
-        }
-
-        if let comfort, comfort.level >= .busy || !comfort.activeCrowdControl.isEmpty {
-            level = max(level, .caution)
-            estimatedExtraMinutes += 5
-            reasons.append(comfort.summaryTitle)
         }
 
         let title: String

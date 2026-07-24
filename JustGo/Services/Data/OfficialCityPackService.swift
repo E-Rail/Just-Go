@@ -82,17 +82,6 @@ struct LicensedStationMedia: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-struct CityPackServiceStatus: Codable, Equatable {
-    let accIDs: [String]
-    let crowdControlWindows: [String]
-    let statusColor: String?
-    let statusUpdatedAt: String?
-
-    var hasDisplayableStatus: Bool {
-        !crowdControlWindows.isEmpty || statusColor?.isEmpty == false
-    }
-}
-
 protocol OfficialStationDataProviding {
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func cityDataCoverage(for cityIDs: [String]) async -> [String: CityDataCoverage]
@@ -106,10 +95,8 @@ protocol OfficialStationDataProviding {
     func externalResources(for station: Station) async -> [ExternalTransitResource]
     func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation?
     func licensedMedia(for station: Station) async -> [LicensedStationMedia]
-    func serviceStatus(for station: Station) async -> CityPackServiceStatus?
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot
     func serviceWindows(cityID: String, stationName: String) async -> [StationServiceWindow]
-    func crowdControlWindows(cityID: String, stationNames: [String]) async -> [ComfortStationWindows]
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage
     func matchingStation(place: TransitPlace, cityID: String) async -> Station?
     /// Best-available entrance/exit (+ optional platform/interchange) guidance per station,
@@ -622,11 +609,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             .filter(Self.validatesBundledMedia) ?? []
     }
 
-    func serviceStatus(for station: Station) async -> CityPackServiceStatus? {
-        _ = await loadCityPack(for: station.cityID)
-        return stationRecord(for: station)?.serviceStatus
-    }
-
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot {
         _ = await loadCityPack(for: station.cityID)
         guard let loaded = packs[station.cityID],
@@ -839,20 +821,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return stationRecord(cityID: cityID, stationName: stationName)?.schedules.map {
             StationServiceWindow(lineName: $0.lineName, direction: $0.direction, firstTime: $0.firstTime, lastTime: $0.lastTime)
         } ?? []
-    }
-
-    func crowdControlWindows(cityID: String, stationNames: [String]) async -> [ComfortStationWindows] {
-        _ = await loadCityPack(for: cityID)
-        var seen = Set<String>()
-        var result: [ComfortStationWindows] = []
-        for name in stationNames {
-            let key = normalizedStationName(name)
-            guard seen.insert(key).inserted else { continue }
-            guard let windows = stationRecord(cityID: cityID, normalizedName: key)?.serviceStatus?.crowdControlWindows,
-                  !windows.isEmpty else { continue }
-            result.append(ComfortStationWindows(stationName: name, stationID: nil, windows: windows))
-        }
-        return result
     }
 
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage {
@@ -1266,7 +1234,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               station.stationNameEn?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != true,
               station.aliases == Array(Set(station.aliases)).sorted(),
               station.aliases.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }),
-              station.serviceStatus == nil,
               station.externalResources.allSatisfy({ isAllowedExternalResource($0, cityID: cityID) }),
               (station.stationAccessPoints ?? []).isEmpty,
               (station.platformHints ?? []).isEmpty,
@@ -1728,7 +1695,6 @@ private struct OfficialStation: Decodable {
     let accessibility: OfficialAccessibility?
     let schedules: [OfficialSchedule]
     let stationFacilities: [OfficialFacility]
-    let serviceStatus: CityPackServiceStatus?
     // Optional, backward-compatible transit-guidance fields (absent in current packs).
     let stationAccessPoints: [OfficialAccessPoint]?
     let platformHints: [OfficialPlatformHint]?
@@ -1739,7 +1705,7 @@ private struct OfficialStation: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case stationName, stationNameEn, stationID, aliases, accessibility, schedules,
-             stationFacilities, serviceStatus, stationAccessPoints,
+             stationFacilities, stationAccessPoints,
              platformHints, interchangeHints, externalResources, licensedMedia,
              liveArrivalReferences
     }
@@ -1753,7 +1719,6 @@ private struct OfficialStation: Decodable {
         accessibility = try values.decodeIfPresent(OfficialAccessibility.self, forKey: .accessibility)
         schedules = try values.decodeIfPresent([OfficialSchedule].self, forKey: .schedules) ?? []
         stationFacilities = try values.decodeIfPresent([OfficialFacility].self, forKey: .stationFacilities) ?? []
-        serviceStatus = try values.decodeIfPresent(CityPackServiceStatus.self, forKey: .serviceStatus)
         stationAccessPoints = try values.decodeIfPresent([OfficialAccessPoint].self, forKey: .stationAccessPoints)
         platformHints = try values.decodeIfPresent([OfficialPlatformHint].self, forKey: .platformHints)
         interchangeHints = try values.decodeIfPresent([OfficialInterchangeHint].self, forKey: .interchangeHints)

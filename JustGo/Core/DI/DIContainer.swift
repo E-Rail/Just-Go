@@ -29,7 +29,6 @@ final class DIContainer {
     let tripMemoryService: TripMemoryService
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
-    let comfortForecastService: ComfortForecastService
     let tripReminderService: TripReminderService
     let stationInformationDiskCache: OfficialStationInformationDiskCache?
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
@@ -48,7 +47,6 @@ final class DIContainer {
         tripMemoryService: TripMemoryService,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
-        comfortForecastService: ComfortForecastService,
         tripReminderService: TripReminderService,
         stationInformationDiskCache: OfficialStationInformationDiskCache? = nil,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
@@ -68,7 +66,6 @@ final class DIContainer {
         self.tripMemoryService = tripMemoryService
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
-        self.comfortForecastService = comfortForecastService
         self.tripReminderService = tripReminderService
         self.stationInformationDiskCache = stationInformationDiskCache
         self.memoryWarningReleaseTargets = MemoryWarningReleaseTargets(
@@ -181,12 +178,10 @@ final class DIContainer {
             metroNetworkProvider: metroNetworkProvider,
             cityService: cityService
         )
-        let comfortForecastService = ComfortForecastService()
         let routePlanningService = RoutePlanningService(
             placeSearchProvider: placeSearchProvider,
             routeProvider: transitRouteProvider,
-            officialStationData: officialStationData,
-            comfortForecastService: comfortForecastService
+            officialStationData: officialStationData
         )
         let tripMemoryService = TripMemoryService()
         let routeFeasibilityService = RouteFeasibilityService()
@@ -206,7 +201,6 @@ final class DIContainer {
             tripMemoryService: tripMemoryService,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
-            comfortForecastService: comfortForecastService,
             tripReminderService: tripReminderService,
             stationInformationDiskCache: stationInformationDiskCache,
             memoryManagedOfficialStationData: officialStationData,

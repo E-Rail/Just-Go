@@ -38,18 +38,17 @@ struct RouteDetailView: View {
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
 
     var body: some View {
-        // Compute the comfort → feasibility → confidence chain once per render and pass the
-        // values down, instead of letting each card recompute (and re-fetch) them (previously
-        // ~5× comfortForecast and 2× feasibility/personal-reports per body evaluation).
-        let forecast = comfortForecast
-        let feasibility = currentFeasibility(comfort: forecast)
-        let confidence = currentConfidence(feasibility: feasibility, comfort: forecast)
+        // Compute the feasibility → confidence chain once per render and pass the values down,
+        // instead of letting each card recompute them (previously 2× feasibility/personal-reports
+        // per body evaluation).
+        let feasibility = currentFeasibility()
+        let confidence = currentConfidence(feasibility: feasibility)
         return ScrollView {
             VStack(spacing: 20) {
                 if alternatives.count > 1 {
                     RouteTabs(routes: alternatives, selection: $selectedRouteID)
                 }
-                routeDecisionHeader(feasibility: feasibility, confidence: confidence, forecast: forecast)
+                routeDecisionHeader(feasibility: feasibility, confidence: confidence)
                 if let departurePlan { DeparturePlanBanner(plan: departurePlan) }
                 routeMapPreview
                 segmentsTimeline
@@ -59,7 +58,6 @@ struct RouteDetailView: View {
                 tripEssentialsCard
                 accessGuidanceCard
                 tripConfidenceCard(confidence)
-                if forecast.hasSignal { RouteComfortCard(forecast: forecast) }
                 routeFeasibilityCard(feasibility)
                 reminderSection
                 riderTrustActions
@@ -92,7 +90,6 @@ struct RouteDetailView: View {
                     transferSegment: segment,
                     nextTransitSegment: nextTransitSegment(after: segment),
                     cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
-                    crowdControl: route.crowdControl,
                     accessibilityFilter: accessibilityFilter
                 )
             case .station(let stop):
@@ -199,8 +196,7 @@ struct RouteDetailView: View {
 
     private func routeDecisionHeader(
         feasibility: RouteFeasibility,
-        confidence: RouteConfidence,
-        forecast: RouteComfortForecast
+        confidence: RouteConfidence
     ) -> some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -233,9 +229,6 @@ struct RouteDetailView: View {
                     HStack(spacing: 8) {
                         routeStatusChip(confidence.level.title, icon: confidenceIcon(for: confidence.level), tint: confidence.level.color)
                         routeStatusChip(feasibility.title, icon: feasibility.level.iconName, tint: feasibility.level.color)
-                        if forecast.hasSignal {
-                            routeStatusChip(forecast.summaryTitle, icon: forecast.level.iconName, tint: forecast.level.uiColor)
-                        }
                         if route.isFullyAccessible {
                             routeStatusChip(AppLocalization.localized("Fully Accessible Route"), icon: "figure.roll", tint: .green)
                         }
@@ -335,14 +328,6 @@ struct RouteDetailView: View {
                 }
             }
         }
-    }
-
-    private var tripTime: Date {
-        TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
-    }
-
-    private var comfortForecast: RouteComfortForecast {
-        container.comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime)
     }
 
     private var departurePlan: DeparturePlan? {
@@ -499,20 +484,16 @@ struct RouteDetailView: View {
         showReminderTooLate = !scheduled
     }
 
-    func currentFeasibility(comfort: RouteComfortForecast) -> RouteFeasibility {
-        container.routeFeasibilityService.feasibility(
-            for: route,
-            comfort: comfort
-        )
+    func currentFeasibility() -> RouteFeasibility {
+        container.routeFeasibilityService.feasibility(for: route)
     }
 
-    private func currentConfidence(feasibility: RouteFeasibility, comfort: RouteComfortForecast) -> RouteConfidence {
+    private func currentConfidence(feasibility: RouteFeasibility) -> RouteConfidence {
         container.routeConfidenceService.confidence(
             for: route,
             feasibility: feasibility,
             preference: preference,
-            alternatives: alternatives,
-            comfort: comfort
+            alternatives: alternatives
         )
     }
 }

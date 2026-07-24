@@ -253,6 +253,22 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
     case httpStatus(Int)
     case serviceUnavailable(String?)
     case contractViolation(String)
+
+    /// Transient failures worth another attempt before the rider sees an error. A cold first
+    /// request after launch — the initial DNS/TLS handshake, racing the app's own launch work —
+    /// can time out or have its connection reset while the endpoint is perfectly reachable, then
+    /// load on a retry. Permanent failures (bad request, contract mismatch, oversize response)
+    /// and rate limiting (which carries its own backoff) are never retried.
+    var isRetryable: Bool {
+        switch self {
+        case .timedOut, .transport, .serviceUnavailable:
+            return true
+        case .httpStatus(let code):
+            return (500...599).contains(code)
+        case .rateLimited, .invalidRequest, .invalidResponse, .responseTooLarge, .contractViolation:
+            return false
+        }
+    }
 }
 
 private final class BeijingStationInformationRedirectDelegate:

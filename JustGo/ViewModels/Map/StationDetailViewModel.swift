@@ -216,7 +216,11 @@ final class StationDetailViewModel {
         )
 
         do {
-            let snapshot = try await officialStationInformationProvider.information(for: request)
+            let snapshot = try await requestOfficialInformation(
+                request,
+                stationID: stationID,
+                generation: generation
+            )
             guard isCurrentOfficialInformationLoad(
                 stationID: stationID,
                 generation: generation
@@ -230,6 +234,34 @@ final class StationDetailViewModel {
                 generation: generation
             ) else { return }
             officialStationInformationError = stationInformationErrorMessage(error)
+        }
+    }
+
+    /// The first station opened after launch fails intermittently: the cold DNS/TLS handshake to
+    /// the official service, racing the app's own launch work, times out or resets while the
+    /// endpoint is reachable — leaving a blank "unavailable" card that loads on a manual retry.
+    /// Retry transient failures a couple of times (short, growing backoff) before surfacing the
+    /// error, so the first load succeeds on its own. Non-transient failures throw immediately, and
+    /// a superseded load bails as cancelled rather than overwriting a newer station's data.
+    private func requestOfficialInformation(
+        _ request: OfficialStationInformationRequest,
+        stationID: String,
+        generation: Int
+    ) async throws -> OfficialStationInformationSnapshot {
+        let maxAttempts = 3
+        var attempt = 0
+        while true {
+            attempt += 1
+            do {
+                return try await officialStationInformationProvider.information(for: request)
+            } catch let error as OfficialStationInformationProviderError
+                where error.isRetryable && attempt < maxAttempts {
+                try await Task.sleep(for: .milliseconds(300 * attempt))
+                guard isCurrentOfficialInformationLoad(
+                    stationID: stationID,
+                    generation: generation
+                ) else { throw CancellationError() }
+            }
         }
     }
 

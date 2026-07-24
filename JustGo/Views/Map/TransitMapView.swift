@@ -11,7 +11,7 @@ struct MetroGeometryAttributionView: View {
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 4)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(AppLocalization.localized("Metro geometry © OpenStreetMap contributors"))

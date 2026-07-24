@@ -10,6 +10,57 @@ extension RouteConfidenceLevel {
     }
 }
 
+/// The single universal way a route's confidence reads: a continuously sweeping color loop —
+/// tinted green/orange/red by the level — with the 0-100 score at its center. Shared by the
+/// route-selection rows and the route-detail card so the same number and motion appear
+/// everywhere confidence is shown. Honors Reduce Motion (static ring, no spin).
+struct ConfidenceScoreRing: View {
+    let score: Int
+    let color: Color
+    var size: CGFloat = 48
+    var lineWidth: CGFloat = 4
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var sweep = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(color.opacity(0.15), lineWidth: lineWidth)
+            Circle()
+                .stroke(
+                    // First and last stops are the same color so the loop wraps seamlessly;
+                    // the white highlight is the "changing" glint that travels as it rotates.
+                    AngularGradient(
+                        gradient: Gradient(colors: [
+                            color, color.opacity(0.4), .white.opacity(0.85), color.opacity(0.4), color
+                        ]),
+                        center: .center
+                    ),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                )
+                .rotationEffect(.degrees(sweep ? 360 : 0))
+            Text("\(score)")
+                .font(.system(size: size * 0.34, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(color)
+        }
+        .frame(width: size, height: size)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.linear(duration: 2.2).repeatForever(autoreverses: false)) {
+                sweep = true
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(AppLocalization.text(
+            english: "Confidence \(score) out of 100",
+            simplified: "置信度 \(score) 分（满分 100）",
+            traditional: "信心度 \(score) 分（滿分 100）"
+        ))
+    }
+}
+
 struct TripConfidenceCard: View {
     let confidence: RouteConfidence
 
@@ -25,19 +76,16 @@ struct TripConfidenceCard: View {
                             .foregroundStyle(confidence.level.color)
                     }
                     Spacer()
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(AppLocalization.text(
-                            english: "\(confidence.score) / 100",
-                            simplified: "\(confidence.score)分",
-                            traditional: "\(confidence.score)分"
-                        ))
-                            .font(.title3)
-                            .fontWeight(.bold)
+                    VStack(spacing: 4) {
+                        ConfidenceScoreRing(
+                            score: confidence.score,
+                            color: confidence.level.color,
+                            size: 56
+                        )
                         Text(confidence.level.title)
                             .font(.caption)
                             .foregroundStyle(confidence.level.color)
                     }
-                    .accessibilityLabel("\(confidence.level.title), \(confidence.score) \(AppLocalization.localized("out of 100"))")
                 }
 
                 Text(confidence.explanation)

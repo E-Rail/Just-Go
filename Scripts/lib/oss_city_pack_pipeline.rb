@@ -592,6 +592,16 @@ module OSSCityPackPipeline
             "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only on the rider device after a user tap."
           },
           {
+            "id" => "guangzhou-official-station-references",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed official station identifiers (stationShowCode) and aliases for canonical Guangzhou app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://www.gzmtr.com/",
+            "sourceURL" => "https://www.gzmtr.com/",
+            "attribution" => "Guangzhou Metro Group",
+            "redistribution" => "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
+          },
+          {
             "id" => "macau-official-landing-link",
             "kind" => "linkMetadata",
             "scope" => "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
@@ -705,6 +715,13 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[
             justgo-generated-catalog official-transit-resource-links
             osm-metro-networks shanghai-official-landing-links
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/guangzhou_station_information.json",
+          "rightsIDs" => %w[
+            guangzhou-official-station-references justgo-generated-catalog
+            osm-metro-networks
           ].sort
         },
         {
@@ -835,6 +852,15 @@ module OSSCityPackPipeline
         https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
         https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
         https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
+
+        Guangzhou and Shanghai station references are reviewed operator station identifiers for
+        canonical app stations. The bundle contains identifier and alias metadata, not operator
+        page text, schedules, facilities, exits, coordinates, images, or layouts. For those
+        reviewed identifiers, Station Detail may request first/last train times from the operator
+        for temporary, non-persistent native display; the response remains subject to the
+        operator's terms:
+        https://www.gzmtr.com/
+        https://service.shmetro.com/czxx/index.htm
       MARKDOWN
     end
 

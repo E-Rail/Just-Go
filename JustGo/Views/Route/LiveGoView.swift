@@ -630,7 +630,7 @@ struct LiveGoView: View {
             controls
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .padding([.horizontal, .bottom], 10)
     }
 
@@ -773,7 +773,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func noticeBanner(text: String, icon: String, showsSpinner: Bool = false) -> some View {
@@ -793,7 +793,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }
 
@@ -831,7 +831,7 @@ struct LiveGoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }

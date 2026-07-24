@@ -183,6 +183,7 @@ struct RouteResultsView: View {
     /// and a cross-route "best for" reason. Tapping records the planned trip and opens the detail.
     private func comparisonRow(_ route: Route, rank: Int) -> some View {
         let metrics = comparisonMetrics(for: route, rank: rank)
+        let confidence = routeConfidence(for: route)
         let isSelected = route.id == (selectedRouteID ?? viewModel.routes.first?.id)
         return Button {
             selectedRouteID = route.id
@@ -193,50 +194,58 @@ struct RouteResultsView: View {
             )
             showRouteDetail = true
         } label: {
-            VStack(alignment: .leading, spacing: 7) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(AppLocalization.text(
-                        english: "Route \(metrics.rank)",
-                        simplified: "路线 \(metrics.rank)",
-                        traditional: "路線 \(metrics.rank)"
-                    ))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    if let line = route.boardingTransitSegment?.lineName {
-                        LineColorIndicator(colorHex: route.boardingTransitSegment?.lineColorHex ?? "#007AFF", size: 8)
-                        Text(line)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    Spacer()
-                    Text(metrics.durationText)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .monospacedDigit()
-                }
+            HStack(spacing: 12) {
+                ConfidenceScoreRing(
+                    score: confidence.score,
+                    color: confidence.level.color,
+                    size: 50
+                )
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        resultMetricChip(metrics.walkingText, icon: "figure.walk")
-                        resultMetricChip(metrics.transferEffort, icon: "arrow.triangle.2.circlepath")
-                        DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
-                        Text(metrics.bestForReason)
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .lineLimit(1)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.accentColor.opacity(0.12), in: Capsule())
-                            .foregroundStyle(Color.accentColor)
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(AppLocalization.text(
+                            english: "Route \(metrics.rank)",
+                            simplified: "路线 \(metrics.rank)",
+                            traditional: "路線 \(metrics.rank)"
+                        ))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        if let line = route.boardingTransitSegment?.lineName {
+                            LineColorIndicator(colorHex: route.boardingTransitSegment?.lineColorHex ?? "#007AFF", size: 8)
+                            Text(line)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                        Text(metrics.durationText)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .monospacedDigit()
+                    }
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            resultMetricChip(metrics.walkingText, icon: "figure.walk")
+                            resultMetricChip(metrics.transferEffort, icon: "arrow.triangle.2.circlepath")
+                            DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
+                            Text(metrics.bestForReason)
+                                .font(.caption2)
+                                .fontWeight(.medium)
+                                .lineLimit(1)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.accentColor.opacity(0.12), in: Capsule())
+                                .foregroundStyle(Color.accentColor)
+                        }
                     }
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
             )
         }
@@ -266,6 +275,22 @@ struct RouteResultsView: View {
             transferEffort: transferEffort(for: route),
             exitConfidence: exitConfidence(for: route),
             bestForReason: bestForReason(for: route, in: viewModel.routes)
+        )
+    }
+
+    /// The route's 0-100 confidence, computed from the identical comfort → feasibility →
+    /// confidence chain the detail screen uses (all synchronous), so the ring's number in the
+    /// list never disagrees with the one shown after tapping in.
+    private func routeConfidence(for route: Route) -> RouteConfidence {
+        let tripTime = TripTimeContext(anchor: viewModel.tripAnchor, totalDuration: route.totalDuration).departureDate
+        let forecast = container.comfortForecastService.forecast(for: route.crowdControl, tripTime: tripTime)
+        let feasibility = container.routeFeasibilityService.feasibility(for: route, comfort: forecast)
+        return container.routeConfidenceService.confidence(
+            for: route,
+            feasibility: feasibility,
+            preference: viewModel.sortStrategy,
+            alternatives: viewModel.routes,
+            comfort: forecast
         )
     }
 

@@ -28,10 +28,10 @@ struct RouteTabs: View {
                         .padding(.vertical, 9)
                         .background(
                             selection == route.id ? Color.accentColor.opacity(0.12) : Color(.systemGray6),
-                            in: RoundedRectangle(cornerRadius: 8)
+                            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
                         )
                         .overlay {
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
                                 .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
                         }
                     }

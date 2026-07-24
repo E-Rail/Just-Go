@@ -68,6 +68,7 @@ module OSSDataValidators
     opendatacommons.org
     service.shmetro.com
     www.bjsubway.com
+    www.gzmtr.com
     www.mlm.com.mo
     www.mtr.com.hk
     www.openstreetmap.org
@@ -425,6 +426,9 @@ module OSSDataValidators
         "DataPacks/sources/official-resources/shanghai_station_information.json" => %w[
           justgo-generated-catalog official-transit-resource-links osm-metro-networks
           shanghai-official-landing-links
+        ].sort,
+        "DataPacks/sources/official-resources/guangzhou_station_information.json" => %w[
+          guangzhou-official-station-references justgo-generated-catalog osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/beijing_station_information.json" => %w[
           beijing-official-landing-links justgo-generated-catalog

@@ -1,9 +1,30 @@
 import SwiftUI
 
 extension StationDetailView {
+    /// The categories the loaded snapshot actually has data for — so a lines-only source
+    /// (Guangzhou) shows just its trains with no empty Exits/Facilities tabs, and the segmented
+    /// control appears only when there is more than one thing to switch between.
+    private var officialInformationCategories: [OfficialStationInformationCategory] {
+        guard let snapshot = viewModel?.officialStationInformation else { return [] }
+        var categories: [OfficialStationInformationCategory] = []
+        if !snapshot.lines.isEmpty { categories.append(.firstLast) }
+        if !snapshot.exits.isEmpty { categories.append(.exits) }
+        if !snapshot.facilityGroups.isEmpty { categories.append(.facilities) }
+        return categories
+    }
+
+    /// The category to render: the picked one while it still has data, otherwise the first that does.
+    private var effectiveOfficialInformationCategory: OfficialStationInformationCategory {
+        let categories = officialInformationCategories
+        if categories.contains(selectedOfficialInformationCategory) {
+            return selectedOfficialInformationCategory
+        }
+        return categories.first ?? selectedOfficialInformationCategory
+    }
+
     @ViewBuilder
     var officialStationInformationSection: some View {
-        if displayedStation.cityID == "1100" || displayedStation.cityID == "8100" {
+        if usesNativeStationInformationSurface || viewModel?.officialResourceReview != nil {
             let review = viewModel?.officialResourceReview
             let resource = viewModel?.officialStationInformationSourceResource
             let contextResources = review?.resources.filter { $0.kind != .stationInformation } ?? []
@@ -40,20 +61,23 @@ extension StationDetailView {
                     }
 
                     if usesNativeStationInformationSurface {
-                        Picker(
-                            AppLocalization.text(
-                                english: "Station information category",
-                                simplified: "车站信息类别",
-                                traditional: "車站資訊類別"
-                            ),
-                            selection: $selectedOfficialInformationCategory
-                        ) {
-                            ForEach(OfficialStationInformationCategory.allCases) { category in
-                                Text(category.title(for: displayedStation.cityID))
-                                    .tag(category)
+                        let categories = officialInformationCategories
+                        if categories.count > 1 {
+                            Picker(
+                                AppLocalization.text(
+                                    english: "Station information category",
+                                    simplified: "车站信息类别",
+                                    traditional: "車站資訊類別"
+                                ),
+                                selection: $selectedOfficialInformationCategory
+                            ) {
+                                ForEach(categories) { category in
+                                    Text(category.title(for: displayedStation.cityID))
+                                        .tag(category)
+                                }
                             }
+                            .pickerStyle(.segmented)
                         }
-                        .pickerStyle(.segmented)
 
                         nativeOfficialStationInformationContent
 
@@ -134,7 +158,7 @@ extension StationDetailView {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
         } else if let snapshot = viewModel?.officialStationInformation {
-            switch selectedOfficialInformationCategory {
+            switch effectiveOfficialInformationCategory {
             case .firstLast:
                 officialLineRows(snapshot.lines)
             case .exits:
@@ -160,6 +184,7 @@ extension StationDetailView {
                     )
                 }
                 .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
@@ -205,6 +230,7 @@ extension StationDetailView {
                         )
                     }
                     .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
                 }
             }
         } else {
@@ -360,20 +386,19 @@ extension StationDetailView {
     }
 
     private var officialCategoryEmptyState: some View {
-        let categoryTitle = selectedOfficialInformationCategory.title(
-            for: displayedStation.cityID
-        )
+        let category = effectiveOfficialInformationCategory
+        let categoryTitle = category.title(for: displayedStation.cityID)
         return Label {
             Text(AppLocalization.text(
-                english: "The official source has no verified \(categoryTitle.lowercased()) information for this station.",
-                simplified: "官方来源暂无本站的已核实\(categoryTitle)信息。",
-                traditional: "官方來源暫無本站的已核實\(categoryTitle)資訊。"
+                english: "No \(categoryTitle.lowercased()) for this station.",
+                simplified: "暂无本站\(categoryTitle)。",
+                traditional: "暫無本站\(categoryTitle)。"
             ))
             .font(.subheadline)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
         } icon: {
-            Image(systemName: selectedOfficialInformationCategory.icon)
+            Image(systemName: category.icon)
                 .foregroundStyle(.secondary)
         }
         .padding(.vertical, 8)
@@ -705,8 +730,8 @@ extension StationDetailView {
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 160)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                             .font(.caption)
@@ -717,7 +742,7 @@ extension StationDetailView {
                             .padding(8)
                     }
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
                             .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
                     }
                 }

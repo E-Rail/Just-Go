@@ -109,7 +109,7 @@ struct MapContainerView: View {
                                     .foregroundStyle(.white)
                             }
                             .padding(8)
-                            .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 10))
+                            .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                         }
                         .layoutPriority(1)
                     }
@@ -250,9 +250,9 @@ struct MapContainerView: View {
                 .fontWeight(.medium)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 14)
-                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.appSurface, in: Capsule())
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    Capsule()
                         .stroke(Color.accentColor.opacity(0.4), lineWidth: 1)
                 )
                 .foregroundStyle(Color.accentColor)
@@ -330,7 +330,7 @@ struct MapContainerView: View {
                 }
                 .padding(12)
                 .contentShape(Rectangle())
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                 .background {
                     GeometryReader { proxy in
@@ -404,7 +404,7 @@ struct MapContainerView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .frame(maxHeight: searchDropdownMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 

@@ -179,7 +179,7 @@ struct RouteDetailView: View {
             onStationSelected: { _ in }
         )
         .frame(height: 220)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(alignment: .topTrailing) {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
                 .font(.caption)
@@ -189,7 +189,7 @@ struct RouteDetailView: View {
                 .background(.black.opacity(0.55), in: Circle())
                 .padding(10)
         }
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .onTapGesture {
             showExpandedRouteMap = true
         }
@@ -254,7 +254,7 @@ struct RouteDetailView: View {
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
-                    .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 10))
+                    .background(Color(hex: selectedThemeHex), in: Capsule())
                     .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
@@ -380,7 +380,7 @@ struct RouteDetailView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
 

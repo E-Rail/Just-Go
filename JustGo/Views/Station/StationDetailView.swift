@@ -97,14 +97,18 @@ struct StationDetailView: View {
     }
 
     var usesNativeStationInformationSurface: Bool {
+        // Hong Kong ships its station data in the bundle, so it is always native. Every other
+        // city is native exactly when the bundled Station Information directory routes the station
+        // to an online source — Beijing, Shanghai, Guangzhou today, and any city added later with
+        // no code change here. The directory is synchronous, so this is stable once the view model
+        // exists; before that, ask the directory directly to avoid a first-frame flash.
         if displayedStation.cityID == "8100" {
             return true
         }
-        guard displayedStation.cityID == "1100" else { return false }
-        if viewModel == nil || viewModel?.isLoadingCityPack == true {
-            return true
+        if let viewModel {
+            return viewModel.usesCategorizedStationInformation
         }
-        return viewModel?.usesCategorizedStationInformation == true
+        return container.stationInformationDirectory.onlineEntry(forStationID: displayedStation.id) != nil
     }
 
     /// The bundled sections (schedules, accessibility, essentials, guide) return whenever
@@ -121,14 +125,8 @@ struct StationDetailView: View {
     private var beforeYouGoSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text(AppLocalization.localized("Before You Go"))
-                        .font(.headline)
-                    Spacer()
-                    Text(AppLocalization.localized("Best data available"))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
+                Text(AppLocalization.localized("Before You Go"))
+                    .font(.headline)
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 124), spacing: 8)], alignment: .leading, spacing: 8) {
                     confidenceChip(
@@ -156,28 +154,6 @@ struct StationDetailView: View {
                         icon: "wave.3.right"
                     )
                 }
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        if displayedStation.isTransferStation {
-                            stationFactChip(AppLocalization.localized("Transfer station"), icon: "arrow.triangle.2.circlepath", tint: .orange)
-                        }
-                        if !displayedStation.facilities.isEmpty {
-                            stationFactChip(AppLocalization.localized("Station essentials available"), icon: "info.circle.fill", tint: .blue)
-                        }
-                        if viewModel?.arrivals.isEmpty == false {
-                            stationFactChip(
-                                AppLocalization.text(
-                                    english: "Train information available",
-                                    simplified: "列车信息可用",
-                                    traditional: "列車資訊可用"
-                                ),
-                                icon: "clock.fill",
-                                tint: .green
-                            )
-                        }
-                    }
-                }
             }
         }
     }
@@ -199,18 +175,7 @@ struct StationDetailView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 7)
-        .background(confidence.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private func stationFactChip(_ title: String, icon: String, tint: Color) -> some View {
-        Label(title, systemImage: icon)
-            .font(.caption2)
-            .fontWeight(.medium)
-            .foregroundStyle(tint)
-            .lineLimit(1)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(tint.opacity(0.12), in: Capsule())
+        .background(confidence.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var stationHeader: some View {
@@ -251,7 +216,7 @@ struct StationDetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
-                    .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                    .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
             }
         }
@@ -296,7 +261,7 @@ struct StationDetailView: View {
                         }
                         .padding(.horizontal, 9)
                         .padding(.vertical, 7)
-                        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8))
+                        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
             }
@@ -337,12 +302,12 @@ struct PlanRouteButtons: View {
                     systemImage: "arrow.up.circle.fill"
                 )
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.vertical, 12)
+                .background(Color.appSurface, in: Capsule())
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    Capsule()
                         .stroke(themeColor.opacity(0.4), lineWidth: 1)
                 )
                 .foregroundStyle(themeColor)
@@ -360,13 +325,13 @@ struct PlanRouteButtons: View {
                     systemImage: "arrow.down.circle.fill"
                 )
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, 12)
                 // Raw hex, not `themeColor`: this is a solid fill under white text, and
                 // `Color.adaptive` lightens toward white in dark mode specifically for
                 // *foreground* legibility — used as a fill it collapses contrast instead.
-                .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(hex: selectedThemeHex), in: Capsule())
                 .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

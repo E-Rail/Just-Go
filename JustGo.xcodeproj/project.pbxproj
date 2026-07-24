@@ -104,6 +104,7 @@
 		A1000606 /* Transit/OfficialStationInformationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000606 /* Transit/OfficialStationInformationCache.swift */; };
 		A1000710 /* Transit/StationInformationDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000710 /* Transit/StationInformationDirectory.swift */; };
 		A1000711 /* Transit/ShanghaiStationInformationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000711 /* Transit/ShanghaiStationInformationProvider.swift */; };
+		A1000712 /* Transit/GuangzhouStationInformationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000712 /* Transit/GuangzhouStationInformationProvider.swift */; };
 		A1000301 /* Time/ChinaClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000301 /* Time/ChinaClock.swift */; };
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
 		A1000303 /* Transit/RouteComfort.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000303 /* Transit/RouteComfort.swift */; };
@@ -223,6 +224,7 @@
 		A2000606 /* Transit/OfficialStationInformationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/OfficialStationInformationCache.swift; sourceTree = "<group>"; };
 		A2000710 /* Transit/StationInformationDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/StationInformationDirectory.swift; sourceTree = "<group>"; };
 		A2000711 /* Transit/ShanghaiStationInformationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/ShanghaiStationInformationProvider.swift; sourceTree = "<group>"; };
+		A2000712 /* Transit/GuangzhouStationInformationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/GuangzhouStationInformationProvider.swift; sourceTree = "<group>"; };
 		A2000301 /* Time/ChinaClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time/ChinaClock.swift; sourceTree = "<group>"; };
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
 		A2000303 /* Transit/RouteComfort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RouteComfort.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				A2000606 /* Transit/OfficialStationInformationCache.swift */,
 				A2000710 /* Transit/StationInformationDirectory.swift */,
 				A2000711 /* Transit/ShanghaiStationInformationProvider.swift */,
+				A2000712 /* Transit/GuangzhouStationInformationProvider.swift */,
 				A200005B /* Transit/BundledMetroRouteProvider.swift */,
 				A200005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift */,
 				A200005E /* Transit/MetroRoutingTypes.swift */,
@@ -585,6 +588,7 @@
 				A1000606 /* Transit/OfficialStationInformationCache.swift in Sources */,
 				A1000710 /* Transit/StationInformationDirectory.swift in Sources */,
 				A1000711 /* Transit/ShanghaiStationInformationProvider.swift in Sources */,
+				A1000712 /* Transit/GuangzhouStationInformationProvider.swift in Sources */,
 				A100005B /* Transit/BundledMetroRouteProvider.swift in Sources */,
 				A100005F /* Transit/BundledMetroRouteProvider+RouteAssembly.swift in Sources */,
 				A100005E /* Transit/MetroRoutingTypes.swift in Sources */,

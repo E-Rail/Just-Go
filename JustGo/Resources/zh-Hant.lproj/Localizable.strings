@@ -151,7 +151,6 @@
 "Likely smooth" = "大概率順暢";
 "Some uncertainty" = "存在一些不確定";
 "Check before going" = "出發前請確認";
-"out of 100" = "滿分100";
 "Official" = "官方";
 "Community verified" = "社群已驗證";
 "Source pending" = "資料來源待接入";
@@ -175,9 +174,7 @@
 "This route is likely to be smooth based on available data." = "根據現有資料，此路線大概率順暢。";
 "This route works, but check the listed uncertainties before going." = "此路線可用，但出發前請確認列出的不確定資訊。";
 "Based on available data, not a safety guarantee." = "基於現有資料，不代表安全保證。";
-"Best data available" = "目前最佳資料";
 "Transfer station" = "轉乘站";
-"Station essentials available" = "車站必備資訊可用";
 "Metro geometry © OpenStreetMap contributors" = "地鐵線路幾何 © OpenStreetMap 貢獻者";
 "Metro track geometry" = "地鐵真實線路";
 "OpenStreetMap physical track geometry" = "OpenStreetMap 實際軌道幾何";

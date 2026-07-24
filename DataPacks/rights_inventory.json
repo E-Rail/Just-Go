@@ -72,6 +72,16 @@
       "redistribution": "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only on the rider device after a user tap."
     },
     {
+      "id": "guangzhou-official-station-references",
+      "kind": "linkMetadata",
+      "scope": "Reviewed official station identifiers (stationShowCode) and aliases for canonical Guangzhou app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.gzmtr.com/",
+      "sourceURL": "https://www.gzmtr.com/",
+      "attribution": "Guangzhou Metro Group",
+      "redistribution": "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
+    },
+    {
       "id": "macau-official-landing-link",
       "kind": "linkMetadata",
       "scope": "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
@@ -187,6 +197,14 @@
         "beijing-official-landing-links",
         "justgo-generated-catalog",
         "official-transit-resource-links",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/guangzhou_station_information.json",
+      "rightsIDs": [
+        "guangzhou-official-station-references",
+        "justgo-generated-catalog",
         "osm-metro-networks"
       ]
     },

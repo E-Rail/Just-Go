@@ -151,7 +151,6 @@
 "Likely smooth" = "Likely smooth";
 "Some uncertainty" = "Some uncertainty";
 "Check before going" = "Check before going";
-"out of 100" = "out of 100";
 "Official" = "Official";
 "Community verified" = "Community verified";
 "Source pending" = "Source pending";
@@ -175,9 +174,7 @@
 "This route is likely to be smooth based on available data." = "This route is likely to be smooth based on available data.";
 "This route works, but check the listed uncertainties before going." = "This route works, but check the listed uncertainties before going.";
 "Based on available data, not a safety guarantee." = "Based on available data, not a safety guarantee.";
-"Best data available" = "Best data available";
 "Transfer station" = "Transfer station";
-"Station essentials available" = "Station essentials available";
 "Metro geometry © OpenStreetMap contributors" = "Metro geometry © OpenStreetMap contributors";
 "Metro track geometry" = "Metro track geometry";
 "OpenStreetMap physical track geometry" = "OpenStreetMap physical track geometry";

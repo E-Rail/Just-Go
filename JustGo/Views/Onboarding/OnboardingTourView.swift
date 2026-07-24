@@ -140,7 +140,7 @@ struct OnboardingTourView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
+                    .background(Color(hex: selectedThemeHex), in: Capsule())
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)

@@ -350,9 +350,9 @@ struct PersonalStationMediaSection: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .aspectRatio(4 / 3, contentMode: .fit)
                 .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
                 }
                 .overlay(alignment: .topTrailing) {

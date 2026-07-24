@@ -466,7 +466,7 @@ struct OfficialResourcesDirectoryView: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(Color.secondary.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
     }
 }
 

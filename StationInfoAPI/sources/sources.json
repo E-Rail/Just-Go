@@ -135,39 +135,41 @@
       "attribution": "Guangzhou Metro Group",
       "license": "LicenseRef-External-Link-Only",
       "redistributable": false,
-      "status": "preview",
+      "status": "stable",
       "populates": ["lines"],
-      "directoryKey": "stationShowCode",
+      "directoryKey": "externalStationID",
       "access": {
         "kind": "onDeviceFetch",
         "endpoints": {
-          "lineStation": {
+          "serviceTime": {
+            "method": "POST",
+            "url": "https://apis.gzmtr.com/app-map/serviceTime/list/{externalStationID}",
+            "requestBody": "{}",
+            "responseType": "application/json",
+            "note": "First/last for the whole physical station. The externalStationID is one representative stationShowCode; any of a station's per-line codes resolves the same full response, which lists every line serving the station."
+          },
+          "lineColors": {
             "method": "POST",
             "url": "https://apis.gzmtr.com/app-map/metroweb/linestation",
             "requestBody": "{}",
             "responseType": "application/json",
-            "note": "The full network: businessObject[] lines, each with stations[] carrying stationShowCode, names and lineColor. One call yields every stationShowCode."
-          },
-          "firstLast": {
-            "method": "POST",
-            "url": "https://apis.gzmtr.com/app-map/serviceTime/list/{stationShowCode}",
-            "requestBody": "{}",
-            "responseType": "application/json"
+            "note": "The full network: businessObject[] lines carrying lineName and lineColor. Fetched once to colour the lines returned by serviceTime; also how a developer discovers every stationShowCode."
           }
         }
       },
       "map": {
         "lines": {
-          "from": "firstLast.businessObject[]",
+          "from": "serviceTime.businessObject[] grouped by lineCn",
           "lineName": "lineCn",
-          "lineColorHex": "lineStation lineColor for lineCn",
-          "direction": "\"往{toStationName}\"",
+          "lineColorHex": "lineColors lineColor for lineCn",
+          "direction": "toStationName",
           "firstTrain": "startTime",
           "lastTrain": "endTime"
         }
       },
       "rules": {
         "request": "POST with Content-Type application/json and body {} . No auth token is required (the client's token interceptor is disabled).",
+        "identity": "serviceTime rows carry stationName; reject the response unless it matches the reviewed catalog name or one of its aliases (the operator writes a few stations with a parenthetical or decomposed-character variant).",
         "colorHex": "lineColor is 8-digit RRGGBBAA (\"edcf3dff\"); drop the alpha byte, prefix #, uppercase.",
         "coverage": "Exit and facility endpoints (/station/getLetter, /getDevice, /getService) return null and are not populated; this source is lines-only.",
         "placeholders": ["/", "-", "无", "暂无"]

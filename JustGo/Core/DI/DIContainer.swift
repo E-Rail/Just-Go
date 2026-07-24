@@ -161,7 +161,8 @@ final class DIContainer {
         // consumer would — no per-city branching at the call sites.
         let stationInformationRouter = OfficialStationInformationRouter(
             beijing: BeijingStationInformationProvider(diskCache: stationInformationDiskCache),
-            shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache)
+            shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache),
+            guangzhou: GuangzhouStationInformationProvider(diskCache: stationInformationDiskCache)
         )
         let stationInformationDirectory = StationInformationDirectory()
         // The bundled catalog decode + validation is heavy; hand the service a loader so it

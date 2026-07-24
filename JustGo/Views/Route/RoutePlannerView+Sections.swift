@@ -58,7 +58,7 @@ extension RoutePlannerView {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -94,7 +94,7 @@ extension RoutePlannerView {
                                 }
                                 .frame(width: 180, alignment: .leading)
                                 .padding()
-                                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
                             .buttonStyle(.plain)
                         }
@@ -113,9 +113,9 @@ extension RoutePlannerView {
                 .font(.subheadline)
                 .fontWeight(.medium)
                 .lineLimit(1)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 16)
                 .frame(height: 48)
-                .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(.systemGray5), in: Capsule())
         }
         .buttonStyle(.plain)
         // Gated on a current successful plan, not just filled fields: an unplanned save
@@ -140,7 +140,7 @@ extension RoutePlannerView {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             } else {
                 VStack(spacing: 0) {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
@@ -178,7 +178,7 @@ extension RoutePlannerView {
                         }
                     }
                 }
-                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
         }
     }

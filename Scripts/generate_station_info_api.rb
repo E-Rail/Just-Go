@@ -71,6 +71,21 @@ module StationInfoAPIGenerator
     end
   end
 
+  def guangzhou_entries
+    catalog("guangzhou_station_information.json").fetch("stations").map do |station|
+      [
+        station.fetch("stationID"),
+        display(station).merge(
+          "sources" => {
+            "guangzhouMetroOnline" => {
+              "externalStationID" => station.fetch("externalStationID")
+            }
+          }
+        )
+      ]
+    end
+  end
+
   def hong_kong_entries
     catalog("hong_kong_station_bindings.json").fetch("stations").map do |station|
       [
@@ -97,7 +112,7 @@ module StationInfoAPIGenerator
 
   def build
     merged = {}
-    (beijing_entries + shanghai_entries + hong_kong_entries).each do |station_id, fragment|
+    (beijing_entries + shanghai_entries + guangzhou_entries + hong_kong_entries).each do |station_id, fragment|
       existing = merged[station_id]
       if existing
         existing.fetch("sources").merge!(fragment.fetch("sources"))

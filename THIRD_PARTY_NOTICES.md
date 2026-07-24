@@ -54,3 +54,12 @@ https://jtw.beijing.gov.cn/sjtl/202111/t20211118_2540164.html
 https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
 https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
 https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
+
+Guangzhou and Shanghai station references are reviewed operator station identifiers for
+canonical app stations. The bundle contains identifier and alias metadata, not operator
+page text, schedules, facilities, exits, coordinates, images, or layouts. For those
+reviewed identifiers, Station Detail may request first/last train times from the operator
+for temporary, non-persistent native display; the response remains subject to the
+operator's terms:
+https://www.gzmtr.com/
+https://service.shmetro.com/czxx/index.htm

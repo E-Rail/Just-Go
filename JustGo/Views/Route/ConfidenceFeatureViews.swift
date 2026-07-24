@@ -55,7 +55,7 @@ struct ServiceStatusBanner: View {
                 .foregroundStyle(status.uiColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(compact ? 8 : 12)
-                .background(status.uiColor.opacity(0.12), in: RoundedRectangle(cornerRadius: compact ? 8 : 12))
+                .background(status.uiColor.opacity(0.12), in: RoundedRectangle(cornerRadius: compact ? 8 : 12, style: .continuous))
                 .accessibilityLabel(text)
         }
     }
@@ -165,7 +165,7 @@ struct DeparturePlannerSection: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .onAppear(perform: syncFromAnchor)
         .onChange(of: mode) { _, _ in syncToAnchor() }
         .onChange(of: date) { _, _ in syncToAnchor() }

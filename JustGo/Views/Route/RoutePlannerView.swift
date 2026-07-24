@@ -176,7 +176,7 @@ struct RoutePlannerView: View {
                     .foregroundStyle(.tertiary)
             }
             .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -267,7 +267,7 @@ struct RoutePlannerView: View {
             .accessibilityLabel(AppLocalization.text(english: "Dismiss", simplified: "关闭", traditional: "關閉"))
         }
         .padding()
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var searchHint: String? {
@@ -464,7 +464,7 @@ struct RoutePlannerView: View {
             .autocorrectionDisabled()
             .textFieldStyle(.plain)
             .padding(12)
-            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.
@@ -488,7 +488,7 @@ struct RoutePlannerView: View {
         // Capped at the keyboard's measured top edge so the field group, the list, and
         // the keyboard stay simultaneously visible; taller lists scroll internally.
         .frame(maxHeight: suggestionMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .background {
             GeometryReader { proxy in
                 Color.clear.preference(key: SuggestionListTopYKey.self, value: proxy.frame(in: .global).minY)
@@ -556,7 +556,7 @@ struct RoutePlannerView: View {
             .frame(height: 48)
             .background(viewModel?.canSearch == true ? Color(hex: selectedThemeHex) : Color.gray)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(Capsule())
         }
         .disabled(viewModel?.canSearch != true || viewModel?.isLoading == true)
         .alert(AppLocalization.localized("No Routes Found"), isPresented: errorAlertIsPresented) {

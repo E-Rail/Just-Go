@@ -107,7 +107,7 @@ struct StationSearchView: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .padding(.horizontal)
         .background {
             GeometryReader { proxy in
@@ -130,7 +130,7 @@ struct StationSearchView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .frame(maxHeight: searchDropdownMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
@@ -174,7 +174,7 @@ struct StationSearchView: View {
                 }
             }
         }
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 

@@ -252,6 +252,8 @@ final class StationDetailViewModel {
             return .beijing(externalStationID: entry.externalStationID, expectedNames: expectedNames)
         case "shanghaiMetroOnline":
             return .shanghai(lineStationIDs: entry.lineStationIDs, expectedNames: expectedNames)
+        case "guangzhouMetroOnline":
+            return .guangzhou(stationShowCode: entry.externalStationID, expectedNames: expectedNames)
         default:
             return nil
         }

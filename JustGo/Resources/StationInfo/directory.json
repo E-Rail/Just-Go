@@ -5,10 +5,11 @@
   "sourceRegistry": "../sources/sources.json",
   "sources": [
     "beijingSubwayOnline",
+    "guangzhouMetroOnline",
     "hongKongGovernment",
     "shanghaiMetroOnline"
   ],
-  "stationCount": 993,
+  "stationCount": 1339,
   "stations": {
     "00170074e2fd8df1": {
       "name": "天通苑南",
@@ -99,6 +100,15 @@
         }
       }
     },
+    "021f71d3c5a2ab84": {
+      "name": "永泰",
+      "nameEn": "Yongtai",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "323"
+        }
+      }
+    },
     "026d8ef2c102d891": {
       "name": "陆家嘴",
       "nameEn": "Lujiazui",
@@ -146,6 +156,15 @@
         }
       }
     },
+    "03ebe7edacb59842": {
+      "name": "二沙岛",
+      "nameEn": "Ersha Island",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1217"
+        }
+      }
+    },
     "03fa47a9d4de0447": {
       "name": "学林路",
       "nameEn": "Xuelin Road",
@@ -156,6 +175,15 @@
             "1350"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1350"
+        }
+      }
+    },
+    "0444790988568894": {
+      "name": "黄沙",
+      "nameEn": "Huangsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "105"
         }
       }
     },
@@ -196,6 +224,15 @@
         }
       }
     },
+    "04bfc7151d81b4e3": {
+      "name": "上涌",
+      "nameEn": "Shangchong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1129"
+        }
+      }
+    },
     "05a7375d0d9a6af6": {
       "name": "首都机场3号航站楼",
       "nameEn": "Capital Airport Terminal 3",
@@ -219,6 +256,15 @@
             "0623"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0623"
+        }
+      }
+    },
+    "05ed2401e43f4f17": {
+      "name": "白云东平",
+      "nameEn": "Baiyun Dongping",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1410"
         }
       }
     },
@@ -265,6 +311,42 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997025",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997025"
+        }
+      }
+    },
+    "06564c5bfb028737": {
+      "name": "沙园",
+      "nameEn": "Shayuan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "817"
+        }
+      }
+    },
+    "067e36b5991b01c2": {
+      "name": "东山口",
+      "nameEn": "Dongshankou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "112"
+        }
+      }
+    },
+    "06848b36b7caa8aa": {
+      "name": "朱村",
+      "nameEn": "Zhucun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2118"
+        }
+      }
+    },
+    "06fd50392754b573": {
+      "name": "金洲",
+      "nameEn": "Jinzhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "407"
         }
       }
     },
@@ -352,6 +434,15 @@
         }
       }
     },
+    "083d4d6fd3feb6cd": {
+      "name": "公园前",
+      "nameEn": "Gongyuanqian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "109"
+        }
+      }
+    },
     "08848153f1fe5bb1": {
       "name": "西土城",
       "nameEn": "Xitucheng",
@@ -376,6 +467,15 @@
         }
       }
     },
+    "08d8d61004c376d5": {
+      "name": "西门口",
+      "nameEn": "Ximenkou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "108"
+        }
+      }
+    },
     "08f7f297b3b414e8": {
       "name": "昌平",
       "nameEn": "Changping",
@@ -393,6 +493,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997279",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997279"
+        }
+      }
+    },
+    "09679b8da1ab17a3": {
+      "name": "华景路",
+      "nameEn": "Huajing Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1105"
         }
       }
     },
@@ -468,6 +577,15 @@
               "stationCode": "TAW"
             }
           ]
+        }
+      }
+    },
+    "0b04aef449632a17": {
+      "name": "大学城北",
+      "nameEn": "Higher Education Mega Center North",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "419"
         }
       }
     },
@@ -551,6 +669,23 @@
         }
       }
     },
+    "0c72438cdccb8125": {
+      "name": "季华园",
+      "nameEn": "Jihua Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF06"
+        }
+      }
+    },
+    "0ca1255641402cb4": {
+      "name": "神舟路",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2107"
+        }
+      }
+    },
     "0d0d32fb76678af7": {
       "name": "昌平东关",
       "nameEn": "Changping Dongguan",
@@ -581,6 +716,15 @@
         }
       }
     },
+    "0dee3428f6aecfba": {
+      "name": "线坑",
+      "nameEn": "Xiankeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP103"
+        }
+      }
+    },
     "0def2f57183c521a": {
       "name": "塘桥",
       "nameEn": "Tangqiao",
@@ -591,6 +735,15 @@
             "0420"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0420"
+        }
+      }
+    },
+    "0e0ce1377fcf2583": {
+      "name": "农讲所",
+      "nameEn": "Peasant Movement Institute",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "110"
         }
       }
     },
@@ -644,6 +797,23 @@
         }
       }
     },
+    "0f0c537ee8736c7d": {
+      "name": "赤岗",
+      "nameEn": "Chigang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "824"
+        }
+      }
+    },
+    "0f259edddfe8d0c7": {
+      "name": "金坑",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2112"
+        }
+      }
+    },
     "0f4723c4f5ab31f8": {
       "name": "坑口",
       "nameEn": "Hang Hau",
@@ -655,6 +825,15 @@
               "stationCode": "HAH"
             }
           ]
+        }
+      }
+    },
+    "0f5894ae40b39e10": {
+      "name": "宝岗大道",
+      "nameEn": "Baogang Dadao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "818"
         }
       }
     },
@@ -786,6 +965,24 @@
         }
       }
     },
+    "11a13c0385be4689": {
+      "name": "蕉门",
+      "nameEn": "Jiaomen",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "408"
+        }
+      }
+    },
+    "12713d287ad76892": {
+      "name": "鹅掌坦",
+      "nameEn": "Ezhangtan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "809"
+        }
+      }
+    },
     "12ccd1edbc11f845": {
       "name": "黑庄户",
       "nameEn": "Heizhuanghu",
@@ -855,6 +1052,15 @@
             "0827"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0827"
+        }
+      }
+    },
+    "139dc618751f7787": {
+      "name": "汤村",
+      "nameEn": "Tangcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1428"
         }
       }
     },
@@ -937,6 +1143,15 @@
             "1060"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1060"
+        }
+      }
+    },
+    "14af118fd6a104b9": {
+      "name": "燕山",
+      "nameEn": "Yanshan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "720"
         }
       }
     },
@@ -1064,6 +1279,15 @@
         }
       }
     },
+    "16ef0797d37f2270": {
+      "name": "新造",
+      "nameEn": "Xinzao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "417"
+        }
+      }
+    },
     "17120deb49c6d358": {
       "name": "海怡半島",
       "nameEn": "South Horizons",
@@ -1141,6 +1365,15 @@
         }
       }
     },
+    "18620d21aa456cb0": {
+      "name": "区少年宫（萝岗）",
+      "nameEn": "Luogang District Children's Palace",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP102"
+        }
+      }
+    },
     "188fa075fa5c74b4": {
       "name": "松江体育中心",
       "nameEn": "Songjiang Sports Center",
@@ -1204,6 +1437,33 @@
             "1137"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1137"
+        }
+      }
+    },
+    "19cee545a045aed9": {
+      "name": "东风",
+      "nameEn": "Dongfeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1421"
+        }
+      }
+    },
+    "19d5db24f924bd73": {
+      "name": "芳村",
+      "nameEn": "Fangcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "104"
+        }
+      }
+    },
+    "1a386e6700d11de6": {
+      "name": "南涌",
+      "nameEn": "Nanchong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-5"
         }
       }
     },
@@ -1327,6 +1587,15 @@
         }
       }
     },
+    "1d0b06574eeeeec3": {
+      "name": "潭村",
+      "nameEn": "Tancun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "515"
+        }
+      }
+    },
     "1d13ba9409119c61": {
       "name": "永安里",
       "nameEn": "Yonganli",
@@ -1344,6 +1613,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996537",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996537"
+        }
+      }
+    },
+    "1dbf52696459c7a3": {
+      "name": "海傍",
+      "nameEn": "Haibang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "414"
         }
       }
     },
@@ -1414,6 +1692,15 @@
         }
       }
     },
+    "1e91a0c327385814": {
+      "name": "越秀公园",
+      "nameEn": "Yuexiu Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "215"
+        }
+      }
+    },
     "1ea03e7c6a222d0c": {
       "name": "罗南新村",
       "nameEn": "Luonan Xincun",
@@ -1441,6 +1728,15 @@
         }
       }
     },
+    "1f0c833ddad1eba3": {
+      "name": "澜石",
+      "nameEn": "Lanshi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF04"
+        }
+      }
+    },
     "1f1e0a95393e8edb": {
       "name": "马各庄",
       "nameEn": "Magezhuang",
@@ -1451,6 +1747,15 @@
         }
       }
     },
+    "1f52c717f9f0fa82": {
+      "name": "天河智慧城",
+      "nameEn": "Tianhe Smart City",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2106"
+        }
+      }
+    },
     "1f7397964a31c3df": {
       "name": "广渠门外",
       "nameEn": "Guangqumen Wai",
@@ -1458,6 +1763,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996777",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996777"
+        }
+      }
+    },
+    "1fae4e671ba01ab2": {
+      "name": "广州塔",
+      "nameEn": "Canton Tower",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "309"
         }
       }
     },
@@ -1484,6 +1798,33 @@
         }
       }
     },
+    "2073c9bb76f79a42": {
+      "name": "贤江西",
+      "nameEn": "Xianjiang West",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP116"
+        }
+      }
+    },
+    "208d6e9cdd3e2682": {
+      "name": "朝安",
+      "nameEn": "Chao'an",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF10"
+        }
+      }
+    },
+    "2092489eef543536": {
+      "name": "石碁南",
+      "nameEn": "Shiqinan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "301-2"
+        }
+      }
+    },
     "209b5a7fa12ae812": {
       "name": "双江路",
       "nameEn": "Shuangjiang Road",
@@ -1494,6 +1835,15 @@
             "1070"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1070"
+        }
+      }
+    },
+    "20c30181c3dedc33": {
+      "name": "三元里",
+      "nameEn": "Sanyuanli",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "217"
         }
       }
     },
@@ -1514,6 +1864,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997269",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997269"
+        }
+      }
+    },
+    "21aec478e0b0b0a4": {
+      "name": "华林寺",
+      "nameEn": "Hualinsi Buddhist Temple",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "813"
+        }
+      }
+    },
+    "21f2aa37337f70ff": {
+      "name": "广州东站",
+      "nameEn": "Guangzhou East Railway Station",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "116"
         }
       }
     },
@@ -1593,6 +1961,24 @@
             "1059"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0412"
+        }
+      }
+    },
+    "22c103b38bb0b48e": {
+      "name": "香雪",
+      "nameEn": "Xiangxue",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "632"
+        }
+      }
+    },
+    "2346e8e38072db18": {
+      "name": "新塘",
+      "nameEn": "Xintang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1332"
         }
       }
     },
@@ -1684,6 +2070,42 @@
         }
       }
     },
+    "2478190a8eb8823f": {
+      "name": "鹤龙",
+      "nameEn": "Helong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1407"
+        }
+      }
+    },
+    "24af4f8f972b0487": {
+      "name": "柯木塱",
+      "nameEn": "Kemulang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "625"
+        }
+      }
+    },
+    "24b42e2087af8de0": {
+      "name": "同和",
+      "nameEn": "Tonghe",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "322"
+        }
+      }
+    },
+    "24d2469d07f19e6d": {
+      "name": "岭头",
+      "nameEn": "Lingtou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP113"
+        }
+      }
+    },
     "24dcc61f339631d4": {
       "name": "世纪大道",
       "nameEn": "Century Avenue",
@@ -1754,6 +2176,24 @@
         }
       }
     },
+    "2660daff0c1d0274": {
+      "name": "同济路",
+      "nameEn": "Tongji Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF07"
+        }
+      }
+    },
+    "269fe8dc6bd2d86d": {
+      "name": "竹料",
+      "nameEn": "Zhuliao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1413"
+        }
+      }
+    },
     "26e5e61b4eb3539c": {
       "name": "海户屯",
       "nameEn": "Haihu Tun",
@@ -1778,6 +2218,15 @@
         }
       }
     },
+    "26fc294d770ee05b": {
+      "name": "北山",
+      "nameEn": "Beishan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1222"
+        }
+      }
+    },
     "2703ee1e1fb8c446": {
       "name": "巩华城",
       "nameEn": "Gonghuacheng",
@@ -1798,6 +2247,15 @@
             "1852"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1852"
+        }
+      }
+    },
+    "27324aec7530156f": {
+      "name": "萝岗",
+      "nameEn": "Luogang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "631"
         }
       }
     },
@@ -1840,6 +2298,15 @@
         }
       }
     },
+    "2885b69e20756b76": {
+      "name": "龙归",
+      "nameEn": "Longgui",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "326"
+        }
+      }
+    },
     "28acdc3b24202314": {
       "name": "长江西路",
       "sources": {
@@ -1866,6 +2333,24 @@
         }
       }
     },
+    "2916e190dba9842c": {
+      "name": "大涌",
+      "nameEn": "Dachong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "404"
+        }
+      }
+    },
+    "2937f39e4190ca6d": {
+      "name": "南浦西",
+      "nameEn": "Nanpu West",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2205"
+        }
+      }
+    },
     "2938d50994cfd8f7": {
       "name": "东兰路",
       "nameEn": "Donglan Road",
@@ -1876,6 +2361,15 @@
             "1223"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1223"
+        }
+      }
+    },
+    "29401b1fbd0146ce": {
+      "name": "陈村",
+      "nameEn": "Chencun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-3"
         }
       }
     },
@@ -1890,6 +2384,15 @@
               "stationCode": "MOK"
             }
           ]
+        }
+      }
+    },
+    "29a4b66e99dfaa8c": {
+      "name": "玉岩路",
+      "nameEn": "Yuyan Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP207"
         }
       }
     },
@@ -1982,6 +2485,15 @@
         }
       }
     },
+    "2aa03b63d1b699b7": {
+      "name": "苏元",
+      "nameEn": "Suyuan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "630"
+        }
+      }
+    },
     "2b133d15571fe1e5": {
       "name": "鳳地",
       "nameEn": "Fung Tei",
@@ -1993,6 +2505,24 @@
               "stationCode": "340"
             }
           ]
+        }
+      }
+    },
+    "2b1caf80a9411340": {
+      "name": "猎德大桥南",
+      "nameEn": "Liede Bridge South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ102"
+        }
+      }
+    },
+    "2b3f4dd74beedbff": {
+      "name": "植物园",
+      "nameEn": "Botanical Garden",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "623"
         }
       }
     },
@@ -2026,6 +2556,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999087",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999087"
+        }
+      }
+    },
+    "2c389a7474ffb510": {
+      "name": "沙涌",
+      "nameEn": "Shachong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1122"
         }
       }
     },
@@ -2066,6 +2605,15 @@
         }
       }
     },
+    "2c982a512ee33194": {
+      "name": "林和西",
+      "nameEn": "Linhexi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "317"
+        }
+      }
+    },
     "2cc156718ed268f2": {
       "name": "立水桥南",
       "nameEn": "Lishuiqiao South",
@@ -2073,6 +2621,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996253",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996253"
+        }
+      }
+    },
+    "2cd75d0bd406f2cd": {
+      "name": "会展中",
+      "nameEn": "Canton Fair Complex Middle",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ106"
         }
       }
     },
@@ -2086,6 +2643,15 @@
         }
       }
     },
+    "2d5954974e768365": {
+      "name": "白江",
+      "nameEn": "Baijiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1331"
+        }
+      }
+    },
     "2dcc3f646510f38c": {
       "name": "来广营",
       "nameEn": "Laiguangying",
@@ -2093,6 +2659,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998619",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998619"
+        }
+      }
+    },
+    "2e9516b92165dfde": {
+      "name": "石碁",
+      "nameEn": "Shiqi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "415"
         }
       }
     },
@@ -2116,6 +2691,15 @@
             "0842"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0842"
+        }
+      }
+    },
+    "2eea9707a2b2e080": {
+      "name": "岭头东",
+      "nameEn": "Lingtou East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP115"
         }
       }
     },
@@ -2183,6 +2767,15 @@
         }
       }
     },
+    "30825d00902b23a7": {
+      "name": "镇龙西",
+      "nameEn": "Zhenlongxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2113"
+        }
+      }
+    },
     "30a8b30a03eaab87": {
       "name": "上岸",
       "sources": {
@@ -2207,6 +2800,15 @@
         }
       }
     },
+    "30d3747275f0b301": {
+      "name": "高塘石",
+      "nameEn": "Gaotangshi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "626"
+        }
+      }
+    },
     "3158ba0da4195a6c": {
       "name": "高桥西",
       "nameEn": "West Gaoqiao",
@@ -2227,6 +2829,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151018771",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151018771"
+        }
+      }
+    },
+    "31ac4d0b188255a2": {
+      "name": "知识城",
+      "nameEn": "Sino-Singapore Guangzhou Knowledge City",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1425"
         }
       }
     },
@@ -2264,6 +2875,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150995209",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150995209"
+        }
+      }
+    },
+    "321d9883ff1aa221": {
+      "name": "飞沙角",
+      "nameEn": "Feishajiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "406"
         }
       }
     },
@@ -2314,6 +2934,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996017",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996017"
+        }
+      }
+    },
+    "3379e2d39feb5418": {
+      "name": "陈村北",
+      "nameEn": "Chencunbei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-2"
         }
       }
     },
@@ -2397,6 +3026,15 @@
         }
       }
     },
+    "345c66eff210e415": {
+      "name": "中大",
+      "nameEn": "Sun Yat-sen University",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "821"
+        }
+      }
+    },
     "345f0ad62aa8a5dd": {
       "name": "民生路",
       "nameEn": "Minsheng Road",
@@ -2467,6 +3105,15 @@
             "0505"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0505"
+        }
+      }
+    },
+    "35bc342d4f7744b4": {
+      "name": "体育中心",
+      "nameEn": "Tianhe Sports Center",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "115"
         }
       }
     },
@@ -2541,6 +3188,33 @@
             "1437"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1055"
+        }
+      }
+    },
+    "375dc0937d3ca5a2": {
+      "name": "小坪",
+      "nameEn": "Xiaoping",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "804"
+        }
+      }
+    },
+    "37bb6b5f6d771d47": {
+      "name": "汉溪长隆",
+      "nameEn": "Hanxi Changlong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "303"
+        }
+      }
+    },
+    "384bee9df7f7533a": {
+      "name": "花地湾",
+      "nameEn": "Huadiwan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "103"
         }
       }
     },
@@ -2639,6 +3313,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151019561",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019561"
+        }
+      }
+    },
+    "3a984d646f3c24cf": {
+      "name": "云霄路",
+      "nameEn": "Yunxiao Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1403"
         }
       }
     },
@@ -2758,6 +3441,15 @@
         }
       }
     },
+    "3c253cd269cc355f": {
+      "name": "昌岗",
+      "nameEn": "Changgang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "209"
+        }
+      }
+    },
     "3c44de3cd50e68df": {
       "name": "成山路",
       "nameEn": "Chengshan Road",
@@ -2769,6 +3461,15 @@
             "1341"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0828"
+        }
+      }
+    },
+    "3c8d293dc76a11ed": {
+      "name": "杨箕",
+      "nameEn": "Yangji",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "113"
         }
       }
     },
@@ -2825,6 +3526,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999335",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999335"
+        }
+      }
+    },
+    "3d2ca0bf09721cdf": {
+      "name": "科丰路",
+      "nameEn": "Kefenglu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "717"
         }
       }
     },
@@ -2935,6 +3645,15 @@
         }
       }
     },
+    "3f2eb26438eb43ce": {
+      "name": "沙村",
+      "nameEn": "Shacun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1330"
+        }
+      }
+    },
     "3f509483b50e5e63": {
       "name": "沙河高教园",
       "nameEn": "Shahe University Park",
@@ -2982,6 +3701,15 @@
         }
       }
     },
+    "40078045fa653864": {
+      "name": "赤沙北",
+      "nameEn": "Chisha North",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1220"
+        }
+      }
+    },
     "403898988260423e": {
       "name": "上海科技馆",
       "nameEn": "Shanghai Science and Technology Museum",
@@ -2992,6 +3720,15 @@
             "0250"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0250"
+        }
+      }
+    },
+    "4054622fbff04cd1": {
+      "name": "海心沙",
+      "nameEn": "Haixinsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM02"
         }
       }
     },
@@ -3010,6 +3747,24 @@
         }
       }
     },
+    "4083c54c7ec01fee": {
+      "name": "太和",
+      "nameEn": "Taihe",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1412"
+        }
+      }
+    },
+    "408b25c9e759da80": {
+      "name": "五羊邨",
+      "nameEn": "Wuyangcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "512"
+        }
+      }
+    },
     "4098c9426639fcdc": {
       "name": "国家会展中心",
       "nameEn": "National Exhibiation and Convention Center",
@@ -3021,6 +3776,33 @@
             "1722"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0234"
+        }
+      }
+    },
+    "40b6e68a330c53fa": {
+      "name": "石围塘",
+      "nameEn": "Shiweitang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1119"
+        }
+      }
+    },
+    "40f9fceaf89b7cd7": {
+      "name": "天河珠村",
+      "nameEn": "Tianhe Zhucun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1323"
+        }
+      }
+    },
+    "410d0af4e2ea3085": {
+      "name": "长湴",
+      "nameEn": "Changban",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "622"
         }
       }
     },
@@ -3054,6 +3836,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999061",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999061"
+        }
+      }
+    },
+    "41c0c3ebd090d0e1": {
+      "name": "凤岗",
+      "nameEn": "Fenggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2117"
         }
       }
     },
@@ -3136,6 +3927,15 @@
         }
       }
     },
+    "42b310d308c095af": {
+      "name": "普君北路",
+      "nameEn": "Pujun Beilu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF09"
+        }
+      }
+    },
     "42cf305bf273d8cd": {
       "name": "长清路",
       "nameEn": "Changqing Road",
@@ -3161,6 +3961,15 @@
               "stationCode": "LHP"
             }
           ]
+        }
+      }
+    },
+    "4321646f9047d91d": {
+      "name": "一德路",
+      "nameEn": "Yide Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "609"
         }
       }
     },
@@ -3213,6 +4022,15 @@
         }
       }
     },
+    "44142d8ca58eca43": {
+      "name": "花城大道",
+      "nameEn": "Huacheng Dadao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM04"
+        }
+      }
+    },
     "4422eedc5d38d8b1": {
       "name": "蔡意橋",
       "nameEn": "Choy Yee Bridge",
@@ -3224,6 +4042,42 @@
               "stationCode": "75"
             }
           ]
+        }
+      }
+    },
+    "448626edd20dfc99": {
+      "name": "彩虹桥",
+      "nameEn": "Caihong Bridge",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "811"
+        }
+      }
+    },
+    "449ebf4a9e098d41": {
+      "name": "西场",
+      "nameEn": "Xichang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "504"
+        }
+      }
+    },
+    "44e0ebced1daca24": {
+      "name": "暹岗",
+      "nameEn": "Xiangang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "629"
+        }
+      }
+    },
+    "4536ba7d67b3a540": {
+      "name": "低涌",
+      "nameEn": "Dichong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "413"
         }
       }
     },
@@ -3248,6 +4102,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151017749",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151017749"
+        }
+      }
+    },
+    "45d86f1aab6596a1": {
+      "name": "夏园",
+      "nameEn": "Xiayuan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "527"
         }
       }
     },
@@ -3334,6 +4197,15 @@
         }
       }
     },
+    "47ebc4d6dce9f1da": {
+      "name": "鹤洞东",
+      "nameEn": "Hedong East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1123"
+        }
+      }
+    },
     "4847afd62cb714aa": {
       "name": "三门路",
       "nameEn": "Sanmen Road",
@@ -3347,6 +4219,15 @@
         }
       }
     },
+    "4847cd456878785b": {
+      "name": "江泰路",
+      "nameEn": "Jiangtai Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "208"
+        }
+      }
+    },
     "48539a40c41c4c98": {
       "name": "定边路",
       "nameEn": "Dingbian Road",
@@ -3357,6 +4238,24 @@
             "1425"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1425"
+        }
+      }
+    },
+    "487152574858f279": {
+      "name": "科学城",
+      "nameEn": "Science City",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2108"
+        }
+      }
+    },
+    "488d24c534f66c61": {
+      "name": "沙河顶",
+      "nameEn": "Shaheding",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "617"
         }
       }
     },
@@ -3394,6 +4293,24 @@
         }
       }
     },
+    "49d37f99e3b13801": {
+      "name": "车陂",
+      "nameEn": "Chebei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "423"
+        }
+      }
+    },
+    "49e061531f97699a": {
+      "name": "花果山公园",
+      "nameEn": "Huaguoshan Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "905"
+        }
+      }
+    },
     "4a1a1453d25432e7": {
       "name": "龍門",
       "nameEn": "Lung Mun",
@@ -3405,6 +4322,15 @@
               "stationCode": "30"
             }
           ]
+        }
+      }
+    },
+    "4ab42f17c959a992": {
+      "name": "五山",
+      "nameEn": "Wushan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "315"
         }
       }
     },
@@ -3512,6 +4438,15 @@
         }
       }
     },
+    "4cda81bf4b0eaf4f": {
+      "name": "员岗",
+      "nameEn": "Yuangang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "707"
+        }
+      }
+    },
     "4ce0c1fde748275a": {
       "name": "新街口",
       "nameEn": "Xinjiekou",
@@ -3519,6 +4454,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996013",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996013"
+        }
+      }
+    },
+    "4d18b226c43e7bcc": {
+      "name": "黄陂",
+      "nameEn": "Huangbei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "627"
         }
       }
     },
@@ -3601,6 +4545,24 @@
         }
       }
     },
+    "4e820d2c76029f99": {
+      "name": "下中路",
+      "nameEn": "Xiazhong Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP203"
+        }
+      }
+    },
+    "4eb85e01a3905416": {
+      "name": "市广路",
+      "nameEn": "Shiguanglu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2202"
+        }
+      }
+    },
     "4eeef34ed3149fb9": {
       "name": "大棠路",
       "nameEn": "Tai Tong Road",
@@ -3612,6 +4574,15 @@
               "stationCode": "590"
             }
           ]
+        }
+      }
+    },
+    "4f0312abd2c3e9f4": {
+      "name": "广州火车站",
+      "nameEn": "Guangzhou Railway Station",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "216"
         }
       }
     },
@@ -3661,6 +4632,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151018005",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151018005"
+        }
+      }
+    },
+    "50036d485161e92c": {
+      "name": "岗顶",
+      "nameEn": "Gangding",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "313"
         }
       }
     },
@@ -3824,6 +4804,15 @@
         }
       }
     },
+    "5472070b62dc24b1": {
+      "name": "亭岗",
+      "nameEn": "Tinggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "802"
+        }
+      }
+    },
     "5472779423a848fc": {
       "name": "花庄",
       "nameEn": "Huazhuang",
@@ -3903,6 +4892,15 @@
         }
       }
     },
+    "55480c0219731de1": {
+      "name": "浔峰岗北",
+      "nameEn": "Xunfenggang North",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1202"
+        }
+      }
+    },
     "55724239c54964c8": {
       "name": "临平路",
       "nameEn": "Linping Road",
@@ -3933,6 +4931,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "151019287",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019287"
+        }
+      }
+    },
+    "557b6337f9ddc7fd": {
+      "name": "小北",
+      "nameEn": "Xiaobei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "507"
+        }
+      }
+    },
+    "557bc14ba5acb615": {
+      "name": "广隆",
+      "nameEn": "Guanglong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "405"
         }
       }
     },
@@ -3986,6 +5002,42 @@
         }
       }
     },
+    "56c62b3d0f532902": {
+      "name": "新城东",
+      "nameEn": "Xincheng Dong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF01"
+        }
+      }
+    },
+    "56e116fd45c499f3": {
+      "name": "保盈大道",
+      "nameEn": "Baoying Dadao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "528"
+        }
+      }
+    },
+    "574800da7c942a42": {
+      "name": "东圃",
+      "nameEn": "Dongpu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "519"
+        }
+      }
+    },
+    "5775849277ce7565": {
+      "name": "新丰路",
+      "nameEn": "Xinfeng Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP119"
+        }
+      }
+    },
     "579a6437d032d10f": {
       "name": "嘉定西",
       "nameEn": "West Jiading",
@@ -3996,6 +5048,24 @@
             "1132"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1132"
+        }
+      }
+    },
+    "57c133995d97afa3": {
+      "name": "琶洲塔",
+      "nameEn": "Pazhou Pagoda",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ109"
+        }
+      }
+    },
+    "57f7f7140909fb03": {
+      "name": "清塘",
+      "nameEn": "Qingtang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "910"
         }
       }
     },
@@ -4020,6 +5090,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151019559",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019559"
+        }
+      }
+    },
+    "587f2da391e15451": {
+      "name": "黄边",
+      "nameEn": "Huangbian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "223"
         }
       }
     },
@@ -4109,6 +5188,24 @@
             "1435"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0122"
+        }
+      }
+    },
+    "5a22fa0805c65511": {
+      "name": "南海神庙",
+      "nameEn": "Nanhai God Temple",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1327"
+        }
+      }
+    },
+    "5a5cb1b4f737491f": {
+      "name": "黄阁汽车城",
+      "nameEn": "Huangge Auto Town",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "410"
         }
       }
     },
@@ -4211,6 +5308,15 @@
         }
       }
     },
+    "5c9fc9adb9b6017b": {
+      "name": "烈士陵园",
+      "nameEn": "Martyrs' Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "111"
+        }
+      }
+    },
     "5d09e630cd7868be": {
       "name": "场中路",
       "nameEn": "Changzhong Road",
@@ -4234,6 +5340,15 @@
             "1162"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1162"
+        }
+      }
+    },
+    "5d2a50d2ae4d522c": {
+      "name": "天河客运站",
+      "nameEn": "Tianhe Coach Terminal",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "316"
         }
       }
     },
@@ -4271,6 +5386,15 @@
             "1239"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1239"
+        }
+      }
+    },
+    "5d785d512b57031c": {
+      "name": "文冲",
+      "nameEn": "Wenchong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "524"
         }
       }
     },
@@ -4494,6 +5618,15 @@
         }
       }
     },
+    "603d97eae9001e0d": {
+      "name": "会展东",
+      "nameEn": "Canton Fair Complex East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ107"
+        }
+      }
+    },
     "606804a7ba1351df": {
       "name": "高家园",
       "nameEn": "Gaojiayuan",
@@ -4598,6 +5731,24 @@
         }
       }
     },
+    "61154fa94c8621d6": {
+      "name": "美的大道",
+      "nameEn": "Meidi Dadao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-8"
+        }
+      }
+    },
+    "612e1b47afe953a3": {
+      "name": "双沙",
+      "nameEn": "Shuangsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "525"
+        }
+      }
+    },
     "61af5a7ba97b0374": {
       "name": "香港大學",
       "nameEn": "HKU",
@@ -4639,6 +5790,15 @@
         }
       }
     },
+    "61f5daa7af0ead2e": {
+      "name": "猎德",
+      "nameEn": "Liede",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "514"
+        }
+      }
+    },
     "625b65b52e5469fa": {
       "name": "顺义",
       "nameEn": "Shunyi",
@@ -4660,6 +5820,15 @@
               "stationCode": "110"
             }
           ]
+        }
+      }
+    },
+    "62c5a667549352b4": {
+      "name": "客村",
+      "nameEn": "Kecun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "308"
         }
       }
     },
@@ -4725,6 +5894,15 @@
         }
       }
     },
+    "639802d25ff6f9cb": {
+      "name": "增城广场",
+      "nameEn": "Zengcheng Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2121"
+        }
+      }
+    },
     "642704620f7b5fdb": {
       "name": "浦电路",
       "nameEn": "Pudian Road",
@@ -4735,6 +5913,24 @@
             "0631"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0631"
+        }
+      }
+    },
+    "64c20b2ce77eabb7": {
+      "name": "太平",
+      "nameEn": "Taiping",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1417"
+        }
+      }
+    },
+    "65d9922ed66eef59": {
+      "name": "坑贝",
+      "nameEn": "Kengbei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2116"
         }
       }
     },
@@ -4797,6 +5993,15 @@
         }
       }
     },
+    "67a5534bbee48b05": {
+      "name": "棠下",
+      "nameEn": "Tangxia",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1321"
+        }
+      }
+    },
     "67aec568af34870f": {
       "name": "徐泾北城",
       "nameEn": "Xujingbeicheng",
@@ -4810,6 +6015,15 @@
         }
       }
     },
+    "67bbf16592dc2717": {
+      "name": "羌洞",
+      "nameEn": "Qiangdong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP111"
+        }
+      }
+    },
     "68315b68b98dd248": {
       "name": "富锦路",
       "nameEn": "Fujin Road",
@@ -4820,6 +6034,15 @@
             "0138"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0138"
+        }
+      }
+    },
+    "68560adfaab82c93": {
+      "name": "彭边",
+      "nameEn": "Pengbian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1408"
         }
       }
     },
@@ -4846,6 +6069,15 @@
         }
       }
     },
+    "68d44ea2d8d619ef": {
+      "name": "南风",
+      "nameEn": "Nanfeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ104"
+        }
+      }
+    },
     "68d9f6ed06c51736": {
       "name": "尖東",
       "nameEn": "East Tsim Sha Tsui",
@@ -4857,6 +6089,33 @@
               "stationCode": "ETS"
             }
           ]
+        }
+      }
+    },
+    "691fca4d7875a7d5": {
+      "name": "龙洞",
+      "nameEn": "Longdong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "624"
+        }
+      }
+    },
+    "6961395d446fb051": {
+      "name": "京溪南方医院",
+      "nameEn": "Jingxi Nanfang Hospital",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "321"
+        }
+      }
+    },
+    "69aa65cdd5247102": {
+      "name": "马沥",
+      "nameEn": "Mali",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1415"
         }
       }
     },
@@ -4901,6 +6160,15 @@
         }
       }
     },
+    "6af0a4becda8506d": {
+      "name": "石牌桥",
+      "nameEn": "Shipaiqiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "312"
+        }
+      }
+    },
     "6b137ab0402f1d57": {
       "name": "漕盈路",
       "nameEn": "Caoying Road",
@@ -4911,6 +6179,15 @@
             "1730"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1730"
+        }
+      }
+    },
+    "6b91e1d76349137c": {
+      "name": "从化客运站",
+      "nameEn": "Conghua Coach Terminal",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1420"
         }
       }
     },
@@ -4935,6 +6212,15 @@
             "1342"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0626"
+        }
+      }
+    },
+    "6c33a374dc236309": {
+      "name": "香雪大道东",
+      "nameEn": "Xiangxue Avenue East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP205"
         }
       }
     },
@@ -4974,6 +6260,15 @@
             "0639"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0639"
+        }
+      }
+    },
+    "6c67ab3b32a6e642": {
+      "name": "马鞍山公园",
+      "nameEn": "Ma'anshan Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "907"
         }
       }
     },
@@ -5096,6 +6391,15 @@
         }
       }
     },
+    "6e91b0630043c127": {
+      "name": "姬堂",
+      "nameEn": "Jitang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "715"
+        }
+      }
+    },
     "6edc917d64c17e97": {
       "name": "封浜",
       "nameEn": "Fengbang",
@@ -5175,6 +6479,15 @@
         }
       }
     },
+    "70639d770131f9de": {
+      "name": "双岗",
+      "nameEn": "Shuanggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1326"
+        }
+      }
+    },
     "706ef69da8cc1742": {
       "name": "牛街",
       "nameEn": "Niujie",
@@ -5205,6 +6518,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150995472",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150995472"
+        }
+      }
+    },
+    "712180761a1742ce": {
+      "name": "黄埔新港",
+      "nameEn": "Huangpu New Port",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "530"
         }
       }
     },
@@ -5254,6 +6576,15 @@
         }
       }
     },
+    "722633dc158e0a73": {
+      "name": "东湖",
+      "nameEn": "Donghu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "613"
+        }
+      }
+    },
     "7246244615f7b488": {
       "name": "柴灣",
       "nameEn": "Chai Wan",
@@ -5275,6 +6606,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996795",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996795"
+        }
+      }
+    },
+    "728c059cc56042a5": {
+      "name": "江南西",
+      "nameEn": "Jiangnanxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "210"
         }
       }
     },
@@ -5319,6 +6659,15 @@
         }
       }
     },
+    "730ef20ed931447a": {
+      "name": "中新",
+      "nameEn": "Zhongxin",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2115"
+        }
+      }
+    },
     "73179abb76c9884a": {
       "name": "军事博物馆",
       "nameEn": "Military Museum",
@@ -5342,6 +6691,15 @@
         }
       }
     },
+    "733bedcd85318ec2": {
+      "name": "海涌路",
+      "nameEn": "Haichong Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "301-3"
+        }
+      }
+    },
     "73ad0a900dc2deb2": {
       "name": "申江路",
       "nameEn": "Shenjiang Road",
@@ -5352,6 +6710,15 @@
             "1250"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1250"
+        }
+      }
+    },
+    "73dcb58678581b04": {
+      "name": "华师",
+      "nameEn": "South China Normal University",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "314"
         }
       }
     },
@@ -5435,6 +6802,24 @@
         }
       }
     },
+    "76170026fb418d42": {
+      "name": "南村万博",
+      "nameEn": "Nancun Wanbo",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "706"
+        }
+      }
+    },
+    "764e99eb2d44728d": {
+      "name": "燕塘",
+      "nameEn": "Yantang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "319"
+        }
+      }
+    },
     "76bc9357394354c4": {
       "name": "丰庄",
       "nameEn": "Fengzhuang",
@@ -5489,6 +6874,15 @@
         }
       }
     },
+    "7739061968ea3559": {
+      "name": "中山八",
+      "nameEn": "Zhongshanba",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "503"
+        }
+      }
+    },
     "7743e9759901a60a": {
       "name": "奥体中心",
       "nameEn": "Olympic Sports Center",
@@ -5496,6 +6890,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997019",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997019"
+        }
+      }
+    },
+    "7744feae953d2588": {
+      "name": "中医药大学",
+      "nameEn": "Guangzhou University of Chinese Medicine",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1112"
         }
       }
     },
@@ -5527,6 +6930,24 @@
               "stationCode": "600"
             }
           ]
+        }
+      }
+    },
+    "7780ed88b85c7839": {
+      "name": "浔峰岗",
+      "nameEn": "Xunfenggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "601"
+        }
+      }
+    },
+    "77d7f35020514eea": {
+      "name": "三溪",
+      "nameEn": "Sanxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "520"
         }
       }
     },
@@ -5590,6 +7011,15 @@
         }
       }
     },
+    "7897c98c97ba3c5d": {
+      "name": "官湖",
+      "nameEn": "Yufengwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1333"
+        }
+      }
+    },
     "789826511d5cdb8b": {
       "name": "朗屏",
       "nameEn": "Long Ping",
@@ -5630,6 +7060,24 @@
         }
       }
     },
+    "792fd3ea60247f9c": {
+      "name": "白云公园",
+      "nameEn": "Baiyun Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "219"
+        }
+      }
+    },
+    "793fd18da1eab1be": {
+      "name": "庙头",
+      "nameEn": "Miaotou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "526"
+        }
+      }
+    },
     "798b771c507f47ad": {
       "name": "威宁路",
       "nameEn": "Weining Road",
@@ -5653,6 +7101,15 @@
             "1158"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1158"
+        }
+      }
+    },
+    "7992fc0aee0fe4f6": {
+      "name": "东晓南",
+      "nameEn": "Dongxiao South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "207"
         }
       }
     },
@@ -5800,6 +7257,15 @@
         }
       }
     },
+    "7b3cd290a1f75e7e": {
+      "name": "市桥",
+      "nameEn": "Shiqiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "302"
+        }
+      }
+    },
     "7b8c7d5af5398979": {
       "name": "淞虹路",
       "nameEn": "Songhong Road",
@@ -5823,6 +7289,15 @@
         }
       }
     },
+    "7c56629e775e9d0d": {
+      "name": "香雪公园",
+      "nameEn": "Xiangxue Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP206"
+        }
+      }
+    },
     "7c59a8d1c9396f7e": {
       "name": "云山路",
       "nameEn": "Yunshan Road",
@@ -5834,6 +7309,15 @@
             "1445"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0637"
+        }
+      }
+    },
+    "7c684771e979c1f6": {
+      "name": "杨箕东",
+      "nameEn": "Yangji East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1012"
         }
       }
     },
@@ -5884,6 +7368,15 @@
         }
       }
     },
+    "7e764949dcd24b6f": {
+      "name": "千灯湖",
+      "nameEn": "Qiandeng Lake",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF14"
+        }
+      }
+    },
     "7eff2a5bdf181c12": {
       "name": "十八里店",
       "sources": {
@@ -5930,6 +7423,15 @@
         }
       }
     },
+    "7f8b7945a5a5b176": {
+      "name": "琶洲大桥南",
+      "nameEn": "Pazhou Bridge South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ108"
+        }
+      }
+    },
     "7fe7d02efedf23b0": {
       "name": "天通苑",
       "nameEn": "Tiantongyuan",
@@ -5937,6 +7439,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "151013637",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013637"
+        }
+      }
+    },
+    "800b536390185ccd": {
+      "name": "东平",
+      "nameEn": "Dongping",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "F319"
+        }
+      }
+    },
+    "80d60bd01635b7ce": {
+      "name": "万胜围",
+      "nameEn": "Wanshengwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "421"
         }
       }
     },
@@ -5950,6 +7470,15 @@
             "0535"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0535"
+        }
+      }
+    },
+    "80e6e73865cb4f0b": {
+      "name": "花围",
+      "nameEn": "Huawei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1002"
         }
       }
     },
@@ -5970,6 +7499,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999323",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999323"
+        }
+      }
+    },
+    "811a6e4b57dedb90": {
+      "name": "中大南门",
+      "nameEn": "Sun Yat-sen University South Entrance",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1008"
         }
       }
     },
@@ -6043,6 +7581,15 @@
         }
       }
     },
+    "82550366f521f4fe": {
+      "name": "钟落潭",
+      "nameEn": "Zhongluotan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1414"
+        }
+      }
+    },
     "8265da4ddec5c01d": {
       "name": "北新泾",
       "nameEn": "Beixinjing",
@@ -6053,6 +7600,15 @@
             "0238"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0238"
+        }
+      }
+    },
+    "82a2b11b00c2694f": {
+      "name": "夏港",
+      "nameEn": "Xiagang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "529"
         }
       }
     },
@@ -6080,6 +7636,15 @@
         }
       }
     },
+    "834b97d1ae7f5fc0": {
+      "name": "江夏",
+      "nameEn": "Jiangxia",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "222"
+        }
+      }
+    },
     "83686ce3b98db06e": {
       "name": "嫩江路",
       "nameEn": "Nenjiang Road",
@@ -6103,6 +7668,15 @@
             "1451"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1451"
+        }
+      }
+    },
+    "8379e8dcc7313df6": {
+      "name": "海珠广场",
+      "nameEn": "Haizhu Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "212"
         }
       }
     },
@@ -6167,6 +7741,15 @@
         }
       }
     },
+    "851dd0220a605347": {
+      "name": "会议中心",
+      "nameEn": "Convention Center",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP105"
+        }
+      }
+    },
     "851ec8b842913e11": {
       "name": "商城路",
       "nameEn": "Shangcheng Road",
@@ -6187,6 +7770,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999063",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999063"
+        }
+      }
+    },
+    "85363d5eb92690c7": {
+      "name": "新市墟",
+      "nameEn": "Xinshixu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1207"
+        }
+      }
+    },
+    "853f12c6af8ca55b": {
+      "name": "市民广场",
+      "nameEn": "Civic Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP104"
         }
       }
     },
@@ -6245,6 +7846,33 @@
         }
       }
     },
+    "86d715f2ee7e3a49": {
+      "name": "石潭",
+      "nameEn": "Shitan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "805"
+        }
+      }
+    },
+    "871883100b209bc8": {
+      "name": "洛溪",
+      "nameEn": "Luoxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "205"
+        }
+      }
+    },
+    "878748d2038e1d1c": {
+      "name": "南洲",
+      "nameEn": "Nanzhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "206"
+        }
+      }
+    },
     "87a8e432d6f3a58d": {
       "name": "新闸路",
       "nameEn": "Xinzha Road",
@@ -6286,6 +7914,42 @@
         }
       }
     },
+    "882146dc3759e91b": {
+      "name": "花都广场",
+      "nameEn": "Huadu Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "906"
+        }
+      }
+    },
+    "8856d2c426f0a5c0": {
+      "name": "飞翔公园",
+      "nameEn": "Feixiang Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "218"
+        }
+      }
+    },
+    "8860458fd53827f8": {
+      "name": "陈家祠",
+      "nameEn": "Chen Clan Academy",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "107"
+        }
+      }
+    },
+    "8874555b499cbae3": {
+      "name": "水西",
+      "nameEn": "Shuixi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "719"
+        }
+      }
+    },
     "8883766b6d382930": {
       "name": "太平庄",
       "nameEn": "Taipingzhuang",
@@ -6320,6 +7984,15 @@
             "1842"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1063"
+        }
+      }
+    },
+    "88ca72b2cd82b52f": {
+      "name": "大干围",
+      "nameEn": "Daganwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1004"
         }
       }
     },
@@ -6370,6 +8043,15 @@
         }
       }
     },
+    "89db4c945e55b309": {
+      "name": "坑口",
+      "nameEn": "Kengkou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "102"
+        }
+      }
+    },
     "8a185c16c394a0d4": {
       "name": "中华艺术宫",
       "nameEn": "China Art Museum",
@@ -6416,6 +8098,24 @@
         }
       }
     },
+    "8ae602352e2ac837": {
+      "name": "夏良",
+      "nameEn": "Xialiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1411"
+        }
+      }
+    },
+    "8b29ebaed94b3e3a": {
+      "name": "珠江新城",
+      "nameEn": "Zhujiang New Town",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "310"
+        }
+      }
+    },
     "8b33de3695986f6a": {
       "name": "长春桥",
       "nameEn": "Changchunqiao",
@@ -6423,6 +8123,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998041",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998041"
+        }
+      }
+    },
+    "8b58115334c07261": {
+      "name": "大观南路",
+      "nameEn": "Daguan Nanlu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2105"
         }
       }
     },
@@ -6460,6 +8169,15 @@
             "1228"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0313"
+        }
+      }
+    },
+    "8bd09116b53fa11f": {
+      "name": "桂城",
+      "nameEn": "Guicheng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "F324"
         }
       }
     },
@@ -6530,6 +8248,15 @@
             "1544"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1544"
+        }
+      }
+    },
+    "8cba02c4008a2ecc": {
+      "name": "高增",
+      "nameEn": "Gaozeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "328"
         }
       }
     },
@@ -6647,6 +8374,15 @@
         }
       }
     },
+    "8ef7cf8716ebea15": {
+      "name": "凤凰新村",
+      "nameEn": "Fenghuang Xincun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "816"
+        }
+      }
+    },
     "8f411591d49b8c86": {
       "name": "迎春路",
       "nameEn": "Yingchun Road",
@@ -6670,6 +8406,15 @@
             "0845"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0845"
+        }
+      }
+    },
+    "8f72ae3719af06c6": {
+      "name": "新南",
+      "nameEn": "Xinnan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1423"
         }
       }
     },
@@ -6737,6 +8482,24 @@
             "0112"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0112"
+        }
+      }
+    },
+    "9038ce3953653d5e": {
+      "name": "鹭江",
+      "nameEn": "Lujiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "822"
+        }
+      }
+    },
+    "904ec98e5d3f7846": {
+      "name": "沙贝",
+      "nameEn": "Shabei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "603"
         }
       }
     },
@@ -6844,6 +8607,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998057",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998057"
+        }
+      }
+    },
+    "91d3ae048637e55d": {
+      "name": "板桥",
+      "nameEn": "Banqiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "708"
         }
       }
     },
@@ -6957,6 +8729,15 @@
         }
       }
     },
+    "934586d74f2bfd06": {
+      "name": "钟村",
+      "nameEn": "Zhongcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "704"
+        }
+      }
+    },
     "93d483fa432ac659": {
       "name": "抚顺路",
       "nameEn": "Fushun Road",
@@ -6981,6 +8762,15 @@
             "1232"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0936"
+        }
+      }
+    },
+    "94b411d8c74f2e37": {
+      "name": "广州体育馆",
+      "nameEn": "Guangzhou Gymnasium",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1209"
         }
       }
     },
@@ -7024,6 +8814,15 @@
         }
       }
     },
+    "95a9e9f79c385239": {
+      "name": "枫下",
+      "nameEn": "Fengxia",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1424"
+        }
+      }
+    },
     "95c1750fc9ec1d21": {
       "name": "將軍澳",
       "nameEn": "Tseung Kwan O",
@@ -7061,6 +8860,24 @@
         }
       }
     },
+    "96411d2b2cd3ef52": {
+      "name": "北滘公园",
+      "nameEn": "Beijiao Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-7"
+        }
+      }
+    },
+    "96844e5daaad6726": {
+      "name": "体育西路",
+      "nameEn": "Tiyu Xilu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "114"
+        }
+      }
+    },
     "96930a07de4a3cc5": {
       "name": "农业展览馆",
       "nameEn": "Agricultural Exhibition Center",
@@ -7071,6 +8888,33 @@
         }
       }
     },
+    "97031ca7ad3974a3": {
+      "name": "车陂南",
+      "nameEn": "Chebeinan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "422"
+        }
+      }
+    },
+    "970d6f075d96ec30": {
+      "name": "流花",
+      "nameEn": "Liuhua",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1115"
+        }
+      }
+    },
+    "979d42a7dd08ffd1": {
+      "name": "金峰",
+      "nameEn": "Jinfeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "628"
+        }
+      }
+    },
     "983302a50e7a70e5": {
       "name": "良乡南关",
       "nameEn": "Liangxiang Nanguan",
@@ -7078,6 +8922,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151019303",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019303"
+        }
+      }
+    },
+    "984b44851b6f77e9": {
+      "name": "逸景路",
+      "nameEn": "Yijing Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1128"
         }
       }
     },
@@ -7101,6 +8954,24 @@
             "1521"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1521"
+        }
+      }
+    },
+    "98b554ae44abc76b": {
+      "name": "嘉禾望岗",
+      "nameEn": "Jiahewanggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "224"
+        }
+      }
+    },
+    "98e5b3ca70c5ed6e": {
+      "name": "南岗",
+      "nameEn": "Nangang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1329"
         }
       }
     },
@@ -7164,6 +9035,15 @@
         }
       }
     },
+    "9a17acc55340dc26": {
+      "name": "长岭居小学",
+      "nameEn": "Changlingju Primary School",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP112"
+        }
+      }
+    },
     "9a913b614df06ad4": {
       "name": "欣澳",
       "nameEn": "Sunny Bay",
@@ -7188,6 +9068,24 @@
             "1633"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1633"
+        }
+      }
+    },
+    "9aebca3c5e2dc3da": {
+      "name": "横沥",
+      "nameEn": "Hengli",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1802"
+        }
+      }
+    },
+    "9b257138a78f5f02": {
+      "name": "淘金",
+      "nameEn": "Taojin",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "508"
         }
       }
     },
@@ -7238,6 +9136,15 @@
         }
       }
     },
+    "9ba0e298e2b46dba": {
+      "name": "金融高新区",
+      "nameEn": "Financial Hi-Tech Zone",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF15"
+        }
+      }
+    },
     "9ba8a4016ef608d3": {
       "name": "十里河",
       "nameEn": "Shilihe",
@@ -7259,6 +9166,15 @@
             "1846"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0331"
+        }
+      }
+    },
+    "9c002d65a6f2570d": {
+      "name": "大洲",
+      "nameEn": "Dazhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-1"
         }
       }
     },
@@ -7295,6 +9211,15 @@
         }
       }
     },
+    "9c9dceb7e0d11b07": {
+      "name": "黄埔大道",
+      "nameEn": "Huangpu Dadao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM06"
+        }
+      }
+    },
     "9ca64bac74fc9224": {
       "name": "磁器口",
       "nameEn": "Ciqikou",
@@ -7326,6 +9251,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998817",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998817"
+        }
+      }
+    },
+    "9d7022cb6dfdfc0e": {
+      "name": "石溪",
+      "nameEn": "Shixi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF23"
         }
       }
     },
@@ -7398,6 +9332,15 @@
         }
       }
     },
+    "9e4ed94c43dfb8c1": {
+      "name": "清㘵",
+      "nameEn": "Qingbu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "909"
+        }
+      }
+    },
     "9e55f8497dd0d608": {
       "name": "柳芳",
       "nameEn": "Liufang",
@@ -7419,6 +9362,15 @@
               "stationCode": "230"
             }
           ]
+        }
+      }
+    },
+    "9e7e6cb3d45034ef": {
+      "name": "鹤洞",
+      "nameEn": "Hedong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF19"
         }
       }
     },
@@ -7508,6 +9460,15 @@
         }
       }
     },
+    "9ffb4c2079414f83": {
+      "name": "萧岗",
+      "nameEn": "Xiao-gang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "221"
+        }
+      }
+    },
     "a031a53acaf0f6f9": {
       "name": "漕宝路",
       "nameEn": "Caobao Road",
@@ -7519,6 +9480,15 @@
             "1227"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0116"
+        }
+      }
+    },
+    "a04b09e9968c85c3": {
+      "name": "花城路",
+      "nameEn": "Huachenglu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "904"
         }
       }
     },
@@ -7547,6 +9517,15 @@
               "stationCode": "540"
             }
           ]
+        }
+      }
+    },
+    "a0e019b5ee64cc00": {
+      "name": "如意坊",
+      "nameEn": "Ruyifang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "606"
         }
       }
     },
@@ -7595,6 +9574,15 @@
         }
       }
     },
+    "a210ef968a7f25b9": {
+      "name": "黄阁",
+      "nameEn": "Huangge",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "409"
+        }
+      }
+    },
     "a26166dda3906086": {
       "name": "宋园路",
       "nameEn": "Songyuan Road",
@@ -7605,6 +9593,15 @@
             "1048"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1048"
+        }
+      }
+    },
+    "a2a66938b48af59f": {
+      "name": "陈头岗",
+      "nameEn": "Chentougang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2204"
         }
       }
     },
@@ -7685,6 +9682,15 @@
         }
       }
     },
+    "a3b0a776eb3db4cd": {
+      "name": "长寿路",
+      "nameEn": "Changshou Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "106"
+        }
+      }
+    },
     "a42091a129a346cf": {
       "name": "静安寺",
       "nameEn": "Jing'an Temple",
@@ -7710,6 +9716,15 @@
             "1427"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1427"
+        }
+      }
+    },
+    "a4605b977edfd63b": {
+      "name": "晓港",
+      "nameEn": "Xiaogang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "820"
         }
       }
     },
@@ -7747,6 +9762,15 @@
         }
       }
     },
+    "a5456259ee4503d2": {
+      "name": "开源大道东",
+      "nameEn": "Kaiyuan Road East",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP208"
+        }
+      }
+    },
     "a55cb7d258b33b71": {
       "name": "車公廟",
       "nameEn": "Che Kung Temple",
@@ -7771,6 +9795,15 @@
             "1548"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1548"
+        }
+      }
+    },
+    "a5b652da903b713d": {
+      "name": "长洲",
+      "nameEn": "Changzhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "711"
         }
       }
     },
@@ -7854,6 +9887,15 @@
         }
       }
     },
+    "a84b1d997df8333b": {
+      "name": "沥滘",
+      "nameEn": "Lijiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "306"
+        }
+      }
+    },
     "a870111984f1f2ef": {
       "name": "上海国际旅游度假区",
       "nameEn": "Shanghai International Resort",
@@ -7864,6 +9906,15 @@
             "5136"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=5136"
+        }
+      }
+    },
+    "a881e081f4df3397": {
+      "name": "大剧院",
+      "nameEn": "Guangzhou Opera House",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM03"
         }
       }
     },
@@ -7878,6 +9929,15 @@
               "stationCode": "350"
             }
           ]
+        }
+      }
+    },
+    "a88a7c385e33f0f6": {
+      "name": "贤江",
+      "nameEn": "Xianjiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP118"
         }
       }
     },
@@ -7957,6 +10017,24 @@
         }
       }
     },
+    "a9da4c059929dcaa": {
+      "name": "白云文化广场",
+      "nameEn": "Baiyun Culture Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "220"
+        }
+      }
+    },
+    "a9fe5c65a52ce680": {
+      "name": "人和",
+      "nameEn": "Renhe",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "327"
+        }
+      }
+    },
     "aa055d3ae5f2c5ea": {
       "name": "共康路",
       "nameEn": "Gongkang Road",
@@ -7994,6 +10072,15 @@
         }
       }
     },
+    "aba37363fcb87dcc": {
+      "name": "西村",
+      "nameEn": "Xicun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "505"
+        }
+      }
+    },
     "ac1d2a0a6312a818": {
       "name": "白石桥南",
       "nameEn": "Baishiqiao South",
@@ -8011,6 +10098,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996783",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996783"
+        }
+      }
+    },
+    "ac4c2adff0164260": {
+      "name": "工业大道南",
+      "nameEn": "Gongye Avenue South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1005"
         }
       }
     },
@@ -8047,6 +10143,24 @@
         }
       }
     },
+    "ac961ac166e47ef8": {
+      "name": "赤岗塔",
+      "nameEn": "Chigang Pagoda",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1218"
+        }
+      }
+    },
+    "aca6b62f05db3fc6": {
+      "name": "黄花岗",
+      "nameEn": "Huanghuagang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "616"
+        }
+      }
+    },
     "acbdd087a26126ca": {
       "name": "上海大学",
       "nameEn": "Shanghai University",
@@ -8070,6 +10184,15 @@
             "0114"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0114"
+        }
+      }
+    },
+    "acd993e7880de2ca": {
+      "name": "花都汽车城",
+      "nameEn": "Huadu Auto City",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "902"
         }
       }
     },
@@ -8105,6 +10228,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998555",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998555"
+        }
+      }
+    },
+    "ad5089c89a81bcd1": {
+      "name": "钟岗",
+      "nameEn": "Zhonggang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2120"
         }
       }
     },
@@ -8160,6 +10292,15 @@
         }
       }
     },
+    "aed4a322b8804831": {
+      "name": "世纪莲",
+      "nameEn": "Shijilian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF03"
+        }
+      }
+    },
     "aedb89f2c80621b3": {
       "name": "八里桥",
       "nameEn": "Baliqiao",
@@ -8211,6 +10352,24 @@
         }
       }
     },
+    "af80ef55de0271e2": {
+      "name": "官洲",
+      "nameEn": "Guanzhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "420"
+        }
+      }
+    },
+    "afbc4d2227ed3a58": {
+      "name": "区庄",
+      "nameEn": "Ouzhuang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "509"
+        }
+      }
+    },
     "afdd179a32b6333e": {
       "name": "宝山路",
       "nameEn": "Baoshan Road",
@@ -8222,6 +10381,15 @@
             "0411"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0324"
+        }
+      }
+    },
+    "aff1c7758a5fb552": {
+      "name": "上步",
+      "nameEn": "Shangbu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "807"
         }
       }
     },
@@ -8255,6 +10423,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996799",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996799"
+        }
+      }
+    },
+    "b0b1a8148a249957": {
+      "name": "北京路",
+      "nameEn": "Beijing Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "611"
         }
       }
     },
@@ -8292,6 +10469,24 @@
         }
       }
     },
+    "b0ea9aa7ffadc756": {
+      "name": "科韵路",
+      "nameEn": "Keyun Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "517"
+        }
+      }
+    },
+    "b118c802a4521fdd": {
+      "name": "南漖",
+      "nameEn": "Nanjiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2206"
+        }
+      }
+    },
     "b190a504ecbc3f8c": {
       "name": "康桥",
       "nameEn": "Kangqiao",
@@ -8318,6 +10513,15 @@
         }
       }
     },
+    "b1fbccfd627850f3": {
+      "name": "西塱",
+      "nameEn": "Xilang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "101"
+        }
+      }
+    },
     "b244b60d256dd5ad": {
       "name": "元江路",
       "nameEn": "Yuanjiang Road",
@@ -8338,6 +10542,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997035",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997035"
+        }
+      }
+    },
+    "b2a383bb2e10c965": {
+      "name": "沙溪",
+      "nameEn": "Shaxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1805"
+        }
+      }
+    },
+    "b2b3fd2e73fb4ed0": {
+      "name": "旺村",
+      "nameEn": "Wangcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1427"
         }
       }
     },
@@ -8379,6 +10601,15 @@
         }
       }
     },
+    "b3d321f50e54a6eb": {
+      "name": "横沙",
+      "nameEn": "Hengsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "602"
+        }
+      }
+    },
     "b45bef356fc92bd3": {
       "name": "张江高科",
       "nameEn": "Zhangjiang Hi-Tech Park",
@@ -8389,6 +10620,15 @@
             "0253"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0253"
+        }
+      }
+    },
+    "b460c278071d5fe9": {
+      "name": "聚龙",
+      "nameEn": "Julong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "806"
         }
       }
     },
@@ -8430,6 +10670,15 @@
             "0502"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0502"
+        }
+      }
+    },
+    "b50f8a19376657c7": {
+      "name": "祖庙",
+      "nameEn": "Zumiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF08"
         }
       }
     },
@@ -8576,6 +10825,15 @@
         }
       }
     },
+    "b6b0fdb073a0b0be": {
+      "name": "天平架",
+      "nameEn": "Tianpingjia",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "619"
+        }
+      }
+    },
     "b6f0d07e3f1f8c80": {
       "name": "亦创会展中心",
       "nameEn": "Beijing Etrang Intrenational Exhibition & Convention Center",
@@ -8583,6 +10841,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "151015195",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151015195"
+        }
+      }
+    },
+    "b71a393824b7df1b": {
+      "name": "大塘",
+      "nameEn": "Datang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "307"
+        }
+      }
+    },
+    "b73eb26166c8e058": {
+      "name": "体育中心南",
+      "nameEn": "Tianhe Sports Center South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM08"
         }
       }
     },
@@ -8628,6 +10904,15 @@
         }
       }
     },
+    "b80e76962e916999": {
+      "name": "山田",
+      "nameEn": "Shantian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2119"
+        }
+      }
+    },
     "b81987388cf80fd5": {
       "name": "德茂",
       "nameEn": "Demao",
@@ -8648,6 +10933,15 @@
         }
       }
     },
+    "b8b4b7f1386de708": {
+      "name": "磨碟沙",
+      "nameEn": "Modiesha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "825"
+        }
+      }
+    },
     "b8fbb5d4ba2bdb8a": {
       "name": "安河桥北",
       "nameEn": "Anheqiaobei",
@@ -8665,6 +10959,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996497",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996497"
+        }
+      }
+    },
+    "b953b62a5b2d335b": {
+      "name": "大沙地",
+      "nameEn": "Dashadi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "522"
         }
       }
     },
@@ -8722,6 +11025,27 @@
         "beijingSubwayOnline": {
           "externalStationID": "151019547",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019547"
+        }
+      }
+    },
+    "bae543c2b7e6db7d": {
+      "name": "棠东",
+      "nameEn": "Tangdong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2103"
+        }
+      }
+    },
+    "bae5b2f82c467959": {
+      "name": "𧒽岗",
+      "nameEn": "Leigang",
+      "aliases": [
+        "虫雷 岗"
+      ],
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF13"
         }
       }
     },
@@ -8786,6 +11110,15 @@
         }
       }
     },
+    "bba69b2bb626fdfa": {
+      "name": "南横",
+      "nameEn": "Nanheng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "402"
+        }
+      }
+    },
     "bbfe183fc2b4ca4a": {
       "name": "望京西",
       "nameEn": "Wangjing West",
@@ -8793,6 +11126,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999327",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999327"
+        }
+      }
+    },
+    "bc403f06357c9333": {
+      "name": "鱼珠",
+      "nameEn": "Yuzhu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "521"
         }
       }
     },
@@ -8843,6 +11185,15 @@
             "0633"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0633"
+        }
+      }
+    },
+    "bcd5e981fad66347": {
+      "name": "马务",
+      "nameEn": "Mawu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1405"
         }
       }
     },
@@ -8963,6 +11314,24 @@
         }
       }
     },
+    "bee35e0b249db2e2": {
+      "name": "黄埔图书馆",
+      "nameEn": "Huangpu Library",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP202"
+        }
+      }
+    },
+    "bee8604b22ad9dac": {
+      "name": "天河南",
+      "nameEn": "Tianhenan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM07"
+        }
+      }
+    },
     "bef5d7751e2ea0cf": {
       "name": "打浦桥",
       "nameEn": "Dapuqiao",
@@ -8987,6 +11356,15 @@
               "stationCode": "425"
             }
           ]
+        }
+      }
+    },
+    "bf4d583bc98600be": {
+      "name": "龙口西",
+      "nameEn": "Longkouxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1107"
         }
       }
     },
@@ -9054,6 +11432,15 @@
         }
       }
     },
+    "c0e11683f261dbb5": {
+      "name": "同福西",
+      "nameEn": "Tongfuxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "815"
+        }
+      }
+    },
     "c0fbae04468a49b2": {
       "name": "粉嶺",
       "nameEn": "Fanling",
@@ -9088,6 +11475,15 @@
             "0640"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0640"
+        }
+      }
+    },
+    "c226dfe469519ec7": {
+      "name": "滘口",
+      "nameEn": "Jiaokou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "501"
         }
       }
     },
@@ -9289,6 +11685,36 @@
         }
       }
     },
+    "c68955ac4f1ad1d7": {
+      "name": "庆盛",
+      "nameEn": "Qingsheng",
+      "aliases": [
+        "庆盛（南沙北站）"
+      ],
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "411"
+        }
+      }
+    },
+    "c6d8e310a4c3216d": {
+      "name": "大金钟路",
+      "nameEn": "Dajinzhong Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1111"
+        }
+      }
+    },
+    "c6f71723d5dce5dc": {
+      "name": "西洲",
+      "nameEn": "Xizhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1203"
+        }
+      }
+    },
     "c73ab5cf38f9ddb0": {
       "name": "隆昌路",
       "nameEn": "Longchang Road",
@@ -9313,6 +11739,15 @@
               "stationCode": "TAP"
             }
           ]
+        }
+      }
+    },
+    "c79d9dd67c79dd72": {
+      "name": "番禺广场",
+      "nameEn": "Panyu Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "301"
         }
       }
     },
@@ -9402,6 +11837,15 @@
         }
       }
     },
+    "c975633631b6e6e4": {
+      "name": "大沙东",
+      "nameEn": "Dashadong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "523"
+        }
+      }
+    },
     "c9807090d23c39d9": {
       "name": "曲阳路",
       "nameEn": "Quyang Road",
@@ -9427,6 +11871,15 @@
             "5131"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0236"
+        }
+      }
+    },
+    "ca3cf39367b25bdd": {
+      "name": "萝峰",
+      "nameEn": "Luofeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP204"
         }
       }
     },
@@ -9467,6 +11920,15 @@
         }
       }
     },
+    "caa0692db28e54e4": {
+      "name": "塘坑",
+      "nameEn": "Tangkeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "403"
+        }
+      }
+    },
     "cab3ced1b8c7363b": {
       "name": "桥户营",
       "nameEn": "Qiaohuying",
@@ -9474,6 +11936,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151018269",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151018269"
+        }
+      }
+    },
+    "cabb92e2a3cf3dab": {
+      "name": "菊树",
+      "nameEn": "Jushu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF17"
         }
       }
     },
@@ -9497,6 +11968,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997781",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997781"
+        }
+      }
+    },
+    "cb570ee4e3cca51d": {
+      "name": "文化公园",
+      "nameEn": "Cultural Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "608"
+        }
+      }
+    },
+    "cbdf2a51b309fc78": {
+      "name": "新和",
+      "nameEn": "Xinhe",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1416"
         }
       }
     },
@@ -9658,6 +12147,24 @@
         }
       }
     },
+    "ce164e6523860161": {
+      "name": "滘心",
+      "nameEn": "Jiaoxin",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "801"
+        }
+      }
+    },
+    "ce8710b43fb86df1": {
+      "name": "广州北站",
+      "nameEn": "Guangzhou North Railway Station",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "903"
+        }
+      }
+    },
     "ce8b7b5ed01c18f4": {
       "name": "烏溪沙",
       "nameEn": "Wu Kai Sha",
@@ -9685,6 +12192,42 @@
         }
       }
     },
+    "ceddbe77f8dec7c9": {
+      "name": "滨江东路",
+      "nameEn": "Binjiang East Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1009"
+        }
+      }
+    },
+    "cefa6ccb37cb6646": {
+      "name": "纪念堂",
+      "nameEn": "Sun Yat-Sen Memorial Hall",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "214"
+        }
+      }
+    },
+    "cfa9daead90fd107": {
+      "name": "南沙客运港",
+      "nameEn": "Nansha Passenger Port",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "401"
+        }
+      }
+    },
+    "cfd18ebc5106ecb9": {
+      "name": "长平",
+      "nameEn": "Changping",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "2111"
+        }
+      }
+    },
     "cfd235c2e126af60": {
       "name": "灵境胡同",
       "nameEn": "Lingjing Hutong",
@@ -9695,6 +12238,15 @@
         }
       }
     },
+    "cfed527932cc5867": {
+      "name": "北师大实验学校",
+      "nameEn": "Guangzhou Experimental School Affiliated to BNU",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP109"
+        }
+      }
+    },
     "d0487791cd334ff4": {
       "name": "车道沟",
       "nameEn": "Chedaogou",
@@ -9702,6 +12254,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "151018047",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151018047"
+        }
+      }
+    },
+    "d094f9532f5e403d": {
+      "name": "动物园",
+      "nameEn": "Zoo",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "510"
         }
       }
     },
@@ -9730,6 +12291,15 @@
               "stationCode": "YAT"
             }
           ]
+        }
+      }
+    },
+    "d12a6002e9205fa3": {
+      "name": "河沙",
+      "nameEn": "Hesha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "604"
         }
       }
     },
@@ -9770,6 +12340,15 @@
         }
       }
     },
+    "d1b7985e2250d485": {
+      "name": "员村",
+      "nameEn": "Yuancun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "516"
+        }
+      }
+    },
     "d208b0cb4d4cbe14": {
       "name": "前门",
       "nameEn": "Qianmen",
@@ -9777,6 +12356,33 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997039",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997039"
+        }
+      }
+    },
+    "d2171b9c33b1cb5e": {
+      "name": "梅花园",
+      "nameEn": "Meihuayuan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "320"
+        }
+      }
+    },
+    "d25b4a602bc3393a": {
+      "name": "棣园",
+      "nameEn": "Diyuan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1124"
+        }
+      }
+    },
+    "d29c52424230404d": {
+      "name": "五凤",
+      "nameEn": "Wufeng",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1007"
         }
       }
     },
@@ -9804,6 +12410,15 @@
         }
       }
     },
+    "d3a5b2fa80b1a556": {
+      "name": "峻泰路",
+      "nameEn": "Juntai Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP107"
+        }
+      }
+    },
     "d3acdfe9e858fdf2": {
       "name": "湾子",
       "nameEn": "Wanzi",
@@ -9824,6 +12439,42 @@
             "0837"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0837"
+        }
+      }
+    },
+    "d3e5ebb66b6852bc": {
+      "name": "镇龙",
+      "nameEn": "Zhenlong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1430"
+        }
+      }
+    },
+    "d41ed5739df15fbf": {
+      "name": "东涌",
+      "nameEn": "Dongchong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "412"
+        }
+      }
+    },
+    "d424628519b3aac9": {
+      "name": "红卫",
+      "nameEn": "Hongwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1422"
+        }
+      }
+    },
+    "d426ceef93d88cbf": {
+      "name": "沙河",
+      "nameEn": "Shahe",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "618"
         }
       }
     },
@@ -9898,6 +12549,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998297",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998297"
+        }
+      }
+    },
+    "d53fedad3ea737ed": {
+      "name": "广州白云站",
+      "nameEn": "Guangzhou Baiyun Railway Station",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1205"
+        }
+      }
+    },
+    "d59e5dfb290bddd8": {
+      "name": "加庄",
+      "nameEn": "Jiazhuang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "716"
         }
       }
     },
@@ -10004,6 +12673,15 @@
         }
       }
     },
+    "d71f6078b10148e0": {
+      "name": "美的",
+      "nameEn": "Midea",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-6"
+        }
+      }
+    },
     "d7246943398db4b7": {
       "name": "左家庄",
       "nameEn": "Zuojiazhuang",
@@ -10060,6 +12738,24 @@
         }
       }
     },
+    "d7b617d7a734e0cb": {
+      "name": "龙溪",
+      "nameEn": "Longxi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF16"
+        }
+      }
+    },
+    "d81a4b586875aaef": {
+      "name": "鹤边",
+      "nameEn": "Hebian",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1406"
+        }
+      }
+    },
     "d82c92024c2fde16": {
       "name": "万泉河桥",
       "nameEn": "Wanquanhe Qiao",
@@ -10077,6 +12773,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150998821",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998821"
+        }
+      }
+    },
+    "d86f8d2b8aa8d079": {
+      "name": "坦尾",
+      "nameEn": "Tanwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "502"
         }
       }
     },
@@ -10103,6 +12808,15 @@
         }
       }
     },
+    "d9112e5960ffc99f": {
+      "name": "同德",
+      "nameEn": "Tongde",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "808"
+        }
+      }
+    },
     "d92748dcd9ec09a7": {
       "name": "五洲大道",
       "nameEn": "Wuzhou Avenue",
@@ -10116,6 +12830,15 @@
         }
       }
     },
+    "d949a1b924c0bf4c": {
+      "name": "琶醍",
+      "nameEn": "Party Pier",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THZ103"
+        }
+      }
+    },
     "d9754e28d0d678bf": {
       "name": "祁连山南路",
       "nameEn": "South Qilianshan Road",
@@ -10126,6 +12849,15 @@
             "1324"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1324"
+        }
+      }
+    },
+    "d9880b4789c136ef": {
+      "name": "团一大广场",
+      "nameEn": "Tuanyida Square",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "612"
         }
       }
     },
@@ -10164,6 +12896,24 @@
         }
       }
     },
+    "da567145b647c5a6": {
+      "name": "龙潭",
+      "nameEn": "Longtan",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1131"
+        }
+      }
+    },
+    "da7ade8fbd193e08": {
+      "name": "魁奇路",
+      "nameEn": "Kuiqi Lu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "F218"
+        }
+      }
+    },
     "da949cec4e0d8945": {
       "name": "朱梅路",
       "nameEn": "Zhumei Road",
@@ -10174,6 +12924,15 @@
             "1529"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1529"
+        }
+      }
+    },
+    "daceb33eec49303b": {
+      "name": "赤草",
+      "nameEn": "Chicao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1419"
         }
       }
     },
@@ -10197,6 +12956,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "151020057",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151020057"
+        }
+      }
+    },
+    "db7831e0c1dc026e": {
+      "name": "新沙",
+      "nameEn": "Xinsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1334"
+        }
+      }
+    },
+    "dbb72dcb52de9e7c": {
+      "name": "莲塘",
+      "nameEn": "Liantang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "908"
         }
       }
     },
@@ -10268,6 +13045,18 @@
         }
       }
     },
+    "de2b674ffab0e407": {
+      "name": "机场北",
+      "nameEn": "Airport North",
+      "aliases": [
+        "机场北（T2）"
+      ],
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "330"
+        }
+      }
+    },
     "de9aa5bd0be60b10": {
       "name": "惠新西街南口",
       "nameEn": "Huixinxijie Nankou",
@@ -10288,6 +13077,15 @@
             "0747"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0747"
+        }
+      }
+    },
+    "ded06f1fccde3dfd": {
+      "name": "飞鹅岭",
+      "nameEn": "Fei'eling",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "901"
         }
       }
     },
@@ -10406,6 +13204,15 @@
         }
       }
     },
+    "e154c81be5c7c772": {
+      "name": "赤沙",
+      "nameEn": "Chisha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1101"
+        }
+      }
+    },
     "e182a5d9fd05e342": {
       "name": "上環",
       "nameEn": "Sheung Wan",
@@ -10446,6 +13253,24 @@
         }
       }
     },
+    "e1d393320b289cad": {
+      "name": "市二宫",
+      "nameEn": "The 2nd Workers' Cultural Palace",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "211"
+        }
+      }
+    },
+    "e20d6fa571399811": {
+      "name": "何棠下",
+      "nameEn": "Hetangxia",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1426"
+        }
+      }
+    },
     "e211a2e012932df9": {
       "name": "森林公园南门",
       "nameEn": "Forest Park South Gate",
@@ -10453,6 +13278,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997015",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997015"
+        }
+      }
+    },
+    "e26a5f0e3dfff470": {
+      "name": "石井",
+      "nameEn": "Shijing",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "803"
         }
       }
     },
@@ -10502,6 +13336,15 @@
             "0940"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0940"
+        }
+      }
+    },
+    "e432b5cca84e3405": {
+      "name": "神岗",
+      "nameEn": "Shengang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1418"
         }
       }
     },
@@ -10575,6 +13418,15 @@
         }
       }
     },
+    "e55e62117138a2ef": {
+      "name": "锦龙",
+      "nameEn": "Jinlong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "701-4"
+        }
+      }
+    },
     "e568f5fd6a495bcb": {
       "name": "延安西路",
       "nameEn": "West Yan'an Road",
@@ -10586,6 +13438,15 @@
             "0404"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0317"
+        }
+      }
+    },
+    "e56d69c4121ef49b": {
+      "name": "镇龙北",
+      "nameEn": "Zhenlongbei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1429"
         }
       }
     },
@@ -10657,6 +13518,15 @@
         }
       }
     },
+    "e7ad415b387e1b82": {
+      "name": "南浦",
+      "nameEn": "Nanpu",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "204"
+        }
+      }
+    },
     "e7bad4bf34d1d922": {
       "name": "白盆窑",
       "nameEn": "Baipenyao",
@@ -10697,6 +13567,15 @@
         }
       }
     },
+    "e84872e713df3044": {
+      "name": "干部健康中心",
+      "nameEn": "Guangzhou Cadre Health Management Center",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP114"
+        }
+      }
+    },
     "e8562e2540c2ef97": {
       "name": "将台",
       "nameEn": "Jiangtai",
@@ -10717,6 +13596,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999317",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999317"
+        }
+      }
+    },
+    "e8eee36cc1b8d986": {
+      "name": "厦滘",
+      "nameEn": "Xiajiao",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "305"
         }
       }
     },
@@ -10744,6 +13632,15 @@
         }
       }
     },
+    "e9b060b3cedab7e6": {
+      "name": "黄村",
+      "nameEn": "Huangcun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "424"
+        }
+      }
+    },
     "e9bc94eeeae1f41a": {
       "name": "漕溪路",
       "nameEn": "Caoxi Road",
@@ -10768,6 +13665,15 @@
             "1147"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0242"
+        }
+      }
+    },
+    "e9e6bf41b395f230": {
+      "name": "谢村",
+      "nameEn": "Xiecun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "703"
         }
       }
     },
@@ -10816,6 +13722,15 @@
         }
       }
     },
+    "ea9d1c7e12543a70": {
+      "name": "冼村",
+      "nameEn": "Xiancun",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1808"
+        }
+      }
+    },
     "eab2189f82ea2fba": {
       "name": "姚家园",
       "nameEn": "Yaojiayuan",
@@ -10823,6 +13738,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150995745",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150995745"
+        }
+      }
+    },
+    "eabd65116729d53e": {
+      "name": "燕岗",
+      "nameEn": "Yangang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1125"
         }
       }
     },
@@ -10880,6 +13804,24 @@
         }
       }
     },
+    "ec0d763a391f6a91": {
+      "name": "乐嘉路",
+      "nameEn": "Lejia Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1402"
+        }
+      }
+    },
+    "ec10611b628f7857": {
+      "name": "万顷沙",
+      "nameEn": "Wanqingsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1801"
+        }
+      }
+    },
     "ec46d6541bf95bdc": {
       "name": "大红门南",
       "nameEn": "Dahongmen Nan(South)",
@@ -10887,6 +13829,24 @@
         "beijingSubwayOnline": {
           "externalStationID": "150997053",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150997053"
+        }
+      }
+    },
+    "ec713ea9f059bf6d": {
+      "name": "裕丰围",
+      "nameEn": "Yufengwei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "713"
+        }
+      }
+    },
+    "ec87307f6f75faeb": {
+      "name": "南桂路",
+      "nameEn": "Nangui Road",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "GF12"
         }
       }
     },
@@ -10901,6 +13861,15 @@
               "stationCode": "TSY"
             }
           ]
+        }
+      }
+    },
+    "edda824b14102807": {
+      "name": "大学城南",
+      "nameEn": "Higher Education Mega Center South",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "418"
         }
       }
     },
@@ -10934,6 +13903,15 @@
             "1724"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=1724"
+        }
+      }
+    },
+    "ee48693ee7b79e25": {
+      "name": "贤江公园",
+      "nameEn": "Xianjiang Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "THP117"
         }
       }
     },
@@ -11061,6 +14039,15 @@
         }
       }
     },
+    "f07a2fbeeee5f7e2": {
+      "name": "白云大道北",
+      "nameEn": "Baiyun Dadaobei",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "324"
+        }
+      }
+    },
     "f08e0bf05784078f": {
       "name": "黄村西大街",
       "nameEn": "Huangcun Xidajie",
@@ -11134,6 +14121,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150999115",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999115"
+        }
+      }
+    },
+    "f1c35c8bd2bbcb4d": {
+      "name": "大石",
+      "nameEn": "Dashi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "304"
         }
       }
     },
@@ -11267,6 +14263,15 @@
         }
       }
     },
+    "f47bfb4bf104a5bc": {
+      "name": "傍江",
+      "nameEn": "Bangjiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "301-1"
+        }
+      }
+    },
     "f4c724d609249136": {
       "name": "石門",
       "nameEn": "Shek Mun",
@@ -11321,6 +14326,24 @@
         }
       }
     },
+    "f55e0dac208674fc": {
+      "name": "琶洲",
+      "nameEn": "Pazhou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "827"
+        }
+      }
+    },
+    "f56eab7e97fb5b7a": {
+      "name": "石壁",
+      "nameEn": "Shibi",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "202"
+        }
+      }
+    },
     "f58eb217b39170fc": {
       "name": "衡山路",
       "nameEn": "Hengshan Road",
@@ -11357,6 +14380,15 @@
             "0922"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0922"
+        }
+      }
+    },
+    "f64356de18123063": {
+      "name": "妇儿中心",
+      "nameEn": "Guangzhou Women and Children's Medical Center",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "APM05"
         }
       }
     },
@@ -11470,6 +14502,15 @@
         }
       }
     },
+    "f7e40f4f83288488": {
+      "name": "云台花园",
+      "nameEn": "Yuntai Garden",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1110"
+        }
+      }
+    },
     "f8039a3210e0f0a9": {
       "name": "堅尼地城",
       "nameEn": "Kennedy Town",
@@ -11568,6 +14609,15 @@
             "0507"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0507"
+        }
+      }
+    },
+    "f9af39bdac379780": {
+      "name": "广州南站",
+      "nameEn": "Guangzhou South Railway Station",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "201"
         }
       }
     },
@@ -11674,6 +14724,15 @@
         }
       }
     },
+    "fb617acdbc73258b": {
+      "name": "新港东",
+      "nameEn": "Xingangdong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "826"
+        }
+      }
+    },
     "fb64cb0d59e32a0a": {
       "name": "青雲",
       "nameEn": "Tsing Wun",
@@ -11711,6 +14770,15 @@
         }
       }
     },
+    "fbdec5018ee9c815": {
+      "name": "会江",
+      "nameEn": "Huijiang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "203"
+        }
+      }
+    },
     "fc3720296241d7f5": {
       "name": "洞泾",
       "nameEn": "Dongjing",
@@ -11735,6 +14803,24 @@
             "0935"
           ],
           "sourcePageURL": "https://service.shmetro.com/czxx/index.htm?id=0741"
+        }
+      }
+    },
+    "fc41b70d1c95ac50": {
+      "name": "梓元岗",
+      "nameEn": "Ziyuangang",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1113"
+        }
+      }
+    },
+    "fd0e91eed5984b8f": {
+      "name": "天河公园",
+      "nameEn": "Tianhe Park",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1104"
         }
       }
     },
@@ -11805,6 +14891,15 @@
         }
       }
     },
+    "fe526a01b3577027": {
+      "name": "棠涌",
+      "nameEn": "Tangchong",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1206"
+        }
+      }
+    },
     "fe7a7b9e98111de1": {
       "name": "新宫",
       "nameEn": "Xin'Gong",
@@ -11863,6 +14958,15 @@
         }
       }
     },
+    "fed76fe0482fefbc": {
+      "name": "大冲口",
+      "nameEn": "Dachongkou",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1121"
+        }
+      }
+    },
     "feda84848b4c6987": {
       "name": "美孚",
       "nameEn": "Mei Foo",
@@ -11884,6 +14988,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996767",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996767"
+        }
+      }
+    },
+    "ff1be8d5819b04c4": {
+      "name": "东沙",
+      "nameEn": "Dongsha",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "1003"
         }
       }
     },
@@ -11941,6 +15054,15 @@
         "beijingSubwayOnline": {
           "externalStationID": "150996997",
           "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996997"
+        }
+      }
+    },
+    "ffea092f418e0edc": {
+      "name": "深井",
+      "nameEn": "Shenjing",
+      "sources": {
+        "guangzhouMetroOnline": {
+          "externalStationID": "710"
         }
       }
     },

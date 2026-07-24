@@ -83,15 +83,11 @@
 		A1000074 /* Components/Transit/StepControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000074 /* Components/Transit/StepControls.swift */; };
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
 		A1000070 /* Route/SmartCommuteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070 /* Route/SmartCommuteCard.swift */; };
-		A1000071 /* Map/NetworkLineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071 /* Map/NetworkLineStatusView.swift */; };
 		A1000313 /* Map/MapItemDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000313 /* Map/MapItemDetailSheet.swift */; };
 		A1000072 /* Route/TransferStationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072 /* Route/TransferStationSheet.swift */; };
 		A1000401 /* Onboarding/OnboardingTourView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000401 /* Onboarding/OnboardingTourView.swift */; };
 		A1000075 /* Onboarding/LaunchStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000075 /* Onboarding/LaunchStageView.swift */; };
-		A1000500 /* User/PersonalStationMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000500 /* User/PersonalStationMedia.swift */; };
-		A1000501 /* Data/PersonalStationMediaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000501 /* Data/PersonalStationMediaService.swift */; };
 		A1000502 /* Transit/HongKongRealtimeArrivalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */; };
-		A1000503 /* Station/PersonalStationMediaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000503 /* Station/PersonalStationMediaSection.swift */; };
 		A1000504 /* BundledCityPacks in Resources */ = {isa = PBXBuildFile; fileRef = A2000504 /* BundledCityPacks */; };
 		A1000700 /* StationInfo in Resources */ = {isa = PBXBuildFile; fileRef = A2000700 /* StationInfo */; };
 		A1000506 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000506 /* PrivacyInfo.xcprivacy */; };
@@ -203,15 +199,11 @@
 		A2000074 /* Components/Transit/StepControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StepControls.swift; sourceTree = "<group>"; };
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		A2000070 /* Route/SmartCommuteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/SmartCommuteCard.swift; sourceTree = "<group>"; };
-		A2000071 /* Map/NetworkLineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/NetworkLineStatusView.swift; sourceTree = "<group>"; };
 		A2000313 /* Map/MapItemDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapItemDetailSheet.swift; sourceTree = "<group>"; };
 		A2000072 /* Route/TransferStationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferStationSheet.swift; sourceTree = "<group>"; };
 		A2000401 /* Onboarding/OnboardingTourView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/OnboardingTourView.swift; sourceTree = "<group>"; };
 		A2000075 /* Onboarding/LaunchStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/LaunchStageView.swift; sourceTree = "<group>"; };
-		A2000500 /* User/PersonalStationMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/PersonalStationMedia.swift; sourceTree = "<group>"; };
-		A2000501 /* Data/PersonalStationMediaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/PersonalStationMediaService.swift; sourceTree = "<group>"; };
 		A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/HongKongRealtimeArrivalProvider.swift; sourceTree = "<group>"; };
-		A2000503 /* Station/PersonalStationMediaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/PersonalStationMediaSection.swift; sourceTree = "<group>"; };
 		A2000504 /* BundledCityPacks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BundledCityPacks; sourceTree = "<group>"; };
 		A2000700 /* StationInfo */ = {isa = PBXFileReference; lastKnownFileType = folder; path = StationInfo; sourceTree = "<group>"; };
 		A2000506 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -321,7 +313,6 @@
 				A200002F /* User/SearchHistory.swift */,
 				A2000051 /* User/TripMemory.swift */,
 				A2000309 /* User/StationQuickTag.swift */,
-				A2000500 /* User/PersonalStationMedia.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -336,7 +327,6 @@
 				A2000701 /* Diagnostics/MainThreadHangMonitor.swift */,
 				A2000076 /* Diagnostics/LaunchClock.swift */,
 				A200004A /* Data/OfficialCityPackService.swift */,
-				A2000501 /* Data/PersonalStationMediaService.swift */,
 				A200005A /* Data/BundledMetroNetworkService.swift */,
 				A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */,
 				A2000603 /* Transit/OfficialStationInformationProvider.swift */,
@@ -380,13 +370,11 @@
 				A2000072 /* Route/TransferStationSheet.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
-				A2000071 /* Map/NetworkLineStatusView.swift */,
 				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
 				A2000064 /* Station/FullScreenStationImageView.swift */,
-				A2000503 /* Station/PersonalStationMediaSection.swift */,
 				A200000A /* Route/RoutePlannerView.swift */,
 				A2000068 /* Route/RoutePlannerView+Sections.swift */,
 				A200000B /* Route/RouteResultsView.swift */,
@@ -553,7 +541,6 @@
 				A1000062 /* Station/StationDetailView+Accessibility.swift in Sources */,
 				A1000063 /* Station/StationDetailView+DataSections.swift in Sources */,
 				A1000064 /* Station/FullScreenStationImageView.swift in Sources */,
-				A1000503 /* Station/PersonalStationMediaSection.swift in Sources */,
 				A1000009 /* Map/StationDetailViewModel.swift in Sources */,
 				A100000A /* Route/RoutePlannerView.swift in Sources */,
 				A1000068 /* Route/RoutePlannerView+Sections.swift in Sources */,
@@ -581,7 +568,6 @@
 				A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */,
 				A1000602 /* Components/Web/OfficialTransitResourceViewer.swift in Sources */,
 				A1000604 /* Components/QuickTagEditorSheet.swift in Sources */,
-				A1000501 /* Data/PersonalStationMediaService.swift in Sources */,
 				A100005A /* Data/BundledMetroNetworkService.swift in Sources */,
 				A1000502 /* Transit/HongKongRealtimeArrivalProvider.swift in Sources */,
 				A1000603 /* Transit/OfficialStationInformationProvider.swift in Sources */,
@@ -614,7 +600,6 @@
 				A100002F /* User/SearchHistory.swift in Sources */,
 				A1000051 /* User/TripMemory.swift in Sources */,
 				A1000309 /* User/StationQuickTag.swift in Sources */,
-				A1000500 /* User/PersonalStationMedia.swift in Sources */,
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000310 /* Profile/QuickTagsView.swift in Sources */,
 				A1000605 /* Profile/QuickTagAddView.swift in Sources */,
@@ -626,7 +611,6 @@
 				A100006C /* Logging.swift in Sources */,
 				A1000312 /* AppTheme.swift in Sources */,
 				A1000070 /* Route/SmartCommuteCard.swift in Sources */,
-				A1000071 /* Map/NetworkLineStatusView.swift in Sources */,
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,

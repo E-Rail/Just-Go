@@ -30,17 +30,6 @@ struct StationDetailView: View {
                 }
                 serviceStatusSection
                 stationMapSection
-                if let stationKey = PersonalStationMediaKey(
-                    cityID: displayedStation.cityID,
-                    stationID: displayedStation.stationID
-                ) {
-                    PersonalStationMediaSection(
-                        stationKey: stationKey,
-                        stationName: displayedStation.localizedName
-                    ) { image in
-                        selectedStationImage = image
-                    }
-                }
             }
             .padding()
         }

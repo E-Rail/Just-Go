@@ -26,13 +26,12 @@ struct JustGoApp: App {
         LaunchClock.mark("container.ready")
         #endif
         _container = State(initialValue: container)
-        // Both sweeps walk directories whose size the app doesn't control, and nothing waits
-        // on their results — keep them off the main thread, which is otherwise blocked here
+        // The sweep walks a directory whose size the app doesn't control, and nothing waits
+        // on its result — keep it off the main thread, which is otherwise blocked here
         // until the first frame. Measured at 8ms on an empty container but 82ms with 4,200
         // temp entries, i.e. bounded only by how much junk has accumulated.
         Task.detached(priority: .utility) {
             Self.removeObsoleteRouteCaches()
-            Self.removeOrphanedPhotoImportTempFiles()
         }
     }
 
@@ -122,19 +121,6 @@ struct JustGoApp: App {
         let fileManager = FileManager.default
         if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("LineOverlays", isDirectory: true))
-        }
-    }
-
-    /// `PersonalMediaPhotoFile.transferRepresentation` copies an import's original, unsanitized
-    /// bytes (GPS/EXIF intact) into the temp directory before stripping metadata. That copy is
-    /// only ever meant to live for the duration of one import; if the process is killed mid-import
-    /// it's otherwise never cleaned up, so sweep any leftovers unconditionally on next launch.
-    private nonisolated static func removeOrphanedPhotoImportTempFiles() {
-        let fileManager = FileManager.default
-        let tempDirectory = fileManager.temporaryDirectory
-        guard let contents = try? fileManager.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil) else { return }
-        for url in contents where url.lastPathComponent.hasPrefix("JustGoPhotoImport-") {
-            try? fileManager.removeItem(at: url)
         }
     }
 

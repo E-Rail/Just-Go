@@ -31,7 +31,6 @@ struct MapContainerView: View {
     @State private var tappedPlace: TappedPlace?
     @State private var showPlaceTagDialog = false
     @State private var showCityPicker = false
-    @State private var showNetworkLineStatus = false
     @State private var isLoadingStationDetail = false
     @State private var placeMatchTask: Task<Void, Never>?
     @State private var stationOpenTask: Task<Void, Never>?
@@ -95,23 +94,6 @@ struct MapContainerView: View {
                         MetroGeometryAttributionView()
                             .lineLimit(1)
                             .layoutPriority(0)
-                    }
-                    if appState.selectedCity != nil {
-                        Button {
-                            showNetworkLineStatus = true
-                        } label: {
-                            VStack(spacing: 2) {
-                                Image(systemName: "tram.circle.fill")
-                                    .font(.title2)
-                                    .foregroundStyle(.white)
-                                Text(AppLocalization.localized("Lines"))
-                                    .font(.system(size: 9, weight: .medium))
-                                    .foregroundStyle(.white)
-                            }
-                            .padding(8)
-                            .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        }
-                        .layoutPriority(1)
                     }
                     mapLocateButton
                         .layoutPriority(1)
@@ -208,9 +190,6 @@ struct MapContainerView: View {
                 get: { appState.selectedCity },
                 set: { appState.selectedCity = $0 }
             ))
-        }
-        .sheet(isPresented: $showNetworkLineStatus) {
-            NetworkLineStatusView(cityID: appState.selectedCity?.id ?? "")
         }
         .onDisappear {
             placeMatchTask?.cancel()

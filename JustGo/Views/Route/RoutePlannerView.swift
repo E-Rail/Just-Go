@@ -270,14 +270,6 @@ struct RoutePlannerView: View {
         .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    private var searchHint: String? {
-        guard viewModel?.canSearch != true, let vm = viewModel else { return nil }
-        if vm.selectedCity == nil {
-            return AppLocalization.localized("Select a city above to search routes")
-        }
-        return AppLocalization.localized("Enter a starting station and destination to search")
-    }
-
     private var plannerActionRail: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 10) {
@@ -285,13 +277,6 @@ struct RoutePlannerView: View {
                     saveCurrentTripButton
                 }
                 searchButton
-            }
-            if let hint = searchHint {
-                Text(hint)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

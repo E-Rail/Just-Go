@@ -48,7 +48,7 @@ struct StationAssetImage<Content: View, Failure: View>: View {
         }
         let dimension = targetDimension
         let decoded = await Task.detached(priority: .userInitiated) {
-            Self.decode(url: url, targetDimension: dimension)
+            StationAssetImageDecoder.decode(url: url, targetDimension: dimension)
         }.value
         guard !Task.isCancelled else { return }
         guard let decoded else {
@@ -59,7 +59,14 @@ struct StationAssetImage<Content: View, Failure: View>: View {
         loadedImage = decoded
     }
 
-    private static func decode(url: URL, targetDimension: CGFloat?) -> UIImage? {
+}
+
+/// Non-generic on purpose: the decode runs in a detached task off the main actor, and referencing
+/// it through the generic `StationAssetImage<Content, Failure>` would drag those views' possibly
+/// main-actor-isolated `View` conformances across isolation (a Swift 6 error). A free helper carries
+/// no such conformances.
+private enum StationAssetImageDecoder {
+    static func decode(url: URL, targetDimension: CGFloat?) -> UIImage? {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
         if let targetDimension {
             let maxPixelSize = Int(targetDimension * UIScreen.main.scale)

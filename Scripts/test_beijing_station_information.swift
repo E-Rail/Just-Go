@@ -229,8 +229,9 @@ private func testParsingAndRequestContract() async throws {
     try requireEqual(OfficialStationInformationCategory.allCases.count, 3, "category count")
     try requireEqual(snapshot.stationName, "建国门", "station name")
     try requireEqual(snapshot.source, .beijingSubwayOnline, "source")
-    try requireEqual(snapshot.trains.count, 2, "first/last train rows")
-    try requireEqual(snapshot.trains.first?.lineColorHex, "#BE3631", "line color")
+    try requireEqual(snapshot.lines.count, 2, "first/last train lines")
+    try requireEqual(snapshot.lines.first?.services.count, 1, "services on the first line")
+    try requireEqual(snapshot.lines.first?.lineColorHex, "#BE3631", "line color")
     try requireEqual(snapshot.exits.first?.details.count, 2, "exit nearby text")
     try requireEqual(snapshot.facilityGroups.first?.items.first?.location, "C口、B口、A口", "facility location")
     try requireEqual(snapshot.facilityGroups.first?.items.count, 2, "facility status rows")
@@ -389,6 +390,7 @@ private actor FakeStationInformationCache: OfficialStationInformationCaching {
     private var stored: [String: OfficialStationInformationSnapshot] = [:]
 
     func storedSnapshot(
+        cityID: String,
         stationID: String,
         externalStationID: String
     ) -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)? {
@@ -398,7 +400,7 @@ private actor FakeStationInformationCache: OfficialStationInformationCaching {
         return (snapshot, Self.storedDate)
     }
 
-    func store(_ snapshot: OfficialStationInformationSnapshot, externalStationID: String) {
+    func store(_ snapshot: OfficialStationInformationSnapshot, cityID: String, externalStationID: String) {
         stored[externalStationID] = snapshot
     }
 
@@ -413,6 +415,7 @@ private func waitForStore(
     // The provider's disk store is fire-and-forget; poll briefly for it to land.
     for _ in 0..<100 {
         if await cache.storedSnapshot(
+            cityID: "1100",
             stationID: "network-1100-jianguomen",
             externalStationID: "150995220"
         ) != nil {
@@ -552,32 +555,36 @@ private func testDirectionGroupingCollapsesDuplicateRows() async throws {
     let provider = BeijingStationInformationProvider(session: session)
     let snapshot = try await provider.information(for: request())
 
-    let identities = snapshot.trains.map { "\($0.lineName)|\($0.destination)" }
+    // Flatten the line/service tree back into the direction rows this regression is about.
+    let rows = snapshot.lines.flatMap { line in
+        line.services.map { (lineName: line.lineName, service: $0) }
+    }
+    let identities = rows.map { "\($0.lineName)|\($0.service.direction)" }
     guard Set(identities).count == identities.count else {
         throw HarnessFailure(description: "Duplicate line/direction rows survived: \(identities)")
     }
-    guard snapshot.trains.count == 3 else {
+    guard rows.count == 3 else {
         throw HarnessFailure(
-            description: "Expected 3 grouped rows, got \(snapshot.trains.count): \(identities)"
+            description: "Expected 3 grouped rows, got \(rows.count): \(identities)"
         )
     }
 
-    guard let shiliuzhuang = snapshot.trains.first(where: { $0.destination == "石榴庄" }) else {
+    guard let shiliuzhuang = rows.first(where: { $0.service.direction == "石榴庄" })?.service else {
         throw HarnessFailure(description: "石榴庄 direction row missing")
     }
-    guard shiliuzhuang.firstTime == "5:07", shiliuzhuang.lastTime == "23:28" else {
+    guard shiliuzhuang.firstTrain == "5:07", shiliuzhuang.lastTrain == "23:28" else {
         throw HarnessFailure(
             description: "石榴庄 window should span 5:07–23:28, got "
-                + "\(shiliuzhuang.firstTime ?? "nil")–\(shiliuzhuang.lastTime ?? "nil")"
+                + "\(shiliuzhuang.firstTrain ?? "nil")–\(shiliuzhuang.lastTrain ?? "nil")"
         )
     }
 
-    guard let sihuidong = snapshot.trains.first(where: { $0.destination == "四惠东" }) else {
+    guard let sihuidong = rows.first(where: { $0.service.direction == "四惠东" })?.service else {
         throw HarnessFailure(description: "四惠东 direction row missing")
     }
-    guard sihuidong.lastTime == "0:21" else {
+    guard sihuidong.lastTrain == "0:21" else {
         throw HarnessFailure(
-            description: "Past-midnight last train should win, got \(sihuidong.lastTime ?? "nil")"
+            description: "Past-midnight last train should win, got \(sihuidong.lastTrain ?? "nil")"
         )
     }
 }

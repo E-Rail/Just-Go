@@ -161,7 +161,7 @@ private final class NormalizedStationIndexBox {
     init(_ value: [String: [MetroStation]]) { self.value = value }
 }
 
-protocol MetroNetworkProviding {
+protocol MetroNetworkProviding: Sendable {
     func network(for cityID: String) async -> MetroNetwork?
     func networkSummaries() async -> [MetroNetworkSummary]
     func stations(in cityID: String) async -> [Station]

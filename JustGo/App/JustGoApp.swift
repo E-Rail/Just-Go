@@ -118,7 +118,7 @@ struct JustGoApp: App {
         }
     }
 
-    private static func removeObsoleteRouteCaches() {
+    private nonisolated static func removeObsoleteRouteCaches() {
         let fileManager = FileManager.default
         if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("LineOverlays", isDirectory: true))
@@ -129,7 +129,7 @@ struct JustGoApp: App {
     /// bytes (GPS/EXIF intact) into the temp directory before stripping metadata. That copy is
     /// only ever meant to live for the duration of one import; if the process is killed mid-import
     /// it's otherwise never cleaned up, so sweep any leftovers unconditionally on next launch.
-    private static func removeOrphanedPhotoImportTempFiles() {
+    private nonisolated static func removeOrphanedPhotoImportTempFiles() {
         let fileManager = FileManager.default
         let tempDirectory = fileManager.temporaryDirectory
         guard let contents = try? fileManager.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil) else { return }

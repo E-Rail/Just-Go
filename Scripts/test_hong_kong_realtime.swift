@@ -375,7 +375,7 @@ private func testLightRailNormalAndSpecialServices() async throws {
     try requireEqual(special.timeText, "Arriving", "textual live time must be preserved")
     try requireEqual(special.source, .liveCountdown, "Light Rail data must be live")
     try require(special.isLiveArrival, "text-only government responses must remain live")
-    try require(!special.hasLiveCountdown, "text-only responses must not claim a numeric countdown")
+    try require(special.minutesRemaining == nil, "text-only responses must not claim a numeric countdown")
 
     guard let url = MockTransport.urls.first else {
         throw HarnessFailure(description: "Light Rail request URL was not recorded")

@@ -133,7 +133,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         "osm-metro-networks",
         "data-gov-hk-mtr",
         "beijing-official-landing-links",
-        "macau-official-landing-link"
+        "macau-official-landing-link",
+        // Registered in DataPacks/rights_inventory.json under LicenseRef-OGDL-TW-1.0, which
+        // permits redistribution and derivative works with mandatory attribution. Without it
+        // here the bundled Taipei pack failed the rights subset check and was discarded whole,
+        // so its official station entrances never reached the app.
+        "taipei-open-data"
     ]
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
@@ -1235,17 +1240,24 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               station.aliases == Array(Set(station.aliases)).sorted(),
               station.aliases.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }),
               station.externalResources.allSatisfy({ isAllowedExternalResource($0, cityID: cityID) }),
-              (station.stationAccessPoints ?? []).isEmpty,
-              (station.platformHints ?? []).isEmpty,
-              (station.interchangeHints ?? []).isEmpty,
               station.liveArrivalReferences.allSatisfy({ validatesLiveReference($0, cityID: cityID) }) else {
             return false
         }
         switch origin {
         case .bundled:
+            // A bundled pack ships inside the app binary, is pinned by the manifest's SHA-256,
+            // and is reviewed in-repo, so authored guidance is trusted from it. Rejecting
+            // `stationAccessPoints` here regardless of origin silently discarded the *entire*
+            // Taipei pack — every one of its stations carries the operator's official entrance
+            // coordinates, so every station failed and the city fell back to notConfigured.
             return station.licensedMedia.allSatisfy(validatesBundledMedia)
         case .downloaded:
-            return station.licensedMedia.isEmpty
+            // A downloaded pack is remote content. It must not be able to introduce authored
+            // guidance or licensed media that the app would then present to riders as official.
+            return station.licensedMedia.isEmpty &&
+                (station.stationAccessPoints ?? []).isEmpty &&
+                (station.platformHints ?? []).isEmpty &&
+                (station.interchangeHints ?? []).isEmpty
         }
     }
 

@@ -58,6 +58,7 @@ struct ProfileView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalization.localized("Current Profile"))
@@ -89,6 +90,7 @@ struct ProfileView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .buttonStyle(.plain)
         } header: {
             Text(AppLocalization.localized("Data Source"))
         }
@@ -110,6 +112,7 @@ struct ProfileView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .buttonStyle(.plain)
 
             Button(action: { showTripMemory = true }) {
                 HStack {
@@ -122,6 +125,7 @@ struct ProfileView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .buttonStyle(.plain)
 
         } header: {
             Text(AppLocalization.localized("My Activity"))
@@ -141,6 +145,7 @@ struct ProfileView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -161,6 +166,7 @@ struct ProfileView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .foregroundStyle(.primary)
             }
 
             Link(destination: AppWebLinks.termsOfService) {
@@ -171,6 +177,7 @@ struct ProfileView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .foregroundStyle(.primary)
             }
         } header: {
             Text(AppLocalization.localized("About"))

@@ -534,6 +534,12 @@ final class StationDetailViewModel {
         }) {
             return .official
         }
+        // The official online surface carries first/last train times for every live-fetch city.
+        // While it is showing them, the chip must agree instead of reporting that this station
+        // has no schedule data at all.
+        if officialStationInformation?.lines.isEmpty == false {
+            return .official
+        }
         return arrivals.isEmpty ? cityPackPendingConfidence : .estimated
     }
 
@@ -545,12 +551,14 @@ final class StationDetailViewModel {
         if station?.accessibility?.hasVerifiedAccessibilityData == true {
             return .official
         }
-        // Beijing's accessibility facts come from the official online surface, not the
-        // bundled pack — while that surface is showing facility data (live or cached), the
-        // "Before You Go" chip must agree with it instead of claiming nothing exists.
+        // Accessibility facts for the live-fetch cities come from the official online surface,
+        // not the bundled pack — Beijing publishes them as facility groups, Shanghai and
+        // Guangzhou as per-exit accessibility flags. While that surface is showing either (live
+        // or cached), the "Before You Go" chip must agree with it instead of claiming nothing
+        // exists.
         if let information = officialStationInformation,
-           information.source == .beijingSubwayOnline,
-           !information.facilityGroups.isEmpty {
+           !information.facilityGroups.isEmpty ||
+            information.exits.contains(where: { $0.isAccessible == true }) {
             return .official
         }
         return cityPackPendingConfidence

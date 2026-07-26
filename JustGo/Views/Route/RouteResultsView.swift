@@ -13,31 +13,35 @@ struct RouteResultsView: View {
 
     var body: some View {
         List {
-            sortOptionsSection
+            Group {
+                sortOptionsSection
 
-            if viewModel.isLoading {
-                HStack {
-                    Spacer()
-                    VStack(spacing: 12) {
-                        ProgressView()
-                        Text(AppLocalization.localized("Finding routes..."))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                if viewModel.isLoading {
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 12) {
+                            ProgressView()
+                            Text(AppLocalization.localized("Finding routes..."))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        Spacer()
                     }
-                    .padding()
-                    Spacer()
+                } else if let error = viewModel.errorMessage {
+                    ContentUnavailableView {
+                        Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
+                    } description: {
+                        Text(error)
+                    }
+                } else {
+                    routesSection
                 }
-            } else if let error = viewModel.errorMessage {
-                ContentUnavailableView {
-                    Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
-                } description: {
-                    Text(error)
-                }
-            } else {
-                routesSection
             }
+            .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
@@ -250,7 +254,6 @@ struct RouteResultsView: View {
             )
         }
         .buttonStyle(.plain)
-        .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
     }

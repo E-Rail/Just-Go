@@ -1,4 +1,13 @@
+import MapKit
 import SwiftUI
+
+/// One street an operator lists against its exits, with every exit that reaches it.
+struct OfficialStationExitStreet: Identifiable {
+    let name: String
+    let exits: [OfficialStationExitInformation]
+
+    var id: String { name }
+}
 
 extension StationDetailView {
     /// The categories the loaded snapshot actually has data for — so a lines-only source
@@ -304,37 +313,224 @@ extension StationDetailView {
         }
     }
 
+    /// Exits keyed by the street each one opens onto. Operators publish exits as a number plus
+    /// the roads it reaches ("1 — 西藏南路 复兴东路") and nothing positional, so this inverts that
+    /// same text into "which exit do I take for this street" without inventing any geometry. An
+    /// exit reaching two streets is listed under both, which is what its own record says.
+    private func officialExitsByStreet(
+        _ exits: [OfficialStationExitInformation]
+    ) -> [OfficialStationExitStreet] {
+        // Beijing and Shanghai list the roads an exit reaches, one per element. Hong Kong's
+        // details are descriptive phrases ("Lift access"), which are not places to group by, so
+        // it keeps the plain list.
+        guard viewModel?.officialStationInformation?.source != .hongKongGovernment else { return [] }
+        var order: [String] = []
+        var grouped: [String: [OfficialStationExitInformation]] = [:]
+        for exit in exits {
+            for street in exit.details where !street.isEmpty {
+                if grouped[street] == nil {
+                    order.append(street)
+                }
+                grouped[street, default: []].append(exit)
+            }
+        }
+        return order.compactMap { street in
+            guard let members = grouped[street] else { return nil }
+            return OfficialStationExitStreet(name: street, exits: members)
+        }
+    }
+
     @ViewBuilder
     private func officialExitRows(_ exits: [OfficialStationExitInformation]) -> some View {
         if exits.isEmpty {
             officialCategoryEmptyState
         } else {
+            let streets = officialExitsByStreet(exits)
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(exits.enumerated()), id: \.element.id) { index, exit in
-                    if index > 0 {
-                        Divider()
-                    }
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: exit.isAccessible == true
-                            ? "figure.roll"
-                            : "door.left.hand.open")
-                            .foregroundStyle(exit.isAccessible == true ? .green : Color.accentColor)
-                            .frame(width: 22)
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(exit.name)
+                if streets.isEmpty {
+                    // No street text published — fall back to the plain numbered list.
+                    officialExitList(exits)
+                } else {
+                    ForEach(Array(streets.enumerated()), id: \.element.id) { index, street in
+                        if index > 0 {
+                            Divider()
+                        }
+                        VStack(alignment: .leading, spacing: 7) {
+                            Label(street.name, systemImage: "signpost.right")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            ForEach(exit.details, id: \.self) { detail in
-                                Text(detail)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .fixedSize(horizontal: false, vertical: true)
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 62), spacing: 6)],
+                                alignment: .leading,
+                                spacing: 6
+                            ) {
+                                ForEach(street.exits) { exit in
+                                    officialExitChip(exit)
+                                }
                             }
                         }
-                        Spacer(minLength: 0)
+                        .padding(.vertical, 9)
                     }
-                    .padding(.vertical, 9)
+
+                    if exits.contains(where: { $0.isAccessible == true }) {
+                        Text(AppLocalization.text(
+                            english: "Step-free exits are marked.",
+                            simplified: "已标记无障碍出入口。",
+                            traditional: "已標記無障礙出入口。"
+                        ))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 2)
+                    }
                 }
+            }
+        }
+    }
+
+    /// Entrances the bundled pack gives a real position for. Only Taipei publishes these today;
+    /// Beijing, Shanghai, Guangzhou and Hong Kong give street text and nothing positional, so
+    /// there is nothing to place and the street grouping is the only honest form for them.
+    private var mappableAccessPoints: [StationAccessPoint] {
+        (viewModel?.accessPoints ?? []).filter { $0.coordinate != nil }
+    }
+
+    /// Just the part of an entrance name that tells exits apart. Packs name them in full
+    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels — on the map
+    /// the station is already the centre pin, so only the number carries information. The full
+    /// name stays in the accessibility label and in the list below.
+    private func shortAccessPointLabel(_ point: StationAccessPoint) -> String {
+        var label = point.name
+        for stationName in [displayedStation.name, displayedStation.nameEn].compactMap({ $0 }) {
+            label = label.replacingOccurrences(of: stationName, with: "")
+        }
+        for marker in ["站出入口", "站出口", "出入口", "出口", "Exit", "exit", "站"] {
+            label = label.replacingOccurrences(of: marker, with: "")
+        }
+        label = label.trimmingCharacters(in: CharacterSet(charactersIn: " 　-–—:：#号號"))
+        return label.isEmpty ? point.name : label
+    }
+
+    /// The station and its entrances at their published coordinates. Read-only: it orients the
+    /// rider, and the full-screen map is a tab away.
+    private func stationAccessPointMap(_ points: [StationAccessPoint]) -> some View {
+        let station = displayedStation
+        let center = CLLocationCoordinate2D(
+            latitude: station.latitude,
+            longitude: station.longitude
+        )
+        return Map(
+            initialPosition: .region(
+                MKCoordinateRegion(
+                    center: center,
+                    latitudinalMeters: 420,
+                    longitudinalMeters: 420
+                )
+            ),
+            interactionModes: []
+        ) {
+            Annotation(station.localizedName, coordinate: center) {
+                Image(systemName: "tram.fill")
+                    .font(.caption)
+                    .foregroundStyle(.white)
+                    .padding(6)
+                    .background(Color.accentColor, in: Circle())
+            }
+            .annotationTitles(.hidden)
+
+            ForEach(points) { point in
+                if let coordinate = point.coordinate {
+                    Annotation(
+                        point.name,
+                        coordinate: CLLocationCoordinate2D(
+                            latitude: coordinate.latitude,
+                            longitude: coordinate.longitude
+                        )
+                    ) {
+                        Text(shortAccessPointLabel(point))
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.legibleText(
+                                onHex: point.isAccessible ? "#34C759" : "#FFFFFF"
+                            ))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 3)
+                            .background(
+                                point.isAccessible ? Color.green : Color.white,
+                                in: Capsule()
+                            )
+                            .accessibilityLabel(point.isAccessible
+                                ? AppLocalization.text(
+                                    english: "\(point.name), step-free",
+                                    simplified: "\(point.name)，无障碍",
+                                    traditional: "\(point.name)，無障礙"
+                                )
+                                : point.name
+                            )
+                    }
+                    .annotationTitles(.hidden)
+                }
+            }
+        }
+        .frame(height: 190)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .accessibilityLabel(AppLocalization.text(
+            english: "Map of station entrances",
+            simplified: "车站出入口地图",
+            traditional: "車站出入口地圖"
+        ))
+    }
+
+    private func officialExitChip(_ exit: OfficialStationExitInformation) -> some View {
+        let isAccessible = exit.isAccessible == true
+        return HStack(spacing: 4) {
+            if isAccessible {
+                Image(systemName: "figure.roll")
+                    .font(.caption2)
+            }
+            Text(exit.name)
+                .font(.caption)
+                .fontWeight(.medium)
+        }
+        .foregroundStyle(isAccessible ? Color.green : Color.accentColor)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            (isAccessible ? Color.green : Color.accentColor).opacity(0.14),
+            in: Capsule()
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(isAccessible
+            ? AppLocalization.text(
+                english: "Exit \(exit.name), step-free",
+                simplified: "出入口 \(exit.name)，无障碍",
+                traditional: "出入口 \(exit.name)，無障礙"
+            )
+            : AppLocalization.text(
+                english: "Exit \(exit.name)",
+                simplified: "出入口 \(exit.name)",
+                traditional: "出入口 \(exit.name)"
+            )
+        )
+    }
+
+    private func officialExitList(_ exits: [OfficialStationExitInformation]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(exits.enumerated()), id: \.element.id) { index, exit in
+                if index > 0 {
+                    Divider()
+                }
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: exit.isAccessible == true
+                        ? "figure.roll"
+                        : "door.left.hand.open")
+                        .foregroundStyle(exit.isAccessible == true ? .green : Color.accentColor)
+                        .frame(width: 22)
+                    Text(exit.name)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Spacer(minLength: 0)
+                }
+                .padding(.vertical, 9)
             }
         }
     }
@@ -508,6 +704,13 @@ extension StationDetailView {
                         Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
                             .font(.subheadline)
                             .fontWeight(.medium)
+
+                        // Drawn only where the pack publishes real entrance coordinates, so the
+                        // pins are the operator's own positions rather than a guess.
+                        let mappable = mappableAccessPoints
+                        if !mappable.isEmpty {
+                            stationAccessPointMap(mappable)
+                        }
 
                         ForEach(exits) { exit in
                             HStack(spacing: 8) {

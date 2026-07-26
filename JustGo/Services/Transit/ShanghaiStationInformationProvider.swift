@@ -313,7 +313,12 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             for entrance in (line["entrance"] as? [[String: Any]]) ?? [] {
                 // The exit id is a JSON number at some stations and a string at others.
                 guard let name = stringValue(entrance["id"]) else { continue }
-                let details = trimmed(entrance["description"] as? String).map { [$0] } ?? []
+                // Shanghai packs every road an exit reaches into one space-separated string
+                // ("西藏南路 复兴东路 盐城路"). Split it so `details` means one place per element,
+                // the way Beijing's `nearby` array already does — the exits view groups on that.
+                let details = trimmed(entrance["description"] as? String)
+                    .map { $0.split(whereSeparator: \.isWhitespace).map(String.init) }?
+                    .uniqued() ?? []
                 let accessible: Bool?
                 switch entrance["icon2"] as? String {
                 case "w_y.png": accessible = true

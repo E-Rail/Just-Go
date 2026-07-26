@@ -32,6 +32,12 @@ SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 # belong to the city — every other route relation in the bbox is dropped. `own_unknown_lines`
 # whitelists the handful of the city's own lines that carry no network/operator tag in OSM
 # (so they would otherwise be indistinguishable from foreign untagged lines).
+# The Pearl River Delta intercity railway (城际铁路) is a scheduled, metro-style service riders
+# use to move between the delta's cities, and it interchanges with the metro at shared stations.
+# It is named here as its own allowlist entry rather than opening `route=train` generally, so
+# mainline/high-speed railway inside the same bounding boxes (国铁/高铁) stays out.
+GUANGDONG_INTERCITY_NETWORKS = ["珠三角城际", "粤港澳大湾区城际铁路"].freeze
+
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
@@ -45,7 +51,7 @@ CITIES = {
   },
   "4401" => {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
-    networks: ["广州地铁"],
+    networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
     own_unknown_lines: []
   },
   "4403" => {
@@ -90,8 +96,16 @@ CITIES = {
   "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true, own_unknown_lines: [] },
   "1501" => { name: "Hohhot", bbox: [40.70, 111.50, 41.00, 112.00], networks: ["呼和浩特地铁", "呼和浩特轨道交通"], own_unknown_lines: [] },
   "1401" => { name: "Taiyuan", bbox: [37.65, 112.40, 38.05, 112.70], networks: ["太原轨道交通", "太原地铁"], own_unknown_lines: [] },
-  "4419" => { name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00], networks: ["东莞轨道交通", "东莞地铁"], own_unknown_lines: [] },
-  "4406" => { name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35], networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车"], own_unknown_lines: [] },
+  "4419" => {
+    name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00],
+    networks: ["东莞轨道交通", "东莞地铁", *GUANGDONG_INTERCITY_NETWORKS],
+    own_unknown_lines: []
+  },
+  "4406" => {
+    name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35],
+    networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车", *GUANGDONG_INTERCITY_NETWORKS],
+    own_unknown_lines: []
+  },
   "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"], own_unknown_lines: [] },
   "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"], own_unknown_lines: [] },
   "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: [] },
@@ -805,16 +819,19 @@ def select_service_relations(relations, elements_by_key, ways)
     }
     selected_nodes.merge(nodes)
 
-    # Rendering-only recovery. A candidate lands in this group either because it shares the
-    # group's founding station set exactly (a plain reverse-direction duplicate — same stops,
-    # parallel track, already fully represented by whichever direction got selected) or because
-    # it was folded in by `passenger_service_patterns`'s subset/terminal merge despite having a
-    # *different* station set (it skips or adds a stop the other direction doesn't — physically
-    # divergent track, e.g. an airport line's one-way loop through a second terminal). Only the
-    # latter's track is missing from the map today, so only it gets unioned back in.
+    # Rendering-only recovery: every candidate in this group that is not the selected one
+    # contributes its track back to the drawn path, never to the routing graph.
+    #
+    # A real line is two physical tracks, and OSM models each direction as its own relation.
+    # Keeping only the selected direction drew a single-track line down a double-track corridor,
+    # which is what riders see on the ground and on operator maps. Both directions are therefore
+    # unioned in — the plain reverse-direction duplicate (same stops, parallel track) as well as
+    # the divergent case folded in by `passenger_service_patterns`'s subset/terminal merge, where
+    # a direction skips or adds a stop and its track physically separates (an airport line's
+    # one-way loop through a second terminal). `geometry_ways` dedupes by way ID, so a corridor
+    # whose directions genuinely share one way is still drawn once.
     candidates.each do |candidate|
       next if candidate.equal?(selected)
-      next if relation_station_names(candidate, elements_by_key).to_set == pattern[:stations]
 
       extra_geometry_ways.concat(relation_track_ways(candidate, ways))
     end
@@ -1060,7 +1077,20 @@ def self_test
   fail_with("Hong Kong MTR line must not enter Shenzhen") if city_owns_line?(CITIES.fetch("4403"), normalized("港鐵 MTR"), "港鐵東鐵綫")
   fail_with("Suzhou line must not enter Shanghai") if city_owns_line?(CITIES.fetch("3100"), normalized("苏州轨道交通"), "11号线")
   fail_with("Shenzhen line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("深圳地铁"), "深圳地铁13号线")
-  fail_with("intercity line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际")
+  fail_with("Guangdong intercity should be kept") unless city_owns_line?(
+    CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际"
+  )
+  fail_with("Greater Bay intercity should be kept") unless city_owns_line?(
+    CITIES.fetch("4406"), normalized("粤港澳大湾区城际铁路"), "广清城际"
+  )
+  # Intercity is admitted by name, not by opening `route=train`: mainline and high-speed
+  # railway sharing the same bounding box must still be rejected.
+  fail_with("national rail must not enter Guangzhou") if city_owns_line?(
+    CITIES.fetch("4401"), normalized("中国铁路"), "广深铁路", mode: "train"
+  )
+  fail_with("high-speed rail must not enter Guangzhou") if city_owns_line?(
+    CITIES.fetch("4401"), normalized("台灣高鐵"), "高鐵", mode: "train"
+  )
   fail_with("own untagged line should be kept") unless city_owns_line?(CITIES.fetch("3100"), "unknown", "磁浮线")
   fail_with("foreign untagged line must be dropped") if city_owns_line?(CITIES.fetch("4401"), "unknown", "华为松山湖有轨电车1号线")
   fail_with("untagged urban line should be kept under allow_unknown") unless city_owns_line?(

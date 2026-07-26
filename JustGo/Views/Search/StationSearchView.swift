@@ -262,6 +262,7 @@ struct StationSearchView: View {
 
     private var resultsList: some View {
         List {
+            Group {
             if viewModel?.isSearching ?? false {
                 HStack {
                     Spacer()
@@ -312,8 +313,11 @@ struct StationSearchView: View {
             } else if !isAnyFilterActive && viewModel?.recentSearches.isEmpty == false {
                 recentSearchesSection
             }
+            }
+            .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 
     private var filterLoadingRow: some View {

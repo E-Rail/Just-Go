@@ -22,185 +22,189 @@ struct TransitDataView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                            .foregroundStyle(.green)
-                        Text(AppLocalization.localized("Transit Data Sources"))
-                            .font(.headline)
+                Group {
+                    Section {
+                        HStack {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .foregroundStyle(.green)
+                            Text(AppLocalization.localized("Transit Data Sources"))
+                                .font(.headline)
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
-                }
 
-                Section {
-                    if state.officialResourceCities.isEmpty && !state.didLoadOfficialResources {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    } else if state.officialResourceCities.isEmpty {
-                        Label(
-                            AppLocalization.text(
-                                english: "Official resource catalog unavailable",
-                                simplified: "官方资源目录不可用",
-                                traditional: "官方資源目錄不可用"
-                            ),
-                            systemImage: "exclamationmark.triangle"
+                    Section {
+                        if state.officialResourceCities.isEmpty && !state.didLoadOfficialResources {
+                            ProgressView()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else if state.officialResourceCities.isEmpty {
+                            Label(
+                                AppLocalization.text(
+                                    english: "Official resource catalog unavailable",
+                                    simplified: "官方资源目录不可用",
+                                    traditional: "官方資源目錄不可用"
+                                ),
+                                systemImage: "exclamationmark.triangle"
+                            )
+                            .foregroundStyle(.secondary)
+                        } else {
+                            NavigationLink {
+                                OfficialResourcesDirectoryView(cities: state.officialResourceCities)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "link")
+                                        .foregroundStyle(Color.accentColor)
+                                        .frame(width: 24)
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(AppLocalization.text(
+                                            english: "Official Resources",
+                                            simplified: "官方资源",
+                                            traditional: "官方資源"
+                                        ))
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        Text(AppLocalization.text(
+                                            english: "Maps, travel information, accessibility, and help for 58 reviewed cities",
+                                            simplified: "58 个已审核城市的地图、出行信息、无障碍服务与帮助",
+                                            traditional: "58 個已審核城市的地圖、出行資訊、無障礙服務與協助"
+                                        ))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Section {
+                        dataCapabilityRow(
+                            icon: "map.fill",
+                            title: AppLocalization.localized("Map, station search, and routes"),
+                            detail: AppLocalization.text(
+                                english: "Included metro routing; Apple Maps place search and walking legs",
+                                simplified: "内置地铁路线；Apple 地图地点搜索与步行路段",
+                                traditional: "內置地鐵路線；Apple 地圖地點搜尋與步行路段"
+                            )
                         )
-                        .foregroundStyle(.secondary)
-                    } else {
-                        NavigationLink {
-                            OfficialResourcesDirectoryView(cities: state.officialResourceCities)
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: "link")
-                                    .foregroundStyle(Color.accentColor)
-                                    .frame(width: 24)
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(AppLocalization.text(
-                                        english: "Official Resources",
-                                        simplified: "官方资源",
-                                        traditional: "官方資源"
-                                    ))
-                                        .font(.subheadline)
+                        dataCapabilityRow(
+                            icon: "point.bottomleft.forward.to.point.topright.scurvepath",
+                            title: AppLocalization.localized("Metro track geometry"),
+                            detail: AppLocalization.localized("OpenStreetMap physical track geometry")
+                        )
+                        dataCapabilityRow(
+                            icon: "accessibility",
+                            title: AppLocalization.localized("Accessibility and station facilities"),
+                            detail: AppLocalization.localized("Official city packs when public sources exist")
+                        )
+                        dataCapabilityRow(
+                            icon: "clock.fill",
+                            title: AppLocalization.localized("Train times"),
+                            detail: AppLocalization.localized("Official first/last schedules; live countdown only when an official provider exists")
+                        )
+                        dataCapabilityRow(
+                            icon: "photo.fill",
+                            title: AppLocalization.text(
+                                english: "Station layouts and media",
+                                simplified: "车站布局与媒体",
+                                traditional: "車站佈局與媒體"
+                            ),
+                            detail: AppLocalization.text(
+                                english: "In-app official resources and licensed media are kept separate",
+                                simplified: "应用内官方资源与许可媒体分别管理",
+                                traditional: "App 內官方資源與授權媒體分別管理"
+                            )
+                        )
+                    } header: {
+                        Text(AppLocalization.localized("Essential Rider Information"))
+                    }
+
+                    Section {
+                        attributionLink(
+                            title: AppLocalization.text(
+                                english: "OpenStreetMap contributors",
+                                simplified: "OpenStreetMap 贡献者",
+                                traditional: "OpenStreetMap 貢獻者"
+                            ),
+                            detail: "ODbL 1.0",
+                            url: URL(string: "https://www.openstreetmap.org/copyright")!
+                        )
+                        attributionLink(
+                            title: "MTR Corporation Limited · DATA.GOV.HK",
+                            detail: AppLocalization.text(
+                                english: "Hong Kong data reuse terms",
+                                simplified: "香港数据重用条款",
+                                traditional: "香港資料重用條款"
+                            ),
+                            url: URL(string: "https://data.gov.hk/en/terms-and-conditions")!
+                        )
+                        // The Open Government Data License requires naming the providing agency and
+                        // linking the licence; the grant is void without it, so this row is not optional.
+                        attributionLink(
+                            title: "臺北大眾捷運股份有限公司 · data.taipei",
+                            detail: AppLocalization.text(
+                                english: "Open Government Data License, Taiwan, v1.0",
+                                simplified: "政府资料开放授权条款第 1 版",
+                                traditional: "政府資料開放授權條款第 1 版"
+                            ),
+                            url: URL(string: "https://data.gov.tw/license")!
+                        )
+                    } header: {
+                        Text(AppLocalization.text(
+                            english: "Data Attribution",
+                            simplified: "数据署名",
+                            traditional: "資料署名"
+                        ))
+                    }
+
+                    Section {
+                        ForEach(cities) { city in
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(city.localizedName)
+                                        .font(.body)
                                         .fontWeight(.medium)
-                                    Text(AppLocalization.text(
-                                        english: "Maps, travel information, accessibility, and help for 58 reviewed cities",
-                                        simplified: "58 个已审核城市的地图、出行信息、无障碍服务与帮助",
-                                        traditional: "58 個已審核城市的地圖、出行資訊、無障礙服務與協助"
-                                    ))
+                                    Text(AppLocalization.cityLineSummary(stations: city.stationCount, lines: city.lineCount))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
+                                    CityCapabilityTags(
+                                        coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage,
+                                        hasOfficialOnlineStationInformation:
+                                            container.stationInformationDirectory.servesStationInformation(cityID: city.id)
+                                    )
+                                    .equatable()
+                                }
+                                Spacer()
+                                cityPackControl(for: city)
+                            }
+                            .swipeActions {
+                                if isDownloadedStatus(state.packStatus[city.id]),
+                                   !state.downloading.contains(city.id) {
+                                    Button(role: .destructive) {
+                                        Task { await deletePack(city) }
+                                    } label: {
+                                        Label(AppLocalization.localized("Delete"), systemImage: "trash")
+                                    }
                                 }
                             }
                         }
+                    } header: {
+                        Text(AppLocalization.text(
+                            english: "City Data Packs",
+                            simplified: "城市数据包",
+                            traditional: "城市資料包"
+                        ))
+                    } footer: {
+                        Text(AppLocalization.text(
+                            english: "Deleting a downloaded update restores the included version.",
+                            simplified: "删除下载的更新后会恢复内置版本。",
+                            traditional: "刪除下載的更新後會恢復內置版本。"
+                        ))
                     }
                 }
-
-                Section {
-                    dataCapabilityRow(
-                        icon: "map.fill",
-                        title: AppLocalization.localized("Map, station search, and routes"),
-                        detail: AppLocalization.text(
-                            english: "Included metro routing; Apple Maps place search and walking legs",
-                            simplified: "内置地铁路线；Apple 地图地点搜索与步行路段",
-                            traditional: "內置地鐵路線；Apple 地圖地點搜尋與步行路段"
-                        )
-                    )
-                    dataCapabilityRow(
-                        icon: "point.bottomleft.forward.to.point.topright.scurvepath",
-                        title: AppLocalization.localized("Metro track geometry"),
-                        detail: AppLocalization.localized("OpenStreetMap physical track geometry")
-                    )
-                    dataCapabilityRow(
-                        icon: "accessibility",
-                        title: AppLocalization.localized("Accessibility and station facilities"),
-                        detail: AppLocalization.localized("Official city packs when public sources exist")
-                    )
-                    dataCapabilityRow(
-                        icon: "clock.fill",
-                        title: AppLocalization.localized("Train times"),
-                        detail: AppLocalization.localized("Official first/last schedules; live countdown only when an official provider exists")
-                    )
-                    dataCapabilityRow(
-                        icon: "photo.fill",
-                        title: AppLocalization.text(
-                            english: "Station layouts and media",
-                            simplified: "车站布局与媒体",
-                            traditional: "車站佈局與媒體"
-                        ),
-                        detail: AppLocalization.text(
-                            english: "In-app official resources, licensed media, and private on-device photos are kept separate",
-                            simplified: "应用内官方资源、许可媒体与设备上的私人照片分别管理",
-                            traditional: "App 內官方資源、授權媒體與裝置上的私人照片分別管理"
-                        )
-                    )
-                } header: {
-                    Text(AppLocalization.localized("Essential Rider Information"))
-                }
-
-                Section {
-                    attributionLink(
-                        title: AppLocalization.text(
-                            english: "OpenStreetMap contributors",
-                            simplified: "OpenStreetMap 贡献者",
-                            traditional: "OpenStreetMap 貢獻者"
-                        ),
-                        detail: "ODbL 1.0",
-                        url: URL(string: "https://www.openstreetmap.org/copyright")!
-                    )
-                    attributionLink(
-                        title: "MTR Corporation Limited · DATA.GOV.HK",
-                        detail: AppLocalization.text(
-                            english: "Hong Kong data reuse terms",
-                            simplified: "香港数据重用条款",
-                            traditional: "香港資料重用條款"
-                        ),
-                        url: URL(string: "https://data.gov.hk/en/terms-and-conditions")!
-                    )
-                    // The Open Government Data License requires naming the providing agency and
-                    // linking the licence; the grant is void without it, so this row is not optional.
-                    attributionLink(
-                        title: "臺北大眾捷運股份有限公司 · data.taipei",
-                        detail: AppLocalization.text(
-                            english: "Open Government Data License, Taiwan, v1.0",
-                            simplified: "政府资料开放授权条款第 1 版",
-                            traditional: "政府資料開放授權條款第 1 版"
-                        ),
-                        url: URL(string: "https://data.gov.tw/license")!
-                    )
-                } header: {
-                    Text(AppLocalization.text(
-                        english: "Data Attribution",
-                        simplified: "数据署名",
-                        traditional: "資料署名"
-                    ))
-                }
-
-                Section {
-                    ForEach(cities) { city in
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(city.localizedName)
-                                    .font(.body)
-                                    .fontWeight(.medium)
-                                Text(AppLocalization.cityLineSummary(stations: city.stationCount, lines: city.lineCount))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                CityCapabilityTags(
-                                    coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage,
-                                    hasOfficialOnlineStationInformation:
-                                        container.stationInformationDirectory.servesStationInformation(cityID: city.id)
-                                )
-                                .equatable()
-                            }
-                            Spacer()
-                            cityPackControl(for: city)
-                        }
-                        .swipeActions {
-                            if isDownloadedStatus(state.packStatus[city.id]),
-                               !state.downloading.contains(city.id) {
-                                Button(role: .destructive) {
-                                    Task { await deletePack(city) }
-                                } label: {
-                                    Label(AppLocalization.localized("Delete"), systemImage: "trash")
-                                }
-                            }
-                        }
-                    }
-                } header: {
-                    Text(AppLocalization.text(
-                        english: "City Data Packs",
-                        simplified: "城市数据包",
-                        traditional: "城市資料包"
-                    ))
-                } footer: {
-                    Text(AppLocalization.text(
-                        english: "Deleting a downloaded update restores the included version.",
-                        simplified: "删除下载的更新后会恢复内置版本。",
-                        traditional: "刪除下載的更新後會恢復內置版本。"
-                    ))
-                }
+                .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("Transit Data"))
             .navigationBarTitleDisplayMode(.inline)

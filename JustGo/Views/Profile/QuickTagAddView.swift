@@ -28,55 +28,60 @@ struct QuickTagAddView: View {
     var body: some View {
         NavigationStack {
             List {
-                if !stationResults.isEmpty {
-                    Section {
-                        ForEach(stationResults, id: \.stationID) { station in
-                            resultRow(
-                                title: station.localizedName,
-                                caption: station.lines.map(\.localizedName).joined(separator: " • "),
-                                icon: "tram.fill",
-                                isTagged: tripMemoryService.isQuickTagged(
-                                    stationID: station.stationID,
-                                    cityID: station.cityID
-                                )
-                            ) {
-                                pendingTarget = .station(station)
-                                showEditor = true
+                Group {
+                    if !stationResults.isEmpty {
+                        Section {
+                            ForEach(stationResults, id: \.stationID) { station in
+                                resultRow(
+                                    title: station.localizedName,
+                                    caption: station.lines.map(\.localizedName).joined(separator: " • "),
+                                    icon: "tram.fill",
+                                    isTagged: tripMemoryService.isQuickTagged(
+                                        stationID: station.stationID,
+                                        cityID: station.cityID
+                                    )
+                                ) {
+                                    pendingTarget = .station(station)
+                                    showEditor = true
+                                }
                             }
+                        } header: {
+                            Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
                         }
-                    } header: {
-                        Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
                     }
-                }
-                if !placeResults.isEmpty {
-                    Section {
-                        ForEach(placeResults) { place in
-                            resultRow(
-                                title: place.name,
-                                caption: place.address ?? "",
-                                icon: "mappin.circle.fill",
-                                isTagged: tripMemoryService.quickTag(place: place) != nil
-                            ) {
-                                pendingTarget = .place(place)
-                                showEditor = true
+                    if !placeResults.isEmpty {
+                        Section {
+                            ForEach(placeResults) { place in
+                                resultRow(
+                                    title: place.name,
+                                    caption: place.address ?? "",
+                                    icon: "mappin.circle.fill",
+                                    isTagged: tripMemoryService.quickTag(place: place) != nil
+                                ) {
+                                    pendingTarget = .place(place)
+                                    showEditor = true
+                                }
                             }
+                        } header: {
+                            Text(AppLocalization.text(english: "Places", simplified: "地点", traditional: "地點"))
                         }
-                    } header: {
-                        Text(AppLocalization.text(english: "Places", simplified: "地点", traditional: "地點"))
+                    }
+                    if stationResults.isEmpty && placeResults.isEmpty {
+                        Section {
+                            Text(emptyStateText)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 24)
+                                .listRowBackground(Color.clear)
+                        }
                     }
                 }
-                if stationResults.isEmpty && placeResults.isEmpty {
-                    Section {
-                        Text(emptyStateText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 24)
-                            .listRowBackground(Color.clear)
-                    }
-                }
+                .listRowBackground(Color.clear)
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(Color.appBackground)
             .navigationTitle(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -16,95 +16,99 @@ struct QuickTagsView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    if tripMemoryService.stationQuickTags.isEmpty {
-                        VStack(spacing: 8) {
-                            Image(systemName: "tag.circle")
-                                .font(.largeTitle)
-                                .foregroundStyle(.secondary)
-                            Text(AppLocalization.localized("No Quick Tags yet"))
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                            Text(AppLocalization.text(
-                                english: "Tap + to add one.",
-                                simplified: "点击 + 添加。",
-                                traditional: "點擊 + 新增。"
-                            ))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 32)
-                    } else {
-                        ForEach(tripMemoryService.stationQuickTags) { quickTag in
-                            HStack(spacing: 10) {
-                                if quickTag.resolvedTargetType == .station {
-                                    NavigationLink(destination: StationDetailView(station: quickTag.toStation())) {
+                Group {
+                    Section {
+                        if tripMemoryService.stationQuickTags.isEmpty {
+                            VStack(spacing: 8) {
+                                Image(systemName: "tag.circle")
+                                    .font(.largeTitle)
+                                    .foregroundStyle(.secondary)
+                                Text(AppLocalization.localized("No Quick Tags yet"))
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                                Text(AppLocalization.text(
+                                    english: "Tap + to add one.",
+                                    simplified: "点击 + 添加。",
+                                    traditional: "點擊 + 新增。"
+                                ))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 32)
+                        } else {
+                            ForEach(tripMemoryService.stationQuickTags) { quickTag in
+                                HStack(spacing: 10) {
+                                    if quickTag.resolvedTargetType == .station {
+                                        NavigationLink(destination: StationDetailView(station: quickTag.toStation())) {
+                                            quickTagRow(quickTag)
+                                        }
+                                    } else {
+                                        // Map-place tags have no station page to open.
                                         quickTagRow(quickTag)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
                                     }
-                                } else {
-                                    // Map-place tags have no station page to open.
-                                    quickTagRow(quickTag)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
 
-                                Button {
-                                    editingQuickTag = quickTag
-                                } label: {
-                                    Image(systemName: "tag")
-                                        .imageScale(.medium)
-                                }
-                                .buttonStyle(.borderless)
-                                .accessibilityLabel(AppLocalization.localized("Edit Quick Tag"))
+                                    Button {
+                                        editingQuickTag = quickTag
+                                    } label: {
+                                        Image(systemName: "tag")
+                                            .imageScale(.medium)
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .accessibilityLabel(AppLocalization.localized("Edit Quick Tag"))
 
-                                Button(role: .destructive) {
-                                    tripMemoryService.deleteQuickTag(id: quickTag.id)
-                                } label: {
-                                    Image(systemName: "trash")
-                                        .imageScale(.medium)
+                                    Button(role: .destructive) {
+                                        tripMemoryService.deleteQuickTag(id: quickTag.id)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .imageScale(.medium)
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .accessibilityLabel(AppLocalization.localized("Delete Quick Tag"))
                                 }
-                                .buttonStyle(.borderless)
-                                .accessibilityLabel(AppLocalization.localized("Delete Quick Tag"))
-                            }
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    editingQuickTag = quickTag
-                                } label: {
-                                    Label(tagActionTitle, systemImage: "tag")
+                                .swipeActions(edge: .leading) {
+                                    Button {
+                                        editingQuickTag = quickTag
+                                    } label: {
+                                        Label(tagActionTitle, systemImage: "tag")
+                                    }
+                                    .tint(.accentColor)
                                 }
-                                .tint(.accentColor)
-                            }
-                            .swipeActions {
-                                Button(role: .destructive) {
-                                    tripMemoryService.deleteQuickTag(id: quickTag.id)
-                                } label: {
-                                    Label(AppLocalization.localized("Delete"), systemImage: "trash")
+                                .swipeActions {
+                                    Button(role: .destructive) {
+                                        tripMemoryService.deleteQuickTag(id: quickTag.id)
+                                    } label: {
+                                        Label(AppLocalization.localized("Delete"), systemImage: "trash")
+                                    }
                                 }
-                            }
-                            .contextMenu {
-                                Button {
-                                    editingQuickTag = quickTag
-                                } label: {
-                                    Label(tagActionTitle, systemImage: "tag")
+                                .contextMenu {
+                                    Button {
+                                        editingQuickTag = quickTag
+                                    } label: {
+                                        Label(tagActionTitle, systemImage: "tag")
+                                    }
                                 }
                             }
                         }
-                    }
-                } header: {
-                    HStack {
-                        Text(AppLocalization.text(
-                            english: "Saved tags",
-                            simplified: "已保存标签",
-                            traditional: "已儲存標籤"
-                        ))
-                        Spacer()
-                        Text("\(tripMemoryService.stationQuickTags.count)")
-                            .monospacedDigit()
+                    } header: {
+                        HStack {
+                            Text(AppLocalization.text(
+                                english: "Saved tags",
+                                simplified: "已保存标签",
+                                traditional: "已儲存標籤"
+                            ))
+                            Spacer()
+                            Text("\(tripMemoryService.stationQuickTags.count)")
+                                .monospacedDigit()
+                        }
                     }
                 }
+                .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .background(Color.appBackground)
             .navigationTitle(AppLocalization.localized("Quick Tags"))
             .navigationBarTitleDisplayMode(.inline)

@@ -78,34 +78,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 348,
+        "networkStations": 414,
         "matchedStations": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "accessibility": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 348
+          "total": 414
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 348
+          "total": 414
         }
       }
     },
@@ -2198,34 +2198,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 55,
+        "networkStations": 123,
         "matchedStations": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "accessibility": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 55
+          "total": 123
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 55
+          "total": 123
         }
       }
     },
@@ -2251,34 +2251,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 39,
+        "networkStations": 93,
         "matchedStations": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "accessibility": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 39
+          "total": 93
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 39
+          "total": 93
         }
       }
     },

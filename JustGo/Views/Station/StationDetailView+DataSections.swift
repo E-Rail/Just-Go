@@ -442,7 +442,10 @@ extension StationDetailView {
         case .notOpenForPassengerService, .noCurrentPassengerService:
             return .unavailable
         case nil:
-            return .unknown
+            // A loaded live snapshot is itself official data. The reviewed-resource record only
+            // covers the operator's *page*, and Shanghai/Guangzhou stations carry no review row,
+            // so without this the chip read "No data" directly above verified first/last times.
+            return viewModel?.officialStationInformation == nil ? .unknown : .official
         }
     }
 

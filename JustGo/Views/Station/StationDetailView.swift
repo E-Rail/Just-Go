@@ -103,10 +103,13 @@ struct StationDetailView: View {
     /// the native online surface has nothing to serve — the fetch failed and no snapshot is
     /// cached — so a blocked or offline network still gets the offline official data instead
     /// of only an error card.
+    /// Applies to every live-fetch city, not just Beijing: the directory lookup used to miss for
+    /// map-opened stations, so Shanghai and Guangzhou always fell into the non-native branch above
+    /// and kept their bundled sections by accident. Now that they reach the native surface too,
+    /// they need the same offline fallback Beijing had.
     var showsBundledStationSections: Bool {
         guard usesNativeStationInformationSurface else { return true }
-        return displayedStation.cityID == "1100" &&
-            viewModel?.officialStationInformation == nil &&
+        return viewModel?.officialStationInformation == nil &&
             viewModel?.officialStationInformationError != nil
     }
 

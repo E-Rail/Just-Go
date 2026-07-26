@@ -83,10 +83,25 @@ final class StationInformationDirectory: Sendable {
 
     /// The routing entry for a canonical station, if any source covers it live.
     func onlineEntry(forStationID stationID: String) -> StationDirectoryEntry? {
-        guard let entry = entriesByStationID[stationID],
+        guard let entry = entriesByStationID[Self.canonicalStationID(stationID)],
               onDeviceFetchSources.contains(entry.source),
               !entry.externalStationID.isEmpty else { return nil }
         return entry
+    }
+
+    /// Stations resolved from the bundled metro network carry a synthesised
+    /// `network-<cityID>-<canonicalID>` identifier, while the directory — like the city packs — is
+    /// keyed by the bare canonical ID. Every station opened from the map arrives in that
+    /// synthesised form, so without this the lookup missed for all of them and the live
+    /// first/last surface silently fell back to the "official page available" placeholder.
+    /// Anything else is already canonical.
+    private static func canonicalStationID(_ value: String) -> String {
+        let prefix = "network-"
+        guard value.hasPrefix(prefix),
+              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
+            return value
+        }
+        return String(value[value.index(after: citySeparator)...])
     }
 
     /// Whether a city has any station-information source, matching how `sources.json` declares it.

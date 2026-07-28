@@ -5,6 +5,7 @@ struct StationDetailView: View {
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State var viewModel: StationDetailViewModel?
     @State var selectedStationImage: FullScreenStationImage?
     @State var showQuickTagDialog = false
@@ -173,27 +174,22 @@ struct StationDetailView: View {
         let station = displayedStation
         return GlassCard {
             VStack(spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(station.localizedName)
-                            .font(.title)
-                            .fontWeight(.bold)
-                        if let alternateName = station.alternateLocalizedName {
-                            Text(alternateName)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
+                // At accessibility text sizes a name and two chips cannot share one row: the
+                // chips get squeezed into single-character columns and the station name breaks
+                // mid-syllable. Stack them instead once the type is that large.
+                if dynamicTypeSize.isAccessibilitySize {
+                    // One chip per row, not two side by side: at this type size a pair still
+                    // squeezes the wider label into a four-line stack inside its own capsule.
+                    VStack(alignment: .leading, spacing: 8) {
+                        headerNames(station)
+                        headerChips(station)
                     }
-
-                    Spacer()
-
-                    if station.isTransferStation {
-                        Label(AppLocalization.localized("Transfer"), systemImage: "arrow.triangle.2.circlepath")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.orange.opacity(0.2), in: Capsule())
-                            .foregroundStyle(.orange)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    HStack {
+                        headerNames(station)
+                        Spacer()
+                        headerChips(station)
                     }
                 }
 
@@ -210,6 +206,73 @@ struct StationDetailView: View {
                     .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func headerNames(_ station: Station) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(station.localizedName)
+                .font(.title)
+                .fontWeight(.bold)
+            if let alternateName = station.alternateLocalizedName {
+                Text(alternateName)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func headerChips(_ station: Station) -> some View {
+        // Service status sits before the transfer chip: whether the station takes passengers at
+        // all outranks how you change trains there.
+        if let serviceStatus = stationServiceStatusLabel {
+            Label(serviceStatus.text, systemImage: serviceStatus.icon)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.secondary.opacity(0.18), in: Capsule())
+                .foregroundStyle(.secondary)
+        }
+
+        if station.isTransferStation {
+            Label(AppLocalization.localized("Transfer"), systemImage: "arrow.triangle.2.circlepath")
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.orange.opacity(0.2), in: Capsule())
+                .foregroundStyle(.orange)
+        }
+    }
+
+    /// A station the network draws but riders cannot yet use. The reviewed operator state already
+    /// existed — it was only spelled out in prose far down the official-information section, so a
+    /// rider planning a trip to 福寿岭 had no way to see it was still a building site. This lifts
+    /// the same reviewed fact into the header, and keeps the two cases distinct: never opened at
+    /// all, versus open track with no passenger stop today.
+    private var stationServiceStatusLabel: (text: String, icon: String)? {
+        switch viewModel?.officialResourceReview?.stationInformationStatus {
+        case .notOpenForPassengerService:
+            return (
+                AppLocalization.text(
+                    english: "Not yet open",
+                    simplified: "尚未开通",
+                    traditional: "尚未開通"
+                ),
+                "hammer.fill"
+            )
+        case .noCurrentPassengerService:
+            return (
+                AppLocalization.text(
+                    english: "No passenger service",
+                    simplified: "暂不办理客运",
+                    traditional: "暫不辦理客運"
+                ),
+                "nosign"
+            )
+        case .exactPage, .officialContextOnly, nil:
+            return nil
         }
     }
 

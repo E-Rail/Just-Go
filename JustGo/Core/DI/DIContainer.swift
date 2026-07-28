@@ -159,7 +159,8 @@ final class DIContainer {
         let stationInformationRouter = OfficialStationInformationRouter(
             beijing: BeijingStationInformationProvider(diskCache: stationInformationDiskCache),
             shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache),
-            guangzhou: GuangzhouStationInformationProvider(diskCache: stationInformationDiskCache)
+            guangzhou: GuangzhouStationInformationProvider(diskCache: stationInformationDiskCache),
+            hangzhou: HangzhouStationInformationProvider(diskCache: stationInformationDiskCache)
         )
         let stationInformationDirectory = StationInformationDirectory()
         // The bundled catalog decode + validation is heavy; hand the service a loader so it

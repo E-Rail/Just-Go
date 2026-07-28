@@ -7,15 +7,18 @@ actor OfficialStationInformationRouter: OfficialStationInformationProviding {
     private let beijing: BeijingStationInformationProvider
     private let shanghai: ShanghaiStationInformationProvider
     private let guangzhou: GuangzhouStationInformationProvider
+    private let hangzhou: HangzhouStationInformationProvider
 
     init(
         beijing: BeijingStationInformationProvider,
         shanghai: ShanghaiStationInformationProvider,
-        guangzhou: GuangzhouStationInformationProvider
+        guangzhou: GuangzhouStationInformationProvider,
+        hangzhou: HangzhouStationInformationProvider
     ) {
         self.beijing = beijing
         self.shanghai = shanghai
         self.guangzhou = guangzhou
+        self.hangzhou = hangzhou
     }
 
     func information(
@@ -28,6 +31,8 @@ actor OfficialStationInformationRouter: OfficialStationInformationProviding {
             return try await shanghai.information(for: request)
         case .guangzhou:
             return try await guangzhou.information(for: request)
+        case .hangzhou:
+            return try await hangzhou.information(for: request)
         }
     }
 
@@ -35,6 +40,7 @@ actor OfficialStationInformationRouter: OfficialStationInformationProviding {
         await beijing.releaseMemory()
         await shanghai.releaseMemory()
         await guangzhou.releaseMemory()
+        await hangzhou.releaseMemory()
     }
 }
 
@@ -181,7 +187,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
                 throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
             }
             return PreparedRequest(stationID: stationID, lineStationIDs: keys, expectedNames: names)
-        case .beijing, .guangzhou:
+        case .beijing, .guangzhou, .hangzhou:
             throw OfficialStationInformationProviderError.invalidRequest(
                 "Non-Shanghai references are handled by their own provider"
             )

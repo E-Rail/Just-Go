@@ -147,6 +147,10 @@ STABLE_CATALOGS = {
     catalog: "DataPacks/sources/official-resources/guangzhou_station_information.json",
     rightsID: "guangzhou-official-station-references"
   },
+  "hangzhouMetroOnline" => {
+    catalog: "DataPacks/sources/official-resources/hangzhou_station_information.json",
+    rightsID: "hangzhou-official-station-references"
+  },
   "hongKongGovernment" => {
     catalog: "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
     rightsID: "data-gov-hk-mtr"

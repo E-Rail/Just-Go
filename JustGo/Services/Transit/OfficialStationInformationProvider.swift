@@ -52,6 +52,7 @@ enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
     case beijingSubwayOnline
     case shanghaiMetroOnline
     case guangzhouMetroOnline
+    case hangzhouMetroOnline
     case hongKongGovernment
 
     var title: String {
@@ -73,6 +74,12 @@ enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
                 english: "Guangzhou Metro",
                 simplified: "广州地铁",
                 traditional: "廣州地鐵"
+            )
+        case .hangzhouMetroOnline:
+            return AppLocalization.text(
+                english: "Hangzhou Metro",
+                simplified: "杭州地铁",
+                traditional: "杭州地鐵"
             )
         case .hongKongGovernment:
             return AppLocalization.text(
@@ -230,6 +237,10 @@ enum OfficialStationInformationReference: Hashable, Sendable {
     /// Guangzhou's serviceTime endpoint returns every line for a physical station from any one of
     /// its per-line codes, so the reference carries a single representative stationShowCode.
     case guangzhou(stationShowCode: String, expectedNames: [String])
+    /// Hangzhou returns the whole network in one response, so the reference carries every station
+    /// code the operator publishes for this physical station — usually one, but 火车东站 is split
+    /// upstream into a main-hall and an east-plaza record that have to be read together.
+    case hangzhou(stationCodes: [String], expectedNames: [String])
 }
 
 struct OfficialStationInformationRequest: Hashable, Sendable {
@@ -500,7 +511,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 externalStationID: externalID,
                 expectedNames: names
             )
-        case .shanghai, .guangzhou:
+        case .shanghai, .guangzhou, .hangzhou:
             throw OfficialStationInformationProviderError.invalidRequest(
                 "Non-Beijing references are handled by their own provider"
             )

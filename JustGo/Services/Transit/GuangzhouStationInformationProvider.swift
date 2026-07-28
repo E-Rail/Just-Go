@@ -160,7 +160,7 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
                 throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
             }
             return PreparedRequest(stationID: stationID, stationShowCode: code, expectedNames: names)
-        case .beijing, .shanghai:
+        case .beijing, .shanghai, .hangzhou:
             throw OfficialStationInformationProviderError.invalidRequest(
                 "Non-Guangzhou references are handled by their own provider"
             )

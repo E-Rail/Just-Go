@@ -69,6 +69,7 @@ module OSSDataValidators
     service.shmetro.com
     www.bjsubway.com
     www.gzmtr.com
+    www.hzmetro.com
     www.mlm.com.mo
     www.mtr.com.hk
     www.openstreetmap.org
@@ -429,6 +430,9 @@ module OSSDataValidators
         ].sort,
         "DataPacks/sources/official-resources/guangzhou_station_information.json" => %w[
           guangzhou-official-station-references justgo-generated-catalog osm-metro-networks
+        ].sort,
+        "DataPacks/sources/official-resources/hangzhou_station_information.json" => %w[
+          hangzhou-official-station-references justgo-generated-catalog osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/beijing_station_information.json" => %w[
           beijing-official-landing-links justgo-generated-catalog

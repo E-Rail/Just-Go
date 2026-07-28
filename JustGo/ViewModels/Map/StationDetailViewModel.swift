@@ -280,6 +280,15 @@ final class StationDetailViewModel {
             return .shanghai(lineStationIDs: entry.lineStationIDs, expectedNames: expectedNames)
         case "guangzhouMetroOnline":
             return .guangzhou(stationShowCode: entry.externalStationID, expectedNames: expectedNames)
+        case "hangzhouMetroOnline":
+            // Hangzhou keys service times per operator station record, and 火车东站 is published
+            // as two, so the reference carries every code rather than the representative alone.
+            return .hangzhou(
+                stationCodes: entry.lineStationIDs.isEmpty
+                    ? [entry.externalStationID]
+                    : entry.lineStationIDs,
+                expectedNames: expectedNames
+            )
         default:
             return nil
         }

@@ -82,6 +82,16 @@
       "redistribution": "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
     },
     {
+      "id": "hangzhou-official-station-references",
+      "kind": "linkMetadata",
+      "scope": "Reviewed official station identifiers (stationCode) and aliases for canonical Hangzhou app stations; no operator page text, schedules, station descriptions, facilities, exits, coordinates, images, or media are copied",
+      "licenseSPDX": "LicenseRef-External-Link-Only",
+      "licenseURL": "https://www.hzmetro.com/",
+      "sourceURL": "https://www.hzmetro.com/",
+      "attribution": "Hangzhou Metro Group Co., Ltd.",
+      "redistribution": "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
+    },
+    {
       "id": "macau-official-landing-link",
       "kind": "linkMetadata",
       "scope": "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
@@ -204,6 +214,14 @@
       "path": "DataPacks/sources/official-resources/guangzhou_station_information.json",
       "rightsIDs": [
         "guangzhou-official-station-references",
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/official-resources/hangzhou_station_information.json",
+      "rightsIDs": [
+        "hangzhou-official-station-references",
         "justgo-generated-catalog",
         "osm-metro-networks"
       ]

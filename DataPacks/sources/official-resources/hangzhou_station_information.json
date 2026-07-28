@@ -1,0 +1,3230 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-28",
+  "sourceIndexURL": "https://www.hzmetro.com/api/operation/all",
+  "sourceIndexSHA256": "19f41b307ada8c9f953649a6cf5f500db1fb9ee0cd82ab66c50055b6091554f4",
+  "operatorURL": "https://www.hzmetro.com/",
+  "siteInquiryURL": "https://www.hzmetro.com/operation/siteInquiry",
+  "provider": "Hangzhou Metro",
+  "canonicalStationCount": 270,
+  "sourceStationCount": 261,
+  "mappedStationCount": 259,
+  "stationPageCount": 259,
+  "stationPageGapCount": 11,
+  "stations": [
+    {
+      "stationID": "0141101571e0f102",
+      "stationName": "候潮门",
+      "stationNameEn": "Houchaomen",
+      "aliases": [
+
+      ],
+      "externalStationID": "160",
+      "lineStationIDs": [
+        "160"
+      ]
+    },
+    {
+      "stationID": "018607964b556e59",
+      "stationName": "文海南路",
+      "stationNameEn": "South Wenhai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "48",
+      "lineStationIDs": [
+        "48"
+      ]
+    },
+    {
+      "stationID": "03a95918d6d29d1a",
+      "stationName": "青山湖科技城",
+      "stationNameEn": "Qingshanhu Sci-tech City",
+      "aliases": [
+
+      ],
+      "externalStationID": "16",
+      "lineStationIDs": [
+        "16"
+      ]
+    },
+    {
+      "stationID": "0556252a5bea0876",
+      "stationName": "新汉路",
+      "stationNameEn": "Xinhan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "97",
+      "lineStationIDs": [
+        "97"
+      ]
+    },
+    {
+      "stationID": "05670e1a6b38a576",
+      "stationName": "耕文路",
+      "stationNameEn": "耕文路",
+      "aliases": [
+
+      ],
+      "externalStationID": "201",
+      "lineStationIDs": [
+        "201"
+      ]
+    },
+    {
+      "stationID": "05d4973df7fced1f",
+      "stationName": "五常",
+      "stationNameEn": "Wuchang",
+      "aliases": [
+
+      ],
+      "externalStationID": "6",
+      "lineStationIDs": [
+        "6"
+      ]
+    },
+    {
+      "stationID": "05fc641998ba3509",
+      "stationName": "荆长路",
+      "stationNameEn": "Jinchang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "61",
+      "lineStationIDs": [
+        "61"
+      ]
+    },
+    {
+      "stationID": "0607dd53c4b62207",
+      "stationName": "义蓬",
+      "stationNameEn": "Yipeng",
+      "aliases": [
+
+      ],
+      "externalStationID": "36",
+      "lineStationIDs": [
+        "36"
+      ]
+    },
+    {
+      "stationID": "069cc8b12db8949f",
+      "stationName": "潘水",
+      "stationNameEn": "Panshui",
+      "aliases": [
+
+      ],
+      "externalStationID": "231",
+      "lineStationIDs": [
+        "231"
+      ]
+    },
+    {
+      "stationID": "091b5d7e8fbb7290",
+      "stationName": "西浦路",
+      "stationNameEn": "西浦路",
+      "aliases": [
+
+      ],
+      "externalStationID": "137",
+      "lineStationIDs": [
+        "137"
+      ]
+    },
+    {
+      "stationID": "09627c4867b12bec",
+      "stationName": "留下",
+      "stationNameEn": "留下",
+      "aliases": [
+
+      ],
+      "externalStationID": "72",
+      "lineStationIDs": [
+        "72"
+      ]
+    },
+    {
+      "stationID": "0a12681cb740ae41",
+      "stationName": "博奥路",
+      "stationNameEn": "Bo'ao Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "8",
+      "lineStationIDs": [
+        "8"
+      ]
+    },
+    {
+      "stationID": "0b63bdb891b2a6b0",
+      "stationName": "笕桥老街",
+      "stationNameEn": "笕桥老街",
+      "aliases": [
+
+      ],
+      "externalStationID": "125",
+      "lineStationIDs": [
+        "125"
+      ]
+    },
+    {
+      "stationID": "0c22a165740b3f09",
+      "stationName": "启成路",
+      "stationNameEn": "Qicheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "189",
+      "lineStationIDs": [
+        "189"
+      ]
+    },
+    {
+      "stationID": "0e6ec677e75c51bd",
+      "stationName": "龙舟北路",
+      "stationNameEn": "龙舟北路",
+      "aliases": [
+
+      ],
+      "externalStationID": "229",
+      "lineStationIDs": [
+        "229"
+      ]
+    },
+    {
+      "stationID": "109f4c5fe292a7db",
+      "stationName": "蒋村",
+      "stationNameEn": "Jiangcun",
+      "aliases": [
+
+      ],
+      "externalStationID": "75",
+      "lineStationIDs": [
+        "75"
+      ]
+    },
+    {
+      "stationID": "11a42cbca8a418a1",
+      "stationName": "吴山前村",
+      "stationNameEn": "吴山前村",
+      "aliases": [
+
+      ],
+      "externalStationID": "142",
+      "lineStationIDs": [
+        "142"
+      ]
+    },
+    {
+      "stationID": "124478fc4894c518",
+      "stationName": "新风",
+      "stationNameEn": "Xinfeng",
+      "aliases": [
+
+      ],
+      "externalStationID": "124",
+      "lineStationIDs": [
+        "124"
+      ]
+    },
+    {
+      "stationID": "149a5db5e77a428d",
+      "stationName": "复兴路",
+      "stationNameEn": "Fuxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "91",
+      "lineStationIDs": [
+        "91"
+      ]
+    },
+    {
+      "stationID": "15ace8796c47759b",
+      "stationName": "古荡",
+      "stationNameEn": "古荡",
+      "aliases": [
+
+      ],
+      "externalStationID": "158",
+      "lineStationIDs": [
+        "158"
+      ]
+    },
+    {
+      "stationID": "178c139fbbdc4563",
+      "stationName": "盈中",
+      "stationNameEn": "Yingzhong",
+      "aliases": [
+
+      ],
+      "externalStationID": "115",
+      "lineStationIDs": [
+        "115"
+      ]
+    },
+    {
+      "stationID": "17961b88c2006e84",
+      "stationName": "坎山",
+      "stationNameEn": "Kanshan",
+      "aliases": [
+
+      ],
+      "externalStationID": "143",
+      "lineStationIDs": [
+        "143"
+      ]
+    },
+    {
+      "stationID": "17ad9bcefeb292ab",
+      "stationName": "双桥",
+      "stationNameEn": "Shuangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "86",
+      "lineStationIDs": [
+        "86"
+      ]
+    },
+    {
+      "stationID": "1845554cfe081ddb",
+      "stationName": "三坝",
+      "stationNameEn": "三坝",
+      "aliases": [
+
+      ],
+      "externalStationID": "224",
+      "lineStationIDs": [
+        "224"
+      ]
+    },
+    {
+      "stationID": "1850d1b15bc714e5",
+      "stationName": "南苑",
+      "stationNameEn": "Nanyuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "133",
+      "lineStationIDs": [
+        "133"
+      ]
+    },
+    {
+      "stationID": "18a52ae46c06313d",
+      "stationName": "下沙江滨",
+      "stationNameEn": "Xiashajiangbin",
+      "aliases": [
+
+      ],
+      "externalStationID": "18",
+      "lineStationIDs": [
+        "18"
+      ]
+    },
+    {
+      "stationID": "197dee91b6a8aa6b",
+      "stationName": "建设三路",
+      "stationNameEn": "建设三路",
+      "aliases": [
+
+      ],
+      "externalStationID": "156",
+      "lineStationIDs": [
+        "156"
+      ]
+    },
+    {
+      "stationID": "1a7b80692676a27c",
+      "stationName": "定安路",
+      "stationNameEn": "Ding'an Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "157",
+      "lineStationIDs": [
+        "157"
+      ]
+    },
+    {
+      "stationID": "1ab1b99122804495",
+      "stationName": "富阳客运中心",
+      "stationNameEn": "富阳客运中心",
+      "aliases": [
+
+      ],
+      "externalStationID": "260",
+      "lineStationIDs": [
+        "260"
+      ]
+    },
+    {
+      "stationID": "1b8a94a91617dd0a",
+      "stationName": "桂花西路",
+      "stationNameEn": "桂花西路",
+      "aliases": [
+
+      ],
+      "externalStationID": "236",
+      "lineStationIDs": [
+        "236"
+      ]
+    },
+    {
+      "stationID": "1c67997e0074e5b7",
+      "stationName": "九堡",
+      "stationNameEn": "Jiubao",
+      "aliases": [
+
+      ],
+      "externalStationID": "98",
+      "lineStationIDs": [
+        "98"
+      ]
+    },
+    {
+      "stationID": "1c787e8ce806a21a",
+      "stationName": "江汉路",
+      "stationNameEn": "江汉路",
+      "aliases": [
+
+      ],
+      "externalStationID": "139",
+      "lineStationIDs": [
+        "139"
+      ]
+    },
+    {
+      "stationID": "1dbf278875da4bd2",
+      "stationName": "葛巷",
+      "stationNameEn": "Gexiang",
+      "aliases": [
+
+      ],
+      "externalStationID": "83",
+      "lineStationIDs": [
+        "83"
+      ]
+    },
+    {
+      "stationID": "1de4ad57ea252804",
+      "stationName": "良睦路",
+      "stationNameEn": "Liangmu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "136",
+      "lineStationIDs": [
+        "136"
+      ]
+    },
+    {
+      "stationID": "1e1076e580050332",
+      "stationName": "野生动物园东",
+      "stationNameEn": "野生动物园东",
+      "aliases": [
+
+      ],
+      "externalStationID": "226",
+      "lineStationIDs": [
+        "226"
+      ]
+    },
+    {
+      "stationID": "1f07dd0c254180f9",
+      "stationName": "中医药大学",
+      "stationNameEn": "Zhejiang Chinese Medical University",
+      "aliases": [
+
+      ],
+      "externalStationID": "216",
+      "lineStationIDs": [
+        "216"
+      ]
+    },
+    {
+      "stationID": "210f0fd7a11a2e13",
+      "stationName": "钱江世纪城",
+      "stationNameEn": "Qianjiang Century City",
+      "aliases": [
+
+      ],
+      "externalStationID": "35",
+      "lineStationIDs": [
+        "35"
+      ]
+    },
+    {
+      "stationID": "21420dc123d54b3c",
+      "stationName": "古翠路",
+      "stationNameEn": "Gucui Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "50",
+      "lineStationIDs": [
+        "50"
+      ]
+    },
+    {
+      "stationID": "21542faf4e75c0da",
+      "stationName": "桥头堡",
+      "stationNameEn": "Qiaotoubao",
+      "aliases": [
+
+      ],
+      "externalStationID": "45",
+      "lineStationIDs": [
+        "45"
+      ]
+    },
+    {
+      "stationID": "2154e6b799312c65",
+      "stationName": "白洋",
+      "stationNameEn": "Baiyang",
+      "aliases": [
+
+      ],
+      "externalStationID": "203",
+      "lineStationIDs": [
+        "203"
+      ]
+    },
+    {
+      "stationID": "222395ebe4b1ad8a",
+      "stationName": "五堡",
+      "stationNameEn": "五堡",
+      "aliases": [
+
+      ],
+      "externalStationID": "175",
+      "lineStationIDs": [
+        "175"
+      ]
+    },
+    {
+      "stationID": "2262d48fab466dce",
+      "stationName": "曹家桥",
+      "stationNameEn": "Caojiaqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "187",
+      "lineStationIDs": [
+        "187"
+      ]
+    },
+    {
+      "stationID": "25d73a9223e4b3d3",
+      "stationName": "宝善桥",
+      "stationNameEn": "Baoshan Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "22",
+      "lineStationIDs": [
+        "22"
+      ]
+    },
+    {
+      "stationID": "26e0441107ae83f1",
+      "stationName": "受降",
+      "stationNameEn": "受降",
+      "aliases": [
+
+      ],
+      "externalStationID": "147",
+      "lineStationIDs": [
+        "147"
+      ]
+    },
+    {
+      "stationID": "2ab6f10feee1fc97",
+      "stationName": "黄龙体育中心",
+      "stationNameEn": "Huanglong Sports Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "253",
+      "lineStationIDs": [
+        "253"
+      ]
+    },
+    {
+      "stationID": "2ae58213308cdba8",
+      "stationName": "九睦路",
+      "stationNameEn": "Jiumu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "38",
+      "lineStationIDs": [
+        "38"
+      ]
+    },
+    {
+      "stationID": "2cc5bd4b7a6a8f44",
+      "stationName": "小和山",
+      "stationNameEn": "小和山",
+      "aliases": [
+
+      ],
+      "externalStationID": "73",
+      "lineStationIDs": [
+        "73"
+      ]
+    },
+    {
+      "stationID": "2d725ad3ed76ca06",
+      "stationName": "文新",
+      "stationNameEn": "Wenxin",
+      "aliases": [
+
+      ],
+      "externalStationID": "180",
+      "lineStationIDs": [
+        "180"
+      ]
+    },
+    {
+      "stationID": "2f6a6b07b8e1288e",
+      "stationName": "潮王路",
+      "stationNameEn": "潮王路",
+      "aliases": [
+
+      ],
+      "externalStationID": "146",
+      "lineStationIDs": [
+        "146"
+      ]
+    },
+    {
+      "stationID": "314b43c63ac8e595",
+      "stationName": "永盛路",
+      "stationNameEn": "Yongsheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "88",
+      "lineStationIDs": [
+        "88"
+      ]
+    },
+    {
+      "stationID": "329d775d5658cf8e",
+      "stationName": "阳陂湖",
+      "stationNameEn": "阳陂湖",
+      "aliases": [
+
+      ],
+      "externalStationID": "182",
+      "lineStationIDs": [
+        "182"
+      ]
+    },
+    {
+      "stationID": "337f329df0a11afa",
+      "stationName": "杨家墩",
+      "stationNameEn": "杨家墩",
+      "aliases": [
+
+      ],
+      "externalStationID": "181",
+      "lineStationIDs": [
+        "181"
+      ]
+    },
+    {
+      "stationID": "3446be0d07c06b0e",
+      "stationName": "杭行路",
+      "stationNameEn": "杭行路",
+      "aliases": [
+
+      ],
+      "externalStationID": "80",
+      "lineStationIDs": [
+        "80"
+      ]
+    },
+    {
+      "stationID": "34699df9f7fc6855",
+      "stationName": "大关",
+      "stationNameEn": "Daguan",
+      "aliases": [
+
+      ],
+      "externalStationID": "64",
+      "lineStationIDs": [
+        "64"
+      ]
+    },
+    {
+      "stationID": "350ed743bf705f30",
+      "stationName": "禹航路",
+      "stationNameEn": "Yuhang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "171",
+      "lineStationIDs": [
+        "171"
+      ]
+    },
+    {
+      "stationID": "354edb8ebb658bd5",
+      "stationName": "高沙路",
+      "stationNameEn": "Gaosha Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "165",
+      "lineStationIDs": [
+        "165"
+      ]
+    },
+    {
+      "stationID": "3556ed64cf4dc578",
+      "stationName": "金鸡路",
+      "stationNameEn": "Jinji Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "196",
+      "lineStationIDs": [
+        "196"
+      ]
+    },
+    {
+      "stationID": "358bb2724e6f4abf",
+      "stationName": "邱山大街",
+      "stationNameEn": "邱山大街",
+      "aliases": [
+
+      ],
+      "externalStationID": "93",
+      "lineStationIDs": [
+        "93"
+      ]
+    },
+    {
+      "stationID": "359ef5c33c1f27b7",
+      "stationName": "冯娄村",
+      "stationNameEn": "冯娄村",
+      "aliases": [
+
+      ],
+      "externalStationID": "15",
+      "lineStationIDs": [
+        "15"
+      ]
+    },
+    {
+      "stationID": "36ea27e89c6a09a4",
+      "stationName": "新塘",
+      "stationNameEn": "Xintang",
+      "aliases": [
+
+      ],
+      "externalStationID": "95",
+      "lineStationIDs": [
+        "95"
+      ]
+    },
+    {
+      "stationID": "370396719bfe2bd8",
+      "stationName": "西溪湿地南",
+      "stationNameEn": "西溪湿地南",
+      "aliases": [
+
+      ],
+      "externalStationID": "197",
+      "lineStationIDs": [
+        "197"
+      ]
+    },
+    {
+      "stationID": "371287a8fe115c8c",
+      "stationName": "江陵路",
+      "stationNameEn": "Jiangling Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "105",
+      "lineStationIDs": [
+        "105"
+      ]
+    },
+    {
+      "stationID": "37819cda83a924c3",
+      "stationName": "南阳",
+      "stationNameEn": "南阳",
+      "aliases": [
+
+      ],
+      "externalStationID": "234",
+      "lineStationIDs": [
+        "234"
+      ]
+    },
+    {
+      "stationID": "37df799b6dd47b5b",
+      "stationName": "和睦",
+      "stationNameEn": "Hemu",
+      "aliases": [
+
+      ],
+      "externalStationID": "130",
+      "lineStationIDs": [
+        "130"
+      ]
+    },
+    {
+      "stationID": "39291918e6798819",
+      "stationName": "吴山广场",
+      "stationNameEn": "吴山广场",
+      "aliases": [
+
+      ],
+      "externalStationID": "223",
+      "lineStationIDs": [
+        "223"
+      ]
+    },
+    {
+      "stationID": "393c96a0b32686d7",
+      "stationName": "城星路",
+      "stationNameEn": "Chengxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "241",
+      "lineStationIDs": [
+        "241"
+      ]
+    },
+    {
+      "stationID": "39ff3deb25a93cc4",
+      "stationName": "江东二路",
+      "stationNameEn": "Jiangdong'er Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "41",
+      "lineStationIDs": [
+        "41"
+      ]
+    },
+    {
+      "stationID": "3b13b78214de8cc4",
+      "stationName": "杭氧",
+      "stationNameEn": "Hangyang",
+      "aliases": [
+
+      ],
+      "externalStationID": "25",
+      "lineStationIDs": [
+        "25"
+      ]
+    },
+    {
+      "stationID": "3b3ebff3ce84ebe1",
+      "stationName": "金德路",
+      "stationNameEn": "Jinde Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "77",
+      "lineStationIDs": [
+        "77"
+      ]
+    },
+    {
+      "stationID": "3c3b03d6631ac79b",
+      "stationName": "黄鹤山",
+      "stationNameEn": "黄鹤山",
+      "aliases": [
+
+      ],
+      "externalStationID": "17",
+      "lineStationIDs": [
+        "17"
+      ]
+    },
+    {
+      "stationID": "3d4e0f572f9b9d1d",
+      "stationName": "丰潭路",
+      "stationNameEn": "Fengtan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "257",
+      "lineStationIDs": [
+        "257"
+      ]
+    },
+    {
+      "stationID": "3e18e7b3727c6000",
+      "stationName": "人民路",
+      "stationNameEn": "Renmin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "113",
+      "lineStationIDs": [
+        "113"
+      ]
+    },
+    {
+      "stationID": "403a898b36d56d8b",
+      "stationName": "西兴",
+      "stationNameEn": "Xixing",
+      "aliases": [
+
+      ],
+      "externalStationID": "205",
+      "lineStationIDs": [
+        "205"
+      ]
+    },
+    {
+      "stationID": "408742a779f420a0",
+      "stationName": "中泰",
+      "stationNameEn": "Zhongtai",
+      "aliases": [
+
+      ],
+      "externalStationID": "247",
+      "lineStationIDs": [
+        "247"
+      ]
+    },
+    {
+      "stationID": "41e5f5f2180dbff6",
+      "stationName": "红普南路",
+      "stationNameEn": "South Hongpu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "70",
+      "lineStationIDs": [
+        "70"
+      ]
+    },
+    {
+      "stationID": "428e49b2d797c450",
+      "stationName": "好运街",
+      "stationNameEn": "好运街",
+      "aliases": [
+
+      ],
+      "externalStationID": "47",
+      "lineStationIDs": [
+        "47"
+      ]
+    },
+    {
+      "stationID": "43e189270c74ca6e",
+      "stationName": "市民中心",
+      "stationNameEn": "Citizen Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "96",
+      "lineStationIDs": [
+        "96"
+      ]
+    },
+    {
+      "stationID": "440d0bc8c188e116",
+      "stationName": "黎明",
+      "stationNameEn": "黎明",
+      "aliases": [
+
+      ],
+      "externalStationID": "215",
+      "lineStationIDs": [
+        "215"
+      ]
+    },
+    {
+      "stationID": "44e5bd2afa95f6f5",
+      "stationName": "绿汀路",
+      "stationNameEn": "Lvting Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "106",
+      "lineStationIDs": [
+        "106"
+      ]
+    },
+    {
+      "stationID": "45fdd7f8bff887e9",
+      "stationName": "科海路",
+      "stationNameEn": "Kehai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "12",
+      "lineStationIDs": [
+        "12"
+      ]
+    },
+    {
+      "stationID": "4862d78fea5048ba",
+      "stationName": "储运路",
+      "stationNameEn": "储运路",
+      "aliases": [
+
+      ],
+      "externalStationID": "20",
+      "lineStationIDs": [
+        "20"
+      ]
+    },
+    {
+      "stationID": "49179b56437c4ce7",
+      "stationName": "乔司南",
+      "stationNameEn": "South Qiaosi",
+      "aliases": [
+
+      ],
+      "externalStationID": "177",
+      "lineStationIDs": [
+        "177"
+      ]
+    },
+    {
+      "stationID": "49fb96d376e497c5",
+      "stationName": "合欢路",
+      "stationNameEn": "Hehuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "213",
+      "lineStationIDs": [
+        "213"
+      ]
+    },
+    {
+      "stationID": "4a38a5935c1e9e78",
+      "stationName": "伟业路",
+      "stationNameEn": "伟业路",
+      "aliases": [
+
+      ],
+      "externalStationID": "227",
+      "lineStationIDs": [
+        "227"
+      ]
+    },
+    {
+      "stationID": "4b07f7548931f0e2",
+      "stationName": "桃花湖公园",
+      "stationNameEn": "Taohua Lake Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "116",
+      "lineStationIDs": [
+        "116"
+      ]
+    },
+    {
+      "stationID": "4dadc5909d0c8820",
+      "stationName": "昙花庵路",
+      "stationNameEn": "Tanhuaan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "13",
+      "lineStationIDs": [
+        "13"
+      ]
+    },
+    {
+      "stationID": "512baeaa485c0023",
+      "stationName": "杭州大会展中心",
+      "stationNameEn": "杭州大会展中心",
+      "aliases": [
+
+      ],
+      "externalStationID": "39",
+      "lineStationIDs": [
+        "39"
+      ]
+    },
+    {
+      "stationID": "51e466761aaaa33d",
+      "stationName": "御道",
+      "stationNameEn": "Yudao",
+      "aliases": [
+
+      ],
+      "externalStationID": "161",
+      "lineStationIDs": [
+        "161"
+      ]
+    },
+    {
+      "stationID": "5263873f3a60541c",
+      "stationName": "向阳路",
+      "stationNameEn": "向阳路",
+      "aliases": [
+
+      ],
+      "externalStationID": "126",
+      "lineStationIDs": [
+        "126"
+      ]
+    },
+    {
+      "stationID": "52b38d74b48dbc02",
+      "stationName": "花坞",
+      "stationNameEn": "Huawu",
+      "aliases": [
+
+      ],
+      "externalStationID": "56",
+      "lineStationIDs": [
+        "56"
+      ]
+    },
+    {
+      "stationID": "52d684fa68b58960",
+      "stationName": "火车东站",
+      "stationNameEn": "East Railway Station",
+      "aliases": [
+        "火车东站（东广场）"
+      ],
+      "externalStationID": "76",
+      "lineStationIDs": [
+        "76",
+        "150"
+      ]
+    },
+    {
+      "stationID": "52f57223dc457c11",
+      "stationName": "文三路",
+      "stationNameEn": "Wensan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "128",
+      "lineStationIDs": [
+        "128"
+      ]
+    },
+    {
+      "stationID": "5754b39854adbfed",
+      "stationName": "星桥",
+      "stationNameEn": "星桥",
+      "aliases": [
+
+      ],
+      "externalStationID": "138",
+      "lineStationIDs": [
+        "138"
+      ]
+    },
+    {
+      "stationID": "5849aa928de4507f",
+      "stationName": "金沙湖",
+      "stationNameEn": "Jinshahu",
+      "aliases": [
+
+      ],
+      "externalStationID": "222",
+      "lineStationIDs": [
+        "222"
+      ]
+    },
+    {
+      "stationID": "58aba9703bace44c",
+      "stationName": "金星",
+      "stationNameEn": "Jinxing",
+      "aliases": [
+
+      ],
+      "externalStationID": "11",
+      "lineStationIDs": [
+        "11"
+      ]
+    },
+    {
+      "stationID": "5a9e702967aa308a",
+      "stationName": "丁桥",
+      "stationNameEn": "丁桥",
+      "aliases": [
+
+      ],
+      "externalStationID": "245",
+      "lineStationIDs": [
+        "245"
+      ]
+    },
+    {
+      "stationID": "5aa2f5a24016d1d7",
+      "stationName": "中村",
+      "stationNameEn": "中村",
+      "aliases": [
+
+      ],
+      "externalStationID": "204",
+      "lineStationIDs": [
+        "204"
+      ]
+    },
+    {
+      "stationID": "5b116aa76cb51d59",
+      "stationName": "文一西路",
+      "stationNameEn": "West Wenyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "90",
+      "lineStationIDs": [
+        "90"
+      ]
+    },
+    {
+      "stationID": "5ba2474eb1449e2b",
+      "stationName": "庆春广场",
+      "stationNameEn": "Qingchun Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "141",
+      "lineStationIDs": [
+        "141"
+      ]
+    },
+    {
+      "stationID": "5cbc15bdf7216665",
+      "stationName": "五联",
+      "stationNameEn": "五联",
+      "aliases": [
+
+      ],
+      "externalStationID": "208",
+      "lineStationIDs": [
+        "208"
+      ]
+    },
+    {
+      "stationID": "5ef94fcd263b8f30",
+      "stationName": "文泽路",
+      "stationNameEn": "Wenze Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "63",
+      "lineStationIDs": [
+        "63"
+      ]
+    },
+    {
+      "stationID": "60bed24b4d37ce05",
+      "stationName": "河庄路",
+      "stationNameEn": "河庄路",
+      "aliases": [
+
+      ],
+      "externalStationID": "60",
+      "lineStationIDs": [
+        "60"
+      ]
+    },
+    {
+      "stationID": "617b923faae9da07",
+      "stationName": "银湖",
+      "stationNameEn": "Yinhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "71",
+      "lineStationIDs": [
+        "71"
+      ]
+    },
+    {
+      "stationID": "63cc7919a8447363",
+      "stationName": "滨和路",
+      "stationNameEn": "Binhe Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "237",
+      "lineStationIDs": [
+        "237"
+      ]
+    },
+    {
+      "stationID": "64764c1037ff4b36",
+      "stationName": "兴议",
+      "stationNameEn": "Xingyi",
+      "aliases": [
+
+      ],
+      "externalStationID": "14",
+      "lineStationIDs": [
+        "14"
+      ]
+    },
+    {
+      "stationID": "65879309e88b7c94",
+      "stationName": "拱宸桥东",
+      "stationNameEn": "East Gongchen Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "82",
+      "lineStationIDs": [
+        "82"
+      ]
+    },
+    {
+      "stationID": "67959e751ec10bc1",
+      "stationName": "云水",
+      "stationNameEn": "Yunshui",
+      "aliases": [
+
+      ],
+      "externalStationID": "37",
+      "lineStationIDs": [
+        "37"
+      ]
+    },
+    {
+      "stationID": "67ab2391c47544f0",
+      "stationName": "下宁桥",
+      "stationNameEn": "Xianing Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "94",
+      "lineStationIDs": [
+        "94"
+      ]
+    },
+    {
+      "stationID": "696a16c0f9c1ec61",
+      "stationName": "九和路",
+      "stationNameEn": "Jiuhe Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "31",
+      "lineStationIDs": [
+        "31"
+      ]
+    },
+    {
+      "stationID": "6c06bc763787a29a",
+      "stationName": "丰北",
+      "stationNameEn": "Fengbei",
+      "aliases": [
+
+      ],
+      "externalStationID": "242",
+      "lineStationIDs": [
+        "242"
+      ]
+    },
+    {
+      "stationID": "6cfba02cde4ce2b0",
+      "stationName": "沈塘桥",
+      "stationNameEn": "Shentangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "167",
+      "lineStationIDs": [
+        "167"
+      ]
+    },
+    {
+      "stationID": "6e345d52c83f54e0",
+      "stationName": "江城路",
+      "stationNameEn": "Jiangcheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "104",
+      "lineStationIDs": [
+        "104"
+      ]
+    },
+    {
+      "stationID": "6e843eb16b4d7e93",
+      "stationName": "花园岗",
+      "stationNameEn": "Huayuangang",
+      "aliases": [
+
+      ],
+      "externalStationID": "99",
+      "lineStationIDs": [
+        "99"
+      ]
+    },
+    {
+      "stationID": "6e9dcc72c6c8c4b3",
+      "stationName": "浦沿",
+      "stationNameEn": "Puyan",
+      "aliases": [
+
+      ],
+      "externalStationID": "42",
+      "lineStationIDs": [
+        "42"
+      ]
+    },
+    {
+      "stationID": "6fd24b9886596d47",
+      "stationName": "池华街",
+      "stationNameEn": "Chihua Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "57",
+      "lineStationIDs": [
+        "57"
+      ]
+    },
+    {
+      "stationID": "6ff51f07dda6e07d",
+      "stationName": "奥体中心",
+      "stationNameEn": "Olympic Sports Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "251",
+      "lineStationIDs": [
+        "251"
+      ]
+    },
+    {
+      "stationID": "7087b7f59a40cf40",
+      "stationName": "高教路",
+      "stationNameEn": "高教路",
+      "aliases": [
+
+      ],
+      "externalStationID": "259",
+      "lineStationIDs": [
+        "259"
+      ]
+    },
+    {
+      "stationID": "70ef493cd3357095",
+      "stationName": "桃源街",
+      "stationNameEn": "桃源街",
+      "aliases": [
+
+      ],
+      "externalStationID": "238",
+      "lineStationIDs": [
+        "238"
+      ]
+    },
+    {
+      "stationID": "713a4c9e266a8478",
+      "stationName": "美院象山",
+      "stationNameEn": "美院象山",
+      "aliases": [
+
+      ],
+      "externalStationID": "58",
+      "lineStationIDs": [
+        "58"
+      ]
+    },
+    {
+      "stationID": "726a6211dbab99c3",
+      "stationName": "墩祥街",
+      "stationNameEn": "Dunxiang Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "10",
+      "lineStationIDs": [
+        "10"
+      ]
+    },
+    {
+      "stationID": "76d6c7e94d49ad42",
+      "stationName": "联庄",
+      "stationNameEn": "Lianzhuang",
+      "aliases": [
+
+      ],
+      "externalStationID": "220",
+      "lineStationIDs": [
+        "220"
+      ]
+    },
+    {
+      "stationID": "778cd390f48712bf",
+      "stationName": "建国北路",
+      "stationNameEn": "North Jianguo Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "101",
+      "lineStationIDs": [
+        "101"
+      ]
+    },
+    {
+      "stationID": "77a28d07b46a2115",
+      "stationName": "逸盛路",
+      "stationNameEn": "Yisheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "131",
+      "lineStationIDs": [
+        "131"
+      ]
+    },
+    {
+      "stationID": "782ccb8ffd4b2866",
+      "stationName": "荷禹路",
+      "stationNameEn": "Heyu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "127",
+      "lineStationIDs": [
+        "127"
+      ]
+    },
+    {
+      "stationID": "788bea37b67cccf0",
+      "stationName": "人民广场",
+      "stationNameEn": "People Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "51",
+      "lineStationIDs": [
+        "51"
+      ]
+    },
+    {
+      "stationID": "79a18f24ed71aef8",
+      "stationName": "江锦路",
+      "stationNameEn": "江锦路",
+      "aliases": [
+
+      ],
+      "externalStationID": "29",
+      "lineStationIDs": [
+        "29"
+      ]
+    },
+    {
+      "stationID": "7a03164a47e71ef8",
+      "stationName": "甬江路",
+      "stationNameEn": "Yongjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "54",
+      "lineStationIDs": [
+        "54"
+      ]
+    },
+    {
+      "stationID": "7bf2543bad2a3578",
+      "stationName": "古荡新村",
+      "stationNameEn": "Gudangxincun",
+      "aliases": [
+
+      ],
+      "externalStationID": "170",
+      "lineStationIDs": [
+        "170"
+      ]
+    },
+    {
+      "stationID": "7ee4ea989f60726b",
+      "stationName": "全丰",
+      "stationNameEn": "全丰",
+      "aliases": [
+
+      ],
+      "externalStationID": "154",
+      "lineStationIDs": [
+        "154"
+      ]
+    },
+    {
+      "stationID": "805f2a06bff0b518",
+      "stationName": "石马",
+      "stationNameEn": "Shima",
+      "aliases": [
+
+      ],
+      "externalStationID": "132",
+      "lineStationIDs": [
+        "132"
+      ]
+    },
+    {
+      "stationID": "80baba7776ffed66",
+      "stationName": "西文街",
+      "stationNameEn": "Xiwen Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "164",
+      "lineStationIDs": [
+        "164"
+      ]
+    },
+    {
+      "stationID": "8113adfbe932f54c",
+      "stationName": "高桥",
+      "stationNameEn": "高桥",
+      "aliases": [
+
+      ],
+      "externalStationID": "218",
+      "lineStationIDs": [
+        "218"
+      ]
+    },
+    {
+      "stationID": "81312b0ef0f774e4",
+      "stationName": "九州街",
+      "stationNameEn": "Jiuzhou Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "169",
+      "lineStationIDs": [
+        "169"
+      ]
+    },
+    {
+      "stationID": "81d89350cbe688cb",
+      "stationName": "学院路",
+      "stationNameEn": "Xueyuan Road",
+      "aliases": [
+        "学院路站"
+      ],
+      "externalStationID": "52",
+      "lineStationIDs": [
+        "52"
+      ]
+    },
+    {
+      "stationID": "82184237c546dfc8",
+      "stationName": "皋亭坝",
+      "stationNameEn": "皋亭坝",
+      "aliases": [
+
+      ],
+      "externalStationID": "144",
+      "lineStationIDs": [
+        "144"
+      ]
+    },
+    {
+      "stationID": "828589560eb17c09",
+      "stationName": "大运河",
+      "stationNameEn": "The Grand Canal",
+      "aliases": [
+
+      ],
+      "externalStationID": "185",
+      "lineStationIDs": [
+        "185"
+      ]
+    },
+    {
+      "stationID": "8370f0e046a36c07",
+      "stationName": "北大桥",
+      "stationNameEn": "Beida Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "153",
+      "lineStationIDs": [
+        "153"
+      ]
+    },
+    {
+      "stationID": "839cad4a6d4d1723",
+      "stationName": "联胜路",
+      "stationNameEn": "联胜路",
+      "aliases": [
+
+      ],
+      "externalStationID": "198",
+      "lineStationIDs": [
+        "198"
+      ]
+    },
+    {
+      "stationID": "83e3599c1a9511d1",
+      "stationName": "青西三路",
+      "stationNameEn": "青西三路",
+      "aliases": [
+
+      ],
+      "externalStationID": "148",
+      "lineStationIDs": [
+        "148"
+      ]
+    },
+    {
+      "stationID": "8514eadcc9e88642",
+      "stationName": "振宁路",
+      "stationNameEn": "Zhenning Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "2",
+      "lineStationIDs": [
+        "2"
+      ]
+    },
+    {
+      "stationID": "860e8b0fae142616",
+      "stationName": "善贤",
+      "stationNameEn": "Shanxian",
+      "aliases": [
+
+      ],
+      "externalStationID": "250",
+      "lineStationIDs": [
+        "250"
+      ]
+    },
+    {
+      "stationID": "866f353546d6591e",
+      "stationName": "南湖东",
+      "stationNameEn": "East Nanhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "235",
+      "lineStationIDs": [
+        "235"
+      ]
+    },
+    {
+      "stationID": "86774510ca2c0778",
+      "stationName": "婺江路",
+      "stationNameEn": "Wujiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "59",
+      "lineStationIDs": [
+        "59"
+      ]
+    },
+    {
+      "stationID": "8760f10b1265a900",
+      "stationName": "祥园路",
+      "stationNameEn": "Xiangyuan Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "65",
+      "lineStationIDs": [
+        "65"
+      ]
+    },
+    {
+      "stationID": "888200266fc5f9a8",
+      "stationName": "双浦",
+      "stationNameEn": "Shuangpu",
+      "aliases": [
+
+      ],
+      "externalStationID": "214",
+      "lineStationIDs": [
+        "214"
+      ]
+    },
+    {
+      "stationID": "88f2f2ca3ed468a1",
+      "stationName": "三堡",
+      "stationNameEn": "Sanbao",
+      "aliases": [
+
+      ],
+      "externalStationID": "192",
+      "lineStationIDs": [
+        "192"
+      ]
+    },
+    {
+      "stationID": "89d408064cf540cd",
+      "stationName": "莫邪塘",
+      "stationNameEn": "Moyetang",
+      "aliases": [
+
+      ],
+      "externalStationID": "19",
+      "lineStationIDs": [
+        "19"
+      ]
+    },
+    {
+      "stationID": "8a40d27950184c02",
+      "stationName": "南峰",
+      "stationNameEn": "Nanfeng",
+      "aliases": [
+
+      ],
+      "externalStationID": "100",
+      "lineStationIDs": [
+        "100"
+      ]
+    },
+    {
+      "stationID": "8b4b1991f4a612db",
+      "stationName": "龙安",
+      "stationNameEn": "Long’an",
+      "aliases": [
+
+      ],
+      "externalStationID": "206",
+      "lineStationIDs": [
+        "206"
+      ]
+    },
+    {
+      "stationID": "8d265caffdd8aa08",
+      "stationName": "公望街",
+      "stationNameEn": "公望街",
+      "aliases": [
+
+      ],
+      "externalStationID": "40",
+      "lineStationIDs": [
+        "40"
+      ]
+    },
+    {
+      "stationID": "8f837f5d50b23b16",
+      "stationName": "闸弄口",
+      "stationNameEn": "Zhalongkou",
+      "aliases": [
+
+      ],
+      "externalStationID": "256",
+      "lineStationIDs": [
+        "256"
+      ]
+    },
+    {
+      "stationID": "8fc291b52f6d4790",
+      "stationName": "近江",
+      "stationNameEn": "Jinjiang",
+      "aliases": [
+
+      ],
+      "externalStationID": "219",
+      "lineStationIDs": [
+        "219"
+      ]
+    },
+    {
+      "stationID": "8fc3ab2567573927",
+      "stationName": "博览中心",
+      "stationNameEn": "Expo Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "194",
+      "lineStationIDs": [
+        "194"
+      ]
+    },
+    {
+      "stationID": "906935dde09d6bee",
+      "stationName": "工商大学云滨",
+      "stationNameEn": "工商大学云滨",
+      "aliases": [
+
+      ],
+      "externalStationID": "190",
+      "lineStationIDs": [
+        "190"
+      ]
+    },
+    {
+      "stationID": "90791ac295b94654",
+      "stationName": "客运中心",
+      "stationNameEn": "Coach Center",
+      "aliases": [
+
+      ],
+      "externalStationID": "121",
+      "lineStationIDs": [
+        "121"
+      ]
+    },
+    {
+      "stationID": "92f1fd34b8316f43",
+      "stationName": "华丰路",
+      "stationNameEn": "华丰路",
+      "aliases": [
+
+      ],
+      "externalStationID": "258",
+      "lineStationIDs": [
+        "258"
+      ]
+    },
+    {
+      "stationID": "932b7a4f611c7e18",
+      "stationName": "枫桦西路",
+      "stationNameEn": "枫桦西路",
+      "aliases": [
+
+      ],
+      "externalStationID": "123",
+      "lineStationIDs": [
+        "123"
+      ]
+    },
+    {
+      "stationID": "943ee3815a0aaf23",
+      "stationName": "钱江路",
+      "stationNameEn": "Qianjiang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "21",
+      "lineStationIDs": [
+        "21"
+      ]
+    },
+    {
+      "stationID": "94a4fa330213bf56",
+      "stationName": "万安桥",
+      "stationNameEn": "Wan’an Bridge",
+      "aliases": [
+
+      ],
+      "externalStationID": "24",
+      "lineStationIDs": [
+        "24"
+      ]
+    },
+    {
+      "stationID": "96e0824f6af8c196",
+      "stationName": "洪园",
+      "stationNameEn": "Hongyuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "193",
+      "lineStationIDs": [
+        "193"
+      ]
+    },
+    {
+      "stationID": "97b539115aca05e5",
+      "stationName": "临平南高铁站",
+      "stationNameEn": "Linpingnan Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "243",
+      "lineStationIDs": [
+        "243"
+      ]
+    },
+    {
+      "stationID": "998ddbaa821a80b1",
+      "stationName": "中河北路",
+      "stationNameEn": "North Zhonghe Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "62",
+      "lineStationIDs": [
+        "62"
+      ]
+    },
+    {
+      "stationID": "9bb5fb35d7287427",
+      "stationName": "永福",
+      "stationNameEn": "Yongfu",
+      "aliases": [
+
+      ],
+      "externalStationID": "102",
+      "lineStationIDs": [
+        "102"
+      ]
+    },
+    {
+      "stationID": "9c6e7891261a2f88",
+      "stationName": "知行路",
+      "stationNameEn": "知行路",
+      "aliases": [
+
+      ],
+      "externalStationID": "68",
+      "lineStationIDs": [
+        "68"
+      ]
+    },
+    {
+      "stationID": "9c753e85ac53488b",
+      "stationName": "庆菱路",
+      "stationNameEn": "Qingling Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "111",
+      "lineStationIDs": [
+        "111"
+      ]
+    },
+    {
+      "stationID": "9ca561889d77ec25",
+      "stationName": "海创园",
+      "stationNameEn": "Haichuangyuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "149",
+      "lineStationIDs": [
+        "149"
+      ]
+    },
+    {
+      "stationID": "9d7ae9664821ce67",
+      "stationName": "杭师大仓前",
+      "stationNameEn": "Cangqian Campus Hangzhou Normal University",
+      "aliases": [
+
+      ],
+      "externalStationID": "186",
+      "lineStationIDs": [
+        "186"
+      ]
+    },
+    {
+      "stationID": "a19ea1d44135abc5",
+      "stationName": "景芳",
+      "stationNameEn": "景芳",
+      "aliases": [
+
+      ],
+      "externalStationID": "84",
+      "lineStationIDs": [
+        "84"
+      ]
+    },
+    {
+      "stationID": "a27391bd48707867",
+      "stationName": "武林广场",
+      "stationNameEn": "Wulin Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "134",
+      "lineStationIDs": [
+        "134"
+      ]
+    },
+    {
+      "stationID": "a284cadfa0936246",
+      "stationName": "下沙西",
+      "stationNameEn": "West Xiasha",
+      "aliases": [
+
+      ],
+      "externalStationID": "74",
+      "lineStationIDs": [
+        "74"
+      ]
+    },
+    {
+      "stationID": "a37c20cc63423dda",
+      "stationName": "滨康路",
+      "stationNameEn": "Binkang Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "4",
+      "lineStationIDs": [
+        "4"
+      ]
+    },
+    {
+      "stationID": "a3ac7ae4099a10c6",
+      "stationName": "临安广场",
+      "stationNameEn": "Lin'an Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "85",
+      "lineStationIDs": [
+        "85"
+      ]
+    },
+    {
+      "stationID": "a40d02108921b0ab",
+      "stationName": "明石路",
+      "stationNameEn": "明石路",
+      "aliases": [
+
+      ],
+      "externalStationID": "151",
+      "lineStationIDs": [
+        "151"
+      ]
+    },
+    {
+      "stationID": "a434f8915404cabb",
+      "stationName": "萍水街",
+      "stationNameEn": "Pingshui Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "103",
+      "lineStationIDs": [
+        "103"
+      ]
+    },
+    {
+      "stationID": "a439869d93f86618",
+      "stationName": "龙翔桥",
+      "stationNameEn": "Longxiangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "233",
+      "lineStationIDs": [
+        "233"
+      ]
+    },
+    {
+      "stationID": "a483df429c09a238",
+      "stationName": "新镇路",
+      "stationNameEn": "Xinzhen Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "117",
+      "lineStationIDs": [
+        "117"
+      ]
+    },
+    {
+      "stationID": "a4da899eb205bf3c",
+      "stationName": "水澄桥",
+      "stationNameEn": "Shuichengqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "34",
+      "lineStationIDs": [
+        "34"
+      ]
+    },
+    {
+      "stationID": "a535e46f06d61e63",
+      "stationName": "青山湖",
+      "stationNameEn": "Qingshanhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "112",
+      "lineStationIDs": [
+        "112"
+      ]
+    },
+    {
+      "stationID": "aa7eb74e0808adc2",
+      "stationName": "杭发厂",
+      "stationNameEn": "Hangfachang",
+      "aliases": [
+
+      ],
+      "externalStationID": "114",
+      "lineStationIDs": [
+        "114"
+      ]
+    },
+    {
+      "stationID": "ab3368b7824ac9b2",
+      "stationName": "武林门",
+      "stationNameEn": "Wulinmen",
+      "aliases": [
+
+      ],
+      "externalStationID": "107",
+      "lineStationIDs": [
+        "107"
+      ]
+    },
+    {
+      "stationID": "ab58a510a0b58f08",
+      "stationName": "新兴路",
+      "stationNameEn": "Xinxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "129",
+      "lineStationIDs": [
+        "129"
+      ]
+    },
+    {
+      "stationID": "acc94bff8449631b",
+      "stationName": "东岳",
+      "stationNameEn": "Dongyue",
+      "aliases": [
+
+      ],
+      "externalStationID": "79",
+      "lineStationIDs": [
+        "79"
+      ]
+    },
+    {
+      "stationID": "aec4c1218c461a02",
+      "stationName": "三墩",
+      "stationNameEn": "Sandun",
+      "aliases": [
+
+      ],
+      "externalStationID": "23",
+      "lineStationIDs": [
+        "23"
+      ]
+    },
+    {
+      "stationID": "af0154165d0faf05",
+      "stationName": "浙大紫金港",
+      "stationNameEn": "Zhejiang University Zijingang Campus",
+      "aliases": [
+
+      ],
+      "externalStationID": "183",
+      "lineStationIDs": [
+        "183"
+      ]
+    },
+    {
+      "stationID": "b1c23f5ce3549eb8",
+      "stationName": "彭埠",
+      "stationNameEn": "Pengbu",
+      "aliases": [
+
+      ],
+      "externalStationID": "55",
+      "lineStationIDs": [
+        "55"
+      ]
+    },
+    {
+      "stationID": "b2446df75df7bcc2",
+      "stationName": "五洲路",
+      "stationNameEn": "Wuzhou Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "145",
+      "lineStationIDs": [
+        "145"
+      ]
+    },
+    {
+      "stationID": "b28427fa6c1f15ab",
+      "stationName": "新街",
+      "stationNameEn": "Xinjie",
+      "aliases": [
+
+      ],
+      "externalStationID": "81",
+      "lineStationIDs": [
+        "81"
+      ]
+    },
+    {
+      "stationID": "b2a87e35fb46e5b8",
+      "stationName": "湘湖",
+      "stationNameEn": "Xianghu",
+      "aliases": [
+
+      ],
+      "externalStationID": "32",
+      "lineStationIDs": [
+        "32"
+      ]
+    },
+    {
+      "stationID": "b5b06ba22515f87e",
+      "stationName": "建业路",
+      "stationNameEn": "建业路",
+      "aliases": [
+
+      ],
+      "externalStationID": "166",
+      "lineStationIDs": [
+        "166"
+      ]
+    },
+    {
+      "stationID": "b5c390e4e200b74c",
+      "stationName": "飞虹路",
+      "stationNameEn": "Feihong Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "120",
+      "lineStationIDs": [
+        "120"
+      ]
+    },
+    {
+      "stationID": "b6b28437ed68ec50",
+      "stationName": "汽轮广场",
+      "stationNameEn": "汽轮广场",
+      "aliases": [
+
+      ],
+      "externalStationID": "1",
+      "lineStationIDs": [
+        "1"
+      ]
+    },
+    {
+      "stationID": "b6f101acbad3a55d",
+      "stationName": "古墩路",
+      "stationNameEn": "Gudun Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "168",
+      "lineStationIDs": [
+        "168"
+      ]
+    },
+    {
+      "stationID": "b81ebc9b84362070",
+      "stationName": "元宝塘",
+      "stationNameEn": "Yuanbaotang",
+      "aliases": [
+
+      ],
+      "externalStationID": "249",
+      "lineStationIDs": [
+        "249"
+      ]
+    },
+    {
+      "stationID": "b8985f2a0eb8d3b0",
+      "stationName": "翁梅",
+      "stationNameEn": "Wengmei",
+      "aliases": [
+
+      ],
+      "externalStationID": "199",
+      "lineStationIDs": [
+        "199"
+      ]
+    },
+    {
+      "stationID": "b9b2d2c0c99c5878",
+      "stationName": "吴家角港",
+      "stationNameEn": "Wujiajiao Port",
+      "aliases": [
+
+      ],
+      "externalStationID": "110",
+      "lineStationIDs": [
+        "110"
+      ]
+    },
+    {
+      "stationID": "bb6d888aa9b29d8f",
+      "stationName": "霞鸣街",
+      "stationNameEn": "Xiaming Street",
+      "aliases": [
+
+      ],
+      "externalStationID": "254",
+      "lineStationIDs": [
+        "254"
+      ]
+    },
+    {
+      "stationID": "bbb7dde34fcb628d",
+      "stationName": "凤起路",
+      "stationNameEn": "Fengqi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "163",
+      "lineStationIDs": [
+        "163"
+      ]
+    },
+    {
+      "stationID": "bd3327f174f71733",
+      "stationName": "七堡",
+      "stationNameEn": "Qibao",
+      "aliases": [
+
+      ],
+      "externalStationID": "155",
+      "lineStationIDs": [
+        "155"
+      ]
+    },
+    {
+      "stationID": "beb9f706cc971af2",
+      "stationName": "平澜路",
+      "stationNameEn": "平澜路",
+      "aliases": [
+
+      ],
+      "externalStationID": "92",
+      "lineStationIDs": [
+        "92"
+      ]
+    },
+    {
+      "stationID": "bed673cc1ae96908",
+      "stationName": "华鹤街",
+      "stationNameEn": "华鹤街",
+      "aliases": [
+
+      ],
+      "externalStationID": "135",
+      "lineStationIDs": [
+        "135"
+      ]
+    },
+    {
+      "stationID": "bef3c4a6ffaaac5b",
+      "stationName": "亚运村",
+      "stationNameEn": "Asian Games Village",
+      "aliases": [
+
+      ],
+      "externalStationID": "184",
+      "lineStationIDs": [
+        "184"
+      ]
+    },
+    {
+      "stationID": "bfef2da54626de5b",
+      "stationName": "驿城路",
+      "stationNameEn": "Yicheng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "209",
+      "lineStationIDs": [
+        "209"
+      ]
+    },
+    {
+      "stationID": "c027858debe3d8f1",
+      "stationName": "南湖",
+      "stationNameEn": "Nanhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "202",
+      "lineStationIDs": [
+        "202"
+      ]
+    },
+    {
+      "stationID": "c14d4cda8b4a5756",
+      "stationName": "盈丰路",
+      "stationNameEn": "Yingfeng Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "5",
+      "lineStationIDs": [
+        "5"
+      ]
+    },
+    {
+      "stationID": "c5395da9f8f867ba",
+      "stationName": "建设一路",
+      "stationNameEn": "Jiansheyi Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "176",
+      "lineStationIDs": [
+        "176"
+      ]
+    },
+    {
+      "stationID": "c5530cbf6ee8fef4",
+      "stationName": "火车南站",
+      "stationNameEn": "South Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "118",
+      "lineStationIDs": [
+        "118"
+      ]
+    },
+    {
+      "stationID": "c5620bfca764b09a",
+      "stationName": "塘新线",
+      "stationNameEn": "Tangxinxian",
+      "aliases": [
+
+      ],
+      "externalStationID": "246",
+      "lineStationIDs": [
+        "246"
+      ]
+    },
+    {
+      "stationID": "c59739cddc5784d7",
+      "stationName": "江晖路",
+      "stationNameEn": "Jianghui Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "28",
+      "lineStationIDs": [
+        "28"
+      ]
+    },
+    {
+      "stationID": "c5ab2e516fdcc52c",
+      "stationName": "诚业路",
+      "stationNameEn": "诚业路",
+      "aliases": [
+
+      ],
+      "externalStationID": "69",
+      "lineStationIDs": [
+        "69"
+      ]
+    },
+    {
+      "stationID": "c67927ab7fc07efc",
+      "stationName": "通惠中路",
+      "stationNameEn": "Middle Tonghui Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "9",
+      "lineStationIDs": [
+        "9"
+      ]
+    },
+    {
+      "stationID": "c679ea32a8e57a87",
+      "stationName": "打铁关",
+      "stationNameEn": "Datieguan",
+      "aliases": [
+
+      ],
+      "externalStationID": "261",
+      "lineStationIDs": [
+        "261"
+      ]
+    },
+    {
+      "stationID": "c6b02292592a01d9",
+      "stationName": "明星路",
+      "stationNameEn": "Mingxing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "207",
+      "lineStationIDs": [
+        "207"
+      ]
+    },
+    {
+      "stationID": "c78b3d54c9e57af6",
+      "stationName": "香积寺",
+      "stationNameEn": "香积寺",
+      "aliases": [
+
+      ],
+      "externalStationID": "211",
+      "lineStationIDs": [
+        "211"
+      ]
+    },
+    {
+      "stationID": "c7b2435da59b606a",
+      "stationName": "朝阳",
+      "stationNameEn": "Chaoyang",
+      "aliases": [
+
+      ],
+      "externalStationID": "179",
+      "lineStationIDs": [
+        "179"
+      ]
+    },
+    {
+      "stationID": "c8b8fae349148ab7",
+      "stationName": "八百里",
+      "stationNameEn": "Babaili",
+      "aliases": [
+
+      ],
+      "externalStationID": "78",
+      "lineStationIDs": [
+        "78"
+      ]
+    },
+    {
+      "stationID": "c96155fbb80d7004",
+      "stationName": "华中南路",
+      "stationNameEn": "华中南路",
+      "aliases": [
+
+      ],
+      "externalStationID": "240",
+      "lineStationIDs": [
+        "240"
+      ]
+    },
+    {
+      "stationID": "ca5cabd3df128898",
+      "stationName": "城站",
+      "stationNameEn": "Chengzhan",
+      "aliases": [
+
+      ],
+      "externalStationID": "30",
+      "lineStationIDs": [
+        "30"
+      ]
+    },
+    {
+      "stationID": "cd2f666d1b251adc",
+      "stationName": "西溪湿地北",
+      "stationNameEn": "North Xixi Wetland",
+      "aliases": [
+
+      ],
+      "externalStationID": "239",
+      "lineStationIDs": [
+        "239"
+      ]
+    },
+    {
+      "stationID": "cdd265498ba60559",
+      "stationName": "聚才路",
+      "stationNameEn": "Jucai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "122",
+      "lineStationIDs": [
+        "122"
+      ]
+    },
+    {
+      "stationID": "ce6568881f57081c",
+      "stationName": "枸桔弄",
+      "stationNameEn": "Goujunong",
+      "aliases": [
+
+      ],
+      "externalStationID": "43",
+      "lineStationIDs": [
+        "43"
+      ]
+    },
+    {
+      "stationID": "ceb89fe5a6ee9f4b",
+      "stationName": "东新园",
+      "stationNameEn": "Dongxinyuan",
+      "aliases": [
+        "东新园站"
+      ],
+      "externalStationID": "87",
+      "lineStationIDs": [
+        "87"
+      ]
+    },
+    {
+      "stationID": "cfd08864cd71026a",
+      "stationName": "虾龙圩",
+      "stationNameEn": "Xialongwei",
+      "aliases": [
+
+      ],
+      "externalStationID": "178",
+      "lineStationIDs": [
+        "178"
+      ]
+    },
+    {
+      "stationID": "d0e802b25a5a661e",
+      "stationName": "火车西站",
+      "stationNameEn": "West Railway Station",
+      "aliases": [
+
+      ],
+      "externalStationID": "225",
+      "lineStationIDs": [
+        "225"
+      ]
+    },
+    {
+      "stationID": "d16b42751d71a348",
+      "stationName": "音乐学院",
+      "stationNameEn": "音乐学院",
+      "aliases": [
+
+      ],
+      "externalStationID": "67",
+      "lineStationIDs": [
+        "67"
+      ]
+    },
+    {
+      "stationID": "d41db550c35230ff",
+      "stationName": "长河",
+      "stationNameEn": "Changhe",
+      "aliases": [
+
+      ],
+      "externalStationID": "66",
+      "lineStationIDs": [
+        "66"
+      ]
+    },
+    {
+      "stationID": "d52647ae07c9a049",
+      "stationName": "渡驾桥",
+      "stationNameEn": "Dujiaqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "26",
+      "lineStationIDs": [
+        "26"
+      ]
+    },
+    {
+      "stationID": "d6ce324de1c1089c",
+      "stationName": "之江文化中心",
+      "stationNameEn": "之江文化中心",
+      "aliases": [
+
+      ],
+      "externalStationID": "7",
+      "lineStationIDs": [
+        "7"
+      ]
+    },
+    {
+      "stationID": "d8340c905a30dff6",
+      "stationName": "良渚",
+      "stationNameEn": "Liangzhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "173",
+      "lineStationIDs": [
+        "173"
+      ]
+    },
+    {
+      "stationID": "d9b459089b020f79",
+      "stationName": "创景路",
+      "stationNameEn": "Chuangjing Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "200",
+      "lineStationIDs": [
+        "200"
+      ]
+    },
+    {
+      "stationID": "d9fcf24d29a8f316",
+      "stationName": "乔司",
+      "stationNameEn": "Qiaosi",
+      "aliases": [
+
+      ],
+      "externalStationID": "3",
+      "lineStationIDs": [
+        "3"
+      ]
+    },
+    {
+      "stationID": "db0091762c59fc83",
+      "stationName": "新天地街",
+      "stationNameEn": "新天地街",
+      "aliases": [
+
+      ],
+      "externalStationID": "89",
+      "lineStationIDs": [
+        "89"
+      ]
+    },
+    {
+      "stationID": "db27c9445a1e360d",
+      "stationName": "星民",
+      "stationNameEn": "Xingmin",
+      "aliases": [
+
+      ],
+      "externalStationID": "108",
+      "lineStationIDs": [
+        "108"
+      ]
+    },
+    {
+      "stationID": "db627e2c894195b6",
+      "stationName": "黄龙洞",
+      "stationNameEn": "Huanglongdong",
+      "aliases": [
+
+      ],
+      "externalStationID": "140",
+      "lineStationIDs": [
+        "140"
+      ]
+    },
+    {
+      "stationID": "db79a9953e55f8ad",
+      "stationName": "金家渡",
+      "stationNameEn": "Jinjiadu",
+      "aliases": [
+
+      ],
+      "externalStationID": "27",
+      "lineStationIDs": [
+        "27"
+      ]
+    },
+    {
+      "stationID": "dc61c6769a4ae6bd",
+      "stationName": "虎啸杏",
+      "stationNameEn": "Huxiaoxing",
+      "aliases": [
+
+      ],
+      "externalStationID": "191",
+      "lineStationIDs": [
+        "191"
+      ]
+    },
+    {
+      "stationID": "dc8c79887f1d8bc7",
+      "stationName": "汤家村",
+      "stationNameEn": "汤家村",
+      "aliases": [
+
+      ],
+      "externalStationID": "49",
+      "lineStationIDs": [
+        "49"
+      ]
+    },
+    {
+      "stationID": "dd4c0aff9cb6035f",
+      "stationName": "屏峰",
+      "stationNameEn": "屏峰",
+      "aliases": [
+
+      ],
+      "externalStationID": "152",
+      "lineStationIDs": [
+        "152"
+      ]
+    },
+    {
+      "stationID": "de7454c30d2459b0",
+      "stationName": "平安桥",
+      "stationNameEn": "平安桥",
+      "aliases": [
+
+      ],
+      "externalStationID": "174",
+      "lineStationIDs": [
+        "174"
+      ]
+    },
+    {
+      "stationID": "ded4c85174eb8be4",
+      "stationName": "新湾路",
+      "stationNameEn": "新湾路",
+      "aliases": [
+
+      ],
+      "externalStationID": "252",
+      "lineStationIDs": [
+        "252"
+      ]
+    },
+    {
+      "stationID": "df2c5fae4c82b4e0",
+      "stationName": "仓北村",
+      "stationNameEn": "仓北村",
+      "aliases": [
+
+      ],
+      "externalStationID": "53",
+      "lineStationIDs": [
+        "53"
+      ]
+    },
+    {
+      "stationID": "dffde0d1c3646085",
+      "stationName": "农林大学",
+      "stationNameEn": "Zhejiang A & F University",
+      "aliases": [
+
+      ],
+      "externalStationID": "44",
+      "lineStationIDs": [
+        "44"
+      ]
+    },
+    {
+      "stationID": "e3cbd526f7350ad0",
+      "stationName": "姑娘桥",
+      "stationNameEn": "Guniangqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "188",
+      "lineStationIDs": [
+        "188"
+      ]
+    },
+    {
+      "stationID": "e7ac352e005f3753",
+      "stationName": "港城大道",
+      "stationNameEn": "港城大道",
+      "aliases": [
+
+      ],
+      "externalStationID": "195",
+      "lineStationIDs": [
+        "195"
+      ]
+    },
+    {
+      "stationID": "e9d629430624cf9a",
+      "stationName": "观音塘",
+      "stationNameEn": "Guanyintang",
+      "aliases": [
+
+      ],
+      "externalStationID": "172",
+      "lineStationIDs": [
+        "172"
+      ]
+    },
+    {
+      "stationID": "ea989c7c65163c2a",
+      "stationName": "翠柏路",
+      "stationNameEn": "Cuibai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "162",
+      "lineStationIDs": [
+        "162"
+      ]
+    },
+    {
+      "stationID": "ebdc8693c1f8cfc2",
+      "stationName": "独城生态公园",
+      "stationNameEn": "独城生态公园",
+      "aliases": [
+
+      ],
+      "externalStationID": "228",
+      "lineStationIDs": [
+        "228"
+      ]
+    },
+    {
+      "stationID": "ebe69181aa9ce7ae",
+      "stationName": "六堡",
+      "stationNameEn": "六堡",
+      "aliases": [
+
+      ],
+      "externalStationID": "33",
+      "lineStationIDs": [
+        "33"
+      ]
+    },
+    {
+      "stationID": "ed100430d0e9c0d5",
+      "stationName": "凤新路",
+      "stationNameEn": "Fengxin Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "119",
+      "lineStationIDs": [
+        "119"
+      ]
+    },
+    {
+      "stationID": "ee38570fbe31e70e",
+      "stationName": "新业路",
+      "stationNameEn": "Xinye Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "221",
+      "lineStationIDs": [
+        "221"
+      ]
+    },
+    {
+      "stationID": "ee79e40514c2dc5b",
+      "stationName": "新港",
+      "stationNameEn": "Xingang",
+      "aliases": [
+
+      ],
+      "externalStationID": "210",
+      "lineStationIDs": [
+        "210"
+      ]
+    },
+    {
+      "stationID": "f06dede0337aace6",
+      "stationName": "育才北路",
+      "stationNameEn": "North Yucai Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "244",
+      "lineStationIDs": [
+        "244"
+      ]
+    },
+    {
+      "stationID": "f459bdc6e770067f",
+      "stationName": "西湖文化广场",
+      "stationNameEn": "West Lake Cultural Square",
+      "aliases": [
+
+      ],
+      "externalStationID": "230",
+      "lineStationIDs": [
+        "230"
+      ]
+    },
+    {
+      "stationID": "f72e0747a779dd97",
+      "stationName": "临平",
+      "stationNameEn": "Linping",
+      "aliases": [
+
+      ],
+      "externalStationID": "109",
+      "lineStationIDs": [
+        "109"
+      ]
+    },
+    {
+      "stationID": "fa395152de005b0a",
+      "stationName": "江河汇",
+      "stationNameEn": "Jianghehui",
+      "aliases": [
+
+      ],
+      "externalStationID": "46",
+      "lineStationIDs": [
+        "46"
+      ]
+    },
+    {
+      "stationID": "fa68ae69152d595f",
+      "stationName": "南星桥",
+      "stationNameEn": "Nanxingqiao",
+      "aliases": [
+
+      ],
+      "externalStationID": "232",
+      "lineStationIDs": [
+        "232"
+      ]
+    },
+    {
+      "stationID": "fbf969a2c536fdd8",
+      "stationName": "杜甫村",
+      "stationNameEn": "Dufucun",
+      "aliases": [
+
+      ],
+      "externalStationID": "255",
+      "lineStationIDs": [
+        "255"
+      ]
+    },
+    {
+      "stationID": "fc2a3039443fe501",
+      "stationName": "青六中路",
+      "stationNameEn": "Middle Qingliu Road",
+      "aliases": [
+
+      ],
+      "externalStationID": "248",
+      "lineStationIDs": [
+        "248"
+      ]
+    },
+    {
+      "stationID": "fe5c4f047ea52707",
+      "stationName": "萧山国际机场",
+      "stationNameEn": "Xiaoshan International Airport",
+      "aliases": [
+
+      ],
+      "externalStationID": "159",
+      "lineStationIDs": [
+        "159"
+      ]
+    },
+    {
+      "stationID": "ff9073d879e2fd87",
+      "stationName": "同协路",
+      "stationNameEn": "同协路",
+      "aliases": [
+
+      ],
+      "externalStationID": "212",
+      "lineStationIDs": [
+        "212"
+      ]
+    }
+  ],
+  "canonicalCoverageGaps": [
+    {
+      "stationID": "10b446504a3bc477",
+      "stationName": "周王庙",
+      "stationNameEn": "周王庙",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "23ebc133f79cca21",
+      "stationName": "桐九公路",
+      "stationNameEn": "桐九公路",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "50cb035b7930f594",
+      "stationName": "长安(东方学院)",
+      "stationNameEn": "Changan(Dongfang College)",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "60347627b400dcf2",
+      "stationName": "浙大国际校区",
+      "stationNameEn": "浙大国际校区",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "763697ad342a17c9",
+      "stationName": "海宁高铁西站",
+      "stationNameEn": "海宁高铁西站",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "841532650348a016",
+      "stationName": "长安东",
+      "stationNameEn": "长安东",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "892baadfd50d72c9",
+      "stationName": "斜桥",
+      "stationNameEn": "斜桥",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "c10a1e65e187ed66",
+      "stationName": "许村",
+      "stationNameEn": "Xucun",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "da3aad6d762cd760",
+      "stationName": "皮革城",
+      "stationNameEn": "皮革城",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "e34429a25f957266",
+      "stationName": "盐官",
+      "stationNameEn": "盐官",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    },
+    {
+      "stationID": "ee77a61bdf68f9b1",
+      "stationName": "海昌路",
+      "stationNameEn": "Haichang Road",
+      "lineNames": [
+        "杭海城际铁路"
+      ],
+      "reason": "hainingIntercity"
+    }
+  ],
+  "sourceOnlyStationCount": 1,
+  "sourceOnlyStationNames": [
+    "创明路"
+  ]
+}

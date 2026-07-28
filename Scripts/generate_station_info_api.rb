@@ -86,6 +86,25 @@ module StationInfoAPIGenerator
     end
   end
 
+  # Hangzhou's endpoint returns the whole network in one payload, so the reference is the
+  # station's own codes rather than a page: the pinned representative plus every code the
+  # operator publishes for that physical station (火车东站 is split into two records upstream).
+  def hangzhou_entries
+    catalog("hangzhou_station_information.json").fetch("stations").map do |station|
+      [
+        station.fetch("stationID"),
+        display(station).merge(
+          "sources" => {
+            "hangzhouMetroOnline" => {
+              "externalStationID" => station.fetch("externalStationID"),
+              "lineStationIDs" => station.fetch("lineStationIDs")
+            }
+          }
+        )
+      ]
+    end
+  end
+
   def hong_kong_entries
     catalog("hong_kong_station_bindings.json").fetch("stations").map do |station|
       [
@@ -112,7 +131,8 @@ module StationInfoAPIGenerator
 
   def build
     merged = {}
-    (beijing_entries + shanghai_entries + guangzhou_entries + hong_kong_entries).each do |station_id, fragment|
+    (beijing_entries + shanghai_entries + guangzhou_entries + hangzhou_entries +
+      hong_kong_entries).each do |station_id, fragment|
       existing = merged[station_id]
       if existing
         existing.fetch("sources").merge!(fragment.fetch("sources"))

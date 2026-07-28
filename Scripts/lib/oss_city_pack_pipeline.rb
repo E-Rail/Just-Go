@@ -602,6 +602,16 @@ module OSSCityPackPipeline
             "redistribution" => "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
           },
           {
+            "id" => "hangzhou-official-station-references",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed official station identifiers (stationCode) and aliases for canonical Hangzhou app stations; no operator page text, schedules, station descriptions, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://www.hzmetro.com/",
+            "sourceURL" => "https://www.hzmetro.com/",
+            "attribution" => "Hangzhou Metro Group Co., Ltd.",
+            "redistribution" => "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
+          },
+          {
             "id" => "macau-official-landing-link",
             "kind" => "linkMetadata",
             "scope" => "HTTPS Macao LRT operator homepage link only; no operator facts or media are copied",
@@ -721,6 +731,13 @@ module OSSCityPackPipeline
           "path" => "DataPacks/sources/official-resources/guangzhou_station_information.json",
           "rightsIDs" => %w[
             guangzhou-official-station-references justgo-generated-catalog
+            osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/hangzhou_station_information.json",
+          "rightsIDs" => %w[
+            hangzhou-official-station-references justgo-generated-catalog
             osm-metro-networks
           ].sort
         },
@@ -853,14 +870,15 @@ module OSSCityPackPipeline
         https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
         https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
 
-        Guangzhou and Shanghai station references are reviewed operator station identifiers for
-        canonical app stations. The bundle contains identifier and alias metadata, not operator
-        page text, schedules, facilities, exits, coordinates, images, or layouts. For those
-        reviewed identifiers, Station Detail may request first/last train times from the operator
-        for temporary, non-persistent native display; the response remains subject to the
-        operator's terms:
+        Guangzhou, Shanghai and Hangzhou station references are reviewed operator station
+        identifiers for canonical app stations. The bundle contains identifier and alias metadata,
+        not operator page text, schedules, station descriptions, facilities, exits, coordinates,
+        images, or layouts. For those reviewed identifiers, Station Detail may request first/last
+        train times from the operator for temporary, non-persistent native display; the response
+        remains subject to the operator's terms:
         https://www.gzmtr.com/
         https://service.shmetro.com/czxx/index.htm
+        https://www.hzmetro.com/
       MARKDOWN
     end
 

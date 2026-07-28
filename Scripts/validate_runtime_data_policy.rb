@@ -76,6 +76,8 @@ expected_web_literals = Set.new([
   ["JustGo/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["JustGo/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],
   ["JustGo/Services/Transit/ShanghaiStationInformationProvider.swift", "https://service.shmetro.com/"],
+  ["JustGo/Services/Transit/HangzhouStationInformationProvider.swift", "https://www.hzmetro.com"],
+  ["JustGo/Services/Transit/HangzhouStationInformationProvider.swift", "https://www.hzmetro.com/operation/siteInquiry"],
   ["JustGo/Services/Data/OfficialCityPackService.swift", "https://www.bjsubway.com/station/xltcx/"],
   ["JustGo/Services/Data/OfficialCityPackService.swift", "https://www.mtr.bj.cn/service/line/"],
   ["JustGo/Services/Data/OfficialCityPackService.swift", "https://www.mtr.com.hk/en/customer/services/system_map.html"],

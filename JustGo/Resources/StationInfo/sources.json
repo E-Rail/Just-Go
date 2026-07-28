@@ -175,6 +175,47 @@
         "placeholders": ["/", "-", "无", "暂无"]
       }
     },
+    "hangzhouMetroOnline": {
+      "cityID": "3301",
+      "provider": "Hangzhou Metro",
+      "attribution": "Hangzhou Metro Group Co., Ltd.",
+      "license": "LicenseRef-External-Link-Only",
+      "redistributable": false,
+      "status": "stable",
+      "populates": ["lines"],
+      "directoryKey": "lineStationIDs",
+      "access": {
+        "kind": "onDeviceFetch",
+        "endpoints": {
+          "operationAll": {
+            "method": "POST",
+            "url": "https://www.hzmetro.com/api/operation/all",
+            "requestBody": "",
+            "responseType": "application/json",
+            "note": "The whole network in one response — every line, every station, and each station's first/last train per direction. Unlike the other mainland sources there is no per-station endpoint: fetch once and read the station out of the payload."
+          }
+        }
+      },
+      "map": {
+        "lines": {
+          "from": "data.subwaySiteDetail{lineName}[] direction blocks, filtered to allStation[] entries whose stationCode is one of the station's lineStationIDs",
+          "lineName": "the subwaySiteDetail key",
+          "lineColorHex": null,
+          "direction": "title",
+          "firstTrain": "allStation[].startTime",
+          "lastTrain": "allStation[].endTime"
+        }
+      },
+      "rules": {
+        "request": "POST with Content-Type application/x-www-form-urlencoded and an empty body. The endpoint answers HTTP 502 unless a same-origin Origin (https://www.hzmetro.com) and Referer are sent; no auth token is required.",
+        "identity": "data.stationlist[] carries stationCode and stationName; reject the response unless the name for a requested code matches the reviewed catalog name or one of its aliases.",
+        "lineStationIDs": "One physical station usually has a single code. 火车东站 is published as two records — the main hall (1号线/4号线) and 火车东站（东广场） (19号线/6号线) — so its reference carries both codes and the two are merged into one station's service list.",
+        "coverage": "The payload has no exits and no facilities, so this source is lines-only. data.stationlist[].description is operator prose and is neither committed nor displayed.",
+        "serviceDay": "Times are H:MM with no zero padding (\"6:04\"). The payload's own title states which service day it describes (e.g. 工作日时刻表, the weekday timetable).",
+        "naming": "data.stationlist and data.subwaySiteDetail disagree on the 站 suffix for four stations (学院路/学院路站, 东新园/东新园站, 荆长路/荆长路站, 南湖东/南湖东站). Match on stationCode, never on the name, and use stationlist as the identity source.",
+        "placeholders": ["", "/", "-", "——", "无", "暂无", "终点站"]
+      }
+    },
     "hongKongGovernment": {
       "cityID": "8100",
       "provider": "MTR Corporation Limited / DATA.GOV.HK",

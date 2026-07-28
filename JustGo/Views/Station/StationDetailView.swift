@@ -87,7 +87,7 @@ struct StationDetailView: View {
     var usesNativeStationInformationSurface: Bool {
         // Hong Kong ships its station data in the bundle, so it is always native. Every other
         // city is native exactly when the bundled Station Information directory routes the station
-        // to an online source — Beijing, Shanghai, Guangzhou today, and any city added later with
+        // to an online source — Beijing, Shanghai, Guangzhou, Hangzhou today, and any city added with
         // no code change here. The directory is synchronous, so this is stable once the view model
         // exists; before that, ask the directory directly to avoid a first-frame flash.
         if displayedStation.cityID == "8100" {

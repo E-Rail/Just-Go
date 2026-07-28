@@ -444,7 +444,7 @@ extension StationDetailView {
             ForEach(points) { point in
                 if let coordinate = point.coordinate {
                     Annotation(
-                        point.name,
+                        point.displayName(relativeTo: stationCoordinate),
                         coordinate: CLLocationCoordinate2D(
                             latitude: coordinate.latitude,
                             longitude: coordinate.longitude
@@ -757,51 +757,6 @@ extension StationDetailView {
 
     /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
     /// platform hints, labeled with a confidence chip. Sits above Train Times.
-    /// Entrances imported from OpenStreetMap are named by the letter on the sign — "C", "A1" —
-    /// because that is all the survey records. On the map that is exactly right, but a list of
-    /// bare letters does not read as anything, so a row says "Exit C". Names that are already
-    /// sentences ("民權西路站出口1") are left alone.
-    private func accessPointRowName(_ point: StationAccessPoint) -> String {
-        let name = point.name.trimmingCharacters(in: .whitespaces)
-        guard name.count <= 3,
-              name.range(of: #"^[A-Za-z]?\d{0,2}[A-Za-z]?$"#, options: .regularExpression) != nil,
-              !name.isEmpty else { return point.name }
-        return AppLocalization.text(
-            english: "Exit \(name)",
-            simplified: "\(name) 出入口",
-            traditional: "\(name) 出入口"
-        )
-    }
-
-    /// One row standing in for the entrances OpenStreetMap positioned but never named, said in
-    /// terms of what a rider can do about it: they are on the map above.
-    @ViewBuilder
-    private func unlabeledAccessPointSummary(_ exits: [StationAccessPoint]) -> some View {
-        let unlabeled = exits.filter(\.isUnlabeled)
-        if !unlabeled.isEmpty {
-            let named = exits.count - unlabeled.count
-            HStack(spacing: 8) {
-                Image(systemName: "mappin.and.ellipse")
-                    .foregroundStyle(.secondary)
-                    .frame(width: 22)
-                Text(named == 0
-                    ? AppLocalization.text(
-                        english: "\(unlabeled.count) entrances, shown on the map above. The survey records where they are but not how they are signed.",
-                        simplified: "\(unlabeled.count) 个出入口，已标在上方地图。数据记录了位置，但未记录出入口编号。",
-                        traditional: "\(unlabeled.count) 個出入口，已標在上方地圖。資料記錄了位置，但未記錄出入口編號。"
-                    )
-                    : AppLocalization.text(
-                        english: "\(unlabeled.count) more entrances on the map above, with no exit letter recorded.",
-                        simplified: "上方地图另有 \(unlabeled.count) 个出入口，未记录编号。",
-                        traditional: "上方地圖另有 \(unlabeled.count) 個出入口，未記錄編號。"
-                    )
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                Spacer()
-            }
-        }
-    }
 
     /// Whether the official online section above is already rendering this station's exit list.
     private var officialSurfaceListsExits: Bool {
@@ -838,30 +793,14 @@ extension StationDetailView {
                             mapResizeHandle
                         }
 
-                        // The official online surface lists this station's exits already, with the
-                        // streets each one reaches — richer than a bare name. Repeating the names
-                        // here would print the same list twice on one screen, so when it is
-                        // showing them this section contributes only the map above.
-                        ForEach(officialSurfaceListsExits ? [] : exits.filter { !$0.isUnlabeled }) { exit in
-                            HStack(spacing: 8) {
-                                Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
-                                    .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
-                                    .frame(width: 22)
-                                Text(accessPointRowName(exit))
-                                    .font(.subheadline)
-                                if exit.isAccessible {
-                                    Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
-                                        .font(.caption2)
-                                        .foregroundStyle(.green)
-                                }
-                                Spacer()
-                            }
+                        // The official online surface lists this station's *named* exits already,
+                        // with the streets each one reaches — richer than a bare name. Repeating
+                        // those would print the same list twice on one screen. It never covers the
+                        // unlabeled entrances, so those stay either way.
+                        let listed = officialSurfaceListsExits ? exits.filter(\.isUnlabeled) : exits
+                        ForEach(listed.presentationGroups(relativeTo: stationCoordinate)) { group in
+                            StationAccessPointRow(group: group)
                         }
-
-                        // Entrances the survey placed but never named get counted, not listed:
-                        // 玉泉路 has four on its west side alone, and four rows reading "West
-                        // entrance" would be worse than one row that says where to look.
-                        unlabeledAccessPointSummary(exits)
                     }
 
                     if !platformHints.isEmpty {

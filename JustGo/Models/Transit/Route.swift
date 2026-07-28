@@ -484,6 +484,68 @@ enum StationAccessBearing: CaseIterable {
     }
 }
 
+/// One row in an entrance list: either a single named entrance, or every unlabeled entrance that
+/// shares a compass direction, counted.
+struct StationAccessPointGroup: Identifiable {
+    let id: String
+    let name: String
+    let count: Int
+    /// True when any entrance in the group is recorded as step-free.
+    let isAccessible: Bool
+
+    /// Entrances imported from OpenStreetMap are named by the letter on the sign — "C", "A1" —
+    /// because that is all the survey records. On a map pin that is exactly right, but a list of
+    /// bare letters does not read as anything, so a row says "Exit C". Names that are already
+    /// sentences ("民權西路站出口1") or directions ("West entrance") are left alone.
+    var listName: String {
+        guard !name.isEmpty,
+              name.count <= 3,
+              name.range(of: #"^[A-Za-z]?\d{0,2}[A-Za-z]?$"#, options: .regularExpression) != nil else {
+            return name
+        }
+        return AppLocalization.text(
+            english: "Exit \(name)",
+            simplified: "\(name) 出入口",
+            traditional: "\(name) 出入口"
+        )
+    }
+}
+
+extension Collection where Element == StationAccessPoint {
+    /// How to list these entrances, wherever they are listed.
+    ///
+    /// Named entrances get a row each — the name is what a rider matches against the sign overhead.
+    /// Unlabeled ones have no sign to match, so they are grouped by direction and counted: 玉泉路
+    /// has four doors on its west side, and four rows all reading "West entrance" tells a rider
+    /// strictly less than one row reading "West entrance ×4".
+    func presentationGroups(relativeTo station: CodableCoordinate?) -> [StationAccessPointGroup] {
+        var groups: [StationAccessPointGroup] = []
+        var indexByName: [String: Int] = [:]
+
+        for point in self {
+            let name = point.displayName(relativeTo: station)
+            guard point.isUnlabeled, let index = indexByName[name] else {
+                if point.isUnlabeled { indexByName[name] = groups.count }
+                groups.append(StationAccessPointGroup(
+                    id: point.id,
+                    name: name,
+                    count: 1,
+                    isAccessible: point.isAccessible
+                ))
+                continue
+            }
+            let existing = groups[index]
+            groups[index] = StationAccessPointGroup(
+                id: existing.id,
+                name: existing.name,
+                count: existing.count + 1,
+                isAccessible: existing.isAccessible || point.isAccessible
+            )
+        }
+        return groups
+    }
+}
+
 extension StationAccessPoint {
     /// A surveyed door with no sign letter and no name of its own.
     var isUnlabeled: Bool {
@@ -584,18 +646,14 @@ struct StationAccessGuidance {
         confidence: .unavailable
     )
 
-    /// The recommended exit/entrance to surface (prefers an explicit exit, then any point).
-    var primaryAccessPoint: StationAccessPoint? {
-        accessPoints.first { $0.kind == .exit } ?? accessPoints.first
-    }
-
-    /// The entrance to actually send a rider to, given where they are walking to or from and
-    /// whether they need step-free access.
+    /// The entrance to send a rider to, given where they are walking to or from and whether they
+    /// need step-free access.
     ///
-    /// `primaryAccessPoint` above answers a different question — "name one of this station's
-    /// exits" — and picking the first one is fine for that. For a trip it is not: exits at a large
-    /// interchange can be several hundred metres and one busy road apart, so the arbitrary first
-    /// exit routinely sends someone out of the wrong side of the station.
+    /// This replaced a `primaryAccessPoint` that returned `accessPoints.first`. Nothing about that
+    /// was tied to the rider: the order is the pack's, which for OpenStreetMap entrances is node
+    /// id. Exits at a large interchange sit several hundred metres and one busy road apart, so the
+    /// arbitrary first exit routinely sent people out of the wrong side of the station. Deleted
+    /// rather than deprecated — leaving it in place is an invitation to reintroduce the bug.
     func recommendedAccessPoint(
         near target: CodableCoordinate?,
         requiresStepFree: Bool
@@ -731,5 +789,7 @@ struct RouteWarning: Identifiable, Codable {
         case lastTrainSoon
         case serviceEnded
         case serviceNotStarted
+        /// The rider is being told to board or alight somewhere that does not take passengers.
+        case stationNotServingPassengers
     }
 }

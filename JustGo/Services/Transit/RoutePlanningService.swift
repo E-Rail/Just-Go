@@ -127,6 +127,16 @@ final class RoutePlanningService {
             }
         }
 
+        // Being in the routable network does not make a station one a rider can use. The reviewed
+        // catalog marks eight that do not take passengers — 福寿岭 is still a building site, 黄土店
+        // is open track with no passenger stop — and every one of them can be routed to today. The
+        // status was only ever read by the station's own screen, so a plan could send someone to a
+        // door that does not open and say nothing.
+        route.warnings.append(contentsOf: await passengerServiceWarnings(
+            stops: criticalStops,
+            cityID: routeCityID
+        ))
+
         // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
         let guidanceByStation = await officialStationData.stationGuidance(
             cityID: routeCityID,
@@ -275,6 +285,37 @@ final class RoutePlanningService {
                 accessibilityNotes: notes
             )
         }
+    }
+
+    /// One warning per boarding, transfer or arrival station the operator does not serve. Transfers
+    /// count: a transfer is a place the rider gets off one train and onto another, on foot, which
+    /// is exactly what a station closed to passengers does not allow.
+    private func passengerServiceWarnings(
+        stops: [RouteStationStop],
+        cityID: String
+    ) async -> [RouteWarning] {
+        var warnings: [RouteWarning] = []
+        for stop in stops {
+            let station = Station(
+                stationID: stop.stationID,
+                name: stop.name,
+                latitude: stop.coordinate?.latitude ?? 0,
+                longitude: stop.coordinate?.longitude ?? 0,
+                cityID: cityID
+            )
+            guard let status = await officialStationData
+                .officialResourceReview(for: station)?
+                .stationInformationStatus,
+                !status.servesPassengers,
+                let message = status.routeWarning(stationName: stop.name) else { continue }
+
+            warnings.append(RouteWarning(
+                type: .stationNotServingPassengers,
+                message: message,
+                affectedStationID: stop.stationID
+            ))
+        }
+        return warnings
     }
 
     private func criticalStops(for route: Route) -> [RouteStationStop] {

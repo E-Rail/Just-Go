@@ -26,3 +26,14 @@ JustGo/Config/Secrets.xcconfig
 
 # Local xcodebuild output
 build/
+
+# AI agent tooling — local state and per-machine settings.
+# CLAUDE.md itself is tracked on purpose: it is the shared project brief, not local state.
+.claude/
+CLAUDE.local.md
+.aider*
+.codex/
+.continue/
+.windsurf/
+.opencode/
+AGENTS.local.md

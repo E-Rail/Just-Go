@@ -48,6 +48,15 @@ final class RouteFeasibilityService {
             case .serviceEnded, .serviceNotStarted:
                 level = max(level, .risky)
                 reasons.append(warning.message)
+            case .stationNotServingPassengers:
+                // Not a caution — the rider cannot get on or off here at all, so the plan is wrong
+                // rather than merely uncertain.
+                level = max(level, .risky)
+                reasons.append(warning.message)
+                bottleneck = bottleneck ?? RouteBottleneck(
+                    segmentTitle: AppLocalization.localized("Station access"),
+                    reason: warning.message
+                )
             case .lastTrainSoon:
                 level = max(level, .caution)
                 reasons.append(warning.message)

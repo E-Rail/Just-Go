@@ -261,32 +261,11 @@ struct StationDetailView: View {
 
     /// A station the network draws but riders cannot yet use. The reviewed operator state already
     /// existed — it was only spelled out in prose far down the official-information section, so a
-    /// rider planning a trip to 福寿岭 had no way to see it was still a building site. This lifts
-    /// the same reviewed fact into the header, and keeps the two cases distinct: never opened at
-    /// all, versus open track with no passenger stop today.
+    /// rider planning a trip to 福寿岭 had no way to see it was still a building site. The wording
+    /// lives on the status itself, so this header and the route planner's warning can never
+    /// disagree about what the same reviewed fact means.
     private var stationServiceStatusLabel: (text: String, icon: String)? {
-        switch viewModel?.officialResourceReview?.stationInformationStatus {
-        case .notOpenForPassengerService:
-            return (
-                AppLocalization.text(
-                    english: "Not yet open",
-                    simplified: "尚未开通",
-                    traditional: "尚未開通"
-                ),
-                "hammer.fill"
-            )
-        case .noCurrentPassengerService:
-            return (
-                AppLocalization.text(
-                    english: "No passenger service",
-                    simplified: "暂不办理客运",
-                    traditional: "暫不辦理客運"
-                ),
-                "nosign"
-            )
-        case .exactPage, .officialContextOnly, nil:
-            return nil
-        }
+        viewModel?.officialResourceReview?.stationInformationStatus?.serviceStatusLabel
     }
 
     private var planRouteSection: some View {

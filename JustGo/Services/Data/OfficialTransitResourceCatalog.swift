@@ -195,6 +195,69 @@ enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
     case officialContextOnly
     case notOpenForPassengerService
     case noCurrentPassengerService
+
+    /// Whether a rider can board or alight here at all.
+    ///
+    /// The reviewed catalog marks eight stations that riders cannot use, and every one of them is
+    /// in the routable network — a trip can be planned to 福寿岭 or 黄土店 today. This is the single
+    /// definition the station header, the route planner and anything added later all read, so a
+    /// station's usability can never again be true on one screen and unmentioned on the next.
+    var servesPassengers: Bool {
+        switch self {
+        case .exactPage, .officialContextOnly:
+            return true
+        case .notOpenForPassengerService, .noCurrentPassengerService:
+            return false
+        }
+    }
+
+    /// Short label for a chip or badge: "Not yet open" versus "No passenger service". The two cases
+    /// stay distinct — never opened at all, versus open track with no passenger stop today.
+    var serviceStatusLabel: (text: String, icon: String)? {
+        switch self {
+        case .notOpenForPassengerService:
+            return (
+                AppLocalization.text(
+                    english: "Not yet open",
+                    simplified: "尚未开通",
+                    traditional: "尚未開通"
+                ),
+                "hammer.fill"
+            )
+        case .noCurrentPassengerService:
+            return (
+                AppLocalization.text(
+                    english: "No passenger service",
+                    simplified: "暂不办理客运",
+                    traditional: "暫不辦理客運"
+                ),
+                "nosign"
+            )
+        case .exactPage, .officialContextOnly:
+            return nil
+        }
+    }
+
+    /// Full sentence for a route warning, which has to name the station because the rider is
+    /// looking at a whole trip rather than one station's page.
+    func routeWarning(stationName: String) -> String? {
+        switch self {
+        case .notOpenForPassengerService:
+            return AppLocalization.text(
+                english: "\(stationName) has not opened to passengers yet.",
+                simplified: "\(stationName)尚未开通客运。",
+                traditional: "\(stationName)尚未開通客運。"
+            )
+        case .noCurrentPassengerService:
+            return AppLocalization.text(
+                english: "\(stationName) does not handle passengers at present.",
+                simplified: "\(stationName)目前不办理客运。",
+                traditional: "\(stationName)目前不辦理客運。"
+            )
+        case .exactPage, .officialContextOnly:
+            return nil
+        }
+    }
 }
 
 struct OfficialTransitResourceStation: Codable, Equatable, Identifiable, Sendable {

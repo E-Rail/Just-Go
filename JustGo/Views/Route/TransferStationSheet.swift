@@ -28,6 +28,12 @@ struct TransferStationSheet: View {
         return stop?.coordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
+    /// What entrances without a sign letter are described relative to. Nil is handled — those
+    /// entrances fall back to a plain "station entrance" rather than an empty row.
+    private var stationCoordinate: CodableCoordinate? {
+        (transferStopCoordinate ?? enrichedStation?.coordinate).map(CodableCoordinate.init)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -183,20 +189,8 @@ struct TransferStationSheet: View {
                             .font(.caption)
                             .fontWeight(.medium)
                             .foregroundStyle(.secondary)
-                        ForEach(exits) { exit in
-                            HStack(spacing: 8) {
-                                Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
-                                    .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
-                                    .frame(width: 22)
-                                Text(exit.name)
-                                    .font(.subheadline)
-                                if exit.isAccessible {
-                                    Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
-                                        .font(.caption2)
-                                        .foregroundStyle(.green)
-                                }
-                                Spacer()
-                            }
+                        ForEach(exits.presentationGroups(relativeTo: stationCoordinate)) { group in
+                            StationAccessPointRow(group: group)
                         }
                     }
 

@@ -1,5 +1,36 @@
 import SwiftUI
 
+/// The station sheet's top-level sections. Everything used to stack in one column — ten cards, two
+/// of them tall — so reaching the entrance map meant scrolling past the whole page. These group the
+/// same content by the question a rider arrived with, and only the tabs that have something to show
+/// are offered.
+enum StationDetailTab: String, CaseIterable, Identifiable {
+    case trains
+    case map
+    case station
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .trains:
+            return AppLocalization.text(english: "Trains", simplified: "列车", traditional: "列車")
+        case .map:
+            return AppLocalization.localized("Map")
+        case .station:
+            return AppLocalization.text(english: "Station", simplified: "车站", traditional: "車站")
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .trains: return "clock"
+        case .map: return "map"
+        case .station: return "building.columns"
+        }
+    }
+}
+
 struct StationDetailView: View {
     let station: Station
     @Environment(DIContainer.self) private var container
@@ -10,6 +41,7 @@ struct StationDetailView: View {
     @State var selectedStationImage: FullScreenStationImage?
     @State var showQuickTagDialog = false
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
+    @State var selectedTab: StationDetailTab = .trains
     /// Riders drag the entrance map's handle to resize it. The choice persists because someone who
     /// wants a big map wants it at every station, not once.
     @AppStorage("stationGuideMapHeight") var stationGuideMapHeight = StationDetailView.defaultMapHeight
@@ -18,6 +50,26 @@ struct StationDetailView: View {
     static let defaultMapHeight: Double = 190
     static let mapHeightRange: ClosedRange<Double> = 140...560
 
+    /// Only tabs with something behind them are offered — an empty tab is worse than no tab. The
+    /// station tab is always present: lines and the data-confidence chips do not depend on a pack.
+    var availableTabs: [StationDetailTab] {
+        StationDetailTab.allCases.filter { tab in
+            switch tab {
+            case .trains: return hasOfficialStationInformationContent || showsBundledStationSections
+            case .map: return hasStationGuideContent
+            case .station: return true
+            }
+        }
+    }
+
+    /// The tab to render: the picked one while it still has content, otherwise the first that does.
+    /// Content arrives asynchronously, so the selection has to survive a tab appearing or vanishing
+    /// under it — the entrance map in particular only exists once the city pack has loaded.
+    var effectiveTab: StationDetailTab {
+        let tabs = availableTabs
+        return tabs.contains(selectedTab) ? selectedTab : (tabs.first ?? .station)
+    }
+
     private var currentQuickTag: StationQuickTag? {
         tripMemoryService.quickTag(stationID: displayedStation.stationID, cityID: displayedStation.cityID)
     }
@@ -25,24 +77,48 @@ struct StationDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // Identity and the one action worth taking from here stay above the tabs: they are
+                // what every visit needs, whichever question brought the rider.
                 stationHeader
                 planRouteSection
-                linesSection
-                beforeYouGoSection
-                officialStationInformationSection
-                if showsBundledStationSections {
-                    accessibilitySection
-                    stationEssentialsSection
-                    arrivalsSection
+
+                let tabs = availableTabs
+                if tabs.count > 1 {
+                    Picker(
+                        AppLocalization.text(
+                            english: "Station section",
+                            simplified: "车站栏目",
+                            traditional: "車站欄目"
+                        ),
+                        selection: $selectedTab
+                    ) {
+                        ForEach(tabs) { tab in
+                            Text(tab.title).tag(tab)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                 }
-                // Outside the bundled gate: entrance geometry answers a different question from
-                // the operator's exit text. The operator says which streets an exit reaches; the
-                // bundled OSM entrances say where it physically is, which is the only thing that
-                // can draw the exit map. Suppressing it whenever a live snapshot loaded hid the
-                // map in exactly the cities with the most entrances. The section renders nothing
-                // when it has nothing, so this is safe for cities with no pack at all.
-                stationGuideSection
-                stationMapSection
+
+                switch effectiveTab {
+                case .trains:
+                    officialStationInformationSection
+                    if showsBundledStationSections {
+                        arrivalsSection
+                    }
+                case .map:
+                    // Entrance geometry answers a different question from the operator's exit text
+                    // — the operator says which streets an exit reaches, the bundled OSM entrances
+                    // say where it physically is — so this sits outside the bundled-sections gate.
+                    stationGuideSection
+                case .station:
+                    linesSection
+                    if showsBundledStationSections {
+                        accessibilitySection
+                        stationEssentialsSection
+                    }
+                    stationMapSection
+                    beforeYouGoSection
+                }
             }
             .padding()
         }
@@ -278,36 +354,42 @@ struct StationDetailView: View {
         return PlanRouteButtons(place: place, cityID: station.cityID, onSelected: { dismiss() })
     }
 
+    /// Renders nothing when the station carries no resolved lines, rather than a headed card with
+    /// an empty grid under it — a card that says only "Lines" costs a screenful of scrolling and
+    /// tells a rider nothing.
+    @ViewBuilder
     private var linesSection: some View {
         let station = displayedStation
-        return GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(AppLocalization.localized("Lines"))
-                    .font(.headline)
+        if !station.uniqueLogicalLines.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(AppLocalization.localized("Lines"))
+                        .font(.headline)
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 8)], alignment: .leading, spacing: 8) {
-                    ForEach(station.uniqueLogicalLines) { line in
-                        HStack(spacing: 7) {
-                            Circle()
-                                .fill(Color(hex: line.colorHex))
-                                .frame(width: 10, height: 10)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(line.localizedName)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .lineLimit(1)
-                                if let alternateName = line.alternateLocalizedName {
-                                    Text(alternateName)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 8)], alignment: .leading, spacing: 8) {
+                        ForEach(station.uniqueLogicalLines) { line in
+                            HStack(spacing: 7) {
+                                Circle()
+                                    .fill(Color(hex: line.colorHex))
+                                    .frame(width: 10, height: 10)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(line.localizedName)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
                                         .lineLimit(1)
+                                    if let alternateName = line.alternateLocalizedName {
+                                        Text(alternateName)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
                                 }
+                                Spacer(minLength: 0)
                             }
-                            Spacer(minLength: 0)
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 7)
+                            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 7)
-                        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
             }

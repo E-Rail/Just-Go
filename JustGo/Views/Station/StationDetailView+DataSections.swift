@@ -31,9 +31,15 @@ extension StationDetailView {
         return categories.first ?? selectedOfficialInformationCategory
     }
 
+    /// Whether `officialStationInformationSection` would draw anything. The tab bar and the section
+    /// read the same property so a tab can never be offered for an empty page.
+    var hasOfficialStationInformationContent: Bool {
+        usesNativeStationInformationSurface || viewModel?.officialResourceReview != nil
+    }
+
     @ViewBuilder
     var officialStationInformationSection: some View {
-        if usesNativeStationInformationSurface || viewModel?.officialResourceReview != nil {
+        if hasOfficialStationInformationContent {
             let review = viewModel?.officialResourceReview
             let resource = viewModel?.officialStationInformationSourceResource
             let contextResources = review?.resources.filter { $0.kind != .stationInformation } ?? []
@@ -755,20 +761,28 @@ extension StationDetailView {
         }
     }
 
-    /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
-    /// platform hints, labeled with a confidence chip. Sits above Train Times.
-
-    /// Whether the official online section above is already rendering this station's exit list.
+    /// Whether the official online section is already rendering this station's exit list.
     private var officialSurfaceListsExits: Bool {
         usesNativeStationInformationSurface &&
             viewModel?.officialStationInformation?.exits.isEmpty == false
     }
 
+    /// Whether `stationGuideSection` would draw anything, which is also what decides whether the
+    /// Map tab is offered. One property, so the tab and its content cannot disagree. It stays true
+    /// while the pack is loading: the tab should appear with a spinner rather than pop in late.
+    var hasStationGuideContent: Bool {
+        viewModel?.isLoadingCityPack == true ||
+            !(viewModel?.accessPoints ?? []).isEmpty ||
+            !(viewModel?.platformHints ?? []).isEmpty
+    }
+
+    /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
+    /// platform hints, labeled with a confidence chip.
     @ViewBuilder
     var stationGuideSection: some View {
         let exits = viewModel?.accessPoints ?? []
         let platformHints = viewModel?.platformHints ?? []
-        if viewModel?.isLoadingCityPack == true || !exits.isEmpty || !platformHints.isEmpty {
+        if hasStationGuideContent {
             GlassCard {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {

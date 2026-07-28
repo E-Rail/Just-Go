@@ -394,6 +394,10 @@ extension StationDetailView {
         (viewModel?.accessPoints ?? []).filter { $0.coordinate != nil }
     }
 
+    private var stationCoordinate: CodableCoordinate {
+        CodableCoordinate(latitude: displayedStation.latitude, longitude: displayedStation.longitude)
+    }
+
     /// Just the part of an entrance name that tells exits apart. Packs name them in full
     /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels — on the map
     /// the station is already the centre pin, so only the number carries information. The full
@@ -446,38 +450,107 @@ extension StationDetailView {
                             longitude: coordinate.longitude
                         )
                     ) {
-                        Text(shortAccessPointLabel(point))
-                            .font(.caption2)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.legibleText(
-                                onHex: point.isAccessible ? "#34C759" : "#FFFFFF"
-                            ))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 3)
-                            .background(
-                                point.isAccessible ? Color.green : Color.white,
-                                in: Capsule()
-                            )
-                            .accessibilityLabel(point.isAccessible
-                                ? AppLocalization.text(
-                                    english: "\(point.name), step-free",
-                                    simplified: "\(point.name)，无障碍",
-                                    traditional: "\(point.name)，無障礙"
-                                )
-                                : point.name
-                            )
+                        accessPointMarker(point)
                     }
                     .annotationTitles(.hidden)
                 }
             }
         }
-        .frame(height: 190)
+        .frame(height: stationGuideMapHeight)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .accessibilityLabel(AppLocalization.text(
             english: "Map of station entrances",
             simplified: "车站出入口地图",
             traditional: "車站出入口地圖"
         ))
+    }
+
+    /// A named entrance wears its letter; one OpenStreetMap surveyed without a name is a plain dot,
+    /// because four doors on the west side would otherwise all read "West" and tell a rider
+    /// nothing. Where the door is on the map is the whole point for those, and the direction is
+    /// still spoken to VoiceOver and printed in the list summary below.
+    @ViewBuilder
+    private func accessPointMarker(_ point: StationAccessPoint) -> some View {
+        let spokenName = point.displayName(relativeTo: stationCoordinate)
+        let label = point.isAccessible
+            ? AppLocalization.text(
+                english: "\(spokenName), step-free",
+                simplified: "\(spokenName)，无障碍",
+                traditional: "\(spokenName)，無障礙"
+            )
+            : spokenName
+
+        if point.isUnlabeled {
+            Circle()
+                .fill(point.isAccessible ? Color.green : Color.white)
+                .stroke(Color.black.opacity(0.25), lineWidth: 0.5)
+                .frame(width: 11, height: 11)
+                .accessibilityLabel(label)
+        } else {
+            Text(shortAccessPointLabel(point))
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.legibleText(
+                    onHex: point.isAccessible ? "#34C759" : "#FFFFFF"
+                ))
+                .padding(.horizontal, 5)
+                .padding(.vertical, 3)
+                .background(
+                    point.isAccessible ? Color.green : Color.white,
+                    in: Capsule()
+                )
+                .accessibilityLabel(label)
+        }
+    }
+
+    /// Drag to resize the map. The handle sits below the map rather than on it so the gesture never
+    /// competes with the enclosing ScrollView, and VoiceOver gets an adjustable action because
+    /// there is no way to drag a handle by voice.
+    private func clampedMapHeight(_ value: Double) -> Double {
+        min(
+            max(value, StationDetailView.mapHeightRange.lowerBound),
+            StationDetailView.mapHeightRange.upperBound
+        )
+    }
+
+    private var mapResizeHandle: some View {
+        let step: Double = 60
+        return Capsule()
+            .fill(Color.secondary.opacity(0.4))
+            .frame(width: 44, height: 5)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 2)
+                    .onChanged { value in
+                        let base = mapHeightAtDragStart ?? stationGuideMapHeight
+                        mapHeightAtDragStart = base
+                        stationGuideMapHeight = clampedMapHeight(base + value.translation.height)
+                    }
+                    .onEnded { _ in mapHeightAtDragStart = nil }
+            )
+            .accessibilityElement()
+            .accessibilityLabel(AppLocalization.text(
+                english: "Map height",
+                simplified: "地图高度",
+                traditional: "地圖高度"
+            ))
+            .accessibilityValue(AppLocalization.text(
+                english: "\(Int(stationGuideMapHeight)) points",
+                simplified: "\(Int(stationGuideMapHeight)) 点",
+                traditional: "\(Int(stationGuideMapHeight)) 點"
+            ))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment:
+                    stationGuideMapHeight = clampedMapHeight(stationGuideMapHeight + step)
+                case .decrement:
+                    stationGuideMapHeight = clampedMapHeight(stationGuideMapHeight - step)
+                @unknown default:
+                    break
+                }
+            }
     }
 
     private func officialExitChip(_ exit: OfficialStationExitInformation) -> some View {
@@ -700,6 +773,36 @@ extension StationDetailView {
         )
     }
 
+    /// One row standing in for the entrances OpenStreetMap positioned but never named, said in
+    /// terms of what a rider can do about it: they are on the map above.
+    @ViewBuilder
+    private func unlabeledAccessPointSummary(_ exits: [StationAccessPoint]) -> some View {
+        let unlabeled = exits.filter(\.isUnlabeled)
+        if !unlabeled.isEmpty {
+            let named = exits.count - unlabeled.count
+            HStack(spacing: 8) {
+                Image(systemName: "mappin.and.ellipse")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 22)
+                Text(named == 0
+                    ? AppLocalization.text(
+                        english: "\(unlabeled.count) entrances, shown on the map above. The survey records where they are but not how they are signed.",
+                        simplified: "\(unlabeled.count) 个出入口，已标在上方地图。数据记录了位置，但未记录出入口编号。",
+                        traditional: "\(unlabeled.count) 個出入口，已標在上方地圖。資料記錄了位置，但未記錄出入口編號。"
+                    )
+                    : AppLocalization.text(
+                        english: "\(unlabeled.count) more entrances on the map above, with no exit letter recorded.",
+                        simplified: "上方地图另有 \(unlabeled.count) 个出入口，未记录编号。",
+                        traditional: "上方地圖另有 \(unlabeled.count) 個出入口，未記錄編號。"
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                Spacer()
+            }
+        }
+    }
+
     /// Whether the official online section above is already rendering this station's exit list.
     private var officialSurfaceListsExits: Bool {
         usesNativeStationInformationSurface &&
@@ -732,13 +835,14 @@ extension StationDetailView {
                         let mappable = mappableAccessPoints
                         if !mappable.isEmpty {
                             stationAccessPointMap(mappable)
+                            mapResizeHandle
                         }
 
                         // The official online surface lists this station's exits already, with the
                         // streets each one reaches — richer than a bare name. Repeating the names
                         // here would print the same list twice on one screen, so when it is
                         // showing them this section contributes only the map above.
-                        ForEach(officialSurfaceListsExits ? [] : exits) { exit in
+                        ForEach(officialSurfaceListsExits ? [] : exits.filter { !$0.isUnlabeled }) { exit in
                             HStack(spacing: 8) {
                                 Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
                                     .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
@@ -753,6 +857,11 @@ extension StationDetailView {
                                 Spacer()
                             }
                         }
+
+                        // Entrances the survey placed but never named get counted, not listed:
+                        // 玉泉路 has four on its west side alone, and four rows reading "West
+                        // entrance" would be worse than one row that says where to look.
+                        unlabeledAccessPointSummary(exits)
                     }
 
                     if !platformHints.isEmpty {

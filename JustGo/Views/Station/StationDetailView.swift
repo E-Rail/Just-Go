@@ -10,6 +10,13 @@ struct StationDetailView: View {
     @State var selectedStationImage: FullScreenStationImage?
     @State var showQuickTagDialog = false
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
+    /// Riders drag the entrance map's handle to resize it. The choice persists because someone who
+    /// wants a big map wants it at every station, not once.
+    @AppStorage("stationGuideMapHeight") var stationGuideMapHeight = StationDetailView.defaultMapHeight
+    @State var mapHeightAtDragStart: Double?
+
+    static let defaultMapHeight: Double = 190
+    static let mapHeightRange: ClosedRange<Double> = 140...560
 
     private var currentQuickTag: StationQuickTag? {
         tripMemoryService.quickTag(stationID: displayedStation.stationID, cityID: displayedStation.cityID)

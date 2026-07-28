@@ -159,6 +159,40 @@ class OSSDataValidatorsTest < Minitest::Test
 
   private
 
+  # An OpenStreetMap node is the one entrance a pack may ship unnamed: the survey has its position
+  # but no sign letter, and the app names it by compass bearing at render time. Every other source
+  # names its entrances, so a blank name there means something upstream dropped it.
+  def test_accepts_a_nameless_openstreetmap_entrance
+    blank_a_named_access_point("1100") { |point| assert point["id"].start_with?("osm-") }
+
+    assert city_pack_validator.validate!
+  end
+
+  def test_rejects_a_nameless_entrance_from_a_named_source
+    blank_a_named_access_point("1100") { |point| point["id"] = "beijing-exit-1" }
+
+    error = assert_raises(OSSDataValidators::ValidationError) { city_pack_validator.validate! }
+    assert_match(/is missing its name/, error.message)
+  end
+
+  # Blanks the name of an entrance that *had* one, so neither test above can pass by mutating an
+  # entrance that was already unnamed.
+  def blank_a_named_access_point(city_id)
+    relative = "JustGo/Resources/BundledCityPacks/#{city_id}.json"
+    pack = JSON.parse(File.read(File.join(@root, relative)))
+    point = pack.fetch("stations")
+      .flat_map { |station| Array(station["stationAccessPoints"]) }
+      .find { |candidate| !candidate.fetch("name").strip.empty? }
+    refute_nil point, "#{city_id} has no named entrance to blank"
+    yield point
+    point["name"] = ""
+    write_json(relative, pack)
+  end
+
+  def city_pack_validator
+    OSSDataValidators::CityPackValidator.new(root: @root)
+  end
+
   def copy_fixture
     FileUtils.cp_r(File.join(SOURCE_ROOT, "DataPacks"), @root)
     resources = File.join(@root, "JustGo", "Resources")

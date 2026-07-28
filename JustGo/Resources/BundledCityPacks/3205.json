@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 235,
     "matchedStations": {
-      "covered": 48,
+      "covered": 53,
       "total": 235
     },
     "accessibility": {
@@ -176,6 +176,15 @@
           "longitude": 120.649343,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8057387475",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.31265,
+          "longitude": 120.650263,
+          "isAccessible": true,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -209,6 +218,15 @@
           "kind": "exit",
           "latitude": 31.252287,
           "longitude": 120.629405,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11773074603",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.253393,
+          "longitude": 120.628983,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -798,6 +816,24 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-11055022962",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.31632,
+          "longitude": 120.678319,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11055022963",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.31695,
+          "longitude": 120.678182,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-11055022966",
           "name": "2",
           "kind": "exit",
@@ -839,6 +875,15 @@
           "kind": "exit",
           "latitude": 31.317589,
           "longitude": 120.679779,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7831309033",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.317531,
+          "longitude": 120.680504,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -1049,6 +1094,59 @@
       ]
     },
     {
+      "stationID": "5de0732f82be53ef",
+      "stationName": "中央公园",
+      "stationNameEn": "Central Park",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-7774690629",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.314584,
+          "longitude": 120.660701,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7774690630",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.314334,
+          "longitude": 120.66014,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7774690631",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.313515,
+          "longitude": 120.660009,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "62f6e7690c0bfc01",
       "stationName": "星海广场",
       "stationNameEn": "Xinghai Square",
@@ -1072,6 +1170,24 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-7549306617",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.31501,
+          "longitude": 120.671163,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7549306618",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.315923,
+          "longitude": 120.670946,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-9105542141",
           "name": "3",
@@ -1915,6 +2031,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-7745754929",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.307673,
+          "longitude": 120.630829,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-7745754930",
           "name": "1",
           "kind": "exit",
@@ -2044,6 +2169,59 @@
           "kind": "exit",
           "latitude": 31.137832,
           "longitude": 120.699592,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "af2b2874ad044a0e",
+      "stationName": "张庄",
+      "stationNameEn": "Zhangzhuang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13392828795",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.396692,
+          "longitude": 120.597504,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13392828796",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.398003,
+          "longitude": 120.597965,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13392828797",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.397963,
+          "longitude": 120.597409,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -2505,6 +2683,41 @@
           "kind": "exit",
           "latitude": 31.31883,
           "longitude": 120.602131,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "d6d3ebbcc430c675",
+      "stationName": "富元路",
+      "stationNameEn": "Fuyuan Lu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13392792190",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.403941,
+          "longitude": 120.624636,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -3026,6 +3239,94 @@
           "kind": "exit",
           "latitude": 31.264153,
           "longitude": 120.74013,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f3fc696df308dd31",
+      "stationName": "苏锦",
+      "stationNameEn": "Sujin",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12303889800",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.336231,
+          "longitude": 120.60486,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-4570243011",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.336859,
+          "longitude": 120.604736,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f75a9e2f9b66e8ef",
+      "stationName": "南斜步",
+      "stationNameEn": "Nanxiebu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13392842502",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.273931,
+          "longitude": 120.760889,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13392842503",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.275276,
+          "longitude": 120.760327,
           "isAccessible": false,
           "source": "specificEntrance"
         }

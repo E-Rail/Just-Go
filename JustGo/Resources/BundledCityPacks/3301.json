@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 270,
     "matchedStations": {
-      "covered": 261,
+      "covered": 262,
       "total": 270
     },
     "accessibility": {
@@ -956,6 +956,15 @@
           "longitude": 119.983053,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13172549933",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.287605,
+          "longitude": 119.982559,
+          "isAccessible": true,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -1016,6 +1025,24 @@
           "kind": "exit",
           "latitude": 30.294647,
           "longitude": 120.067836,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9848212940",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.29452,
+          "longitude": 120.068081,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9848212942",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.294305,
+          "longitude": 120.069021,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -2117,6 +2144,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-9881192186",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.201829,
+          "longitude": 120.20458,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9881192190",
           "name": "A",
           "kind": "exit",
@@ -2583,6 +2619,15 @@
           "kind": "exit",
           "latitude": 30.281754,
           "longitude": 120.118754,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9497782001",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.281882,
+          "longitude": 120.118784,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -3397,6 +3442,15 @@
           "longitude": 120.47267,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9865970148",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.23718,
+          "longitude": 120.471192,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -3576,6 +3630,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-13483199435",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.353238,
+          "longitude": 120.114168,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9289900084",
           "name": "D",
           "kind": "exit",
@@ -3599,6 +3662,15 @@
           "kind": "exit",
           "latitude": 30.354382,
           "longitude": 120.11473,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9289900089",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.353895,
+          "longitude": 120.116315,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -3834,6 +3906,24 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-13397338955",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.309692,
+          "longitude": 120.335087,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13397338960",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.309716,
+          "longitude": 120.335699,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9442045136",
           "name": "A",
           "kind": "exit",
@@ -3852,11 +3942,29 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-9442045138",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.308876,
+          "longitude": 120.334956,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9442045139",
           "name": "D1",
           "kind": "exit",
           "latitude": 30.309194,
           "longitude": 120.336163,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9442045140",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.308978,
+          "longitude": 120.33569,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -3920,6 +4028,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-13271913206",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.182316,
+          "longitude": 120.253044,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-8997710354",
           "name": "B2",
@@ -4355,6 +4472,42 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12769658899",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.310365,
+          "longitude": 120.119183,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12769658900",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.310775,
+          "longitude": 120.119458,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12769765457",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.311069,
+          "longitude": 120.118255,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12769765458",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.311676,
+          "longitude": 120.118208,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-12769765467",
           "name": "D1",
           "kind": "exit",
@@ -4391,6 +4544,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-12769785501",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.308856,
+          "longitude": 120.119137,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8995490149",
           "name": "A",
           "kind": "exit",
@@ -4405,6 +4567,15 @@
           "kind": "exit",
           "latitude": 30.309085,
           "longitude": 120.120927,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8995490161",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.308953,
+          "longitude": 120.120517,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -4709,6 +4880,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-9289865888",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.365432,
+          "longitude": 120.114496,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-9289865890",
           "name": "B",
@@ -5319,6 +5499,15 @@
           "kind": "exit",
           "latitude": 30.241513,
           "longitude": 120.212702,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9103417216",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.243512,
+          "longitude": 120.209515,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -6502,6 +6691,15 @@
           "longitude": 120.129808,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9867278938",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.277107,
+          "longitude": 120.130255,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -6637,6 +6835,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8981893228",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.308952,
+          "longitude": 120.326033,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8981893229",
           "name": "D",
           "kind": "exit",
@@ -6651,6 +6858,15 @@
           "kind": "exit",
           "latitude": 30.309006,
           "longitude": 120.324885,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8981893239",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.309706,
+          "longitude": 120.326021,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -6884,6 +7100,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-12495720268",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.276254,
+          "longitude": 119.980292,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-12495720270",
           "name": "B1",
@@ -7506,6 +7731,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-13640153916",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.316925,
+          "longitude": 120.148261,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-8995579057",
           "name": "B",
@@ -8161,6 +8395,15 @@
           "kind": "exit",
           "latitude": 30.157398,
           "longitude": 120.154192,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13001236055",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.157196,
+          "longitude": 120.154236,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -9340,6 +9583,41 @@
       ]
     },
     {
+      "stationID": "7bf2543bad2a3578",
+      "stationName": "古荡新村",
+      "stationNameEn": "Gudangxincun",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9832064044",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.269704,
+          "longitude": 120.110325,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "7ee4ea989f60726b",
       "stationName": "全丰",
       "stationNameEn": "全丰",
@@ -9956,6 +10234,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-12060802328",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.302972,
+          "longitude": 120.129791,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-12085266667",
           "name": "垂梯",
@@ -11003,6 +11290,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-12925570617",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.28479,
+          "longitude": 120.191948,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-6483724647",
           "name": "D",
           "kind": "exit",
@@ -11097,6 +11393,15 @@
           "kind": "exit",
           "latitude": 30.230624,
           "longitude": 120.197151,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9446434505",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.23105,
+          "longitude": 120.19667,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -11317,6 +11622,15 @@
           "kind": "exit",
           "latitude": 30.310836,
           "longitude": 120.280094,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7729944388",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.311394,
+          "longitude": 120.277925,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -11561,6 +11875,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8951522543",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254408,
+          "longitude": 120.214352,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8951522547",
           "name": "D2",
           "kind": "exit",
@@ -11708,6 +12031,15 @@
           "kind": "exit",
           "latitude": 30.247929,
           "longitude": 120.049894,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9837566727",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.248025,
+          "longitude": 120.050295,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -11912,6 +12244,15 @@
           "kind": "exit",
           "latitude": 30.291975,
           "longitude": 120.026325,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8989972071",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.291813,
+          "longitude": 120.026591,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -12283,6 +12624,15 @@
           "kind": "exit",
           "latitude": 30.272665,
           "longitude": 120.165059,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12129296554",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.272689,
+          "longitude": 120.165002,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -12722,11 +13072,65 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-4291125551",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254406,
+          "longitude": 120.16364,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727106",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254505,
+          "longitude": 120.163748,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727107",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254259,
+          "longitude": 120.163644,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-5027727108",
           "name": "C",
           "kind": "exit",
           "latitude": 30.254099,
           "longitude": 120.163768,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727109",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.253759,
+          "longitude": 120.164553,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727110",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254194,
+          "longitude": 120.164665,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727111",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.254195,
+          "longitude": 120.164769,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -12745,6 +13149,24 @@
           "kind": "exit",
           "latitude": 30.25528,
           "longitude": 120.164437,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727234",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.255042,
+          "longitude": 120.163775,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5027727235",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.255271,
+          "longitude": 120.163712,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -12988,6 +13410,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8995066244",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.1706,
+          "longitude": 120.267923,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8995066247",
           "name": "C1",
           "kind": "exit",
@@ -13002,6 +13433,15 @@
           "kind": "exit",
           "latitude": 30.170128,
           "longitude": 120.266662,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8995066262",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.170923,
+          "longitude": 120.26643,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -13317,6 +13757,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8994796283",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.320342,
+          "longitude": 120.092482,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9507342013",
           "name": "垂梯",
           "kind": "exit",
@@ -13384,6 +13833,15 @@
           "kind": "exit",
           "latitude": 30.29399,
           "longitude": 120.076074,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9848212822",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.293893,
+          "longitude": 120.076387,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -15586,6 +16044,24 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-13271913239",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.244667,
+          "longitude": 120.181177,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13875467889",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.24449,
+          "longitude": 120.180345,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8941329140",
           "name": "C",
           "kind": "exit",
@@ -16394,11 +16870,29 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-12114390286",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.280121,
+          "longitude": 119.99903,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-12114390287",
           "name": "B2",
           "kind": "exit",
           "latitude": 30.279919,
           "longitude": 119.998559,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8995489949",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.279877,
+          "longitude": 119.998955,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -16426,6 +16920,15 @@
           "kind": "exit",
           "latitude": 30.278139,
           "longitude": 119.99746,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9849262872",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.279616,
+          "longitude": 119.998774,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -16541,6 +17044,15 @@
           "kind": "exit",
           "latitude": 30.506577,
           "longitude": 120.664903,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8311921622",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.506713,
+          "longitude": 120.666035,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -18438,6 +18950,15 @@
           "kind": "exit",
           "latitude": 30.235509,
           "longitude": 120.433576,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11091909604",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.235149,
+          "longitude": 120.43452,
           "isAccessible": false,
           "source": "specificEntrance"
         }

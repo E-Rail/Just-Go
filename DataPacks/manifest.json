@@ -5,8 +5,8 @@
     {
       "cityID": "1100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 630934,
-      "sha256": "dd9bac89dd1dffef3e5c42b33a33324e3578ab80dd634605b13ce2db39a2f968",
+      "sizeBytes": 680949,
+      "sha256": "5f58a2af6c24ebe3e756ed7093a4a6c0f8d29959434c1dd5803be320e81a3ddd",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -59,8 +59,8 @@
     {
       "cityID": "4401",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 469614,
-      "sha256": "6fd2b4ab157be8b16a12f39ad91556e49affbc09c8b80d92256486bfcecd8f68",
+      "sizeBytes": 475934,
+      "sha256": "ef42b8ed9984994e0e75582ce5881f50daf5e7a41182a4b90a4dfb94589a86cd",
       "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -112,8 +112,8 @@
     {
       "cityID": "3100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 517371,
-      "sha256": "9d7432b2e64d06bd72163055c2da78e19cca98f80ccaa73134acef6a432fa357",
+      "sizeBytes": 522401,
+      "sha256": "2f60db893fb1fbee19a026d60c5836bce0a6a3a2b2441893850efd06b915393c",
       "bundledResource": "BundledCityPacks/3100.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -133,7 +133,7 @@
       "coverage": {
         "networkStations": 471,
         "matchedStations": {
-          "covered": 368,
+          "covered": 369,
           "total": 471
         },
         "accessibility": {
@@ -165,8 +165,8 @@
     {
       "cityID": "1200",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 117118,
-      "sha256": "3cbb6b5d4cb1c0ef4cd214b7d108236f3078e55855ee6fb14bf9e5f826ea4d91",
+      "sizeBytes": 136393,
+      "sha256": "c7356f45b606ee9c4326ba4dc8bcb97a1c7ffc812c79aa2fb8f5a29392793ccf",
       "bundledResource": "BundledCityPacks/1200.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -186,7 +186,7 @@
       "coverage": {
         "networkStations": 239,
         "matchedStations": {
-          "covered": 87,
+          "covered": 108,
           "total": 239
         },
         "accessibility": {
@@ -218,8 +218,8 @@
     {
       "cityID": "5000",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 102720,
-      "sha256": "08d4501c1bf1a741c0ad6e8d2c12b38a1c79b5a8bd297edda298f7b4f0c5af03",
+      "sizeBytes": 109042,
+      "sha256": "20815dbda0952d4fac7c1ac9170895a9103e6db61010729e1c681f0ce274542e",
       "bundledResource": "BundledCityPacks/5000.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -239,7 +239,7 @@
       "coverage": {
         "networkStations": 273,
         "matchedStations": {
-          "covered": 77,
+          "covered": 83,
           "total": 273
         },
         "accessibility": {
@@ -324,8 +324,8 @@
     {
       "cityID": "3201",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 137269,
-      "sha256": "a53546a5374270e5be422a0ffb6a5f320839316cb87fad3091044c5343781311",
+      "sizeBytes": 141188,
+      "sha256": "18b451441a19744943c142df17e6f432178560769e2d0a8517f2baa655c13533",
       "bundledResource": "BundledCityPacks/3201.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -345,7 +345,7 @@
       "coverage": {
         "networkStations": 210,
         "matchedStations": {
-          "covered": 97,
+          "covered": 100,
           "total": 210
         },
         "accessibility": {
@@ -377,8 +377,8 @@
     {
       "cityID": "4201",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 89112,
-      "sha256": "7d9375649dcf9a2a1ed6ca1e61a164fe8779ef992da9d9378c9611c2c484414b",
+      "sizeBytes": 119325,
+      "sha256": "9ae6d5544376ca7c264aa0a0f0f690bda971e7bf1038fb30d77b70e654b27c7e",
       "bundledResource": "BundledCityPacks/4201.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -398,7 +398,7 @@
       "coverage": {
         "networkStations": 293,
         "matchedStations": {
-          "covered": 62,
+          "covered": 89,
           "total": 293
         },
         "accessibility": {
@@ -430,8 +430,8 @@
     {
       "cityID": "5101",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 220037,
-      "sha256": "a6cbf3cab82088abe40fc397992e0da779f67619c84b190f1492530f0068c868",
+      "sizeBytes": 268671,
+      "sha256": "910eb85b664bc3b26240f8b8b019fe0f70a6d3d750a03a6ec283474faf6f8033",
       "bundledResource": "BundledCityPacks/5101.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -451,7 +451,7 @@
       "coverage": {
         "networkStations": 396,
         "matchedStations": {
-          "covered": 153,
+          "covered": 184,
           "total": 396
         },
         "accessibility": {
@@ -1119,8 +1119,8 @@
     {
       "cityID": "3205",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 73357,
-      "sha256": "5c900fe625d98149e8ddfe64a6eba0adf347ba18edd160f39c2cf0727bc7780e",
+      "sizeBytes": 79998,
+      "sha256": "923550f5e770b46b3729a2bdf6b8418368f41dbb0bbde0f5c547a42143a2e3f7",
       "bundledResource": "BundledCityPacks/3205.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -1140,7 +1140,7 @@
       "coverage": {
         "networkStations": 235,
         "matchedStations": {
-          "covered": 48,
+          "covered": 53,
           "total": 235
         },
         "accessibility": {
@@ -1543,8 +1543,8 @@
     {
       "cityID": "3301",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 424307,
-      "sha256": "fa8862a7eeadd98108ac0bd00039a3992889a9007dab0c3b621dbcfd653e0dce",
+      "sizeBytes": 438087,
+      "sha256": "e1960a34ec977eb121d33279bb007b6314d313a26e9b8f20353591ed85ac76b1",
       "bundledResource": "BundledCityPacks/3301.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -1564,7 +1564,7 @@
       "coverage": {
         "networkStations": 270,
         "matchedStations": {
-          "covered": 261,
+          "covered": 262,
           "total": 270
         },
         "accessibility": {
@@ -2126,8 +2126,8 @@
     {
       "cityID": "4403",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 503480,
-      "sha256": "b568cf38b794ee25ebad9e1c4fe3cc8b185181ce389d793375566aba38ffa4e6",
+      "sizeBytes": 508180,
+      "sha256": "6c0e5036273cde5b91f64bc8d9551826020036dae5b88f5b13ce00271272dedb",
       "bundledResource": "BundledCityPacks/4403.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -2147,7 +2147,7 @@
       "coverage": {
         "networkStations": 372,
         "matchedStations": {
-          "covered": 319,
+          "covered": 321,
           "total": 372
         },
         "accessibility": {

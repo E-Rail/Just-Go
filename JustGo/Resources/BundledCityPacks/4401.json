@@ -482,6 +482,33 @@
           "longitude": 113.295133,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-3040302061",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.124,
+          "longitude": 113.294092,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6576363061",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.124406,
+          "longitude": 113.2948,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6576363064",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.124546,
+          "longitude": 113.294949,
+          "isAccessible": true,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -4458,6 +4485,15 @@
           "longitude": 113.277351,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8549130616",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.089843,
+          "longitude": 113.27508,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -4854,6 +4890,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-13178690713",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.119405,
+          "longitude": 113.311604,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-5266078713",
           "name": "五羊邨站 C出入口",
           "kind": "exit",
@@ -5133,6 +5178,24 @@
           "kind": "exit",
           "latitude": 22.988528,
           "longitude": 113.85156,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11936217134",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.989458,
+          "longitude": 113.850381,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11936217135",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.989981,
+          "longitude": 113.85093,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -6920,6 +6983,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12147023213",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.221124,
+          "longitude": 113.286428,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-3212019206",
           "name": "黄边站 A出入口",
           "kind": "exit",
@@ -7182,6 +7254,42 @@
           "kind": "exit",
           "latitude": 23.171261,
           "longitude": 113.344449,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9198207481",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.170963,
+          "longitude": 113.343891,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9198207482",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.17119,
+          "longitude": 113.344147,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9198207487",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.170436,
+          "longitude": 113.343805,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9198207488",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.170876,
+          "longitude": 113.344236,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -8440,6 +8548,24 @@
           "longitude": 113.273901,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9214833573",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.097907,
+          "longitude": 113.273611,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9214833575",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.096611,
+          "longitude": 113.274223,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -8718,6 +8844,24 @@
           "kind": "exit",
           "latitude": 23.0038,
           "longitude": 113.344337,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10586725845",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.002039,
+          "longitude": 113.344547,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10586725846",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.002744,
+          "longitude": 113.343437,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -9110,6 +9254,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-13666261387",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.18135,
+          "longitude": 113.270436,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-3896847496",
           "name": "白云公园站 A出入口",
@@ -10355,6 +10508,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-11050460206",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.169693,
+          "longitude": 113.263855,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-2463179383",
           "name": "飞翔公园站 C出入口",
@@ -13196,6 +13358,24 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-13946035415",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.140368,
+          "longitude": 113.242282,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13946035416",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.140786,
+          "longitude": 113.241565,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-3665457896",
           "name": "西村站 D出入口",
           "kind": "exit",
@@ -15412,6 +15592,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-13899032365",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.866764,
+          "longitude": 113.490411,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-4956999393",
           "name": "南沙北站",
           "kind": "exit",
@@ -16691,6 +16880,15 @@
           "kind": "exit",
           "latitude": 23.073256,
           "longitude": 113.263491,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13432354998",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.073118,
+          "longitude": 113.265267,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -18633,6 +18831,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-13144168994",
+          "name": "",
+          "kind": "exit",
+          "latitude": 23.169087,
+          "longitude": 113.260245,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-13601109997",
           "name": "B",
           "kind": "exit",
@@ -18685,6 +18892,24 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-9107562279",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.700263,
+          "longitude": 113.555341,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9107562280",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.700179,
+          "longitude": 113.555218,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-9128508954",
           "name": "万顷沙站 A出入口",
@@ -18957,6 +19182,15 @@
           "kind": "exit",
           "latitude": 22.959339,
           "longitude": 113.896361,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13595342732",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.958149,
+          "longitude": 113.89801,
           "isAccessible": false,
           "source": "specificEntrance"
         }

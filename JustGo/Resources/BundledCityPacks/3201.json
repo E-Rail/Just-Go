@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 210,
     "matchedStations": {
-      "covered": 97,
+      "covered": 100,
       "total": 210
     },
     "accessibility": {
@@ -634,6 +634,15 @@
           "longitude": 118.816668,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8002523207",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.065428,
+          "longitude": 118.814824,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -1176,6 +1185,41 @@
       ]
     },
     {
+      "stationID": "2c6cfd1da84fec78",
+      "stationName": "江宁滨江开发区",
+      "stationNameEn": "Jiangning Binjiang Development Zone",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13770679935",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.856,
+          "longitude": 118.591602,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "2d5fd82999f69be6",
       "stationName": "宏运大道",
       "stationNameEn": "宏运大道",
@@ -1699,6 +1743,50 @@
           "kind": "exit",
           "latitude": 32.060524,
           "longitude": 118.756479,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "49db7d85b75709f3",
+      "stationName": "葛塘",
+      "stationNameEn": "Getang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-7998554088",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.244658,
+          "longitude": 118.753319,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7998554089",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.244201,
+          "longitude": 118.754066,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -2532,6 +2620,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-5492523480",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.088041,
+          "longitude": 118.798918,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-5500139642",
           "name": "南京站#1",
           "kind": "exit",
@@ -2834,6 +2931,50 @@
       ]
     },
     {
+      "stationID": "7a5b8287227f1183",
+      "stationName": "竹山路",
+      "stationNameEn": "Zhushanlu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8002563130",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.931816,
+          "longitude": 118.844908,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8002563131",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.932379,
+          "longitude": 118.844689,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "7c20c630fedcd32c",
       "stationName": "南京工业大学",
       "stationNameEn": "南京工业大学",
@@ -3022,6 +3163,15 @@
           "kind": "exit",
           "latitude": 31.977273,
           "longitude": 118.799965,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8001964973",
+          "name": "",
+          "kind": "exit",
+          "latitude": 31.977387,
+          "longitude": 118.801178,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -3443,6 +3593,15 @@
           "kind": "exit",
           "latitude": 32.153559,
           "longitude": 118.718236,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7998554094",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.153024,
+          "longitude": 118.718853,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -4160,6 +4319,24 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-8001955583",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.057994,
+          "longitude": 118.798514,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8001955584",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.056295,
+          "longitude": 118.797552,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-8001965385",
           "name": "鸡鸣寺#6",

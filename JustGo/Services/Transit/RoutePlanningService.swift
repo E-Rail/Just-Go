@@ -42,6 +42,15 @@ final class RoutePlanningService {
                     let enriched = await self.enrichedRoute(
                         route,
                         city: city,
+                        // A POI's own entrance beats its centroid when MapKit knows one — it is
+                        // the door the rider actually walks to, so it is the right thing to
+                        // measure the station's exits against.
+                        originTarget: CodableCoordinate(
+                            origin.entranceCoordinate ?? origin.coordinate
+                        ),
+                        destinationTarget: CodableCoordinate(
+                            destination.entranceCoordinate ?? destination.coordinate
+                        ),
                         accessibilityFilter: accessibilityFilter,
                         tripAnchor: tripAnchor
                     )
@@ -59,6 +68,8 @@ final class RoutePlanningService {
     private func enrichedRoute(
         _ route: Route,
         city: String,
+        originTarget: CodableCoordinate,
+        destinationTarget: CodableCoordinate,
         accessibilityFilter: AccessibilityFilter,
         tripAnchor: TripTimeAnchor
     ) async -> Route {
@@ -121,8 +132,24 @@ final class RoutePlanningService {
             cityID: routeCityID,
             stationNames: criticalStopNames
         )
-        route.stationGuidance = buildStationGuidance(route: route, guidance: guidanceByStation)
-        route.accessGuidance = upgradeAccessGuidance(route.accessGuidance, guidance: guidanceByStation)
+        let stationPositions = criticalStops.reduce(into: [String: CodableCoordinate]()) { index, stop in
+            if let coordinate = stop.coordinate { index[stop.name] = coordinate }
+        }
+        route.stationGuidance = buildStationGuidance(
+            route: route,
+            guidance: guidanceByStation,
+            originTarget: originTarget,
+            destinationTarget: destinationTarget,
+            requiresStepFree: accessibilityFilter.requiresStepFreeEntrance
+        )
+        route.accessGuidance = upgradeAccessGuidance(
+            route.accessGuidance,
+            guidance: guidanceByStation,
+            stationPositions: stationPositions,
+            originTarget: originTarget,
+            destinationTarget: destinationTarget,
+            requiresStepFree: accessibilityFilter.requiresStepFreeEntrance
+        )
 
         return route
     }
@@ -131,7 +158,10 @@ final class RoutePlanningService {
     /// access-point + confidence (and a transfer-corridor hint, when one is authored).
     private func buildStationGuidance(
         route: Route,
-        guidance: [String: StationAccessGuidance]
+        guidance: [String: StationAccessGuidance],
+        originTarget: CodableCoordinate,
+        destinationTarget: CodableCoordinate,
+        requiresStepFree: Bool
     ) -> [RouteStationGuidance] {
         let transitSegments = route.segments.filter { $0.type.isTransit }
         guard !transitSegments.isEmpty else { return [] }
@@ -141,11 +171,27 @@ final class RoutePlanningService {
         func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role, interchange: StationInterchangeHint? = nil) {
             guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
             let access = guidance[stop.name] ?? .empty
+            // Boarding aims at where the rider is coming from, arrival at where they are going;
+            // a transfer never leaves the station, so it has no entrance to recommend.
+            let target: CodableCoordinate?
+            switch role {
+            case .boarding: target = originTarget
+            case .arrival: target = destinationTarget
+            case .transfer: target = nil
+            }
+            // Downstream — the trip timeline, the arrival notification — only ever sees this point,
+            // so an unlabeled entrance has its direction resolved here, while the station it is
+            // measured from is still in hand.
+            let exit = role == .transfer
+                ? nil
+                : access.recommendedAccessPoint(near: target, requiresStepFree: requiresStepFree)?
+                    .point
+                    .labeled(relativeTo: stop.coordinate)
             result.append(RouteStationGuidance(
                 stationID: stop.stationID,
                 stationName: stop.name,
                 role: role,
-                exit: role == .transfer ? nil : access.primaryAccessPoint,
+                exit: exit,
                 interchange: interchange,
                 confidence: access.confidence
             ))
@@ -173,11 +219,20 @@ final class RoutePlanningService {
     /// when station data provides one; otherwise leaves the honest "unavailable" guide untouched.
     private func upgradeAccessGuidance(
         _ guides: [RouteAccessGuide],
-        guidance: [String: StationAccessGuidance]
+        guidance: [String: StationAccessGuidance],
+        stationPositions: [String: CodableCoordinate],
+        originTarget: CodableCoordinate,
+        destinationTarget: CodableCoordinate,
+        requiresStepFree: Bool
     ) -> [RouteAccessGuide] {
         guides.map { guide in
             let access = guidance[guide.stationName] ?? .empty
-            guard let point = access.primaryAccessPoint else { return guide }
+            let target = guide.kind == .origin ? originTarget : destinationTarget
+            guard let recommendation = access.recommendedAccessPoint(
+                near: target,
+                requiresStepFree: requiresStepFree
+            ) else { return guide }
+            let point = recommendation.point.labeled(relativeTo: stationPositions[guide.stationName])
             let upgradedPoint = RouteAccessPoint(
                 id: point.id,
                 name: point.name,
@@ -186,7 +241,7 @@ final class RoutePlanningService {
                 hasElevatorHint: point.kind == .elevator || point.isAccessible,
                 source: point.source
             )
-            let notes: [String]
+            var notes: [String]
             if access.confidence == .official {
                 notes = guide.accessibilityNotes.filter {
                     $0 != AppLocalization.localized("Specific entrance or exit is unavailable")
@@ -197,6 +252,16 @@ final class RoutePlanningService {
                     simplified: "出入口 \(point.name) 根据车站数据估算，请到现场确认。",
                     traditional: "出入口 \(point.name) 根據車站資料估算，請到現場確認。"
                 )]
+            }
+            // The rider asked for step-free access and this station has no entrance recorded as
+            // step-free. Say that, rather than let the nearest exit read as an accessible one —
+            // most entrances are simply unsurveyed, which is not the same as being accessible.
+            if recommendation.stepFreeUnavailable {
+                notes.append(AppLocalization.text(
+                    english: "No step-free entrance is recorded at \(guide.stationName) — this is the nearest one.",
+                    simplified: "\(guide.stationName)暂无无障碍出入口记录，这是最近的一个。",
+                    traditional: "\(guide.stationName)暫無無障礙出入口記錄，這是最近的一個。"
+                ))
             }
             return RouteAccessGuide(
                 id: guide.id,

@@ -11,6 +11,13 @@ struct AccessibilityFilter {
         requiresElevator: false,
         avoidStairs: false
     )
+
+    /// Whether the rider needs the entrance itself to be step-free. All three settings imply it:
+    /// a wheelchair cannot use a stepped entrance, "needs a lift" is the same requirement stated
+    /// by the equipment, and avoiding stairs is exactly what a step-free entrance is for.
+    var requiresStepFreeEntrance: Bool {
+        requiresWheelchairAccess || requiresElevator || avoidStairs
+    }
 }
 
 struct Route: Identifiable, Codable {
@@ -432,6 +439,88 @@ struct StationAccessPoint: Identifiable, Codable {
     let confidence: DataConfidence
 }
 
+/// The eight-point compass sector an entrance sits in, measured from its station.
+///
+/// OpenStreetMap surveys thousands of entrances as a position and nothing else — no name, no exit
+/// letter, because the sign carries none or nobody recorded it. Those doors are still worth walking
+/// to, so they ship with an empty name and are described by where they are. The direction is
+/// derived from the surveyed coordinate, so it states a fact rather than inventing a sign.
+enum StationAccessBearing: CaseIterable {
+    case north, northeast, east, southeast, south, southwest, west, northwest
+
+    /// Sectors are 45° wide and centred on their compass point, so due north spans 337.5°–22.5°.
+    /// Returns `nil` for a door essentially on top of the station centre, where naming a direction
+    /// would be noise rather than guidance.
+    static func between(station: CodableCoordinate, point: CodableCoordinate) -> StationAccessBearing? {
+        let meanLatitude = (station.latitude + point.latitude) / 2 * .pi / 180
+        let northing = (point.latitude - station.latitude) * .pi / 180 * 6_371_000
+        let easting = (point.longitude - station.longitude) * .pi / 180 * 6_371_000 * cos(meanLatitude)
+        guard northing * northing + easting * easting > 100 else { return nil }
+
+        var degrees = atan2(easting, northing) * 180 / .pi
+        if degrees < 0 { degrees += 360 }
+        return allCases[Int((degrees + 22.5) / 45) % allCases.count]
+    }
+
+    var entranceName: String {
+        switch self {
+        case .north:
+            return AppLocalization.text(english: "North entrance", simplified: "北侧出入口", traditional: "北側出入口")
+        case .northeast:
+            return AppLocalization.text(english: "Northeast entrance", simplified: "东北侧出入口", traditional: "東北側出入口")
+        case .east:
+            return AppLocalization.text(english: "East entrance", simplified: "东侧出入口", traditional: "東側出入口")
+        case .southeast:
+            return AppLocalization.text(english: "Southeast entrance", simplified: "东南侧出入口", traditional: "東南側出入口")
+        case .south:
+            return AppLocalization.text(english: "South entrance", simplified: "南侧出入口", traditional: "南側出入口")
+        case .southwest:
+            return AppLocalization.text(english: "Southwest entrance", simplified: "西南侧出入口", traditional: "西南側出入口")
+        case .west:
+            return AppLocalization.text(english: "West entrance", simplified: "西侧出入口", traditional: "西側出入口")
+        case .northwest:
+            return AppLocalization.text(english: "Northwest entrance", simplified: "西北侧出入口", traditional: "西北側出入口")
+        }
+    }
+}
+
+extension StationAccessPoint {
+    /// A surveyed door with no sign letter and no name of its own.
+    var isUnlabeled: Bool {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// What to call this entrance out loud. Named entrances keep their name; unlabeled ones are
+    /// described by their direction from the station, which is why the station's own position has
+    /// to be passed in. Without one there is nothing to measure against, so it falls back to a
+    /// plain "station entrance" — never to the empty string the pack actually carries.
+    func displayName(relativeTo station: CodableCoordinate?) -> String {
+        guard isUnlabeled else { return name }
+        guard let station, let coordinate,
+              let bearing = StationAccessBearing.between(station: station, point: coordinate) else {
+            return AppLocalization.text(english: "Station entrance", simplified: "车站出入口", traditional: "車站出入口")
+        }
+        return bearing.entranceName
+    }
+
+    /// The same point with its direction resolved into `name`, for the places downstream that only
+    /// ever see the access point and no longer have the station to measure from — route guidance,
+    /// the trip timeline, the arrival notification.
+    func labeled(relativeTo station: CodableCoordinate?) -> StationAccessPoint {
+        guard isUnlabeled else { return self }
+        return StationAccessPoint(
+            id: id,
+            name: displayName(relativeTo: station),
+            kind: kind,
+            coordinate: coordinate,
+            isAccessible: isAccessible,
+            notes: notes,
+            source: source,
+            confidence: confidence
+        )
+    }
+}
+
 /// Boarding tips for a platform (which car, which door side). Authored-only; absent in packs today.
 struct StationPlatformHint: Codable {
     let lineName: String?
@@ -499,11 +588,73 @@ struct StationAccessGuidance {
     var primaryAccessPoint: StationAccessPoint? {
         accessPoints.first { $0.kind == .exit } ?? accessPoints.first
     }
+
+    /// The entrance to actually send a rider to, given where they are walking to or from and
+    /// whether they need step-free access.
+    ///
+    /// `primaryAccessPoint` above answers a different question — "name one of this station's
+    /// exits" — and picking the first one is fine for that. For a trip it is not: exits at a large
+    /// interchange can be several hundred metres and one busy road apart, so the arbitrary first
+    /// exit routinely sends someone out of the wrong side of the station.
+    func recommendedAccessPoint(
+        near target: CodableCoordinate?,
+        requiresStepFree: Bool
+    ) -> StationExitRecommendation? {
+        let exits = accessPoints.filter { $0.kind == .exit }
+        let candidates = exits.isEmpty ? accessPoints : exits
+        guard !candidates.isEmpty else { return nil }
+
+        // Only OSM's `wheelchair=yes`/`designated` sets `isAccessible`, so an untagged entrance is
+        // "nobody surveyed this", not "there are steps". When nothing here is tagged step-free the
+        // rider still gets the nearest exit — with the shortfall reported rather than papered over.
+        let stepFree = candidates.filter(\.isAccessible)
+        let unavailable = requiresStepFree && stepFree.isEmpty
+        let preferred = requiresStepFree && !stepFree.isEmpty ? stepFree : candidates
+
+        let nearest = target.flatMap { target -> StationAccessPoint? in
+            preferred
+                .compactMap { point -> (point: StationAccessPoint, metres: Double)? in
+                    guard let coordinate = point.coordinate else { return nil }
+                    return (point, target.metres(to: coordinate))
+                }
+                .min { $0.metres < $1.metres }?
+                .point
+        }
+        let chosen = nearest ?? preferred[0]
+
+        return StationExitRecommendation(point: chosen, stepFreeUnavailable: unavailable)
+    }
+}
+
+/// A chosen entrance plus whether it satisfied the rider's step-free requirement.
+struct StationExitRecommendation {
+    let point: StationAccessPoint
+    /// The rider asked for step-free access and no entrance at this station is recorded as
+    /// step-free — the point is still the nearest one, but nothing here claims it is accessible.
+    let stepFreeUnavailable: Bool
 }
 
 struct CodableCoordinate: Codable, Equatable {
     let latitude: Double
     let longitude: Double
+
+    init(latitude: Double, longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+
+    init(_ coordinate: CLLocationCoordinate2D) {
+        self.init(latitude: coordinate.latitude, longitude: coordinate.longitude)
+    }
+
+    /// Flat-earth distance in metres. Exact enough at the scale this is used for — comparing
+    /// entrances of one station against one nearby destination, never more than a few kilometres.
+    func metres(to other: CodableCoordinate) -> Double {
+        let meanLatitude = (latitude + other.latitude) / 2 * .pi / 180
+        let northing = (other.latitude - latitude) * .pi / 180 * 6_371_000
+        let easting = (other.longitude - longitude) * .pi / 180 * 6_371_000 * cos(meanLatitude)
+        return (northing * northing + easting * easting).squareRoot()
+    }
 }
 
 enum TransitPlaceSource: String, Codable {

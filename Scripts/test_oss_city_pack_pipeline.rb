@@ -154,6 +154,34 @@ class OSSCityPackPipelineTest < Minitest::Test
     refute_includes renamed.fetch("aliases"), "海皇路"
   end
 
+  # 玉泉路 has eight entrances surveyed within 90 m and a sign letter on none of them. Dropping
+  # unlabeled entrances left it — and 133 other stations — showing no entrance map at all, which is
+  # the regression this pins: a station is not allowed to lose its whole survey for want of a label.
+  def test_entrances_with_no_sign_letter_still_ship
+    beijing = json("JustGo/Resources/BundledCityPacks/1100.json")
+    yuquanlu = beijing.fetch("stations").find { |station| station.fetch("stationName") == "玉泉路" }
+    points = yuquanlu.fetch("stationAccessPoints")
+
+    assert_equal 8, points.length
+    assert points.all? { |point| point.fetch("name").empty? }, "these entrances carry no label"
+    assert points.all? { |point| point.fetch("id").start_with?("osm-") }
+    assert points.all? { |point| point["latitude"].is_a?(Float) && point["longitude"].is_a?(Float) }
+  end
+
+  # `accessibleEntrances` is a list of names a rider reads off the screen, so an entrance OSM tagged
+  # step-free but never named belongs in none of them — an empty string there is a blank row.
+  def test_no_pack_lists_a_nameless_accessible_entrance
+    OSSDataValidators::BUNDLED_CITY_IDS.each do |city_id|
+      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+        entrances = station.dig("accessibility", "accessibleEntrances")
+        next if entrances.nil?
+
+        assert entrances.none? { |name| name.to_s.strip.empty? },
+               "#{city_id} #{station.fetch("stationName")} lists an unnamed accessible entrance"
+      end
+    end
+  end
+
   def test_no_pack_ships_licensed_media
     %w[1100 7101 8100].each do |city_id|
       json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|

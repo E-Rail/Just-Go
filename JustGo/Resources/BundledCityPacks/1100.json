@@ -80,6 +80,17 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11472613946",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.065981,
+          "longitude": 116.412825,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -439,6 +450,24 @@
           "latitude": 39.999024,
           "longitude": 116.35252,
           "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11799850929",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.000645,
+          "longitude": 116.353471,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11799850930",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.000734,
+          "longitude": 116.352308,
+          "isAccessible": true,
           "source": "specificEntrance"
         },
         {
@@ -926,6 +955,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12947578836",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.886929,
+          "longitude": 116.314795,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12947578837",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.886791,
+          "longitude": 116.315898,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -1140,6 +1189,15 @@
           "kind": "exit",
           "latitude": 39.908738,
           "longitude": 116.516146,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5442860530",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908256,
+          "longitude": 116.515315,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -1440,11 +1498,83 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1300399127",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.900872,
+          "longitude": 116.417893,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1300399137",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.901286,
+          "longitude": 116.417893,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1300399159",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.900839,
+          "longitude": 116.416008,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1300399166",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.901247,
+          "longitude": 116.415942,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1300399186",
           "name": "B",
           "kind": "exit",
           "latitude": 39.901278,
           "longitude": 116.417499,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1300399201",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.901254,
+          "longitude": 116.416343,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1359090010",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.901567,
+          "longitude": 116.419392,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1429554241",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.899741,
+          "longitude": 116.418817,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1429554243",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.900076,
+          "longitude": 116.418813,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -1600,6 +1730,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-2098804209",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.021311,
+          "longitude": 116.492511,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2098804216",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.021733,
+          "longitude": 116.492491,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2098804226",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.02276,
+          "longitude": 116.49372,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -2310,6 +2469,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9691077527",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.867635,
+          "longitude": 116.341316,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9691077528",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.868544,
+          "longitude": 116.342428,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -2606,6 +2785,17 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1298076031",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908321,
+          "longitude": 116.308944,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -3094,6 +3284,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-11889042617",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.846389,
+          "longitude": 116.349078,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9122335000",
           "name": "A",
           "kind": "exit",
@@ -3553,6 +3752,15 @@
           "longitude": 116.600987,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12399943037",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.926154,
+          "longitude": 116.59901,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -3768,6 +3976,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1362259050",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.999448,
+          "longitude": 116.310054,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1362259051",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.999526,
+          "longitude": 116.30884,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1362259055",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.999935,
+          "longitude": 116.310699,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -4522,6 +4759,71 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1674674639",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.835397,
+          "longitude": 116.371169,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674674644",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.835987,
+          "longitude": 116.371174,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674674645",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.836029,
+          "longitude": 116.370522,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674674656",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.83766,
+          "longitude": 116.370571,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674674657",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.837803,
+          "longitude": 116.371221,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674675752",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.834589,
+          "longitude": 116.370479,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1674675754",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.835,
+          "longitude": 116.371426,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -4557,6 +4859,80 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1298050521",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.90734,
+          "longitude": 116.295801,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050530",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907667,
+          "longitude": 116.294266,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050531",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907337,
+          "longitude": 116.29386,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050552",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907672,
+          "longitude": 116.295355,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050562",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907673,
+          "longitude": 116.29582,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050571",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907323,
+          "longitude": 116.294287,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050572",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907341,
+          "longitude": 116.295358,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050577",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.90767,
+          "longitude": 116.293873,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -4594,6 +4970,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-10735103649",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923482,
+          "longitude": 116.372719,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-533640038",
           "name": "B",
@@ -4682,6 +5067,15 @@
           "kind": "exit",
           "latitude": 39.934284,
           "longitude": 116.434746,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8283682614",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.933959,
+          "longitude": 116.435299,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -5401,6 +5795,17 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-3337810728",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.845297,
+          "longitude": 116.38448,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -5547,6 +5952,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-11992333186",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.933057,
+          "longitude": 116.368401,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-11992333187",
           "name": "J",
           "kind": "exit",
@@ -5665,6 +6079,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1301959229",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.906798,
+          "longitude": 116.375086,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1301959252",
           "name": "B出口",
           "kind": "exit",
@@ -5688,6 +6111,42 @@
           "kind": "exit",
           "latitude": 39.907464,
           "longitude": 116.377276,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5077273852",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907972,
+          "longitude": 116.373686,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5077273885",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.906369,
+          "longitude": 116.373692,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5077273896",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907483,
+          "longitude": 116.37315,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8500051831",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.906842,
+          "longitude": 116.373156,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -5761,6 +6220,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-5277764649",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.068435,
+          "longitude": 116.131383,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764660",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.067403,
+          "longitude": 116.129386,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764663",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.067458,
+          "longitude": 116.131314,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764664",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.068392,
+          "longitude": 116.130125,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -6460,6 +6957,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-10675884486",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.922711,
+          "longitude": 116.451306,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-11203076219",
           "name": "东大桥站垂直电梯",
           "kind": "exit",
@@ -6799,6 +7305,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-385074709",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.884624,
+          "longitude": 116.459949,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-385074712",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.884623,
+          "longitude": 116.463116,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-385074714",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.883967,
+          "longitude": 116.461884,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-385074716",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.883838,
+          "longitude": 116.460856,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -7141,6 +7685,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-1840733228",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923178,
+          "longitude": 116.46051,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-3450796154",
           "name": "H 出口",
@@ -8316,6 +8869,15 @@
           "latitude": 39.932697,
           "longitude": 116.332954,
           "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11283755473",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.933471,
+          "longitude": 116.333245,
+          "isAccessible": true,
           "source": "specificEntrance"
         },
         {
@@ -9865,6 +10427,33 @@
           "longitude": 116.332338,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788324400",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.722114,
+          "longitude": 116.333279,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788324401",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.72349,
+          "longitude": 116.332327,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788324402",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.72367,
+          "longitude": 116.333,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -9904,6 +10493,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1654257552",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907972,
+          "longitude": 116.417397,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1654257557",
           "name": "A",
           "kind": "exit",
@@ -9927,6 +10525,15 @@
           "kind": "exit",
           "latitude": 39.908005,
           "longitude": 116.418789,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-4716204515",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908039,
+          "longitude": 116.420767,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -10065,6 +10672,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1296102348",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.939892,
+          "longitude": 116.171572,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1300399156",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.939602,
+          "longitude": 116.170831,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -10103,6 +10730,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-11471883327",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.97595,
+          "longitude": 116.305826,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-11471883328",
           "name": "G",
           "kind": "exit",
@@ -10127,6 +10763,15 @@
           "latitude": 39.975851,
           "longitude": 116.306934,
           "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11694477732",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.97483,
+          "longitude": 116.306567,
+          "isAccessible": true,
           "source": "specificEntrance"
         },
         {
@@ -10543,6 +11188,15 @@
           "kind": "exit",
           "latitude": 39.940963,
           "longitude": 116.354092,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1253535267",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.941002,
+          "longitude": 116.353203,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -11362,6 +12016,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-5277764659",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.067876,
+          "longitude": 116.187293,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764665",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.068693,
+          "longitude": 116.189583,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764676",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.068722,
+          "longitude": 116.187229,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -11400,11 +12083,29 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1788406118",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.741974,
+          "longitude": 116.332819,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1788406174",
           "name": "京港地铁清源路站出入口",
           "kind": "exit",
           "latitude": 39.743248,
           "longitude": 116.332056,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788406181",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.743341,
+          "longitude": 116.332694,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -11896,11 +12597,29 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-1349005728",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923183,
+          "longitude": 116.357318,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1357572463",
           "name": "A",
           "kind": "exit",
           "latitude": 39.92401,
           "longitude": 116.354953,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1501674085",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923065,
+          "longitude": 116.354668,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -13196,6 +13915,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11821221326",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.924365,
+          "longitude": 116.33419,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11821221327",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923764,
+          "longitude": 116.334826,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11821221328",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.922465,
+          "longitude": 116.335157,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -13977,6 +14725,80 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1298050519",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907664,
+          "longitude": 116.273472,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050528",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907655,
+          "longitude": 116.275025,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050555",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907248,
+          "longitude": 116.275028,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050568",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907655,
+          "longitude": 116.27456,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050575",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907259,
+          "longitude": 116.273466,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050586",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907246,
+          "longitude": 116.274556,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050591",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907662,
+          "longitude": 116.273061,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298050597",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.90726,
+          "longitude": 116.273042,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -14582,6 +15404,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-10855438673",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.832614,
+          "longitude": 116.297085,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-10855438674",
           "name": "D",
           "kind": "exit",
@@ -14606,6 +15437,15 @@
           "latitude": 39.832935,
           "longitude": 116.297836,
           "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10855438677",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.832113,
+          "longitude": 116.297809,
+          "isAccessible": true,
           "source": "specificEntrance"
         },
         {
@@ -15042,6 +15882,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1363471399",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.070892,
+          "longitude": 116.360819,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1573019675",
           "name": "F2",
           "kind": "exit",
@@ -15403,6 +16252,24 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-11744202993",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.844743,
+          "longitude": 116.316989,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11744202995",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.844237,
+          "longitude": 116.317597,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-6295446317",
           "name": "东南口",
           "kind": "exit",
@@ -15464,6 +16331,53 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1364282616",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.93869,
+          "longitude": 116.339948,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1364282700",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.937815,
+          "longitude": 116.33772,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1364282701",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.937926,
+          "longitude": 116.340155,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1364282702",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.938702,
+          "longitude": 116.340251,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-910168396",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.93863,
+          "longitude": 116.338161,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -15862,6 +16776,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-11758318935",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.046967,
+          "longitude": 116.351175,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8712102274",
           "name": "西小口站C口",
           "kind": "exit",
@@ -15932,6 +16855,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9534846768",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.221599,
+          "longitude": 116.281162,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9534846769",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.222277,
+          "longitude": 116.281162,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -16048,6 +16991,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1788317644",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.71166,
+          "longitude": 116.318894,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788317645",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.711853,
+          "longitude": 116.319686,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788317646",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.71303,
+          "longitude": 116.318386,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788317647",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.713182,
+          "longitude": 116.319312,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -16211,6 +17192,15 @@
           "longitude": 116.294645,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2013438858",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.973759,
+          "longitude": 116.294467,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -16249,6 +17239,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-10655378371",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.940595,
+          "longitude": 116.432999,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-10655378372",
           "name": "G",
@@ -16492,6 +17491,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-12433635798",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.968913,
+          "longitude": 116.382856,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-12433635799",
           "name": "B",
@@ -17185,6 +18193,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8498001931",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.863797,
+          "longitude": 116.66982,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8498001932",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.863781,
+          "longitude": 116.671843,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8498001933",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.863117,
+          "longitude": 116.671638,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8498001934",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.863139,
+          "longitude": 116.669868,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -17360,6 +18406,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9379477294",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.87564,
+          "longitude": 116.476933,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9379477295",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.875391,
+          "longitude": 116.476944,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9379477296",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.875252,
+          "longitude": 116.477706,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -17798,6 +18873,62 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12218813398",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.865701,
+          "longitude": 116.293925,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12218813399",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.865691,
+          "longitude": 116.294394,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12218813400",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.866724,
+          "longitude": 116.294022,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12218883501",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.866594,
+          "longitude": 116.294525,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12218883502",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.867015,
+          "longitude": 116.294545,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12218883503",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.866291,
+          "longitude": 116.291584,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -17884,6 +19015,15 @@
           "kind": "exit",
           "latitude": 39.83641,
           "longitude": 116.286275,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10855438672",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.836051,
+          "longitude": 116.287687,
           "isAccessible": true,
           "source": "specificEntrance"
         }
@@ -18327,6 +19467,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-2575657183",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976788,
+          "longitude": 116.439425,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-862672246",
           "name": "B",
           "kind": "exit",
@@ -18515,6 +19664,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1350216401",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976083,
+          "longitude": 116.328097,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1350216498",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976557,
+          "longitude": 116.327894,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1350216500",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976637,
+          "longitude": 116.330332,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14028431246",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.975997,
+          "longitude": 116.328304,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -18835,6 +20022,15 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-10763621390",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.915762,
+          "longitude": 116.374041,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-10763621391",
           "name": "B",
           "kind": "exit",
@@ -18978,6 +20174,80 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1296155049",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907249,
+          "longitude": 116.252266,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155053",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907617,
+          "longitude": 116.253445,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155060",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907617,
+          "longitude": 116.251908,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155062",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907249,
+          "longitude": 116.253455,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155066",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907247,
+          "longitude": 116.25191,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155071",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907617,
+          "longitude": 116.253798,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155075",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907611,
+          "longitude": 116.252262,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296155084",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907257,
+          "longitude": 116.2538,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -19192,6 +20462,53 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12435034363",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.935324,
+          "longitude": 116.500006,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12435034364",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.934864,
+          "longitude": 116.498338,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12435034365",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.93617,
+          "longitude": 116.500976,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12435034366",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.935997,
+          "longitude": 116.500366,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12435034367",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.935495,
+          "longitude": 116.498616,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -19309,6 +20626,17 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-10290625093",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.706326,
+          "longitude": 115.989857,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -19594,6 +20922,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8498013139",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.862576,
+          "longitude": 116.68598,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8498013140",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.862722,
+          "longitude": 116.684468,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -20026,6 +21374,17 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1356089824",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.078982,
+          "longitude": 116.59296,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -20328,6 +21687,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1359135056",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976817,
+          "longitude": 116.418295,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2575677046",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.976787,
+          "longitude": 116.41679,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-4289827668",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.97793,
+          "longitude": 116.418029,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5719179211",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.977359,
+          "longitude": 116.416876,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -20518,6 +21915,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-274696962",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.070949,
+          "longitude": 116.335846,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-274696967",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.070946,
+          "longitude": 116.336569,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -20760,6 +22177,33 @@
           "longitude": 116.315824,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1362276452",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.984917,
+          "longitude": 116.316942,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1420940400",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.983316,
+          "longitude": 116.316026,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1559643067",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.983015,
+          "longitude": 116.317075,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -20860,6 +22304,15 @@
           "longitude": 116.478118,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-4832116903",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908673,
+          "longitude": 116.478792,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -20933,6 +22386,24 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-10842743297",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.764159,
+          "longitude": 116.332153,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2494634843",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.764011,
+          "longitude": 116.330984,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-5444199589",
           "name": "京港地铁高米店南站出入口",
@@ -21158,6 +22629,24 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-1302986764",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908288,
+          "longitude": 116.410885,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1302986770",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.909245,
+          "longitude": 116.411675,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1302986771",
           "name": "B1",
           "kind": "exit",
@@ -21181,6 +22670,15 @@
           "kind": "exit",
           "latitude": 39.907868,
           "longitude": 116.412387,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1302986800",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907802,
+          "longitude": 116.410903,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -21952,6 +23450,26 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-3362684848",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.857798,
+          "longitude": 116.187469,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-3362684854",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.858718,
+          "longitude": 116.187557,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -22207,6 +23725,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8589947908",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.002671,
+          "longitude": 116.415964,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9829539407",
           "name": "G",
           "kind": "exit",
@@ -22259,6 +23786,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-5277764652",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.072473,
+          "longitude": 116.239112,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764671",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.071697,
+          "longitude": 116.239428,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764672",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.071217,
+          "longitude": 116.237734,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5277764680",
+          "name": "",
+          "kind": "exit",
+          "latitude": 40.071916,
+          "longitude": 116.237333,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -22680,6 +24245,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1788337399",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.731061,
+          "longitude": 116.332259,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788337402",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.731548,
+          "longitude": 116.333407,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788337404",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.73197,
+          "longitude": 116.331859,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1788337407",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.732271,
+          "longitude": 116.333039,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -22715,6 +24318,80 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1298058529",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907759,
+          "longitude": 116.338128,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058539",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907106,
+          "longitude": 116.338164,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058556",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.90776,
+          "longitude": 116.338661,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058567",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907128,
+          "longitude": 116.336553,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058575",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907781,
+          "longitude": 116.336579,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058590",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907102,
+          "longitude": 116.338605,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058603",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.90712,
+          "longitude": 116.337112,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1298058633",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907775,
+          "longitude": 116.337125,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -22785,6 +24462,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1296102332",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907616,
+          "longitude": 116.236704,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296102340",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907212,
+          "longitude": 116.236728,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296102379",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907605,
+          "longitude": 116.235221,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1296102415",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.907205,
+          "longitude": 116.235228,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -22998,6 +24713,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1362259044",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.998768,
+          "longitude": 116.291285,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1421547756",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.999182,
+          "longitude": 116.290555,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1423966915",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.997795,
+          "longitude": 116.291172,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1423966920",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.998094,
+          "longitude": 116.290344,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -23380,6 +25133,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-1357810156",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.933079,
+          "longitude": 116.416869,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1357810160",
           "name": "C",
           "kind": "exit",
@@ -23514,6 +25276,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-1765144965",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.960873,
+          "longitude": 116.457456,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-1974915214",
           "name": "D",
           "kind": "exit",
@@ -23528,6 +25299,15 @@
           "kind": "exit",
           "latitude": 39.961183,
           "longitude": 116.45689,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5690603188",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.960645,
+          "longitude": 116.457967,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -23884,6 +25664,44 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1303502769",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.909077,
+          "longitude": 116.494767,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1303502771",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908603,
+          "longitude": 116.496324,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1303502778",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.909017,
+          "longitude": 116.496109,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-1303502783",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908661,
+          "longitude": 116.494722,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -24453,6 +26271,24 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-10842159181",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.909652,
+          "longitude": 116.16564,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10842159184",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.908924,
+          "longitude": 116.16395,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9635360715",
           "name": "C",
           "kind": "exit",
@@ -24560,6 +26396,35 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-4844392642",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.889299,
+          "longitude": 116.386563,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6731175877",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.889807,
+          "longitude": 116.385255,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6732322957",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.889782,
+          "longitude": 116.38392,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -24622,6 +26487,15 @@
           "latitude": 39.825765,
           "longitude": 116.297612,
           "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10855359644",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.824943,
+          "longitude": 116.296658,
+          "isAccessible": true,
           "source": "specificEntrance"
         },
         {

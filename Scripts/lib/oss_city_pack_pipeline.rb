@@ -267,12 +267,15 @@ module OSSCityPackPipeline
         raise BuildError, "OSM entrance document for #{city_id} is invalid"
       end
 
-      # An entrance with neither a name nor an exit letter has no rider-facing identity — it would
-      # render as an unlabelled pin nobody can match to a sign — so it is dropped rather than
-      # given an invented label.
+      # Entrances with neither a name nor an exit letter are kept. They were dropped at first, on
+      # the reasoning that a pin nobody can match to a sign is useless — but that reasoning only
+      # holds for a *list*. A door you walk to needs a position, not a letter, and dropping them
+      # blanked the map at 134 stations that OSM surveys perfectly well: 玉泉路 has eight entrances
+      # within 90 m and shipped none of them. They travel with an empty name; the app labels them
+      # by their compass bearing from the station, which is derived from the surveyed coordinate
+      # rather than invented, and localizes properly instead of baking one language into the pack.
       document.fetch("stations").each_with_object({}) do |(station_id, entrances), index|
         points = entrances
-          .select { |entrance| identifiable_entrance?(entrance) }
           .map { |entrance| osm_access_point(entrance) }
           .uniq { |point| point.fetch("id") }
           .sort_by { |point| point.fetch("id") }
@@ -280,12 +283,9 @@ module OSSCityPackPipeline
       end
     end
 
-    def identifiable_entrance?(entrance)
-      !entrance["ref"].to_s.strip.empty? || !entrance["name"].to_s.strip.empty?
-    end
-
     # `ref` is the exit letter riders actually look for ("A", "B2"); it is the identity here, with
     # the OSM node ID only as a fallback so an untagged entrance still gets a stable, unique id.
+    # The name is left empty when the survey records neither, which the app renders as a bearing.
     def osm_access_point(entrance)
       node_id = entrance.fetch("osmNodeID")
       label = entrance["ref"].to_s.strip
@@ -354,10 +354,16 @@ module OSSCityPackPipeline
       )
     end
 
+    # `accessibleEntrances` is a list of names riders read, so an entrance OSM tagged step-free but
+    # never named contributes nothing to it. Where a station's only step-free entrances are unnamed
+    # the block is skipped entirely rather than written empty: an empty block would still count
+    # towards the pack's accessibility coverage while displaying nothing. Step-free *routing* is
+    # unaffected either way — it reads `isAccessible` off the access point, not this list.
     def apply_entrance_accessibility!(record)
       accessible = record.fetch("stationAccessPoints")
         .select { |point| point.fetch("isAccessible") == true }
         .map { |point| point.fetch("name") }
+        .reject { |name| name.strip.empty? }
       return record if accessible.empty?
 
       record["accessibility"] = {

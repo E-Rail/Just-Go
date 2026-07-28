@@ -667,6 +667,23 @@ module OSSDataValidators
       )
     end
 
+    # An OSM node id is the one case where an empty name is the truth rather than a bug: the survey
+    # records the door's position but no sign letter, and the app labels it by compass bearing at
+    # render time so the label localizes. Every other source names its entrances, so for those an
+    # empty name still means something upstream dropped it.
+    OSM_ACCESS_POINT_ID = /\Aosm-\d+\z/.freeze
+
+    def validate_access_point_name!(city_id, point)
+      return if point["name"].is_a?(String) && !point["name"].strip.empty?
+
+      unless point["name"].is_a?(String)
+        fail_validation("#{city_id} access point name must be a string")
+      end
+      unless point["id"].to_s.match?(OSM_ACCESS_POINT_ID)
+        fail_validation("#{city_id} access point #{point["id"].inspect} is missing its name")
+      end
+    end
+
     def validate_access_points!(city_id, station, canonical)
       points = station["stationAccessPoints"]
       return if points.nil?
@@ -677,7 +694,7 @@ module OSSDataValidators
         ids == ids.uniq && ids == ids.sort
       points.each do |point|
         exact_keys!(point, REQUIRED_ACCESS_POINT_KEYS, "#{city_id} station access point")
-        fail_validation("#{city_id} access point name is missing") if point["name"].to_s.strip.empty?
+        validate_access_point_name!(city_id, point)
         fail_validation("#{city_id} access point kind is unsupported") unless
           ACCESS_POINT_KINDS.include?(point["kind"])
         fail_validation("#{city_id} access point source is unsupported") unless
@@ -692,7 +709,7 @@ module OSSDataValidators
         distance = metres_between(latitude, longitude, canonical.fetch("latitude"), canonical.fetch("longitude"))
         if distance > ACCESS_POINT_MAX_METRES
           fail_validation(
-            "#{city_id} access point #{point["name"]} is #{distance.round}m from its station " \
+            "#{city_id} access point #{point["id"]} is #{distance.round}m from its station " \
             "(check the coordinate frame)"
           )
         end
@@ -784,16 +801,16 @@ module OSSDataValidators
     # Cities whose pack is nothing but OpenStreetMap station entrances. Beijing also carries them
     # but is pinned with the operator cities above, since its pack predates this source.
     OSM_ENTRANCE_PACK_EXPECTATIONS = {
-      "1200" => { stations: 87, exits: 300, accessibility: 5, network: 239 },
-      "3100" => { stations: 368, exits: 1411, accessibility: 56, network: 471 },
-      "3201" => { stations: 97, exits: 365, accessibility: 11, network: 210 },
-      "3205" => { stations: 48, exits: 211, accessibility: 2, network: 235 },
-      "3301" => { stations: 261, exits: 1278, accessibility: 10, network: 270 },
-      "4201" => { stations: 62, exits: 240, accessibility: 7, network: 293 },
-      "4401" => { stations: 329, exits: 1236, accessibility: 37, network: 414 },
-      "4403" => { stations: 319, exits: 1488, accessibility: 19, network: 372 },
-      "5000" => { stations: 77, exits: 283, accessibility: 3, network: 273 },
-      "5101" => { stations: 153, exits: 623, accessibility: 9, network: 396 },
+      "1200" => { stations: 108, exits: 344, accessibility: 5, network: 239 },
+      "3100" => { stations: 369, exits: 1430, accessibility: 56, network: 471 },
+      "3201" => { stations: 100, exits: 376, accessibility: 11, network: 210 },
+      "3205" => { stations: 53, exits: 230, accessibility: 2, network: 235 },
+      "3301" => { stations: 262, exits: 1333, accessibility: 10, network: 270 },
+      "4201" => { stations: 89, exits: 319, accessibility: 7, network: 293 },
+      "4401" => { stations: 329, exits: 1262, accessibility: 37, network: 414 },
+      "4403" => { stations: 321, exits: 1504, accessibility: 19, network: 372 },
+      "5000" => { stations: 83, exits: 299, accessibility: 3, network: 273 },
+      "5101" => { stations: 184, exits: 771, accessibility: 9, network: 396 },
       "6101" => { stations: 227, exits: 920, accessibility: 164, network: 247 }
     }.freeze
 

@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 396,
     "matchedStations": {
-      "covered": 153,
+      "covered": 184,
       "total": 396
     },
     "accessibility": {
@@ -220,6 +220,33 @@
           "longitude": 104.069909,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11048052438",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.503595,
+          "longitude": 104.069887,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11048052439",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.503636,
+          "longitude": 104.071003,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11048052440",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.503755,
+          "longitude": 104.071058,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -298,6 +325,50 @@
           "kind": "exit",
           "latitude": 30.693254,
           "longitude": 104.066491,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "0cd8f8681212cce2",
+      "stationName": "迎宾大道",
+      "stationNameEn": "Yingbin Avenue",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-10719051320",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.71225,
+          "longitude": 104.013268,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10719051321",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.712728,
+          "longitude": 104.014443,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -619,6 +690,24 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12563218774",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.629008,
+          "longitude": 104.122596,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12563218829",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.629103,
+          "longitude": 104.12335,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9422745431",
           "name": "D口",
           "kind": "exit",
@@ -686,6 +775,41 @@
           "kind": "exit",
           "latitude": 30.550867,
           "longitude": 104.098743,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "13e7b726637f2833",
+      "stationName": "明蜀王陵",
+      "stationNameEn": "Mingshuwangling",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-7194678287",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.648703,
+          "longitude": 104.195382,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -827,6 +951,59 @@
           "kind": "exit",
           "latitude": 30.478822,
           "longitude": 104.069005,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "19cc4920f310f167",
+      "stationName": "熊猫大道",
+      "stationNameEn": "Panda Avenue",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13279830653",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.724872,
+          "longitude": 104.108512,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13279830654",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.7249,
+          "longitude": 104.107373,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5906206285",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.725893,
+          "longitude": 104.108537,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -1432,6 +1609,33 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12883578434",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.673134,
+          "longitude": 104.091579,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578435",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.674045,
+          "longitude": 104.090285,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578436",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.673854,
+          "longitude": 104.091029,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-7858481434",
           "name": "B",
           "kind": "exit",
@@ -1499,6 +1703,41 @@
           "kind": "exit",
           "latitude": 30.677002,
           "longitude": 103.998193,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "28251f47d8dffd4e",
+      "stationName": "温家山",
+      "stationNameEn": "温家山",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11500333557",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.49846,
+          "longitude": 104.008711,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -1952,6 +2191,130 @@
           "kind": "exit",
           "latitude": 30.688375,
           "longitude": 103.842263,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "2ddd8f1cdf4c31d9",
+      "stationName": "动物园",
+      "stationNameEn": "Chengdu Zoo",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12625575780",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.714003,
+          "longitude": 104.103986,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12625660769",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.71394,
+          "longitude": 104.102688,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12625660770",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.713172,
+          "longitude": 104.102578,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12625660771",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.712912,
+          "longitude": 104.103345,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "2de1907df813dbbf",
+      "stationName": "阳公桥",
+      "stationNameEn": "Yanggongqiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12883578487",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.649125,
+          "longitude": 103.994824,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578488",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.64898,
+          "longitude": 103.997169,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578489",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.649542,
+          "longitude": 103.997505,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578490",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.648623,
+          "longitude": 103.994571,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -2538,6 +2901,24 @@
           "longitude": 104.008347,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578480",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.652411,
+          "longitude": 104.008872,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578481",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.651955,
+          "longitude": 104.010904,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -3001,6 +3382,41 @@
       ]
     },
     {
+      "stationID": "40ee187d868d6476",
+      "stationName": "万家湾",
+      "stationNameEn": "Wanjiawan",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386314418",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.662959,
+          "longitude": 103.962231,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "41e33d7db4213b0a",
       "stationName": "十里店",
       "stationNameEn": "Shilidian",
@@ -3119,6 +3535,59 @@
           "kind": "exit",
           "latitude": 30.622087,
           "longitude": 104.133699,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "42c731d2899d8ddd",
+      "stationName": "芦角",
+      "stationNameEn": "Lujiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13457121495",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.43127,
+          "longitude": 104.038601,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13457121496",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.43221,
+          "longitude": 104.037212,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13457121497",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.431914,
+          "longitude": 104.03673,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -3364,6 +3833,59 @@
       ]
     },
     {
+      "stationID": "4819c2cb491e6dc3",
+      "stationName": "白佛桥",
+      "stationNameEn": "Baifoqiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-10140139110",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.641433,
+          "longitude": 103.963537,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10140139111",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.641003,
+          "longitude": 103.962184,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-10140139112",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.640441,
+          "longitude": 103.962453,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "4b1b376f8e87f31a",
       "stationName": "浣花里",
       "stationNameEn": "Huanhua Lane",
@@ -3494,6 +4016,42 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12612814139",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.617079,
+          "longitude": 104.032432,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615825976",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.616307,
+          "longitude": 104.033774,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615825977",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.618178,
+          "longitude": 104.035117,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615825978",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.617085,
+          "longitude": 104.034389,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8928765229",
           "name": "B",
           "kind": "exit",
@@ -3508,6 +4066,50 @@
           "kind": "exit",
           "latitude": 30.617466,
           "longitude": 104.035169,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "4b9c585f2972d445",
+      "stationName": "牧华路",
+      "stationNameEn": "牧华路",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11500333553",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.484641,
+          "longitude": 104.012123,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11500333556",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.485584,
+          "longitude": 104.010239,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -3537,6 +4139,24 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-12883578430",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.673055,
+          "longitude": 104.101483,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578431",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.672468,
+          "longitude": 104.098621,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-8733440497",
           "name": "A2",
@@ -3667,6 +4287,59 @@
           "kind": "exit",
           "latitude": 30.64951,
           "longitude": 104.065903,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "5339a9ee478abc40",
+      "stationName": "桐梓林",
+      "stationNameEn": "Tongzilin",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-6257575031",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.615802,
+          "longitude": 104.067395,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6257575032",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.615321,
+          "longitude": 104.066805,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-6257575033",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.61482,
+          "longitude": 104.067419,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -4074,6 +4747,86 @@
           "kind": "exit",
           "latitude": 30.661933,
           "longitude": 104.049505,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "59ba33719170e8cb",
+      "stationName": "犀浦",
+      "stationNameEn": "Xipu Railway Station",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8570630139",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.757085,
+          "longitude": 103.969373,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8570630140",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.757284,
+          "longitude": 103.969004,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8570630141",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.75839,
+          "longitude": 103.970147,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8570630142",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.758723,
+          "longitude": 103.97113,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8570630143",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.758272,
+          "longitude": 103.971612,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8570630144",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.757942,
+          "longitude": 103.971194,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -4616,6 +5369,33 @@
           "longitude": 103.920156,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9019960456",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.634191,
+          "longitude": 103.922542,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9019960457",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.634832,
+          "longitude": 103.922287,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9019960458",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.634799,
+          "longitude": 103.920247,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -4768,6 +5548,51 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-12883578455",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.652473,
+          "longitude": 104.041144,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578456",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.651873,
+          "longitude": 104.041246,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578457",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.651614,
+          "longitude": 104.043369,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578458",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.651611,
+          "longitude": 104.04272,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578459",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.651582,
+          "longitude": 104.041553,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-12883578460",
           "name": "C",
           "kind": "exit",
@@ -4888,6 +5713,68 @@
           "kind": "exit",
           "latitude": 30.716898,
           "longitude": 104.044423,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "6d6f89c867d06e2c",
+      "stationName": "天府三街",
+      "stationNameEn": "3rd Tianfu Street",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-5621961657",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.545749,
+          "longitude": 104.069661,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5621961658",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.545592,
+          "longitude": 104.068544,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9850905429",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.546724,
+          "longitude": 104.068008,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9850905439",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.546541,
+          "longitude": 104.069821,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -5441,11 +6328,47 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-5621961662",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.555275,
+          "longitude": 104.068128,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-5621961663",
           "name": "B",
           "kind": "exit",
           "latitude": 30.554549,
           "longitude": 104.068332,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9199455772",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.555024,
+          "longitude": 104.069472,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9199455775",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.553411,
+          "longitude": 104.069502,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9199455790",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.555884,
+          "longitude": 104.069421,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -5949,6 +6872,68 @@
       ]
     },
     {
+      "stationID": "8a77f8746d69e843",
+      "stationName": "松林",
+      "stationNameEn": "Songlin",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13457121491",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.42518,
+          "longitude": 104.047454,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13457121492",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.425751,
+          "longitude": 104.0478,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13457121493",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.426103,
+          "longitude": 104.045378,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13457121494",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.426611,
+          "longitude": 104.045621,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "8bc82aefbcf7262c",
       "stationName": "省体育馆",
       "stationNameEn": "Sichuan Gymnasium",
@@ -6041,6 +7026,166 @@
           "kind": "exit",
           "latitude": 30.633272,
           "longitude": 104.065955,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "8f2e486f88a7e56d",
+      "stationName": "九道堰",
+      "stationNameEn": "Jiudiaoyan",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-7647129993",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.771923,
+          "longitude": 104.081586,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7647129994",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.771269,
+          "longitude": 104.081419,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7647129995",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.770807,
+          "longitude": 104.08301,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7647129996",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.771114,
+          "longitude": 104.084012,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7647129997",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.77219,
+          "longitude": 104.083662,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-7647129998",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.772205,
+          "longitude": 104.083032,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "8f5639a99e7ccf38",
+      "stationName": "双桥路",
+      "stationNameEn": "Shuangqiao Road",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8611239139",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.647542,
+          "longitude": 104.11308,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8611239140",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.647011,
+          "longitude": 104.113622,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8611239141",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.646671,
+          "longitude": 104.113487,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8611239142",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.646228,
+          "longitude": 104.114421,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8611239143",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645126,
+          "longitude": 104.113067,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8611239144",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.64505,
+          "longitude": 104.113589,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -6171,6 +7316,41 @@
       ]
     },
     {
+      "stationID": "9140cde1ad8611d7",
+      "stationName": "分水",
+      "stationNameEn": "Fenshui",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386884908",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.611724,
+          "longitude": 104.176631,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "92ed79b54ea5da95",
       "stationName": "观东",
       "stationNameEn": "Guandong",
@@ -6271,6 +7451,95 @@
           "kind": "exit",
           "latitude": 30.719103,
           "longitude": 104.030566,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13286839358",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.717485,
+          "longitude": 104.031686,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "9361f0dd551fb5b1",
+      "stationName": "广州路",
+      "stationNameEn": "Guangzhou Road",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9705248994",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.416051,
+          "longitude": 104.076195,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9705248995",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.416865,
+          "longitude": 104.076319,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9705249000",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.417668,
+          "longitude": 104.077511,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9705249001",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.418361,
+          "longitude": 104.076715,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9705249002",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.419405,
+          "longitude": 104.077503,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9705249003",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.420153,
+          "longitude": 104.077488,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -6454,6 +7723,50 @@
       ]
     },
     {
+      "stationID": "9abeb23d13d41262",
+      "stationName": "龙港",
+      "stationNameEn": "Longgang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11500333558",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.534692,
+          "longitude": 103.974832,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11500333559",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.535911,
+          "longitude": 103.972629,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "9d3474c2d7530abe",
       "stationName": "孵化园",
       "stationNameEn": "Incubation Park",
@@ -6599,6 +7912,77 @@
           "kind": "exit",
           "latitude": 30.672907,
           "longitude": 103.963188,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "a3250bebc8aff071",
+      "stationName": "踏水桥",
+      "stationNameEn": "Tashui Bridge",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12883578425",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.675736,
+          "longitude": 104.107728,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578426",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.674732,
+          "longitude": 104.109087,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578427",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.675641,
+          "longitude": 104.108814,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578428",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.674965,
+          "longitude": 104.107698,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578429",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.675298,
+          "longitude": 104.10748,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -6753,6 +8137,59 @@
           "kind": "exit",
           "latitude": 30.606503,
           "longitude": 104.034897,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "a5600561d5fdc448",
+      "stationName": "瓦窑滩",
+      "stationNameEn": "Wayaotan",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386314421",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.661714,
+          "longitude": 103.949063,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386314422",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.662311,
+          "longitude": 103.947388,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386314423",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.661699,
+          "longitude": 103.947377,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -7202,6 +8639,50 @@
       ]
     },
     {
+      "stationID": "ae549f223521f500",
+      "stationName": "玉虹路",
+      "stationNameEn": "Yuhong Road",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386884911",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.606978,
+          "longitude": 104.186484,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386884912",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.606624,
+          "longitude": 104.186824,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "b3a88675aadc4fe0",
       "stationName": "双店路",
       "stationNameEn": "Shaungdian Road",
@@ -7644,6 +9125,175 @@
       ]
     },
     {
+      "stationID": "c12e067efa43bfa3",
+      "stationName": "牛王庙",
+      "stationNameEn": "Niuwangmiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12553350957",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645839,
+          "longitude": 104.094016,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406940",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645108,
+          "longitude": 104.093671,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406941",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.644699,
+          "longitude": 104.09552,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406942",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.644683,
+          "longitude": 104.094758,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406943",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.644924,
+          "longitude": 104.09436,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406944",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645765,
+          "longitude": 104.092643,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406945",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.643203,
+          "longitude": 104.09163,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406946",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.643376,
+          "longitude": 104.092244,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12561406947",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.643728,
+          "longitude": 104.092453,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "c75b7b5a2531fdda",
+      "stationName": "莲花",
+      "stationNameEn": "Lianhua",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9025063859",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.546579,
+          "longitude": 103.978867,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9025063860",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.546092,
+          "longitude": 103.978906,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9025063861",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.545875,
+          "longitude": 103.979655,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9025063862",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.546254,
+          "longitude": 103.980007,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "c899a5f1bc9a0206",
       "stationName": "武汉路",
       "stationNameEn": "Wuhan Road",
@@ -8040,6 +9690,33 @@
           "longitude": 104.027157,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615471202",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.581316,
+          "longitude": 104.025874,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615825979",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.582699,
+          "longitude": 104.02459,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12615825980",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.580655,
+          "longitude": 104.025412,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -8274,6 +9951,68 @@
       ]
     },
     {
+      "stationID": "d1eae781907e8b34",
+      "stationName": "昭觉寺南路",
+      "stationNameEn": "Zhaojuesi South Road",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12623385227",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.702935,
+          "longitude": 104.097178,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12623385228",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.703267,
+          "longitude": 104.096839,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12625660767",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.704337,
+          "longitude": 104.097269,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12625660768",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.702448,
+          "longitude": 104.096312,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "d2496509960a81b0",
       "stationName": "东郊记忆",
       "stationNameEn": "Dongjiao Memory",
@@ -8307,6 +10046,15 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-8611239146",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.667861,
+          "longitude": 104.128415,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-8611239147",
           "name": "B1",
           "kind": "exit",
@@ -8330,6 +10078,68 @@
           "kind": "exit",
           "latitude": 30.669128,
           "longitude": 104.1295,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "d628e7c48e6f6a0d",
+      "stationName": "兰家沟",
+      "stationNameEn": "Lanjiagou",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9369093390",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.443874,
+          "longitude": 103.995894,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9369093391",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.443303,
+          "longitude": 103.99557,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9369093392",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.443179,
+          "longitude": 103.997554,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9369093393",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.44257,
+          "longitude": 103.997339,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -8394,6 +10204,15 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-5621961685",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.582028,
+          "longitude": 104.063917,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-5621961686",
           "name": "A口",
@@ -8561,6 +10380,15 @@
           "longitude": 104.196024,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386833209",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.56401,
+          "longitude": 104.195071,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -8658,6 +10486,33 @@
           "longitude": 104.181786,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8631874065",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.647085,
+          "longitude": 104.181756,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8631874066",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.646998,
+          "longitude": 104.180815,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8631874067",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.646943,
+          "longitude": 104.180154,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -8729,6 +10584,15 @@
           "longitude": 103.983816,
           "isAccessible": false,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8547581363",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.758182,
+          "longitude": 103.983992,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -8784,11 +10648,117 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-9575358225",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.706517,
+          "longitude": 104.013597,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9613241815",
           "name": "H口",
           "kind": "exit",
           "latitude": 30.70693,
           "longitude": 104.014004,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "e7392afa75456ead",
+      "stationName": "梓潼宫",
+      "stationNameEn": "Zitonggong",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9073394007",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.748803,
+          "longitude": 103.992898,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9073394010",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.747252,
+          "longitude": 103.993579,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9073417641",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.747385,
+          "longitude": 103.994339,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "e7431b256e306e7c",
+      "stationName": "龙华寺",
+      "stationNameEn": "Longhuasi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386314425",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.571597,
+          "longitude": 104.179042,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386314426",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.571139,
+          "longitude": 104.180314,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -9336,6 +11306,15 @@
           "longitude": 104.069045,
           "isAccessible": true,
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5621961654",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.524973,
+          "longitude": 104.06919,
+          "isAccessible": false,
+          "source": "specificEntrance"
         }
       ]
     },
@@ -9369,6 +11348,50 @@
           "kind": "exit",
           "latitude": 30.592286,
           "longitude": 103.970554,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f58b17f50e264c76",
+      "stationName": "净居寺",
+      "stationNameEn": "Jingjusi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13386314409",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.621763,
+          "longitude": 104.10385,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13386314410",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.622042,
+          "longitude": 104.103585,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -9431,6 +11454,50 @@
           "kind": "exit",
           "latitude": 30.43745,
           "longitude": 104.032209,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f746f23abe0deabe",
+      "stationName": "城隍庙",
+      "stationNameEn": "Chenghuangmiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12883578438",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.679143,
+          "longitude": 104.080293,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12883578439",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.679063,
+          "longitude": 104.080475,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -9776,6 +11843,77 @@
           "kind": "exit",
           "latitude": 30.611493,
           "longitude": 104.152575,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "fe52c620287a1dad",
+      "stationName": "机投桥",
+      "stationNameEn": "Jitouqiao",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8882930532",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645308,
+          "longitude": 103.978742,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8882930533",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.644902,
+          "longitude": 103.977276,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8882930534",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.646948,
+          "longitude": 103.977755,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8882930535",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.64588,
+          "longitude": 103.978425,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8882930536",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.645101,
+          "longitude": 103.980042,
           "isAccessible": false,
           "source": "specificEntrance"
         }

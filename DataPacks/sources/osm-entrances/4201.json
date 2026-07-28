@@ -1,0 +1,2090 @@
+{
+  "schemaVersion": 1,
+  "cityID": "4201",
+  "source": "OpenStreetMap",
+  "sourceQuery": "node[railway=subway_entrance]",
+  "attribution": "© OpenStreetMap contributors",
+  "licenseURL": "https://www.openstreetmap.org/copyright",
+  "coordinateSystem": "gcj02",
+  "maxMatchMetres": 300.0,
+  "stats": {
+    "entranceCount": 332,
+    "boundCount": 319,
+    "unmatchedCount": 11,
+    "ambiguousCount": 2,
+    "stationsWithEntrances": 89,
+    "networkStationCount": 293
+  },
+  "stations": {
+    "0305a37edb2fbdd1": [
+      {
+        "osmNodeID": "2446691192",
+        "latitude": 30.5525099,
+        "longitude": 114.3166152
+      },
+      {
+        "osmNodeID": "2446691291",
+        "latitude": 30.5531577,
+        "longitude": 114.3181095
+      },
+      {
+        "osmNodeID": "2446691451",
+        "latitude": 30.5538644,
+        "longitude": 114.3165355
+      },
+      {
+        "osmNodeID": "2446691456",
+        "latitude": 30.5539088,
+        "longitude": 114.3185392,
+        "ref": "C",
+        "name": "C出口"
+      },
+      {
+        "osmNodeID": "2446691485",
+        "latitude": 30.5542058,
+        "longitude": 114.3169622,
+        "ref": "D1",
+        "name": "D1出口"
+      }
+    ],
+    "03b972821bd2975d": [
+      {
+        "osmNodeID": "5227950249",
+        "latitude": 30.5775937,
+        "longitude": 114.361194
+      },
+      {
+        "osmNodeID": "5227950250",
+        "latitude": 30.5770505,
+        "longitude": 114.3624912
+      },
+      {
+        "osmNodeID": "5227950251",
+        "latitude": 30.577178,
+        "longitude": 114.3613256
+      }
+    ],
+    "07161885702b1768": [
+      {
+        "osmNodeID": "13797894463",
+        "latitude": 30.5058388,
+        "longitude": 114.2363517,
+        "ref": "A"
+      }
+    ],
+    "0840f26ae59a1976": [
+      {
+        "osmNodeID": "5227950405",
+        "latitude": 30.6075267,
+        "longitude": 114.4050644,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "12989686565",
+        "latitude": 30.6073224,
+        "longitude": 114.4062709,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "5227950404",
+        "latitude": 30.6083183,
+        "longitude": 114.4065128,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "5227950406",
+        "latitude": 30.6081114,
+        "longitude": 114.4049475,
+        "ref": "D"
+      }
+    ],
+    "09d2abbf179ebf34": [
+      {
+        "osmNodeID": "11953541255",
+        "latitude": 30.5747478,
+        "longitude": 114.3714716
+      },
+      {
+        "osmNodeID": "11953541256",
+        "latitude": 30.5744209,
+        "longitude": 114.3711116
+      }
+    ],
+    "110ace55e7bb5178": [
+      {
+        "osmNodeID": "11127356264",
+        "latitude": 30.4884411,
+        "longitude": 114.5218595,
+        "ref": "A",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11127356265",
+        "latitude": 30.4883961,
+        "longitude": 114.523802,
+        "ref": "B",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11127356266",
+        "latitude": 30.4890814,
+        "longitude": 114.5237649,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11127356263",
+        "latitude": 30.4891386,
+        "longitude": 114.5220485,
+        "ref": "D"
+      }
+    ],
+    "1ac56a0f5420e687": [
+      {
+        "osmNodeID": "5227950225",
+        "latitude": 30.5484024,
+        "longitude": 114.2658298
+      },
+      {
+        "osmNodeID": "5227950226",
+        "latitude": 30.549387,
+        "longitude": 114.2664601
+      }
+    ],
+    "1b38d61436bc4696": [
+      {
+        "osmNodeID": "5485665031",
+        "latitude": 30.6748326,
+        "longitude": 114.3420004
+      },
+      {
+        "osmNodeID": "5485665032",
+        "latitude": 30.6745785,
+        "longitude": 114.3419171
+      }
+    ],
+    "1b57bef8b357bd1d": [
+      {
+        "osmNodeID": "5227950230",
+        "latitude": 30.5340599,
+        "longitude": 114.3010511
+      },
+      {
+        "osmNodeID": "5227950231",
+        "latitude": 30.5344852,
+        "longitude": 114.301078
+      }
+    ],
+    "24bbfcf767ba1051": [
+      {
+        "osmNodeID": "11127342045",
+        "latitude": 30.4885857,
+        "longitude": 114.4908789,
+        "ref": "A",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11127342046",
+        "latitude": 30.4887514,
+        "longitude": 114.4918864,
+        "ref": "B1"
+      },
+      {
+        "osmNodeID": "11127342047",
+        "latitude": 30.4888848,
+        "longitude": 114.4929202,
+        "ref": "B2",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11127342048",
+        "latitude": 30.4896559,
+        "longitude": 114.4929684,
+        "ref": "C"
+      }
+    ],
+    "25f0d04b061a4bbb": [
+      {
+        "osmNodeID": "12466967859",
+        "latitude": 30.4967989,
+        "longitude": 114.4112275,
+        "ref": "A1"
+      }
+    ],
+    "28e3ced94343ea67": [
+      {
+        "osmNodeID": "9862922774",
+        "latitude": 30.6306724,
+        "longitude": 114.3861292,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "9862922780",
+        "latitude": 30.6318585,
+        "longitude": 114.3880139,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "9862922777",
+        "latitude": 30.6322637,
+        "longitude": 114.3875922,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "9862922771",
+        "latitude": 30.6313373,
+        "longitude": 114.385661,
+        "ref": "D"
+      }
+    ],
+    "312575175d155c72": [
+      {
+        "osmNodeID": "12194156891",
+        "latitude": 30.4991977,
+        "longitude": 114.1659004,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "12194156888",
+        "latitude": 30.5005313,
+        "longitude": 114.1668119,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "12194156889",
+        "latitude": 30.5009288,
+        "longitude": 114.1663358,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "12194156890",
+        "latitude": 30.4996554,
+        "longitude": 114.1652772,
+        "ref": "D"
+      },
+      {
+        "osmNodeID": "12194156893",
+        "latitude": 30.4993863,
+        "longitude": 114.1672669,
+        "ref": "E1"
+      },
+      {
+        "osmNodeID": "12194156894",
+        "latitude": 30.4989981,
+        "longitude": 114.1679007,
+        "ref": "E2"
+      },
+      {
+        "osmNodeID": "12194156895",
+        "latitude": 30.4991963,
+        "longitude": 114.168652,
+        "ref": "H"
+      },
+      {
+        "osmNodeID": "12194156892",
+        "latitude": 30.4998521,
+        "longitude": 114.1676507,
+        "ref": "J"
+      }
+    ],
+    "3209809112295609": [
+      {
+        "osmNodeID": "11126762459",
+        "latitude": 30.4369718,
+        "longitude": 114.43024,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11126762458",
+        "latitude": 30.4373948,
+        "longitude": 114.429694,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11126762457",
+        "latitude": 30.4373225,
+        "longitude": 114.4292614,
+        "ref": "C"
+      }
+    ],
+    "3304f8076bc8b19e": [
+      {
+        "osmNodeID": "8383822207",
+        "latitude": 30.4610055,
+        "longitude": 114.3184355
+      }
+    ],
+    "3ff21696b5669c1d": [
+      {
+        "osmNodeID": "5482637653",
+        "latitude": 30.6434688,
+        "longitude": 114.3304746
+      },
+      {
+        "osmNodeID": "5482637654",
+        "latitude": 30.6438523,
+        "longitude": 114.3305982
+      }
+    ],
+    "40121ae9366c1858": [
+      {
+        "osmNodeID": "11361096406",
+        "latitude": 30.3739272,
+        "longitude": 114.3213642,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11361096404",
+        "latitude": 30.3722228,
+        "longitude": 114.3208644,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11361096405",
+        "latitude": 30.3718965,
+        "longitude": 114.3221323,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11361096407",
+        "latitude": 30.3736969,
+        "longitude": 114.3220304,
+        "ref": "D"
+      },
+      {
+        "osmNodeID": "11361096403",
+        "latitude": 30.3704049,
+        "longitude": 114.3215842,
+        "ref": "E"
+      },
+      {
+        "osmNodeID": "11361096401",
+        "latitude": 30.3695881,
+        "longitude": 114.3216674,
+        "ref": "F"
+      },
+      {
+        "osmNodeID": "11361096400",
+        "latitude": 30.3694208,
+        "longitude": 114.3225459,
+        "ref": "K"
+      },
+      {
+        "osmNodeID": "11361096402",
+        "latitude": 30.3706562,
+        "longitude": 114.3222935,
+        "ref": "L"
+      }
+    ],
+    "40b09f9456eab1f8": [
+      {
+        "osmNodeID": "11127352638",
+        "latitude": 30.4872837,
+        "longitude": 114.5619336,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11127352639",
+        "latitude": 30.4869947,
+        "longitude": 114.5639413,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11127352637",
+        "latitude": 30.4881532,
+        "longitude": 114.5622382,
+        "ref": "D"
+      }
+    ],
+    "445417ec52048594": [
+      {
+        "osmNodeID": "5227950229",
+        "latitude": 30.543103,
+        "longitude": 114.2685514,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11894888017",
+        "latitude": 30.5423537,
+        "longitude": 114.2695382,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "5227950228",
+        "latitude": 30.5435238,
+        "longitude": 114.2691469,
+        "ref": "D"
+      }
+    ],
+    "4b6ba7e4ceb8410e": [
+      {
+        "osmNodeID": "9371525121",
+        "latitude": 30.4544517,
+        "longitude": 114.2684353,
+        "name": "中医药大学地铁站C1口"
+      },
+      {
+        "osmNodeID": "9371525123",
+        "latitude": 30.4547124,
+        "longitude": 114.2678959,
+        "name": "中医药大学地铁站C2口"
+      },
+      {
+        "osmNodeID": "9371525124",
+        "latitude": 30.453587,
+        "longitude": 114.2672442,
+        "name": "中医药大学地铁站D2口"
+      },
+      {
+        "osmNodeID": "9371525126",
+        "latitude": 30.4533883,
+        "longitude": 114.2678493,
+        "name": "中医药大学地铁站D1口"
+      },
+      {
+        "osmNodeID": "9594937284",
+        "latitude": 30.4529903,
+        "longitude": 114.2688896,
+        "name": "中医药大学地铁站A1口"
+      },
+      {
+        "osmNodeID": "9594937287",
+        "latitude": 30.4540046,
+        "longitude": 114.2694466,
+        "name": "中医药大学地铁站B1口"
+      },
+      {
+        "osmNodeID": "12860132324",
+        "latitude": 30.4532332,
+        "longitude": 114.2685553,
+        "name": "中医药大学地铁站A2口"
+      },
+      {
+        "osmNodeID": "12860132325",
+        "latitude": 30.4540038,
+        "longitude": 114.2690005,
+        "name": "中医药大学地铁站B2口"
+      }
+    ],
+    "4f309654b065d9ae": [
+      {
+        "osmNodeID": "5482625797",
+        "latitude": 30.6562811,
+        "longitude": 114.3350117
+      }
+    ],
+    "50ab04b4aedf29ca": [
+      {
+        "osmNodeID": "13657309239",
+        "latitude": 30.526886,
+        "longitude": 114.1888287,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "13657309238",
+        "latitude": 30.5279845,
+        "longitude": 114.1897185,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "13657309240",
+        "latitude": 30.5289897,
+        "longitude": 114.1891393,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "13657309237",
+        "latitude": 30.5278296,
+        "longitude": 114.1886329,
+        "ref": "D",
+        "wheelchair": "no"
+      }
+    ],
+    "54e433c7e73487d6": [
+      {
+        "osmNodeID": "12804518420",
+        "latitude": 30.5798679,
+        "longitude": 114.0084609,
+        "ref": "A",
+        "name": "A出口"
+      },
+      {
+        "osmNodeID": "12804518414",
+        "latitude": 30.5793471,
+        "longitude": 114.0098211,
+        "ref": "B",
+        "name": "B出口"
+      },
+      {
+        "osmNodeID": "12804518407",
+        "latitude": 30.5798302,
+        "longitude": 114.0098682,
+        "ref": "C1",
+        "name": "C1出口"
+      },
+      {
+        "osmNodeID": "12804518403",
+        "latitude": 30.5798451,
+        "longitude": 114.0100805,
+        "ref": "C2",
+        "name": "C2出口"
+      }
+    ],
+    "579812bc60dc0e13": [
+      {
+        "osmNodeID": "11127349537",
+        "latitude": 30.4857155,
+        "longitude": 114.6049323,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11127349538",
+        "latitude": 30.4861892,
+        "longitude": 114.6069341,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11127349539",
+        "latitude": 30.4870311,
+        "longitude": 114.6062344,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11127349536",
+        "latitude": 30.4866008,
+        "longitude": 114.6053288,
+        "ref": "D"
+      }
+    ],
+    "59ee44a0568cf5a9": [
+      {
+        "osmNodeID": "11328792188",
+        "latitude": 30.6803351,
+        "longitude": 114.3657128,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11328792189",
+        "latitude": 30.6807664,
+        "longitude": 114.3655464,
+        "ref": "C"
+      }
+    ],
+    "5a0a5a04588298da": [
+      {
+        "osmNodeID": "12989686550",
+        "latitude": 30.604574,
+        "longitude": 114.4161167,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "12989686551",
+        "latitude": 30.6048119,
+        "longitude": 114.4169178,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "12989686552",
+        "latitude": 30.605979,
+        "longitude": 114.4165171,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "12989686549",
+        "latitude": 30.6058114,
+        "longitude": 114.415698,
+        "ref": "D"
+      }
+    ],
+    "5b5d268bdd146536": [
+      {
+        "osmNodeID": "2398956759",
+        "latitude": 30.5266061,
+        "longitude": 114.3521261,
+        "name": "街道口站A出口"
+      },
+      {
+        "osmNodeID": "2398956762",
+        "latitude": 30.5271798,
+        "longitude": 114.352462,
+        "name": "街道口站D出口"
+      },
+      {
+        "osmNodeID": "5999630100",
+        "latitude": 30.5258608,
+        "longitude": 114.3548127,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "13583237949",
+        "latitude": 30.5265398,
+        "longitude": 114.3548217,
+        "ref": "C"
+      }
+    ],
+    "5cdaec6e7a8fd940": [
+      {
+        "osmNodeID": "2398956494",
+        "latitude": 30.5228089,
+        "longitude": 114.3641792,
+        "name": "广埠屯站H出口"
+      },
+      {
+        "osmNodeID": "2398956495",
+        "latitude": 30.5233675,
+        "longitude": 114.3634478,
+        "name": "广埠屯站J出口"
+      },
+      {
+        "osmNodeID": "2398956492",
+        "latitude": 30.523608,
+        "longitude": 114.3621251,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "2398956493",
+        "latitude": 30.5230564,
+        "longitude": 114.3630661,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "13685773218",
+        "latitude": 30.5225093,
+        "longitude": 114.3636829,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "13685773219",
+        "latitude": 30.5219854,
+        "longitude": 114.3643493,
+        "ref": "D"
+      },
+      {
+        "osmNodeID": "2398956496",
+        "latitude": 30.5245405,
+        "longitude": 114.3626905,
+        "ref": "K"
+      }
+    ],
+    "604a4c0d02d8dc9a": [
+      {
+        "osmNodeID": "12469079026",
+        "latitude": 30.5329256,
+        "longitude": 114.3173647,
+        "ref": "F"
+      },
+      {
+        "osmNodeID": "12469079025",
+        "latitude": 30.532042,
+        "longitude": 114.3169993,
+        "ref": "H"
+      }
+    ],
+    "60969ffbc6a44466": [
+      {
+        "osmNodeID": "5227950281",
+        "latitude": 30.5926444,
+        "longitude": 114.3717919,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "5227950282",
+        "latitude": 30.593185,
+        "longitude": 114.3719665,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "12990981211",
+        "latitude": 30.5930948,
+        "longitude": 114.3712143,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "12990981209",
+        "latitude": 30.5925308,
+        "longitude": 114.3713229,
+        "ref": "D"
+      }
+    ],
+    "612fe4b11eec2c19": [
+      {
+        "osmNodeID": "11553895922",
+        "latitude": 30.4830403,
+        "longitude": 114.3130946
+      },
+      {
+        "osmNodeID": "11553895923",
+        "latitude": 30.4833466,
+        "longitude": 114.3136067
+      },
+      {
+        "osmNodeID": "11553895924",
+        "latitude": 30.484402,
+        "longitude": 114.3131559
+      },
+      {
+        "osmNodeID": "11553895925",
+        "latitude": 30.4846661,
+        "longitude": 114.3136068
+      }
+    ],
+    "61ab7a9d2b894620": [
+      {
+        "osmNodeID": "2398956752",
+        "latitude": 30.5128418,
+        "longitude": 114.3694915,
+        "name": "虎泉站A出口"
+      },
+      {
+        "osmNodeID": "2398956753",
+        "latitude": 30.5119434,
+        "longitude": 114.3705551,
+        "name": "虎泉站B出口"
+      },
+      {
+        "osmNodeID": "2398956754",
+        "latitude": 30.5117423,
+        "longitude": 114.3712373,
+        "name": "虎泉站C出口"
+      },
+      {
+        "osmNodeID": "2398956755",
+        "latitude": 30.5130904,
+        "longitude": 114.3699769,
+        "name": "虎泉站D出口"
+      }
+    ],
+    "62292e47b876892b": [
+      {
+        "osmNodeID": "9594937271",
+        "latitude": 30.4681665,
+        "longitude": 114.2935654,
+        "ref": "A",
+        "name": "白沙六路地铁站A口"
+      },
+      {
+        "osmNodeID": "12860132333",
+        "latitude": 30.4693405,
+        "longitude": 114.2935586,
+        "ref": "B",
+        "name": "白沙六路地铁站B口"
+      },
+      {
+        "osmNodeID": "9594937265",
+        "latitude": 30.4692903,
+        "longitude": 114.2929571,
+        "ref": "C",
+        "name": "白沙六路地铁站C口"
+      },
+      {
+        "osmNodeID": "9594937266",
+        "latitude": 30.4681623,
+        "longitude": 114.2929693,
+        "ref": "D",
+        "name": "白沙六路地铁站D口"
+      }
+    ],
+    "626463907bb58aaa": [
+      {
+        "osmNodeID": "5227950209",
+        "latitude": 30.558859,
+        "longitude": 114.2203431
+      },
+      {
+        "osmNodeID": "5227950210",
+        "latitude": 30.559606,
+        "longitude": 114.2197007
+      },
+      {
+        "osmNodeID": "5227950211",
+        "latitude": 30.5592331,
+        "longitude": 114.2186302
+      },
+      {
+        "osmNodeID": "5227950212",
+        "latitude": 30.559748,
+        "longitude": 114.2188443
+      }
+    ],
+    "642cb1a22b9206a0": [
+      {
+        "osmNodeID": "5227950244",
+        "latitude": 30.5701835,
+        "longitude": 114.3561009
+      },
+      {
+        "osmNodeID": "5227950245",
+        "latitude": 30.570846,
+        "longitude": 114.3557517
+      },
+      {
+        "osmNodeID": "5227950246",
+        "latitude": 30.5701819,
+        "longitude": 114.3551473
+      },
+      {
+        "osmNodeID": "5227950247",
+        "latitude": 30.5698781,
+        "longitude": 114.3557839
+      }
+    ],
+    "6818557ae8b8a424": [
+      {
+        "osmNodeID": "11126780903",
+        "latitude": 30.4767053,
+        "longitude": 114.4298741,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11126780902",
+        "latitude": 30.4768638,
+        "longitude": 114.4305555,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11126780901",
+        "latitude": 30.4781944,
+        "longitude": 114.4305232,
+        "ref": "C"
+      }
+    ],
+    "6a4b3e519ca83d0d": [
+      {
+        "osmNodeID": "2398956485",
+        "latitude": 30.505531,
+        "longitude": 114.3970253,
+        "name": "光谷广场站B出口"
+      },
+      {
+        "osmNodeID": "2398956486",
+        "latitude": 30.5055248,
+        "longitude": 114.3981108,
+        "name": "光谷广场站C出口"
+      },
+      {
+        "osmNodeID": "2398956487",
+        "latitude": 30.5060247,
+        "longitude": 114.3977923,
+        "name": "光谷广场站E出口"
+      },
+      {
+        "osmNodeID": "2398956488",
+        "latitude": 30.5057984,
+        "longitude": 114.3959657,
+        "name": "光谷广场站F出口"
+      }
+    ],
+    "6ccc1c800288aa6a": [
+      {
+        "osmNodeID": "8301451250",
+        "latitude": 30.5647252,
+        "longitude": 114.3655614,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "8301451245",
+        "latitude": 30.5654894,
+        "longitude": 114.3654304,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "8301451240",
+        "latitude": 30.5645829,
+        "longitude": 114.3646145,
+        "ref": "D"
+      }
+    ],
+    "6f6b45720a159e83": [
+      {
+        "osmNodeID": "5482625810",
+        "latitude": 30.6664987,
+        "longitude": 114.3382392
+      }
+    ],
+    "74fe08fb104ffa07": [
+      {
+        "osmNodeID": "10080986048",
+        "latitude": 30.4948581,
+        "longitude": 114.293502,
+        "ref": "A",
+        "name": "张家湾地铁站A口"
+      },
+      {
+        "osmNodeID": "10080986054",
+        "latitude": 30.495982,
+        "longitude": 114.2937905,
+        "ref": "B",
+        "name": "张家湾地铁站B口"
+      },
+      {
+        "osmNodeID": "10080986057",
+        "latitude": 30.496072,
+        "longitude": 114.2932986,
+        "ref": "C",
+        "name": "张家湾地铁站C口"
+      },
+      {
+        "osmNodeID": "10080986051",
+        "latitude": 30.4949553,
+        "longitude": 114.2930112,
+        "ref": "D",
+        "name": "张家湾地铁站D口"
+      }
+    ],
+    "77311dba17627113": [
+      {
+        "osmNodeID": "10651551531",
+        "latitude": 30.5353464,
+        "longitude": 114.3536521,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "13694127557",
+        "latitude": 30.5364931,
+        "longitude": 114.3508966,
+        "ref": "B"
+      }
+    ],
+    "77c2e4e08d7baddd": [
+      {
+        "osmNodeID": "5483930305",
+        "latitude": 30.6180845,
+        "longitude": 114.313551
+      }
+    ],
+    "781bf3412440e87e": [
+      {
+        "osmNodeID": "9893867486",
+        "latitude": 30.6242986,
+        "longitude": 114.3758491,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "9893867483",
+        "latitude": 30.625075,
+        "longitude": 114.3772844,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "9893867484",
+        "latitude": 30.6255211,
+        "longitude": 114.3766956,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "9893867485",
+        "latitude": 30.6246365,
+        "longitude": 114.3755666,
+        "ref": "D"
+      }
+    ],
+    "7874289dba780e5b": [
+      {
+        "osmNodeID": "5227950241",
+        "latitude": 30.5635847,
+        "longitude": 114.3491753
+      },
+      {
+        "osmNodeID": "5227950242",
+        "latitude": 30.5631745,
+        "longitude": 114.3497501
+      },
+      {
+        "osmNodeID": "5227950243",
+        "latitude": 30.5622279,
+        "longitude": 114.3488581
+      }
+    ],
+    "79151f93005379a7": [
+      {
+        "osmNodeID": "9311585495",
+        "latitude": 30.5069,
+        "longitude": 114.4128768,
+        "ref": "A1"
+      },
+      {
+        "osmNodeID": "9311585492",
+        "latitude": 30.506827,
+        "longitude": 114.4136849,
+        "ref": "A2"
+      },
+      {
+        "osmNodeID": "9311585491",
+        "latitude": 30.5070921,
+        "longitude": 114.4144284,
+        "ref": "A3"
+      },
+      {
+        "osmNodeID": "9311585490",
+        "latitude": 30.5070201,
+        "longitude": 114.4151206,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "9311585494",
+        "latitude": 30.5074655,
+        "longitude": 114.4159319,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "9311585493",
+        "latitude": 30.5076275,
+        "longitude": 114.4142432,
+        "ref": "D"
+      }
+    ],
+    "7a08fbc0637ea2f9": [
+      {
+        "osmNodeID": "11553895938",
+        "latitude": 30.481314,
+        "longitude": 114.3266626
+      },
+      {
+        "osmNodeID": "11553895939",
+        "latitude": 30.4809596,
+        "longitude": 114.326208
+      },
+      {
+        "osmNodeID": "11553895940",
+        "latitude": 30.4820984,
+        "longitude": 114.3261697
+      },
+      {
+        "osmNodeID": "11553895941",
+        "latitude": 30.4821232,
+        "longitude": 114.3257379
+      }
+    ],
+    "85b4ecb20e584caa": [
+      {
+        "osmNodeID": "5227950254",
+        "latitude": 30.5839293,
+        "longitude": 114.3684025,
+        "name": "D"
+      },
+      {
+        "osmNodeID": "5227950255",
+        "latitude": 30.5843836,
+        "longitude": 114.3694418,
+        "name": "C"
+      },
+      {
+        "osmNodeID": "5227950256",
+        "latitude": 30.5839889,
+        "longitude": 114.3696378,
+        "name": "B"
+      },
+      {
+        "osmNodeID": "5227950257",
+        "latitude": 30.5836512,
+        "longitude": 114.3689513,
+        "name": "A"
+      }
+    ],
+    "86908c336c7acea2": [
+      {
+        "osmNodeID": "5227950202",
+        "latitude": 30.5648544,
+        "longitude": 114.2014015
+      },
+      {
+        "osmNodeID": "5227950203",
+        "latitude": 30.564493,
+        "longitude": 114.2005776
+      },
+      {
+        "osmNodeID": "5227950204",
+        "latitude": 30.5641811,
+        "longitude": 114.2019686
+      },
+      {
+        "osmNodeID": "5227950205",
+        "latitude": 30.5646867,
+        "longitude": 114.202196
+      }
+    ],
+    "8708775a845590d0": [
+      {
+        "osmNodeID": "5227950367",
+        "latitude": 30.6046539,
+        "longitude": 114.3884297,
+        "ref": "A",
+        "name": "A"
+      },
+      {
+        "osmNodeID": "5227950366",
+        "latitude": 30.6050823,
+        "longitude": 114.3900718,
+        "ref": "B",
+        "name": "B"
+      },
+      {
+        "osmNodeID": "5227950365",
+        "latitude": 30.605592,
+        "longitude": 114.3897655,
+        "ref": "C",
+        "name": "C"
+      },
+      {
+        "osmNodeID": "5227950368",
+        "latitude": 30.6056077,
+        "longitude": 114.3885371,
+        "ref": "D",
+        "name": "D"
+      }
+    ],
+    "8ad5d9835c747533": [
+      {
+        "osmNodeID": "11127292389",
+        "latitude": 30.4847323,
+        "longitude": 114.4647286,
+        "ref": "A",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11127292390",
+        "latitude": 30.4850063,
+        "longitude": 114.467177,
+        "ref": "B",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11127292391",
+        "latitude": 30.48575,
+        "longitude": 114.467041,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11127292388",
+        "latitude": 30.4855286,
+        "longitude": 114.4652074,
+        "ref": "D"
+      }
+    ],
+    "90c7d5f65128a417": [
+      {
+        "osmNodeID": "12860132330",
+        "latitude": 30.4307287,
+        "longitude": 114.2619202,
+        "ref": "A",
+        "name": "红霞地铁站A口"
+      },
+      {
+        "osmNodeID": "12818439858",
+        "latitude": 30.4313192,
+        "longitude": 114.2619747,
+        "ref": "B",
+        "name": "红霞地铁站B口"
+      },
+      {
+        "osmNodeID": "12860132332",
+        "latitude": 30.4315971,
+        "longitude": 114.2617546,
+        "ref": "C",
+        "name": "红霞地铁站C口"
+      },
+      {
+        "osmNodeID": "12860132331",
+        "latitude": 30.4304461,
+        "longitude": 114.2616582,
+        "ref": "D",
+        "name": "红霞地铁站D口"
+      }
+    ],
+    "9353337b5430b7c8": [
+      {
+        "osmNodeID": "8480326058",
+        "latitude": 30.6391462,
+        "longitude": 114.2041155,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "8480319675",
+        "latitude": 30.6388361,
+        "longitude": 114.2056605,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "8480319700",
+        "latitude": 30.6396979,
+        "longitude": 114.2052151,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "8480326051",
+        "latitude": 30.6397929,
+        "longitude": 114.2042735,
+        "ref": "D"
+      }
+    ],
+    "96c4b5d67211cab3": [
+      {
+        "osmNodeID": "11126745471",
+        "latitude": 30.4628687,
+        "longitude": 114.4200742,
+        "ref": "A1"
+      },
+      {
+        "osmNodeID": "11126745472",
+        "latitude": 30.4622015,
+        "longitude": 114.4201057,
+        "ref": "A2"
+      },
+      {
+        "osmNodeID": "11126745473",
+        "latitude": 30.4613667,
+        "longitude": 114.420149,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11126745474",
+        "latitude": 30.4612659,
+        "longitude": 114.4210999,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11126745475",
+        "latitude": 30.4629126,
+        "longitude": 114.421026,
+        "ref": "D"
+      }
+    ],
+    "98d0292842f48593": [
+      {
+        "osmNodeID": "5178943916",
+        "latitude": 30.5590416,
+        "longitude": 114.2663408
+      }
+    ],
+    "9b7ae86ca45e3694": [
+      {
+        "osmNodeID": "5626825222",
+        "latitude": 30.6844824,
+        "longitude": 114.3426819
+      },
+      {
+        "osmNodeID": "5626825223",
+        "latitude": 30.6840323,
+        "longitude": 114.3426685
+      }
+    ],
+    "9f82ae227463e78c": [
+      {
+        "osmNodeID": "9311585496",
+        "latitude": 30.506203,
+        "longitude": 114.4232086,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "9311585499",
+        "latitude": 30.5061651,
+        "longitude": 114.4244215,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "9311585498",
+        "latitude": 30.5068203,
+        "longitude": 114.4242496,
+        "ref": "C",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9311585497",
+        "latitude": 30.5068911,
+        "longitude": 114.4233757,
+        "ref": "D"
+      }
+    ],
+    "a7c6395b99d20c37": [
+      {
+        "osmNodeID": "5325077207",
+        "latitude": 30.5784935,
+        "longitude": 114.3301424,
+        "ref": "A",
+        "name": "A出口"
+      },
+      {
+        "osmNodeID": "5325077206",
+        "latitude": 30.5773606,
+        "longitude": 114.3288419,
+        "ref": "B",
+        "name": "B出口"
+      },
+      {
+        "osmNodeID": "5325077209",
+        "latitude": 30.5769398,
+        "longitude": 114.3283349,
+        "ref": "C",
+        "name": "C出口"
+      },
+      {
+        "osmNodeID": "5325077208",
+        "latitude": 30.5768109,
+        "longitude": 114.3285116,
+        "ref": "D",
+        "name": "D出口"
+      },
+      {
+        "osmNodeID": "5325077203",
+        "latitude": 30.5783138,
+        "longitude": 114.3303102,
+        "ref": "E",
+        "name": "E出口"
+      },
+      {
+        "osmNodeID": "5325077205",
+        "latitude": 30.5772161,
+        "longitude": 114.3290103,
+        "ref": "F",
+        "name": "F出口"
+      }
+    ],
+    "ac53ffeea4a57a75": [
+      {
+        "osmNodeID": "11126797823",
+        "latitude": 30.4483497,
+        "longitude": 114.4206193,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11126797824",
+        "latitude": 30.4469655,
+        "longitude": 114.4206436,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11126797825",
+        "latitude": 30.4470177,
+        "longitude": 114.4215063,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11126797826",
+        "latitude": 30.4484932,
+        "longitude": 114.4214391,
+        "ref": "D"
+      }
+    ],
+    "afade9178527e2b6": [
+      {
+        "osmNodeID": "5227950214",
+        "latitude": 30.5565145,
+        "longitude": 114.2307407
+      },
+      {
+        "osmNodeID": "5227950215",
+        "latitude": 30.5561989,
+        "longitude": 114.2323178
+      },
+      {
+        "osmNodeID": "5227950216",
+        "latitude": 30.5569832,
+        "longitude": 114.2310219
+      },
+      {
+        "osmNodeID": "5227950217",
+        "latitude": 30.5567812,
+        "longitude": 114.2322563
+      }
+    ],
+    "b1fdf6323019b50e": [
+      {
+        "osmNodeID": "12866130601",
+        "latitude": 30.4276888,
+        "longitude": 114.2948311,
+        "ref": "A",
+        "name": "军运村地铁站A口"
+      },
+      {
+        "osmNodeID": "12866100799",
+        "latitude": 30.4268499,
+        "longitude": 114.2946778,
+        "ref": "B",
+        "name": "军运村地铁站B口"
+      },
+      {
+        "osmNodeID": "12866100798",
+        "latitude": 30.4266888,
+        "longitude": 114.2949681,
+        "ref": "C1",
+        "name": "军运村地铁站C1口"
+      },
+      {
+        "osmNodeID": "12866100797",
+        "latitude": 30.427076,
+        "longitude": 114.2951781,
+        "ref": "C2",
+        "name": "军运村地铁站C2口"
+      },
+      {
+        "osmNodeID": "12866100800",
+        "latitude": 30.4277804,
+        "longitude": 114.2953065,
+        "ref": "D",
+        "name": "军运村地铁站D口"
+      }
+    ],
+    "b6c92f254e07386e": [
+      {
+        "osmNodeID": "11886181208",
+        "latitude": 30.5372186,
+        "longitude": 114.3330524,
+        "ref": "D1"
+      },
+      {
+        "osmNodeID": "11886181210",
+        "latitude": 30.5375401,
+        "longitude": 114.3331679,
+        "ref": "E"
+      }
+    ],
+    "b730d0c0e3a3a80d": [
+      {
+        "osmNodeID": "5227950239",
+        "latitude": 30.5532682,
+        "longitude": 114.3414174,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "5227950237",
+        "latitude": 30.5543898,
+        "longitude": 114.3420513,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "5227950238",
+        "latitude": 30.554689,
+        "longitude": 114.3413999,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "5227950240",
+        "latitude": 30.5535464,
+        "longitude": 114.3407792,
+        "ref": "D"
+      }
+    ],
+    "b81e6128334a3cd7": [
+      {
+        "osmNodeID": "5227950197",
+        "latitude": 30.5664943,
+        "longitude": 114.1898036
+      },
+      {
+        "osmNodeID": "5227950198",
+        "latitude": 30.565997,
+        "longitude": 114.1888085
+      },
+      {
+        "osmNodeID": "5227950199",
+        "latitude": 30.5666027,
+        "longitude": 114.187371
+      },
+      {
+        "osmNodeID": "5227950200",
+        "latitude": 30.5670633,
+        "longitude": 114.1894184
+      }
+    ],
+    "b9a4367680adc72b": [
+      {
+        "osmNodeID": "11894772510",
+        "latitude": 30.5461707,
+        "longitude": 114.3022562,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11894772509",
+        "latitude": 30.5474863,
+        "longitude": 114.3027531,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11894772508",
+        "latitude": 30.5477167,
+        "longitude": 114.3023531,
+        "ref": "C"
+      }
+    ],
+    "b9ea846d60baaf5f": [
+      {
+        "osmNodeID": "2067995727",
+        "latitude": 30.5603336,
+        "longitude": 114.3086399,
+        "name": "积玉桥C口"
+      },
+      {
+        "osmNodeID": "7115820598",
+        "latitude": 30.5617741,
+        "longitude": 114.309458,
+        "name": "积玉桥D口"
+      },
+      {
+        "osmNodeID": "7115820599",
+        "latitude": 30.5621903,
+        "longitude": 114.3089279,
+        "name": "积玉桥A口"
+      },
+      {
+        "osmNodeID": "7115820600",
+        "latitude": 30.5605891,
+        "longitude": 114.3080317,
+        "name": "积玉桥B口"
+      }
+    ],
+    "bacd6f0b46feb7a1": [
+      {
+        "osmNodeID": "11127293767",
+        "latitude": 30.5005552,
+        "longitude": 114.4311188,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11127293768",
+        "latitude": 30.4999923,
+        "longitude": 114.4306861,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11127293769",
+        "latitude": 30.4994725,
+        "longitude": 114.4313309,
+        "ref": "C"
+      }
+    ],
+    "bbc22472c0da671f": [
+      {
+        "osmNodeID": "13617736144",
+        "latitude": 30.4848778,
+        "longitude": 114.5115746,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "13617736145",
+        "latitude": 30.4844843,
+        "longitude": 114.5127187,
+        "ref": "B1"
+      },
+      {
+        "osmNodeID": "13617736146",
+        "latitude": 30.4844219,
+        "longitude": 114.5135055,
+        "ref": "B2"
+      },
+      {
+        "osmNodeID": "13617736147",
+        "latitude": 30.4852805,
+        "longitude": 114.5137636,
+        "ref": "C1"
+      },
+      {
+        "osmNodeID": "13617736148",
+        "latitude": 30.4855408,
+        "longitude": 114.5127153,
+        "ref": "C2"
+      }
+    ],
+    "c01495286eda7148": [
+      {
+        "osmNodeID": "12193761355",
+        "latitude": 30.5050949,
+        "longitude": 114.1714327,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "12193761356",
+        "latitude": 30.5065291,
+        "longitude": 114.1719208,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "12193761357",
+        "latitude": 30.5068049,
+        "longitude": 114.1712375,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "12193761358",
+        "latitude": 30.5057499,
+        "longitude": 114.1703759,
+        "ref": "D"
+      }
+    ],
+    "c0eb6a8be31cf359": [
+      {
+        "osmNodeID": "13617568466",
+        "latitude": 30.4890561,
+        "longitude": 114.5339813,
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13617568465",
+        "latitude": 30.4880195,
+        "longitude": 114.5329733,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "13617568464",
+        "latitude": 30.4879685,
+        "longitude": 114.5349881,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "13617568463",
+        "latitude": 30.4887624,
+        "longitude": 114.5351787,
+        "ref": "D"
+      }
+    ],
+    "cc22a138e20e337e": [
+      {
+        "osmNodeID": "5483918124",
+        "latitude": 30.6314484,
+        "longitude": 114.3228079
+      }
+    ],
+    "d12e078e7a9035a1": [
+      {
+        "osmNodeID": "4519170283",
+        "latitude": 30.5626378,
+        "longitude": 114.2108135
+      },
+      {
+        "osmNodeID": "5227950207",
+        "latitude": 30.562549,
+        "longitude": 114.2099091
+      },
+      {
+        "osmNodeID": "5227950208",
+        "latitude": 30.561637,
+        "longitude": 114.2095158
+      }
+    ],
+    "df8b5609dde55c08": [
+      {
+        "osmNodeID": "12990978482",
+        "latitude": 30.5988013,
+        "longitude": 114.3768121,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "12990978484",
+        "latitude": 30.5995737,
+        "longitude": 114.3773995,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "12990978487",
+        "latitude": 30.6001918,
+        "longitude": 114.3786599,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "12990978490",
+        "latitude": 30.6006387,
+        "longitude": 114.3796287,
+        "ref": "D"
+      },
+      {
+        "osmNodeID": "12990978493",
+        "latitude": 30.6009393,
+        "longitude": 114.3803539,
+        "ref": "E"
+      },
+      {
+        "osmNodeID": "12990978496",
+        "latitude": 30.6012555,
+        "longitude": 114.3798269,
+        "ref": "F"
+      },
+      {
+        "osmNodeID": "12990978499",
+        "latitude": 30.6003698,
+        "longitude": 114.3778751,
+        "ref": "H"
+      },
+      {
+        "osmNodeID": "12990978476",
+        "latitude": 30.6002076,
+        "longitude": 114.376791,
+        "ref": "J"
+      },
+      {
+        "osmNodeID": "12990981202",
+        "latitude": 30.5994293,
+        "longitude": 114.3759894,
+        "ref": "K"
+      }
+    ],
+    "e04fbea65c009209": [
+      {
+        "osmNodeID": "11553895915",
+        "latitude": 30.4751298,
+        "longitude": 114.3135798
+      },
+      {
+        "osmNodeID": "11553895916",
+        "latitude": 30.4750058,
+        "longitude": 114.3130055
+      },
+      {
+        "osmNodeID": "11553895917",
+        "latitude": 30.4734318,
+        "longitude": 114.3137972
+      },
+      {
+        "osmNodeID": "11553895918",
+        "latitude": 30.4733119,
+        "longitude": 114.3132344
+      }
+    ],
+    "e20e9602c5bf2741": [
+      {
+        "osmNodeID": "3503046966",
+        "latitude": 30.6150829,
+        "longitude": 114.1642378
+      },
+      {
+        "osmNodeID": "4834385009",
+        "latitude": 30.6148668,
+        "longitude": 114.1638316
+      }
+    ],
+    "e31e0ac2ef2b3b80": [
+      {
+        "osmNodeID": "11475856983",
+        "latitude": 30.4857178,
+        "longitude": 114.503105
+      },
+      {
+        "osmNodeID": "11475856984",
+        "latitude": 30.4857124,
+        "longitude": 114.5026267
+      },
+      {
+        "osmNodeID": "11475856985",
+        "latitude": 30.4844754,
+        "longitude": 114.5026346
+      },
+      {
+        "osmNodeID": "11475856986",
+        "latitude": 30.4844785,
+        "longitude": 114.5031236
+      },
+      {
+        "osmNodeID": "11475856987",
+        "latitude": 30.4848704,
+        "longitude": 114.5035004
+      },
+      {
+        "osmNodeID": "11475856988",
+        "latitude": 30.4852981,
+        "longitude": 114.503503
+      },
+      {
+        "osmNodeID": "11475856989",
+        "latitude": 30.4848812,
+        "longitude": 114.5022312
+      }
+    ],
+    "e85c50b31055166a": [
+      {
+        "osmNodeID": "9988598366",
+        "latitude": 30.5505965,
+        "longitude": 114.3458223,
+        "ref": "A",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9988598364",
+        "latitude": 30.5519574,
+        "longitude": 114.346746,
+        "ref": "B",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8301451242",
+        "latitude": 30.5521566,
+        "longitude": 114.3462573,
+        "ref": "C",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9988598365",
+        "latitude": 30.5517369,
+        "longitude": 114.3457168,
+        "ref": "D",
+        "wheelchair": "no"
+      }
+    ],
+    "e95512086617d4a3": [
+      {
+        "osmNodeID": "11807188510",
+        "latitude": 30.5535115,
+        "longitude": 114.3052522,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "13575368733",
+        "latitude": 30.55494,
+        "longitude": 114.3050161,
+        "ref": "C",
+        "name": "昙华林武胜门站C口"
+      }
+    ],
+    "e95e66019dc57aac": [
+      {
+        "osmNodeID": "12860132326",
+        "latitude": 30.4434765,
+        "longitude": 114.2630158,
+        "name": "黄家湖(武科大)地铁站B口"
+      },
+      {
+        "osmNodeID": "12860132327",
+        "latitude": 30.4435681,
+        "longitude": 114.2627964,
+        "name": "黄家湖(武科大)地铁站C口"
+      },
+      {
+        "osmNodeID": "12860132328",
+        "latitude": 30.4429394,
+        "longitude": 114.2627493,
+        "name": "黄家湖(武科大)地铁站A口"
+      },
+      {
+        "osmNodeID": "12860132329",
+        "latitude": 30.4430012,
+        "longitude": 114.2625262,
+        "name": "黄家湖(武科大)地铁站D口"
+      }
+    ],
+    "ecf02c42c5c647ac": [
+      {
+        "osmNodeID": "13610783827",
+        "latitude": 30.5422782,
+        "longitude": 114.3015081,
+        "name": "B2"
+      },
+      {
+        "osmNodeID": "13610783828",
+        "latitude": 30.5419908,
+        "longitude": 114.3018747,
+        "name": "B1"
+      }
+    ],
+    "ed73673e0946b1bd": [
+      {
+        "osmNodeID": "9594937242",
+        "latitude": 30.478257,
+        "longitude": 114.2933895,
+        "ref": "A",
+        "name": "光霞地铁站A口"
+      },
+      {
+        "osmNodeID": "9594937241",
+        "latitude": 30.4792595,
+        "longitude": 114.2933764,
+        "ref": "B",
+        "name": "光霞地铁站B口"
+      },
+      {
+        "osmNodeID": "9594937236",
+        "latitude": 30.4792278,
+        "longitude": 114.2928569,
+        "ref": "C",
+        "name": "光霞地铁站C口"
+      }
+    ],
+    "edf6c53e5a9c823d": [
+      {
+        "osmNodeID": "5324642180",
+        "latitude": 30.5807179,
+        "longitude": 114.2266624,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "5324642181",
+        "latitude": 30.580164,
+        "longitude": 114.2261296,
+        "ref": "B"
+      }
+    ],
+    "ef9ed1cedb9cf097": [
+      {
+        "osmNodeID": "2398924976",
+        "latitude": 30.5303406,
+        "longitude": 114.3402754,
+        "name": "宝通寺站A出口"
+      },
+      {
+        "osmNodeID": "2398924977",
+        "latitude": 30.5298781,
+        "longitude": 114.3415027,
+        "name": "宝通寺站B出口"
+      },
+      {
+        "osmNodeID": "2398924979",
+        "latitude": 30.5305189,
+        "longitude": 114.341485,
+        "name": "宝通寺站C2出口"
+      },
+      {
+        "osmNodeID": "2398924978",
+        "latitude": 30.5303087,
+        "longitude": 114.3420866,
+        "ref": "C1"
+      },
+      {
+        "osmNodeID": "2398924980",
+        "latitude": 30.5309543,
+        "longitude": 114.3401499,
+        "ref": "D"
+      }
+    ],
+    "f3f55ee8d3aec430": [
+      {
+        "osmNodeID": "11328792184",
+        "latitude": 30.683426,
+        "longitude": 114.3727457,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "11328792185",
+        "latitude": 30.6839629,
+        "longitude": 114.37397,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "11328792186",
+        "latitude": 30.6843503,
+        "longitude": 114.3736532,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "11328792187",
+        "latitude": 30.6838319,
+        "longitude": 114.3725363,
+        "ref": "D"
+      }
+    ],
+    "f6c297b3e9d824d4": [
+      {
+        "osmNodeID": "13797894462",
+        "latitude": 30.5064218,
+        "longitude": 114.2278679
+      }
+    ],
+    "f9a6a775ad1af344": [
+      {
+        "osmNodeID": "5227950219",
+        "latitude": 30.5528114,
+        "longitude": 114.2433553
+      },
+      {
+        "osmNodeID": "5227950220",
+        "latitude": 30.5533312,
+        "longitude": 114.2436232
+      },
+      {
+        "osmNodeID": "5227950221",
+        "latitude": 30.5539605,
+        "longitude": 114.2418551
+      },
+      {
+        "osmNodeID": "5227950222",
+        "latitude": 30.5534847,
+        "longitude": 114.2416997
+      }
+    ],
+    "fa7bf7fe8bb18602": [
+      {
+        "osmNodeID": "8928864497",
+        "latitude": 30.5159781,
+        "longitude": 114.3507621,
+        "name": "D",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8928864503",
+        "latitude": 30.5138901,
+        "longitude": 114.3505471,
+        "name": "C"
+      },
+      {
+        "osmNodeID": "8928864509",
+        "latitude": 30.5163375,
+        "longitude": 114.3500652,
+        "name": "A",
+        "wheelchair": "no"
+      }
+    ],
+    "fd3c4883fda1e78d": [
+      {
+        "osmNodeID": "2398956499",
+        "latitude": 30.5050467,
+        "longitude": 114.3818853,
+        "name": "杨家湾站出口"
+      },
+      {
+        "osmNodeID": "10941933005",
+        "latitude": 30.5045252,
+        "longitude": 114.3820989
+      },
+      {
+        "osmNodeID": "2398956498",
+        "latitude": 30.5049231,
+        "longitude": 114.3836508,
+        "ref": "A",
+        "name": "杨家湾站出口"
+      },
+      {
+        "osmNodeID": "2398956500",
+        "latitude": 30.505204,
+        "longitude": 114.3836345,
+        "ref": "C",
+        "name": "杨家湾站出口"
+      },
+      {
+        "osmNodeID": "2398956501",
+        "latitude": 30.5053177,
+        "longitude": 114.3817842,
+        "ref": "D",
+        "name": "杨家湾站出口"
+      }
+    ],
+    "fe87158500dff1e6": [
+      {
+        "osmNodeID": "4873338743",
+        "latitude": 30.5643884,
+        "longitude": 114.1733478,
+        "name": "孟家鋪站A出口"
+      },
+      {
+        "osmNodeID": "5227950174",
+        "latitude": 30.5652429,
+        "longitude": 114.173318
+      }
+    ],
+    "fedecaa0483d19d2": [
+      {
+        "osmNodeID": "11127321178",
+        "latitude": 30.4870962,
+        "longitude": 114.4799067,
+        "ref": "A",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11127321179",
+        "latitude": 30.4869643,
+        "longitude": 114.4812928,
+        "ref": "B",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11127321180",
+        "latitude": 30.4878056,
+        "longitude": 114.4798221,
+        "ref": "E"
+      }
+    ]
+  }
+}

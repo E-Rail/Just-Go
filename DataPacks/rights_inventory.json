@@ -24,7 +24,7 @@
     {
       "id": "osm-metro-networks",
       "kind": "database",
-      "scope": "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry",
+      "scope": "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry, and the station entrances (railway=subway_entrance) bundled as station access points",
       "licenseSPDX": "ODbL-1.0",
       "licenseURL": "https://opendatacommons.org/licenses/odbl/1-0/",
       "sourceURL": "https://www.openstreetmap.org/",
@@ -250,6 +250,90 @@
         "official-transit-resource-links",
         "osm-metro-networks",
         "shanghai-official-landing-links"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/1100.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/1200.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/3100.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/3201.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/3205.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/3301.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/4201.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/4401.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/4403.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/5000.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/5101.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "DataPacks/sources/osm-entrances/6101.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
       ]
     },
     {
@@ -964,6 +1048,83 @@
       "path": "JustGo/Resources/BundledCityPacks/1100.json",
       "rightsIDs": [
         "beijing-official-landing-links",
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/1200.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/3100.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/3201.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/3205.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/3301.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/4201.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/4401.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/4403.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/5000.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/5101.json",
+      "rightsIDs": [
+        "justgo-generated-catalog",
+        "osm-metro-networks"
+      ]
+    },
+    {
+      "path": "JustGo/Resources/BundledCityPacks/6101.json",
+      "rightsIDs": [
         "justgo-generated-catalog",
         "osm-metro-networks"
       ]

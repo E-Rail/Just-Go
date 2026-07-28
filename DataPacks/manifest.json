@@ -5,8 +5,8 @@
     {
       "cityID": "1100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 382293,
-      "sha256": "e60beac52dc129c706cdbfa5d8b8463afb91d370ad4d0bdd9edbed107eec418e",
+      "sizeBytes": 630745,
+      "sha256": "4924fb870c886be7d03a2e49d4ef26d8e8ecf0cc78a01c9a92e4be142ea29787",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -17,7 +17,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "external_only",
@@ -31,7 +31,7 @@
           "total": 444
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 43,
           "total": 444
         },
         "staticSchedules": {
@@ -58,10 +58,10 @@
     },
     {
       "cityID": "4401",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 469575,
+      "sha256": "20cc112823bd76d4f2f39b71e9d6aa462e8ccf9c9ff2f5486a2151527c4e9475",
+      "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -70,7 +70,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -80,11 +80,11 @@
       "coverage": {
         "networkStations": 414,
         "matchedStations": {
-          "covered": 0,
+          "covered": 329,
           "total": 414
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 37,
           "total": 414
         },
         "staticSchedules": {
@@ -111,10 +111,10 @@
     },
     {
       "cityID": "3100",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 517371,
+      "sha256": "9d7432b2e64d06bd72163055c2da78e19cca98f80ccaa73134acef6a432fa357",
+      "bundledResource": "BundledCityPacks/3100.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -123,7 +123,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -133,11 +133,11 @@
       "coverage": {
         "networkStations": 471,
         "matchedStations": {
-          "covered": 0,
+          "covered": 368,
           "total": 471
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 56,
           "total": 471
         },
         "staticSchedules": {
@@ -164,10 +164,10 @@
     },
     {
       "cityID": "1200",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 116968,
+      "sha256": "67e9e8e47e523bdbb0b6c93b8803a861cdaf89ba704a4d19a0a3f1bcb2413eea",
+      "bundledResource": "BundledCityPacks/1200.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -176,7 +176,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -186,11 +186,11 @@
       "coverage": {
         "networkStations": 239,
         "matchedStations": {
-          "covered": 0,
+          "covered": 87,
           "total": 239
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 5,
           "total": 239
         },
         "staticSchedules": {
@@ -217,10 +217,10 @@
     },
     {
       "cityID": "5000",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 102720,
+      "sha256": "08d4501c1bf1a741c0ad6e8d2c12b38a1c79b5a8bd297edda298f7b4f0c5af03",
+      "bundledResource": "BundledCityPacks/5000.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -229,7 +229,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -239,11 +239,11 @@
       "coverage": {
         "networkStations": 273,
         "matchedStations": {
-          "covered": 0,
+          "covered": 77,
           "total": 273
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 3,
           "total": 273
         },
         "staticSchedules": {
@@ -323,10 +323,10 @@
     },
     {
       "cityID": "3201",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 136791,
+      "sha256": "d25bb447cef2ed14d5619d4b8bb244a913258a574f154fc965e87339f4c13b9d",
+      "bundledResource": "BundledCityPacks/3201.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -335,7 +335,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -345,11 +345,11 @@
       "coverage": {
         "networkStations": 210,
         "matchedStations": {
-          "covered": 0,
+          "covered": 97,
           "total": 210
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 11,
           "total": 210
         },
         "staticSchedules": {
@@ -376,10 +376,10 @@
     },
     {
       "cityID": "4201",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 89022,
+      "sha256": "7cbc43cf466da9ac3599a00184a73ada641d0b168e17276bc6cd34493765f3c3",
+      "bundledResource": "BundledCityPacks/4201.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -388,7 +388,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -398,11 +398,11 @@
       "coverage": {
         "networkStations": 293,
         "matchedStations": {
-          "covered": 0,
+          "covered": 62,
           "total": 293
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 7,
           "total": 293
         },
         "staticSchedules": {
@@ -429,10 +429,10 @@
     },
     {
       "cityID": "5101",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 220037,
+      "sha256": "a6cbf3cab82088abe40fc397992e0da779f67619c84b190f1492530f0068c868",
+      "bundledResource": "BundledCityPacks/5101.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -441,7 +441,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -451,11 +451,11 @@
       "coverage": {
         "networkStations": 396,
         "matchedStations": {
-          "covered": 0,
+          "covered": 153,
           "total": 396
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 9,
           "total": 396
         },
         "staticSchedules": {
@@ -482,10 +482,10 @@
     },
     {
       "cityID": "6101",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 396381,
+      "sha256": "9f191baae4023e109e9b2bacdd6d4f245d4e749193508c24ec4920c7e6af8975",
+      "bundledResource": "BundledCityPacks/6101.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -494,7 +494,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -504,11 +504,11 @@
       "coverage": {
         "networkStations": 247,
         "matchedStations": {
-          "covered": 0,
+          "covered": 227,
           "total": 247
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 164,
           "total": 247
         },
         "staticSchedules": {
@@ -1118,10 +1118,10 @@
     },
     {
       "cityID": "3205",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 73243,
+      "sha256": "60425fe57467c8db2418423f62d6a3ee6f93b51a12c7d65c1bd27f801dc317b2",
+      "bundledResource": "BundledCityPacks/3205.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -1130,7 +1130,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -1140,11 +1140,11 @@
       "coverage": {
         "networkStations": 235,
         "matchedStations": {
-          "covered": 0,
+          "covered": 48,
           "total": 235
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 2,
           "total": 235
         },
         "staticSchedules": {
@@ -1542,10 +1542,10 @@
     },
     {
       "cityID": "3301",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 423557,
+      "sha256": "c06196493cc362627c69cbbd872d04bba71fc414bf698316019233d70aa6d796",
+      "bundledResource": "BundledCityPacks/3301.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -1554,7 +1554,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -1564,11 +1564,11 @@
       "coverage": {
         "networkStations": 270,
         "matchedStations": {
-          "covered": 0,
+          "covered": 261,
           "total": 270
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 10,
           "total": 270
         },
         "staticSchedules": {
@@ -2125,10 +2125,10 @@
     },
     {
       "cityID": "4403",
-      "version": "source-pending",
-      "sizeBytes": 0,
-      "sha256": null,
-      "bundledResource": null,
+      "version": "oss-safe-v2-20260715",
+      "sizeBytes": 503465,
+      "sha256": "59a6d914911857ecc78a5de8550219992d112dae8e99dbaa505b9bc5e6fc4b46",
+      "bundledResource": "BundledCityPacks/4403.json",
       "downloadURL": null,
       "rightsIDs": [
         "osm-metro-networks"
@@ -2137,7 +2137,7 @@
 
       ],
       "capabilities": {
-        "accessibility": "source_pending",
+        "accessibility": "partial_static",
         "schedules": "source_pending",
         "liveArrivals": "source_pending",
         "stationMaps": "source_pending",
@@ -2147,11 +2147,11 @@
       "coverage": {
         "networkStations": 372,
         "matchedStations": {
-          "covered": 0,
+          "covered": 319,
           "total": 372
         },
         "accessibility": {
-          "covered": 0,
+          "covered": 19,
           "total": 372
         },
         "staticSchedules": {

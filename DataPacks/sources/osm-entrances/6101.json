@@ -1,0 +1,7602 @@
+{
+  "schemaVersion": 1,
+  "cityID": "6101",
+  "source": "OpenStreetMap",
+  "sourceQuery": "node[railway=subway_entrance]",
+  "attribution": "© OpenStreetMap contributors",
+  "licenseURL": "https://www.openstreetmap.org/copyright",
+  "coordinateSystem": "gcj02",
+  "maxMatchMetres": 300.0,
+  "stats": {
+    "entranceCount": 930,
+    "boundCount": 920,
+    "unmatchedCount": 10,
+    "ambiguousCount": 0,
+    "stationsWithEntrances": 227,
+    "networkStationCount": 247
+  },
+  "stations": {
+    "0060bbbf0da8a0d3": [
+      {
+        "osmNodeID": "9032386196",
+        "latitude": 34.2691592,
+        "longitude": 108.7013813,
+        "ref": "A1",
+        "name": "沣西文化公园-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386197",
+        "latitude": 34.2691647,
+        "longitude": 108.7019583,
+        "ref": "A2",
+        "name": "沣西文化公园-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386198",
+        "latitude": 34.2683642,
+        "longitude": 108.701416,
+        "ref": "B1",
+        "name": "沣西文化公园-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386199",
+        "latitude": 34.2683779,
+        "longitude": 108.7019333,
+        "ref": "B2",
+        "name": "沣西文化公园-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "00d33cdb8da52672": [
+      {
+        "osmNodeID": "9032498701",
+        "latitude": 34.1941794,
+        "longitude": 108.8558706,
+        "ref": "A",
+        "name": "丈八六路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498702",
+        "latitude": 34.1931504,
+        "longitude": 108.8561837,
+        "ref": "B",
+        "name": "丈八六路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498703",
+        "latitude": 34.1936297,
+        "longitude": 108.8573908,
+        "ref": "C",
+        "name": "丈八六路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498704",
+        "latitude": 34.1944657,
+        "longitude": 108.8569185,
+        "ref": "D",
+        "name": "丈八六路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "0304413d80933673": [
+      {
+        "osmNodeID": "8971024161",
+        "latitude": 34.2702646,
+        "longitude": 108.9622096,
+        "ref": "A",
+        "name": "五路口-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971024162",
+        "latitude": 34.269536,
+        "longitude": 108.9625121,
+        "ref": "B",
+        "name": "五路口-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "7813299149",
+        "latitude": 34.2696775,
+        "longitude": 108.9633727,
+        "ref": "C",
+        "name": "五路口-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7818722636",
+        "latitude": 34.270426,
+        "longitude": 108.9634026,
+        "ref": "D",
+        "name": "五路口-D口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "8971024163",
+        "latitude": 34.2685524,
+        "longitude": 108.9632316,
+        "ref": "E",
+        "name": "五路口-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971024164",
+        "latitude": 34.2679678,
+        "longitude": 108.9627098,
+        "ref": "F",
+        "name": "五路口-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "0340d2a499e25f56": [
+      {
+        "osmNodeID": "9021609422",
+        "latitude": 34.3111511,
+        "longitude": 109.0125147,
+        "ref": "A",
+        "name": "广泰门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021609423",
+        "latitude": 34.3104151,
+        "longitude": 109.0124543,
+        "ref": "B",
+        "name": "广泰门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609424",
+        "latitude": 34.3104367,
+        "longitude": 109.0141005,
+        "ref": "C",
+        "name": "广泰门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609425",
+        "latitude": 34.3111641,
+        "longitude": 109.0138701,
+        "ref": "D",
+        "name": "广泰门-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "12768645507",
+        "latitude": 34.3128915,
+        "longitude": 109.0139786,
+        "ref": "E",
+        "name": "广泰门-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "12768645508",
+        "latitude": 34.31111,
+        "longitude": 109.0152894,
+        "ref": "F",
+        "name": "广泰门-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "04456ddfa51d6c87": [
+      {
+        "osmNodeID": "9029195947",
+        "latitude": 34.1810666,
+        "longitude": 108.9748824,
+        "ref": "A",
+        "name": "金滹沱-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029195948",
+        "latitude": 34.1799827,
+        "longitude": 108.9749319,
+        "ref": "B",
+        "name": "金滹沱-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195949",
+        "latitude": 34.1799686,
+        "longitude": 108.9755759,
+        "ref": "C",
+        "name": "金滹沱-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195950",
+        "latitude": 34.1810735,
+        "longitude": 108.9755703,
+        "ref": "D",
+        "name": "金滹沱-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "050259c0f56a8f67": [
+      {
+        "osmNodeID": "9084428043",
+        "latitude": 34.3745968,
+        "longitude": 108.9821667,
+        "ref": "A",
+        "name": "西安工大·武德路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "12438270616",
+        "latitude": 34.373182,
+        "longitude": 108.9831322,
+        "ref": "C",
+        "name": "西安工大·武德路-C口"
+      },
+      {
+        "osmNodeID": "12438270615",
+        "latitude": 34.3736587,
+        "longitude": 108.9838515,
+        "ref": "D",
+        "name": "西安工大·武德路-D口"
+      },
+      {
+        "osmNodeID": "12438270611",
+        "latitude": 34.3733297,
+        "longitude": 108.9811065,
+        "ref": "E",
+        "name": "西安工大·武德路-E口"
+      },
+      {
+        "osmNodeID": "12438270612",
+        "latitude": 34.3727884,
+        "longitude": 108.9820889,
+        "ref": "F",
+        "name": "西安工大·武德路-F口"
+      },
+      {
+        "osmNodeID": "12438270614",
+        "latitude": 34.3754978,
+        "longitude": 108.9818989,
+        "ref": "G1",
+        "name": "西安工大·武德路-G1口"
+      },
+      {
+        "osmNodeID": "12438270613",
+        "latitude": 34.3744376,
+        "longitude": 108.9812,
+        "ref": "H",
+        "name": "西安工大·武德路-H口"
+      }
+    ],
+    "0594d433202793bf": [
+      {
+        "osmNodeID": "11202048123",
+        "latitude": 34.3988571,
+        "longitude": 108.9589204,
+        "ref": "A",
+        "name": "草滩-A口"
+      },
+      {
+        "osmNodeID": "11202048124",
+        "latitude": 34.3982039,
+        "longitude": 108.9591227,
+        "ref": "B",
+        "name": "草滩-B口"
+      },
+      {
+        "osmNodeID": "11202048125",
+        "latitude": 34.3989462,
+        "longitude": 108.9607065,
+        "ref": "C",
+        "name": "草滩-C口"
+      },
+      {
+        "osmNodeID": "11202048126",
+        "latitude": 34.3998725,
+        "longitude": 108.959758,
+        "ref": "D",
+        "name": "草滩-D口"
+      }
+    ],
+    "06d1c8bfb193f3a9": [
+      {
+        "osmNodeID": "8968699246",
+        "latitude": 34.270023,
+        "longitude": 108.9199625,
+        "ref": "A",
+        "name": "玉祥门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968699245",
+        "latitude": 34.2694118,
+        "longitude": 108.9199917,
+        "ref": "B",
+        "name": "玉祥门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968699248",
+        "latitude": 34.2689405,
+        "longitude": 108.9209164,
+        "ref": "C",
+        "name": "玉祥门-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968699247",
+        "latitude": 34.2702254,
+        "longitude": 108.9217839,
+        "ref": "D",
+        "name": "玉祥门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "07a57bf7d511b6e8": [
+      {
+        "osmNodeID": "9084428065",
+        "latitude": 34.367005,
+        "longitude": 109.0772006,
+        "ref": "A",
+        "name": "贺韶-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428066",
+        "latitude": 34.3662582,
+        "longitude": 109.077069,
+        "ref": "B",
+        "name": "贺韶-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428067",
+        "latitude": 34.366111,
+        "longitude": 109.0784333,
+        "ref": "C",
+        "name": "贺韶-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428068",
+        "latitude": 34.3668557,
+        "longitude": 109.078538,
+        "ref": "D",
+        "name": "贺韶-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "07d5191a687e6eb9": [
+      {
+        "osmNodeID": "9009622871",
+        "latitude": 34.2374863,
+        "longitude": 108.8861847,
+        "ref": "A",
+        "name": "延平门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9009622872",
+        "latitude": 34.2369926,
+        "longitude": 108.8860877,
+        "ref": "B",
+        "name": "延平门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9009622873",
+        "latitude": 34.2365467,
+        "longitude": 108.8877715,
+        "ref": "C1",
+        "name": "延平门-C1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9009622874",
+        "latitude": 34.236861,
+        "longitude": 108.8886603,
+        "ref": "C2",
+        "name": "延平门-C2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9009622875",
+        "latitude": 34.2378711,
+        "longitude": 108.8877399,
+        "ref": "D1",
+        "name": "延平门-D1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9009622876",
+        "latitude": 34.2374258,
+        "longitude": 108.8884741,
+        "ref": "D2",
+        "name": "延平门-D2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9009622877",
+        "latitude": 34.2378116,
+        "longitude": 108.8885317,
+        "ref": "D3",
+        "name": "延平门-D3口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "13339880707",
+        "latitude": 34.2349742,
+        "longitude": 108.8878654,
+        "ref": "E",
+        "name": "延平门-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13339880706",
+        "latitude": 34.2362651,
+        "longitude": 108.8882897,
+        "ref": "F",
+        "name": "延平门-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "08bde4c676757848": [
+      {
+        "osmNodeID": "9084199366",
+        "latitude": 34.3613907,
+        "longitude": 109.0386547,
+        "ref": "A1",
+        "name": "国际港务区-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199367",
+        "latitude": 34.3609093,
+        "longitude": 109.0385806,
+        "ref": "A2",
+        "name": "国际港务区-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199369",
+        "latitude": 34.3607477,
+        "longitude": 109.0400666,
+        "ref": "B1",
+        "name": "国际港务区-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199368",
+        "latitude": 34.3612137,
+        "longitude": 109.040141,
+        "ref": "B2",
+        "name": "国际港务区-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "0ad3c4252df60e97": [
+      {
+        "osmNodeID": "8968533933",
+        "latitude": 34.289888,
+        "longitude": 108.831287,
+        "ref": "B",
+        "name": "三桥-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968533934",
+        "latitude": 34.2894648,
+        "longitude": 108.8323354,
+        "ref": "C",
+        "name": "三桥-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "0b098a38d13c89fe": [
+      {
+        "osmNodeID": "9032498690",
+        "latitude": 34.1605017,
+        "longitude": 108.8466751,
+        "ref": "A",
+        "name": "郭杜西-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498691",
+        "latitude": 34.1591121,
+        "longitude": 108.8469758,
+        "ref": "B",
+        "name": "郭杜西-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498692",
+        "latitude": 34.1606425,
+        "longitude": 108.8474507,
+        "ref": "D",
+        "name": "郭杜西-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "0ce49e75d5a18318": [
+      {
+        "osmNodeID": "7818718649",
+        "latitude": 34.2750867,
+        "longitude": 109.0547699,
+        "ref": "A",
+        "name": "半坡-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971579914",
+        "latitude": 34.2745867,
+        "longitude": 109.0560913,
+        "ref": "B",
+        "name": "半坡-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971579915",
+        "latitude": 34.2742155,
+        "longitude": 109.0569966,
+        "ref": "C",
+        "name": "半坡-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971579916",
+        "latitude": 34.2757451,
+        "longitude": 109.0570899,
+        "ref": "D",
+        "name": "半坡-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "0e722512acbe8d0f": [
+      {
+        "osmNodeID": "11380744996",
+        "latitude": 34.2514315,
+        "longitude": 109.0376401,
+        "ref": "A",
+        "name": "田家湾-A口"
+      },
+      {
+        "osmNodeID": "11380745002",
+        "latitude": 34.2509405,
+        "longitude": 109.0372806,
+        "ref": "B",
+        "name": "田家湾-B口"
+      },
+      {
+        "osmNodeID": "11380745001",
+        "latitude": 34.2514417,
+        "longitude": 109.0390086,
+        "ref": "D",
+        "name": "田家湾-D口"
+      }
+    ],
+    "0e72aa04bc860b07": [
+      {
+        "osmNodeID": "11211304423",
+        "latitude": 34.3057706,
+        "longitude": 108.6927075,
+        "ref": "A",
+        "name": "安谷-A口"
+      },
+      {
+        "osmNodeID": "11211304425",
+        "latitude": 34.3051277,
+        "longitude": 108.6933025,
+        "ref": "B",
+        "name": "安谷-B口"
+      },
+      {
+        "osmNodeID": "11211304426",
+        "latitude": 34.3063936,
+        "longitude": 108.6945845,
+        "ref": "C",
+        "name": "安谷-C口"
+      },
+      {
+        "osmNodeID": "11211304424",
+        "latitude": 34.3068227,
+        "longitude": 108.6937698,
+        "ref": "D",
+        "name": "安谷-D口"
+      }
+    ],
+    "11868dc9a5cb5943": [
+      {
+        "osmNodeID": "9034095986",
+        "latitude": 34.2960714,
+        "longitude": 109.1181853,
+        "ref": "C",
+        "name": "田王-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034095987",
+        "latitude": 34.2973805,
+        "longitude": 109.1181048,
+        "ref": "D",
+        "name": "田王-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1401fa10c0c1f6e5": [
+      {
+        "osmNodeID": "9032386140",
+        "latitude": 34.2408811,
+        "longitude": 108.7269827,
+        "ref": "A",
+        "name": "文教园-A口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9032386139",
+        "latitude": 34.2406506,
+        "longitude": 108.726895,
+        "ref": "B",
+        "name": "文教园-B口",
+        "wheelchair": "limited"
+      }
+    ],
+    "163724b43cecbfe0": [
+      {
+        "osmNodeID": "13357206342",
+        "latitude": 34.3926762,
+        "longitude": 108.922548,
+        "ref": "A",
+        "name": "渭河南-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13357206344",
+        "latitude": 34.3924197,
+        "longitude": 108.9238149,
+        "ref": "B",
+        "name": "渭河南-B口",
+        "wheelchair": "yes"
+      }
+    ],
+    "1644be7ec774f6c7": [
+      {
+        "osmNodeID": "8898927836",
+        "latitude": 34.2457971,
+        "longitude": 108.805211,
+        "ref": "A",
+        "name": "王寺-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927837",
+        "latitude": 34.24466,
+        "longitude": 108.8052852,
+        "ref": "B",
+        "name": "王寺-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927833",
+        "latitude": 34.2449548,
+        "longitude": 108.8064034,
+        "ref": "C",
+        "name": "王寺-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927832",
+        "latitude": 34.2456706,
+        "longitude": 108.8063894,
+        "ref": "D",
+        "name": "王寺-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "169c4d668315ae9f": [
+      {
+        "osmNodeID": "11379862999",
+        "latitude": 34.2519438,
+        "longitude": 109.0558454,
+        "ref": "A",
+        "name": "穆将王-A口"
+      },
+      {
+        "osmNodeID": "11379863000",
+        "latitude": 34.2506341,
+        "longitude": 109.055996,
+        "ref": "B",
+        "name": "穆将王-B口"
+      },
+      {
+        "osmNodeID": "11379863002",
+        "latitude": 34.2509574,
+        "longitude": 109.0570422,
+        "ref": "C",
+        "name": "穆将王-C口"
+      },
+      {
+        "osmNodeID": "11379863001",
+        "latitude": 34.2515736,
+        "longitude": 109.0572811,
+        "ref": "D",
+        "name": "穆将王-D口"
+      }
+    ],
+    "16d834c1e3b4ca84": [
+      {
+        "osmNodeID": "8968489719",
+        "latitude": 34.3080181,
+        "longitude": 108.795722,
+        "ref": "A",
+        "name": "沣东自贸园-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968489720",
+        "latitude": 34.3066348,
+        "longitude": 108.7967607,
+        "ref": "C1",
+        "name": "沣东自贸园-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968489722",
+        "latitude": 34.3062844,
+        "longitude": 108.7981076,
+        "ref": "C2",
+        "name": "沣东自贸园-C2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968489721",
+        "latitude": 34.3073708,
+        "longitude": 108.7979723,
+        "ref": "D",
+        "name": "沣东自贸园-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "19e7ff5d8f1d4711": [
+      {
+        "osmNodeID": "9019127269",
+        "latitude": 34.2229574,
+        "longitude": 108.9630552,
+        "ref": "A",
+        "name": "大雁塔-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9019410638",
+        "latitude": 34.2223633,
+        "longitude": 108.962765,
+        "ref": "B",
+        "name": "大雁塔-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9019410639",
+        "latitude": 34.2224225,
+        "longitude": 108.9656388,
+        "ref": "C",
+        "name": "大雁塔-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9019410640",
+        "latitude": 34.2229604,
+        "longitude": 108.9649019,
+        "ref": "D",
+        "name": "大雁塔-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9019410641",
+        "latitude": 34.2239412,
+        "longitude": 108.9641944,
+        "ref": "E",
+        "name": "大雁塔-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9019410642",
+        "latitude": 34.224007,
+        "longitude": 108.9634944,
+        "ref": "F",
+        "name": "大雁塔-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "1afcc56b521e5afb": [
+      {
+        "osmNodeID": "8967743780",
+        "latitude": 34.203712,
+        "longitude": 108.8892232,
+        "ref": "A",
+        "name": "省体育馆-A口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "8967743781",
+        "latitude": 34.2028478,
+        "longitude": 108.8893933,
+        "ref": "B",
+        "name": "省体育馆-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8967743782",
+        "latitude": 34.2024482,
+        "longitude": 108.8903474,
+        "ref": "C",
+        "name": "省体育馆-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13339880727",
+        "latitude": 34.2032126,
+        "longitude": 108.8901236,
+        "ref": "D",
+        "name": "省体育馆-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1c9a439933fe3cba": [
+      {
+        "osmNodeID": "8617662660",
+        "latitude": 34.2240915,
+        "longitude": 108.8989806,
+        "ref": "A",
+        "name": "甘家寨-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8617662664",
+        "latitude": 34.2230843,
+        "longitude": 108.8986287,
+        "ref": "B",
+        "name": "甘家寨-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8617662661",
+        "latitude": 34.2239899,
+        "longitude": 108.9001002,
+        "ref": "D",
+        "name": "甘家寨-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "1ca516da9d015bde": [
+      {
+        "osmNodeID": "9034096007",
+        "latitude": 34.3704531,
+        "longitude": 109.1882672,
+        "ref": "A",
+        "name": "西工程大·西科大(临潼校区)-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096008",
+        "latitude": 34.369847,
+        "longitude": 109.1884025,
+        "ref": "B",
+        "name": "西工程大·西科大(临潼校区)-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034096009",
+        "latitude": 34.3707422,
+        "longitude": 109.1897957,
+        "ref": "D",
+        "name": "西工程大·西科大(临潼校区)-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1d8315f31392316b": [
+      {
+        "osmNodeID": "8898927812",
+        "latitude": 34.2528516,
+        "longitude": 108.8245219,
+        "ref": "A",
+        "name": "阿房宫南-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927813",
+        "latitude": 34.2520864,
+        "longitude": 108.8244052,
+        "ref": "B",
+        "name": "阿房宫南-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927809",
+        "latitude": 34.2528506,
+        "longitude": 108.8261863,
+        "ref": "D",
+        "name": "阿房宫南-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1dbbe5a715baa0a4": [
+      {
+        "osmNodeID": "13386793867",
+        "latitude": 34.2826305,
+        "longitude": 108.8908881,
+        "ref": "A",
+        "name": "白家口-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793869",
+        "latitude": 34.2803973,
+        "longitude": 108.8917783,
+        "ref": "C",
+        "name": "白家口-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793868",
+        "latitude": 34.2833372,
+        "longitude": 108.8917222,
+        "ref": "E",
+        "name": "白家口-E口",
+        "wheelchair": "no"
+      }
+    ],
+    "1e07ff477a42c04f": [
+      {
+        "osmNodeID": "9003363665",
+        "latitude": 34.1834705,
+        "longitude": 108.9453998,
+        "ref": "A",
+        "name": "三爻-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9003363666",
+        "latitude": 34.1822869,
+        "longitude": 108.9455841,
+        "ref": "B",
+        "name": "三爻-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9003363667",
+        "latitude": 34.1832954,
+        "longitude": 108.9462609,
+        "ref": "D",
+        "name": "三爻-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1ee050526f366418": [
+      {
+        "osmNodeID": "8987669287",
+        "latitude": 34.2817446,
+        "longitude": 108.9468523,
+        "ref": "A",
+        "name": "安远门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8987669288",
+        "latitude": 34.2808335,
+        "longitude": 108.9468149,
+        "ref": "B",
+        "name": "安远门-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8987669289",
+        "latitude": 34.2808006,
+        "longitude": 108.9475551,
+        "ref": "C",
+        "name": "安远门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8987669290",
+        "latitude": 34.2819953,
+        "longitude": 108.9475305,
+        "ref": "D",
+        "name": "安远门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "1ee734a517dab35a": [
+      {
+        "osmNodeID": "11391497105",
+        "latitude": 34.2286044,
+        "longitude": 108.747152,
+        "ref": "A",
+        "name": "诗经里-A口"
+      },
+      {
+        "osmNodeID": "11391497103",
+        "latitude": 34.2271375,
+        "longitude": 108.746853,
+        "ref": "B",
+        "name": "诗经里-B口"
+      },
+      {
+        "osmNodeID": "11391497104",
+        "latitude": 34.2263969,
+        "longitude": 108.7473408,
+        "ref": "C",
+        "name": "诗经里-C口"
+      }
+    ],
+    "1fb35b86d64989d2": [
+      {
+        "osmNodeID": "11380745022",
+        "latitude": 34.2520348,
+        "longitude": 109.0149997,
+        "ref": "A",
+        "name": "万寿南路-A口"
+      },
+      {
+        "osmNodeID": "11380745024",
+        "latitude": 34.2506272,
+        "longitude": 109.0157317,
+        "ref": "C",
+        "name": "万寿南路-C口"
+      },
+      {
+        "osmNodeID": "11380745023",
+        "latitude": 34.252138,
+        "longitude": 109.0155801,
+        "ref": "D",
+        "name": "万寿南路-D口"
+      },
+      {
+        "osmNodeID": "12768637689",
+        "latitude": 34.2514188,
+        "longitude": 109.0134598,
+        "ref": "E",
+        "name": "万寿南路-E口"
+      },
+      {
+        "osmNodeID": "12768637690",
+        "latitude": 34.2508795,
+        "longitude": 109.0133828,
+        "ref": "F",
+        "name": "万寿南路-F口"
+      }
+    ],
+    "208c20907010436b": [
+      {
+        "osmNodeID": "9029259502",
+        "latitude": 34.2194232,
+        "longitude": 109.025714,
+        "ref": "A",
+        "name": "马腾空-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927573",
+        "latitude": 34.2191592,
+        "longitude": 109.0271723,
+        "ref": "B",
+        "name": "马腾空-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927570",
+        "latitude": 34.2201478,
+        "longitude": 109.0279463,
+        "ref": "C",
+        "name": "马腾空-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927572",
+        "latitude": 34.2197108,
+        "longitude": 109.0270259,
+        "ref": "D",
+        "name": "马腾空-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927571",
+        "latitude": 34.2187166,
+        "longitude": 109.0291562,
+        "ref": "E",
+        "name": "马腾空-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386870260",
+        "latitude": 34.2188912,
+        "longitude": 109.0279324,
+        "ref": "F",
+        "name": "马腾空-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "218e40397bb3157c": [
+      {
+        "osmNodeID": "9031431095",
+        "latitude": 34.2528253,
+        "longitude": 108.8516853,
+        "ref": "A",
+        "name": "西窑头-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9031431096",
+        "latitude": 34.2520749,
+        "longitude": 108.851644,
+        "ref": "B",
+        "name": "西窑头-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9031431097",
+        "latitude": 34.2520976,
+        "longitude": 108.8532782,
+        "ref": "C",
+        "name": "西窑头-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "22d37daae774a9ee": [
+      {
+        "osmNodeID": "9029084665",
+        "latitude": 34.2973851,
+        "longitude": 108.9710921,
+        "ref": "A",
+        "name": "大明宫-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084666",
+        "latitude": 34.2960884,
+        "longitude": 108.9710859,
+        "ref": "B",
+        "name": "大明宫-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084667",
+        "latitude": 34.2961913,
+        "longitude": 108.9720942,
+        "ref": "C",
+        "name": "大明宫-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084668",
+        "latitude": 34.2972179,
+        "longitude": 108.9718651,
+        "ref": "D",
+        "name": "大明宫-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "24e9f52177f0c613": [
+      {
+        "osmNodeID": "13398005504",
+        "latitude": 34.199001,
+        "longitude": 108.9193083,
+        "ref": "A",
+        "name": "安化门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13398005507",
+        "latitude": 34.1981001,
+        "longitude": 108.9180948,
+        "ref": "B",
+        "name": "安化门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13398005506",
+        "latitude": 34.1980744,
+        "longitude": 108.920496,
+        "ref": "C",
+        "name": "安化门-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13398005505",
+        "latitude": 34.1987042,
+        "longitude": 108.9204259,
+        "ref": "D",
+        "name": "安化门-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "25c22e4995dec009": [
+      {
+        "osmNodeID": "11388111709",
+        "latitude": 34.3294893,
+        "longitude": 108.78252,
+        "ref": "A",
+        "name": "西咸大厦-A口"
+      },
+      {
+        "osmNodeID": "11388111711",
+        "latitude": 34.3293948,
+        "longitude": 108.7832974,
+        "ref": "A",
+        "name": "西咸大厦-D口"
+      },
+      {
+        "osmNodeID": "11388111710",
+        "latitude": 34.3283624,
+        "longitude": 108.782619,
+        "ref": "B",
+        "name": "西咸大厦-B口"
+      }
+    ],
+    "26cdc93ed9778d7c": [
+      {
+        "osmNodeID": "9034096000",
+        "latitude": 34.3443539,
+        "longitude": 109.150131,
+        "ref": "C",
+        "name": "凤凰池-C口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9034096001",
+        "latitude": 34.3446523,
+        "longitude": 109.1499507,
+        "ref": "D",
+        "name": "凤凰池-D口",
+        "wheelchair": "limited"
+      }
+    ],
+    "28a7d18d31764656": [
+      {
+        "osmNodeID": "11380957905",
+        "latitude": 34.2513246,
+        "longitude": 108.9867489,
+        "ref": "A",
+        "name": "交通大学·兴庆宫-A口"
+      },
+      {
+        "osmNodeID": "11380957906",
+        "latitude": 34.2508145,
+        "longitude": 108.9855512,
+        "ref": "B",
+        "name": "交通大学·兴庆宫-B口"
+      },
+      {
+        "osmNodeID": "11380957907",
+        "latitude": 34.2513399,
+        "longitude": 108.9873956,
+        "ref": "D",
+        "name": "交通大学·兴庆宫-D口"
+      },
+      {
+        "osmNodeID": "11380957908",
+        "latitude": 34.2512947,
+        "longitude": 108.9885643,
+        "ref": "F",
+        "name": "交通大学·兴庆宫-F口"
+      }
+    ],
+    "28d4a4489c06af43": [
+      {
+        "osmNodeID": "8968330416",
+        "latitude": 34.2414916,
+        "longitude": 108.9096566,
+        "ref": "A",
+        "name": "西北工业大学-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968337819",
+        "latitude": 34.2400874,
+        "longitude": 108.910574,
+        "ref": "B",
+        "name": "西北工业大学-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968337818",
+        "latitude": 34.240683,
+        "longitude": 108.9112743,
+        "ref": "C",
+        "name": "西北工业大学-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968337817",
+        "latitude": 34.2413936,
+        "longitude": 108.911343,
+        "ref": "D",
+        "name": "西北工业大学-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968330415",
+        "latitude": 34.2424937,
+        "longitude": 108.9104146,
+        "ref": "E",
+        "name": "西北工业大学-E口",
+        "wheelchair": "no"
+      }
+    ],
+    "290b64a945bf6ad6": [
+      {
+        "osmNodeID": "9084428048",
+        "latitude": 34.3743324,
+        "longitude": 109.0200107,
+        "ref": "A1",
+        "name": "奥体中心-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428049",
+        "latitude": 34.3742899,
+        "longitude": 109.0191677,
+        "ref": "A2",
+        "name": "奥体中心-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428050",
+        "latitude": 34.3728706,
+        "longitude": 109.0201189,
+        "ref": "B1",
+        "name": "奥体中心-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428051",
+        "latitude": 34.3733111,
+        "longitude": 109.0189222,
+        "ref": "B2",
+        "name": "奥体中心-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428052",
+        "latitude": 34.3728662,
+        "longitude": 109.0218992,
+        "ref": "C",
+        "name": "奥体中心-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428053",
+        "latitude": 34.3737952,
+        "longitude": 109.0220295,
+        "ref": "D",
+        "name": "奥体中心-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "2960bb30e2e44909": [
+      {
+        "osmNodeID": "8974813675",
+        "latitude": 34.3183482,
+        "longitude": 108.9469075,
+        "ref": "A",
+        "name": "青少年中心-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8974813678",
+        "latitude": 34.3171249,
+        "longitude": 108.9469199,
+        "ref": "B",
+        "name": "青少年中心-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8974813677",
+        "latitude": 34.3176009,
+        "longitude": 108.9478991,
+        "ref": "C",
+        "name": "青少年中心-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8974813676",
+        "latitude": 34.3181583,
+        "longitude": 108.9481215,
+        "ref": "D",
+        "name": "青少年中心-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13021032643",
+        "latitude": 34.3180677,
+        "longitude": 108.9451349,
+        "ref": "E",
+        "name": "青少年中心-E口"
+      },
+      {
+        "osmNodeID": "13021032644",
+        "latitude": 34.317632,
+        "longitude": 108.9461945,
+        "ref": "F",
+        "name": "青少年中心-F口"
+      }
+    ],
+    "2a56837d23ad59c3": [
+      {
+        "osmNodeID": "8971520615",
+        "latitude": 34.2697807,
+        "longitude": 109.0120834,
+        "ref": "A",
+        "name": "万寿路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971520616",
+        "latitude": 34.2692012,
+        "longitude": 109.0120493,
+        "ref": "B",
+        "name": "万寿路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971526118",
+        "latitude": 34.2692016,
+        "longitude": 109.0137014,
+        "ref": "C",
+        "name": "万寿路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971526117",
+        "latitude": 34.2697946,
+        "longitude": 109.0137536,
+        "ref": "D",
+        "name": "万寿路-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "12768637676",
+        "latitude": 34.2706837,
+        "longitude": 109.0139643,
+        "ref": "E",
+        "name": "万寿路-E口"
+      },
+      {
+        "osmNodeID": "12768637678",
+        "latitude": 34.268743,
+        "longitude": 109.0151946,
+        "ref": "F",
+        "name": "万寿路-F口"
+      },
+      {
+        "osmNodeID": "12768637677",
+        "latitude": 34.2701026,
+        "longitude": 109.0151787,
+        "ref": "G",
+        "name": "万寿路-G口"
+      }
+    ],
+    "2d216528c017c283": [
+      {
+        "osmNodeID": "8968520774",
+        "latitude": 34.3008106,
+        "longitude": 108.813357,
+        "ref": "A",
+        "name": "后卫寨-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968520776",
+        "latitude": 34.3001246,
+        "longitude": 108.812381,
+        "ref": "B",
+        "name": "后卫寨-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968520775",
+        "latitude": 34.3002883,
+        "longitude": 108.8144603,
+        "ref": "D",
+        "name": "后卫寨-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "2dd305db667b85bb": [
+      {
+        "osmNodeID": "11211326948",
+        "latitude": 34.3185449,
+        "longitude": 108.7375524,
+        "ref": "A",
+        "name": "陕西中医药大学-A口"
+      },
+      {
+        "osmNodeID": "11211326949",
+        "latitude": 34.3177684,
+        "longitude": 108.7377891,
+        "ref": "B",
+        "name": "陕西中医药大学-B口"
+      },
+      {
+        "osmNodeID": "11211326950",
+        "latitude": 34.3179608,
+        "longitude": 108.7391506,
+        "ref": "C",
+        "name": "陕西中医药大学-C口"
+      },
+      {
+        "osmNodeID": "11211326951",
+        "latitude": 34.3188143,
+        "longitude": 108.7395028,
+        "ref": "D",
+        "name": "陕西中医药大学-D口"
+      }
+    ],
+    "2e0adf92f56902f4": [
+      {
+        "osmNodeID": "9021609433",
+        "latitude": 34.3113526,
+        "longitude": 109.0333329,
+        "ref": "A1",
+        "name": "桃花潭-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609432",
+        "latitude": 34.3113555,
+        "longitude": 109.0328474,
+        "ref": "A2",
+        "name": "桃花潭-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609442",
+        "latitude": 34.3105394,
+        "longitude": 109.0328628,
+        "ref": "B1",
+        "name": "桃花潭-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021609441",
+        "latitude": 34.3106375,
+        "longitude": 109.0328602,
+        "ref": "B2",
+        "name": "桃花潭-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "30bbac8bc7907395": [
+      {
+        "osmNodeID": "12438270598",
+        "latitude": 34.330253,
+        "longitude": 108.983893,
+        "ref": "A",
+        "name": "帽珥冢-A口"
+      },
+      {
+        "osmNodeID": "12438270601",
+        "latitude": 34.3287166,
+        "longitude": 108.9840122,
+        "ref": "B1",
+        "name": "帽珥冢-B1口"
+      },
+      {
+        "osmNodeID": "12438270602",
+        "latitude": 34.3292015,
+        "longitude": 108.9835276,
+        "ref": "B2",
+        "name": "帽珥冢-B2口"
+      },
+      {
+        "osmNodeID": "12438270600",
+        "latitude": 34.3291365,
+        "longitude": 108.9849862,
+        "ref": "C",
+        "name": "帽珥冢-C口"
+      },
+      {
+        "osmNodeID": "12438270599",
+        "latitude": 34.3300339,
+        "longitude": 108.9846933,
+        "ref": "D",
+        "name": "帽珥冢-D口"
+      }
+    ],
+    "30cd5d018def2afc": [
+      {
+        "osmNodeID": "8898927797",
+        "latitude": 34.2520335,
+        "longitude": 108.8711589,
+        "ref": "B",
+        "name": "汉城南路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9031431093",
+        "latitude": 34.2517319,
+        "longitude": 108.872442,
+        "ref": "C",
+        "name": "汉城南路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9031431094",
+        "latitude": 34.2528838,
+        "longitude": 108.8723511,
+        "ref": "D",
+        "name": "汉城南路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "3378ebb628980ce1": [
+      {
+        "osmNodeID": "9029084677",
+        "latitude": 34.2418137,
+        "longitude": 108.9632613,
+        "ref": "A",
+        "name": "建筑科技大学·李家村-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084683",
+        "latitude": 34.2403722,
+        "longitude": 108.9632271,
+        "ref": "B",
+        "name": "建筑科技大学·李家村-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084682",
+        "latitude": 34.2403773,
+        "longitude": 108.9639539,
+        "ref": "C",
+        "name": "建筑科技大学·李家村-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029084684",
+        "latitude": 34.2418649,
+        "longitude": 108.9637946,
+        "ref": "D",
+        "name": "建筑科技大学·李家村-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927752",
+        "latitude": 34.2414845,
+        "longitude": 108.9621593,
+        "ref": "E",
+        "name": "建筑科技大学·李家村-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927751",
+        "latitude": 34.2408789,
+        "longitude": 108.9620982,
+        "ref": "F",
+        "name": "建筑科技大学-李家村-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "337d1dc6fc529a75": [
+      {
+        "osmNodeID": "10983581108",
+        "latitude": 34.2771706,
+        "longitude": 108.9656439,
+        "ref": "C",
+        "name": "西安站-C口",
+        "nameEn": "Xian Station Metro Line 4 Entrance C"
+      }
+    ],
+    "346a4bcb7bc187c5": [
+      {
+        "osmNodeID": "9032498686",
+        "latitude": 34.1516401,
+        "longitude": 108.8451027,
+        "ref": "A",
+        "name": "仁村-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498687",
+        "latitude": 34.1506102,
+        "longitude": 108.8444632,
+        "ref": "B",
+        "name": "仁村-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498689",
+        "latitude": 34.151365,
+        "longitude": 108.8458255,
+        "ref": "D",
+        "name": "仁村-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "3696c88c79fca97f": [
+      {
+        "osmNodeID": "11380957913",
+        "latitude": 34.2589948,
+        "longitude": 108.9756062,
+        "ref": "A",
+        "name": "长乐门-C1口"
+      },
+      {
+        "osmNodeID": "11380957910",
+        "latitude": 34.2594567,
+        "longitude": 108.9742837,
+        "ref": "A1",
+        "name": "长乐门-A1口"
+      },
+      {
+        "osmNodeID": "11380957911",
+        "latitude": 34.259445,
+        "longitude": 108.9753521,
+        "ref": "A2",
+        "name": "长乐门-A2口"
+      },
+      {
+        "osmNodeID": "11380957914",
+        "latitude": 34.2589643,
+        "longitude": 108.9764226,
+        "ref": "C2",
+        "name": "长乐门-C2口"
+      },
+      {
+        "osmNodeID": "11380957912",
+        "latitude": 34.2595084,
+        "longitude": 108.9759082,
+        "ref": "D",
+        "name": "长乐门-D口"
+      }
+    ],
+    "369c3b9949611dec": [
+      {
+        "osmNodeID": "7821624188",
+        "latitude": 34.2490665,
+        "longitude": 108.9466562,
+        "ref": "A1",
+        "name": "永宁门-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7821624187",
+        "latitude": 34.2487446,
+        "longitude": 108.9461233,
+        "ref": "A2",
+        "name": "永宁门-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8997446980",
+        "latitude": 34.2477903,
+        "longitude": 108.9465283,
+        "ref": "B",
+        "name": "永宁门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8997446979",
+        "latitude": 34.248061,
+        "longitude": 108.9476514,
+        "ref": "C",
+        "name": "永宁门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7821624189",
+        "latitude": 34.2490665,
+        "longitude": 108.9472172,
+        "ref": "D1",
+        "name": "永宁门-D1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7813319345",
+        "latitude": 34.2487176,
+        "longitude": 108.9477528,
+        "ref": "D2",
+        "name": "永宁门-D2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "36f3366dbc4c80a2": [
+      {
+        "osmNodeID": "9029084669",
+        "latitude": 34.2882676,
+        "longitude": 108.9710667,
+        "ref": "A",
+        "name": "含元殿-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084670",
+        "latitude": 34.2870584,
+        "longitude": 108.9710678,
+        "ref": "B",
+        "name": "含元殿-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084671",
+        "latitude": 34.2874691,
+        "longitude": 108.9724421,
+        "ref": "C1",
+        "name": "含元殿-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084672",
+        "latitude": 34.2882001,
+        "longitude": 108.9718627,
+        "ref": "D",
+        "name": "含元殿-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "379c60229f84a611": [
+      {
+        "osmNodeID": "9032386242",
+        "latitude": 34.2690662,
+        "longitude": 108.6799681,
+        "ref": "A1",
+        "name": "翱翔小镇-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386243",
+        "latitude": 34.2690673,
+        "longitude": 108.6805217,
+        "ref": "A2",
+        "name": "翱翔小镇-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386244",
+        "latitude": 34.2683636,
+        "longitude": 108.6799409,
+        "ref": "B1",
+        "name": "翱翔小镇-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386246",
+        "latitude": 34.2683602,
+        "longitude": 108.6804892,
+        "ref": "B2",
+        "name": "翱翔小镇-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "37a2ffba11086754": [
+      {
+        "osmNodeID": "8971178990",
+        "latitude": 34.2699692,
+        "longitude": 108.9344975,
+        "name": "洒金桥-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971178989",
+        "latitude": 34.2694661,
+        "longitude": 108.933212,
+        "ref": "B",
+        "name": "洒金桥-B口",
+        "wheelchair": "yes"
+      }
+    ],
+    "38411e217ff526b2": [
+      {
+        "osmNodeID": "13248020909",
+        "latitude": 34.5099837,
+        "longitude": 109.1029842,
+        "ref": "A1",
+        "name": "杏王-A1口"
+      },
+      {
+        "osmNodeID": "13248020910",
+        "latitude": 34.5100199,
+        "longitude": 109.1035514,
+        "ref": "A2",
+        "name": "杏王-A2口"
+      },
+      {
+        "osmNodeID": "13248020895",
+        "latitude": 34.5092592,
+        "longitude": 109.1030533,
+        "ref": "B1",
+        "name": "杏王-B1口"
+      },
+      {
+        "osmNodeID": "13248020896",
+        "latitude": 34.5092966,
+        "longitude": 109.1036198,
+        "ref": "B2",
+        "name": "杏王-B2口"
+      }
+    ],
+    "397a451fdd706648": [
+      {
+        "osmNodeID": "12438270625",
+        "latitude": 34.4112059,
+        "longitude": 109.0261638,
+        "ref": "A1",
+        "name": "西堡-A1口"
+      },
+      {
+        "osmNodeID": "12438270626",
+        "latitude": 34.4112034,
+        "longitude": 109.0266977,
+        "ref": "A2",
+        "name": "西堡-A2口"
+      },
+      {
+        "osmNodeID": "12438270627",
+        "latitude": 34.4105616,
+        "longitude": 109.0261572,
+        "ref": "B1",
+        "name": "西堡-B1口"
+      },
+      {
+        "osmNodeID": "12438270628",
+        "latitude": 34.4105659,
+        "longitude": 109.0267156,
+        "ref": "B2",
+        "name": "西堡-B2口"
+      }
+    ],
+    "3a0ca09f3b7f7adb": [
+      {
+        "osmNodeID": "11383665727",
+        "latitude": 34.2596205,
+        "longitude": 108.9382367,
+        "ref": "A1",
+        "name": "广济街-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11383665728",
+        "latitude": 34.2590975,
+        "longitude": 108.940679,
+        "ref": "C",
+        "name": "广济街-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11383665730",
+        "latitude": 34.2595414,
+        "longitude": 108.9405482,
+        "ref": "D1",
+        "name": "广济街-D1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11383665729",
+        "latitude": 34.2595953,
+        "longitude": 108.9396569,
+        "ref": "D2",
+        "name": "广济街-D2口",
+        "wheelchair": "no"
+      }
+    ],
+    "3aa6d0a3887b3f18": [
+      {
+        "osmNodeID": "11378815374",
+        "latitude": 34.2104112,
+        "longitude": 108.9703756,
+        "ref": "A",
+        "name": "大唐芙蓉园-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029084685",
+        "latitude": 34.209009,
+        "longitude": 108.9715524,
+        "ref": "B",
+        "name": "大唐芙蓉园-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084686",
+        "latitude": 34.2090707,
+        "longitude": 108.9726427,
+        "ref": "C",
+        "name": "大唐芙蓉园-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7813329991",
+        "latitude": 34.2106332,
+        "longitude": 108.9707564,
+        "ref": "D",
+        "name": "大唐芙蓉园-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "3c6f05bebe17ea50": [
+      {
+        "osmNodeID": "9925951571",
+        "latitude": 34.4373313,
+        "longitude": 108.7600988,
+        "name": "机场西-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9925951572",
+        "latitude": 34.4380736,
+        "longitude": 108.7621532,
+        "name": "机场西-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9925951573",
+        "latitude": 34.439574,
+        "longitude": 108.7614082,
+        "name": "机场西-C1口",
+        "wheelchair": "no"
+      }
+    ],
+    "3dbac617f9c47b4d": [
+      {
+        "osmNodeID": "9029259506",
+        "latitude": 34.2389697,
+        "longitude": 108.9885976,
+        "ref": "A",
+        "name": "雁翔路北口-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927748",
+        "latitude": 34.2376446,
+        "longitude": 108.9894031,
+        "ref": "B",
+        "name": "雁翔路北口-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927749",
+        "latitude": 34.2377675,
+        "longitude": 108.9898878,
+        "ref": "C",
+        "name": "雁翔路北口-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927750",
+        "latitude": 34.2390663,
+        "longitude": 108.989208,
+        "ref": "D",
+        "name": "雁翔路北口-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "3e5f56d0d5abe8d1": [
+      {
+        "osmNodeID": "13339880713",
+        "latitude": 34.2259794,
+        "longitude": 108.8889042,
+        "ref": "A",
+        "name": "科技二路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13339880715",
+        "latitude": 34.2253156,
+        "longitude": 108.888865,
+        "ref": "B",
+        "name": "科技二路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13339880714",
+        "latitude": 34.2249073,
+        "longitude": 108.8899645,
+        "ref": "C",
+        "name": "科技二路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13339880712",
+        "latitude": 34.2263021,
+        "longitude": 108.8899834,
+        "ref": "D",
+        "name": "科技二路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "3f2ec69c26268afb": [
+      {
+        "osmNodeID": "9032386164",
+        "latitude": 34.2610616,
+        "longitude": 108.7102707,
+        "ref": "A1",
+        "name": "东马坊-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386165",
+        "latitude": 34.2606451,
+        "longitude": 108.7102722,
+        "ref": "A2",
+        "name": "东马坊-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386186",
+        "latitude": 34.261064,
+        "longitude": 108.7114702,
+        "ref": "B1",
+        "name": "东马坊-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386187",
+        "latitude": 34.2606568,
+        "longitude": 108.7114719,
+        "ref": "B2",
+        "name": "东马坊-B2口",
+        "wheelchair": "no"
+      }
+    ],
+    "4024863ef5da18c3": [
+      {
+        "osmNodeID": "11380745003",
+        "latitude": 34.2514226,
+        "longitude": 109.0252867,
+        "ref": "A",
+        "name": "卫星测控中心-A口"
+      },
+      {
+        "osmNodeID": "11380745004",
+        "latitude": 34.2508806,
+        "longitude": 109.0259899,
+        "ref": "B",
+        "name": "卫星测控中心-B口"
+      },
+      {
+        "osmNodeID": "11380745005",
+        "latitude": 34.2514233,
+        "longitude": 109.0266495,
+        "ref": "D",
+        "name": "卫星测控中心-D口"
+      }
+    ],
+    "41b7c172dbba4c2a": [
+      {
+        "osmNodeID": "9029084657",
+        "latitude": 34.3177605,
+        "longitude": 108.9711863,
+        "ref": "A",
+        "name": "余家寨-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084658",
+        "latitude": 34.3168,
+        "longitude": 108.9726163,
+        "ref": "C",
+        "name": "余家寨-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029084659",
+        "latitude": 34.3194074,
+        "longitude": 108.9721145,
+        "ref": "F",
+        "name": "余家寨-F口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13288666784",
+        "latitude": 34.3168295,
+        "longitude": 108.9747053,
+        "ref": "J",
+        "name": "余家寨-J口"
+      },
+      {
+        "osmNodeID": "13288666781",
+        "latitude": 34.3173748,
+        "longitude": 108.9730942,
+        "ref": "K",
+        "name": "余家寨-K口",
+        "wheelchair": "yes"
+      }
+    ],
+    "42a07b6a100eecce": [
+      {
+        "osmNodeID": "13386793875",
+        "latitude": 34.2868058,
+        "longitude": 108.9015579,
+        "ref": "A",
+        "name": "光化门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793876",
+        "latitude": 34.2860086,
+        "longitude": 108.9018785,
+        "ref": "B",
+        "name": "光化门-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793877",
+        "latitude": 34.2872447,
+        "longitude": 108.9027275,
+        "ref": "D",
+        "name": "光化门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "44d6f46dbf2eccfc": [
+      {
+        "osmNodeID": "6670618320",
+        "latitude": 34.3614934,
+        "longitude": 108.9448496,
+        "ref": "B",
+        "name": "北苑-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "5218241219",
+        "latitude": 34.3615125,
+        "longitude": 108.9457996,
+        "ref": "C",
+        "name": "北苑-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "5218241220",
+        "latitude": 34.3626589,
+        "longitude": 108.9452679,
+        "ref": "D",
+        "name": "北苑-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4510f65ae96ba95b": [
+      {
+        "osmNodeID": "8973232033",
+        "latitude": 34.3304311,
+        "longitude": 108.9468239,
+        "ref": "A",
+        "name": "凤城五路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8973785607",
+        "latitude": 34.3294711,
+        "longitude": 108.9462488,
+        "ref": "B",
+        "name": "凤城五路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8973232034",
+        "latitude": 34.3301171,
+        "longitude": 108.9480084,
+        "ref": "D",
+        "name": "凤城五路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "4589af6cbfdb8494": [
+      {
+        "osmNodeID": "9084199370",
+        "latitude": 34.3727187,
+        "longitude": 109.0404701,
+        "ref": "A1",
+        "name": "双寨-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199371",
+        "latitude": 34.3722063,
+        "longitude": 109.0403898,
+        "ref": "A2",
+        "name": "双寨-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199372",
+        "latitude": 34.3717561,
+        "longitude": 109.0419241,
+        "ref": "B1",
+        "name": "双寨-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199373",
+        "latitude": 34.3722965,
+        "longitude": 109.0420108,
+        "ref": "B2",
+        "name": "双寨-B2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199374",
+        "latitude": 34.3707631,
+        "longitude": 109.0419301,
+        "ref": "C",
+        "name": "双寨-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199375",
+        "latitude": 34.3715044,
+        "longitude": 109.0421398,
+        "ref": "D",
+        "name": "双寨-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084199376",
+        "latitude": 34.3717417,
+        "longitude": 109.039892,
+        "ref": "E",
+        "name": "双寨-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084199377",
+        "latitude": 34.3706031,
+        "longitude": 109.0400972,
+        "ref": "F",
+        "name": "双寨-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "4775c08ffd997fb4": [
+      {
+        "osmNodeID": "8898927901",
+        "latitude": 34.2452453,
+        "longitude": 108.758328,
+        "ref": "A",
+        "name": "镐京-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927902",
+        "latitude": 34.244674,
+        "longitude": 108.7583179,
+        "ref": "B",
+        "name": "镐京-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927906",
+        "latitude": 34.2443592,
+        "longitude": 108.7592868,
+        "ref": "C",
+        "name": "镐京-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927905",
+        "latitude": 34.2452469,
+        "longitude": 108.7596718,
+        "ref": "D",
+        "name": "镐京-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "479cd4853019a83d": [
+      {
+        "osmNodeID": "9007792469",
+        "latitude": 34.2383161,
+        "longitude": 108.8478971,
+        "ref": "A",
+        "name": "鱼化寨-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9007932188",
+        "latitude": 34.2377363,
+        "longitude": 108.8478659,
+        "ref": "B",
+        "name": "鱼化寨-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9007932189",
+        "latitude": 34.2376886,
+        "longitude": 108.8493898,
+        "ref": "C",
+        "name": "鱼化寨-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9007932190",
+        "latitude": 34.2382471,
+        "longitude": 108.8494222,
+        "ref": "D",
+        "name": "鱼化寨-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9007932191",
+        "latitude": 34.238368,
+        "longitude": 108.8468477,
+        "ref": "E",
+        "name": "鱼化寨-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9007932192",
+        "latitude": 34.2377795,
+        "longitude": 108.846695,
+        "ref": "F",
+        "name": "鱼化寨-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "48ecdccd5dc1679e": [
+      {
+        "osmNodeID": "9029195951",
+        "latitude": 34.1711691,
+        "longitude": 108.9740233,
+        "ref": "A",
+        "name": "航天大道-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195952",
+        "latitude": 34.1701198,
+        "longitude": 108.9741847,
+        "ref": "B",
+        "name": "航天大道-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195953",
+        "latitude": 34.1698222,
+        "longitude": 108.9747484,
+        "ref": "C",
+        "name": "航天大道-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195954",
+        "latitude": 34.1715075,
+        "longitude": 108.9751576,
+        "ref": "D",
+        "name": "航天大道-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "49708c2e44970e7f": [
+      {
+        "osmNodeID": "9008405276",
+        "latitude": 34.2376114,
+        "longitude": 108.8734746,
+        "ref": "A",
+        "name": "丈八北路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9008405277",
+        "latitude": 34.2376244,
+        "longitude": 108.872739,
+        "ref": "B",
+        "name": "丈八北路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9008405278",
+        "latitude": 34.2371072,
+        "longitude": 108.8727547,
+        "ref": "C",
+        "name": "丈八北路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9008405290",
+        "latitude": 34.2370018,
+        "longitude": 108.8738878,
+        "ref": "D",
+        "name": "丈八北路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4a94f53234f1f291": [
+      {
+        "osmNodeID": "13386742096",
+        "latitude": 34.3360486,
+        "longitude": 108.9712412,
+        "ref": "A",
+        "name": "常青路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386742098",
+        "latitude": 34.3343969,
+        "longitude": 108.9719571,
+        "ref": "C",
+        "name": "常青路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13386742097",
+        "latitude": 34.3364907,
+        "longitude": 108.9718773,
+        "ref": "D",
+        "name": "常青路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4abda4d7305f6d52": [
+      {
+        "osmNodeID": "12438270604",
+        "latitude": 34.3403122,
+        "longitude": 108.9836326,
+        "ref": "A",
+        "name": "团结村-A口"
+      },
+      {
+        "osmNodeID": "12438270606",
+        "latitude": 34.3390016,
+        "longitude": 108.9838751,
+        "ref": "B",
+        "name": "团结村-B口"
+      },
+      {
+        "osmNodeID": "12438270605",
+        "latitude": 34.339389,
+        "longitude": 108.9847586,
+        "ref": "C",
+        "name": "团结村-C口"
+      },
+      {
+        "osmNodeID": "12438270603",
+        "latitude": 34.3407248,
+        "longitude": 108.9847885,
+        "ref": "D",
+        "name": "团结村-D口"
+      }
+    ],
+    "4adefd2118acfb63": [
+      {
+        "osmNodeID": "9084428058",
+        "latitude": 34.3701769,
+        "longitude": 109.0532628,
+        "ref": "A",
+        "name": "新寺-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428059",
+        "latitude": 34.3694342,
+        "longitude": 109.0531027,
+        "ref": "B",
+        "name": "新寺-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428060",
+        "latitude": 34.3692398,
+        "longitude": 109.0544033,
+        "ref": "C",
+        "name": "新寺-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428061",
+        "latitude": 34.3699927,
+        "longitude": 109.0546107,
+        "ref": "D",
+        "name": "新寺-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4bc6f467ceea297a": [
+      {
+        "osmNodeID": "8967743777",
+        "latitude": 34.2126313,
+        "longitude": 108.891931,
+        "ref": "A",
+        "name": "木塔寺-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8617662670",
+        "latitude": 34.2119234,
+        "longitude": 108.8927817,
+        "ref": "C",
+        "name": "木塔寺-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8967743778",
+        "latitude": 34.2127904,
+        "longitude": 108.8927029,
+        "ref": "D",
+        "name": "木塔寺-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8617698183",
+        "latitude": 34.2114943,
+        "longitude": 108.892975,
+        "ref": "E",
+        "name": "木塔寺-E口",
+        "wheelchair": "no"
+      }
+    ],
+    "4c721aadee639db9": [
+      {
+        "osmNodeID": "8968582871",
+        "latitude": 34.2792015,
+        "longitude": 108.8622526,
+        "ref": "B1",
+        "name": "枣园-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968582870",
+        "latitude": 34.279449,
+        "longitude": 108.8618008,
+        "ref": "B2",
+        "name": "枣园-B2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968582873",
+        "latitude": 34.2783053,
+        "longitude": 108.8624918,
+        "ref": "C",
+        "name": "枣园-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968582872",
+        "latitude": 34.2789086,
+        "longitude": 108.8633509,
+        "ref": "D",
+        "name": "枣园-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4d83845ace443725": [
+      {
+        "osmNodeID": "9034101121",
+        "latitude": 34.3965789,
+        "longitude": 109.2361458,
+        "ref": "A",
+        "name": "秦陵西-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034101122",
+        "latitude": 34.395558,
+        "longitude": 109.2352185,
+        "ref": "B",
+        "name": "秦陵西-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034101123",
+        "latitude": 34.395553,
+        "longitude": 109.2367352,
+        "ref": "C",
+        "name": "秦陵西-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034101124",
+        "latitude": 34.3967036,
+        "longitude": 109.2372099,
+        "ref": "D",
+        "name": "秦陵西-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4e328a9d1e5c9195": [
+      {
+        "osmNodeID": "8968357495",
+        "latitude": 34.3174027,
+        "longitude": 108.7620695,
+        "ref": "B",
+        "name": "北槐-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968357496",
+        "latitude": 34.3166619,
+        "longitude": 108.7637218,
+        "ref": "C",
+        "name": "北槐-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968357494",
+        "latitude": 34.3176034,
+        "longitude": 108.7637064,
+        "ref": "D",
+        "name": "北槐-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "4fd4c9e0f84a13e1": [
+      {
+        "osmNodeID": "8987427610",
+        "latitude": 34.2924207,
+        "longitude": 108.9468041,
+        "ref": "A",
+        "name": "龙首原-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8987427611",
+        "latitude": 34.2913799,
+        "longitude": 108.946799,
+        "ref": "B",
+        "name": "龙首原-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8987462357",
+        "latitude": 34.2918977,
+        "longitude": 108.9476387,
+        "ref": "C",
+        "name": "龙首原-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8987462356",
+        "latitude": 34.292473,
+        "longitude": 108.9476854,
+        "ref": "D",
+        "name": "龙首原-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "5251d38ff21f74fe": [
+      {
+        "osmNodeID": "11215938693",
+        "latitude": 34.33786,
+        "longitude": 108.7855955,
+        "ref": "A",
+        "name": "秦创原中心-A口"
+      },
+      {
+        "osmNodeID": "11215938692",
+        "latitude": 34.3368909,
+        "longitude": 108.7858298,
+        "ref": "B",
+        "name": "秦创原中心-B口"
+      },
+      {
+        "osmNodeID": "11215938695",
+        "latitude": 34.3367999,
+        "longitude": 108.7872217,
+        "ref": "C",
+        "name": "秦创原中心-C口"
+      },
+      {
+        "osmNodeID": "11215938694",
+        "latitude": 34.338219,
+        "longitude": 108.7872181,
+        "ref": "D",
+        "name": "秦创原中心-D口"
+      }
+    ],
+    "53990293743187a0": [
+      {
+        "osmNodeID": "8971579867",
+        "latitude": 34.2741917,
+        "longitude": 109.0436858,
+        "ref": "A1",
+        "name": "浐河-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971579866",
+        "latitude": 34.2749467,
+        "longitude": 109.0432875,
+        "ref": "A2",
+        "name": "浐河-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971579869",
+        "latitude": 34.2733261,
+        "longitude": 109.0437454,
+        "ref": "B2",
+        "name": "浐河-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971579868",
+        "latitude": 34.2738339,
+        "longitude": 109.0452523,
+        "ref": "C",
+        "name": "浐河-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "55227064642b8002": [
+      {
+        "osmNodeID": "9028995242",
+        "latitude": 34.3598718,
+        "longitude": 108.9294201,
+        "ref": "A",
+        "name": "凤城十二路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995249",
+        "latitude": 34.3585037,
+        "longitude": 108.9294098,
+        "ref": "B",
+        "name": "凤城十二路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9028995250",
+        "latitude": 34.3583249,
+        "longitude": 108.9300345,
+        "ref": "C",
+        "name": "凤城十二路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995251",
+        "latitude": 34.3596434,
+        "longitude": 108.9300775,
+        "ref": "D",
+        "name": "凤城十二路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "56c09b0859ddb94d": [
+      {
+        "osmNodeID": "8971275449",
+        "latitude": 34.2705901,
+        "longitude": 108.9729104,
+        "ref": "A",
+        "name": "朝阳门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971275448",
+        "latitude": 34.2695754,
+        "longitude": 108.9730853,
+        "ref": "B",
+        "name": "朝阳门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971275450",
+        "latitude": 34.2696381,
+        "longitude": 108.9751344,
+        "ref": "C",
+        "name": "朝阳门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971275451",
+        "latitude": 34.2702657,
+        "longitude": 108.9749249,
+        "ref": "D",
+        "name": "朝阳门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "575368f686d3b4e9": [
+      {
+        "osmNodeID": "9034095991",
+        "latitude": 34.3338849,
+        "longitude": 109.1316217,
+        "ref": "B",
+        "name": "紫霞三路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034095992",
+        "latitude": 34.3342248,
+        "longitude": 109.1335012,
+        "ref": "D",
+        "name": "紫霞三路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "579d019860c682b8": [
+      {
+        "osmNodeID": "13339880725",
+        "latitude": 34.2126153,
+        "longitude": 108.889327,
+        "ref": "A",
+        "name": "木塔寺西-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13339880726",
+        "latitude": 34.2110294,
+        "longitude": 108.8892685,
+        "ref": "B",
+        "name": "木塔寺西-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13339880724",
+        "latitude": 34.2136598,
+        "longitude": 108.8899014,
+        "ref": "D",
+        "name": "木塔寺西-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "595a547b1f3ba574": [
+      {
+        "osmNodeID": "13288474285",
+        "latitude": 34.3027569,
+        "longitude": 108.9228513,
+        "ref": "A",
+        "name": "大风阁-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13288474287",
+        "latitude": 34.301826,
+        "longitude": 108.9238012,
+        "ref": "C",
+        "name": "大风阁-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13288474286",
+        "latitude": 34.3023306,
+        "longitude": 108.9238703,
+        "ref": "D",
+        "name": "大风阁-D口"
+      }
+    ],
+    "5b50516957f90589": [
+      {
+        "osmNodeID": "8938952790",
+        "latitude": 34.2910621,
+        "longitude": 108.9946506,
+        "ref": "A",
+        "name": "石家街-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8938952789",
+        "latitude": 34.2901447,
+        "longitude": 108.9947952,
+        "ref": "B",
+        "name": "石家街-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8938952788",
+        "latitude": 34.2905608,
+        "longitude": 108.9961768,
+        "ref": "C1",
+        "name": "石家街-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8938952791",
+        "latitude": 34.2915875,
+        "longitude": 108.9965293,
+        "ref": "C2",
+        "name": "石家街-C2口",
+        "wheelchair": "no"
+      }
+    ],
+    "5b57aae6092575f7": [
+      {
+        "osmNodeID": "13248020687",
+        "latitude": 34.5227676,
+        "longitude": 109.1099675,
+        "ref": "A1",
+        "name": "昭慧广场-A1口"
+      },
+      {
+        "osmNodeID": "13248020688",
+        "latitude": 34.5223419,
+        "longitude": 109.1099664,
+        "ref": "A2",
+        "name": "昭慧广场-A2口"
+      },
+      {
+        "osmNodeID": "13248020680",
+        "latitude": 34.5227717,
+        "longitude": 109.1093094,
+        "ref": "B1",
+        "name": "昭慧广场-B1口"
+      },
+      {
+        "osmNodeID": "13248020681",
+        "latitude": 34.5223468,
+        "longitude": 109.1093084,
+        "ref": "B2",
+        "name": "昭慧广场-B2口"
+      }
+    ],
+    "5c2a59c79699c26a": [
+      {
+        "osmNodeID": "8898927761",
+        "latitude": 34.2408316,
+        "longitude": 108.9463396,
+        "ref": "A",
+        "name": "南稍门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8997907464",
+        "latitude": 34.2397007,
+        "longitude": 108.9464349,
+        "ref": "B",
+        "name": "南稍门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998213769",
+        "latitude": 34.2398264,
+        "longitude": 108.9472856,
+        "ref": "C",
+        "name": "南稍门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8997907465",
+        "latitude": 34.2407093,
+        "longitude": 108.9472341,
+        "ref": "D",
+        "name": "南稍门-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927763",
+        "latitude": 34.2408788,
+        "longitude": 108.9446023,
+        "ref": "F",
+        "name": "南稍门-F口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927762",
+        "latitude": 34.241877,
+        "longitude": 108.9464622,
+        "ref": "G",
+        "name": "南稍门-G口",
+        "wheelchair": "no"
+      }
+    ],
+    "5e025bfae4ec6172": [
+      {
+        "osmNodeID": "9021492989",
+        "latitude": 34.244571,
+        "longitude": 108.996324,
+        "ref": "A",
+        "name": "延兴门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492990",
+        "latitude": 34.2431195,
+        "longitude": 108.995501,
+        "ref": "B1",
+        "name": "延兴门-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492991",
+        "latitude": 34.2421859,
+        "longitude": 108.9959778,
+        "ref": "B2",
+        "name": "延兴门-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492992",
+        "latitude": 34.243431,
+        "longitude": 108.9975382,
+        "ref": "C",
+        "name": "延兴门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492993",
+        "latitude": 34.2445514,
+        "longitude": 108.9972674,
+        "ref": "D",
+        "name": "延兴门-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "5e61a93c48ada1de": [
+      {
+        "osmNodeID": "9028995286",
+        "latitude": 34.341317,
+        "longitude": 108.9596442,
+        "ref": "A",
+        "name": "市中医医院-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9028995287",
+        "latitude": 34.3408066,
+        "longitude": 108.9596764,
+        "ref": "B",
+        "name": "市中医医院-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995288",
+        "latitude": 34.340575,
+        "longitude": 108.9607443,
+        "ref": "C",
+        "name": "市中医医院-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "615bc8569ca1d117": [
+      {
+        "osmNodeID": "11214916826",
+        "latitude": 34.3132746,
+        "longitude": 108.6729111,
+        "ref": "A",
+        "name": "中华西路-A口"
+      },
+      {
+        "osmNodeID": "11214916825",
+        "latitude": 34.3123588,
+        "longitude": 108.6743439,
+        "ref": "B",
+        "name": "中华西路-B口"
+      },
+      {
+        "osmNodeID": "11214916824",
+        "latitude": 34.313496,
+        "longitude": 108.6748542,
+        "ref": "C",
+        "name": "中华西路-C口"
+      },
+      {
+        "osmNodeID": "11214916823",
+        "latitude": 34.3138527,
+        "longitude": 108.6742065,
+        "ref": "D",
+        "name": "中华西路-D口"
+      }
+    ],
+    "6281548f9b8990cb": [
+      {
+        "osmNodeID": "8968357481",
+        "latitude": 34.3211163,
+        "longitude": 108.7519767,
+        "ref": "A",
+        "name": "沣河森林公园-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968357482",
+        "latitude": 34.3199316,
+        "longitude": 108.751738,
+        "ref": "B",
+        "name": "沣河森林公园-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968357483",
+        "latitude": 34.319952,
+        "longitude": 108.7538993,
+        "ref": "C",
+        "name": "沣河森林公园-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968357480",
+        "latitude": 34.3210806,
+        "longitude": 108.7534276,
+        "ref": "D",
+        "name": "沣河森林公园-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "628caf928ff78e2f": [
+      {
+        "osmNodeID": "13386793878",
+        "latitude": 34.2849886,
+        "longitude": 108.9118295,
+        "ref": "A",
+        "name": "景曜门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13386793879",
+        "latitude": 34.2850022,
+        "longitude": 108.9147224,
+        "ref": "D",
+        "name": "景曜门-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13386793880",
+        "latitude": 34.2850504,
+        "longitude": 108.912894,
+        "ref": "E",
+        "name": "景曜门-E口",
+        "wheelchair": "yes"
+      }
+    ],
+    "632351c8a32757e0": [
+      {
+        "osmNodeID": "11211326941",
+        "latitude": 34.3169388,
+        "longitude": 108.7265854,
+        "ref": "A",
+        "name": "白马河-A口"
+      },
+      {
+        "osmNodeID": "11211326942",
+        "latitude": 34.3161164,
+        "longitude": 108.7265338,
+        "ref": "B",
+        "name": "白马河-B口"
+      },
+      {
+        "osmNodeID": "11211326943",
+        "latitude": 34.3162276,
+        "longitude": 108.7273833,
+        "ref": "C",
+        "name": "白马河-C口"
+      },
+      {
+        "osmNodeID": "11211326940",
+        "latitude": 34.3175899,
+        "longitude": 108.7276635,
+        "ref": "D",
+        "name": "白马河-D口"
+      }
+    ],
+    "64bf7f907516841d": [
+      {
+        "osmNodeID": "9029259510",
+        "latitude": 34.2419604,
+        "longitude": 108.9324437,
+        "ref": "A",
+        "name": "省人民医院·黄雁村-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029259511",
+        "latitude": 34.2408739,
+        "longitude": 108.9324028,
+        "ref": "B1",
+        "name": "省人民医院·黄雁村-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927764",
+        "latitude": 34.24051,
+        "longitude": 108.9317443,
+        "ref": "B2",
+        "name": "省人民医院·黄雁村-B2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029259512",
+        "latitude": 34.2409215,
+        "longitude": 108.9339494,
+        "ref": "C",
+        "name": "省人民医院·黄雁村-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927765",
+        "latitude": 34.2414592,
+        "longitude": 108.9336588,
+        "ref": "D",
+        "name": "省人民医院·黄雁村-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "66bfc8516cc29c5f": [
+      {
+        "osmNodeID": "9029195955",
+        "latitude": 34.1629433,
+        "longitude": 108.9741205,
+        "ref": "A",
+        "name": "飞天路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029195956",
+        "latitude": 34.1618227,
+        "longitude": 108.9747695,
+        "ref": "C",
+        "name": "飞天路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195957",
+        "latitude": 34.1629546,
+        "longitude": 108.9747311,
+        "ref": "D",
+        "name": "飞天路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "6788ef1232bdf229": [
+      {
+        "osmNodeID": "9658997822",
+        "latitude": 34.2795969,
+        "longitude": 109.0690478,
+        "ref": "A",
+        "name": "纺织城-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8992352593",
+        "latitude": 34.2794664,
+        "longitude": 109.0694351,
+        "ref": "B",
+        "name": "纺织城-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8992352594",
+        "latitude": 34.2794576,
+        "longitude": 109.0701964,
+        "ref": "C",
+        "name": "纺织城-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8992352591",
+        "latitude": 34.2792846,
+        "longitude": 109.0695981,
+        "ref": "E",
+        "name": "纺织城-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7821623272",
+        "latitude": 34.2788034,
+        "longitude": 109.0695141,
+        "ref": "F",
+        "name": "纺织城-F口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971693405",
+        "latitude": 34.2788036,
+        "longitude": 109.0703471,
+        "ref": "G",
+        "name": "纺织城-G口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8992352592",
+        "latitude": 34.2792792,
+        "longitude": 109.0703754,
+        "ref": "H",
+        "name": "纺织城-H口",
+        "wheelchair": "no"
+      }
+    ],
+    "69e863ba03072b4e": [
+      {
+        "osmNodeID": "9028995264",
+        "latitude": 34.3495838,
+        "longitude": 108.9299081,
+        "name": "凤城九路-"
+      },
+      {
+        "osmNodeID": "9028995265",
+        "latitude": 34.3495288,
+        "longitude": 108.9293731,
+        "name": "凤城九路-"
+      },
+      {
+        "osmNodeID": "9028995259",
+        "latitude": 34.3479535,
+        "longitude": 108.9293871,
+        "ref": "A",
+        "name": "凤城九路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995260",
+        "latitude": 34.3467667,
+        "longitude": 108.929305,
+        "ref": "B",
+        "name": "凤城九路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9028995261",
+        "latitude": 34.3467748,
+        "longitude": 108.9300001,
+        "ref": "C",
+        "name": "凤城九路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995262",
+        "latitude": 34.3478844,
+        "longitude": 108.9300196,
+        "ref": "D",
+        "name": "凤城九路-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995263",
+        "latitude": 34.3486678,
+        "longitude": 108.9299896,
+        "ref": "E",
+        "name": "凤城九路-E口",
+        "wheelchair": "no"
+      }
+    ],
+    "6b1b1818eb3c6551": [
+      {
+        "osmNodeID": "9022100900",
+        "latitude": 34.3960638,
+        "longitude": 109.043338,
+        "ref": "A",
+        "name": "保税区-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9022100901",
+        "latitude": 34.3950212,
+        "longitude": 109.0433838,
+        "ref": "B",
+        "name": "保税区-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022100902",
+        "latitude": 34.3951496,
+        "longitude": 109.0448525,
+        "ref": "C",
+        "name": "保税区-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022100903",
+        "latitude": 34.3961946,
+        "longitude": 109.0447836,
+        "ref": "D",
+        "name": "保税区-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "6b84c8d767badfff": [
+      {
+        "osmNodeID": "9022214487",
+        "latitude": 34.3799672,
+        "longitude": 108.9394133,
+        "name": "西安北站-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9022214482",
+        "latitude": 34.3795838,
+        "longitude": 108.9379219,
+        "ref": "A",
+        "name": "西安北站-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022214485",
+        "latitude": 34.3787635,
+        "longitude": 108.9383024,
+        "ref": "B",
+        "name": "西安北站-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022214486",
+        "latitude": 34.3791182,
+        "longitude": 108.9396677,
+        "ref": "C",
+        "name": "西安北站-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "6daa59f8b12df830": [
+      {
+        "osmNodeID": "13440058762",
+        "latitude": 34.2085256,
+        "longitude": 109.0119481,
+        "ref": "A",
+        "name": "缪家寨-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13440058763",
+        "latitude": 34.2066588,
+        "longitude": 109.0123443,
+        "ref": "B",
+        "name": "缪家寨-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13440058761",
+        "latitude": 34.2085749,
+        "longitude": 109.0143718,
+        "ref": "D",
+        "name": "缪家寨-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "6e50f6f57f0fb305": [
+      {
+        "osmNodeID": "9031041977",
+        "latitude": 34.2451511,
+        "longitude": 108.9006412,
+        "ref": "C1",
+        "name": "丰庆公园-C1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9031041978",
+        "latitude": 34.2468216,
+        "longitude": 108.9007132,
+        "ref": "D",
+        "name": "丰庆公园-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "6f606951adbbe013": [
+      {
+        "osmNodeID": "11210098306",
+        "latitude": 34.3337862,
+        "longitude": 108.6620339,
+        "ref": "A",
+        "name": "咸阳西-A口"
+      },
+      {
+        "osmNodeID": "11210098307",
+        "latitude": 34.3334213,
+        "longitude": 108.6621338,
+        "ref": "B",
+        "name": "咸阳西-B口"
+      },
+      {
+        "osmNodeID": "11210098304",
+        "latitude": 34.3337462,
+        "longitude": 108.6634999,
+        "ref": "C",
+        "name": "咸阳西-C口"
+      },
+      {
+        "osmNodeID": "11210098305",
+        "latitude": 34.3341066,
+        "longitude": 108.6631002,
+        "ref": "D",
+        "name": "咸阳西-D口"
+      }
+    ],
+    "71e56cb48d16a385": [
+      {
+        "osmNodeID": "11377105503",
+        "latitude": 34.2205729,
+        "longitude": 109.0371345,
+        "ref": "A",
+        "name": "月登阁-A口"
+      },
+      {
+        "osmNodeID": "8898927556",
+        "latitude": 34.2208831,
+        "longitude": 109.0377108,
+        "ref": "D",
+        "name": "月登阁-D口"
+      }
+    ],
+    "7547c918e475e4bb": [
+      {
+        "osmNodeID": "13444811983",
+        "latitude": 34.2002925,
+        "longitude": 108.9975898,
+        "ref": "A",
+        "name": "新开门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13444811985",
+        "latitude": 34.1993506,
+        "longitude": 108.998783,
+        "ref": "C",
+        "name": "新开门-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13444811984",
+        "latitude": 34.2007254,
+        "longitude": 108.9991575,
+        "ref": "D",
+        "name": "新开门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "75f3eee2f82ad282": [
+      {
+        "osmNodeID": "2921585610",
+        "latitude": 34.1587528,
+        "longitude": 108.9445376,
+        "ref": "A",
+        "name": "航天城-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9006045604",
+        "latitude": 34.1577026,
+        "longitude": 108.9443623,
+        "ref": "B",
+        "name": "航天城-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9006045605",
+        "latitude": 34.1574896,
+        "longitude": 108.9448391,
+        "ref": "C",
+        "name": "航天城-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "769632da32757512": [
+      {
+        "osmNodeID": "13307712458",
+        "latitude": 34.2292259,
+        "longitude": 109.0192419,
+        "ref": "A",
+        "name": "东等驾坡-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13307712460",
+        "latitude": 34.228171,
+        "longitude": 109.0201276,
+        "ref": "B",
+        "name": "东等驾坡-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13307712461",
+        "latitude": 34.2284019,
+        "longitude": 109.0208224,
+        "ref": "C",
+        "name": "东等驾坡-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13307712459",
+        "latitude": 34.2295914,
+        "longitude": 109.019881,
+        "ref": "D",
+        "name": "东等驾坡-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "7788d1edbc8eef66": [
+      {
+        "osmNodeID": "8898927807",
+        "latitude": 34.2528462,
+        "longitude": 108.8333566,
+        "ref": "A",
+        "name": "石桥立交-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927805",
+        "latitude": 34.2520939,
+        "longitude": 108.8331646,
+        "ref": "B",
+        "name": "石桥立交-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927801",
+        "latitude": 34.2520981,
+        "longitude": 108.83481,
+        "ref": "C",
+        "name": "石桥立交-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927800",
+        "latitude": 34.2528438,
+        "longitude": 108.834797,
+        "ref": "D",
+        "name": "石桥立交-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "77942cdd82a81acc": [
+      {
+        "osmNodeID": "12438270607",
+        "latitude": 34.3542316,
+        "longitude": 108.980816,
+        "ref": "A",
+        "name": "红旗厂-A口"
+      },
+      {
+        "osmNodeID": "12438270608",
+        "latitude": 34.3532667,
+        "longitude": 108.981237,
+        "ref": "B",
+        "name": "红旗厂-B口"
+      },
+      {
+        "osmNodeID": "12438270609",
+        "latitude": 34.3532636,
+        "longitude": 108.9821001,
+        "ref": "C",
+        "name": "红旗厂-C口"
+      },
+      {
+        "osmNodeID": "12438270610",
+        "latitude": 34.3542472,
+        "longitude": 108.9825668,
+        "ref": "D",
+        "name": "红旗厂-D口"
+      }
+    ],
+    "780514000bc5d9cc": [
+      {
+        "osmNodeID": "9032498683",
+        "latitude": 34.1449854,
+        "longitude": 108.8380928,
+        "ref": "B",
+        "name": "西安国际医学中心-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498682",
+        "latitude": 34.1460337,
+        "longitude": 108.8388017,
+        "ref": "C",
+        "name": "西安国际医学中心-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498684",
+        "latitude": 34.1446784,
+        "longitude": 108.8388033,
+        "ref": "C",
+        "name": "西安国际医学中心-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498685",
+        "latitude": 34.1457795,
+        "longitude": 108.8395521,
+        "ref": "D",
+        "name": "西安国际医学中心-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "786bf731d9f00691": [
+      {
+        "osmNodeID": "13252460250",
+        "latitude": 34.5049523,
+        "longitude": 109.0393918,
+        "ref": "A1",
+        "name": "崇皇-A1口"
+      },
+      {
+        "osmNodeID": "13252460249",
+        "latitude": 34.5049134,
+        "longitude": 109.0388545,
+        "ref": "A2",
+        "name": "崇皇-A2口"
+      },
+      {
+        "osmNodeID": "13252460254",
+        "latitude": 34.5042642,
+        "longitude": 109.0394688,
+        "ref": "B1",
+        "name": "崇皇-B1口"
+      },
+      {
+        "osmNodeID": "13252460253",
+        "latitude": 34.5042231,
+        "longitude": 109.0389077,
+        "ref": "B2",
+        "name": "崇皇-B2口"
+      }
+    ],
+    "7c9e37f059351aec": [
+      {
+        "osmNodeID": "8898927907",
+        "latitude": 34.245547,
+        "longitude": 108.7485176,
+        "ref": "A",
+        "name": "欢乐谷-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927915",
+        "latitude": 34.2452297,
+        "longitude": 108.746818,
+        "ref": "B1",
+        "name": "欢乐谷-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927916",
+        "latitude": 34.2446556,
+        "longitude": 108.7468129,
+        "ref": "B2",
+        "name": "欢乐谷-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927910",
+        "latitude": 34.2446638,
+        "longitude": 108.7499145,
+        "ref": "C",
+        "name": "欢乐谷-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927909",
+        "latitude": 34.2452321,
+        "longitude": 108.7499121,
+        "ref": "D",
+        "name": "欢乐谷-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11336378419",
+        "latitude": 34.2436337,
+        "longitude": 108.747303,
+        "ref": "E",
+        "name": "欢乐谷-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11336378420",
+        "latitude": 34.2441804,
+        "longitude": 108.748638,
+        "ref": "F",
+        "name": "欢乐谷-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "80ec760c46dc05f5": [
+      {
+        "osmNodeID": "9029259507",
+        "latitude": 34.2414671,
+        "longitude": 108.9727923,
+        "ref": "A",
+        "name": "太乙路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029259508",
+        "latitude": 34.2410418,
+        "longitude": 108.9727814,
+        "ref": "B",
+        "name": "太乙路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029259509",
+        "latitude": 34.2415108,
+        "longitude": 108.9746235,
+        "ref": "D",
+        "name": "太乙路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "83a3d39770ae6219": [
+      {
+        "osmNodeID": "9000163979",
+        "latitude": 34.2129942,
+        "longitude": 108.9462496,
+        "ref": "A",
+        "name": "八里村-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9000163980",
+        "latitude": 34.2121709,
+        "longitude": 108.9462279,
+        "ref": "B",
+        "name": "八里村-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9000163981",
+        "latitude": 34.2121111,
+        "longitude": 108.9470095,
+        "ref": "C",
+        "name": "八里村-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9000163982",
+        "latitude": 34.2130962,
+        "longitude": 108.9469986,
+        "ref": "D",
+        "name": "八里村-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "85cda18294d86bbb": [
+      {
+        "osmNodeID": "11935640689",
+        "latitude": 34.3779116,
+        "longitude": 109.2222041,
+        "ref": "A",
+        "name": "东三岔-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11935640691",
+        "latitude": 34.377637,
+        "longitude": 109.221524,
+        "ref": "B1",
+        "name": "东三岔-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11935640690",
+        "latitude": 34.3769907,
+        "longitude": 109.2211498,
+        "ref": "B2",
+        "name": "东三岔-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034101117",
+        "latitude": 34.3764475,
+        "longitude": 109.2217099,
+        "ref": "C",
+        "name": "东三岔-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "85e1ad2269722d2d": [
+      {
+        "osmNodeID": "9021609448",
+        "latitude": 34.3169458,
+        "longitude": 109.0464107,
+        "ref": "A",
+        "name": "浐灞中心-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609449",
+        "latitude": 34.3163693,
+        "longitude": 109.0460703,
+        "ref": "B",
+        "name": "浐灞中心-B口",
+        "wheelchair": "no"
+      }
+    ],
+    "8b6e15ecfe27c140": [
+      {
+        "osmNodeID": "12438270640",
+        "latitude": 34.4500417,
+        "longitude": 109.0376666,
+        "ref": "A1",
+        "name": "泾渭半岛-A1口"
+      },
+      {
+        "osmNodeID": "12438270641",
+        "latitude": 34.4504717,
+        "longitude": 109.0376149,
+        "ref": "A2",
+        "name": "泾渭半岛-A2口"
+      },
+      {
+        "osmNodeID": "12438270639",
+        "latitude": 34.4501346,
+        "longitude": 109.0386919,
+        "ref": "B1",
+        "name": "泾渭半岛-B1口"
+      },
+      {
+        "osmNodeID": "12438270638",
+        "latitude": 34.4505576,
+        "longitude": 109.0386272,
+        "ref": "B2",
+        "name": "泾渭半岛-B2口"
+      }
+    ],
+    "8b7746758eadd41b": [
+      {
+        "osmNodeID": "11388111714",
+        "latitude": 34.2974289,
+        "longitude": 108.7695937,
+        "ref": "A",
+        "name": "复兴大道北-A口"
+      },
+      {
+        "osmNodeID": "11388111715",
+        "latitude": 34.2963044,
+        "longitude": 108.7698982,
+        "ref": "B",
+        "name": "复兴大道北-B口"
+      },
+      {
+        "osmNodeID": "11388111716",
+        "latitude": 34.2963141,
+        "longitude": 108.770502,
+        "ref": "C",
+        "name": "复兴大道北-C口"
+      },
+      {
+        "osmNodeID": "11388111717",
+        "latitude": 34.2970763,
+        "longitude": 108.7709208,
+        "ref": "D",
+        "name": "复兴大道北-D口"
+      }
+    ],
+    "8d02c0c574aef3c1": [
+      {
+        "osmNodeID": "8898927874",
+        "latitude": 34.2452452,
+        "longitude": 108.7696569,
+        "ref": "A",
+        "name": "复兴大道南-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927875",
+        "latitude": 34.2446919,
+        "longitude": 108.769655,
+        "ref": "B",
+        "name": "复兴大道南-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927871",
+        "latitude": 34.2444186,
+        "longitude": 108.7706064,
+        "ref": "C",
+        "name": "复兴大道南-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927870",
+        "latitude": 34.2452448,
+        "longitude": 108.770982,
+        "ref": "D",
+        "name": "复兴大道南-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "8fd36bea9be6a626": [
+      {
+        "osmNodeID": "9028995232",
+        "latitude": 34.3677267,
+        "longitude": 108.9289839,
+        "ref": "A",
+        "name": "元鼎路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995233",
+        "latitude": 34.3667386,
+        "longitude": 108.9292651,
+        "ref": "B",
+        "name": "元鼎路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995234",
+        "latitude": 34.3663833,
+        "longitude": 108.9301163,
+        "ref": "C",
+        "name": "元鼎路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995235",
+        "latitude": 34.3680629,
+        "longitude": 108.9300705,
+        "ref": "D",
+        "name": "元鼎路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "901905e55c41d5d6": [
+      {
+        "osmNodeID": "8898927847",
+        "latitude": 34.2452687,
+        "longitude": 108.7897962,
+        "ref": "A",
+        "name": "斗门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927848",
+        "latitude": 34.2447018,
+        "longitude": 108.789771,
+        "ref": "B",
+        "name": "斗门-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927843",
+        "latitude": 34.2455993,
+        "longitude": 108.7910854,
+        "ref": "D",
+        "name": "斗门-D口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927844",
+        "latitude": 34.2444278,
+        "longitude": 108.7910876,
+        "ref": "D",
+        "name": "斗门-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "906aa898bddf5b5c": [
+      {
+        "osmNodeID": "8971318980",
+        "latitude": 34.2696251,
+        "longitude": 108.9833378,
+        "ref": "A",
+        "name": "康复路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7818687678",
+        "latitude": 34.2691846,
+        "longitude": 108.9840227,
+        "ref": "B",
+        "name": "康复路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971318981",
+        "latitude": 34.2696297,
+        "longitude": 108.9849602,
+        "ref": "D",
+        "name": "康复路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "90de4a4bd4fb6170": [
+      {
+        "osmNodeID": "9034101118",
+        "latitude": 34.3866677,
+        "longitude": 109.227677,
+        "ref": "B",
+        "name": "银桥大道-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034101119",
+        "latitude": 34.3864282,
+        "longitude": 109.228069,
+        "ref": "C",
+        "name": "银桥大道-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034101120",
+        "latitude": 34.3869384,
+        "longitude": 109.2290609,
+        "ref": "D",
+        "name": "银桥大道-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "925f4141fb7f2aae": [
+      {
+        "osmNodeID": "12438270621",
+        "latitude": 34.4074298,
+        "longitude": 108.9915792,
+        "ref": "A",
+        "name": "未央湖-A口"
+      },
+      {
+        "osmNodeID": "13323544397",
+        "latitude": 34.4068193,
+        "longitude": 108.9933995,
+        "ref": "C",
+        "name": "未央湖-C口"
+      },
+      {
+        "osmNodeID": "12438270622",
+        "latitude": 34.4080606,
+        "longitude": 108.9930493,
+        "ref": "D",
+        "name": "未央湖-D口"
+      },
+      {
+        "osmNodeID": "12438270624",
+        "latitude": 34.4070471,
+        "longitude": 108.9941354,
+        "ref": "E",
+        "name": "未央湖-E口"
+      },
+      {
+        "osmNodeID": "12438270623",
+        "latitude": 34.4080723,
+        "longitude": 108.9938739,
+        "ref": "F",
+        "name": "未央湖-F口"
+      }
+    ],
+    "946ec6257ef8915c": [
+      {
+        "osmNodeID": "11391497094",
+        "latitude": 34.2603447,
+        "longitude": 108.7699461,
+        "ref": "A",
+        "name": "沣东城市广场-A口"
+      },
+      {
+        "osmNodeID": "11391497095",
+        "latitude": 34.259159,
+        "longitude": 108.7695662,
+        "ref": "B",
+        "name": "沣东城市广场-B口"
+      },
+      {
+        "osmNodeID": "11391497096",
+        "latitude": 34.2588126,
+        "longitude": 108.770581,
+        "ref": "C",
+        "name": "沣东城市广场-C口"
+      },
+      {
+        "osmNodeID": "11391497097",
+        "latitude": 34.2603401,
+        "longitude": 108.7706577,
+        "ref": "D",
+        "name": "沣东城市广场-D口"
+      }
+    ],
+    "967408188af2def6": [
+      {
+        "osmNodeID": "13386793881",
+        "latitude": 34.2912033,
+        "longitude": 108.9218396,
+        "ref": "A",
+        "name": "红庙坡-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13386793883",
+        "latitude": 34.2890666,
+        "longitude": 108.9218209,
+        "ref": "B",
+        "name": "红庙坡-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793884",
+        "latitude": 34.2888813,
+        "longitude": 108.9225274,
+        "ref": "C",
+        "name": "红庙坡-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13386793882",
+        "latitude": 34.2913948,
+        "longitude": 108.9225615,
+        "ref": "D",
+        "name": "红庙坡-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "96a441b51fd368f0": [
+      {
+        "osmNodeID": "9032386145",
+        "latitude": 34.2408564,
+        "longitude": 108.7170653,
+        "ref": "A",
+        "name": "高桥-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386147",
+        "latitude": 34.240099,
+        "longitude": 108.7170127,
+        "ref": "B1",
+        "name": "高桥-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386146",
+        "latitude": 34.2400981,
+        "longitude": 108.7174882,
+        "ref": "B2",
+        "name": "高桥-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "974fc931798fc71c": [
+      {
+        "osmNodeID": "9020367463",
+        "latitude": 34.2312462,
+        "longitude": 108.9939627,
+        "ref": "A",
+        "name": "青龙寺-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9020367464",
+        "latitude": 34.2307733,
+        "longitude": 108.9947295,
+        "ref": "C",
+        "name": "青龙寺-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927618",
+        "latitude": 34.2302001,
+        "longitude": 108.9946942,
+        "ref": "E",
+        "name": "青龙寺-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927619",
+        "latitude": 34.2317388,
+        "longitude": 108.9938045,
+        "ref": "F",
+        "name": "青龙寺-F口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927620",
+        "latitude": 34.2313356,
+        "longitude": 108.9931318,
+        "ref": "G",
+        "name": "青龙寺-G口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9020367465",
+        "latitude": 34.2302439,
+        "longitude": 108.9936661,
+        "ref": "H",
+        "name": "青龙寺-H口",
+        "wheelchair": "yes"
+      }
+    ],
+    "985dbbf2d81e0f5c": [
+      {
+        "osmNodeID": "13522047851",
+        "latitude": 34.1987066,
+        "longitude": 108.9036764,
+        "ref": "A",
+        "name": "山门口-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13522047852",
+        "latitude": 34.1978315,
+        "longitude": 108.9043614,
+        "ref": "B",
+        "name": "山门口-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13522047853",
+        "latitude": 34.1975009,
+        "longitude": 108.9050268,
+        "ref": "C",
+        "name": "山门口-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13522047854",
+        "latitude": 34.1986636,
+        "longitude": 108.9068734,
+        "ref": "D",
+        "name": "山门口-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "9a32e343d2d84f70": [
+      {
+        "osmNodeID": "8968638824",
+        "latitude": 34.2698365,
+        "longitude": 108.8917035,
+        "ref": "A",
+        "name": "开远门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968638825",
+        "latitude": 34.2688975,
+        "longitude": 108.8916705,
+        "ref": "B",
+        "name": "开远门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968638826",
+        "latitude": 34.2698611,
+        "longitude": 108.8933369,
+        "ref": "D",
+        "name": "开远门-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13275695710",
+        "latitude": 34.2698982,
+        "longitude": 108.8906906,
+        "ref": "F1",
+        "name": "开远门-F1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13275695711",
+        "latitude": 34.2719074,
+        "longitude": 108.8916765,
+        "ref": "G",
+        "name": "开远门-G口",
+        "wheelchair": "yes"
+      }
+    ],
+    "9b27bac5a4063fd9": [
+      {
+        "osmNodeID": "11383665734",
+        "latitude": 34.2592287,
+        "longitude": 108.9307357,
+        "ref": "C",
+        "name": "桥梓口-C口"
+      },
+      {
+        "osmNodeID": "11383665733",
+        "latitude": 34.2596168,
+        "longitude": 108.9309328,
+        "ref": "D1",
+        "name": "桥梓口-D1口"
+      },
+      {
+        "osmNodeID": "11383665732",
+        "latitude": 34.2595996,
+        "longitude": 108.9302223,
+        "ref": "D2",
+        "name": "桥梓口-D2口"
+      },
+      {
+        "osmNodeID": "11466085062",
+        "latitude": 34.2594329,
+        "longitude": 108.932195,
+        "ref": "E",
+        "name": "桥梓口-E口"
+      }
+    ],
+    "9c4c602ae3a0aad0": [
+      {
+        "osmNodeID": "9022100889",
+        "latitude": 34.3454062,
+        "longitude": 109.0479484,
+        "ref": "A1",
+        "name": "务庄-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022100890",
+        "latitude": 34.3456357,
+        "longitude": 109.0474611,
+        "ref": "A2",
+        "name": "务庄-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022100892",
+        "latitude": 34.3448024,
+        "longitude": 109.0475494,
+        "ref": "B1",
+        "name": "务庄-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9022100893",
+        "latitude": 34.3450344,
+        "longitude": 109.0470531,
+        "ref": "B2",
+        "name": "务庄-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "9d6c7065268fea72": [
+      {
+        "osmNodeID": "9032498694",
+        "latitude": 34.1715438,
+        "longitude": 108.8460014,
+        "ref": "A1",
+        "name": "西部大道（西太路口）-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498695",
+        "latitude": 34.1708017,
+        "longitude": 108.8461511,
+        "ref": "A2",
+        "name": "西部大道（西太路口）-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498696",
+        "latitude": 34.1697042,
+        "longitude": 108.8468285,
+        "ref": "C",
+        "name": "西部大道（西太路口）-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498697",
+        "latitude": 34.1713458,
+        "longitude": 108.846836,
+        "ref": "D",
+        "name": "西部大道（西太路口）-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "9da3ec341301832b": [
+      {
+        "osmNodeID": "13288666789",
+        "latitude": 34.3174127,
+        "longitude": 108.983005,
+        "ref": "A",
+        "name": "井上村-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13288666791",
+        "latitude": 34.3168651,
+        "longitude": 108.9820465,
+        "ref": "B",
+        "name": "井上村-B口"
+      },
+      {
+        "osmNodeID": "13288666790",
+        "latitude": 34.3168745,
+        "longitude": 108.982886,
+        "ref": "C",
+        "name": "井上村-C口"
+      },
+      {
+        "osmNodeID": "12438270594",
+        "latitude": 34.3163014,
+        "longitude": 108.984506,
+        "ref": "E",
+        "name": "井上村-E口"
+      },
+      {
+        "osmNodeID": "12438270596",
+        "latitude": 34.317626,
+        "longitude": 108.9844668,
+        "ref": "F",
+        "name": "井上村-F口"
+      },
+      {
+        "osmNodeID": "12438270597",
+        "latitude": 34.3179447,
+        "longitude": 108.9838225,
+        "ref": "G",
+        "name": "井上村-G口"
+      },
+      {
+        "osmNodeID": "12438270595",
+        "latitude": 34.3161044,
+        "longitude": 108.9836693,
+        "ref": "H",
+        "name": "井上村-H口"
+      }
+    ],
+    "a02f60b3ab1ae089": [
+      {
+        "osmNodeID": "11214916816",
+        "latitude": 34.325576,
+        "longitude": 108.664598,
+        "ref": "A",
+        "name": "宝泉路-A口"
+      },
+      {
+        "osmNodeID": "11214916817",
+        "latitude": 34.3244042,
+        "longitude": 108.6654194,
+        "ref": "B",
+        "name": "宝泉路-B口"
+      },
+      {
+        "osmNodeID": "11214916818",
+        "latitude": 34.3245458,
+        "longitude": 108.666104,
+        "ref": "C",
+        "name": "宝泉路-C口"
+      }
+    ],
+    "a2565cc330a23461": [
+      {
+        "osmNodeID": "9020166687",
+        "latitude": 34.223882,
+        "longitude": 108.9767246,
+        "ref": "B",
+        "name": "北池头-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9020166689",
+        "latitude": 34.22302,
+        "longitude": 108.9775776,
+        "ref": "C",
+        "name": "北池头-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9020166690",
+        "latitude": 34.2235318,
+        "longitude": 108.9775427,
+        "ref": "D",
+        "name": "北池头-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "a2ad37fcc972d3ba": [
+      {
+        "osmNodeID": "9021561735",
+        "latitude": 34.3056964,
+        "longitude": 108.9948429,
+        "ref": "A",
+        "name": "辛家庙-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021561736",
+        "latitude": 34.3047238,
+        "longitude": 108.9951786,
+        "ref": "B",
+        "name": "辛家庙-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021561737",
+        "latitude": 34.3041943,
+        "longitude": 108.9959938,
+        "ref": "C",
+        "name": "辛家庙-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021561738",
+        "latitude": 34.3055912,
+        "longitude": 108.9958654,
+        "ref": "D",
+        "name": "辛家庙-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "a2eca1f79697003f": [
+      {
+        "osmNodeID": "8968452899",
+        "latitude": 34.3139931,
+        "longitude": 108.7773803,
+        "ref": "A",
+        "name": "上林路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968452898",
+        "latitude": 34.3131581,
+        "longitude": 108.7765122,
+        "ref": "B",
+        "name": "上林路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968452897",
+        "latitude": 34.3125761,
+        "longitude": 108.7782333,
+        "ref": "C",
+        "name": "上林路-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968452896",
+        "latitude": 34.3133441,
+        "longitude": 108.7786355,
+        "ref": "D",
+        "name": "上林路-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11388111713",
+        "latitude": 34.3117822,
+        "longitude": 108.7766139,
+        "ref": "E",
+        "name": "上林路-E口"
+      },
+      {
+        "osmNodeID": "11388111712",
+        "latitude": 34.3115271,
+        "longitude": 108.777407,
+        "ref": "F",
+        "name": "上林路-F口"
+      }
+    ],
+    "a30ec3183d70bd45": [
+      {
+        "osmNodeID": "13299742458",
+        "latitude": 34.1974382,
+        "longitude": 108.9637357,
+        "ref": "A",
+        "name": "大唐不夜城-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13299742460",
+        "latitude": 34.1964329,
+        "longitude": 108.9634957,
+        "ref": "B",
+        "name": "大唐不夜城-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13299742461",
+        "latitude": 34.1961501,
+        "longitude": 108.9644995,
+        "ref": "C",
+        "name": "大唐不夜城-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13299742459",
+        "latitude": 34.1974406,
+        "longitude": 108.9644782,
+        "ref": "D",
+        "name": "大唐不夜城-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "a504423f50a4a334": [
+      {
+        "osmNodeID": "9032386280",
+        "latitude": 34.2497381,
+        "longitude": 108.6566575,
+        "ref": "A",
+        "name": "创新港-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386281",
+        "latitude": 34.2502254,
+        "longitude": 108.6566563,
+        "ref": "B",
+        "name": "创新港-B口",
+        "wheelchair": "yes"
+      }
+    ],
+    "a65a7eef9116f130": [
+      {
+        "osmNodeID": "11391497092",
+        "latitude": 34.2680471,
+        "longitude": 108.7710043,
+        "ref": "D",
+        "name": "细柳营-D口"
+      },
+      {
+        "osmNodeID": "11391497093",
+        "latitude": 34.2700956,
+        "longitude": 108.7710148,
+        "ref": "E",
+        "name": "细柳营-E口"
+      }
+    ],
+    "a7ab2e87af76a806": [
+      {
+        "osmNodeID": "2619598604",
+        "latitude": 34.1685257,
+        "longitude": 108.9449569,
+        "ref": "B",
+        "name": "凤栖原-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9004436829",
+        "latitude": 34.16852,
+        "longitude": 108.9454904,
+        "ref": "C",
+        "name": "凤栖原-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9004436830",
+        "latitude": 34.1696245,
+        "longitude": 108.9454458,
+        "ref": "D",
+        "name": "凤栖原-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "a920becc556111e5": [
+      {
+        "osmNodeID": "8969343406",
+        "latitude": 34.2707154,
+        "longitude": 108.9467496,
+        "ref": "A1",
+        "name": "北大街-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8969343405",
+        "latitude": 34.2702774,
+        "longitude": 108.9463697,
+        "ref": "A2",
+        "name": "北大街-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8969343410",
+        "latitude": 34.269325,
+        "longitude": 108.9467369,
+        "ref": "B",
+        "name": "北大街-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11128867738",
+        "latitude": 34.2696829,
+        "longitude": 108.9467986,
+        "ref": "B1",
+        "name": "北大街-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8969343408",
+        "latitude": 34.2693896,
+        "longitude": 108.9475043,
+        "ref": "C1",
+        "name": "北大街-C1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8969343409",
+        "latitude": 34.2696951,
+        "longitude": 108.9478059,
+        "ref": "C2",
+        "name": "北大街-C2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8969343407",
+        "latitude": 34.2701749,
+        "longitude": 108.9479071,
+        "ref": "D",
+        "name": "北大街-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "a93944a7a1d2d4a8": [
+      {
+        "osmNodeID": "11391497082",
+        "latitude": 34.2788855,
+        "longitude": 108.77107,
+        "ref": "C",
+        "name": "西安国际足球中心-C口"
+      },
+      {
+        "osmNodeID": "11391497083",
+        "latitude": 34.2804958,
+        "longitude": 108.7709574,
+        "ref": "D",
+        "name": "西安国际足球中心-D口"
+      }
+    ],
+    "aaccab1238bbbba6": [
+      {
+        "osmNodeID": "9034095981",
+        "latitude": 34.2752885,
+        "longitude": 109.096736,
+        "ref": "B",
+        "name": "香王-B口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9034095982",
+        "latitude": 34.2750137,
+        "longitude": 109.0975099,
+        "ref": "C",
+        "name": "香王-C口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9034095983",
+        "latitude": 34.2752619,
+        "longitude": 109.097629,
+        "ref": "D",
+        "name": "香王-D口",
+        "wheelchair": "limited"
+      }
+    ],
+    "ac25cad2498ebad1": [
+      {
+        "osmNodeID": "13392225484",
+        "latitude": 34.1986828,
+        "longitude": 108.926829,
+        "ref": "A",
+        "name": "东仪路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13392225485",
+        "latitude": 34.1981075,
+        "longitude": 108.9269063,
+        "ref": "B",
+        "name": "东仪路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13392225487",
+        "latitude": 34.1981054,
+        "longitude": 108.9293545,
+        "ref": "C",
+        "name": "东仪路-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13392225486",
+        "latitude": 34.1986998,
+        "longitude": 108.9293208,
+        "ref": "D",
+        "name": "东仪路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "aceb26d31281e1bd": [
+      {
+        "osmNodeID": "8996132594",
+        "latitude": 34.26251,
+        "longitude": 108.9464966,
+        "ref": "A",
+        "name": "钟楼-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11383665731",
+        "latitude": 34.2610111,
+        "longitude": 108.9452876,
+        "ref": "A",
+        "name": "桥梓口-A口"
+      },
+      {
+        "osmNodeID": "8996182102",
+        "latitude": 34.2613634,
+        "longitude": 108.9465252,
+        "ref": "B",
+        "name": "钟楼-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "4202152589",
+        "latitude": 34.2602176,
+        "longitude": 108.9470054,
+        "ref": "C",
+        "name": "钟楼-C口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "8996132593",
+        "latitude": 34.2620977,
+        "longitude": 108.9473376,
+        "ref": "D",
+        "name": "钟楼-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11383700606",
+        "latitude": 34.2594731,
+        "longitude": 108.9478592,
+        "ref": "E",
+        "name": "钟楼-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11171012067",
+        "latitude": 34.2586322,
+        "longitude": 108.9501345,
+        "ref": "F",
+        "name": "钟楼-F口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11171012068",
+        "latitude": 34.2593213,
+        "longitude": 108.9507369,
+        "ref": "G2",
+        "name": "钟楼-G2口"
+      },
+      {
+        "osmNodeID": "11171012065",
+        "latitude": 34.2598686,
+        "longitude": 108.9499178,
+        "ref": "H",
+        "name": "钟楼-H口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11383665760",
+        "latitude": 34.2595315,
+        "longitude": 108.9478577,
+        "ref": "J",
+        "name": "钟楼-J口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "11171012066",
+        "latitude": 34.2589225,
+        "longitude": 108.9501357,
+        "ref": "K",
+        "name": "钟楼-K口",
+        "wheelchair": "no"
+      }
+    ],
+    "af716e2a2fbbfe9f": [
+      {
+        "osmNodeID": "12768637656",
+        "latitude": 34.2821381,
+        "longitude": 109.0139691,
+        "ref": "A",
+        "name": "幸福林带北-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "12768637655",
+        "latitude": 34.2814308,
+        "longitude": 109.0140996,
+        "ref": "B",
+        "name": "幸福林带北-B口"
+      },
+      {
+        "osmNodeID": "12768637654",
+        "latitude": 34.281445,
+        "longitude": 109.0151748,
+        "ref": "C",
+        "name": "幸福林带北-C口"
+      },
+      {
+        "osmNodeID": "12768637653",
+        "latitude": 34.2828927,
+        "longitude": 109.0151827,
+        "ref": "D",
+        "name": "幸福林带北-D口"
+      }
+    ],
+    "b0c05e6ebd4fa19b": [
+      {
+        "osmNodeID": "12768637698",
+        "latitude": 34.2420122,
+        "longitude": 109.0139967,
+        "ref": "A",
+        "name": "西等驾坡-A口"
+      },
+      {
+        "osmNodeID": "12768637699",
+        "latitude": 34.2403612,
+        "longitude": 109.0140524,
+        "ref": "B",
+        "name": "西等驾坡-B口"
+      },
+      {
+        "osmNodeID": "12768637697",
+        "latitude": 34.2412492,
+        "longitude": 109.0148838,
+        "ref": "D",
+        "name": "西等驾坡-D口"
+      }
+    ],
+    "b3bad4b61e05fa2f": [
+      {
+        "osmNodeID": "9029084687",
+        "latitude": 34.1977618,
+        "longitude": 108.9744338,
+        "ref": "A",
+        "name": "曲江池西-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084688",
+        "latitude": 34.1972208,
+        "longitude": 108.9744255,
+        "ref": "B",
+        "name": "曲江池西-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029084689",
+        "latitude": 34.1966657,
+        "longitude": 108.9753194,
+        "ref": "C",
+        "name": "曲江池西-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084690",
+        "latitude": 34.1977404,
+        "longitude": 108.9756012,
+        "ref": "D",
+        "name": "曲江池西-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13444811828",
+        "latitude": 34.1977727,
+        "longitude": 108.9769712,
+        "ref": "E",
+        "name": "曲江池西-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13444811829",
+        "latitude": 34.1971824,
+        "longitude": 108.9769631,
+        "ref": "F",
+        "name": "曲江池西-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "b4837861c82b707c": [
+      {
+        "osmNodeID": "9032386264",
+        "latitude": 34.2585501,
+        "longitude": 108.6666235,
+        "ref": "A",
+        "name": "创新港东-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386262",
+        "latitude": 34.2587011,
+        "longitude": 108.666313,
+        "ref": "B1",
+        "name": "创新港东-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386263",
+        "latitude": 34.2583117,
+        "longitude": 108.6661982,
+        "ref": "B2",
+        "name": "创新港东-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "b57865f0a972c3d3": [
+      {
+        "osmNodeID": "9021493009",
+        "latitude": 34.2613833,
+        "longitude": 108.9952493,
+        "ref": "A",
+        "name": "长乐公园-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021493010",
+        "latitude": 34.2602491,
+        "longitude": 108.994867,
+        "ref": "B1",
+        "name": "长乐公园-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021493011",
+        "latitude": 34.2595603,
+        "longitude": 108.9958771,
+        "ref": "B2",
+        "name": "长乐公园-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021493012",
+        "latitude": 34.2611516,
+        "longitude": 108.9964182,
+        "ref": "C",
+        "name": "长乐公园-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "b6178b84602dd3f1": [
+      {
+        "osmNodeID": "9021493001",
+        "latitude": 34.2518105,
+        "longitude": 108.9972219,
+        "name": "咸宁路-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11167476837",
+        "latitude": 34.2512989,
+        "longitude": 108.9949504,
+        "name": "咸宁路-E口"
+      },
+      {
+        "osmNodeID": "11167476854",
+        "latitude": 34.2509334,
+        "longitude": 108.9946798,
+        "name": "咸宁路-F口"
+      },
+      {
+        "osmNodeID": "9021492998",
+        "latitude": 34.251716,
+        "longitude": 108.9962095,
+        "ref": "A",
+        "name": "咸宁路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492999",
+        "latitude": 34.2504199,
+        "longitude": 108.9962176,
+        "ref": "B2",
+        "name": "咸宁路-B2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021493000",
+        "latitude": 34.2503466,
+        "longitude": 108.9972197,
+        "ref": "C",
+        "name": "咸宁路-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "b9ba5725681320f2": [
+      {
+        "osmNodeID": "13444811862",
+        "latitude": 34.2007945,
+        "longitude": 108.9879395,
+        "ref": "A",
+        "name": "寒窑-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13444811903",
+        "latitude": 34.1995752,
+        "longitude": 108.9872334,
+        "ref": "B1",
+        "name": "寒窑-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13444811904",
+        "latitude": 34.1991674,
+        "longitude": 108.9878533,
+        "ref": "B2",
+        "name": "寒窑-B2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13444811861",
+        "latitude": 34.1998565,
+        "longitude": 108.9886048,
+        "ref": "C",
+        "name": "寒窑-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13444811860",
+        "latitude": 34.2002375,
+        "longitude": 108.9903173,
+        "ref": "D",
+        "name": "寒窑-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "bb505012e53daa2d": [
+      {
+        "osmNodeID": "9029195970",
+        "latitude": 34.1421555,
+        "longitude": 108.9982858,
+        "name": "航天东路-",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195971",
+        "latitude": 34.1427635,
+        "longitude": 108.9984496,
+        "name": "航天东路-",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "6613090091",
+        "latitude": 34.1427877,
+        "longitude": 108.9956031,
+        "ref": "A",
+        "name": "航天东路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "6613090092",
+        "latitude": 34.1419508,
+        "longitude": 108.9960855,
+        "ref": "B",
+        "name": "航天东路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195968",
+        "latitude": 34.142164,
+        "longitude": 108.9975553,
+        "ref": "C",
+        "name": "航天东路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195969",
+        "latitude": 34.1428899,
+        "longitude": 108.996771,
+        "ref": "D",
+        "name": "航天东路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "bc0f890f03164530": [
+      {
+        "osmNodeID": "11379863003",
+        "latitude": 34.2583922,
+        "longitude": 109.0641895,
+        "ref": "A",
+        "name": "纺六路-A口"
+      },
+      {
+        "osmNodeID": "11379863005",
+        "latitude": 34.2569962,
+        "longitude": 109.0641878,
+        "ref": "C",
+        "name": "纺六路-C口"
+      },
+      {
+        "osmNodeID": "11379863004",
+        "latitude": 34.2583718,
+        "longitude": 109.0645561,
+        "ref": "D",
+        "name": "纺六路-D口"
+      }
+    ],
+    "be10e8faeb6f5622": [
+      {
+        "osmNodeID": "12768637686",
+        "latitude": 34.2583742,
+        "longitude": 109.0139573,
+        "ref": "B",
+        "name": "韩森寨-B口"
+      },
+      {
+        "osmNodeID": "12768637687",
+        "latitude": 34.258496,
+        "longitude": 109.0151483,
+        "ref": "C",
+        "name": "韩森寨-C口"
+      },
+      {
+        "osmNodeID": "12768637688",
+        "latitude": 34.2593616,
+        "longitude": 109.0150292,
+        "ref": "D",
+        "name": "韩森寨-D口"
+      }
+    ],
+    "bf011e08331351aa": [
+      {
+        "osmNodeID": "11379863006",
+        "latitude": 34.2691086,
+        "longitude": 109.063067,
+        "ref": "B",
+        "name": "纺二路-B口"
+      },
+      {
+        "osmNodeID": "11379863007",
+        "latitude": 34.2705501,
+        "longitude": 109.0630237,
+        "ref": "D",
+        "name": "纺二路-D口"
+      }
+    ],
+    "c12c4c9b2d122e34": [
+      {
+        "osmNodeID": "8967993136",
+        "latitude": 34.2317365,
+        "longitude": 108.9037466,
+        "ref": "A",
+        "name": "科技路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8967993139",
+        "latitude": 34.2305947,
+        "longitude": 108.9043083,
+        "ref": "C",
+        "name": "科技路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8967993137",
+        "latitude": 34.2315234,
+        "longitude": 108.9048416,
+        "ref": "D",
+        "name": "科技路-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8967993135",
+        "latitude": 34.2317882,
+        "longitude": 108.9042934,
+        "ref": "E",
+        "name": "科技路-E口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8967993138",
+        "latitude": 34.2322983,
+        "longitude": 108.9053479,
+        "ref": "F",
+        "name": "科技路-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "c25445f5a58f4eab": [
+      {
+        "osmNodeID": "6613090087",
+        "latitude": 34.1422142,
+        "longitude": 109.0145311,
+        "name": "航天新城-",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "6613090088",
+        "latitude": 34.1428138,
+        "longitude": 109.0141039,
+        "name": "航天新城-",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "6613090085",
+        "latitude": 34.1428155,
+        "longitude": 109.0121177,
+        "ref": "A",
+        "name": "航天新城-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "6613090089",
+        "latitude": 34.1421779,
+        "longitude": 109.0121377,
+        "ref": "B",
+        "name": "航天新城-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "6613090090",
+        "latitude": 34.1420612,
+        "longitude": 109.0132486,
+        "ref": "C",
+        "name": "航天新城-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "6613090086",
+        "latitude": 34.1428077,
+        "longitude": 109.0134957,
+        "ref": "D",
+        "name": "航天新城-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "c2ca70232deb200b": [
+      {
+        "osmNodeID": "9010794514",
+        "latitude": 34.2263174,
+        "longitude": 108.9156717,
+        "ref": "A",
+        "name": "太白南路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9010794515",
+        "latitude": 34.2252599,
+        "longitude": 108.9168561,
+        "ref": "C1",
+        "name": "太白南路-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9010794516",
+        "latitude": 34.2249024,
+        "longitude": 108.9174979,
+        "ref": "C3",
+        "name": "太白南路-C3口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9010794517",
+        "latitude": 34.2260714,
+        "longitude": 108.9174401,
+        "ref": "D1",
+        "name": "太白南路-D1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9010794518",
+        "latitude": 34.2258223,
+        "longitude": 108.9180072,
+        "ref": "D3",
+        "name": "太白南路-D3口",
+        "wheelchair": "no"
+      }
+    ],
+    "c3d30b665c4384b5": [
+      {
+        "osmNodeID": "8998466612",
+        "latitude": 34.2327721,
+        "longitude": 108.9462898,
+        "ref": "A",
+        "name": "体育场-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998466613",
+        "latitude": 34.2318517,
+        "longitude": 108.9464318,
+        "ref": "B",
+        "name": "体育场-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8998482417",
+        "latitude": 34.2318346,
+        "longitude": 108.9472398,
+        "ref": "C",
+        "name": "体育场-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998482418",
+        "latitude": 34.2330044,
+        "longitude": 108.9471066,
+        "ref": "D",
+        "name": "体育场-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "c416d4fe91fed958": [
+      {
+        "osmNodeID": "9029084662",
+        "latitude": 34.3086163,
+        "longitude": 108.9710856,
+        "ref": "A",
+        "name": "大明宫北-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084663",
+        "latitude": 34.3075296,
+        "longitude": 108.9718697,
+        "ref": "C",
+        "name": "大明宫北-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084664",
+        "latitude": 34.3088089,
+        "longitude": 108.9721916,
+        "ref": "D",
+        "name": "大明宫北-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "c4fd24b31dc89e68": [
+      {
+        "osmNodeID": "8972232284",
+        "latitude": 34.34169,
+        "longitude": 108.9467336,
+        "ref": "A",
+        "name": "行政中心-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8972232288",
+        "latitude": 34.3420496,
+        "longitude": 108.9463404,
+        "ref": "A1",
+        "name": "行政中心-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232286",
+        "latitude": 34.3423025,
+        "longitude": 108.9460306,
+        "ref": "A2",
+        "name": "行政中心-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232287",
+        "latitude": 34.3419814,
+        "longitude": 108.945627,
+        "ref": "A3",
+        "name": "行政中心-A3口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8972232292",
+        "latitude": 34.3403246,
+        "longitude": 108.9467491,
+        "ref": "B",
+        "name": "行政中心-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232296",
+        "latitude": 34.3400437,
+        "longitude": 108.9463064,
+        "ref": "B1",
+        "name": "行政中心-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232294",
+        "latitude": 34.3400452,
+        "longitude": 108.9456203,
+        "ref": "B2",
+        "name": "行政中心-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232295",
+        "latitude": 34.3397251,
+        "longitude": 108.9459764,
+        "ref": "B3",
+        "name": "行政中心-B3口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995270",
+        "latitude": 34.3407492,
+        "longitude": 108.9443871,
+        "ref": "B5",
+        "name": "行政中心-B5口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995271",
+        "latitude": 34.3412531,
+        "longitude": 108.9443872,
+        "ref": "B6",
+        "name": "行政中心-B6口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232293",
+        "latitude": 34.3403265,
+        "longitude": 108.9476967,
+        "ref": "C",
+        "name": "行政中心-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232297",
+        "latitude": 34.3399777,
+        "longitude": 108.9480605,
+        "ref": "C1",
+        "name": "行政中心-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232298",
+        "latitude": 34.3396761,
+        "longitude": 108.9483948,
+        "ref": "C2",
+        "name": "行政中心-C2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232299",
+        "latitude": 34.3400307,
+        "longitude": 108.9488514,
+        "ref": "C3",
+        "name": "行政中心-C3口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9028995272",
+        "latitude": 34.3384368,
+        "longitude": 108.9468213,
+        "ref": "C5",
+        "name": "行政中心-C5口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995273",
+        "latitude": 34.3384251,
+        "longitude": 108.9476131,
+        "ref": "C6",
+        "name": "行政中心-C6口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232285",
+        "latitude": 34.3416844,
+        "longitude": 108.9477028,
+        "ref": "D",
+        "name": "行政中心-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232291",
+        "latitude": 34.3417102,
+        "longitude": 108.94852,
+        "ref": "D1",
+        "name": "行政中心-D1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232290",
+        "latitude": 34.3416549,
+        "longitude": 108.9492271,
+        "ref": "D2",
+        "name": "行政中心-D2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972232289",
+        "latitude": 34.3419783,
+        "longitude": 108.9488141,
+        "ref": "D3",
+        "name": "行政中心-D3口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995284",
+        "latitude": 34.3407515,
+        "longitude": 108.9500916,
+        "ref": "D5",
+        "name": "行政中心-D5口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995285",
+        "latitude": 34.3412443,
+        "longitude": 108.9500873,
+        "ref": "D6",
+        "name": "行政中心-D6口",
+        "wheelchair": "no"
+      }
+    ],
+    "c5dcb3f47d23f30c": [
+      {
+        "osmNodeID": "12438270618",
+        "latitude": 34.3927487,
+        "longitude": 108.9817184,
+        "ref": "A",
+        "name": "景家堡-A口"
+      },
+      {
+        "osmNodeID": "12438270617",
+        "latitude": 34.391566,
+        "longitude": 108.9815897,
+        "ref": "B",
+        "name": "景家堡-B口"
+      },
+      {
+        "osmNodeID": "12438270620",
+        "latitude": 34.3915052,
+        "longitude": 108.9828517,
+        "ref": "C",
+        "name": "景家堡-C口"
+      },
+      {
+        "osmNodeID": "12438270619",
+        "latitude": 34.3926185,
+        "longitude": 108.9824609,
+        "ref": "D",
+        "name": "景家堡-D口"
+      }
+    ],
+    "c789d96c8e4fb699": [
+      {
+        "osmNodeID": "9029259504",
+        "latitude": 34.2192197,
+        "longitude": 109.0012364,
+        "ref": "A",
+        "name": "理工大曲江校区-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927602",
+        "latitude": 34.2181339,
+        "longitude": 109.0019162,
+        "ref": "B",
+        "name": "理工大曲江校区-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927604",
+        "latitude": 34.2183796,
+        "longitude": 109.0024787,
+        "ref": "C",
+        "name": "理工大曲江校区-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927603",
+        "latitude": 34.2194886,
+        "longitude": 109.0023473,
+        "ref": "D",
+        "name": "理工大曲江校区-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "c7ca478efd4cff9e": [
+      {
+        "osmNodeID": "8968582862",
+        "latitude": 34.2847466,
+        "longitude": 108.8524225,
+        "ref": "A",
+        "name": "皂河-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968582863",
+        "latitude": 34.2838936,
+        "longitude": 108.8525987,
+        "ref": "C",
+        "name": "皂河-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "ca0e9ddfdc63b0aa": [
+      {
+        "osmNodeID": "3000054596",
+        "latitude": 34.1426492,
+        "longitude": 108.9451639,
+        "ref": "A",
+        "name": "韦曲南-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "2619598602",
+        "latitude": 34.141484,
+        "longitude": 108.9450967,
+        "ref": "B",
+        "name": "韦曲南-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "3000054598",
+        "latitude": 34.1426521,
+        "longitude": 108.9458365,
+        "ref": "D",
+        "name": "韦曲南-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "cb8b06a042deb546": [
+      {
+        "osmNodeID": "9084428041",
+        "latitude": 34.3809114,
+        "longitude": 108.9492654,
+        "ref": "A",
+        "name": "文景山公园-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428042",
+        "latitude": 34.3814554,
+        "longitude": 108.9517488,
+        "ref": "D",
+        "name": "文景山公园-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "cc1fd8f8e5c431d1": [
+      {
+        "osmNodeID": "9032386216",
+        "latitude": 34.2691047,
+        "longitude": 108.6898564,
+        "ref": "A1",
+        "name": "钓台-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386217",
+        "latitude": 34.2691018,
+        "longitude": 108.6903964,
+        "ref": "A2",
+        "name": "钓台-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032386218",
+        "latitude": 34.2683934,
+        "longitude": 108.6898606,
+        "ref": "B1",
+        "name": "钓台-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032386220",
+        "latitude": 34.2683944,
+        "longitude": 108.6904086,
+        "ref": "B2",
+        "name": "钓台-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "cd3fa422f56be543": [
+      {
+        "osmNodeID": "9032498705",
+        "latitude": 34.1943781,
+        "longitude": 108.8695563,
+        "ref": "A",
+        "name": "丈八四路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498706",
+        "latitude": 34.1935499,
+        "longitude": 108.8713927,
+        "ref": "C",
+        "name": "丈八四路-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "cdc99498fac6b6b8": [
+      {
+        "osmNodeID": "11230548538",
+        "latitude": 34.1120708,
+        "longitude": 108.9383819,
+        "ref": "B",
+        "name": "常宁宫-B口"
+      },
+      {
+        "osmNodeID": "11230548539",
+        "latitude": 34.1126078,
+        "longitude": 108.9390296,
+        "ref": "D",
+        "name": "常宁宫-D口"
+      }
+    ],
+    "cf0689f5177e358e": [
+      {
+        "osmNodeID": "9029195964",
+        "latitude": 34.1428944,
+        "longitude": 108.9832612,
+        "ref": "A",
+        "name": "神舟大道-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195965",
+        "latitude": 34.1421543,
+        "longitude": 108.9829687,
+        "ref": "B",
+        "name": "神舟大道-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195966",
+        "latitude": 34.1420514,
+        "longitude": 108.9839514,
+        "ref": "C",
+        "name": "神舟大道-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195967",
+        "latitude": 34.1427612,
+        "longitude": 108.9843157,
+        "ref": "D",
+        "name": "神舟大道-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "cf1a5dd105f244e6": [
+      {
+        "osmNodeID": "9034096003",
+        "latitude": 34.3658902,
+        "longitude": 109.1786514,
+        "ref": "A",
+        "name": "芷阳广场-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096004",
+        "latitude": 34.3640552,
+        "longitude": 109.1772395,
+        "ref": "C",
+        "name": "芷阳广场-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034096005",
+        "latitude": 34.3645927,
+        "longitude": 109.1784146,
+        "ref": "D",
+        "name": "芷阳广场-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "cf6cbca6a4099135": [
+      {
+        "osmNodeID": "8898927596",
+        "latitude": 34.2153841,
+        "longitude": 109.0132405,
+        "ref": "A",
+        "name": "黄渠头-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927599",
+        "latitude": 34.2146298,
+        "longitude": 109.0134261,
+        "ref": "B",
+        "name": "黄渠头-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927598",
+        "latitude": 34.2151487,
+        "longitude": 109.0146638,
+        "ref": "C",
+        "name": "黄渠头-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927597",
+        "latitude": 34.2157651,
+        "longitude": 109.0139474,
+        "ref": "D",
+        "name": "黄渠头-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "cfe6c320abb22944": [
+      {
+        "osmNodeID": "11211304431",
+        "latitude": 34.3142798,
+        "longitude": 108.706287,
+        "ref": "A",
+        "name": "陈杨寨-A口"
+      },
+      {
+        "osmNodeID": "11211304435",
+        "latitude": 34.3131425,
+        "longitude": 108.7057538,
+        "ref": "B",
+        "name": "陈杨寨-B口"
+      },
+      {
+        "osmNodeID": "11211304434",
+        "latitude": 34.3129063,
+        "longitude": 108.7073475,
+        "ref": "C1",
+        "name": "陈杨寨-C1口"
+      },
+      {
+        "osmNodeID": "11211304433",
+        "latitude": 34.3133562,
+        "longitude": 108.707789,
+        "ref": "C2",
+        "name": "陈杨寨-C2口"
+      },
+      {
+        "osmNodeID": "11211304432",
+        "latitude": 34.3142245,
+        "longitude": 108.7079687,
+        "ref": "D",
+        "name": "陈杨寨-D口"
+      }
+    ],
+    "d11a39eb4f40634e": [
+      {
+        "osmNodeID": "8898927780",
+        "latitude": 34.241611,
+        "longitude": 108.923066,
+        "ref": "A",
+        "name": "边家村-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927781",
+        "latitude": 34.2408185,
+        "longitude": 108.922631,
+        "ref": "B",
+        "name": "边家村-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927777",
+        "latitude": 34.2408416,
+        "longitude": 108.9245925,
+        "ref": "C",
+        "name": "边家村-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927776",
+        "latitude": 34.24144,
+        "longitude": 108.9242343,
+        "ref": "D",
+        "name": "边家村-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "d185f330cf3eda17": [
+      {
+        "osmNodeID": "13252460292",
+        "latitude": 34.4892191,
+        "longitude": 109.0345659,
+        "ref": "A",
+        "name": "军庄-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13252460293",
+        "latitude": 34.4888964,
+        "longitude": 109.0345912,
+        "ref": "B",
+        "name": "军庄-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13252460294",
+        "latitude": 34.4888548,
+        "longitude": 109.0341449,
+        "ref": "C",
+        "name": "军庄-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "d2d07f724f657e2b": [
+      {
+        "osmNodeID": "12348682593",
+        "latitude": 34.468492,
+        "longitude": 109.0360064,
+        "ref": "A",
+        "name": "杨官寨-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "12348682594",
+        "latitude": 34.4682034,
+        "longitude": 109.0358846,
+        "ref": "B",
+        "name": "杨官寨-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "12348682595",
+        "latitude": 34.4681477,
+        "longitude": 109.0361122,
+        "ref": "C",
+        "name": "杨官寨-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "d3764bec008d15b7": [
+      {
+        "osmNodeID": "11935640692",
+        "latitude": 34.3667205,
+        "longitude": 109.2115713,
+        "ref": "A",
+        "name": "华清池-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034096014",
+        "latitude": 34.3663264,
+        "longitude": 109.2119178,
+        "ref": "B",
+        "name": "华清池-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034096015",
+        "latitude": 34.3661996,
+        "longitude": 109.2138598,
+        "ref": "C",
+        "name": "华清池-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096016",
+        "latitude": 34.3667743,
+        "longitude": 109.213489,
+        "ref": "D",
+        "name": "华清池-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "d44382f444ad03ad": [
+      {
+        "osmNodeID": "13288666550",
+        "latitude": 34.3184917,
+        "longitude": 108.9294588,
+        "ref": "A",
+        "name": "霸城门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13288666552",
+        "latitude": 34.3171626,
+        "longitude": 108.929464,
+        "ref": "B",
+        "name": "霸城门-B口"
+      },
+      {
+        "osmNodeID": "13288666553",
+        "latitude": 34.3176508,
+        "longitude": 108.9306627,
+        "ref": "C",
+        "name": "霸城门-C口"
+      },
+      {
+        "osmNodeID": "13288666551",
+        "latitude": 34.3184456,
+        "longitude": 108.9300085,
+        "ref": "D",
+        "name": "霸城门-D口"
+      }
+    ],
+    "d5995e936616b6be": [
+      {
+        "osmNodeID": "13288666908",
+        "latitude": 34.3174869,
+        "longitude": 109.0022399,
+        "ref": "A",
+        "name": "北辰东路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13288666909",
+        "latitude": 34.3169298,
+        "longitude": 109.0023807,
+        "ref": "B",
+        "name": "北辰东路-B口"
+      },
+      {
+        "osmNodeID": "13288666907",
+        "latitude": 34.3177101,
+        "longitude": 109.0034167,
+        "ref": "D",
+        "name": "北辰东路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "d7dd7f955ecc1836": [
+      {
+        "osmNodeID": "13252446465",
+        "latitude": 34.5082273,
+        "longitude": 109.0827824,
+        "ref": "A1",
+        "name": "鹿苑大道-A1口"
+      },
+      {
+        "osmNodeID": "13252446464",
+        "latitude": 34.5081822,
+        "longitude": 109.0822559,
+        "ref": "A2",
+        "name": "鹿苑大道-A2口"
+      },
+      {
+        "osmNodeID": "13252446476",
+        "latitude": 34.5073885,
+        "longitude": 109.0831043,
+        "ref": "B",
+        "name": "鹿苑大道-B口"
+      }
+    ],
+    "d87144676e4923a4": [
+      {
+        "osmNodeID": "9034095988",
+        "latitude": 34.3173097,
+        "longitude": 109.1174168,
+        "ref": "A",
+        "name": "洪庆-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034095989",
+        "latitude": 34.3164172,
+        "longitude": 109.1183733,
+        "ref": "C",
+        "name": "洪庆-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034095990",
+        "latitude": 34.3173313,
+        "longitude": 109.1181703,
+        "ref": "D",
+        "name": "洪庆-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "d888e2ec6fa428cc": [
+      {
+        "osmNodeID": "11935547950",
+        "latitude": 34.3551116,
+        "longitude": 109.1663406,
+        "ref": "A",
+        "name": "鹦鹉寺公园-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034096002",
+        "latitude": 34.3545191,
+        "longitude": 109.1660112,
+        "ref": "B",
+        "name": "鹦鹉寺公园-B口",
+        "wheelchair": "yes"
+      }
+    ],
+    "d897e8581fd39de6": [
+      {
+        "osmNodeID": "12768637647",
+        "latitude": 34.3034044,
+        "longitude": 109.0147505,
+        "ref": "A",
+        "name": "米家崖-A口"
+      },
+      {
+        "osmNodeID": "12768637649",
+        "latitude": 34.3017486,
+        "longitude": 109.0145966,
+        "ref": "B1",
+        "name": "米家崖-B1口"
+      },
+      {
+        "osmNodeID": "12768637652",
+        "latitude": 34.3010305,
+        "longitude": 109.0150412,
+        "ref": "B2",
+        "name": "米家崖-B2口"
+      },
+      {
+        "osmNodeID": "12768637651",
+        "latitude": 34.3010761,
+        "longitude": 109.0158404,
+        "ref": "C1",
+        "name": "米家崖-C1口"
+      },
+      {
+        "osmNodeID": "12768637650",
+        "latitude": 34.3017978,
+        "longitude": 109.0160918,
+        "ref": "C2",
+        "name": "米家崖-C2口"
+      },
+      {
+        "osmNodeID": "12768637648",
+        "latitude": 34.3034546,
+        "longitude": 109.0155685,
+        "ref": "D",
+        "name": "米家崖-D口"
+      }
+    ],
+    "d8cfa3f3e640952f": [
+      {
+        "osmNodeID": "9021493014",
+        "latitude": 34.2777488,
+        "longitude": 108.9947564,
+        "ref": "A",
+        "name": "胡家庙-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021493015",
+        "latitude": 34.2770214,
+        "longitude": 108.9950622,
+        "ref": "B",
+        "name": "胡家庙-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021493016",
+        "latitude": 34.2785006,
+        "longitude": 108.9958956,
+        "ref": "D",
+        "name": "胡家庙-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "d8ed2aaa4e80cacc": [
+      {
+        "osmNodeID": "9064081641",
+        "latitude": 34.3833281,
+        "longitude": 109.0421491,
+        "ref": "A1",
+        "name": "新筑-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9064081642",
+        "latitude": 34.3829293,
+        "longitude": 109.0420802,
+        "ref": "A2",
+        "name": "新筑-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9064081644",
+        "latitude": 34.3827893,
+        "longitude": 109.0435059,
+        "ref": "B1",
+        "name": "新筑-B1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9064081643",
+        "latitude": 34.3831686,
+        "longitude": 109.0435662,
+        "ref": "B2",
+        "name": "新筑-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "da6146a9b1735c22": [
+      {
+        "osmNodeID": "8972089469",
+        "latitude": 34.3529287,
+        "longitude": 108.9474322,
+        "ref": "A",
+        "name": "凤城十路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8972089472",
+        "latitude": 34.3518077,
+        "longitude": 108.9472073,
+        "ref": "B",
+        "name": "凤城十路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8972089471",
+        "latitude": 34.3521955,
+        "longitude": 108.9483102,
+        "ref": "C",
+        "name": "凤城十路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8972089470",
+        "latitude": 34.3528557,
+        "longitude": 108.9481898,
+        "ref": "D",
+        "name": "凤城十路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "dabf82543e86c6d0": [
+      {
+        "osmNodeID": "9029195958",
+        "latitude": 34.1552019,
+        "longitude": 108.9740825,
+        "ref": "A",
+        "name": "东长安街-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195959",
+        "latitude": 34.1532423,
+        "longitude": 108.9741707,
+        "ref": "B",
+        "name": "东长安街-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195960",
+        "latitude": 34.1538452,
+        "longitude": 108.9750781,
+        "ref": "C",
+        "name": "东长安街-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029195961",
+        "latitude": 34.1550304,
+        "longitude": 108.9751934,
+        "ref": "D",
+        "name": "东长安街-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029195962",
+        "latitude": 34.1525977,
+        "longitude": 108.9747816,
+        "ref": "E",
+        "name": "东长安街-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13413240498",
+        "latitude": 34.153919,
+        "longitude": 108.9769392,
+        "ref": "F",
+        "name": "东长安街-F口"
+      },
+      {
+        "osmNodeID": "9029195963",
+        "latitude": 34.1522546,
+        "longitude": 108.9740956,
+        "ref": "G",
+        "name": "东长安街-G口",
+        "wheelchair": "no"
+      }
+    ],
+    "df438e2fd3804e27": [
+      {
+        "osmNodeID": "9028995266",
+        "latitude": 34.3412383,
+        "longitude": 108.9357966,
+        "ref": "A",
+        "name": "文景路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995267",
+        "latitude": 34.3407613,
+        "longitude": 108.9357298,
+        "ref": "B",
+        "name": "文景路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995268",
+        "latitude": 34.3404339,
+        "longitude": 108.9373858,
+        "ref": "C",
+        "name": "文景路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9028995269",
+        "latitude": 34.341583,
+        "longitude": 108.9373157,
+        "ref": "D",
+        "name": "文景路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "e088e70ab7c6bd72": [
+      {
+        "osmNodeID": "8971526130",
+        "latitude": 34.2722992,
+        "longitude": 109.0299462,
+        "ref": "A",
+        "name": "长乐坡-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971526131",
+        "latitude": 34.2724118,
+        "longitude": 109.031149,
+        "ref": "D",
+        "name": "长乐坡-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "e0c06348496d8db4": [
+      {
+        "osmNodeID": "8968607264",
+        "latitude": 34.27372,
+        "longitude": 108.8732022,
+        "ref": "A",
+        "name": "汉城路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968607265",
+        "latitude": 34.2731202,
+        "longitude": 108.8729002,
+        "ref": "B",
+        "name": "汉城路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8968607267",
+        "latitude": 34.2723634,
+        "longitude": 108.8740667,
+        "ref": "C",
+        "name": "汉城路-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968607266",
+        "latitude": 34.2731273,
+        "longitude": 108.8743312,
+        "ref": "D",
+        "name": "汉城路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "e27d9c03e4ee8f16": [
+      {
+        "osmNodeID": "9013245496",
+        "latitude": 34.2231365,
+        "longitude": 108.9322425,
+        "ref": "A1",
+        "name": "吉祥村-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9013245497",
+        "latitude": 34.2225811,
+        "longitude": 108.9322873,
+        "ref": "A2",
+        "name": "吉祥村-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9013245498",
+        "latitude": 34.222392,
+        "longitude": 108.9315089,
+        "ref": "A3",
+        "name": "吉祥村-A3口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9013245499",
+        "latitude": 34.2222108,
+        "longitude": 108.9323238,
+        "ref": "B",
+        "name": "吉祥村-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9013245500",
+        "latitude": 34.2223804,
+        "longitude": 108.9335055,
+        "ref": "C",
+        "name": "吉祥村-C口",
+        "wheelchair": "limited"
+      },
+      {
+        "osmNodeID": "9013245501",
+        "latitude": 34.2225754,
+        "longitude": 108.9341515,
+        "ref": "D",
+        "name": "吉祥村-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "e2cd6f55b9bdbe81": [
+      {
+        "osmNodeID": "8968638838",
+        "latitude": 34.2689718,
+        "longitude": 108.9092025,
+        "ref": "B",
+        "name": "劳动路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968638837",
+        "latitude": 34.2689948,
+        "longitude": 108.9103712,
+        "ref": "C1",
+        "name": "劳动路-C1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968638836",
+        "latitude": 34.2694211,
+        "longitude": 108.910441,
+        "ref": "C2",
+        "name": "劳动路-C2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8968638835",
+        "latitude": 34.2699818,
+        "longitude": 108.9103873,
+        "ref": "D",
+        "name": "劳动路-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "e440f55aa93e2d39": [
+      {
+        "osmNodeID": "8898927754",
+        "latitude": 34.2414867,
+        "longitude": 108.9545392,
+        "ref": "A",
+        "name": "文艺路-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927753",
+        "latitude": 34.2410117,
+        "longitude": 108.9543389,
+        "ref": "B",
+        "name": "文艺路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927755",
+        "latitude": 34.2414556,
+        "longitude": 108.95616,
+        "ref": "D",
+        "name": "文艺路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "e453f056b9563439": [
+      {
+        "osmNodeID": "13288666744",
+        "latitude": 34.3180634,
+        "longitude": 108.9594408,
+        "ref": "A",
+        "name": "市第三医院-A口"
+      },
+      {
+        "osmNodeID": "13288666745",
+        "latitude": 34.3173878,
+        "longitude": 108.9600424,
+        "ref": "B",
+        "name": "市第三医院-B口"
+      },
+      {
+        "osmNodeID": "13288666746",
+        "latitude": 34.317684,
+        "longitude": 108.9610193,
+        "ref": "C",
+        "name": "市第三医院-C口"
+      },
+      {
+        "osmNodeID": "13288666743",
+        "latitude": 34.3184239,
+        "longitude": 108.9606462,
+        "ref": "D",
+        "name": "市第三医院-D口"
+      }
+    ],
+    "e5cdb0af480535f8": [
+      {
+        "osmNodeID": "11383665751",
+        "latitude": 34.251168,
+        "longitude": 108.9094811,
+        "ref": "B",
+        "name": "大唐西市-B口"
+      },
+      {
+        "osmNodeID": "11383665753",
+        "latitude": 34.2505247,
+        "longitude": 108.9105895,
+        "ref": "B",
+        "name": "大唐西市-C1口"
+      },
+      {
+        "osmNodeID": "11383665752",
+        "latitude": 34.2504464,
+        "longitude": 108.9094631,
+        "ref": "B1",
+        "name": "大唐西市-B1口"
+      },
+      {
+        "osmNodeID": "11383665754",
+        "latitude": 34.2511429,
+        "longitude": 108.9105281,
+        "ref": "C",
+        "name": "大唐西市-C口"
+      },
+      {
+        "osmNodeID": "11383665755",
+        "latitude": 34.2523413,
+        "longitude": 108.9103163,
+        "ref": "D",
+        "name": "大唐西市-D口"
+      }
+    ],
+    "e607c70b91cd2f39": [
+      {
+        "osmNodeID": "9029084654",
+        "latitude": 34.3256583,
+        "longitude": 108.9712263,
+        "ref": "B",
+        "name": "百花村-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084655",
+        "latitude": 34.3257198,
+        "longitude": 108.9719333,
+        "ref": "C",
+        "name": "百花村-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084656",
+        "latitude": 34.327554,
+        "longitude": 108.9719959,
+        "ref": "D",
+        "name": "百花村-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "e683b4a8db2766a7": [
+      {
+        "osmNodeID": "13252460212",
+        "latitude": 34.5065632,
+        "longitude": 109.061342,
+        "ref": "A1",
+        "name": "榆楚-A1口"
+      },
+      {
+        "osmNodeID": "13252460213",
+        "latitude": 34.5066008,
+        "longitude": 109.0618876,
+        "ref": "A2",
+        "name": "榆楚-A2口"
+      },
+      {
+        "osmNodeID": "13252460218",
+        "latitude": 34.5058092,
+        "longitude": 109.0614375,
+        "ref": "B1",
+        "name": "榆楚-B1口"
+      },
+      {
+        "osmNodeID": "13252460219",
+        "latitude": 34.50585,
+        "longitude": 109.0619768,
+        "ref": "B2",
+        "name": "榆楚-B2口"
+      }
+    ],
+    "e80ca01e461d6538": [
+      {
+        "osmNodeID": "9032498698",
+        "latitude": 34.1803553,
+        "longitude": 108.8458971,
+        "ref": "B",
+        "name": "造字台-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498699",
+        "latitude": 34.1801543,
+        "longitude": 108.8470864,
+        "ref": "C",
+        "name": "造字台-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498700",
+        "latitude": 34.1817027,
+        "longitude": 108.8470913,
+        "ref": "D",
+        "name": "造字台-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "e8678c61eb9b536c": [
+      {
+        "osmNodeID": "9084428062",
+        "latitude": 34.3683436,
+        "longitude": 109.0657569,
+        "ref": "A",
+        "name": "港务大道-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428063",
+        "latitude": 34.3675525,
+        "longitude": 109.0659825,
+        "ref": "B",
+        "name": "港务大道-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428064",
+        "latitude": 34.3672908,
+        "longitude": 109.0680482,
+        "ref": "C",
+        "name": "港务大道-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "12441111331",
+        "latitude": 34.3680824,
+        "longitude": 109.068095,
+        "ref": "D",
+        "name": "港务大道-D口"
+      }
+    ],
+    "eacd6241b7936e5e": [
+      {
+        "osmNodeID": "9032498678",
+        "latitude": 34.1328208,
+        "longitude": 108.8304142,
+        "ref": "A",
+        "name": "西电科大南校区·未来之瞳-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498679",
+        "latitude": 34.1317985,
+        "longitude": 108.8297688,
+        "ref": "B",
+        "name": "西电科大南校区·未来之瞳-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498680",
+        "latitude": 34.1314953,
+        "longitude": 108.8304904,
+        "ref": "C",
+        "name": "西电科大南校区·未来之瞳-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498681",
+        "latitude": 34.132643,
+        "longitude": 108.8312989,
+        "ref": "D",
+        "name": "西电科大南校区·未来之瞳-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "eb7eee80c73996bf": [
+      {
+        "osmNodeID": "8998482439",
+        "latitude": 34.2235971,
+        "longitude": 108.946423,
+        "ref": "A",
+        "name": "小寨-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998482440",
+        "latitude": 34.2221237,
+        "longitude": 108.9463977,
+        "ref": "B",
+        "name": "小寨-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998824799",
+        "latitude": 34.2219283,
+        "longitude": 108.9471954,
+        "ref": "C",
+        "name": "小寨-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8998482444",
+        "latitude": 34.2231829,
+        "longitude": 108.9473477,
+        "ref": "D",
+        "name": "小寨-D口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8998482445",
+        "latitude": 34.2231435,
+        "longitude": 108.9477404,
+        "ref": "E",
+        "name": "小寨-E口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "7813331067",
+        "latitude": 34.2226233,
+        "longitude": 108.9474401,
+        "ref": "F",
+        "name": "小寨-F口",
+        "wheelchair": "no"
+      }
+    ],
+    "f0be6e6e925e61a7": [
+      {
+        "osmNodeID": "11383665748",
+        "latitude": 34.2596001,
+        "longitude": 108.921816,
+        "ref": "A",
+        "name": "安定门-A口"
+      },
+      {
+        "osmNodeID": "11383665750",
+        "latitude": 34.2590126,
+        "longitude": 108.9222659,
+        "ref": "B",
+        "name": "安定门-B口"
+      },
+      {
+        "osmNodeID": "11383665749",
+        "latitude": 34.2598527,
+        "longitude": 108.9225045,
+        "ref": "D",
+        "name": "安定门-D口"
+      }
+    ],
+    "f0e241fffe3eb420": [
+      {
+        "osmNodeID": "9034096010",
+        "latitude": 34.3712233,
+        "longitude": 109.2004536,
+        "ref": "A",
+        "name": "西花园-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096011",
+        "latitude": 34.3705357,
+        "longitude": 109.2001906,
+        "ref": "B",
+        "name": "西花园-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096012",
+        "latitude": 34.3699567,
+        "longitude": 109.2012074,
+        "ref": "C",
+        "name": "西花园-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9034096013",
+        "latitude": 34.3702572,
+        "longitude": 109.2016684,
+        "ref": "D",
+        "name": "西花园-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "f1acbe2b986ef7ec": [
+      {
+        "osmNodeID": "7813311569",
+        "latitude": 34.26005,
+        "longitude": 108.9627417,
+        "ref": "A",
+        "name": "大差市-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "7813303868",
+        "latitude": 34.2587085,
+        "longitude": 108.963381,
+        "ref": "C",
+        "name": "大差市-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084673",
+        "latitude": 34.2601163,
+        "longitude": 108.9634082,
+        "ref": "D",
+        "name": "大差市-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "11380957915",
+        "latitude": 34.259777,
+        "longitude": 108.961773,
+        "ref": "E",
+        "name": "长乐门-E口"
+      },
+      {
+        "osmNodeID": "11380957916",
+        "latitude": 34.2592872,
+        "longitude": 108.9616039,
+        "ref": "F",
+        "name": "长乐门-F口"
+      }
+    ],
+    "f33e420ef29b4b93": [
+      {
+        "osmNodeID": "9031041979",
+        "latitude": 34.2527843,
+        "longitude": 108.8876368,
+        "ref": "A",
+        "name": "金光门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8898927794",
+        "latitude": 34.2520004,
+        "longitude": 108.8876185,
+        "ref": "B",
+        "name": "金光门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9031041980",
+        "latitude": 34.2519109,
+        "longitude": 108.8903467,
+        "ref": "C",
+        "name": "金光门-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8898927793",
+        "latitude": 34.252761,
+        "longitude": 108.8889536,
+        "ref": "D",
+        "name": "金光门-D口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13339880705",
+        "latitude": 34.2505384,
+        "longitude": 108.8891928,
+        "ref": "E",
+        "name": "金光门-E口",
+        "wheelchair": "yes"
+      }
+    ],
+    "f5a14e1ba37436d3": [
+      {
+        "osmNodeID": "9021609456",
+        "latitude": 34.3296355,
+        "longitude": 109.053396,
+        "ref": "A1",
+        "name": "香湖湾-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021609455",
+        "latitude": 34.3300357,
+        "longitude": 109.053673,
+        "ref": "A2",
+        "name": "香湖湾-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9021609457",
+        "latitude": 34.3302343,
+        "longitude": 109.0524539,
+        "ref": "B1",
+        "name": "香湖湾-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021609458",
+        "latitude": 34.3306905,
+        "longitude": 109.0526433,
+        "ref": "B2",
+        "name": "香湖湾-B2口",
+        "wheelchair": "yes"
+      }
+    ],
+    "f627cfed28729d5f": [
+      {
+        "osmNodeID": "12438270634",
+        "latitude": 34.4262983,
+        "longitude": 109.0394263,
+        "ref": "B",
+        "name": "水流-B口"
+      },
+      {
+        "osmNodeID": "12438270633",
+        "latitude": 34.4264595,
+        "longitude": 109.0397093,
+        "ref": "C",
+        "name": "水流-C口"
+      },
+      {
+        "osmNodeID": "12438270635",
+        "latitude": 34.4277296,
+        "longitude": 109.0396378,
+        "ref": "D",
+        "name": "水流-D口"
+      }
+    ],
+    "f6c7d4d67e560eb0": [
+      {
+        "osmNodeID": "11486477151",
+        "latitude": 34.4053852,
+        "longitude": 108.8716934,
+        "ref": "A",
+        "name": "秦宫-A口"
+      }
+    ],
+    "f76bd6a77755e2c6": [
+      {
+        "osmNodeID": "8971481549",
+        "latitude": 34.2697902,
+        "longitude": 108.994157,
+        "ref": "A",
+        "name": "通化门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971481548",
+        "latitude": 34.2692389,
+        "longitude": 108.9946621,
+        "ref": "B",
+        "name": "通化门-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8971481552",
+        "latitude": 34.2691468,
+        "longitude": 108.9960854,
+        "ref": "C",
+        "name": "通化门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971481551",
+        "latitude": 34.2696906,
+        "longitude": 108.9960467,
+        "ref": "D",
+        "name": "通化门-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8971481550",
+        "latitude": 34.2702278,
+        "longitude": 108.9952124,
+        "ref": "E",
+        "name": "通化门-E口",
+        "wheelchair": "no"
+      }
+    ],
+    "f820e0cccc0c0d61": [
+      {
+        "osmNodeID": "9084428044",
+        "latitude": 34.3720962,
+        "longitude": 108.9950175,
+        "ref": "A",
+        "name": "北辰-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428045",
+        "latitude": 34.3714393,
+        "longitude": 108.9948783,
+        "ref": "B",
+        "name": "北辰-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9084428046",
+        "latitude": 34.3712149,
+        "longitude": 108.9964073,
+        "ref": "C",
+        "name": "北辰-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9084428047",
+        "latitude": 34.372254,
+        "longitude": 108.9962228,
+        "ref": "D",
+        "name": "北辰-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "f8a0137ac15c6045": [
+      {
+        "osmNodeID": "9001679547",
+        "latitude": 34.1984152,
+        "longitude": 108.9461371,
+        "ref": "A1",
+        "name": "电视塔-A1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9001679548",
+        "latitude": 34.1988584,
+        "longitude": 108.9457283,
+        "ref": "A2",
+        "name": "电视塔-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9001679549",
+        "latitude": 34.1974151,
+        "longitude": 108.9469309,
+        "ref": "B",
+        "name": "电视塔-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9001679550",
+        "latitude": 34.1977117,
+        "longitude": 108.9484329,
+        "ref": "C",
+        "name": "电视塔-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9001679551",
+        "latitude": 34.1988792,
+        "longitude": 108.9474079,
+        "ref": "D",
+        "name": "电视塔-D口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13363888319",
+        "latitude": 34.197539,
+        "longitude": 108.945418,
+        "ref": "E1",
+        "name": "电视塔-E1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13363888320",
+        "latitude": 34.1977782,
+        "longitude": 108.9452284,
+        "ref": "E2",
+        "name": "电视塔-E2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13363888318",
+        "latitude": 34.1977857,
+        "longitude": 108.9461977,
+        "ref": "F",
+        "name": "电视塔-F口",
+        "wheelchair": "yes"
+      }
+    ],
+    "f8db93c53f7e4ca1": [
+      {
+        "osmNodeID": "13326091999",
+        "latitude": 34.2604963,
+        "longitude": 108.8890525,
+        "ref": "A",
+        "name": "土门-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13326116001",
+        "latitude": 34.2591082,
+        "longitude": 108.888841,
+        "ref": "B",
+        "name": "土门-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13326092000",
+        "latitude": 34.2603594,
+        "longitude": 108.890156,
+        "ref": "D",
+        "name": "土门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "f93171afb11e3930": [
+      {
+        "osmNodeID": "9029084674",
+        "latitude": 34.2506024,
+        "longitude": 108.9628627,
+        "ref": "A",
+        "name": "和平门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9029084675",
+        "latitude": 34.2489289,
+        "longitude": 108.9629296,
+        "ref": "B",
+        "name": "和平门-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9029084676",
+        "latitude": 34.2506546,
+        "longitude": 108.9637245,
+        "ref": "D",
+        "name": "和平门-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "f9711fb3b919f751": [
+      {
+        "osmNodeID": "9032498707",
+        "latitude": 34.1940968,
+        "longitude": 108.8839974,
+        "ref": "A",
+        "name": "丈八一路-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498708",
+        "latitude": 34.1933233,
+        "longitude": 108.8843624,
+        "ref": "B",
+        "name": "丈八一路-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9032498709",
+        "latitude": 34.1935729,
+        "longitude": 108.8854585,
+        "ref": "C",
+        "name": "丈八一路-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9032498710",
+        "latitude": 34.1940903,
+        "longitude": 108.8855753,
+        "ref": "D",
+        "name": "丈八一路-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "fa53971ee5cb6574": [
+      {
+        "osmNodeID": "9034095984",
+        "latitude": 34.2801177,
+        "longitude": 109.1148004,
+        "ref": "B",
+        "name": "灞柳二路-B口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9034095985",
+        "latitude": 34.2811229,
+        "longitude": 109.1157394,
+        "ref": "C",
+        "name": "灞柳二路-C口",
+        "wheelchair": "no"
+      }
+    ],
+    "fa5918fe3df16ba9": [
+      {
+        "osmNodeID": "13421571594",
+        "latitude": 34.2112244,
+        "longitude": 109.0244424,
+        "ref": "A1",
+        "name": "植物园-A1口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13421571595",
+        "latitude": 34.2114519,
+        "longitude": 109.024993,
+        "ref": "A2",
+        "name": "植物园-A2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "13421571593",
+        "latitude": 34.2096632,
+        "longitude": 109.0248428,
+        "ref": "C",
+        "name": "植物园-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "fd58c71b0bc1cf46": [
+      {
+        "osmNodeID": "8977406932",
+        "latitude": 34.3052343,
+        "longitude": 108.9466073,
+        "ref": "A",
+        "name": "大明宫西-A口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "8977406935",
+        "latitude": 34.3045393,
+        "longitude": 108.9468117,
+        "ref": "B",
+        "name": "大明宫西-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8977406936",
+        "latitude": 34.304662,
+        "longitude": 108.9476638,
+        "ref": "C",
+        "name": "大明宫西-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "8977406937",
+        "latitude": 34.3051657,
+        "longitude": 108.9480615,
+        "ref": "D",
+        "name": "大明宫西-D口",
+        "wheelchair": "no"
+      }
+    ],
+    "fd68703a90ccc020": [
+      {
+        "osmNodeID": "11378797567",
+        "latitude": 34.2339317,
+        "longitude": 108.9634373,
+        "ref": "A",
+        "name": "西安科技大学-A口"
+      },
+      {
+        "osmNodeID": "11378797568",
+        "latitude": 34.2328383,
+        "longitude": 108.9634085,
+        "ref": "B",
+        "name": "西安科技大学-B口"
+      },
+      {
+        "osmNodeID": "11378797566",
+        "latitude": 34.2326605,
+        "longitude": 108.9640401,
+        "ref": "C",
+        "name": "西安科技大学-C口"
+      },
+      {
+        "osmNodeID": "11378815369",
+        "latitude": 34.2339293,
+        "longitude": 108.9640462,
+        "ref": "D",
+        "name": "西安科技大学-D口"
+      }
+    ],
+    "fecdc72002427ee6": [
+      {
+        "osmNodeID": "11380745010",
+        "latitude": 34.2513885,
+        "longitude": 109.0056241,
+        "ref": "A",
+        "name": "公园南路-A口"
+      },
+      {
+        "osmNodeID": "11380745015",
+        "latitude": 34.2508351,
+        "longitude": 109.0056193,
+        "ref": "B",
+        "name": "公园南路-B口"
+      },
+      {
+        "osmNodeID": "11380745016",
+        "latitude": 34.2508538,
+        "longitude": 109.0071127,
+        "ref": "C",
+        "name": "公园南路-C口"
+      },
+      {
+        "osmNodeID": "11380745017",
+        "latitude": 34.2513984,
+        "longitude": 109.0070825,
+        "ref": "D",
+        "name": "公园南路-D口"
+      }
+    ],
+    "fee4c23247cc59e1": [
+      {
+        "osmNodeID": "11202048127",
+        "latitude": 34.3936203,
+        "longitude": 108.9448211,
+        "ref": "A",
+        "name": "红会医院北区-A区"
+      },
+      {
+        "osmNodeID": "11202048128",
+        "latitude": 34.3929153,
+        "longitude": 108.9443173,
+        "ref": "B",
+        "name": "红会医院北区-B区"
+      },
+      {
+        "osmNodeID": "11202048130",
+        "latitude": 34.3936206,
+        "longitude": 108.9466111,
+        "ref": "C",
+        "name": "红会医院北区-C区"
+      },
+      {
+        "osmNodeID": "11202048129",
+        "latitude": 34.3941862,
+        "longitude": 108.9463325,
+        "ref": "D",
+        "name": "红会医院北区D区"
+      }
+    ]
+  }
+}

@@ -26,9 +26,15 @@ struct StationDetailView: View {
                 if showsBundledStationSections {
                     accessibilitySection
                     stationEssentialsSection
-                    stationGuideSection
                     arrivalsSection
                 }
+                // Outside the bundled gate: entrance geometry answers a different question from
+                // the operator's exit text. The operator says which streets an exit reaches; the
+                // bundled OSM entrances say where it physically is, which is the only thing that
+                // can draw the exit map. Suppressing it whenever a live snapshot loaded hid the
+                // map in exactly the cities with the most entrances. The section renders nothing
+                // when it has nothing, so this is safe for cities with no pack at all.
+                stationGuideSection
                 stationMapSection
             }
             .padding()

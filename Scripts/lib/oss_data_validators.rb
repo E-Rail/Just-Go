@@ -47,7 +47,13 @@ module OSSDataValidators
     rightsID datasetName termsURL attribution snapshotDate
     redistributionEvidenceURL redistributionEvidence
   ].freeze
-  BUNDLED_CITY_IDS = %w[1100 7101 8100].freeze
+  # Every city that ships a pack inside the app. The three original entries are operator-sourced;
+  # the rest carry OpenStreetMap station entrances, which are ODbL and so may be redistributed in
+  # the bundle rather than fetched on the rider's device. Kept as an explicit list because a pack
+  # appearing here without review is exactly what these validators exist to catch.
+  BUNDLED_CITY_IDS = %w[
+    1100 1200 3100 3201 3205 3301 4201 4401 4403 5000 5101 6101 7101 8100
+  ].freeze
   EXTERNAL_LANDING_PAGES = {
     "1100" => %w[
       https://www.bjsubway.com/station/xltcx/
@@ -401,6 +407,14 @@ module OSSDataValidators
 
     def expected_rights_for(path)
       return ["osm-metro-networks"] if path.match?(%r{\AJustGo/Resources/MetroNetworks/[^/]+\.json\z})
+      # Vendored OSM entrances, and the packs built purely from them. Beijing's pack also carries
+      # its landing-link grant, so it stays in the explicit table below.
+      if path.match?(%r{\ADataPacks/sources/osm-entrances/[^/]+\.json\z})
+        return %w[justgo-generated-catalog osm-metro-networks].sort
+      end
+      if path.match?(%r{\AJustGo/Resources/BundledCityPacks/(?!1100|7101|8100)[^/]+\.json\z})
+        return %w[justgo-generated-catalog osm-metro-networks].sort
+      end
       return ["data-gov-hk-mtr"] if path.match?(%r{\ADataPacks/sources/8100/[^/]+\.csv\z})
       return ["taipei-open-data"] if path.match?(%r{\ADataPacks/sources/7101/[^/]+\.csv\z})
       # Universal city documents aggregate every reviewed source, so each carries the full
@@ -763,14 +777,33 @@ module OSSDataValidators
       end
     end
 
+    # Cities whose pack is nothing but OpenStreetMap station entrances. Beijing also carries them
+    # but is pinned with the operator cities above, since its pack predates this source.
+    OSM_ENTRANCE_PACK_EXPECTATIONS = {
+      "1200" => { stations: 87, exits: 300, accessibility: 5, network: 239 },
+      "3100" => { stations: 368, exits: 1411, accessibility: 56, network: 471 },
+      "3201" => { stations: 97, exits: 365, accessibility: 11, network: 210 },
+      "3205" => { stations: 48, exits: 211, accessibility: 2, network: 235 },
+      "3301" => { stations: 261, exits: 1278, accessibility: 10, network: 270 },
+      "4201" => { stations: 62, exits: 240, accessibility: 7, network: 293 },
+      "4401" => { stations: 329, exits: 1236, accessibility: 37, network: 414 },
+      "4403" => { stations: 319, exits: 1488, accessibility: 19, network: 372 },
+      "5000" => { stations: 77, exits: 283, accessibility: 3, network: 273 },
+      "5101" => { stations: 153, exits: 623, accessibility: 9, network: 396 },
+      "6101" => { stations: 227, exits: 920, accessibility: 164, network: 247 }
+    }.freeze
+
     def validate_city_expectations!(city_id, pack, network)
       stations = pack.fetch("stations")
       expected = case city_id
       when "1100"
+        # Beijing's pack also carries OSM entrances, so its accessibility count is the number of
+        # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
+        # means the entrance import silently stopped matching.
         {
           "networkStations" => 444,
           "matchedStations" => { "covered" => 444, "total" => 444 },
-          "accessibility" => { "covered" => 0, "total" => 444 },
+          "accessibility" => { "covered" => 43, "total" => 444 },
           "staticSchedules" => { "covered" => 0, "total" => 444 },
           "liveArrivals" => { "covered" => 0, "total" => 444 },
           "externalLayouts" => { "covered" => 0, "total" => 444 },
@@ -795,6 +828,32 @@ module OSSDataValidators
           "externalLayouts" => { "covered" => 0, "total" => 151 },
           "licensedMedia" => { "covered" => 0, "total" => 151 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 151 }
+        }
+      when *OSM_ENTRANCE_PACK_EXPECTATIONS.keys
+        # Packs built purely from OpenStreetMap entrances. Station and exit counts are pinned per
+        # city because the failure mode here is quiet: a coordinate-frame or bbox regression drops
+        # the match rate without erroring, and the pack still looks structurally valid.
+        pinned = OSM_ENTRANCE_PACK_EXPECTATIONS.fetch(city_id)
+        exits = stations.sum { |station| Array(station["stationAccessPoints"]).length }
+        unless stations.length == pinned.fetch(:stations) && exits == pinned.fetch(:exits)
+          fail_validation(
+            "#{city_id} OSM entrance pack drifted: #{stations.length} stations / #{exits} exits, " \
+            "expected #{pinned.fetch(:stations)} / #{pinned.fetch(:exits)}"
+          )
+        end
+        if stations.any? { |station| Array(station["stationAccessPoints"]).empty? }
+          fail_validation("#{city_id} OSM entrance pack has a station with no exits")
+        end
+        total = pinned.fetch(:network)
+        {
+          "networkStations" => total,
+          "matchedStations" => { "covered" => pinned.fetch(:stations), "total" => total },
+          "accessibility" => { "covered" => pinned.fetch(:accessibility), "total" => total },
+          "staticSchedules" => { "covered" => 0, "total" => total },
+          "liveArrivals" => { "covered" => 0, "total" => total },
+          "externalLayouts" => { "covered" => 0, "total" => total },
+          "licensedMedia" => { "covered" => 0, "total" => total },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => total }
         }
       else
         missing = network.fetch("stations").reject do |canonical|

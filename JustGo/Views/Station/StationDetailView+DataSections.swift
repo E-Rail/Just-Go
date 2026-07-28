@@ -684,6 +684,28 @@ extension StationDetailView {
 
     /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
     /// platform hints, labeled with a confidence chip. Sits above Train Times.
+    /// Entrances imported from OpenStreetMap are named by the letter on the sign — "C", "A1" —
+    /// because that is all the survey records. On the map that is exactly right, but a list of
+    /// bare letters does not read as anything, so a row says "Exit C". Names that are already
+    /// sentences ("民權西路站出口1") are left alone.
+    private func accessPointRowName(_ point: StationAccessPoint) -> String {
+        let name = point.name.trimmingCharacters(in: .whitespaces)
+        guard name.count <= 3,
+              name.range(of: #"^[A-Za-z]?\d{0,2}[A-Za-z]?$"#, options: .regularExpression) != nil,
+              !name.isEmpty else { return point.name }
+        return AppLocalization.text(
+            english: "Exit \(name)",
+            simplified: "\(name) 出入口",
+            traditional: "\(name) 出入口"
+        )
+    }
+
+    /// Whether the official online section above is already rendering this station's exit list.
+    private var officialSurfaceListsExits: Bool {
+        usesNativeStationInformationSurface &&
+            viewModel?.officialStationInformation?.exits.isEmpty == false
+    }
+
     @ViewBuilder
     var stationGuideSection: some View {
         let exits = viewModel?.accessPoints ?? []
@@ -706,18 +728,22 @@ extension StationDetailView {
                             .fontWeight(.medium)
 
                         // Drawn only where the pack publishes real entrance coordinates, so the
-                        // pins are the operator's own positions rather than a guess.
+                        // pins are surveyed positions rather than a guess.
                         let mappable = mappableAccessPoints
                         if !mappable.isEmpty {
                             stationAccessPointMap(mappable)
                         }
 
-                        ForEach(exits) { exit in
+                        // The official online surface lists this station's exits already, with the
+                        // streets each one reaches — richer than a bare name. Repeating the names
+                        // here would print the same list twice on one screen, so when it is
+                        // showing them this section contributes only the map above.
+                        ForEach(officialSurfaceListsExits ? [] : exits) { exit in
                             HStack(spacing: 8) {
                                 Image(systemName: exit.isAccessible ? "figure.roll" : "figure.walk")
                                     .foregroundStyle(exit.isAccessible ? .green : Color.accentColor)
                                     .frame(width: 22)
-                                Text(exit.name)
+                                Text(accessPointRowName(exit))
                                     .font(.subheadline)
                                 if exit.isAccessible {
                                     Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))

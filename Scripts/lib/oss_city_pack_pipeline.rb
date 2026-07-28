@@ -137,6 +137,17 @@ module OSSCityPackPipeline
 
   TAIPEI_SOURCE_FILES = %w[station_exits.csv stations.csv].freeze
 
+  # Cities whose exits come from OpenStreetMap rather than an operator. OSM is ODbL, so unlike
+  # every operator feed here these ship inside the app and work with no network at all — which is
+  # the only way most of these cities get an exit list or an exit map on the station screen.
+  # Beijing is in the list too, but merges into its existing landing-link pack rather than
+  # producing a second one.
+  # Listing a city here without its DataPacks/sources/osm-entrances file is a hard error, not a
+  # silent skip, so the list and the vendored set cannot drift apart unnoticed.
+  OSM_ENTRANCE_CITY_IDS = %w[
+    1100 1200 3100 3201 3205 3301 4201 4401 4403 5000 5101 6101
+  ].freeze
+
   # "頂埔站出口1" → 頂埔 / 1. Taipei Main Station's exits are lettered without the 站出口 form.
   TAIPEI_EXIT_PATTERN = /\A(?<station>.+?)站(?:出入口|出口)(?<label>.*)\z/
   TAIPEI_MAIN_STATION = "台北車站"
@@ -181,6 +192,13 @@ module OSSCityPackPipeline
         "8100" => build_hong_kong_pack,
         "7101" => build_taipei_pack
       }
+      # Beijing already appears above and merges its entrances into that pack; the rest get a
+      # pack whose only content is OSM exits, which is what makes their station screens work
+      # offline at all.
+      (OSM_ENTRANCE_CITY_IDS - packs.keys).each do |city_id|
+        packs[city_id] = build_osm_entrance_pack(city_id)
+      end
+      packs = packs.sort.to_h
       packs.each { |city_id, pack| write_json(pack_path(city_id), pack) }
       write_json(manifest_path, build_manifest(packs))
 
@@ -195,8 +213,11 @@ module OSSCityPackPipeline
 
     def build_beijing_pack
       network = load_network("1100")
+      # Beijing already ships a pack for its official landing links, so its OSM entrances merge
+      # into that one rather than producing a competing second pack for the same city.
+      access_points = osm_access_points("1100")
       stations = network.fetch("stations").sort_by { |station| station.fetch("id") }.map do |station|
-        base_station(station).merge(
+        record = base_station(station).merge(
           "externalResources" => [
             external_resource(
               "operatorInformation",
@@ -212,6 +233,11 @@ module OSSCityPackPipeline
             )
           ]
         )
+        if (points = access_points[station.fetch("id")])
+          record["stationAccessPoints"] = points
+          apply_entrance_accessibility!(record)
+        end
+        normalize_station_arrays!(record)
       end
 
       coverage = coverage_for(network.fetch("stations").length, stations)
@@ -221,10 +247,131 @@ module OSSCityPackPipeline
         "version" => VERSION,
         "generatedAt" => GENERATED_AT,
         "rightsIDs" => %w[osm-metro-networks beijing-official-landing-links].sort,
-        "capabilities" => deep_copy(BEIJING_CAPABILITIES),
+        "capabilities" => deep_copy(BEIJING_CAPABILITIES).merge(
+          "accessibility" => osm_entrance_capabilities(stations).fetch("accessibility")
+        ),
         "coverage" => coverage,
         "stations" => stations
       }
+    end
+
+    # Reads the vendored OSM entrance binding for a city. Returns station ID -> access-point
+    # records, already in GCJ-02 and already bound to canonical stations by the importer, so the
+    # pack build stays offline and deterministic.
+    def osm_access_points(city_id)
+      path = File.join(root, "DataPacks", "sources", "osm-entrances", "#{city_id}.json")
+      return {} unless File.file?(path)
+
+      document = JSON.parse(File.read(path))
+      unless document["cityID"] == city_id && document["stations"].is_a?(Hash)
+        raise BuildError, "OSM entrance document for #{city_id} is invalid"
+      end
+
+      # An entrance with neither a name nor an exit letter has no rider-facing identity — it would
+      # render as an unlabelled pin nobody can match to a sign — so it is dropped rather than
+      # given an invented label.
+      document.fetch("stations").each_with_object({}) do |(station_id, entrances), index|
+        points = entrances
+          .select { |entrance| identifiable_entrance?(entrance) }
+          .map { |entrance| osm_access_point(entrance) }
+          .uniq { |point| point.fetch("id") }
+          .sort_by { |point| point.fetch("id") }
+        index[station_id] = points unless points.empty?
+      end
+    end
+
+    def identifiable_entrance?(entrance)
+      !entrance["ref"].to_s.strip.empty? || !entrance["name"].to_s.strip.empty?
+    end
+
+    # `ref` is the exit letter riders actually look for ("A", "B2"); it is the identity here, with
+    # the OSM node ID only as a fallback so an untagged entrance still gets a stable, unique id.
+    def osm_access_point(entrance)
+      node_id = entrance.fetch("osmNodeID")
+      label = entrance["ref"].to_s.strip
+      name = entrance["name"].to_s.strip
+      {
+        "id" => "osm-#{node_id}",
+        "name" => name.empty? ? label : name,
+        "kind" => "exit",
+        "latitude" => entrance.fetch("latitude").round(6),
+        "longitude" => entrance.fetch("longitude").round(6),
+        # OSM's wheelchair values are yes/no/limited/designated. Only an unqualified yes is
+        # reported as step-free; "limited" is precisely the case a rider must not be told is fine,
+        # and an untagged entrance — most of them — is simply not a step-free claim. The UI shows
+        # the green wheelchair only for true, so false reads as "not asserted" rather than as
+        # "surveyed and inaccessible".
+        "isAccessible" => accessible_wheelchair_value?(entrance["wheelchair"]) == true,
+        "source" => "specificEntrance"
+      }
+    end
+
+    def accessible_wheelchair_value?(value)
+      case value.to_s.strip.downcase
+      when "yes", "designated" then true
+      when "no", "limited" then false
+      end
+    end
+
+    def build_osm_entrance_pack(city_id)
+      network = load_network(city_id)
+      access_points = osm_access_points(city_id)
+      raise BuildError, "no OSM entrances vendored for #{city_id}" if access_points.empty?
+
+      stations = network.fetch("stations")
+        .select { |station| access_points.key?(station.fetch("id")) }
+        .sort_by { |station| station.fetch("id") }
+        .map do |station|
+          record = base_station(station)
+          record["stationAccessPoints"] = access_points.fetch(station.fetch("id"))
+          apply_entrance_accessibility!(record)
+          normalize_station_arrays!(record)
+        end
+
+      {
+        "schemaVersion" => 2,
+        "cityID" => city_id,
+        "version" => VERSION,
+        "generatedAt" => GENERATED_AT,
+        "rightsIDs" => %w[osm-metro-networks],
+        "capabilities" => osm_entrance_capabilities(stations),
+        "coverage" => coverage_for(network.fetch("stations").length, stations),
+        "stations" => stations
+      }
+    end
+
+    # Only claim static accessibility where OSM actually carries wheelchair tags; most cities have
+    # entrance geometry with no accessibility tagging at all, and saying otherwise would present an
+    # untagged station as one with no step-free entrance rather than one nobody has surveyed.
+    def osm_entrance_capabilities(stations)
+      # Only cities where OSM actually records step-free entrances claim static accessibility.
+      # `accessibility` is set on a station exactly when at least one of its entrances is tagged
+      # wheelchair=yes, so it is the honest signal here. Beijing's pack carries every station,
+      # most with no entrances at all.
+      tagged = stations.any? { |station| !station["accessibility"].nil? }
+      deep_copy(PENDING_CAPABILITIES).merge(
+        "accessibility" => tagged ? "partial_static" : "source_pending"
+      )
+    end
+
+    def apply_entrance_accessibility!(record)
+      accessible = record.fetch("stationAccessPoints")
+        .select { |point| point.fetch("isAccessible") == true }
+        .map { |point| point.fetch("name") }
+      return record if accessible.empty?
+
+      record["accessibility"] = {
+        "source" => "openstreetmap/subway-entrances",
+        "hasElevator" => nil,
+        "hasEscalator" => nil,
+        "hasWheelchairRamp" => nil,
+        "hasTactilePath" => nil,
+        "hasAccessibleRestroom" => nil,
+        "elevatorLocations" => [],
+        "accessibleEntrances" => accessible,
+        "facilityNotes" => []
+      }
+      record
     end
 
     def build_hong_kong_pack
@@ -544,7 +691,7 @@ module OSSCityPackPipeline
           {
             "id" => "osm-metro-networks",
             "kind" => "database",
-            "scope" => "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry",
+            "scope" => "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry, and the station entrances (railway=subway_entrance) bundled as station access points",
             "licenseSPDX" => "ODbL-1.0",
             "licenseURL" => "https://opendatacommons.org/licenses/odbl/1-0/",
             "sourceURL" => "https://www.openstreetmap.org/",
@@ -753,6 +900,20 @@ module OSSCityPackPipeline
           "path" => "JustGo/Resources/BundledCityPacks/7101.json",
           "rightsIDs" => %w[justgo-generated-catalog osm-metro-networks taipei-open-data].sort
         },
+        *OSM_ENTRANCE_CITY_IDS.map do |city_id|
+          {
+            "path" => "DataPacks/sources/osm-entrances/#{city_id}.json",
+            "rightsIDs" => %w[justgo-generated-catalog osm-metro-networks].sort
+          }
+        end,
+        # Beijing's pack is declared with its landing-link grant further down; every other
+        # entrance city ships a pack whose only third-party content is OSM.
+        *(OSM_ENTRANCE_CITY_IDS - %w[1100]).map do |city_id|
+          {
+            "path" => "JustGo/Resources/BundledCityPacks/#{city_id}.json",
+            "rightsIDs" => %w[justgo-generated-catalog osm-metro-networks].sort
+          }
+        end,
         {
           "path" => "THIRD_PARTY_NOTICES.md",
           "rightsIDs" => ["justgo-generated-catalog"]

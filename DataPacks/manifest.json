@@ -5,8 +5,8 @@
     {
       "cityID": "1100",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 630745,
-      "sha256": "4924fb870c886be7d03a2e49d4ef26d8e8ecf0cc78a01c9a92e4be142ea29787",
+      "sizeBytes": 630934,
+      "sha256": "dd9bac89dd1dffef3e5c42b33a33324e3578ab80dd634605b13ce2db39a2f968",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -59,8 +59,8 @@
     {
       "cityID": "4401",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 469575,
-      "sha256": "20cc112823bd76d4f2f39b71e9d6aa462e8ccf9c9ff2f5486a2151527c4e9475",
+      "sizeBytes": 469614,
+      "sha256": "6fd2b4ab157be8b16a12f39ad91556e49affbc09c8b80d92256486bfcecd8f68",
       "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -165,8 +165,8 @@
     {
       "cityID": "1200",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 116968,
-      "sha256": "67e9e8e47e523bdbb0b6c93b8803a861cdaf89ba704a4d19a0a3f1bcb2413eea",
+      "sizeBytes": 117118,
+      "sha256": "3cbb6b5d4cb1c0ef4cd214b7d108236f3078e55855ee6fb14bf9e5f826ea4d91",
       "bundledResource": "BundledCityPacks/1200.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -324,8 +324,8 @@
     {
       "cityID": "3201",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 136791,
-      "sha256": "d25bb447cef2ed14d5619d4b8bb244a913258a574f154fc965e87339f4c13b9d",
+      "sizeBytes": 137269,
+      "sha256": "a53546a5374270e5be422a0ffb6a5f320839316cb87fad3091044c5343781311",
       "bundledResource": "BundledCityPacks/3201.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -377,8 +377,8 @@
     {
       "cityID": "4201",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 89022,
-      "sha256": "7cbc43cf466da9ac3599a00184a73ada641d0b168e17276bc6cd34493765f3c3",
+      "sizeBytes": 89112,
+      "sha256": "7d9375649dcf9a2a1ed6ca1e61a164fe8779ef992da9d9378c9611c2c484414b",
       "bundledResource": "BundledCityPacks/4201.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -1119,8 +1119,8 @@
     {
       "cityID": "3205",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 73243,
-      "sha256": "60425fe57467c8db2418423f62d6a3ee6f93b51a12c7d65c1bd27f801dc317b2",
+      "sizeBytes": 73357,
+      "sha256": "5c900fe625d98149e8ddfe64a6eba0adf347ba18edd160f39c2cf0727bc7780e",
       "bundledResource": "BundledCityPacks/3205.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -1543,8 +1543,8 @@
     {
       "cityID": "3301",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 423557,
-      "sha256": "c06196493cc362627c69cbbd872d04bba71fc414bf698316019233d70aa6d796",
+      "sizeBytes": 424307,
+      "sha256": "fa8862a7eeadd98108ac0bd00039a3992889a9007dab0c3b621dbcfd653e0dce",
       "bundledResource": "BundledCityPacks/3301.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -2126,8 +2126,8 @@
     {
       "cityID": "4403",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 503465,
-      "sha256": "59a6d914911857ecc78a5de8550219992d112dae8e99dbaa505b9bc5e6fc4b46",
+      "sizeBytes": 503480,
+      "sha256": "b568cf38b794ee25ebad9e1c4fe3cc8b185181ce389d793375566aba38ffa4e6",
       "bundledResource": "BundledCityPacks/4403.json",
       "downloadURL": null,
       "rightsIDs": [

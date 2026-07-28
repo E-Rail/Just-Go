@@ -604,7 +604,11 @@ module OSSDataValidators
       exact_keys!(station, REQUIRED_STATION_KEYS, "#{city_id} station", optional: OPTIONAL_STATION_KEYS)
       fail_validation("#{city_id} stationID is missing") if station["stationID"].to_s.empty?
       fail_validation("#{city_id} stationName is missing") if station["stationName"].to_s.empty?
-      fail_validation("#{city_id} stationNameEn must be a string") unless station["stationNameEn"].is_a?(String)
+      # Non-empty, not merely a string: the app rejects a present-but-empty English name and
+      # discards the entire pack for it, so an empty one here is a silent city-wide outage.
+      unless station["stationNameEn"].is_a?(String) && !station["stationNameEn"].strip.empty?
+        fail_validation("#{city_id} stationNameEn must be a non-empty string")
+      end
       fail_validation("#{city_id} aliases must be stable and unique") unless station["aliases"].is_a?(Array) && station["aliases"] == station["aliases"].uniq.sort
       fail_validation("#{city_id} schedules must be empty") unless station["schedules"] == []
       fail_validation("#{city_id} stationFacilities must be an array") unless station["stationFacilities"].is_a?(Array)

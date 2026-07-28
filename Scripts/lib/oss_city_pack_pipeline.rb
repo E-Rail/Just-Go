@@ -1131,7 +1131,13 @@ module OSSCityPackPipeline
       {
         "stationID" => station.fetch("id"),
         "stationName" => station.fetch("name"),
-        "stationNameEn" => station["nameEn"].to_s,
+        # Never emit an empty English name. OfficialCityPackService treats a present-but-empty
+        # stationNameEn as malformed and rejects the station — which fails the *whole* pack, so a
+        # single station OSM has no English name for silently discarded every exit in the city.
+        # Beijing had 22 such stations and had therefore been dropping its bundled pack unnoticed.
+        # Absent English falls back to the station's own name, which is what the app displays for
+        # these stations anyway.
+        "stationNameEn" => station["nameEn"].to_s.strip.empty? ? station.fetch("name") : station.fetch("nameEn"),
         "aliases" => [],
         "accessibility" => nil,
         "schedules" => [],

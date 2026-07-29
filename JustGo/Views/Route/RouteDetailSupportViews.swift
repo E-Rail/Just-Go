@@ -10,10 +10,14 @@ extension RouteConfidenceLevel {
     }
 }
 
-/// The single universal way a route's confidence reads: a continuously sweeping color loop —
-/// tinted green/orange/red by the level — with the 0-100 score at its center. Shared by the
-/// route-selection rows and the route-detail card so the same number and motion appear
-/// everywhere confidence is shown. Honors Reduce Motion (static ring, no spin).
+/// The single universal way a route's confidence reads: a dial filled clockwise from twelve
+/// o'clock to `score`/100 of the way round — tinted green/orange/red by the level — with the
+/// score at its center. Shared by the route-selection rows and the route-detail card so the same
+/// number and geometry appear everywhere confidence is shown.
+///
+/// The arc used to sweep forever instead of stopping at the score. That is a spinner's motion,
+/// and a spinner means "still working" — so a settled 42 read as a value still loading, and the
+/// full circle read as 100 regardless of the number inside it. The fill is now the score.
 struct ConfidenceScoreRing: View {
     let score: Int
     let color: Color
@@ -21,37 +25,30 @@ struct ConfidenceScoreRing: View {
     var lineWidth: CGFloat = 4
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var sweep = false
+
+    /// The score is already clamped to 0-100 by `RouteConfidenceService`, but the ring must not
+    /// depend on that: an over-full trim silently wraps past twelve and understates the score.
+    private var fraction: Double { min(1, max(0, Double(score) / 100)) }
 
     var body: some View {
         ZStack {
             Circle()
                 .stroke(color.opacity(0.15), lineWidth: lineWidth)
             Circle()
-                .stroke(
-                    // First and last stops are the same color so the loop wraps seamlessly;
-                    // the white highlight is the "changing" glint that travels as it rotates.
-                    AngularGradient(
-                        gradient: Gradient(colors: [
-                            color, color.opacity(0.4), .white.opacity(0.85), color.opacity(0.4), color
-                        ]),
-                        center: .center
-                    ),
-                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
-                )
-                .rotationEffect(.degrees(sweep ? 360 : 0))
+                // Derived from `score` rather than grown in from `@State` on appear: `onAppear`
+                // does not fire under `ImageRenderer` or in previews, and a fill that depends on
+                // it renders as an empty ring there — the one failure that looks like real data.
+                .trim(from: 0, to: fraction)
+                .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                // `trim` starts at three o'clock; a dial has to start at twelve.
+                .rotationEffect(.degrees(-90))
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.35), value: fraction)
             Text("\(score)")
                 .font(.system(size: size * 0.34, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(color)
         }
         .frame(width: size, height: size)
-        .onAppear {
-            guard !reduceMotion else { return }
-            withAnimation(.linear(duration: 2.2).repeatForever(autoreverses: false)) {
-                sweep = true
-            }
-        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(AppLocalization.text(
             english: "Confidence \(score) out of 100",

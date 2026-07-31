@@ -41,10 +41,13 @@ struct RoutePlannerView: View {
                             Color.clear.frame(height: 0).id("plannerTop")
                             if let resumableTrip { resumeTripBanner(resumableTrip) }
                             // Simplified UI (cognitive accessibility): only the essentials —
-                            // city, the fields, and search. The resume banner stays: an
-                            // active trip is never noise. Accessibility needs live in
-                            // Profile → Accessibility Settings and seed the search directly.
-                            citySelector
+                            // the fields and search. The resume banner stays: an active trip is
+                            // never noise. Accessibility needs live in Profile → Accessibility
+                            // Settings and seed the search directly.
+                            //
+                            // The city moved to the toolbar: it is picked once and then rarely
+                            // touched, so a full-width row above the From/To fields spent the top
+                            // of the screen on the one control the rider was not reaching for.
                             if !simplifiedUI { smartCommuteSection }
                             routeInputSection
                             plannerActionRail
@@ -80,6 +83,18 @@ struct RoutePlannerView: View {
             }
             .navigationTitle(AppLocalization.localized("Route Planner"))
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { showCityPicker = true }) {
+                        Label(
+                            appState.selectedCity?.localizedName ?? AppLocalization.localized("Select City"),
+                            systemImage: "building.2"
+                        )
+                        .labelStyle(.titleAndIcon)
+                    }
+                    .accessibilityLabel(AppLocalization.localized("City"))
+                }
+            }
             .background(Color.appBackground)
             .onPreferenceChange(SuggestionListTopYKey.self) { suggestionListTopY = $0 }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
@@ -160,25 +175,6 @@ struct RoutePlannerView: View {
                 set: { viewModel.tripAnchor = $0 }
             ))
         }
-    }
-
-    private var citySelector: some View {
-        Button(action: { showCityPicker = true }) {
-            HStack {
-                Image(systemName: "building.2.fill")
-                    .foregroundStyle(Color.accentColor)
-                Text(AppLocalization.localized("City"))
-                Spacer()
-                Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("Select City"))
-                    .foregroundStyle(.secondary)
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        }
-        .buttonStyle(.plain)
     }
 
     private var simplifiedUI: Bool {
@@ -497,8 +493,7 @@ struct RoutePlannerView: View {
                                 .font(.subheadline)
                             if let detailText = place.detailText {
                                 Text(detailText)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .rowMeta()
                             }
                         }
                         Spacer()

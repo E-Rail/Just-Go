@@ -27,9 +27,12 @@ struct Route: Identifiable, Codable {
     let originStationID: String
     let destinationStationID: String
     let strategy: RouteStrategy
-    let segments: [RouteSegment]
+    // Mutable for the same reason `warnings` and `accessGuidance` are: enrichment re-walks the
+    // first and last legs once it knows which door the rider should use, and the distance that
+    // summarises them has to follow.
+    var segments: [RouteSegment]
     let totalDuration: TimeInterval
-    let walkingDistance: Double
+    var walkingDistance: Double
     let totalStops: Int
     let transferCount: Int
     var isFullyAccessible: Bool
@@ -629,6 +632,8 @@ struct RouteComparisonMetrics: Identifiable {
     let transferEffort: String
     let exitConfidence: DataConfidence
     let bestForReason: String
+    let arrivalText: String
+    let summaryLine: String
 }
 
 /// Per-station access guidance returned by the city-pack service: best-available exits/entrances,
@@ -658,9 +663,26 @@ struct StationAccessGuidance {
         near target: CodableCoordinate?,
         requiresStepFree: Bool
     ) -> StationExitRecommendation? {
+        let ranked = rankedAccessPoints(near: target, requiresStepFree: requiresStepFree, limit: 1)
+        guard let point = ranked.points.first else { return nil }
+        return StationExitRecommendation(point: point, stepFreeUnavailable: ranked.stepFreeUnavailable)
+    }
+
+    /// The `limit` most promising entrances, nearest-in-a-straight-line first, plus whether the
+    /// rider's step-free requirement went unmet.
+    ///
+    /// Straight-line order is a *shortlist*, not an answer. At 西直门 the nearest door by air is a
+    /// 698 m walk because the railway runs between it and the street, while a slightly further one
+    /// is a fraction of that. Callers that can afford to measure real walking distance re-rank these;
+    /// callers that cannot take the first and are no worse off than before.
+    func rankedAccessPoints(
+        near target: CodableCoordinate?,
+        requiresStepFree: Bool,
+        limit: Int
+    ) -> (points: [StationAccessPoint], stepFreeUnavailable: Bool) {
         let exits = accessPoints.filter { $0.kind == .exit }
         let candidates = exits.isEmpty ? accessPoints : exits
-        guard !candidates.isEmpty else { return nil }
+        guard !candidates.isEmpty else { return ([], false) }
 
         // Only OSM's `wheelchair=yes`/`designated` sets `isAccessible`, so an untagged entrance is
         // "nobody surveyed this", not "there are steps". When nothing here is tagged step-free the
@@ -669,18 +691,17 @@ struct StationAccessGuidance {
         let unavailable = requiresStepFree && stepFree.isEmpty
         let preferred = requiresStepFree && !stepFree.isEmpty ? stepFree : candidates
 
-        let nearest = target.flatMap { target -> StationAccessPoint? in
-            preferred
-                .compactMap { point -> (point: StationAccessPoint, metres: Double)? in
-                    guard let coordinate = point.coordinate else { return nil }
-                    return (point, target.metres(to: coordinate))
-                }
-                .min { $0.metres < $1.metres }?
-                .point
+        guard let target else {
+            return (Array(preferred.prefix(limit)), unavailable)
         }
-        let chosen = nearest ?? preferred[0]
-
-        return StationExitRecommendation(point: chosen, stepFreeUnavailable: unavailable)
+        let ordered = preferred
+            .compactMap { point -> (point: StationAccessPoint, metres: Double)? in
+                guard let coordinate = point.coordinate else { return nil }
+                return (point, target.metres(to: coordinate))
+            }
+            .sorted { $0.metres < $1.metres }
+            .map(\.point)
+        return (Array((ordered.isEmpty ? preferred : ordered).prefix(limit)), unavailable)
     }
 }
 

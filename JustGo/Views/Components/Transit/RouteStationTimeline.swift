@@ -65,13 +65,11 @@ struct RouteStationTimeline: View {
                     }
                     if let lineName = stop.lineName {
                         Text(lineName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .rowMeta()
                     }
                     if let arrivalTimeText = stop.arrivalTimeText {
                         Text(arrivalTimeText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .rowMeta()
                     }
                 }
                 if rail.isRouteTransfer, let outgoingLineName = rail.outgoingLineName {
@@ -93,8 +91,7 @@ struct RouteStationTimeline: View {
 
             if tappable {
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
                     .padding(.top, 2)
             }
         }

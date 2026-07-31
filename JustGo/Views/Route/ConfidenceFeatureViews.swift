@@ -52,8 +52,7 @@ struct DeparturePlanBanner: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                 Text(plan.arriveByDetail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
                 if let last = plan.lastTrainDetail {
                     Label(last, systemImage: "tram")
                         .font(.caption)

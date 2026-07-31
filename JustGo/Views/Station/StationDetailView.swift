@@ -47,8 +47,11 @@ struct StationDetailView: View {
     @AppStorage("stationGuideMapHeight") var stationGuideMapHeight = StationDetailView.defaultMapHeight
     @State var mapHeightAtDragStart: Double?
 
-    static let defaultMapHeight: Double = 190
-    static let mapHeightRange: ClosedRange<Double> = 140...560
+    // The map is the whole point of the Map tab, so it opens filling most of it rather than as a
+    // 190 pt strip with a list under it. The upper bound lets the list be driven nearly off-screen
+    // for riders who just want to look at where the doors are.
+    static let defaultMapHeight: Double = 380
+    static let mapHeightRange: ClosedRange<Double> = 140...760
 
     /// Only tabs with something behind them are offered — an empty tab is worse than no tab. The
     /// station tab is always present: lines and the data-confidence chips do not depend on a pack.

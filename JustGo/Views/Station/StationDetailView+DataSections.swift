@@ -436,7 +436,10 @@ extension StationDetailView {
                     longitudinalMeters: 420
                 )
             ),
-            interactionModes: []
+            // Pan and zoom were disabled to stop the map swallowing the enclosing ScrollView's
+            // drag. Inside its own tab that conflict is gone, and a station map you cannot move
+            // is a picture: the entrance you want is routinely just outside a 420 m box.
+            interactionModes: [.pan, .zoom]
         ) {
             Annotation(station.localizedName, coordinate: center) {
                 Image(systemName: "tram.fill")
@@ -521,21 +524,36 @@ extension StationDetailView {
 
     private var mapResizeHandle: some View {
         let step: Double = 60
-        return Capsule()
-            .fill(Color.secondary.opacity(0.4))
-            .frame(width: 44, height: 5)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 2)
-                    .onChanged { value in
-                        let base = mapHeightAtDragStart ?? stationGuideMapHeight
-                        mapHeightAtDragStart = base
-                        stationGuideMapHeight = clampedMapHeight(base + value.translation.height)
-                    }
-                    .onEnded { _ in mapHeightAtDragStart = nil }
-            )
+        return HStack(spacing: 8) {
+            Capsule()
+                .fill(Color.secondary.opacity(0.5))
+                .frame(width: 40, height: 5)
+            // The bare capsule read as decoration — a divider, not a control. The arrows say it
+            // moves, and the double-tap gives it a use that does not require discovering the drag.
+            Image(systemName: "arrow.up.and.down")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 11)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 2)
+                .onChanged { value in
+                    let base = mapHeightAtDragStart ?? stationGuideMapHeight
+                    mapHeightAtDragStart = base
+                    stationGuideMapHeight = clampedMapHeight(base + value.translation.height)
+                }
+                .onEnded { _ in mapHeightAtDragStart = nil }
+        )
+        .onTapGesture(count: 2) {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                let maximum = StationDetailView.mapHeightRange.upperBound
+                stationGuideMapHeight = stationGuideMapHeight >= maximum - 1
+                    ? StationDetailView.defaultMapHeight
+                    : maximum
+            }
+        }
             .accessibilityElement()
             .accessibilityLabel(AppLocalization.text(
                 english: "Map height",

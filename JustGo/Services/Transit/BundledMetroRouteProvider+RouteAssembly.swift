@@ -213,65 +213,7 @@ extension BundledMetroRouteProvider {
         fromName: String,
         toName: String
     ) async -> RouteSegment? {
-        let directDistance = from.distance(to: to)
-        guard directDistance >= 10 else { return nil }
-        let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to))
-        request.transportType = .walking
-        let mapRoute: MKRoute?
-        do {
-            mapRoute = try await withMapKitTimeout {
-                try await MKDirections(request: request).calculate().routes.first
-            }
-        } catch {
-            AppLog.routing.info("Walking directions unavailable, using straight-line estimate: \(error)")
-            mapRoute = nil
-        }
-        let distance = mapRoute?.distance ?? directDistance
-        let duration = mapRoute?.expectedTravelTime ?? distance / 1.25
-        let steps = mapRoute?.steps.filter { $0.distance >= 10 || !$0.instructions.isEmpty }.map {
-            WalkingStep(
-                instruction: AppLocalization.isChinese ? "" : $0.instructions,
-                distance: $0.distance,
-                duration: max(1, duration * ($0.distance / max(distance, 1))),
-                isAccessible: !$0.instructions.localizedCaseInsensitiveContains("stairs"),
-                road: nil,
-                action: nil,
-                assistantAction: nil,
-                walkType: nil
-            )
-        } ?? [WalkingStep(
-            instruction: AppLocalization.text(
-                english: "Walk from \(fromName) to \(toName)",
-                simplified: "从\(fromName)步行至\(toName)",
-                traditional: "從\(fromName)步行至\(toName)"
-            ),
-            distance: distance,
-            duration: duration,
-            isAccessible: true,
-            road: nil,
-            action: nil,
-            assistantAction: nil,
-            walkType: nil
-        )]
-        return RouteSegment(
-            id: UUID(),
-            type: .walking,
-            lineName: nil,
-            lineColorHex: nil,
-            fromStationName: fromName,
-            toStationName: toName,
-            fromStationID: nil,
-            toStationID: nil,
-            duration: duration,
-            distance: distance,
-            stops: 0,
-            stationStops: [],
-            polylineCoordinates: mapRoute?.polyline.routeCoordinates.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) } ?? [],
-            walkingDirections: steps,
-            accessibilityNotes: mapRoute == nil ? [AppLocalization.localized("Walking distance is estimated")] : []
-        )
+        await walkingRoutes.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
     }
 
     private func accessGuide(kind: RouteAccessKind, place: TransitPlace, station: MetroStation, walk: RouteSegment?) -> RouteAccessGuide {

@@ -3,10 +3,15 @@ import MapKit
 
 actor BundledMetroRouteProvider: TransitRouteProviding {
     private let metroNetworks: MetroNetworkProviding
+    let walkingRoutes: WalkingRouteProviding
     private var graphs: [String: MetroRoutingGraph] = [:]
 
-    init(metroNetworks: MetroNetworkProviding) {
+    init(
+        metroNetworks: MetroNetworkProviding,
+        walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider()
+    ) {
         self.metroNetworks = metroNetworks
+        self.walkingRoutes = walkingRoutes
     }
 
     func routes(

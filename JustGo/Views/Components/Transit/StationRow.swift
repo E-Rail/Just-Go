@@ -29,8 +29,7 @@ struct StationRow: View {
 
                     if let alternateName = station.alternateLocalizedName {
                         Text(alternateName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .rowMeta()
                     }
 
                     if showAccessibilityBadges {
@@ -42,13 +41,11 @@ struct StationRow: View {
 
                 if let distanceText {
                     Text(distanceText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .rowMeta()
             }
             .padding(.vertical, 4)
         }

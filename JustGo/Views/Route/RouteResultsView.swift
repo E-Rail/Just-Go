@@ -207,31 +207,26 @@ struct RouteResultsView: View {
 
                 VStack(alignment: .leading, spacing: 7) {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(AppLocalization.text(
-                            english: "Route \(metrics.rank)",
-                            simplified: "路线 \(metrics.rank)",
-                            traditional: "路線 \(metrics.rank)"
-                        ))
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        if let line = route.boardingTransitSegment?.lineName {
-                            LineColorIndicator(colorHex: route.boardingTransitSegment?.lineColorHex ?? "#007AFF", size: 8)
-                            Text(line)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-                        Spacer()
                         Text(metrics.durationText)
-                            .font(.title3)
+                            .font(.title2)
                             .fontWeight(.bold)
+                            .monospacedDigit()
+                        Spacer()
+                        Text(metrics.arrivalText)
+                            .rowMeta()
                             .monospacedDigit()
                     }
 
+                    // The lines this route rides, in order, as coloured bars. A rider comparing
+                    // alternatives is choosing between *shapes* of journey, and three chips of grey
+                    // text made every row look the same until you read all of them.
+                    journeyBars(route)
+
+                    Text(metrics.summaryLine)
+                        .rowMeta()
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
-                            resultMetricChip(metrics.walkingText, icon: "figure.walk")
-                            resultMetricChip(metrics.transferEffort, icon: "arrow.triangle.2.circlepath")
                             DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
                             Text(metrics.bestForReason)
                                 .font(.caption2)
@@ -258,18 +253,41 @@ struct RouteResultsView: View {
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
     }
 
-    private func resultMetricChip(_ text: String, icon: String) -> some View {
-        Label(text, systemImage: icon)
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color(.systemGray6), in: Capsule())
+    /// One bar per leg, widths in proportion to time, so the row shows at a glance how much of the
+    /// trip is on foot and how much is riding.
+    private func journeyBars(_ route: Route) -> some View {
+        GeometryReader { proxy in
+            HStack(spacing: 3) {
+                ForEach(route.segments) { segment in
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
+                        .fill(barColor(segment))
+                        .frame(width: barWidth(segment, route: route, total: proxy.size.width))
+                }
+            }
+        }
+        .frame(height: 6)
+    }
+
+    private func barColor(_ segment: RouteSegment) -> Color {
+        switch segment.type {
+        case .walking: return Color.secondary.opacity(0.35)
+        case .subway: return Color.adaptive(hex: segment.lineColorHex ?? "#007AFF")
+        case .transfer: return .orange
+        }
+    }
+
+    private func barWidth(_ segment: RouteSegment, route: Route, total: CGFloat) -> CGFloat {
+        guard route.totalDuration > 0, total > 0 else { return 0 }
+        let spacing = CGFloat(max(0, route.segments.count - 1)) * 3
+        let available = max(0, total - spacing)
+        // A floor keeps a two-minute transfer from vanishing into a hairline the eye reads as a gap.
+        return max(6, available * CGFloat(segment.duration / route.totalDuration))
     }
 
     private func comparisonMetrics(for route: Route, rank: Int) -> RouteComparisonMetrics {
-        RouteComparisonMetrics(
+        let timing = TripTimeContext(anchor: viewModel.tripAnchor, totalDuration: route.totalDuration)
+        let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
+        return RouteComparisonMetrics(
             id: route.id,
             rank: rank,
             durationText: route.formattedDuration,
@@ -277,7 +295,20 @@ struct RouteResultsView: View {
             walkingText: route.formattedWalkingDistance,
             transferEffort: transferEffort(for: route),
             exitConfidence: exitConfidence(for: route),
-            bestForReason: bestForReason(for: route, in: viewModel.routes)
+            bestForReason: bestForReason(for: route, in: viewModel.routes),
+            arrivalText: AppLocalization.text(
+                english: "Arrive \(arrival)",
+                simplified: "\(arrival) 到达",
+                traditional: "\(arrival) 到達"
+            ),
+            summaryLine: [
+                transferEffort(for: route),
+                AppLocalization.text(
+                    english: "\(route.formattedWalkingDistance) walk",
+                    simplified: "步行 \(route.formattedWalkingDistance)",
+                    traditional: "步行 \(route.formattedWalkingDistance)"
+                )
+            ].joined(separator: " · ")
         )
     }
 

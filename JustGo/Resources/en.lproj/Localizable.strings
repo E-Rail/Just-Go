@@ -1,6 +1,5 @@
 "About" = "About";
 "Accessibility" = "Accessibility";
-"Access Guidance" = "Access Guidance";
 "Accessibility Settings" = "Accessibility Settings";
 "Accessible" = "Accessible";
 "App Language" = "App Language";
@@ -29,7 +28,6 @@
 "Flash Alerts" = "Flash Alerts";
 "From" = "From";
 "Fully Accessible" = "Fully Accessible";
-"Fully Accessible Route" = "Fully Accessible Route";
 "Fully Accessible Station" = "Fully Accessible Station";
 "Hearing" = "Hearing";
 "Hearing Impairment" = "Hearing Impairment";
@@ -71,7 +69,6 @@
 "Route" = "Route";
 "Route Details" = "Route Details";
 "Route Planner" = "Route Planner";
-"Route Steps" = "Route Steps";
 "Routes" = "Routes";
 "Schedule unavailable" = "Schedule unavailable";
 "Bundled schedule" = "Bundled schedule";
@@ -170,7 +167,6 @@
 "Prioritized for fewer line changes." = "Prioritized for fewer line changes.";
 "This route is likely to be smooth based on available data." = "This route is likely to be smooth based on available data.";
 "This route works, but check the listed uncertainties before going." = "This route works, but check the listed uncertainties before going.";
-"Based on available data, not a safety guarantee." = "Based on available data, not a safety guarantee.";
 "Transfer station" = "Transfer station";
 "Metro geometry © OpenStreetMap contributors" = "Metro geometry © OpenStreetMap contributors";
 "Metro track geometry" = "Metro track geometry";
@@ -188,13 +184,11 @@
 "Apple Maps walking directions mention an elevator." = "Apple Maps walking directions mention an elevator.";
 "Apple Maps walking directions mention an escalator." = "Apple Maps walking directions mention an escalator.";
 "Apple Maps walking directions mention stairs." = "Apple Maps walking directions mention stairs.";
-"Bottleneck" = "Bottleneck";
 "Choose City" = "Choose City";
 "Checking station details..." = "Checking station details...";
 "Complete Trip" = "Complete Trip";
 "First" = "First";
 "My Trips" = "My Trips";
-"No accessibility concerns found from available data." = "No accessibility concerns found from available data.";
 "No Quick Tags yet" = "No Quick Tags yet";
 "No saved trips yet" = "No saved trips yet";
 "No stations match these filters" = "No stations match these filters";
@@ -206,7 +200,6 @@
 "Personal" = "Personal";
 "Quick Tags" = "Quick Tags";
 "Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
-"Rider Notes" = "Rider Notes";
 "Save" = "Save";
 "Save Trip" = "Save Trip";
 "Saved Trip" = "Saved Trip";

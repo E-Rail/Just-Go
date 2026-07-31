@@ -145,12 +145,10 @@ struct TransferStationSheet: View {
                         simplified: "换乘步行约\(transferSegment.formattedDuration)",
                         traditional: "換乘步行約\(transferSegment.formattedDuration)"
                     ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
                 } icon: {
                     Image(systemName: "figure.walk")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
             }
         }
@@ -182,8 +180,7 @@ struct TransferStationSheet: View {
                             simplified: "暂无具体出入口数据；如有官方运营方页面，可在下方打开。",
                             traditional: "暫無具體出入口資料；如有官方營運方頁面，可在下方開啟。"
                         ))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                     } else {
                         Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
                             .font(.caption)
@@ -240,8 +237,7 @@ struct TransferStationSheet: View {
                 }
                 ForEach(hint.notes, id: \.self) { note in
                     Text(note)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
             }
             Spacer()
@@ -269,8 +265,7 @@ struct TransferStationSheet: View {
                             simplified: "本站暂无官方车站资源。",
                             traditional: "本站暫無官方車站資源。"
                         ))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                     } icon: {
                         Image(systemName: "map")
                             .foregroundStyle(.secondary)
@@ -284,8 +279,7 @@ struct TransferStationSheet: View {
                         simplified: "这些官方资源会在 JustGo 内显示；JustGo 不对其内容作核实或解读。",
                         traditional: "這些官方資源會在 JustGo 內顯示；JustGo 不對其內容作核實或解讀。"
                     ))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
             }
         }
@@ -305,8 +299,7 @@ struct TransferStationSheet: View {
                     HStack {
                         ProgressView()
                         Text(AppLocalization.text(english: "Loading station info…", simplified: "加载中…", traditional: "載入中…"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .rowMeta()
                     }
                 } else if let station = enrichedStation {
                     let acc = station.accessibility
@@ -334,8 +327,7 @@ struct TransferStationSheet: View {
                         simplified: "此站点无障碍数据不可用。",
                         traditional: "此站點無障礙資料不可用。"
                     ))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
                 }
             }
         }
@@ -374,8 +366,7 @@ struct TransferStationSheet: View {
                     simplified: "车站入口（街景）",
                     traditional: "車站入口（街景）"
                 ))
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .rowMeta()
             }
         }
     }

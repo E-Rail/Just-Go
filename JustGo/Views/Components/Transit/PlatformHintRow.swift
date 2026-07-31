@@ -18,8 +18,7 @@ struct StationAccessPointRow: View {
                 .font(.subheadline)
             if group.count > 1 {
                 Text(verbatim: "×\(group.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
                     .accessibilityLabel(AppLocalization.text(
                         english: "\(group.count) entrances",
                         simplified: "\(group.count) 个出入口",
@@ -56,8 +55,7 @@ struct PlatformHintRow: View {
                 }
                 ForEach(hint.notes, id: \.self) { note in
                     Text(note)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
             }
             Spacer()

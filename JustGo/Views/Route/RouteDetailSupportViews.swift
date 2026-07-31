@@ -58,53 +58,104 @@ struct ConfidenceScoreRing: View {
     }
 }
 
-struct TripConfidenceCard: View {
+/// Confidence and feasibility on one screen.
+///
+/// They used to be two stacked cards that answered the same rider question — "can I rely on this
+/// plan?" — from two angles, after the header above them had already printed both verdicts as
+/// chips. Three renderings of two numbers. This is the one place that detail lives now, one tap
+/// from the route.
+struct RouteConfidenceDetailView: View {
     let confidence: RouteConfidence
+    let feasibility: RouteFeasibility
 
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(AppLocalization.localized("Trip Confidence"))
-                            .font(.headline)
-                        Text(confidence.level.summary)
-                            .font(.subheadline)
-                            .foregroundStyle(confidence.level.color)
-                    }
-                    Spacer()
-                    VStack(spacing: 4) {
-                        ConfidenceScoreRing(
-                            score: confidence.score,
-                            color: confidence.level.color,
-                            size: 56
-                        )
+        List {
+            Section {
+                HStack(spacing: 16) {
+                    ConfidenceScoreRing(
+                        score: confidence.score,
+                        color: confidence.level.color,
+                        size: 64,
+                        lineWidth: 5
+                    )
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(confidence.level.title)
-                            .font(.caption)
+                            .font(.headline)
                             .foregroundStyle(confidence.level.color)
+                        Text(confidence.level.summary)
+                            .rowMeta()
                     }
                 }
-
+                .padding(.vertical, 4)
                 Text(confidence.explanation)
-                    .font(.subheadline)
+                    .rowValue()
+            }
 
-                ForEach(confidence.positiveReasons.prefix(3), id: \.self) { reason in
-                    Label(reason, systemImage: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.green)
+            if !accessibilityNotes.isEmpty {
+                Section {
+                    ForEach(accessibilityNotes, id: \.self) { note in
+                        Text(note).rowValue()
+                    }
+                    if feasibility.estimatedExtraMinutes > 0 {
+                        LabeledContent {
+                            Text(AppLocalization.text(
+                                english: "+\(feasibility.estimatedExtraMinutes) min",
+                                chinese: "+\(feasibility.estimatedExtraMinutes) 分钟"
+                            ))
+                            .rowValue()
+                        } label: {
+                            Text(AppLocalization.text(
+                                english: "Possible delay",
+                                simplified: "可能增加",
+                                traditional: "可能增加"
+                            ))
+                        }
+                    }
+                } header: {
+                    Label(feasibility.title, systemImage: feasibility.level.iconName)
+                        .foregroundStyle(feasibility.level.color)
                 }
+            }
 
-                ForEach(confidence.warnings.prefix(3), id: \.self) { warning in
-                    Label(warning, systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            if !confidence.warnings.isEmpty {
+                Section {
+                    ForEach(confidence.warnings.prefix(5), id: \.self) { warning in
+                        Label(warning, systemImage: "exclamationmark.triangle.fill")
+                            .rowValue()
+                    }
+                } header: {
+                    Text(AppLocalization.text(english: "Watch out for", simplified: "需要注意", traditional: "需要注意"))
                 }
+            }
 
-                Text(AppLocalization.localized("Based on available data, not a safety guarantee."))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+            if !confidence.positiveReasons.isEmpty {
+                Section {
+                    ForEach(confidence.positiveReasons.prefix(5), id: \.self) { reason in
+                        Label(reason, systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .rowValue()
+                    }
+                } header: {
+                    Text(AppLocalization.text(english: "In your favour", simplified: "有利因素", traditional: "有利因素"))
+                }
             }
         }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(Color.appBackground)
+        .navigationTitle(AppLocalization.localized("Trip Confidence"))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// The bottleneck first, then the explanations — and nothing at all when there is nothing to
+    /// report. A card that says "no concerns found" is a screenful of no information.
+    private var accessibilityNotes: [String] {
+        var notes: [String] = []
+        if let bottleneck = feasibility.bottleneck {
+            notes.append("\(bottleneck.segmentTitle): \(bottleneck.reason)")
+        }
+        notes.append(contentsOf: feasibility.allExplanations.prefix(4))
+        return notes
     }
 }
 

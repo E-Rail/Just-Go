@@ -171,7 +171,14 @@ final class DIContainer {
             realtimeArrivals: realtimeArrivalProvider,
             officialResourceCatalogLoader: { try .bundled() }
         )
-        let transitRouteProvider = BundledMetroRouteProvider(metroNetworks: metroNetworkProvider)
+        // One walking-leg builder for both callers: the graph walks to the station, enrichment
+        // re-walks to the door it picks. Two instances would be harmless but two implementations
+        // would not, so the shared one is passed explicitly rather than defaulted twice.
+        let walkingRouteProvider = MapKitWalkingRouteProvider()
+        let transitRouteProvider = BundledMetroRouteProvider(
+            metroNetworks: metroNetworkProvider,
+            walkingRoutes: walkingRouteProvider
+        )
         let cityService = CityService()
         let stationSearchService = StationSearchService(
             placeSearchProvider: placeSearchProvider,
@@ -182,7 +189,8 @@ final class DIContainer {
         let routePlanningService = RoutePlanningService(
             placeSearchProvider: placeSearchProvider,
             routeProvider: transitRouteProvider,
-            officialStationData: officialStationData
+            officialStationData: officialStationData,
+            walkingRoutes: walkingRouteProvider
         )
         let tripMemoryService = TripMemoryService()
         let routeFeasibilityService = RouteFeasibilityService()

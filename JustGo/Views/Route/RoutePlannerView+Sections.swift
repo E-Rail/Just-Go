@@ -53,8 +53,7 @@ extension RoutePlannerView {
                     Image(systemName: "bookmark")
                         .foregroundStyle(.secondary)
                     Text(AppLocalization.localized("Search a route, then tap 'Save this trip' to reuse it quickly"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -83,8 +82,7 @@ extension RoutePlannerView {
                                         .fontWeight(.semibold)
                                         .lineLimit(1)
                                     Text(trip.routeTitle)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .rowMeta()
                                         .lineLimit(2)
                                     if trip.hasAccessibilityOverrides {
                                         Label(AppLocalization.localized("Accessibility overrides"), systemImage: "accessibility")
@@ -135,8 +133,7 @@ extension RoutePlannerView {
                     Image(systemName: "clock")
                         .foregroundStyle(.secondary)
                     Text(AppLocalization.localized("Your last 10 routes will appear here for quick access"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -160,8 +157,7 @@ extension RoutePlannerView {
                                     Text("\(route.originStationName) → \(route.destinationStationName)")
                                         .font(.body)
                                     Text([route.lineName, route.displayDuration].compactMap { $0 }.joined(separator: " • "))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .rowMeta()
                                 }
                                 Spacer()
                                 Image(systemName: "clock.arrow.circlepath")
@@ -189,8 +185,7 @@ extension RoutePlannerView {
                 Section {
                     TextField(AppLocalization.localized("Trip name"), text: $savedTripName)
                     Text(defaultSavedTripName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                 } header: {
                     Text(AppLocalization.localized("Saved Trip"))
                 }

@@ -1,6 +1,5 @@
 "About" = "關於";
 "Accessibility" = "無障礙";
-"Access Guidance" = "進出站指引";
 "Accessibility Settings" = "無障礙設定";
 "Accessible" = "無障礙";
 "App Language" = "App 語言";
@@ -28,7 +27,6 @@
 "Flash Alerts" = "閃光提醒";
 "From" = "起點";
 "Fully Accessible" = "完全無障礙";
-"Fully Accessible Route" = "完全無障礙路線";
 "Fully Accessible Station" = "完全無障礙車站";
 "Hearing" = "聽力";
 "Hearing Impairment" = "聽力障礙";
@@ -71,7 +69,6 @@
 "Route" = "路線";
 "Route Details" = "路線詳情";
 "Route Planner" = "路線規劃";
-"Route Steps" = "路線步驟";
 "Routes" = "路線";
 "Schedule unavailable" = "暫無時刻資訊";
 "Bundled schedule" = "內建時刻";
@@ -170,7 +167,6 @@
 "Prioritized for fewer line changes." = "因轉乘更少而優先。";
 "This route is likely to be smooth based on available data." = "根據現有資料，此路線大概率順暢。";
 "This route works, but check the listed uncertainties before going." = "此路線可用，但出發前請確認列出的不確定資訊。";
-"Based on available data, not a safety guarantee." = "基於現有資料，不代表安全保證。";
 "Transfer station" = "轉乘站";
 "Metro geometry © OpenStreetMap contributors" = "地鐵線路幾何 © OpenStreetMap 貢獻者";
 "Metro track geometry" = "地鐵真實線路";
@@ -188,13 +184,11 @@
 "Apple Maps walking directions mention an elevator." = "Apple 地圖步行指引提到電梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地圖步行指引提到電扶梯。";
 "Apple Maps walking directions mention stairs." = "Apple 地圖步行指引提到樓梯。";
-"Bottleneck" = "瓶頸";
 "Choose City" = "選擇城市";
 "Checking station details..." = "正在檢查車站詳情…";
 "Complete Trip" = "完成行程";
 "First" = "首班";
 "My Trips" = "我的行程";
-"No accessibility concerns found from available data." = "現有資料未發現無障礙問題。";
 "No Quick Tags yet" = "暫無快捷標籤";
 "No saved trips yet" = "暫無已儲存行程";
 "No stations match these filters" = "沒有車站符合這些篩選條件";
@@ -206,7 +200,6 @@
 "Personal" = "個人";
 "Quick Tags" = "快捷標籤";
 "Try clearing filters or loading official city data." = "請嘗試清除篩選條件，或載入官方城市資料。";
-"Rider Notes" = "乘客備註";
 "Save" = "儲存";
 "Save Trip" = "儲存行程";
 "Saved Trip" = "已儲存行程";

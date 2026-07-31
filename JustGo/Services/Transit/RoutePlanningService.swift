@@ -2,20 +2,58 @@ import Foundation
 import CoreLocation
 import MapKit
 
+/// Memoises walking legs for the span of one plan.
+///
+/// Alternatives are enriched concurrently and mostly share their endpoints, so without this the
+/// same door-to-destination walk is requested once per alternative per candidate door — enough
+/// duplicate `MKDirections` traffic to get throttled. In-flight calls are shared, not just
+/// finished ones, because the concurrent callers arrive together.
+private actor WalkingLegMemo {
+    private let provider: WalkingRouteProviding
+    private var inFlight: [String: Task<RouteSegment?, Never>] = [:]
+
+    init(provider: WalkingRouteProviding) {
+        self.provider = provider
+    }
+
+    func leg(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        // ~1 m precision: finer than the coordinates differ by, coarser than float noise.
+        let key = String(
+            format: "%.5f,%.5f>%.5f,%.5f",
+            from.latitude, from.longitude, to.latitude, to.longitude
+        )
+        if let existing = inFlight[key] { return await existing.value }
+        let provider = provider
+        let task = Task {
+            await provider.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        }
+        inFlight[key] = task
+        return await task.value
+    }
+}
+
 final class RoutePlanningService {
     private let placeSearchProvider: PlaceSearchProviding
     private let routeProvider: TransitRouteProviding
     private let officialStationData: OfficialStationDataProviding
+    private let walkingRoutes: WalkingRouteProviding
     private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
         placeSearchProvider: PlaceSearchProviding,
         routeProvider: TransitRouteProviding,
-        officialStationData: OfficialStationDataProviding
+        officialStationData: OfficialStationDataProviding,
+        walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider()
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
         self.officialStationData = officialStationData
+        self.walkingRoutes = walkingRoutes
     }
 
     func planRoute(
@@ -30,6 +68,10 @@ final class RoutePlanningService {
             to: destination,
             accessibilityFilter: accessibilityFilter
         )
+
+        // Alternatives overwhelmingly share their first and last stations, so one memo across the
+        // whole plan collapses their duplicate door-walk lookups into a single call each.
+        let legs = WalkingLegMemo(provider: walkingRoutes)
 
         // Each route's enrichment below is a handful of officialStationData lookups that don't
         // touch any shared mutable state — running them one route after another multiplied
@@ -52,7 +94,8 @@ final class RoutePlanningService {
                             destination.entranceCoordinate ?? destination.coordinate
                         ),
                         accessibilityFilter: accessibilityFilter,
-                        tripAnchor: tripAnchor
+                        tripAnchor: tripAnchor,
+                        legs: legs
                     )
                     return (index, enriched)
                 }
@@ -71,7 +114,8 @@ final class RoutePlanningService {
         originTarget: CodableCoordinate,
         destinationTarget: CodableCoordinate,
         accessibilityFilter: AccessibilityFilter,
-        tripAnchor: TripTimeAnchor
+        tripAnchor: TripTimeAnchor,
+        legs: WalkingLegMemo
     ) async -> Route {
         var route = route
         let routeCityID = route.networkCityID ?? city
@@ -145,9 +189,48 @@ final class RoutePlanningService {
         let stationPositions = criticalStops.reduce(into: [String: CodableCoordinate]()) { index, stop in
             if let coordinate = stop.coordinate { index[stop.name] = coordinate }
         }
+        // Choose each end's door ONCE, by measured walking distance, and let every surface read
+        // that one answer. When the timeline picked its own exit and the guide card picked another,
+        // the same trip named two different doors on two screens.
+        let originIndex = route.segments.first?.type == .walking ? 0 : nil
+        let destinationIndex = route.segments.count > 1 && route.segments.last?.type == .walking
+            ? route.segments.count - 1
+            : nil
+        // Read what the two lookups need before starting them: an `async let` body may not capture
+        // the mutable `route` they are about to update.
+        let originGuide = route.originAccessGuide
+        let destinationGuide = route.destinationAccessGuide
+        let originSegment = originIndex.map { route.segments[$0] }
+        let destinationSegment = destinationIndex.map { route.segments[$0] }
+
+        async let originChoiceTask = chooseExit(
+            guide: originGuide,
+            guidance: guidanceByStation,
+            stationPositions: stationPositions,
+            rider: originTarget,
+            existing: originSegment,
+            isArrival: false,
+            requiresStepFree: accessibilityFilter.requiresStepFreeEntrance,
+            legs: legs
+        )
+        async let destinationChoiceTask = chooseExit(
+            guide: destinationGuide,
+            guidance: guidanceByStation,
+            stationPositions: stationPositions,
+            rider: destinationTarget,
+            existing: destinationSegment,
+            isArrival: true,
+            requiresStepFree: accessibilityFilter.requiresStepFreeEntrance,
+            legs: legs
+        )
+        let originChoice = await originChoiceTask
+        let destinationChoice = await destinationChoiceTask
+
         route.stationGuidance = buildStationGuidance(
             route: route,
             guidance: guidanceByStation,
+            originExit: originChoice?.point,
+            destinationExit: destinationChoice?.point,
             originTarget: originTarget,
             destinationTarget: destinationTarget,
             requiresStepFree: accessibilityFilter.requiresStepFreeEntrance
@@ -156,11 +239,167 @@ final class RoutePlanningService {
             route.accessGuidance,
             guidance: guidanceByStation,
             stationPositions: stationPositions,
-            originTarget: originTarget,
-            destinationTarget: destinationTarget,
-            requiresStepFree: accessibilityFilter.requiresStepFreeEntrance
+            originChoice: originChoice,
+            destinationChoice: destinationChoice
+        )
+        route = applyChosenExitLegs(
+            route,
+            originIndex: originIndex,
+            destinationIndex: destinationIndex,
+            originChoice: originChoice,
+            destinationChoice: destinationChoice
         )
 
+        return route
+    }
+
+    /// Distance below which re-walking the leg to a specific door is not worth an `MKDirections`
+    /// round trip — the door is essentially where the graph already sent the rider.
+    private static let exitRerouteThresholdMetres: Double = 40
+
+    /// How many of the nearest doors get their walk actually measured. Three covers the case this
+    /// exists for — one door on the wrong side of a barrier — without turning every plan into a
+    /// dozen routing calls.
+    private static let exitCandidateLimit = 3
+
+    /// The end of a trip, resolved: which door, and the real walk to it.
+    private struct ChosenExit {
+        let point: StationAccessPoint
+        let stepFreeUnavailable: Bool
+        /// nil when the walk was not worth measuring; the caller keeps the leg it already had.
+        let leg: RouteSegment?
+    }
+
+    /// Picks the door for one end of the trip and measures the walk to it.
+    ///
+    /// The graph walks the rider to the station's centre, because a centre is all a graph node has,
+    /// and enrichment then names a specific door. Left there, the two halves of the screen disagree:
+    /// the text says "Exit D" while the map draws — and the duration counts — a walk to the middle
+    /// of the station. At 西单 that read as a 265 m walk to a door 34 m away.
+    ///
+    /// Straight-line distance alone is not enough to choose with, either. At 西直门 the nearest door
+    /// by air is a 698 m walk, because the railway runs between it and the street. So the nearest
+    /// few are measured for real and the shortest actual walk wins.
+    private func chooseExit(
+        guide: RouteAccessGuide?,
+        guidance: [String: StationAccessGuidance],
+        stationPositions: [String: CodableCoordinate],
+        rider: CodableCoordinate,
+        existing: RouteSegment?,
+        isArrival: Bool,
+        requiresStepFree: Bool,
+        legs: WalkingLegMemo
+    ) async -> ChosenExit? {
+        guard let guide else { return nil }
+        let access = guidance[guide.stationName] ?? .empty
+        let ranked = access.rankedAccessPoints(
+            near: rider,
+            requiresStepFree: requiresStepFree,
+            limit: Self.exitCandidateLimit
+        )
+        guard let nearest = ranked.points.first else { return nil }
+        let fallback = ChosenExit(point: nearest, stepFreeUnavailable: ranked.stepFreeUnavailable, leg: nil)
+
+        // Nothing to replace, or no station centre to judge against: keep the straight-line pick and
+        // spend no calls on a difference that cannot be established.
+        guard let existing, let centre = stationPositions[guide.stationName] else { return fallback }
+
+        let measurable = ranked.points.filter { point in
+            guard let coordinate = point.coordinate else { return false }
+            return centre.metres(to: coordinate) > Self.exitRerouteThresholdMetres
+        }
+        guard !measurable.isEmpty else { return fallback }
+
+        let riderCoordinate = CLLocationCoordinate2D(latitude: rider.latitude, longitude: rider.longitude)
+        let fromName = existing.fromStationName ?? ""
+        let toName = existing.toStationName ?? ""
+
+        let walked = await withTaskGroup(of: (StationAccessPoint, RouteSegment?).self) { group in
+            for point in measurable {
+                guard let door = point.coordinate else { continue }
+                group.addTask {
+                    let doorCoordinate = CLLocationCoordinate2D(
+                        latitude: door.latitude,
+                        longitude: door.longitude
+                    )
+                    let leg = await legs.leg(
+                        from: isArrival ? doorCoordinate : riderCoordinate,
+                        to: isArrival ? riderCoordinate : doorCoordinate,
+                        fromName: fromName,
+                        toName: toName
+                    )
+                    return (point, leg)
+                }
+            }
+            var results: [(StationAccessPoint, RouteSegment?)] = []
+            for await result in group { results.append(result) }
+            return results
+        }
+
+        let best = walked
+            .compactMap { point, leg -> (point: StationAccessPoint, leg: RouteSegment)? in
+                leg.map { (point, $0) }
+            }
+            .min { $0.leg.distance < $1.leg.distance }
+        guard let best else { return fallback }
+        return ChosenExit(
+            point: best.point,
+            stepFreeUnavailable: ranked.stepFreeUnavailable,
+            leg: best.leg
+        )
+    }
+
+    /// Swaps in the measured legs and restates everything derived from them.
+    private func applyChosenExitLegs(
+        _ route: Route,
+        originIndex: Int?,
+        destinationIndex: Int?,
+        originChoice: ChosenExit?,
+        destinationChoice: ChosenExit?
+    ) -> Route {
+        var route = route
+        var changed = false
+        if let index = originIndex, let leg = originChoice?.leg {
+            route.segments[index] = leg
+            changed = true
+        }
+        if let index = destinationIndex, let leg = destinationChoice?.leg {
+            route.segments[index] = leg
+            changed = true
+        }
+        guard changed else { return route }
+
+        // The guides quote the walk they belong to, so they have to be restated from the new legs
+        // rather than left holding the centroid's numbers.
+        let updatedSegments = route.segments
+        route.accessGuidance = route.accessGuidance.map { guide in
+            guard let index = guide.kind == .origin ? originIndex : destinationIndex else { return guide }
+            let leg = updatedSegments[index]
+            return RouteAccessGuide(
+                id: guide.id,
+                kind: guide.kind,
+                placeName: guide.placeName,
+                stationName: guide.stationName,
+                accessPoint: guide.accessPoint,
+                walkingDistance: leg.distance,
+                walkingDuration: leg.duration,
+                walkingSteps: leg.walkingDirections ?? [],
+                accessibilityNotes: guide.accessibilityNotes
+            )
+        }
+
+        // `longWalk` was judged against the centroid walk in the assembler; a door can be several
+        // hundred metres from a station's centre, so the verdict can genuinely flip either way.
+        let walkingDistance = updatedSegments.filter { $0.type == .walking }.reduce(0) { $0 + $1.distance }
+        route.walkingDistance = walkingDistance
+        route.warnings.removeAll { $0.type == .longWalk }
+        if walkingDistance >= 800 {
+            route.warnings.append(RouteWarning(
+                type: .longWalk,
+                message: AppLocalization.localized("Long walking segment"),
+                affectedStationID: nil
+            ))
+        }
         return route
     }
 
@@ -169,6 +408,8 @@ final class RoutePlanningService {
     private func buildStationGuidance(
         route: Route,
         guidance: [String: StationAccessGuidance],
+        originExit: StationAccessPoint?,
+        destinationExit: StationAccessPoint?,
         originTarget: CodableCoordinate,
         destinationTarget: CodableCoordinate,
         requiresStepFree: Bool
@@ -181,22 +422,21 @@ final class RoutePlanningService {
         func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role, interchange: StationInterchangeHint? = nil) {
             guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
             let access = guidance[stop.name] ?? .empty
-            // Boarding aims at where the rider is coming from, arrival at where they are going;
-            // a transfer never leaves the station, so it has no entrance to recommend.
-            let target: CodableCoordinate?
+            // The boarding and arrival doors were already chosen — by measured walking distance —
+            // so take those rather than re-deciding here. Deciding twice is how the timeline and
+            // the guide card came to name two different exits for the same trip.
+            //
+            // A transfer never leaves the station, so it has no entrance to recommend at all.
+            let chosen: StationAccessPoint?
             switch role {
-            case .boarding: target = originTarget
-            case .arrival: target = destinationTarget
-            case .transfer: target = nil
+            case .boarding: chosen = originExit
+            case .arrival: chosen = destinationExit
+            case .transfer: chosen = nil
             }
             // Downstream — the trip timeline, the arrival notification — only ever sees this point,
             // so an unlabeled entrance has its direction resolved here, while the station it is
             // measured from is still in hand.
-            let exit = role == .transfer
-                ? nil
-                : access.recommendedAccessPoint(near: target, requiresStepFree: requiresStepFree)?
-                    .point
-                    .labeled(relativeTo: stop.coordinate)
+            let exit = chosen?.labeled(relativeTo: stop.coordinate)
             result.append(RouteStationGuidance(
                 stationID: stop.stationID,
                 stationName: stop.name,
@@ -231,17 +471,13 @@ final class RoutePlanningService {
         _ guides: [RouteAccessGuide],
         guidance: [String: StationAccessGuidance],
         stationPositions: [String: CodableCoordinate],
-        originTarget: CodableCoordinate,
-        destinationTarget: CodableCoordinate,
-        requiresStepFree: Bool
+        originChoice: ChosenExit?,
+        destinationChoice: ChosenExit?
     ) -> [RouteAccessGuide] {
         guides.map { guide in
             let access = guidance[guide.stationName] ?? .empty
-            let target = guide.kind == .origin ? originTarget : destinationTarget
-            guard let recommendation = access.recommendedAccessPoint(
-                near: target,
-                requiresStepFree: requiresStepFree
-            ) else { return guide }
+            guard let recommendation = guide.kind == .origin ? originChoice : destinationChoice
+            else { return guide }
             let point = recommendation.point.labeled(relativeTo: stationPositions[guide.stationName])
             let upgradedPoint = RouteAccessPoint(
                 id: point.id,

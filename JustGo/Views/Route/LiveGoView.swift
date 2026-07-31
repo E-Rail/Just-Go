@@ -255,8 +255,7 @@ struct LiveGoView: View {
                         simplified: "官方链接仅供参考；JustGo 不会据此作任何推断。",
                         traditional: "官方連結僅供參考；JustGo 不會據此作任何推斷。"
                     ))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .rowMeta()
                         .multilineTextAlignment(.center)
                 }
             }
@@ -656,8 +655,7 @@ struct LiveGoView: View {
                 }
                 Spacer()
                 Text(viewModel.progressText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .rowMeta()
             }
 
             if step.rideStopsRemainingText != nil || (step.kind == .ride && step.exitHint?.isEmpty == false) {

@@ -371,6 +371,28 @@ struct RouteAccessPoint: Identifiable, Codable {
     let isWheelchairLikely: Bool
     let hasElevatorHint: Bool
     let source: RouteAccessPointSource
+
+    /// The door named the way a rider would look for it on a sign.
+    ///
+    /// Surveyed entrances arrive as anything from a bare "D" to "五道口 B 出口" depending on the
+    /// source, and "Walk to D" on its own names nothing findable. Shared so the detail screen and
+    /// the navigator cannot label the same door two different ways.
+    var displayName: String {
+        guard !name.lowercased().contains("exit"), !name.contains("出口"), !name.contains("入口") else {
+            return name
+        }
+        return AppLocalization.text(
+            english: "Exit \(name)",
+            simplified: "\(name) 出口",
+            traditional: "\(name) 出口"
+        )
+    }
+
+    /// The door to name, or nil when none was resolved — `.stationPOI` is the station itself, so
+    /// there is no specific entrance and nothing honest to print.
+    var namedDoor: String? {
+        source == .stationPOI ? nil : displayName
+    }
 }
 
 enum RouteAccessPointSource: String, Codable {
@@ -623,14 +645,12 @@ struct RouteStationGuidance: Identifiable, Codable {
 }
 
 /// Render-ready comparison metrics for one route, computed across all alternatives.
+/// What one route row actually renders. Held to exactly that: it previously also carried `rank`,
+/// `transferText`, `walkingText`, `transferEffort` and `exitConfidence`, none of which any view
+/// read — `summaryLine` had absorbed the last two and the row had stopped drawing the rest.
 struct RouteComparisonMetrics: Identifiable {
     let id: UUID
-    let rank: Int
     let durationText: String
-    let transferText: String
-    let walkingText: String
-    let transferEffort: String
-    let exitConfidence: DataConfidence
     let bestForReason: String
     let arrivalText: String
     let summaryLine: String

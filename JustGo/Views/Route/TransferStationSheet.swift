@@ -37,7 +37,6 @@ struct TransferStationSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                headerSection
                 rideSection
                 stationMapSection
                 transferGuideSection
@@ -99,56 +98,42 @@ struct TransferStationSheet: View {
         }
     }
 
-    private var headerSection: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "arrow.triangle.2.circlepath")
-                .font(.title2)
-                .foregroundStyle(Color.accentColor)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(stationName)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-
-                if let nextLine = nextTransitSegment?.lineName {
-                    let colorHex = nextTransitSegment?.lineColorHex ?? "#888888"
-                    Label(nextLine, systemImage: "tram.fill")
-                        .font(.caption)
-                        .foregroundStyle(Color.legibleText(onHex: colorHex))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color(hex: colorHex), in: Capsule())
-                }
-            }
-        }
-    }
-
-    /// Transfer time and onward direction in ONE compact card — each used to be its own
-    /// card holding a single line. The direction is the line a rider actually needs on the
-    /// platform, so it gets the visual weight.
+    /// The whole instruction — which line, which direction, how long the walk — beside the badge
+    /// of the line to look for.
+    ///
+    /// A separate header above this card repeated the station name that the navigation bar was
+    /// already showing, one line apart, and put the onward line in a capsule the ride card then
+    /// named again in text. Two renderings of two facts, in the place where a rider has the least
+    /// attention to spare.
     private var rideSection: some View {
         GlassCard {
-            VStack(alignment: .leading, spacing: 8) {
-                if let nextSegment = nextTransitSegment,
-                   let lineName = nextSegment.lineName, let toward = nextSegment.toStationName {
-                    Text(AppLocalization.text(
-                        english: "Board \(lineName) toward \(toward)",
-                        simplified: "乘\(lineName)方向 \(toward)",
-                        traditional: "乘\(lineName)方向 \(toward)"
-                    ))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+            HStack(alignment: .top, spacing: 12) {
+                if let nextSegment = nextTransitSegment, let lineName = nextSegment.lineName {
+                    LineBadge(name: lineName, colorHex: nextSegment.lineColorHex, size: 34)
                 }
-                Label {
-                    Text(AppLocalization.text(
-                        english: "Transfer walk about \(transferSegment.formattedDuration)",
-                        simplified: "换乘步行约\(transferSegment.formattedDuration)",
-                        traditional: "換乘步行約\(transferSegment.formattedDuration)"
-                    ))
-                    .rowMeta()
-                } icon: {
-                    Image(systemName: "figure.walk")
-                        .rowMeta()
+                VStack(alignment: .leading, spacing: 6) {
+                    if let nextSegment = nextTransitSegment,
+                       let lineName = nextSegment.lineName, let toward = nextSegment.toStationName {
+                        Text(AppLocalization.text(
+                            english: "Board \(lineName) toward \(toward)",
+                            simplified: "乘\(lineName)方向 \(toward)",
+                            traditional: "乘\(lineName)方向 \(toward)"
+                        ))
+                        .font(.headline)
+                    }
+                    Label {
+                        Text(AppLocalization.text(
+                            english: "Transfer walk about \(transferSegment.formattedDuration)",
+                            simplified: "换乘步行约\(transferSegment.formattedDuration)",
+                            traditional: "換乘步行約\(transferSegment.formattedDuration)"
+                        ))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    } icon: {
+                        Image(systemName: "figure.walk")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
@@ -247,30 +232,23 @@ struct TransferStationSheet: View {
     /// Official pages remain user-initiated reference material and never become route geometry.
     @ViewBuilder
     private var stationMapSection: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(AppLocalization.text(
-                    english: "Official Station Resources",
-                    simplified: "官方车站资源",
-                    traditional: "官方車站資源"
-                ))
-                .font(.subheadline)
-                .fontWeight(.medium)
+        let relevantResources = externalResources.filter(\.kind.isTransferRelevant)
+        // Drawn only when there is something to link to. This card previously rendered a title
+        // followed by "No official station resources are listed for this station" — a named
+        // feature reporting its own absence, in the middle of a transfer a rider is walking. The
+        // Transfer Guide below already carries the provenance chip that says what is and is not
+        // known about this station, so nothing honest is lost by leaving the empty case out.
+        if !relevantResources.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(AppLocalization.text(
+                        english: "Official Station Resources",
+                        simplified: "官方车站资源",
+                        traditional: "官方車站資源"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
 
-                let relevantResources = externalResources.filter(\.kind.isTransferRelevant)
-                if relevantResources.isEmpty {
-                    Label {
-                        Text(AppLocalization.text(
-                            english: "No official station resources are listed for this station.",
-                            simplified: "本站暂无官方车站资源。",
-                            traditional: "本站暫無官方車站資源。"
-                        ))
-                        .rowMeta()
-                    } icon: {
-                        Image(systemName: "map")
-                            .foregroundStyle(.secondary)
-                    }
-                } else {
                     ForEach(relevantResources) { resource in
                         OfficialTransitResourceButton(resource: resource, compact: true)
                     }

@@ -28,6 +28,7 @@ struct RouteDetailView: View {
     @State private var showReminderTooLate = false
     @State var tripNote = ""
     @State var detailDestination: RouteDetailDestination?
+    @State private var expandedLegs: Set<UUID> = []
     @State private var boardingServiceWindows: [StationServiceWindow] = []
     // Raw theme hex for the "Navigate" button's solid fill — see RoutePlannerView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
@@ -47,40 +48,30 @@ struct RouteDetailView: View {
         // per body evaluation).
         let feasibility = currentFeasibility()
         let confidence = currentConfidence(feasibility: feasibility)
-        return List {
-            Section {
+        return ScrollView {
+            VStack(spacing: 14) {
                 if alternatives.count > 1 {
                     RouteTabs(routes: alternatives, selection: $selectedRouteID)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                 }
                 routeHero(feasibility: feasibility, confidence: confidence)
+                if let departurePlan {
+                    DeparturePlanBanner(plan: departurePlan)
+                }
+                if route.serviceStatus.bannerText != nil {
+                    ServiceStatusBanner(status: route.serviceStatus)
+                }
+                journeyCard
+                mapCard
+                detailsCard(feasibility: feasibility, confidence: confidence)
             }
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
-
-            if let departurePlan {
-                Section { DeparturePlanBanner(plan: departurePlan) }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
-            // Checked here rather than letting the banner return an empty body: an empty view still
-            // draws a `Section`, which is a blank inset card with nothing in it.
-            if route.serviceStatus.bannerText != nil {
-                Section { ServiceStatusBanner(status: route.serviceStatus) }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
-
-            journeySection
-            mapSection
-            detailsSection(feasibility: feasibility, confidence: confidence)
+            .padding(.horizontal, 16)
+            .padding(.top, 4)
+            .padding(.bottom, 20)
         }
-        .listStyle(.insetGrouped)
-        // The default inset-grouped gap is tuned for Settings, where every section is a peer. Here
-        // the hero, the journey and the details are one continuous read, and the stock spacing put
-        // a third of a screen of nothing between them.
-        .listSectionSpacing(14)
-        .scrollContentBackground(.hidden)
+        // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings, where every
+        // section is an unrelated peer, and it opened this screen with roughly 250 pt of empty space
+        // above the duration; worse, a list row cannot draw the unbroken vertical rail that makes
+        // the legs read as one journey rather than five separate rows.
         .background(Color.appBackground)
         .safeAreaInset(edge: .bottom) { navigateBar }
         .navigationTitle(AppLocalization.localized("Route Details"))
@@ -199,16 +190,31 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(route.formattedDuration)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .monospacedDigit()
+        VStack(alignment: .leading, spacing: 8) {
             Text("\(route.origin) → \(route.destination)")
-                .font(.title3)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .lineLimit(2)
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(route.formattedDuration)
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                Spacer(minLength: 8)
+                // The shape of the journey, readable before any of the words are: which lines, in
+                // what order. It is the same information the legs below carry, but at a glance.
+                HStack(spacing: 4) {
+                    ForEach(route.segments.filter { $0.type == .subway }) { segment in
+                        LineBadge(
+                            name: segment.lineName ?? "",
+                            colorHex: segment.lineColorHex,
+                            size: 26
+                        )
+                    }
+                }
+            }
             Text(heroSummary)
-                .rowMeta()
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             if let concern = heroConcern(feasibility: feasibility, confidence: confidence) {
                 Label(concern.title, systemImage: concern.icon)
                     .font(.subheadline)
@@ -218,7 +224,8 @@ struct RouteDetailView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 4)
+        .padding(16)
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     /// Arrival time, stops and transfers on one line — the three things that decide between two
@@ -278,33 +285,33 @@ struct RouteDetailView: View {
         .background(.bar)
     }
 
-    private var mapSection: some View {
-        Section {
-            TransitMapView(
-                visibleRegion: .constant(route.previewRegion),
-                stations: [],
-                metroNetworks: [],
-                route: route,
-                showsUserLocation: false,
-                onRegionChanged: nil,
-                onStationSelected: { _ in }
-            )
-            .frame(height: 200)
-            .overlay(alignment: .topTrailing) {
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .padding(8)
-                    .background(.black.opacity(0.55), in: Circle())
-                    .padding(10)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture { showExpandedRouteMap = true }
-            .accessibilityAddTraits(.isButton)
-            .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
-            .listRowInsets(EdgeInsets())
+    private var mapCard: some View {
+        TransitMapView(
+            visibleRegion: .constant(route.previewRegion),
+            stations: [],
+            metroNetworks: [],
+            route: route,
+            showsUserLocation: false,
+            onRegionChanged: nil,
+            onStationSelected: { _ in }
+        )
+        .frame(height: 200)
+        // Inside a list row the map ran edge to edge with square corners and no clipping, so it
+        // read as a screenshot someone had pasted in rather than as part of the card stack.
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(alignment: .topTrailing) {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(8)
+                .background(.black.opacity(0.55), in: Circle())
+                .padding(10)
         }
+        .contentShape(Rectangle())
+        .onTapGesture { showExpandedRouteMap = true }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
     }
 
     private var decisionDataConfidence: DataConfidence {
@@ -334,82 +341,113 @@ struct RouteDetailView: View {
     /// Everything that is not the journey itself, one row each. These were nine stacked cards —
     /// confidence, feasibility, trip essentials, access guidance, service hours, reminder, notes —
     /// most of which the rider reads once, if ever.
-    private func detailsSection(
+    private func detailsCard(
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        Section {
+        VStack(spacing: 0) {
             if let hours = boardingServiceHours {
-                LabeledContent {
-                    Text(AppLocalization.text(
-                        english: "\(hours.first) – \(hours.last)",
-                        simplified: "\(hours.first) – \(hours.last)",
-                        traditional: "\(hours.first) – \(hours.last)"
-                    ))
-                    .rowValue()
-                    .monospacedDigit()
-                } label: {
-                    Label(
-                        AppLocalization.text(english: "Service hours", simplified: "运营时间", traditional: "營運時間"),
-                        systemImage: "clock"
-                    )
+                detailRow(
+                    icon: "clock.fill",
+                    tint: .blue,
+                    title: AppLocalization.text(english: "Service hours", simplified: "运营时间", traditional: "營運時間")
+                ) {
+                    Text(verbatim: "\(hours.first) – \(hours.last)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
                 }
+                rowDivider
             }
 
             Button { detailDestination = .confidence(route.id) } label: {
-                HStack(spacing: 12) {
-                    Label(
-                        AppLocalization.text(english: "Confidence", simplified: "可信度", traditional: "可信度"),
-                        systemImage: "checkmark.seal"
-                    )
-                    Spacer()
+                detailRow(
+                    icon: "checkmark.seal.fill",
+                    tint: confidence.level.color,
+                    title: AppLocalization.text(english: "Confidence", simplified: "可信度", traditional: "可信度")
+                ) {
                     ConfidenceScoreRing(
                         score: confidence.score,
                         color: confidence.level.color,
-                        size: 32,
+                        size: 30,
                         lineWidth: 3
                     )
-                    Image(systemName: "chevron.right").rowMeta()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote)
+                        .foregroundStyle(.tertiary)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
-            reminderRow
+            if departurePlan != nil {
+                rowDivider
+                reminderRow
+            }
 
+            rowDivider
             if tripLoggedConfirmation {
-                Label(
-                    AppLocalization.text(english: "Trip logged", simplified: "行程已记录", traditional: "行程已記錄"),
-                    systemImage: "checkmark.circle.fill"
-                )
-                .foregroundStyle(.green)
+                detailRow(
+                    icon: "checkmark.circle.fill",
+                    tint: .green,
+                    title: AppLocalization.text(english: "Trip logged", simplified: "行程已记录", traditional: "行程已記錄")
+                ) { EmptyView() }
             } else {
                 Button {
                     tripNote = ""
                     showTripNote = true
                 } label: {
-                    Label(
-                        AppLocalization.text(english: "Log this trip", simplified: "记录这次行程", traditional: "記錄這次行程"),
-                        systemImage: "checkmark.circle"
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    detailRow(
+                        icon: "square.and.pencil",
+                        tint: .accentColor,
+                        title: AppLocalization.text(english: "Log this trip", simplified: "记录这次行程", traditional: "記錄這次行程")
+                    ) { EmptyView() }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
 
+            rowDivider
             // Provenance needs a subject. On its own the chip said "Not available" under a section
             // header, naming nothing — a red badge for the rider to worry about with no way to tell
             // what it referred to.
-            LabeledContent {
+            detailRow(
+                icon: "building.columns.fill",
+                tint: .secondary,
+                title: AppLocalization.text(english: "Station data", simplified: "车站数据", traditional: "車站資料")
+            ) {
                 DataConfidenceChip(confidence: decisionDataConfidence, compact: true)
-            } label: {
-                Label(
-                    AppLocalization.text(english: "Station data", simplified: "车站数据", traditional: "車站資料"),
-                    systemImage: "building.columns"
-                )
             }
-        } header: {
-            Text(AppLocalization.text(english: "Details", simplified: "详情", traditional: "詳情"))
         }
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    /// Inset to clear the icon well, so the dividers separate the *text* column and the icons read
+    /// as one vertical run.
+    private var rowDivider: some View {
+        Divider().padding(.leading, 56)
+    }
+
+    private func detailRow<Trailing: View>(
+        icon: String,
+        tint: Color,
+        title: String,
+        @ViewBuilder trailing: () -> Trailing
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 28, height: 28)
+                .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            Text(title)
+                .font(.body)
+                .foregroundStyle(.primary)
+            Spacer(minLength: 8)
+            trailing()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 11)
     }
 
     private var departurePlan: DeparturePlan? {
@@ -445,59 +483,71 @@ struct RouteDetailView: View {
         }
     }
 
-    /// One row per leg. Transit legs open to reveal the stations they pass, which is what the
-    /// separate "Stations" card used to do a whole screen further down; transfer legs still push
-    /// to the transfer guide.
-    private var journeySection: some View {
-        Section {
+    /// The journey as one continuous path: an unbroken vertical rail running the height of the
+    /// card, solid in each line's colour while riding and dashed while on foot, with the line's own
+    /// badge marking where the rider boards.
+    ///
+    /// The legs used to be list rows carrying a 34 pt colour chip each — five disconnected bars
+    /// that never said "this is one trip". Transit legs open to reveal the stations they pass,
+    /// which is what a separate "Stations" card used to do a whole screen further down.
+    private var journeyCard: some View {
+        VStack(spacing: 0) {
             ForEach(Array(route.segments.enumerated()), id: \.element.id) { index, segment in
-                switch segment.type {
-                case .subway:
-                    DisclosureGroup {
-                        ForEach(segment.stationStops) { stop in
-                            Button { detailDestination = .station(stop) } label: {
-                                HStack {
-                                    Text(stop.name).rowValue()
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .rowMeta()
-                                }
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    } label: {
-                        journeyRow(segment, index: index)
-                    }
-                case .transfer:
-                    Button { detailDestination = .transfer(segment) } label: {
-                        HStack {
-                            journeyRow(segment, index: index)
-                            Image(systemName: "chevron.right").rowMeta()
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                case .walking:
-                    journeyRow(segment, index: index)
-                }
+                legRow(segment, index: index)
             }
-        } header: {
-            Text(AppLocalization.text(english: "Route", simplified: "行程", traditional: "行程"))
+            arrivalRow
         }
+        .padding(.vertical, 2)
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
-    private func journeyRow(_ segment: RouteSegment, index: Int) -> some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(journeyColor(segment))
-                .frame(width: 4, height: 34)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(journeyTitle(segment, index: index))
-                    .rowValue()
-                    .fontWeight(.medium)
+    private static let railWidth: CGFloat = 44
+    private static let markerSize: CGFloat = 30
+    /// Distance from a row's top edge to the top of its marker, so the marker lands on the title
+    /// line rather than floating above it.
+    private static let markerInset: CGFloat = 13
+
+    private func legRow(_ segment: RouteSegment, index: Int) -> some View {
+        let isWalk = segment.type == .walking
+        let isExpanded = expandedLegs.contains(segment.id)
+        return HStack(alignment: .top, spacing: 0) {
+            ZStack(alignment: .top) {
+                JourneyRail(color: journeyColor(segment), dashed: isWalk)
+                    // The first leg's rail starts at its own marker; drawn full height it would
+                    // stick out of the top of the card like a trip that began somewhere else.
+                    .padding(.top, index == 0 ? Self.markerInset + Self.markerSize / 2 : 0)
+                legMarker(segment)
+                    .padding(.top, Self.markerInset)
+            }
+            .frame(width: Self.railWidth)
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(journeyTitle(segment, index: index))
+                        .font(.body)
+                        .fontWeight(.semibold)
+                    Spacer(minLength: 4)
+                    if segment.duration >= 60 {
+                        Text(segment.formattedDuration)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                    if segment.type == .transfer {
+                        Image(systemName: "chevron.right")
+                            .font(.footnote)
+                            .foregroundStyle(.tertiary)
+                    } else if segment.type == .subway, !segment.stationStops.isEmpty {
+                        Image(systemName: "chevron.down")
+                            .font(.footnote)
+                            .foregroundStyle(.tertiary)
+                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    }
+                }
                 if let detail = journeyDetail(segment, index: index) {
-                    Text(detail).rowMeta()
+                    Text(detail)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
                 // What we do not know about this door — that an exit is estimated rather than
                 // surveyed, or that nothing here is recorded as step-free. It rides with the leg
@@ -507,21 +557,116 @@ struct RouteDetailView: View {
                         .font(.footnote)
                         .foregroundStyle(Color.accentColor)
                 }
+                if isExpanded {
+                    stationStops(segment)
+                }
             }
-            Spacer()
-            if segment.duration >= 60 {
-                Text(segment.formattedDuration)
-                    .rowMeta()
+            .padding(.vertical, 12)
+            .padding(.trailing, 16)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            switch segment.type {
+            case .transfer:
+                detailDestination = .transfer(segment)
+            case .subway where !segment.stationStops.isEmpty:
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isExpanded { expandedLegs.remove(segment.id) } else { expandedLegs.insert(segment.id) }
+                }
+            default:
+                break
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func stationStops(_ segment: RouteSegment) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(segment.stationStops) { stop in
+                Button { detailDestination = .station(stop) } label: {
+                    HStack(spacing: 10) {
+                        Circle()
+                            .strokeBorder(journeyColor(segment), lineWidth: 2)
+                            .frame(width: 7, height: 7)
+                        Text(stop.name)
+                            .font(.subheadline)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.vertical, 7)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.top, 4)
+    }
+
+    /// Where the rider ends up, and when. The last leg is a walk *from* a station, so without this
+    /// the path simply stopped mid-air with no destination on it.
+    private var arrivalRow: some View {
+        HStack(alignment: .top, spacing: 0) {
+            ZStack(alignment: .top) {
+                JourneyRail(color: journeyColor(route.segments.last))
+                    .frame(height: Self.markerInset + Self.markerSize / 2)
+                Image(systemName: "mappin.circle.fill")
+                    .font(.system(size: Self.markerSize))
+                    .foregroundStyle(.white, Color.accentColor)
+                    .padding(.top, Self.markerInset)
+            }
+            .frame(width: Self.railWidth)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(route.destination)
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .lineLimit(2)
+                Text(arrivalDetail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
+            .padding(.vertical, 12)
+            .padding(.trailing, 16)
+            Spacer(minLength: 0)
         }
     }
 
-    private func journeyColor(_ segment: RouteSegment) -> Color {
+    private var arrivalDetail: String {
+        let timing = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
+        let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
+        return AppLocalization.text(
+            english: "Arrive \(arrival)",
+            simplified: "\(arrival) 到达",
+            traditional: "\(arrival) 到達"
+        )
+    }
+
+    @ViewBuilder
+    private func legMarker(_ segment: RouteSegment) -> some View {
         switch segment.type {
-        case .walking: return .gray
-        case .subway: return Color.adaptive(hex: segment.lineColorHex ?? "#007AFF")
+        case .subway:
+            LineBadge(
+                name: segment.lineName ?? "",
+                colorHex: segment.lineColorHex,
+                size: Self.markerSize
+            )
+        case .transfer, .walking:
+            Image(systemName: segment.type == .transfer ? "arrow.triangle.swap" : "figure.walk")
+                .font(.system(size: Self.markerSize * 0.45, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: Self.markerSize, height: Self.markerSize)
+                .background(journeyColor(segment), in: Circle())
+        }
+    }
+
+    private func journeyColor(_ segment: RouteSegment?) -> Color {
+        switch segment?.type {
+        case .subway: return Color(hex: segment?.lineColorHex ?? "#007AFF")
         case .transfer: return .orange
+        case .walking, nil: return .gray
         }
     }
 
@@ -556,11 +701,8 @@ struct RouteDetailView: View {
     }
 
     /// The chosen door for whichever end this leg belongs to, when one was actually resolved.
-    /// `.stationPOI` means no specific entrance is known, so there is nothing honest to name.
     private func exitName(for index: Int) -> String? {
-        guard let point = accessGuide(for: index)?.accessPoint,
-              point.source != .stationPOI else { return nil }
-        return point.name
+        accessGuide(for: index)?.accessPoint?.namedDoor
     }
 
     private func accessNotes(for index: Int) -> [String] {
@@ -582,18 +724,20 @@ struct RouteDetailView: View {
                 // would otherwise file this plan under the newly-shown route.
                 Task { await scheduleReminder(plan: departurePlan, routeID: route.id) }
             } label: {
-                Label(
-                    reminderScheduled
+                detailRow(
+                    icon: reminderScheduled ? "bell.fill" : "bell",
+                    tint: reminderScheduled ? .green : .orange,
+                    title: reminderScheduled
                         ? AppLocalization.text(english: "Reminder set", simplified: "提醒已设置", traditional: "提醒已設定")
                         : AppLocalization.text(
                             english: "Remind me \(reminderLeadMinutes) min before departure",
                             simplified: "出发前\(reminderLeadMinutes)分钟提醒我",
                             traditional: "出發前\(reminderLeadMinutes)分鐘提醒我"
-                        ),
-                    systemImage: reminderScheduled ? "bell.fill" : "bell"
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
+                        )
+                ) { EmptyView() }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .disabled(reminderScheduled)
             .alert(
                 AppLocalization.text(english: "Notifications are off", simplified: "通知已关闭", traditional: "通知已關閉"),

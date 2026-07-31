@@ -57,7 +57,7 @@ extension RoutePlannerView {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .cardSurface()
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -92,7 +92,7 @@ extension RoutePlannerView {
                                 }
                                 .frame(width: 180, alignment: .leading)
                                 .padding()
-                                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .cardSurface()
                             }
                             .buttonStyle(.plain)
                         }
@@ -137,7 +137,7 @@ extension RoutePlannerView {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .cardSurface()
             } else {
                 VStack(spacing: 0) {
                     ForEach(viewModel?.recentRoutes ?? []) { route in
@@ -174,7 +174,7 @@ extension RoutePlannerView {
                         }
                     }
                 }
-                .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .cardSurface()
             }
         }
     }

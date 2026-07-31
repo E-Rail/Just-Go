@@ -27,7 +27,7 @@ struct RouteTabs: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(
-                            selection == route.id ? Color.accentColor.opacity(0.12) : Color(.systemGray6),
+                            selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface,
                             in: RoundedRectangle(cornerRadius: 8, style: .continuous)
                         )
                         .overlay {
@@ -77,9 +77,12 @@ struct SortChip: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
-            .background(isSelected ? Color.accentColor : Color.appSurface, in: Capsule())
-            .foregroundStyle(isSelected ? Color.white : Color.primary)
-            .overlay(Capsule().stroke(isSelected ? Color.clear : Color(.separator), lineWidth: 1))
+            // Tinted rather than filled. `Color.accentColor` is the theme lightened for *foreground*
+            // legibility in dark mode, so using it as a fill under white text collapses the contrast
+            // it exists to protect — the selected chip was pale green with white text on it.
+            .background(isSelected ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
+            .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
+            .overlay(Capsule().stroke(isSelected ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))
         }
         .buttonStyle(.plain)
     }

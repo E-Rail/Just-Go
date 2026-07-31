@@ -49,11 +49,15 @@ struct TripStep: Identifiable, Equatable {
     var title: String {
         switch kind {
         case .walkToStation:
-            let station = toStationName ?? AppLocalization.text(english: "the station", simplified: "车站", traditional: "車站")
+            // The entrance when the plan resolved one — this is a rider standing on the street
+            // looking for a way in, and "walk to 北京站" points at a building with eight of them.
+            let target = exitHint
+                ?? toStationName
+                ?? AppLocalization.text(english: "the station", simplified: "车站", traditional: "車站")
             return AppLocalization.text(
-                english: "Walk to \(station)",
-                simplified: "步行至\(station)",
-                traditional: "步行至\(station)"
+                english: "Walk to \(target)",
+                simplified: "步行至\(target)",
+                traditional: "步行至\(target)"
             )
         case .ride:
             let line = lineName ?? AppLocalization.text(english: "the train", simplified: "列车", traditional: "列車")
@@ -72,8 +76,13 @@ struct TripStep: Identifiable, Equatable {
     var detail: String? {
         switch kind {
         case .walkToStation, .walkToDestination:
-            guard walkingDistance >= 1 else { return nil }
-            return AppLocalization.distance(walkingDistance)
+            // Whatever the title did not say. On the way in the title names the door, so the
+            // station belongs here; on the way out the title names the destination, so the door
+            // does. Either way the rider gets both facts without either line repeating the other.
+            let context = kind == .walkToStation ? (exitHint == nil ? nil : toStationName) : exitHint
+            let pieces = [context, walkingDistance >= 1 ? AppLocalization.distance(walkingDistance) : nil]
+                .compactMap { $0 }
+            return pieces.isEmpty ? nil : pieces.joined(separator: " · ")
         case .ride:
             let stops = AppLocalization.stops(stopCount)
             if let to = toStationName {

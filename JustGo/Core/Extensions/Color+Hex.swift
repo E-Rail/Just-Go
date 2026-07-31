@@ -2,24 +2,25 @@ import SwiftUI
 import UIKit
 import Foundation
 
+/// The app's three surface levels: the page behind everything, the cards on it, and anything
+/// raised above a card.
+///
+/// These were a hand-mixed forest-green ramp (#0F1F14 page, #172E1F card) that tinted every screen
+/// in the app. Two problems, both of which read as "unfinished" rather than "branded": the page and
+/// the card were four points of luminance apart, so cards did not look like cards; and a saturated
+/// hue under *all* content fought every semantic colour drawn on top of it — a red warning, a blue
+/// link and a green badge on a green field share no common ground to sit against.
+///
+/// The system greys are the right answer, and not only because they match iOS. They are the neutral
+/// the semantic colours were designed against, they track light/dark and increased-contrast for
+/// free, and they leave the theme colour to do the one job a brand colour should: mark the thing to
+/// tap. The green did not go away — it moved to the accent, where it means something.
 extension Color {
-    static let appBackground = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.06, green: 0.12, blue: 0.08, alpha: 1)   // #0F1F14 dark forest
-            : UIColor(red: 0.92, green: 0.96, blue: 0.92, alpha: 1)   // #EBF5EC light sage
-    })
+    static let appBackground = Color(UIColor.systemGroupedBackground)
 
-    static let appSurface = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.09, green: 0.18, blue: 0.12, alpha: 1)   // #172E1F dark card
-            : UIColor.systemBackground
-    })
+    static let appSurface = Color(UIColor.secondarySystemGroupedBackground)
 
-    static let appSurfaceSecondary = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.12, green: 0.23, blue: 0.15, alpha: 1)   // #1E3B26 elevated card
-            : UIColor.systemBackground
-    })
+    static let appSurfaceSecondary = Color(UIColor.tertiarySystemGroupedBackground)
 
     init(hex: String) {
         let (r, g, b) = Color.rgbComponents(hex: hex)

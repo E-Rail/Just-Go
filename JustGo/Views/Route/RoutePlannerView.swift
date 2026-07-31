@@ -445,7 +445,7 @@ struct RoutePlannerView: View {
             .autocorrectionDisabled()
             .textFieldStyle(.plain)
             .padding(12)
-            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.
@@ -469,7 +469,7 @@ struct RoutePlannerView: View {
         // Capped at the keyboard's measured top edge so the field group, the list, and
         // the keyboard stay simultaneously visible; taller lists scroll internally.
         .frame(maxHeight: suggestionMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .cardSurface(12)
         .background {
             GeometryReader { proxy in
                 Color.clear.preference(key: SuggestionListTopYKey.self, value: proxy.frame(in: .global).minY)
@@ -533,9 +533,12 @@ struct RoutePlannerView: View {
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 48)
-            .background(viewModel?.canSearch == true ? Color(hex: selectedThemeHex) : Color.gray)
-            .foregroundStyle(.white)
+            .frame(height: 50)
+            // Disabled was a solid mid-grey capsule, which has the same visual weight as the
+            // enabled button and so read as the loudest thing on an empty planner — the screen
+            // shouted its one unavailable action. A recessed fill reads as "not yet".
+            .background(viewModel?.canSearch == true ? Color(hex: selectedThemeHex) : Color(.tertiarySystemFill))
+            .foregroundStyle(viewModel?.canSearch == true ? Color.white : Color.secondary)
             .clipShape(Capsule())
         }
         .disabled(viewModel?.canSearch != true || viewModel?.isLoading == true)

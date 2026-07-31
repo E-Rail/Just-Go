@@ -58,6 +58,31 @@ struct ConfidenceScoreRing: View {
     }
 }
 
+/// The single worst thing about a route, or nothing at all when there is nothing to warn about.
+///
+/// Feasibility outranks confidence: "there are stairs" is a fact about the trip, while a confidence
+/// score is a fact about our data. Shared by the results row and the detail hero so a route cannot
+/// be flagged on one screen and clean on the other — they used to decide separately, and the list
+/// led with a red "38" that the detail screen then described as merely medium.
+///
+/// Returning nil is the point. A green "high confidence" badge on a route with nothing wrong with
+/// it is decoration, and decoration on every row is what made the list unreadable.
+enum RouteConcern {
+    static func worst(
+        feasibility: RouteFeasibility,
+        confidence: RouteConfidence
+    ) -> (title: String, icon: String, tint: Color)? {
+        if feasibility.level != .good, feasibility.level != .unknown {
+            return (feasibility.title, feasibility.level.iconName, feasibility.level.color)
+        }
+        guard confidence.level != .high else { return nil }
+        let icon: String = confidence.level == .medium
+            ? "exclamationmark.triangle.fill"
+            : "exclamationmark.octagon.fill"
+        return (confidence.level.title, icon, confidence.level.color)
+    }
+}
+
 /// Confidence and feasibility on one screen.
 ///
 /// They used to be two stacked cards that answered the same rider question — "can I rely on this
@@ -117,11 +142,18 @@ struct RouteConfidenceDetailView: View {
                 }
             }
 
-            if !confidence.warnings.isEmpty {
+            if !warnings.isEmpty {
                 Section {
-                    ForEach(confidence.warnings.prefix(5), id: \.self) { warning in
-                        Label(warning, systemImage: "exclamationmark.triangle.fill")
-                            .rowValue()
+                    ForEach(warnings, id: \.self) { warning in
+                        Label {
+                            Text(warning).rowValue()
+                        } icon: {
+                            // Explicitly orange: with no tint of its own the warning triangle
+                            // inherited the app's accent, so every caution on this screen was
+                            // drawn in a reassuring green.
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                        }
                     }
                 } header: {
                     Text(AppLocalization.text(english: "Watch out for", simplified: "需要注意", traditional: "需要注意"))
@@ -145,6 +177,15 @@ struct RouteConfidenceDetailView: View {
         .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Trip Confidence"))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Warnings the screen has not already made, capped at five.
+    ///
+    /// The feasibility verdict heads its own section above, and `confidence.warnings` repeats it
+    /// verbatim — "Walking-heavy route" appeared twice on one screen, once as a heading and once as
+    /// a bullet under it, which reads as two separate problems.
+    private var warnings: [String] {
+        confidence.warnings.filter { $0 != feasibility.title }.prefix(5).map { $0 }
     }
 
     /// The bottleneck first, then the explanations — and nothing at all when there is nothing to

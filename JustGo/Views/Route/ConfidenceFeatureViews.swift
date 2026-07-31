@@ -72,7 +72,11 @@ struct DeparturePlanBanner: View {
     }
 }
 
-/// Picker that lets the rider plan around "Leave now / Leave by / Arrive by".
+/// Lets the rider plan around "Leave now / Leave by / Arrive by".
+///
+/// One row, opening a menu — not a headline sentence over a three-way segmented control. Almost
+/// every search leaves this on "Leave now", and asking "When are you traveling?" in prose spent the
+/// height of a route card restating what the control below it already said.
 struct DeparturePlannerSection: View {
     @Binding var anchor: TripTimeAnchor
 
@@ -89,33 +93,62 @@ struct DeparturePlannerSection: View {
             case .arriveBy: return AppLocalization.text(english: "Arrive by", simplified: "到达时间", traditional: "抵達時間")
             }
         }
+
+        var icon: String {
+            switch self {
+            case .now: return "figure.walk.departure"
+            case .departBy: return "clock"
+            case .arriveBy: return "flag.checkered"
+            }
+        }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(AppLocalization.text(english: "When are you traveling?", simplified: "何时出行？", traditional: "何時出行？"))
-                .font(.subheadline)
-                .fontWeight(.medium)
-
-            Picker("", selection: $mode) {
-                ForEach(Mode.allCases) { Text($0.title).tag($0) }
+        VStack(spacing: 0) {
+            Menu {
+                ForEach(Mode.allCases) { option in
+                    Button { mode = option } label: {
+                        Label(option.title, systemImage: option.icon)
+                    }
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: mode.icon)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 28, height: 28)
+                        .background(Color.accentColor.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    // `Color.primary`, not `.primary`: inside a `Menu` the hierarchical style
+                    // resolves against the menu's tint, which rendered the row's own label in the
+                    // accent colour as though it were a link.
+                    Text(mode.title)
+                        .font(.body)
+                        .foregroundStyle(Color.primary)
+                    Spacer()
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.footnote)
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 11)
+                .contentShape(Rectangle())
             }
-            .pickerStyle(.segmented)
-            .accessibilityLabel(AppLocalization.text(english: "When are you traveling?", simplified: "何时出行？", traditional: "何時出行？"))
 
             if mode != .now {
+                Divider().padding(.leading, 56)
                 DatePicker(
                     selection: $date,
                     in: Date()...,
                     displayedComponents: [.date, .hourAndMinute]
                 ) {
                     Text(mode.title)
+                        .font(.body)
                 }
-                .font(.subheadline)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
             }
         }
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .cardSurface()
         .onAppear(perform: syncFromAnchor)
         .onChange(of: mode) { _, _ in syncToAnchor() }
         .onChange(of: date) { _, _ in syncToAnchor() }

@@ -39,8 +39,14 @@ struct RouteResultsView: View {
                 }
             }
             .listRowBackground(Color.clear)
+            // `.plain` draws a hairline above and below every row, which under the sort chips read
+            // as two stray rules floating in the middle of the screen with nothing between them.
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+        // Stock spacing put a third of a screen of nothing between the sort chips and the first
+        // result — the chips sort the list directly below them and belong next to it.
+        .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
         .navigationTitle(AppLocalization.localized("Routes"))
@@ -123,7 +129,11 @@ struct RouteResultsView: View {
                     if viewModel.tripAnchor.isExplicit {
                         activeTimeChip
                     }
-                    ForEach(RoutePreference.primary) { strategy in
+                    // The active strategy leads, whether or not it is one of the three that get
+                    // their own chip. The default sort is "Transit First", which is *not* primary,
+                    // so it rendered only inside the overflow chip at the far right — off the edge
+                    // of the screen, leaving a sort row where nothing looked selected.
+                    ForEach(sortChipStrategies) { strategy in
                         SortChip(
                             title: strategy.title,
                             icon: strategy.icon,
@@ -148,29 +158,32 @@ struct RouteResultsView: View {
                             }
                         }
                     } label: {
-                        Label(
-                            viewModel.sortStrategy.isPrimary
-                                ? AppLocalization.localized("More")
-                                : viewModel.sortStrategy.title,
-                            systemImage: viewModel.sortStrategy.isPrimary ? "ellipsis.circle" : viewModel.sortStrategy.icon
-                        )
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(viewModel.sortStrategy.isPrimary ? Color(.systemGray5) : Color.accentColor)
-                        .foregroundStyle(viewModel.sortStrategy.isPrimary ? Color.primary : Color.white)
-                        .clipShape(Capsule())
+                        Label(AppLocalization.localized("More"), systemImage: "ellipsis.circle")
+                            .font(.caption)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 9)
+                            .background(Color.appSurface, in: Capsule())
+                            .foregroundStyle(Color.primary)
+                            .overlay(Capsule().stroke(Color(.separator), lineWidth: 1))
                     }
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 2)
             }
         }
     }
 
+    /// The three headline strategies, preceded by whatever is actually sorting the list when that
+    /// is something else.
+    private var sortChipStrategies: [RoutePreference] {
+        let primary = RoutePreference.primary
+        guard !primary.contains(viewModel.sortStrategy) else { return primary }
+        return [viewModel.sortStrategy] + primary
+    }
+
     private var routesSection: some View {
         Section {
-            ForEach(Array(viewModel.routes.enumerated()), id: \.element.id) { index, route in
-                comparisonRow(route, rank: index + 1)
+            ForEach(viewModel.routes) { route in
+                comparisonRow(route)
             }
         } header: {
             Text(viewModel.routes.count == 1
@@ -183,12 +196,13 @@ struct RouteResultsView: View {
         }
     }
 
-    /// One comparison row per alternative — duration, walking, transfer effort, exit confidence,
-    /// and a cross-route "best for" reason. Tapping records the planned trip and opens the detail.
-    private func comparisonRow(_ route: Route, rank: Int) -> some View {
-        let metrics = comparisonMetrics(for: route, rank: rank)
-        let confidence = routeConfidence(for: route)
-        let isSelected = route.id == (selectedRouteID ?? viewModel.routes.first?.id)
+    /// One comparison row per alternative — the lines it rides, how long it takes, when it lands,
+    /// and the single thing wrong with it if there is one. Tapping records the planned trip and
+    /// opens the detail.
+    private func comparisonRow(_ route: Route) -> some View {
+        let metrics = comparisonMetrics(for: route)
+        let feasibility = container.routeFeasibilityService.feasibility(for: route)
+        let confidence = routeConfidence(for: route, feasibility: feasibility)
         return Button {
             selectedRouteID = route.id
             _ = tripMemoryService.recordPlannedTrip(
@@ -198,103 +212,70 @@ struct RouteResultsView: View {
             )
             showRouteDetail = true
         } label: {
-            HStack(spacing: 12) {
-                ConfidenceScoreRing(
-                    score: confidence.score,
-                    color: confidence.level.color,
-                    size: 50
-                )
+            VStack(alignment: .leading, spacing: 8) {
+                // Why this route is in the list at all — but only when there is something to
+                // compare it against. With a single result it said "Recommended", which is a
+                // label for a choice the rider was never offered.
+                if viewModel.routes.count > 1 {
+                    Text(metrics.bestForReason)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .textCase(.uppercase)
+                        .foregroundStyle(Color.accentColor)
+                }
 
-                VStack(alignment: .leading, spacing: 7) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        // The lines this route rides, in order, in their own colours. A rider
+                        // comparing alternatives is choosing between *shapes* of journey, and three
+                        // chips of grey text made every row look the same until you read all of them.
+                        JourneyBadgeChain(segments: route.segments)
+
+                        Text(metrics.summaryLine)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer(minLength: 4)
+
+                    VStack(alignment: .trailing, spacing: 2) {
                         Text(metrics.durationText)
                             .font(.title2)
                             .fontWeight(.bold)
                             .monospacedDigit()
-                        Spacer()
                         Text(metrics.arrivalText)
-                            .rowMeta()
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                             .monospacedDigit()
                     }
+                }
 
-                    // The lines this route rides, in order, as coloured bars. A rider comparing
-                    // alternatives is choosing between *shapes* of journey, and three chips of grey
-                    // text made every row look the same until you read all of them.
-                    journeyBars(route)
-
-                    Text(metrics.summaryLine)
-                        .rowMeta()
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            DataConfidenceChip(confidence: metrics.exitConfidence, compact: true)
-                            Text(metrics.bestForReason)
-                                .font(.caption2)
-                                .fontWeight(.medium)
-                                .lineLimit(1)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.accentColor.opacity(0.12), in: Capsule())
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
+                // Full width, below everything: sharing a line with the duration column squeezed
+                // "Walking-heavy route" into a two-line stub. Only what is wrong, and only in
+                // words — this row used to lead with a 50 pt red "38", an unexplained score on a
+                // scale the rider had never been shown.
+                if let concern = RouteConcern.worst(feasibility: feasibility, confidence: confidence) {
+                    Label(concern.title, systemImage: concern.icon)
+                        .font(.footnote)
+                        .fontWeight(.medium)
+                        .foregroundStyle(concern.tint)
                 }
             }
-            .padding(12)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
-            )
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
         .listRowSeparator(.hidden)
-        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+        .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
     }
 
-    /// One bar per leg, widths in proportion to time, so the row shows at a glance how much of the
-    /// trip is on foot and how much is riding.
-    private func journeyBars(_ route: Route) -> some View {
-        GeometryReader { proxy in
-            HStack(spacing: 3) {
-                ForEach(route.segments) { segment in
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(barColor(segment))
-                        .frame(width: barWidth(segment, route: route, total: proxy.size.width))
-                }
-            }
-        }
-        .frame(height: 6)
-    }
-
-    private func barColor(_ segment: RouteSegment) -> Color {
-        switch segment.type {
-        case .walking: return Color.secondary.opacity(0.35)
-        case .subway: return Color.adaptive(hex: segment.lineColorHex ?? "#007AFF")
-        case .transfer: return .orange
-        }
-    }
-
-    private func barWidth(_ segment: RouteSegment, route: Route, total: CGFloat) -> CGFloat {
-        guard route.totalDuration > 0, total > 0 else { return 0 }
-        let spacing = CGFloat(max(0, route.segments.count - 1)) * 3
-        let available = max(0, total - spacing)
-        // A floor keeps a two-minute transfer from vanishing into a hairline the eye reads as a gap.
-        return max(6, available * CGFloat(segment.duration / route.totalDuration))
-    }
-
-    private func comparisonMetrics(for route: Route, rank: Int) -> RouteComparisonMetrics {
+    private func comparisonMetrics(for route: Route) -> RouteComparisonMetrics {
         let timing = TripTimeContext(anchor: viewModel.tripAnchor, totalDuration: route.totalDuration)
         let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
         return RouteComparisonMetrics(
             id: route.id,
-            rank: rank,
             durationText: route.formattedDuration,
-            transferText: route.formattedTransfers,
-            walkingText: route.formattedWalkingDistance,
-            transferEffort: transferEffort(for: route),
-            exitConfidence: exitConfidence(for: route),
             bestForReason: bestForReason(for: route, in: viewModel.routes),
             arrivalText: AppLocalization.text(
                 english: "Arrive \(arrival)",
@@ -313,11 +294,10 @@ struct RouteResultsView: View {
     }
 
     /// The route's 0-100 confidence, computed from the identical comfort → feasibility →
-    /// confidence chain the detail screen uses (all synchronous), so the ring's number in the
-    /// list never disagrees with the one shown after tapping in.
-    private func routeConfidence(for route: Route) -> RouteConfidence {
-        let feasibility = container.routeFeasibilityService.feasibility(for: route)
-        return container.routeConfidenceService.confidence(
+    /// confidence chain the detail screen uses (all synchronous), so a route flagged here is
+    /// flagged the same way after tapping in.
+    private func routeConfidence(for route: Route, feasibility: RouteFeasibility) -> RouteConfidence {
+        container.routeConfidenceService.confidence(
             for: route,
             feasibility: feasibility,
             preference: viewModel.sortStrategy,
@@ -334,10 +314,6 @@ struct RouteResultsView: View {
             return "\(route.formattedTransfers) · \(AppLocalization.minutes(Int(minutes)))"
         }
         return route.formattedTransfers
-    }
-
-    private func exitConfidence(for route: Route) -> DataConfidence {
-        route.arrivalGuidance?.confidence ?? .unknown
     }
 
     /// The single most salient reason this route leads its alternatives.

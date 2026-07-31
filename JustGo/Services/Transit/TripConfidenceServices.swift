@@ -93,6 +93,9 @@ struct LiveGoTripBuilder {
             switch segment.type {
             case .walking:
                 let isOrigin = index == 0
+                // The same door the plan routed to, so the screen the rider actually follows on
+                // foot names the entrance the detail screen promised instead of just the station.
+                let guide = isOrigin ? route.originAccessGuide : route.destinationAccessGuide
                 steps.append(TripStep(
                     id: steps.count,
                     kind: isOrigin ? .walkToStation : .walkToDestination,
@@ -103,6 +106,7 @@ struct LiveGoTripBuilder {
                     stopCount: 0,
                     walkingDistance: segment.distance,
                     duration: segment.duration,
+                    exitHint: guide?.accessPoint?.namedDoor,
                     walkingPathCoordinates: segment.polylineCoordinates,
                     segmentIndex: index
                 ))

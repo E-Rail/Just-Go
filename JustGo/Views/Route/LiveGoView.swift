@@ -628,9 +628,13 @@ struct LiveGoView: View {
 
             controls
         }
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .padding([.horizontal, .bottom], 10)
+        .padding(16)
+        // `.ultraThinMaterial` let the map through: walking past a park turned the panel green,
+        // walking past water turned it blue, and the instruction the rider is following changed
+        // contrast with the scenery. This is the one surface on screen that has to stay readable.
+        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: .black.opacity(0.2), radius: 12, y: 4)
+        .padding([.horizontal, .bottom], 12)
     }
 
     private func stepSummary(_ step: TripStep) -> some View {

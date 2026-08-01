@@ -282,7 +282,10 @@ struct RouteDetailView: View {
         .buttonStyle(.plain)
         .padding(.horizontal)
         .padding(.bottom, 8)
-        .background(.bar)
+        // No `.background(.bar)`. The capsule is opaque and carries its own contrast, so the bar
+        // was protecting nothing — it just laid an opaque grey slab across the full width and
+        // covered the bottom of the last card. The safeAreaInset still reserves this height, so
+        // scrolled content ends above the button rather than under it.
     }
 
     private var mapCard: some View {

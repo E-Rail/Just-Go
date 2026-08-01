@@ -35,6 +35,7 @@ struct MapContainerView: View {
     @State private var placeMatchTask: Task<Void, Never>?
     @State private var stationOpenTask: Task<Void, Never>?
     @State private var centerOnUserTask: Task<Void, Never>?
+    @State private var didCenterOnUser = false
     @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
     // Holds an MKMapItem that resolved while station matching was still deciding whether to
@@ -57,6 +58,13 @@ struct MapContainerView: View {
 
             guard let city = appState.selectedCity else { return }
             await viewModel?.loadStations(for: city)
+            // Open on the rider, not on a city centroid. Only the first time the map appears:
+            // re-running on every city change would fight a city the rider just picked by hand.
+            // When location is unavailable — denied, restricted, or the fix times out — this is
+            // a no-op and the city view `loadStations` already set is what stays on screen.
+            guard !didCenterOnUser else { return }
+            didCenterOnUser = true
+            centerOnUser()
         }
         .onChange(of: viewModel?.searchText ?? "") { _, _ in
             viewModel?.scheduleSearch(in: appState.selectedCity)
@@ -387,17 +395,25 @@ struct MapContainerView: View {
         .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
+    /// The one way this screen ever puts the camera on the rider — used by the locate button and
+    /// by the map's first appearance, so the two cannot land at different zooms or disagree about
+    /// the city. That inconsistency was the complaint: the same intent behaved differently
+    /// depending on which path ran it.
+    private func centerOnUser() {
+        centerOnUserTask?.cancel()
+        centerOnUserTask = Task {
+            // Locating also aligns the app to the city the rider is physically in
+            // (bounded — see centerOnUser): the camera alone moving left the city
+            // pill, station search, and planner stuck on the old city.
+            if let city = await viewModel?.centerOnUser() {
+                appState.selectedCity = city
+            }
+        }
+    }
+
     private var mapLocateButton: some View {
         Button {
-            centerOnUserTask?.cancel()
-            centerOnUserTask = Task {
-                // Locate also aligns the app to the city the user is physically in
-                // (bounded — see centerOnUser): the camera alone moving left the city
-                // pill, station search, and planner stuck on the old city.
-                if let city = await viewModel?.centerOnUser() {
-                    appState.selectedCity = city
-                }
-            }
+            centerOnUser()
         } label: {
             Image(systemName: "location.fill")
                 .font(.headline)
@@ -455,7 +471,7 @@ struct MapContainerView: View {
                 openStation(station)
             } else {
                 guard !Task.isCancelled else { return }
-                viewModel?.updateCamera(to: place.coordinate, spanDelta: 0.02)
+                viewModel?.updateCamera(to: place.coordinate, spanDelta: MapCameraSpan.focused)
             }
         }
     }
@@ -532,6 +548,170 @@ private struct PlaceLoadingView: View {
     }
 }
 
+
+/// Pick a place by pointing at it, for riders who know where they mean but not what it is called.
+///
+/// Centre-pin rather than tap-to-drop: the pin is fixed at the middle of the screen and the map
+/// moves under it. That is what Apple Maps, Uber and Didi all do for this task, and it needs no
+/// new gesture plumbing — `TransitMapView` already reports every camera move through
+/// `onRegionChanged`, which is the only signal this needs.
+struct MapPlacePickerView: View {
+    let field: RouteInputField
+    let initialCoordinate: CLLocationCoordinate2D
+    let onSelect: (TransitPlace) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(DIContainer.self) private var container
+    @State private var visibleRegion: MapVisibleRegion?
+    @State private var resolvedPlace: TransitPlace?
+    @State private var isResolving = false
+    @State private var resolveTask: Task<Void, Never>?
+
+    init(
+        field: RouteInputField,
+        initialCoordinate: CLLocationCoordinate2D,
+        onSelect: @escaping (TransitPlace) -> Void
+    ) {
+        self.field = field
+        self.initialCoordinate = initialCoordinate
+        self.onSelect = onSelect
+        _visibleRegion = State(initialValue: MapVisibleRegion(
+            center: initialCoordinate,
+            latitudeDelta: MapCameraSpan.focused,
+            longitudeDelta: MapCameraSpan.focused
+        ))
+    }
+
+    private var centerCoordinate: CLLocationCoordinate2D {
+        visibleRegion?.center ?? initialCoordinate
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                TransitMapView(
+                    visibleRegion: $visibleRegion,
+                    stations: [],
+                    metroNetworks: [],
+                    route: nil,
+                    showsUserLocation: container.locationService.isAuthorized,
+                    onRegionChanged: { region in
+                        visibleRegion = region
+                        scheduleResolve(for: region.center)
+                    },
+                    onStationSelected: { _ in }
+                )
+                .ignoresSafeArea()
+
+                centerPin
+            }
+            .safeAreaInset(edge: .bottom) { selectionBar }
+            .navigationTitle(field == .origin
+                ? AppLocalization.text(english: "Choose start", simplified: "选择起点", traditional: "選擇起點")
+                : AppLocalization.text(english: "Choose destination", simplified: "选择终点", traditional: "選擇終點"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(AppLocalization.localized("Cancel")) { dismiss() }
+                }
+            }
+        }
+        .task { scheduleResolve(for: initialCoordinate) }
+        .onDisappear { resolveTask?.cancel() }
+    }
+
+    /// Drawn at the map's centre and lifted by half its own height so the point of the pin — not
+    /// the middle of the glyph — sits on the coordinate being chosen.
+    private var centerPin: some View {
+        Image(systemName: "mappin")
+            .font(.system(size: 34, weight: .semibold))
+            .foregroundStyle(Color.accentColor)
+            .shadow(color: .black.opacity(0.35), radius: 4, y: 2)
+            .offset(y: -17)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+
+    private var selectionBar: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(resolvedPlace?.name ?? coordinateLabel)
+                    .font(.headline)
+                    .lineLimit(1)
+                if let address = resolvedPlace?.address, !address.isEmpty {
+                    Text(address).rowMeta().lineLimit(1)
+                } else if isResolving {
+                    Text(AppLocalization.text(
+                        english: "Looking up this place…",
+                        simplified: "正在识别该地点…",
+                        traditional: "正在辨識該地點…"
+                    ))
+                    .rowMeta()
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .animation(.default, value: resolvedPlace)
+
+            Button {
+                onSelect(selectedPlace)
+                dismiss()
+            } label: {
+                Text(field == .origin
+                    ? AppLocalization.text(english: "Set as start", simplified: "设为起点", traditional: "設為起點")
+                    : AppLocalization.text(english: "Set as destination", simplified: "设为终点", traditional: "設為終點"))
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.accentColor.opacity(0.18), in: Capsule())
+                .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(.regularMaterial)
+    }
+
+    /// Shown until the geocode lands, and kept as the name when nothing resolves. A coordinate is
+    /// a perfectly good destination, so confirm stays enabled throughout rather than making the
+    /// rider wait on a lookup that may never return a name for a spot in a park.
+    private var coordinateLabel: String {
+        String(format: "%.5f, %.5f", centerCoordinate.latitude, centerCoordinate.longitude)
+    }
+
+    private var selectedPlace: TransitPlace {
+        if let resolvedPlace, resolvedPlace.coordinate.isEssentiallyEqual(to: centerCoordinate) {
+            return resolvedPlace
+        }
+        return TransitPlace(name: coordinateLabel, coordinate: centerCoordinate, source: .mapKit)
+    }
+
+    /// Debounced: the map reports a region on every frame of a pan, and CLGeocoder rate-limits
+    /// hard enough that resolving each one would return nothing at all.
+    private func scheduleResolve(for coordinate: CLLocationCoordinate2D) {
+        resolveTask?.cancel()
+        isResolving = true
+        resolveTask = Task {
+            try? await Task.sleep(for: .milliseconds(400))
+            guard !Task.isCancelled else { return }
+            let place = try? await container.placeSearchProvider.reverseGeocode(
+                location: coordinate,
+                name: nil
+            )
+            guard !Task.isCancelled else { return }
+            isResolving = false
+            guard let place, coordinate.isEssentiallyEqual(to: centerCoordinate) else { return }
+            resolvedPlace = place.withSource(.mapKit)
+        }
+    }
+}
+
+private extension CLLocationCoordinate2D {
+    /// Same coordinate to roughly a metre — enough to tell "the map has not moved since this
+    /// lookup started" from "the rider panned away and this result is stale".
+    func isEssentiallyEqual(to other: CLLocationCoordinate2D) -> Bool {
+        abs(latitude - other.latitude) < 0.00001 && abs(longitude - other.longitude) < 0.00001
+    }
+}
 
 struct CityPickerView: View {
     @Binding var selectedCity: City?

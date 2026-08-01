@@ -89,10 +89,17 @@ struct TransitMapView: UIViewRepresentable {
         func sync(parent: TransitMapView, on mapView: MKMapView) {
             self.parent = parent
             mapView.showsUserLocation = parent.showsUserLocation
+            #if DEBUG
+            MainThreadHangMonitor.measure("map.syncRegion") { syncRegion(on: mapView) }
+            MainThreadHangMonitor.measure("map.syncNetworks") { syncNetworks(on: mapView) }
+            MainThreadHangMonitor.measure("map.syncStations") { syncStations(on: mapView) }
+            MainThreadHangMonitor.measure("map.syncRoute") { syncRoute(on: mapView) }
+            #else
             syncRegion(on: mapView)
             syncNetworks(on: mapView)
             syncStations(on: mapView)
             syncRoute(on: mapView)
+            #endif
         }
 
         private func syncRegion(on mapView: MKMapView) {

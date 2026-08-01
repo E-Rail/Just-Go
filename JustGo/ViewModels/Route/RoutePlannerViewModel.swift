@@ -2,9 +2,14 @@ import Foundation
 import CoreLocation
 import MapKit
 
-enum RouteInputField: Hashable {
+enum RouteInputField: Hashable, Identifiable {
     case origin
     case destination
+
+    // Identifiable so the map picker can be presented with `sheet(item:)`: the field being
+    // filled is exactly the sheet's identity, so there is no way to present it without knowing
+    // which row the result belongs to.
+    var id: Self { self }
 }
 
 @Observable
@@ -589,7 +594,7 @@ final class RoutePlannerViewModel {
         }
     }
 
-    private func place(for field: RouteInputField) -> TransitPlace? {
+    func place(for field: RouteInputField) -> TransitPlace? {
         field == .origin ? originPlace : destinationPlace
     }
 

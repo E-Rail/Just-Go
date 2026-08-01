@@ -19,6 +19,8 @@ struct RoutePlannerView: View {
     @State var showResults = false
     @FocusState var focusedField: RouteInputField?
     @State private var showCityPicker = false
+    /// Non-nil while the map picker is up, and its value is the field the result fills.
+    @State private var mapPickerField: RouteInputField?
     @State var showSaveCurrentTrip = false
     @State var savedTripName = ""
     @State var scrollToTopTrigger = false
@@ -59,6 +61,9 @@ struct RoutePlannerView: View {
                         }
                         .padding()
                     }
+                    // Dragging the planner down puts the keyboard away too, so the rider has two
+                    // ways out of a field rather than only the tap rule installed in ContentView.
+                    .scrollDismissesKeyboard(.interactively)
                     .onChange(of: scrollToTopTrigger) { _, _ in
                         withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
                     }
@@ -115,6 +120,17 @@ struct RoutePlannerView: View {
                     get: { appState.selectedCity },
                     set: { appState.selectedCity = $0 }
                 ))
+            }
+            .sheet(item: $mapPickerField) { field in
+                MapPlacePickerView(
+                    field: field,
+                    initialCoordinate: mapPickerStart(for: field)
+                ) { place in
+                    // Same bounded nearest-city rule the quick tags use, and before the fill:
+                    // a cross-city switch wipes the fields, so it has to precede the assignment.
+                    switchPlannerCity(forPlaceCityID: nil, coordinate: place.coordinate)
+                    viewModel?.selectPlace(place, for: field)
+                }
             }
             .onChange(of: appState.selectedCity?.id) { _, newID in
                 // switchPlannerCity applies the city to the view model synchronously, so
@@ -181,6 +197,18 @@ struct RoutePlannerView: View {
         appState.accessibilityPreference.simplifiedUI
     }
 
+    /// Where the picker opens. Whatever the field already holds is the most useful starting
+    /// point — a rider adjusting a pin should not have to pan back to it — then the other field,
+    /// then the device, then the city.
+    private func mapPickerStart(for field: RouteInputField) -> CLLocationCoordinate2D {
+        let other: RouteInputField = field == .origin ? .destination : .origin
+        return viewModel?.place(for: field)?.coordinate
+            ?? container.locationService.currentLocation?.coordinate
+            ?? viewModel?.place(for: other)?.coordinate
+            ?? appState.selectedCity?.coordinate
+            ?? CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
+    }
+
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
         guard let pending, let vm = viewModel else { return }
         // A station-originated input can reference another city (Quick Tags → station
@@ -220,10 +248,7 @@ struct RoutePlannerView: View {
         }
         guard let selected = appState.selectedCity else { return }
         let place = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        let selectedCenter = CLLocation(latitude: selected.coordinate.latitude, longitude: selected.coordinate.longitude)
-        guard place.distance(from: selectedCenter) > 80_000,
-              let nearest = container.cityService.findNearestCity(to: place),
-              nearest.id != selected.id else { return }
+        guard let nearest = container.cityService.cityToAdopt(for: place, whileSelecting: selected) else { return }
         switchPlannerCity(toCityID: nearest.id)
     }
 
@@ -436,16 +461,37 @@ struct RoutePlannerView: View {
         placeholder: LocalizedStringKey,
         field: RouteInputField
     ) -> some View {
-        TextField(placeholder, text: Binding(
-            get: { viewModel?.name(for: field) ?? "" },
-            set: { viewModel?.updateName($0, for: field) }
-        ))
-            .focused($focusedField, equals: field)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .textFieldStyle(.plain)
-            .padding(12)
-            .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        HStack(spacing: 4) {
+            TextField(placeholder, text: Binding(
+                get: { viewModel?.name(for: field) ?? "" },
+                set: { viewModel?.updateName($0, for: field) }
+            ))
+                .focused($focusedField, equals: field)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .textFieldStyle(.plain)
+
+            // One button per field rather than one shared: which of From/To is being filled has
+            // to be unambiguous before the map opens, or the rider picks a place and finds it in
+            // the wrong row.
+            Button {
+                focusedField = nil
+                mapPickerField = field
+            } label: {
+                Image(systemName: "map")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
+                    .frame(width: 44, height: 34)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(field == .origin
+                ? AppLocalization.text(english: "Choose start on map", simplified: "在地图上选择起点", traditional: "在地圖上選擇起點")
+                : AppLocalization.text(english: "Choose destination on map", simplified: "在地图上选择终点", traditional: "在地圖上選擇終點"))
+        }
+        .padding(.leading, 12)
+        .padding(.vertical, 12)
+        .background(Color.appSurfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion.

@@ -70,6 +70,12 @@ struct JustGoApp: App {
         // Stage 1 — services. `DIContainer.configure()` already ran in `init`; the city
         // capabilities manifest is the remaining piece, and it is what the city rows render from.
         appState.advanceLaunch(to: .loadingCities)
+        // Ask for a fix before `appState.initialize` below reads one. Without this its
+        // nearest-city branch was dead code — `currentLocation` is always nil this early, so
+        // every launch seeded Beijing and a rider in Shanghai opened the app on the wrong city.
+        // A no-op (and no permission prompt) when location has not been granted; the Map tab
+        // asks for that at the moment it can explain why.
+        container.locationService.prewarmLocation()
         await Task.detached(priority: .userInitiated) {
             CityDataCapabilities.prewarm()
         }.value
@@ -78,7 +84,13 @@ struct JustGoApp: App {
         // geometry already in memory instead of paying for the decode on first appearance.
         // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
         // is a warmup — if it overruns, hand off and let it land in the actor's cache behind us.
+        #if DEBUG
+        LaunchClock.mark("stage1.capabilities.done")
+        #endif
         appState.initialize(container: container)
+        #if DEBUG
+        LaunchClock.mark("stage2.initialize.done")
+        #endif
         appState.advanceLaunch(to: .loadingMapData)
         if let cityID = appState.selectedCity?.id {
             let provider = container.metroNetworkProvider
@@ -89,13 +101,38 @@ struct JustGoApp: App {
             }
         }
 
+        #if DEBUG
+        LaunchClock.mark("stage2.networkDecode.done")
+        #endif
         // Essentials done — hand off.
         appState.advanceLaunch(to: .ready)
+
+        // Then correct the city, rather than making the launch screen wait on GPS. `prewarm`
+        // above only *starts* the fix; it cannot land before this point, so `initialize` always
+        // seeded the fallback and a rider in Shanghai opened the app on Beijing. Waiting for the
+        // fix before handing off would trade a wrong city for a slow launch — do it behind the
+        // live UI instead, and only when the rider is clearly outside the seeded city.
+        await realignCityToDevice()
+        #if DEBUG
+        LaunchClock.mark("stage3.realignCity.done")
+        #endif
 
         // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
         // repair touches a network decode and a city-pack load per tag, and the rows it
         // repairs are several taps away.
         await repairQuickTags()
+    }
+
+    /// Adopts the city the device is actually in, once a fix arrives. No-op without location
+    /// permission, and deliberately silent: this is a correction, not something to announce.
+    private func realignCityToDevice() async {
+        guard container.locationService.isAuthorized else { return }
+        guard let location = try? await container.locationService.requestCurrentLocation() else { return }
+        guard let city = container.cityService.cityToAdopt(
+            for: location,
+            whileSelecting: appState.selectedCity
+        ) else { return }
+        appState.selectedCity = city
     }
 
     private func repairQuickTags() async {

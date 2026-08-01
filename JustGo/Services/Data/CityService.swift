@@ -79,4 +79,25 @@ final class CityService {
         }
     }
 
+    /// The city to switch to for a coordinate, or nil to keep the current selection.
+    ///
+    /// Bounded on purpose: within 80km of the selected city's centre the rider is plausibly still
+    /// inside its metro area, and a seam position in adjacent interconnected metros
+    /// (Guangzhou/Foshan) must not flip the selection. Beyond that, follow them to the nearest.
+    ///
+    /// One rule rather than three. The map's locate button, the planner's cross-city fills and the
+    /// launch realignment all ask this same question, and each used to carry its own copy of the
+    /// answer — including the 80km constant.
+    func cityToAdopt(for location: CLLocation, whileSelecting selected: City?) -> City? {
+        guard let selected else { return findNearestCity(to: location) }
+        let selectedCentre = CLLocation(
+            latitude: selected.coordinate.latitude,
+            longitude: selected.coordinate.longitude
+        )
+        guard location.distance(from: selectedCentre) > 80_000,
+              let nearest = findNearestCity(to: location),
+              nearest.id != selected.id else { return nil }
+        return nearest
+    }
+
 }

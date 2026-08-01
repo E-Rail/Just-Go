@@ -20,6 +20,23 @@ struct MapVisibleRegion {
     }
 }
 
+/// The three scales the map is ever asked to sit at.
+///
+/// These were four hardcoded literals — 0.22 for a city load, 0.1 for locate-me, 0.02 for a search
+/// result, 0.01 for a station — covering what a rider experiences as one action: "show me this".
+/// The same intent therefore landed at a different scale depending on which code path served it,
+/// and pressing locate answered "where am I" with an 11km-wide view of the whole city.
+enum MapCameraSpan {
+    /// Whole metro area. Only for a city with no fix to centre on.
+    static let city: CLLocationDegrees = 0.22
+    /// Walkable surroundings — the default answer to "where am I". Deliberately below the 0.12
+    /// threshold at which `refreshVisibleStations` starts drawing non-interchange stations, so
+    /// the rider lands among the stations they could actually walk to.
+    static let focused: CLLocationDegrees = 0.014
+    /// One station and its exits.
+    static let station: CLLocationDegrees = 0.008
+}
+
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
@@ -83,7 +100,7 @@ final class MapViewModel {
         if !keepUserCamera {
             // Skipped only when the locate flow triggered this switch — the camera is
             // already on the user inside this city, and recentering would undo the locate.
-            updateCamera(to: city.coordinate, spanDelta: 0.22)
+            updateCamera(to: city.coordinate, spanDelta: MapCameraSpan.city)
         }
         metroNetworks = []
         stations = []
@@ -189,8 +206,8 @@ final class MapViewModel {
         withAnimation {
             visibleRegion = MapVisibleRegion(
                 center: station.coordinate,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01
+                latitudeDelta: MapCameraSpan.station,
+                longitudeDelta: MapCameraSpan.station
             )
         }
 
@@ -198,7 +215,7 @@ final class MapViewModel {
     }
 
     func updateCamera(to coordinate: CLLocationCoordinate2D) {
-        updateCamera(to: coordinate, spanDelta: 0.1)
+        updateCamera(to: coordinate, spanDelta: MapCameraSpan.focused)
     }
 
     func updateCamera(to coordinate: CLLocationCoordinate2D, spanDelta: CLLocationDegrees) {
@@ -222,15 +239,10 @@ final class MapViewModel {
             // city's map onto the user's physical position.
             guard !Task.isCancelled else { return nil }
             updateCamera(to: location.coordinate)
-            // Bounded, same rule as the planner's cross-city fills: within 80km of the
-            // selected city's center the user is plausibly in its metro area — seam
-            // positions in adjacent interconnected metros (Guangzhou/Foshan) must not
-            // flip the selection. Beyond it, follow the user to the nearest city.
-            guard let selected = activeCityID.flatMap({ cityService.getCity(byID: $0) }) else { return nil }
-            let selectedCenter = CLLocation(latitude: selected.coordinate.latitude, longitude: selected.coordinate.longitude)
-            guard location.distance(from: selectedCenter) > 80_000,
-                  let nearest = cityService.findNearestCity(to: location),
-                  nearest.id != selected.id else { return nil }
+            guard let selected = activeCityID.flatMap({ cityService.getCity(byID: $0) }),
+                  let nearest = cityService.cityToAdopt(for: location, whileSelecting: selected) else {
+                return nil
+            }
             pendingUserCameraCityID = nearest.id
             return nearest
         } catch {

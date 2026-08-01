@@ -38,6 +38,11 @@ SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 # mainline/high-speed railway inside the same bounding boxes (国铁/高铁) stays out.
 GUANGDONG_INTERCITY_NETWORKS = ["珠三角城际", "粤港澳大湾区城际铁路"].freeze
 
+# Sanity bound on a declared `interchange_aliases` pair — far enough to cover a genuine
+# metro/intercity concourse (Guangzhou's widest real pair is 350m) and tight enough that a typo
+# naming the wrong station fails the import instead of inventing a transfer across the city.
+MAX_INTERCHANGE_ALIAS_METERS = 500
+
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
@@ -52,7 +57,19 @@ CITIES = {
   "4401" => {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
     networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
-    own_unknown_lines: []
+    own_unknown_lines: [],
+    # Metro station first, the intercity station it shares a concourse with second. Every pair
+    # here is one place a rider walks across; OSM names the two halves separately. See the
+    # merge in build_city for why this is a list and not a distance rule.
+    interchange_aliases: [
+      %w[机场北 白云机场北],
+      %w[机场南 白云机场南],
+      %w[广州白云站 广州白云],
+      %w[广州北站 花都],
+      %w[大石 大石东],
+      %w[东平 顺德北],
+      %w[汉溪长隆 广州长隆]
+    ]
   },
   "4403" => {
     name: "Shenzhen", bbox: [22.35, 113.65, 22.95, 114.75],
@@ -201,7 +218,13 @@ def inferred_route_reference(tags, name)
   explicit = normalized(tags["ref"])
   return explicit unless explicit.empty?
 
-  name.to_s[/\d+[a-z]?/i].to_s.downcase
+  # A line reference is a designation plus a number ("S3", "T1"), not the first digits in the
+  # string. This value keys `structured_service?`, so losing the designation does not merely
+  # mislabel a line — it fuses two of them: 成都市域铁路S3资阳线 carries no `ref` tag, reduced to
+  # "3", matched 成都地铁3号线's ref, and unioned into it, dragging 资阳's stations 60km onto
+  # Line 3. Prefer a letter-prefixed form; fall back to bare digits so "Metro Line 10" and
+  # "Light Rail 614P" (no letter against the number) keep reading as before.
+  (name.to_s[/(?<![a-z])[a-z]{1,2}\d+[a-z]?/i] || name.to_s[/\d+[a-z]?/i]).to_s.downcase
 end
 
 def service_identity(tags)
@@ -492,6 +515,13 @@ def line_id(city_id, key)
   Digest::SHA256.hexdigest("#{city_id}|#{key}")[0, 16]
 end
 
+# A station's ID is the hash of its *normalized* name, which is also how service patterns
+# reference it. Both were computed inline; sharing one definition is what lets the interchange
+# merge below rewrite a station ID and its pattern references without them drifting apart.
+def station_id(city_id, name_key)
+  Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16]
+end
+
 def overpass_query(bbox)
   south, west, north, east = bbox
   <<~QUERY
@@ -535,6 +565,14 @@ end
 
 def wgs84_to_gcj02(latitude, longitude)
   GCJ02.from_wgs84(latitude, longitude)
+end
+
+def average_coordinate(station)
+  coordinates = station["coordinates"]
+  [
+    coordinates.sum { |coordinate| coordinate[0] } / coordinates.length,
+    coordinates.sum { |coordinate| coordinate[1] } / coordinates.length
+  ]
 end
 
 def meters_between(a, b)
@@ -960,7 +998,7 @@ def build_network(city_id, city, source)
       "colorHex" => canonical_color(profiles, canonical),
       "stationIDs" => [],
       "servicePatterns" => service_patterns.map do |pattern|
-        pattern.map { |name| Digest::SHA256.hexdigest("#{city_id}|#{name}")[0, 16] }
+        pattern.map { |name| station_id(city_id, name) }
       end,
       "paths" => coordinate_paths,
       "sourceRelationIDs" => direction_relations.map { |relation| relation["id"].to_s }.sort,
@@ -983,13 +1021,63 @@ def build_network(city_id, city, source)
     base
   end
 
+  # Two names, one place. OSM names a metro station and the intercity station it interchanges
+  # with separately, so the name-keyed grouping above emits two nodes — and because the routing
+  # graph only charges a transfer where the line changes *at one node*
+  # (BundledMetroRouteProvider), no transfer edge exists between them at all. The app cannot plan
+  # an interchange riders make every day, and the city's station count double-counts it.
+  #
+  # Declared per pair rather than inferred from distance, because distance cannot separate the
+  # two cases. Measured over Guangzhou's 414 stations, the genuine cross-mode pairs run out to
+  # 350m (汉溪长隆/广州长隆) while 体育西路 and 天河南 — different stations — are 281m apart. Any
+  # threshold that catches the first fuses the second, inventing a transfer between two of the
+  # city's busiest stations. A wrong transfer is worse than a double count.
+  alias_id_rewrites = {}
+  (city[:interchange_aliases] || []).each do |primary_name, secondary_name|
+    primary_key = normalized_station_name(primary_name)
+    secondary_key = normalized_station_name(secondary_name)
+    primary = station_groups[primary_key]
+    secondary = station_groups[secondary_key]
+    # Loud, not skipped: a typo or a renamed station would otherwise silently stop merging and
+    # the double count would quietly come back.
+    fail_with("#{city[:name]} interchange alias names an absent station: #{primary_name}") if primary.nil?
+    fail_with("#{city[:name]} interchange alias names an absent station: #{secondary_name}") if secondary.nil?
+    unless (primary["lineIDs"] & secondary["lineIDs"]).empty?
+      fail_with("#{city[:name]} interchange alias #{primary_name}/#{secondary_name} already share a line")
+    end
+    separation = meters_between(average_coordinate(primary), average_coordinate(secondary))
+    if separation > MAX_INTERCHANGE_ALIAS_METERS
+      fail_with(
+        "#{city[:name]} interchange alias #{primary_name}/#{secondary_name} is #{separation.round}m apart"
+      )
+    end
+    # The merged node sits at the mean of both halves' mapped positions. Anchoring it on the
+    # primary (metro) station instead was tried and measured worse: 1257 entrances bound against
+    # 1259 for the mean, because the entrance importer's 300m match radius then excludes the
+    # intercity half's exits entirely rather than trimming the far end of each.
+    primary["coordinates"].concat(secondary["coordinates"])
+    primary["lineIDs"].merge(secondary["lineIDs"])
+    primary["nameEn"] ||= secondary["nameEn"]
+    station_groups.delete(secondary_key)
+    alias_id_rewrites[station_id(city_id, secondary_key)] = station_id(city_id, primary_key)
+  end
+  unless alias_id_rewrites.empty?
+    lines.each do |line|
+      line["servicePatterns"] = line["servicePatterns"].map do |pattern|
+        # chunk_while collapses the adjacent repeat a rewrite can create if one line somehow
+        # called at both names; `uniq` then drops a pattern that became a duplicate of another.
+        pattern.map { |id| alias_id_rewrites.fetch(id, id) }.chunk_while { |a, b| a == b }.map(&:first)
+      end.uniq
+    end
+  end
+
   stations = station_groups.map do |name_key, station|
     next if station["lineIDs"].empty?
     latitude = station["coordinates"].sum { |coordinate| coordinate[0] } / station["coordinates"].length
     longitude = station["coordinates"].sum { |coordinate| coordinate[1] } / station["coordinates"].length
     latitude, longitude = wgs84_to_gcj02(latitude, longitude)
     {
-      "id" => Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16],
+      "id" => station_id(city_id, name_key),
       "name" => station["name"],
       "nameEn" => station["nameEn"],
       "latitude" => latitude.round(6),
@@ -1113,6 +1201,23 @@ def self_test
   fail_with("terminus pair test failed") unless LineNames.clean("常州地铁2号线 五一路-青枫公园") == "常州地铁2号线"
   fail_with("bare-ref line name test failed") unless
     passenger_line_name("name" => "1 窦官 - 小孟工业园", "ref" => "1") == "1号线"
+  # An explicit `ref` always wins; the cases below all exercise the name fallback, which is what
+  # keys line merging. Dropping a designation letter here fuses two different lines.
+  fail_with("designation must survive ref inference") unless
+    inferred_route_reference({}, "成都市域铁路S3资阳线") == "s3"
+  fail_with("designation must not collide with a plain number") unless
+    inferred_route_reference({}, "成都地铁3号线") == "3"
+  fail_with("S-line designation test failed") unless
+    inferred_route_reference({}, "南京地铁S1号线") == "s1"
+  fail_with("tram designation test failed") unless
+    inferred_route_reference({}, "有轨电车 亦庄T1线") == "t1"
+  # No ASCII letter sits against the number, so these keep reducing to bare digits as before.
+  fail_with("English line-number inference test failed") unless
+    inferred_route_reference({}, "Metro Line 10") == "10"
+  fail_with("numeric-suffix inference test failed") unless
+    inferred_route_reference({}, "Light Rail 614P") == "614p"
+  fail_with("explicit ref must win over the name") unless
+    inferred_route_reference({ "ref" => "S3" }, "成都地铁3号线") == normalized("S3")
   joined = join_way_paths([
     { "id" => 1, "nodes" => [1, 2, 3] },
     { "id" => 2, "nodes" => [5, 4, 3] },

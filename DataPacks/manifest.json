@@ -59,8 +59,8 @@
     {
       "cityID": "4401",
       "version": "oss-safe-v2-20260715",
-      "sizeBytes": 475934,
-      "sha256": "ef42b8ed9984994e0e75582ce5881f50daf5e7a41182a4b90a4dfb94589a86cd",
+      "sizeBytes": 473925,
+      "sha256": "f3de2f884b08736ce9e3bd74fb0997720b88df46b7b7bdb94f89b42974768e65",
       "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": null,
       "rightsIDs": [
@@ -78,34 +78,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 414,
+        "networkStations": 407,
         "matchedStations": {
-          "covered": 329,
-          "total": 414
+          "covered": 326,
+          "total": 407
         },
         "accessibility": {
           "covered": 37,
-          "total": 414
+          "total": 407
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 414
+          "total": 407
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 414
+          "total": 407
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 414
+          "total": 407
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 414
+          "total": 407
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 414
+          "total": 407
         }
       }
     },

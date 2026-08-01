@@ -65,8 +65,13 @@ struct LineBadge: View {
             // one merely nearby is not, which is what separates "S1线" from "Line 2".
             let before = trimmed[..<digits.lowerBound]
             let prefix = before.suffix(while: { $0.isLetter && $0.isASCII })
+            // The character before the designation disqualifies it only when it is an *ASCII*
+            // letter — i.e. the designation is really the tail of a Latin word. `isLetter` alone
+            // is true for CJK, so every Chinese-prefixed line lost its designation: 成都市域铁路S3
+            // 资阳线 badged as "3", colliding with 成都地铁3号线 in the same city, and Nanjing
+            // rendered S1/S2/S6/S7/S8/S9 as bare numbers against its own 1–9号线.
             let isDesignation = prefix.count <= 2 && !prefix.isEmpty
-                && !before.dropLast(prefix.count).last.map { $0.isLetter }.orFalse
+                && !before.dropLast(prefix.count).last.map { $0.isLetter && $0.isASCII }.orFalse
             return (isDesignation ? prefix.uppercased() : "") + trimmed[digits]
         }
         // No number: Latin names reduce to initials, CJK to the leading characters with the

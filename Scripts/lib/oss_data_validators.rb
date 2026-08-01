@@ -807,7 +807,13 @@ module OSSDataValidators
       "3205" => { stations: 53, exits: 230, accessibility: 2, network: 235 },
       "3301" => { stations: 262, exits: 1333, accessibility: 10, network: 270 },
       "4201" => { stations: 89, exits: 319, accessibility: 7, network: 293 },
-      "4401" => { stations: 329, exits: 1262, accessibility: 37, network: 414 },
+      # Seven metro/intercity pairs that share a concourse now import as one station each (see
+      # `interchange_aliases`), so the network drops 414 -> 407. Entrance bindings move with them:
+      # 329 -> 326 stations carry exits because three merges joined two entrance-bearing halves,
+      # and 1262 -> 1259 exits because the merged node sits between the halves and three exits at
+      # 汉溪长隆 fall outside the importer's 300m match radius — while two previously ambiguous
+      # 广州白云 exits now bind unambiguously.
+      "4401" => { stations: 326, exits: 1259, accessibility: 37, network: 407 },
       "4403" => { stations: 321, exits: 1504, accessibility: 19, network: 372 },
       "5000" => { stations: 83, exits: 299, accessibility: 3, network: 273 },
       "5101" => { stations: 184, exits: 771, accessibility: 9, network: 396 },

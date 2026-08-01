@@ -39,10 +39,21 @@ end
 %w[NSLocationWhenInUseUsageDescription].each do |key|
   errors << "JustGo-Info.plist is missing #{key}" unless info_plist.include?("<key>#{key}</key>")
 end
-# The camera was only ever reached through the indoor checkpoint scanner. With that feature gone a
-# purpose string would promise App Review a capability no user can exercise.
-if info_plist.include?("NSCameraUsageDescription")
+# The camera used to be banned outright: it was only ever reached through the indoor checkpoint
+# scanner, and once that was removed a purpose string would have promised App Review a capability
+# no user could exercise. That premise changed when riders gained the ability to photograph a
+# station. The rule keeps its intent — never declare a capability nothing uses — but now checks it
+# in the positive direction, so the string and the code that reaches the camera must appear
+# together or not at all.
+camera_capture_path = "JustGo/Views/Station/PersonalStationMediaSection.swift"
+declares_camera = info_plist.include?("NSCameraUsageDescription")
+reaches_camera = File.file?(File.join(ROOT, camera_capture_path)) &&
+                 read.call(camera_capture_path).include?("sourceType = .camera")
+if declares_camera && !reaches_camera
   errors << "JustGo must not declare camera access it never uses"
+end
+if reaches_camera && !declares_camera
+  errors << "camera capture exists but JustGo-Info.plist declares no NSCameraUsageDescription"
 end
 if info_plist.include?("NSLocationAlwaysAndWhenInUseUsageDescription")
   errors << "JustGo must not declare always-on location access"

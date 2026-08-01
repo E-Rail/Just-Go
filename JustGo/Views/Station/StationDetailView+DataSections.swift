@@ -922,6 +922,26 @@ extension StationDetailView {
         }
     }
 
+    /// Rider photographs of this station.
+    ///
+    /// Rendered only when the station has a canonical ID: `PersonalStationMediaKey` rejects the
+    /// provider fallback IDs, and a key built from one of those would file photos under an
+    /// identity that changes between launches.
+    @ViewBuilder
+    var riderPhotosSection: some View {
+        if let key = PersonalStationMediaKey(
+            cityID: displayedStation.cityID,
+            stationID: displayedStation.stationID
+        ) {
+            PersonalStationMediaSection(
+                stationKey: key,
+                stationName: displayedStation.localizedName
+            ) { image in
+                selectedStationImage = image
+            }
+        }
+    }
+
     @ViewBuilder
     var stationMapSection: some View {
         let resources = (viewModel?.externalResources ?? []).filter {

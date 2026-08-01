@@ -30,6 +30,8 @@
 	<string>$(CITY_PACK_MANIFEST_URL)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>JustGo uses the camera so you can photograph station signs, exits and transfer routes for your own reference.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>JustGo needs your location to find nearby subway stations and provide navigation.</string>
 	<key>UIApplicationSceneManifest</key>

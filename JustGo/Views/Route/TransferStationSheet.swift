@@ -40,6 +40,7 @@ struct TransferStationSheet: View {
                 rideSection
                 stationMapSection
                 transferGuideSection
+                riderPhotosSection
                 accessibilitySection
                 lookAroundSection
             }
@@ -142,6 +143,23 @@ struct TransferStationSheet: View {
     /// The in-station walkthrough riders (especially less sign-savvy ones) ask for: which
     /// exits/entrances exist, the transfer corridor, and boarding car/door hints — each
     /// shown when the pack has it, and honestly marked pending when it doesn't.
+    /// The same photo grid the station screen shows, on the screen where the gap is worst.
+    ///
+    /// Interchange corridors are exactly what no open dataset covers — `transferGuideSection`
+    /// above says "specific exit data is unavailable" at most of them — and the rider reading
+    /// this is standing in one. Deliberately the shared component rather than a copy: the two
+    /// screens drifted once already and shipped blank rows.
+    @ViewBuilder
+    private var riderPhotosSection: some View {
+        if let station = enrichedStation,
+           let key = PersonalStationMediaKey(cityID: station.cityID, stationID: station.stationID) {
+            PersonalStationMediaSection(
+                stationKey: key,
+                stationName: stationName
+            ) { _ in }
+        }
+    }
+
     private var transferGuideSection: some View {
         let exits = guidance?.accessPoints ?? []
         let corridorHints = guidance?.interchangeHints ?? []

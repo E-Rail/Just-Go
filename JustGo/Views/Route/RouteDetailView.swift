@@ -31,6 +31,8 @@ struct RouteDetailView: View {
     /// Which of the three stops the trip sheet is resting at.
     @State private var tripCardDetent: PresentationDetent = .medium
     @State private var showsTripCard = false
+    /// Where the sheet was resting before a push raised it, so coming back restores it.
+    @State private var stopBeforePush: PresentationDetent?
     /// Guidance replaces this page's content rather than covering it — "but in the same page".
     @State private var isGuiding = false
     @State private var cityResources: [ExternalTransitResource] = []
@@ -87,11 +89,6 @@ struct RouteDetailView: View {
         // with "whose view is not in the window hierarchy".
         .task { updateTripCardPresentation(animated: false) }
         .onChange(of: isGuiding) { _, _ in updateTripCardPresentation() }
-        // A sheet is not part of the navigation stack, so pushing a station from inside it left
-        // it sitting on top of the station — and coming back it snapped in with no animation at
-        // all. It now slides out of the way before the push and slides back after, which is what
-        // it looks like when the sheet belongs to this screen rather than to the window.
-        .onChange(of: detailDestination) { _, _ in updateTripCardPresentation() }
         .navigationTitle(isGuiding
             ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
             : AppLocalization.localized("Route Details"))
@@ -125,31 +122,6 @@ struct RouteDetailView: View {
         }
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
-        }
-        // A single destination registration: two navigationDestination(item:) modifiers on
-        // the same node is a historically unreliable SwiftUI pattern (one registration can
-        // shadow the other), and both pushes share this screen anyway.
-        .navigationDestination(item: $detailDestination) { destination in
-            switch destination {
-            case .transfer(let segment):
-                TransferStationSheet(
-                    transferSegment: segment,
-                    nextTransitSegment: nextTransitSegment(after: segment),
-                    cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
-                    accessibilityFilter: accessibilityFilter
-                )
-            case .station(let stop):
-                RouteStationGuideSheet(
-                    stop: stop,
-                    cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
-                )
-            case .confidence:
-                let feasibility = currentFeasibility()
-                RouteConfidenceDetailView(
-                    confidence: currentConfidence(feasibility: feasibility),
-                    feasibility: feasibility
-                )
-            }
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false
@@ -336,19 +308,8 @@ struct RouteDetailView: View {
     /// navigator has taken the page over, and not while a station or transfer is pushed on top of
     /// it. Routed through one function so those three conditions cannot drift apart.
     private func updateTripCardPresentation(animated: Bool = true) {
-        let shouldShow = !isGuiding && detailDestination == nil
-        guard shouldShow != showsTripCard else { return }
-        // Dismissal is animated by the system; presentation needs the push to have finished
-        // first, so it waits a beat rather than racing the navigation transition.
-        if shouldShow, animated {
-            Task {
-                try? await Task.sleep(for: .milliseconds(320))
-                guard !isGuiding, detailDestination == nil else { return }
-                showsTripCard = true
-            }
-        } else {
-            showsTripCard = shouldShow
-        }
+        _ = animated
+        showsTripCard = !isGuiding
     }
 
     /// Pinned rather than scrolled past. It is the only thing on this screen the rider must be able
@@ -384,6 +345,63 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
+        // The sheet carries its own navigation stack, so a station or a transfer opens *inside*
+        // it — the way Maps does it. Pushing onto the page's stack instead meant the sheet had to
+        // be torn down and rebuilt around every push, and the rebuild is what flashed on the way
+        // back. Nothing outside the sheet moves now, so there is nothing left to flash.
+        NavigationStack {
+            tripCardContent(feasibility: feasibility, confidence: confidence)
+            // A single destination registration: two navigationDestination(item:) modifiers on
+            // the same node is a historically unreliable SwiftUI pattern (one registration can
+            // shadow the other), and both pushes share this screen anyway.
+            .navigationDestination(item: $detailDestination) { destination in
+                switch destination {
+                case .transfer(let segment):
+                    TransferStationSheet(
+                        transferSegment: segment,
+                        nextTransitSegment: nextTransitSegment(after: segment),
+                        cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                        accessibilityFilter: accessibilityFilter
+                    )
+                case .station(let stop):
+                    RouteStationGuideSheet(
+                        stop: stop,
+                        cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
+                    )
+                case .confidence:
+                    let feasibility = currentFeasibility()
+                    RouteConfidenceDetailView(
+                        confidence: currentConfidence(feasibility: feasibility),
+                        feasibility: feasibility
+                    )
+                }
+            }
+        }
+        .presentationDetents(Self.tripCardDetents, selection: $tripCardDetent)
+        .presentationDragIndicator(.visible)
+        // The map behind stays live at the two lower stops — the whole point of putting the trip
+        // on a sheet is that the map does not stop existing while it is up.
+        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        // There is nowhere for this to be dismissed *to*: the page underneath is the map for this
+        // one route, and a trip card swiped away would leave a screen with no trip on it.
+        .interactiveDismissDisabled()
+        // A pushed screen in a 30%-tall sheet is a letterbox. Raising the sheet is what Maps does
+        // when it pushes, and it returns to wherever the rider had it once they come back.
+        .onChange(of: detailDestination) { previous, current in
+            if previous == nil, current != nil {
+                stopBeforePush = tripCardDetent
+                withAnimation { tripCardDetent = .fraction(0.92) }
+            } else if current == nil, let stopBeforePush {
+                withAnimation { tripCardDetent = stopBeforePush }
+                self.stopBeforePush = nil
+            }
+        }
+    }
+
+    private func tripCardContent(
+        feasibility: RouteFeasibility,
+        confidence: RouteConfidence
+    ) -> some View {
         ScrollView {
             VStack(spacing: 14) {
                 routeHero(feasibility: feasibility, confidence: confidence)
@@ -395,7 +413,9 @@ struct RouteDetailView: View {
                 detailsCard(feasibility: feasibility, confidence: confidence)
             }
             .padding(.horizontal, 16)
-            .padding(.top, 10)
+            // Clear of the grab indicator. At 10 pt the first card sat right under the handle and
+            // read as if it were attached to the top edge of the sheet.
+            .padding(.top, 22)
             .padding(.bottom, 20)
         }
         // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings, where
@@ -404,14 +424,7 @@ struct RouteDetailView: View {
         // that makes the legs read as one journey rather than five separate rows.
         .background(Color.appBackground)
         .safeAreaInset(edge: .bottom) { navigateBar }
-        .presentationDetents(Self.tripCardDetents, selection: $tripCardDetent)
-        .presentationDragIndicator(.visible)
-        // The map behind stays live at the two lower stops — the whole point of putting the trip
-        // on a sheet is that the map does not stop existing while it is up.
-        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-        // There is nowhere for this to be dismissed *to*: the page underneath is the map for this
-        // one route, and a trip card swiped away would leave a screen with no trip on it.
-        .interactiveDismissDisabled()
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: - Official notices

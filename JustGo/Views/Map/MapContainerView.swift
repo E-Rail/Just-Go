@@ -81,11 +81,14 @@ struct MapContainerView: View {
             // guard was set before the fix arrived, so the very common launch sequence — centre on
             // the rider, then realign to the city they are in, which reloads and resets the camera
             // — ended on the city centroid with the retry already disarmed.
-            guard !didCenterOnUser else { return }
-            centerOnUser()
             #if DEBUG
+            // Ahead of the centring guard below, which returns early once a fix has landed — the
+            // seeding used to sit after it and so silently did nothing on any second run of this
+            // task, which reads as "the harness is flaky" rather than "the harness never ran".
             seedDebugScreen()
             #endif
+            guard !didCenterOnUser else { return }
+            centerOnUser()
         }
         // A place card's "Route here" only records the place; the push happens here, so every
         // sender — map POI, search result, station detail — reaches the entry page the same way
@@ -516,21 +519,37 @@ struct MapContainerView: View {
         next.append(.results)
         path = next
 
+        // The city this trip is being planned against, captured before the seeding below can
+        // have an opinion about it.
+        let planningCityID = appState.selectedCity?.id
+
         planTask?.cancel()
         planTask = Task {
             // "The start defaults to where you are." This used to be a form's job; the rider no
             // longer sees that form, so the seeding happens here instead. A fix can take up to
             // 15 s, which the results page spends saying it is loading — a better wait than an
             // empty field on a page whose only purpose is to be dismissed.
+            //
+            // Deliberately no `alignCity` closure. Passing one meant that looking up a place in
+            // another city adopted that city, and then the device fix immediately adopted the
+            // city the rider is physically standing in — dragging the whole app back and
+            // planning the trip against the wrong network. The destination decides the city here;
+            // the start never overrules it.
             if planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                await planner.useCurrentLocation(for: .origin) { coordinate in
-                    guard let city = container.cityService.cityToAdopt(
-                        forPlaceCityID: nil,
-                        coordinate: coordinate,
-                        whileSelecting: appState.selectedCity
-                    ) else { return }
-                    appState.selectedCity = city
-                    planner.cityChanged(to: city)
+                await planner.useCurrentLocation(for: .origin)
+                // A start in a different city cannot be planned against this network, and
+                // silently keeping it produces either nonsense or an unexplained failure. Drop
+                // it and let the header ask for one — planning across cities is a real trip this
+                // app cannot plan, and saying so beats guessing.
+                if let seeded = planner.place(for: .origin),
+                   let planningCityID,
+                   container.cityService.findNearestCity(
+                       to: CLLocation(
+                           latitude: seeded.coordinate.latitude,
+                           longitude: seeded.coordinate.longitude
+                       )
+                   )?.id != planningCityID {
+                    planner.updateName("", for: .origin)
                 }
             }
             guard !Task.isCancelled else { return }

@@ -33,6 +33,13 @@ enum StationDetailTab: String, CaseIterable, Identifiable {
 
 struct StationDetailView: View {
     let station: Station
+    /// False only when this screen is a destination on the map's own navigation stack: there,
+    /// "Route here" is a *replacement* of this screen by the entry page, and the map performs
+    /// both halves in a single write to its path. Popping ourselves as well would make that two
+    /// stack mutations in one update, which is what rendered a blank pushed screen on iOS 18.
+    /// Everywhere else this view is presented in a sheet, where dismissing is the sheet's own
+    /// business and touches no navigation path.
+    var dismissesOnRouteSelection = true
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -355,7 +362,9 @@ struct StationDetailView: View {
             coordinate: station.coordinate,
             source: .mapKit
         )
-        return PlanRouteButtons(place: place, cityID: station.cityID, onSelected: { dismiss() })
+        return PlanRouteButtons(place: place, cityID: station.cityID, onSelected: {
+            if dismissesOnRouteSelection { dismiss() }
+        })
     }
 
     /// Renders nothing when the station carries no resolved lines, rather than a headed card with

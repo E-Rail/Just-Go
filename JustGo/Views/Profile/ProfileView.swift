@@ -5,14 +5,25 @@ enum AppWebLinks {
     static let termsOfService = URL(string: "https://e-rail.github.io/justgo/docs/terms/")!
 }
 
+/// The five screens Profile can open. One `sheet(item:)` rather than five `sheet(isPresented:)`
+/// on the same node: stacked presentation modifiers are a documented failure class in this app
+/// already — `RouteDetailView` carries the same note about `navigationDestination(item:)` — where
+/// one registration shadows another and the shadowed row simply stops opening. Settings was the
+/// fourth of the five, and the fourth is exactly the one riders reported as dead.
+private enum ProfileDestination: String, Identifiable {
+    case accessibility
+    case transitData
+    case tripMemory
+    case settings
+    case quickTags
+
+    var id: String { rawValue }
+}
+
 struct ProfileView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @State private var showAccessibilitySettings = false
-    @State private var showTransitData = false
-    @State private var showTripMemory = false
-    @State private var showSettings = false
-    @State private var showQuickTags = false
+    @State private var destination: ProfileDestination?
 
     var body: some View {
         NavigationStack {
@@ -27,27 +38,27 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
             .scrollContentBackground(.hidden)
             .background(Color.appBackground)
-            .sheet(isPresented: $showAccessibilitySettings) {
-                AccessibilitySettingsView()
+            .sheet(item: $destination) { destination in
+                switch destination {
+                case .accessibility: AccessibilitySettingsView()
+                case .transitData: TransitDataView()
+                case .tripMemory: TripMemoryView()
+                case .settings: SettingsView()
+                case .quickTags: QuickTagsView()
+                }
             }
-            .sheet(isPresented: $showTransitData) {
-                TransitDataView()
-            }
-            .sheet(isPresented: $showTripMemory) {
-                TripMemoryView()
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
-            .sheet(isPresented: $showQuickTags) {
-                QuickTagsView()
-            }
+        }
+        // Quick Tags → a station → "Route here" switches to the Map tab and pushes the entry page
+        // *underneath* this still-open sheet, so the rider's tap appeared to do nothing. Whoever
+        // records a pending route is leaving Profile; close what is covering the map.
+        .onChange(of: appState.pendingRouteInput) { _, pending in
+            if pending != nil { destination = nil }
         }
     }
 
     private var accessibilitySection: some View {
         Section {
-            Button(action: { showAccessibilitySettings = true }) {
+            Button(action: { destination = .accessibility }) {
                 HStack {
                     Image(systemName: "accessibility")
                         .foregroundStyle(Color.accentColor)
@@ -80,7 +91,7 @@ struct ProfileView: View {
 
     private var transitDataSection: some View {
         Section {
-            Button(action: { showTransitData = true }) {
+            Button(action: { destination = .transitData }) {
                 HStack {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .foregroundStyle(.green)
@@ -100,7 +111,7 @@ struct ProfileView: View {
 
     private var riderTrustSection: some View {
         Section {
-            Button(action: { showQuickTags = true }) {
+            Button(action: { destination = .quickTags }) {
                 HStack {
                     Image(systemName: "tag.fill")
                         .foregroundStyle(Color.accentColor)
@@ -117,7 +128,7 @@ struct ProfileView: View {
             }
             .buttonStyle(.plain)
 
-            Button(action: { showTripMemory = true }) {
+            Button(action: { destination = .tripMemory }) {
                 HStack {
                     Image(systemName: "bookmark.fill")
                         .foregroundStyle(Color.accentColor)
@@ -138,7 +149,7 @@ struct ProfileView: View {
 
     private var settingsSection: some View {
         Section {
-            Button(action: { showSettings = true }) {
+            Button(action: { destination = .settings }) {
                 HStack {
                     Image(systemName: "gear")
                         .foregroundStyle(.gray)

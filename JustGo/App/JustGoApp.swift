@@ -112,15 +112,23 @@ struct JustGoApp: App {
         // seeded the fallback and a rider in Shanghai opened the app on Beijing. Waiting for the
         // fix before handing off would trade a wrong city for a slow launch — do it behind the
         // live UI instead, and only when the rider is clearly outside the seeded city.
+        // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
+        // repair touches a network decode and a city-pack load per tag, and the rows it
+        // repairs are several taps away.
+        //
+        // Started *beside* the realign rather than after it. Realigning waits on a GPS fix, and
+        // a fix that never arrives is not fast to fail: a launch log from a device with no
+        // usable fix marked `stage3.realignCity.done` at +16.1 s — the location request's full
+        // 15 s timeout. Sequencing the repair behind that meant a rider whose GPS was cold got
+        // stale quick-tag rows for a quarter of a minute, for no reason: the two share nothing.
+        async let quickTagRepair: Void = repairQuickTags()
+
         await realignCityToDevice()
         #if DEBUG
         LaunchClock.mark("stage3.realignCity.done")
         #endif
 
-        // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
-        // repair touches a network decode and a city-pack load per tag, and the rows it
-        // repairs are several taps away.
-        await repairQuickTags()
+        await quickTagRepair
     }
 
     /// Adopts the city the device is actually in, once a fix arrives. No-op without location

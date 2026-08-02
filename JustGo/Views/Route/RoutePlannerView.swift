@@ -125,6 +125,16 @@ struct RouteEntryView: View {
         .sheet(isPresented: $showSaveCurrentTrip) {
             saveCurrentTripSheet
         }
+        // On the screen's root node, beside the other presentations, rather than on the search
+        // button buried in the ScrollView it belongs to logically. A presentation anchored to a
+        // scrolling subview asks UIKit to present from a controller that may not be in the window
+        // — which the device log showed happening verbatim ("whose view is not in the window
+        // hierarchy"), and a presentation that fails that way just never appears.
+        .alert(AppLocalization.localized("No Routes Found"), isPresented: errorAlertIsPresented) {
+            Button(AppLocalization.localized("OK"), role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
         .fullScreenCover(isPresented: $showResumeLiveGo, onDismiss: {
             ActiveTripStore.clear()
             resumableTrip = nil
@@ -570,10 +580,5 @@ struct RouteEntryView: View {
             .clipShape(Capsule())
         }
         .disabled(!viewModel.canSearch || viewModel.isLoading)
-        .alert(AppLocalization.localized("No Routes Found"), isPresented: errorAlertIsPresented) {
-            Button(AppLocalization.localized("OK"), role: .cancel) {}
-        } message: {
-            Text(viewModel.errorMessage ?? "")
-        }
     }
 }

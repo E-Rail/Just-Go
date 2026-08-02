@@ -47,6 +47,8 @@ struct MapContainerView: View {
     @State private var stationOpenTask: Task<Void, Never>?
     @State private var centerOnUserTask: Task<Void, Never>?
     @State private var didCenterOnUser = false
+    /// Non-nil for a few seconds after a locate attempt that could not produce a fix.
+    @State private var locateFailure: String?
     @State private var stationOpenGeneration = 0
     @State private var placeCardDetent: PresentationDetent = .large
     // Holds an MKMapItem that resolved while station matching was still deciding whether to
@@ -87,7 +89,17 @@ struct MapContainerView: View {
         // and none of them has to know what the navigation stack looks like.
         .onChange(of: appState.pendingRouteInput) { _, pending in
             guard pending != nil, !path.contains(.routeEntry) else { return }
-            path.append(.routeEntry)
+            // ONE write to `path`, never a removal followed by an append. A pushed station detail
+            // used to pop *itself* (`dismiss()`) in the same button action that set the pending
+            // input, so the stack was mutated twice inside a single update — which SwiftUI logs as
+            // "NavigationRequestObserver tried to update multiple times per frame". iOS 26 coalesces
+            // the two; iOS 18 does not, and what survives is a pushed screen with a back button and
+            // no content. That is the blank page. Dropping the station here instead keeps the whole
+            // transition in one assignment, so there is no ordering left to get wrong.
+            var next = path
+            if case .station = next.last { next.removeLast() }
+            next.append(.routeEntry)
+            path = next
         }
         // A city switch invalidates any in-flight POI/station interaction from the old city.
         // During a POI tap's station match no sheet is presented yet, so the city picker stays
@@ -126,7 +138,16 @@ struct MapContainerView: View {
                     mapLocateButton
                         .layoutPriority(1)
                 }
+                if let locateFailure {
+                    Text(locateFailure)
+                        .font(.footnote)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.regularMaterial, in: Capsule())
+                        .transition(.opacity)
+                }
             }
+            .animation(.easeInOut(duration: 0.2), value: locateFailure)
             .padding(.horizontal)
             .padding(.top, 14)
             .padding(.bottom, 10)
@@ -326,6 +347,7 @@ struct MapContainerView: View {
     /// depending on which path ran it.
     private func centerOnUser() {
         centerOnUserTask?.cancel()
+        locateFailure = nil
         centerOnUserTask = Task {
             guard let outcome = await viewModel?.centerOnUser() else { return }
             if outcome.didCenter { didCenterOnUser = true }
@@ -335,6 +357,14 @@ struct MapContainerView: View {
             if let city = outcome.cityToAdopt {
                 appState.selectedCity = city
             }
+            // Say why nothing moved. A fix that never arrives burns the location request's full
+            // 15 s timeout and then did nothing at all — no camera move, no message — which reads
+            // as the button being broken rather than the fix being missing.
+            guard let failure = outcome.failureMessage else { return }
+            locateFailure = failure
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            locateFailure = nil
         }
     }
 
@@ -509,7 +539,9 @@ struct MapContainerView: View {
             }
         case .station(let stationID):
             if let station = openedStations[stationID] {
-                StationDetailView(station: station)
+                // The map replaces this screen with the entry page itself — see the
+                // pendingRouteInput handler above.
+                StationDetailView(station: station, dismissesOnRouteSelection: false)
             } else {
                 // Cannot happen by construction — the station is stored before the push — but a
                 // screen that says something is strictly better than one that says nothing.

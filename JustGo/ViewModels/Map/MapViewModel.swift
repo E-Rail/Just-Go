@@ -242,6 +242,9 @@ final class MapViewModel {
     struct UserCameraOutcome {
         let didCenter: Bool
         let cityToAdopt: City?
+        /// Why the camera did not move, when the reason is one a rider should hear about.
+        /// Cancellation is not such a reason and leaves this nil — see `centerOnUser`.
+        var failureMessage: String? = nil
     }
 
     func centerOnUser() async -> UserCameraOutcome {
@@ -258,8 +261,18 @@ final class MapViewModel {
             // `.task` run, a network refresh) yanked the camera back to the centroid.
             pendingUserCameraCityID = nearest?.id ?? activeCityID
             return UserCameraOutcome(didCenter: true, cityToAdopt: nearest)
-        } catch {
+        } catch is CancellationError {
+            // Superseded, not failed. The rider asked for something else; say nothing.
             return UserCameraOutcome(didCenter: false, cityToAdopt: nil)
+        } catch {
+            // A fix that never arrives takes the request's full 15 s timeout and then this path,
+            // which used to be silent — the map simply stayed on the city centroid and the rider
+            // was left to conclude the app ignores their location. Missing is shown as missing.
+            return UserCameraOutcome(
+                didCenter: false,
+                cityToAdopt: nil,
+                failureMessage: error.localizedDescription
+            )
         }
     }
 

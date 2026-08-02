@@ -21,7 +21,6 @@ struct RouteDetailView: View {
     @State var selectedRouteID: UUID
     @State var showTripNote = false
     @State var showExpandedRouteMap = false
-    @State var showLiveGo = false
     @State private var scheduledReminderRouteID: UUID?
     @State var tripLoggedConfirmation = false
     @State private var showReminderDenied = false
@@ -34,14 +33,16 @@ struct RouteDetailView: View {
     /// without stranding anyone on a stored value from an older layout.
     @State private var mapFraction: CGFloat?
     @State private var mapDragTranslation: CGFloat = 0
+    /// Guidance replaces this page's content rather than covering it — "but in the same page".
+    @State private var isGuiding = false
     @State private var cityResources: [ExternalTransitResource] = []
     @State private var officialNoticeResource: ExternalTransitResource?
     // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
     // foreground use) isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
-    // Once per detail instance, NOT reset on disappear: dismissing the auto-presented
-    // navigator re-fires onAppear, and a reset would immediately re-present it.
+    // Once per detail instance, NOT reset on disappear: leaving the auto-entered navigator
+    // re-fires onAppear, and a reset would immediately re-enter it.
     @State private var didAutoPresentLiveGo = false
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
@@ -58,35 +59,27 @@ struct RouteDetailView: View {
         // rider already uses has. The map used to be a 200pt card buried between the journey and
         // the details, which is a strange place to put the only thing on the screen that shows
         // where the trip actually goes.
-        return GeometryReader { proxy in
-            VStack(spacing: 0) {
-                mapHeader(height: mapHeight(in: proxy.size.height))
-                grabber(in: proxy.size.height)
-                ScrollView {
-                    VStack(spacing: 14) {
-                        routeHero(feasibility: feasibility, confidence: confidence)
-                        if let departurePlan {
-                            DeparturePlanBanner(plan: departurePlan)
-                        }
-                        officialNoticeCard
-                        journeyCard
-                        detailsCard(feasibility: feasibility, confidence: confidence)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
+        return Group {
+            if isGuiding {
+                // The page becomes the navigator rather than presenting a second one over itself.
+                // Same implementation as the full-screen entries below — the off-route recovery,
+                // the arrival alert and the transfer surface all live in there, and a second
+                // navigator built to sit inline would drift from this one.
+                LiveGoView(route: route, embedded: true) {
+                    isGuiding = false
+                    ActiveTripStore.clear()
                 }
-                // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings,
-                // where every section is an unrelated peer, and it opened this screen with roughly
-                // 250 pt of empty space above the duration; worse, a list row cannot draw the
-                // unbroken vertical rail that makes the legs read as one journey rather than five
-                // separate rows.
-                .background(Color.appBackground)
+            } else {
+                planningSurface(feasibility: feasibility, confidence: confidence)
             }
         }
         .background(Color.appBackground)
-        .safeAreaInset(edge: .bottom) { navigateBar }
-        .navigationTitle(AppLocalization.localized("Route Details"))
+        .safeAreaInset(edge: .bottom) {
+            if !isGuiding { navigateBar }
+        }
+        .navigationTitle(isGuiding
+            ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
+            : AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
         // The trip is the whole screen from here on. A tab bar under the journey invites the rider
         // to leave mid-plan and takes a row of height from the thing they are reading.
@@ -98,9 +91,13 @@ struct RouteDetailView: View {
             if appState.accessibilityPreference.stepByStepGuidance, !didAutoPresentLiveGo {
                 didAutoPresentLiveGo = true
                 ActiveTripStore.save(route)
-                showLiveGo = true
+                isGuiding = true
             }
             #if DEBUG
+            if ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] == "guiding" {
+                ActiveTripStore.save(route)
+                isGuiding = true
+            }
             // The map divider is a drag, and drags cannot be injected in this environment, so its
             // range is verified by driving it to each end and screenshotting instead.
             switch ProcessInfo.processInfo.environment["JUSTGO_DEBUG_MAP_FRACTION"] {
@@ -140,9 +137,6 @@ struct RouteDetailView: View {
         }
         .fullScreenCover(isPresented: $showExpandedRouteMap) {
             FullScreenRouteMapView(route: route)
-        }
-        .fullScreenCover(isPresented: $showLiveGo, onDismiss: { ActiveTripStore.clear() }) {
-            LiveGoView(route: route)
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false
@@ -316,7 +310,7 @@ struct RouteDetailView: View {
     private var navigateBar: some View {
         Button {
             ActiveTripStore.save(route)
-            showLiveGo = true
+            withAnimation(.easeInOut(duration: 0.25)) { isGuiding = true }
         } label: {
             Label(
                 AppLocalization.text(english: "Navigate", simplified: "开始导航", traditional: "開始導航"),
@@ -335,6 +329,39 @@ struct RouteDetailView: View {
         // was protecting nothing — it just laid an opaque grey slab across the full width and
         // covered the bottom of the last card. The safeAreaInset still reserves this height, so
         // scrolled content ends above the button rather than under it.
+    }
+
+    /// The trip as something to read: map on top, journey underneath, boundary draggable.
+    private func planningSurface(
+        feasibility: RouteFeasibility,
+        confidence: RouteConfidence
+    ) -> some View {
+        GeometryReader { proxy in
+            VStack(spacing: 0) {
+                mapHeader(height: mapHeight(in: proxy.size.height))
+                grabber(in: proxy.size.height)
+                ScrollView {
+                    VStack(spacing: 14) {
+                        routeHero(feasibility: feasibility, confidence: confidence)
+                        if let departurePlan {
+                            DeparturePlanBanner(plan: departurePlan)
+                        }
+                        officialNoticeCard
+                        journeyCard
+                        detailsCard(feasibility: feasibility, confidence: confidence)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .padding(.bottom, 20)
+                }
+                // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings,
+                // where every section is an unrelated peer, and it opened this screen with roughly
+                // 250 pt of empty space above the duration; worse, a list row cannot draw the
+                // unbroken vertical rail that makes the legs read as one journey rather than five
+                // separate rows.
+                .background(Color.appBackground)
+            }
+        }
     }
 
     // MARK: - Official notices

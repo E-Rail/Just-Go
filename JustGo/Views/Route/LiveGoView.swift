@@ -56,6 +56,14 @@ private struct LiveTransferGuidanceRequest: Hashable {
 /// map (pan/zoom, user-location puck, follow-me button) with the whole route drawn on it,
 /// a compact instruction panel at the bottom, and off-route re-planning while walking.
 struct LiveGoView: View {
+    /// Rendered inside another screen rather than over it. The route detail turns *into* the
+    /// navigator rather than covering itself with a second one, so this drops the navigation
+    /// chrome that only a presented copy needs and hands the exit back to its host. One
+    /// implementation, two containers — a second navigator would drift from this one, and this is
+    /// where the off-route recovery, the arrival alert and the transfer surface all live.
+    var embedded = false
+    var onExit: (() -> Void)?
+
     @State private var viewModel: LiveGoViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -85,16 +93,36 @@ struct LiveGoView: View {
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
+    /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
+    /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
+    /// The Accessibility toggle below is a stronger promise than this one — see `onAppear`.
+    @AppStorage("guidanceVoiceEnabled") private var voiceEnabled = true
+    /// Whether the camera tracks the rider. On while guiding, because "where am I on this route"
+    /// is the question guidance exists to answer; stepping through manually turns it off so the
+    /// map stays on the step being read.
+    @State private var followsRider = true
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
-    init(route: Route) {
+    init(route: Route, embedded: Bool = false, onExit: (() -> Void)? = nil) {
+        self.embedded = embedded
+        self.onExit = onExit
         _viewModel = State(initialValue: LiveGoViewModel(route: route))
     }
 
-    var body: some View {
-        NavigationStack {
-            Group {
+    /// Presented, this owns a navigation stack; embedded, the host already has one.
+    private var navigatorSurface: some View {
+        Group {
+            if embedded {
+                surface
+            } else {
+                NavigationStack { surface }
+            }
+        }
+    }
+
+    private var surface: some View {
+        Group {
                 if isActiveTransferStep {
                     transferStepSurface
                 } else {
@@ -129,20 +157,33 @@ struct LiveGoView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationTitle(
-                transferNavigationTitle
-            )
+            .navigationTitle(embedded ? "" : transferNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                if !embedded {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(AppLocalization.localized("Done")) { exit() }
+                    }
                 }
             }
-        }
+    }
+
+    /// Leaving guidance. Presented, that is a dismissal; embedded, the host decides what the page
+    /// becomes next, so it is told rather than dismissed out from under.
+    private func exit() {
+        if let onExit { onExit() } else { dismiss() }
+    }
+
+    var body: some View {
+        navigatorSurface
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             // Continuous fixes drive the puck and off-route detection; ended on disappear.
             container.locationService.beginContinuousUpdates()
+            // The Accessibility toggle is a promise, not a preference: a rider who turned on
+            // Audio Navigation gets it, whatever the mute button was last left at.
+            if appState.accessibilityPreference.audioNavigation { voiceEnabled = true }
+            followsRider = true
             frameCurrentStep(animated: false)
             refreshArrivalAlert()
             announceCurrentStep()
@@ -156,6 +197,8 @@ struct LiveGoView: View {
             rerouteNoticeTask?.cancel()
         }
         .onChange(of: viewModel.currentIndex) { _, _ in
+            // Reading ahead is an explicit request to look at that step, not at where you are.
+            followsRider = false
             frameCurrentStep(animated: true)
             refreshArrivalAlert()
             announceCurrentStep()
@@ -513,6 +556,20 @@ struct LiveGoView: View {
     /// transfers) GPS drifts or vanishes entirely, and auto-rerouting on tunnel noise would
     /// constantly replan a trip the rider is following correctly.
     private func handleLocationUpdate(_ location: CLLocation?) {
+        // Centre on the rider, zoomed in, for as long as they are following rather than reading
+        // ahead. `MapCameraSpan.station` is the app's existing tightest scale — the same number the
+        // map uses for one station and its exits — so guidance does not introduce a fifth zoom.
+        if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                camera = .region(MKCoordinateRegion(
+                    center: location.coordinate,
+                    span: MKCoordinateSpan(
+                        latitudeDelta: MapCameraSpan.station,
+                        longitudeDelta: MapCameraSpan.station
+                    )
+                ))
+            }
+        }
         guard let location,
               location.horizontalAccuracy >= 0,
               location.horizontalAccuracy <= 65,
@@ -700,7 +757,72 @@ struct LiveGoView: View {
     }
 
     private var controls: some View {
-        StepControlPair(back: { backButton }, next: { nextButton })
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                guidanceToggle(
+                    isOn: voiceEnabled,
+                    onImage: "speaker.wave.2.fill",
+                    offImage: "speaker.slash.fill",
+                    label: voiceEnabled
+                        ? AppLocalization.text(english: "Mute voice", simplified: "静音", traditional: "靜音")
+                        : AppLocalization.text(english: "Unmute voice", simplified: "取消静音", traditional: "取消靜音")
+                ) {
+                    voiceEnabled.toggle()
+                    if !voiceEnabled { speechSynthesizer.stopSpeaking(at: .immediate) }
+                }
+
+                guidanceToggle(
+                    isOn: followsRider,
+                    onImage: "location.fill",
+                    offImage: "location",
+                    label: AppLocalization.text(
+                        english: "Follow my location",
+                        simplified: "跟随我的位置",
+                        traditional: "跟隨我的位置"
+                    )
+                ) {
+                    followsRider.toggle()
+                    if followsRider {
+                        handleLocationUpdate(container.locationService.currentLocation)
+                    } else {
+                        frameCurrentStep(animated: true)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                Button { exit() } label: {
+                    Text(AppLocalization.text(english: "End", simplified: "结束", traditional: "結束"))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 14)
+                        .frame(height: 36)
+                        .background(Color.secondary.opacity(0.16), in: Capsule())
+                        .foregroundStyle(.primary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            StepControlPair(back: { backButton }, next: { nextButton })
+        }
+    }
+
+    private func guidanceToggle(
+        isOn: Bool,
+        onImage: String,
+        offImage: String,
+        label: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: isOn ? onImage : offImage)
+                .font(.subheadline)
+                .frame(width: 36, height: 36)
+                .background(isOn ? themeColor.opacity(0.18) : Color.secondary.opacity(0.16), in: Circle())
+                .foregroundStyle(isOn ? themeColor : Color.secondary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     private var backButton: some View {
@@ -722,7 +844,7 @@ struct LiveGoView: View {
             if viewModel.canAdvance {
                 withAnimation { viewModel.advance() }
             } else {
-                dismiss()
+                exit()
             }
         } label: {
             StepPrimaryButtonLabel(
@@ -746,7 +868,7 @@ struct LiveGoView: View {
         if preference.vibrationAlerts {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
-        if preference.audioNavigation {
+        if voiceEnabled {
             speechSynthesizer.stopSpeaking(at: .immediate)
             let separator = AppLocalization.isChinese ? "。" : ". "
             let utterance = AVSpeechUtterance(string: [step.title, step.detail].compactMap { $0 }.joined(separator: separator))

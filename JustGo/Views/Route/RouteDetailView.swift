@@ -30,6 +30,12 @@ struct RouteDetailView: View {
     @State var detailDestination: RouteDetailDestination?
     @State private var expandedLegs: Set<UUID> = []
     @State private var boardingServiceWindows: [StationServiceWindow] = []
+    /// The map's share of the screen. Nil until the rider drags it, so the default can change
+    /// without stranding anyone on a stored value from an older layout.
+    @State private var mapFraction: CGFloat?
+    @State private var mapDragTranslation: CGFloat = 0
+    @State private var cityResources: [ExternalTransitResource] = []
+    @State private var officialNoticeResource: ExternalTransitResource?
     // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
     // foreground use) isn't used as a fill under white text.
@@ -48,34 +54,43 @@ struct RouteDetailView: View {
         // per body evaluation).
         let feasibility = currentFeasibility()
         let confidence = currentConfidence(feasibility: feasibility)
-        return ScrollView {
-            VStack(spacing: 14) {
-                if alternatives.count > 1 {
-                    RouteTabs(routes: alternatives, selection: $selectedRouteID)
+        // Map on top, trip underneath, the boundary draggable — the shape every transit app the
+        // rider already uses has. The map used to be a 200pt card buried between the journey and
+        // the details, which is a strange place to put the only thing on the screen that shows
+        // where the trip actually goes.
+        return GeometryReader { proxy in
+            VStack(spacing: 0) {
+                mapHeader(height: mapHeight(in: proxy.size.height))
+                grabber(in: proxy.size.height)
+                ScrollView {
+                    VStack(spacing: 14) {
+                        routeHero(feasibility: feasibility, confidence: confidence)
+                        if let departurePlan {
+                            DeparturePlanBanner(plan: departurePlan)
+                        }
+                        officialNoticeCard
+                        journeyCard
+                        detailsCard(feasibility: feasibility, confidence: confidence)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .padding(.bottom, 20)
                 }
-                routeHero(feasibility: feasibility, confidence: confidence)
-                if let departurePlan {
-                    DeparturePlanBanner(plan: departurePlan)
-                }
-                if route.serviceStatus.bannerText != nil {
-                    ServiceStatusBanner(status: route.serviceStatus)
-                }
-                journeyCard
-                mapCard
-                detailsCard(feasibility: feasibility, confidence: confidence)
+                // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings,
+                // where every section is an unrelated peer, and it opened this screen with roughly
+                // 250 pt of empty space above the duration; worse, a list row cannot draw the
+                // unbroken vertical rail that makes the legs read as one journey rather than five
+                // separate rows.
+                .background(Color.appBackground)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 4)
-            .padding(.bottom, 20)
         }
-        // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings, where every
-        // section is an unrelated peer, and it opened this screen with roughly 250 pt of empty space
-        // above the duration; worse, a list row cannot draw the unbroken vertical rail that makes
-        // the legs read as one journey rather than five separate rows.
         .background(Color.appBackground)
         .safeAreaInset(edge: .bottom) { navigateBar }
         .navigationTitle(AppLocalization.localized("Route Details"))
         .navigationBarTitleDisplayMode(.inline)
+        // The trip is the whole screen from here on. A tab bar under the journey invites the rider
+        // to leave mid-plan and takes a row of height from the thing they are reading.
+        .toolbar(.hidden, for: .tabBar)
         .onAppear {
             // Step-by-Step Guidance (cognitive accessibility): go straight into the
             // guided navigator instead of the dense detail screen; dismissing it lands
@@ -85,6 +100,15 @@ struct RouteDetailView: View {
                 ActiveTripStore.save(route)
                 showLiveGo = true
             }
+            #if DEBUG
+            // The map divider is a drag, and drags cannot be injected in this environment, so its
+            // range is verified by driving it to each end and screenshotting instead.
+            switch ProcessInfo.processInfo.environment["JUSTGO_DEBUG_MAP_FRACTION"] {
+            case "min": mapFraction = Self.minimumMapFraction
+            case "max": mapFraction = Self.maximumMapFraction
+            default: break
+            }
+            #endif
         }
         .sheet(isPresented: $showTripNote) {
             tripNoteSheet
@@ -132,9 +156,14 @@ struct RouteDetailView: View {
                 for: route
             )
             if let cityID = route.networkCityID ?? appState.selectedCity?.id {
+                cityResources = await container.officialStationData
+                    .cityExternalResources(for: [cityID])[cityID] ?? []
                 await loadServiceHours(cityID: cityID)
             }
             await transferAssets
+        }
+        .sheet(item: $officialNoticeResource) { resource in
+            OfficialTransitResourceViewer(resource: resource)
         }
     }
 
@@ -190,28 +219,45 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("\(route.origin) → \(route.destination)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
+        VStack(alignment: .leading, spacing: 10) {
+            // Duration and walking on the left, arrival on the right — the three numbers a rider
+            // reads together when deciding whether this is the route they are taking.
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(route.formattedDuration)
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                Spacer(minLength: 8)
-                // The shape of the journey, readable before any of the words are: which lines, in
-                // what order. It is the same information the legs below carry, but at a glance.
-                HStack(spacing: 4) {
-                    ForEach(route.segments.filter { $0.type == .subway }) { segment in
-                        LineBadge(
-                            name: segment.lineName ?? "",
-                            colorHex: segment.lineColorHex,
-                            size: 26
-                        )
-                    }
-                }
+                    // Three numbers on one line, and "1 hr 52 min" in a large rounded face is wide.
+                    // Shrinking beats wrapping: a duration broken across two lines stops reading as
+                    // one number at all.
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .layoutPriority(2)
+                Text(AppLocalization.text(
+                    english: "\(route.formattedWalkingDistance) walk",
+                    simplified: "步行 \(route.formattedWalkingDistance)",
+                    traditional: "步行 \(route.formattedWalkingDistance)"
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                Spacer(minLength: 4)
+                Text(arrivalDetail)
+                    .font(.headline)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .layoutPriority(1)
             }
+
+            // The shape of the journey, readable before any of the words are: which lines, in
+            // what order, with the walks between them.
+            ScrollView(.horizontal, showsIndicators: false) {
+                JourneyBadgeChain(segments: route.segments, size: 28)
+                    .padding(.vertical, 1)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+
             Text(heroSummary)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -228,22 +274,25 @@ struct RouteDetailView: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
-    /// Arrival time, stops and transfers on one line — the three things that decide between two
-    /// routes, where they can be read together instead of hunted for.
+    /// Stops, transfers and which door to go in by — the line Amap spends on "13站 · ¥5 · 玉泉路
+    /// (C2东南口) 进站". There is no fare here and there will not be one: JustGo holds no fare data
+    /// for any city, and a fare inferred from a stop count is exactly the guess this app refuses
+    /// to make. The entrance is real — it is the door the plan actually routed the rider to.
     private var heroSummary: String {
-        let timing = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
-        let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
         let stops = AppLocalization.text(
             english: "\(route.totalStops) stops",
             simplified: "\(route.totalStops) 站",
             traditional: "\(route.totalStops) 站"
         )
-        let arrive = AppLocalization.text(
-            english: "Arrive \(arrival)",
-            simplified: "\(arrival) 到达",
-            traditional: "\(arrival) 到達"
-        )
-        return "\(arrive) · \(stops) · \(route.formattedTransfers)"
+        var parts = [stops, route.formattedTransfers]
+        if let entrance = route.originAccessGuide?.accessPoint?.namedDoor {
+            parts.append(AppLocalization.text(
+                english: "Enter at \(entrance)",
+                simplified: "\(entrance) 进站",
+                traditional: "\(entrance) 進站"
+            ))
+        }
+        return parts.joined(separator: " · ")
     }
 
     /// The single worst thing about this route, or nothing at all when there is nothing to warn
@@ -288,7 +337,98 @@ struct RouteDetailView: View {
         // scrolled content ends above the button rather than under it.
     }
 
-    private var mapCard: some View {
+    // MARK: - Official notices
+
+    /// What the operator says about riding this route today.
+    ///
+    /// Amap fills this space with live advisory text scraped from the operator. JustGo has no
+    /// advisory feed, so it shows the two things it can actually stand behind and says where each
+    /// came from: the service warnings it derives from official first/last-train data, and a link
+    /// to the operator's own service-status page carrying the provider's name and the date that
+    /// URL was last verified. An unverified guess dressed as an official notice is worse than an
+    /// empty card, so when a city has neither, this draws nothing at all.
+    @ViewBuilder
+    private var officialNoticeCard: some View {
+        let notice = route.serviceStatus.bannerText
+        if notice != nil || officialResource != nil {
+            VStack(alignment: .leading, spacing: 0) {
+                if notice != nil {
+                    ServiceStatusBanner(status: route.serviceStatus)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 4)
+                }
+                if let resource = officialResource {
+                    if notice != nil { rowDivider.padding(.top, 8) }
+                    Button {
+                        officialNoticeResource = resource
+                    } label: {
+                        detailRow(
+                            icon: "building.columns.fill",
+                            tint: .accentColor,
+                            title: resource.title
+                        ) {
+                            Image(systemName: "arrow.up.right")
+                                .font(.footnote)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    // Provenance, not decoration: a rider deciding whether to trust this needs to
+                    // know whose page it is and how stale our pointer to it might be.
+                    Text(AppLocalization.text(
+                        english: "\(resource.provider) · official site · link checked \(resource.verifiedAt)",
+                        simplified: "\(resource.provider) · 官方网站 · 链接核对于 \(resource.verifiedAt)",
+                        traditional: "\(resource.provider) · 官方網站 · 連結核對於 \(resource.verifiedAt)"
+                    ))
+                    .rowMeta()
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+    }
+
+    /// The operator's own page for this city, best kind first.
+    ///
+    /// Only 3 of 58 cities publish a `serviceStatus` page — Beijing, the largest network here,
+    /// publishes `operatorInformation` instead — so keying strictly on service status would draw
+    /// nothing almost everywhere. The row is labelled with the resource's own title rather than a
+    /// generic "Service status", so an operator-information page is never presented as an
+    /// advisory feed it is not.
+    private var officialResource: ExternalTransitResource? {
+        let preference: [ExternalTransitResourceKind] = [
+            .serviceStatus, .operatorInformation, .stationInformation
+        ]
+        for kind in preference {
+            if let match = cityResources.first(where: { $0.kind == kind }) { return match }
+        }
+        return nil
+    }
+
+    // MARK: - Resizable map header
+
+    /// Bounds on the map's share of the screen. The floor keeps enough map to read the shape of
+    /// the trip; the ceiling keeps the first leg visible, so dragging the map up can never hide
+    /// the instruction the rider is standing there to read.
+    private static let minimumMapFraction: CGFloat = 0.22
+    private static let maximumMapFraction: CGFloat = 0.66
+    private static let defaultMapFraction: CGFloat = 0.34
+
+    private func mapHeight(in available: CGFloat) -> CGFloat {
+        guard available > 0 else { return 0 }
+        let fraction = (mapFraction ?? Self.defaultMapFraction) + dragFraction(in: available)
+        return available * min(max(fraction, Self.minimumMapFraction), Self.maximumMapFraction)
+    }
+
+    private func dragFraction(in available: CGFloat) -> CGFloat {
+        guard available > 0 else { return 0 }
+        return mapDragTranslation / available
+    }
+
+    private func mapHeader(height: CGFloat) -> some View {
         TransitMapView(
             visibleRegion: .constant(route.previewRegion),
             stations: [],
@@ -298,23 +438,69 @@ struct RouteDetailView: View {
             onRegionChanged: nil,
             onStationSelected: { _ in }
         )
-        .frame(height: 200)
-        // Inside a list row the map ran edge to edge with square corners and no clipping, so it
-        // read as a screenshot someone had pasted in rather than as part of the card stack.
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .frame(height: height)
+        .clipped()
         .overlay(alignment: .topTrailing) {
-            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.white)
-                .padding(8)
-                .background(.black.opacity(0.55), in: Circle())
-                .padding(10)
+            Button {
+                showExpandedRouteMap = true
+            } label: {
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .padding(8)
+                    .background(.black.opacity(0.55), in: Circle())
+                    .padding(10)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
         }
-        .contentShape(Rectangle())
-        .onTapGesture { showExpandedRouteMap = true }
-        .accessibilityAddTraits(.isButton)
-        .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
+        // Floating over the map's bottom edge rather than sitting in the scroll content: which
+        // alternative is being shown is a property of the whole screen, and scrolling the journey
+        // used to carry the answer off the top of it.
+        .overlay(alignment: .bottom) {
+            if alternatives.count > 1 {
+                RouteTabs(routes: alternatives, selection: $selectedRouteID, floating: true)
+                    .padding(.bottom, 10)
+            }
+        }
+    }
+
+    /// The handle between map and trip. Dragging it trades one for the other; the whole strip is
+    /// the target rather than the 36pt pill, because a 5pt-tall grab handle is not a control
+    /// anybody can reliably hit.
+    private func grabber(in available: CGFloat) -> some View {
+        Capsule()
+            .fill(Color.secondary.opacity(0.45))
+            .frame(width: 40, height: 5)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(Color.appBackground)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture()
+                    .onChanged { mapDragTranslation = $0.translation.height }
+                    .onEnded { value in
+                        let settled = (mapFraction ?? Self.defaultMapFraction)
+                            + value.translation.height / max(available, 1)
+                        mapFraction = min(max(settled, Self.minimumMapFraction), Self.maximumMapFraction)
+                        mapDragTranslation = 0
+                    }
+            )
+            .accessibilityLabel(AppLocalization.text(
+                english: "Resize map",
+                simplified: "调整地图大小",
+                traditional: "調整地圖大小"
+            ))
+            .accessibilityAddTraits(.isButton)
+            // VoiceOver cannot drag: give it the two ends of the range as an action instead of a
+            // gesture it has no way to perform.
+            .accessibilityAction(named: AppLocalization.text(
+                english: "Expand map", simplified: "放大地图", traditional: "放大地圖"
+            )) { mapFraction = Self.maximumMapFraction }
+            .accessibilityAction(named: AppLocalization.text(
+                english: "Shrink map", simplified: "缩小地图", traditional: "縮小地圖"
+            )) { mapFraction = Self.minimumMapFraction }
     }
 
     private var decisionDataConfidence: DataConfidence {

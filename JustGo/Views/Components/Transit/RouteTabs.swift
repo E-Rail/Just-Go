@@ -3,6 +3,10 @@ import SwiftUI
 struct RouteTabs: View {
     let routes: [Route]
     @Binding var selection: UUID
+    /// Drawn over the map rather than on a page background. `Color.appSurface` and a 15% accent
+    /// tint are both partly transparent, which is fine against a solid page and unreadable against
+    /// moving cartography — so the floating form swaps in a material and an opaque selected fill.
+    var floating = false
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -26,12 +30,24 @@ struct RouteTabs: View {
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
-                        .background(
-                            selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface,
-                            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        )
+                        .background {
+                            let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            if floating {
+                                shape.fill(.regularMaterial)
+                                    .overlay(shape.fill(
+                                        selection == route.id
+                                            ? Color.accentColor.opacity(0.22)
+                                            : Color.clear
+                                    ))
+                                    .shadow(color: .black.opacity(0.22), radius: 6, y: 3)
+                            } else {
+                                shape.fill(
+                                    selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface
+                                )
+                            }
+                        }
                         .overlay {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
                         }
                     }
@@ -44,7 +60,9 @@ struct RouteTabs: View {
                 }
             }
             .padding(.vertical, 2)
+            .padding(.horizontal, floating ? 12 : 0)
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private func routeColorBar(_ route: Route) -> some View {

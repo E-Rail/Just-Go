@@ -30,7 +30,7 @@ struct RouteDetailView: View {
     @State var detailDestination: RouteDetailDestination?
     @State private var expandedLegs: Set<UUID> = []
     @State private var boardingServiceWindows: [StationServiceWindow] = []
-    // Raw theme hex for the "Navigate" button's solid fill — see RoutePlannerView's
+    // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
     // foreground use) isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue

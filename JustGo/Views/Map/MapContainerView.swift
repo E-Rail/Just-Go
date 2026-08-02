@@ -13,13 +13,19 @@ private struct TappedPlace: Identifiable {
     var resolvedItem: MKMapItem?
 }
 
-/// Reports the search pill's rendered bottom edge (post-padding/shadow) in `.global` space,
-/// so the results dropdown's height cap tracks Dynamic Type growth instead of a hardcoded offset.
-private struct SearchBarBottomYKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
+/// Everything the map can push. One path enum rather than a `navigationDestination` per screen:
+/// five separate `isPresented` registrations on one node is the pattern that shadowed a sheet and
+/// cost this app its Settings screen, and a path is also the only thing a headless launch can seed
+/// to reach a screen it cannot tap its way to.
+enum MapRoute: Hashable {
+    case search
+    /// The destination, if the rider came from a place card, travels in
+    /// `AppState.pendingRouteInput` — `TransitPlace` is not `Hashable` and a navigation value is
+    /// the wrong place to carry it anyway.
+    case routeEntry
+    case results
+    case detail(UUID)
+    case station(Station)
 }
 
 struct MapContainerView: View {
@@ -27,7 +33,10 @@ struct MapContainerView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var viewModel: MapViewModel?
-    @State private var selectedStation: Station?
+    /// Owned here rather than by the entry screen: the planner's routes have to outlive the entry
+    /// page so that results and detail, both pushed above it, read the same search.
+    @State private var plannerViewModel: RoutePlannerViewModel?
+    @State private var path: [MapRoute] = []
     @State private var tappedPlace: TappedPlace?
     @State private var showPlaceTagDialog = false
     @State private var showCityPicker = false
@@ -41,20 +50,20 @@ struct MapContainerView: View {
     // Holds an MKMapItem that resolved while station matching was still deciding whether to
     // present the place sheet — consumed (or discarded) when that decision lands.
     @State private var pendingResolvedItem: MKMapItem?
-    @State private var keyboardHeight: CGFloat = 0
-    @State private var searchBarBottomY: CGFloat = 0
-    @FocusState private var isSearchFocused: Bool
-
-    private let searchDropdownSpacing: CGFloat = 8
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             mapContent
+                .navigationDestination(for: MapRoute.self) { destination(for: $0) }
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
                 viewModel = container.makeMapViewModel()
             }
+            if plannerViewModel == nil {
+                plannerViewModel = container.makeRoutePlannerViewModel()
+            }
+            plannerViewModel?.cityChanged(to: appState.selectedCity)
 
             guard let city = appState.selectedCity else { return }
             await viewModel?.loadStations(for: city)
@@ -65,9 +74,16 @@ struct MapContainerView: View {
             guard !didCenterOnUser else { return }
             didCenterOnUser = true
             centerOnUser()
+            #if DEBUG
+            seedDebugScreen()
+            #endif
         }
-        .onChange(of: viewModel?.searchText ?? "") { _, _ in
-            viewModel?.scheduleSearch(in: appState.selectedCity)
+        // A place card's "Route here" only records the place; the push happens here, so every
+        // sender — map POI, search result, station detail — reaches the entry page the same way
+        // and none of them has to know what the navigation stack looks like.
+        .onChange(of: appState.pendingRouteInput) { _, pending in
+            guard pending != nil, !path.contains(.routeEntry) else { return }
+            path.append(.routeEntry)
         }
         // A city switch invalidates any in-flight POI/station interaction from the old city.
         // During a POI tap's station match no sheet is presented yet, so the city picker stays
@@ -116,29 +132,8 @@ struct MapContainerView: View {
         .navigationTitle(AppLocalization.localized("Map"))
         .toolbar(.hidden, for: .navigationBar)
         .toolbarBackground(.visible, for: .tabBar)
-        .onPreferenceChange(SearchBarBottomYKey.self) { searchBarBottomY = $0 }
-        // keyboardWillChangeFrame alone covers show, hide, and in-place resizes (QuickType
-        // bar, predictive text) so one observer suffices; keyboardWillHide is a defensive
-        // reset in case a dismissal path doesn't fire a frame-change notification.
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
-            guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-            withAnimation(.easeInOut(duration: duration)) {
-                keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
-            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-            withAnimation(.easeInOut(duration: duration)) {
-                keyboardHeight = 0
-            }
-        }
-        .navigationDestination(item: $selectedStation) { station in
-            StationDetailView(station: station)
-        }
-        .onChange(of: selectedStation?.id) { _, newID in
-            if newID == nil { isLoadingStationDetail = false }
-        }
+        // No keyboard-height tracking here any more: the map's search field moved to its own
+        // page, so this screen has no text input to make room for.
         // No onDismiss here: sheet(item:) already nils the binding on dismissal, and an
         // explicit `tappedPlace = nil` closure would fire for the OLD sheet's dismissal —
         // clobbering a new tap's sheet presented while the old one was still animating out.
@@ -265,134 +260,60 @@ struct MapContainerView: View {
         )
     }
 
+    /// A pill that *looks* like a search field but is a button to the search page. Typing used to
+    /// happen here, over the map, with the results hanging below in a dropdown whose height had to
+    /// be measured against the keyboard on every frame. Searching deserves the whole screen, and
+    /// the map underneath deserves not to be half-covered while you do it.
     private var topControls: some View {
-        VStack(spacing: searchDropdownSpacing) {
-            HStack(spacing: 10) {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-                        .frame(width: 20)
+        HStack(spacing: 10) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 20)
 
-                    TextField(AppLocalization.text(english: "Search places...", simplified: "搜索地点...", traditional: "搜尋地點..."), text: Binding(
-                        get: { viewModel?.searchText ?? "" },
-                        set: { viewModel?.searchText = $0 }
+                Button {
+                    path.append(.search)
+                } label: {
+                    Text(AppLocalization.text(
+                        english: "Search places or stations",
+                        simplified: "搜索地点或车站",
+                        traditional: "搜尋地點或車站"
                     ))
-                    .focused($isSearchFocused)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.search)
-                    .textFieldStyle(.plain)
-                    .frame(minHeight: 28)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
 
-                    if viewModel?.searchText.isEmpty == false {
-                        Button {
-                            viewModel?.clearSearch()
-                            isSearchFocused = false
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.secondary)
-                                .frame(width: 28, height: 28)
-                        }
-                        .buttonStyle(.plain)
-                        // Grow only the tap target (28pt visible frame -> 44pt hit area),
-                        // not the visible icon, so the compact search row doesn't shift.
-                        .contentShape(Rectangle().inset(by: -8))
+                Button(action: { showCityPicker = true }) {
+                    HStack(spacing: 4) {
+                        Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("City"))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Image(systemName: "chevron.down")
+                            .font(.caption)
                     }
-
-                    Spacer(minLength: 8)
-
-                    Button(action: { showCityPicker = true }) {
-                        HStack(spacing: 4) {
-                            Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("City"))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Image(systemName: "chevron.down")
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(.ultraThinMaterial, in: Capsule())
-                    }
-                    .buttonStyle(.plain)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial, in: Capsule())
                 }
-                .padding(12)
-                .contentShape(Rectangle())
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear.preference(key: SearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
-                    }
-                }
-                .onTapGesture {
-                    isSearchFocused = true
-                }
-                .accessibilityElement(children: .contain)
-
-                if isLoadingStationDetail {
-                    ProgressView()
-                        .controlSize(.small)
-                        .frame(width: 34, height: 34)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
+                .buttonStyle(.plain)
             }
+            .padding(12)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+            .accessibilityElement(children: .contain)
 
-            if isSearchFocused && viewModel?.searchResults.isEmpty == false {
-                searchResultsDropdown
-                    .zIndex(20)
+            if isLoadingStationDetail {
+                ProgressView()
+                    .controlSize(.small)
+                    .frame(width: 34, height: 34)
+                    .background(.ultraThinMaterial, in: Circle())
             }
         }
         .zIndex(20)
-    }
-
-    // keyboardTopY and searchBarBottomY are both measured in `.global` screen space, matching
-    // UIScreen.main.bounds, so this needs no window-relative coordinate conversion.
-    private var searchDropdownMaxHeight: CGFloat {
-        let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
-        return max(0, keyboardTopY - searchBarBottomY - searchDropdownSpacing)
-    }
-
-    private var searchResultsDropdown: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                ForEach(viewModel?.searchResults ?? []) { place in
-                    Button {
-                        selectSearchResult(place)
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "mappin.circle.fill")
-                                .foregroundStyle(.secondary)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(place.name)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .lineLimit(1)
-                                if let address = place.address, !address.isEmpty {
-                                    Text(address)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                }
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-
-                    if place.id != viewModel?.searchResults.last?.id {
-                        Divider()
-                            .padding(.leading, 12)
-                    }
-                }
-            }
-        }
-        .scrollBounceBehavior(.basedOnSize)
-        .frame(maxHeight: searchDropdownMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
     /// The one way this screen ever puts the camera on the rider — used by the locate button and
@@ -447,15 +368,14 @@ struct MapContainerView: View {
 
             let selected = await viewModel?.selectStation(station) ?? station
             guard !Task.isCancelled, stationOpenGeneration == generation else { return }
-            selectedStation = selected
+            path.append(.station(selected))
         }
     }
 
-    /// A search result that is a programmed station opens the station detail; any other
-    /// place just recenters the map on it.
+    /// A place chosen on the search page. One that *is* a programmed station opens the station
+    /// detail; anything else recentres the map on it and presents its card, so "Route here" is one
+    /// tap away whether the rider found the place by pointing at it or by typing its name.
     private func selectSearchResult(_ place: TransitPlace) {
-        isSearchFocused = false
-        viewModel?.clearSearch()
         // Track + cancel so rapidly tapping results can't stack matchingStation calls whose
         // out-of-order completion would open the wrong station detail.
         placeMatchTask?.cancel()
@@ -465,6 +385,7 @@ struct MapContainerView: View {
         // resets the POI-tap state, so a cancelled match's buffered resolve can't linger.
         pendingResolvedItem = nil
         tappedPlace = nil
+        placeCardDetent = .medium
         placeMatchTask = Task {
             if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
                 guard !Task.isCancelled else { return }
@@ -472,6 +393,11 @@ struct MapContainerView: View {
             } else {
                 guard !Task.isCancelled else { return }
                 viewModel?.updateCamera(to: place.coordinate, spanDelta: MapCameraSpan.focused)
+                tappedPlace = TappedPlace(
+                    name: place.name,
+                    coordinate: place.coordinate,
+                    resolvedItem: nil
+                )
             }
         }
     }
@@ -523,6 +449,86 @@ struct MapContainerView: View {
         }
     }
 
+    // MARK: - Pushed screens
+
+    @ViewBuilder
+    private func destination(for route: MapRoute) -> some View {
+        switch route {
+        case .search:
+            SearchPageView(
+                onSelectStation: { openStation($0) },
+                onSelectPlace: { selectSearchResult($0) }
+            )
+        case .routeEntry:
+            if let plannerViewModel {
+                RouteEntryView(viewModel: plannerViewModel) {
+                    path.append(.results)
+                }
+            }
+        case .results:
+            if let plannerViewModel {
+                RouteResultsView(viewModel: plannerViewModel) { route in
+                    path.append(.detail(route.id))
+                }
+            }
+        case .detail(let routeID):
+            if let plannerViewModel,
+               let route = plannerViewModel.routes.first(where: { $0.id == routeID }) {
+                RouteDetailView(
+                    route: route,
+                    preference: plannerViewModel.sortStrategy,
+                    alternatives: plannerViewModel.routes,
+                    tripAnchor: plannerViewModel.tripAnchor,
+                    accessibilityFilter: plannerViewModel.accessibilityFilter
+                )
+            }
+        case .station(let station):
+            StationDetailView(station: station)
+        }
+    }
+
+    #if DEBUG
+    /// Lands a headless launch on a pushed screen. There is no tap injection in this environment —
+    /// this Xcode install ships no Simulator.app at all — so without a way to seed the path, every
+    /// screen above the map root is unreachable and therefore unverifiable.
+    private func seedDebugScreen() {
+        guard let screen = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] else { return }
+        switch screen {
+        case "search":
+            path = [.search]
+        case "entry":
+            path = [.routeEntry]
+        case "results", "detail", "guiding":
+            Task { await seedDebugRoute(landingOn: screen) }
+        default:
+            break
+        }
+    }
+
+    /// Plans a real trip between the two most widely separated stations the map has loaded for
+    /// this city, through the same `selectPlace` + `searchRoutes` path a rider drives — so what
+    /// gets screenshotted is the real screen and not a fixture. Widest separation rather than a
+    /// hardcoded pair so this works in any city, and so the route has transfers in it.
+    private func seedDebugRoute(landingOn screen: String) async {
+        guard let plannerViewModel, let stations = viewModel?.stations, stations.count >= 2 else { return }
+        let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
+        guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
+        plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)
+        plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
+        guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
+        path = screen == "results"
+            ? [.routeEntry, .results]
+            : [.routeEntry, .results, .detail(first.id)]
+    }
+
+    private func debugPlace(for station: Station) -> TransitPlace {
+        TransitPlace(
+            name: station.localizedName,
+            coordinate: CLLocationCoordinate2D(latitude: station.latitude, longitude: station.longitude),
+            source: .localStationData
+        )
+    }
+    #endif
 }
 
 /// The place sheet's loading state: shows the tapped POI's name + a spinner immediately, before

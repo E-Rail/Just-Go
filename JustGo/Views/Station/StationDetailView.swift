@@ -402,9 +402,14 @@ struct StationDetailView: View {
 }
 
 
-/// The "From here" / "To here" route-planning pair shown on a station or place popup.
-/// Tapping a button pre-fills the route planner (origin/destination), switches to the Route tab,
-/// and calls `onSelected` so the presenting popup can dismiss itself.
+/// The one route button shown on a station or place card. It records the place as the trip's
+/// *destination* and calls `onSelected` so the presenting card can dismiss itself; the map's
+/// navigation stack watches for that record and pushes the entry page.
+///
+/// This was a pair — "From here" and "To here" — which asked the rider to answer a question they
+/// had not been asked yet. Standing in front of a place on a map, "route here" is what you mean
+/// essentially always; the entry page then opens with this end filled and the other end defaulted
+/// to where you are, and swapping them is one button away if that guess was wrong.
 ///
 /// Colors use `Color.adaptive(hex: selectedThemeHex)` directly rather than the semantic
 /// `Color.accentColor`: the latter resolves from the environment `.tint`, which hasn't propagated
@@ -419,54 +424,27 @@ struct PlanRouteButtons: View {
 
     @Environment(AppState.self) private var appState
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
-    private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
     var body: some View {
-        HStack(spacing: 10) {
-            // "From here" — white (themed surface) with green text + outline.
-            Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .origin, cityID: cityID)
-                appState.selectedTab = 1
-                onSelected()
-            } label: {
-                Label(
-                    AppLocalization.text(english: "From here", simplified: "从此出发", traditional: "從此出發"),
-                    systemImage: "arrow.up.circle.fill"
-                )
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Color.appSurface, in: Capsule())
-                .overlay(
-                    Capsule()
-                        .stroke(themeColor.opacity(0.4), lineWidth: 1)
-                )
-                .foregroundStyle(themeColor)
-            }
-            .buttonStyle(.plain)
-
-            // "To here" — solid theme green with white text.
-            Button {
-                appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination, cityID: cityID)
-                appState.selectedTab = 1
-                onSelected()
-            } label: {
-                Label(
-                    AppLocalization.text(english: "To here", simplified: "到此到达", traditional: "到此到達"),
-                    systemImage: "arrow.down.circle.fill"
-                )
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                // Raw hex, not `themeColor`: this is a solid fill under white text, and
-                // `Color.adaptive` lightens toward white in dark mode specifically for
-                // *foreground* legibility — used as a fill it collapses contrast instead.
-                .background(Color(hex: selectedThemeHex), in: Capsule())
-                .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
+        Button {
+            appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination, cityID: cityID)
+            appState.selectedTab = .map
+            onSelected()
+        } label: {
+            Label(
+                AppLocalization.text(english: "Route here", simplified: "到这里去", traditional: "到這裡去"),
+                systemImage: "arrow.triangle.turn.up.right.circle.fill"
+            )
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            // Raw hex, not `themeColor`: this is a solid fill under white text, and
+            // `Color.adaptive` lightens toward white in dark mode specifically for
+            // *foreground* legibility — used as a fill it collapses contrast instead.
+            .background(Color(hex: selectedThemeHex), in: Capsule())
+            .foregroundStyle(.white)
         }
+        .buttonStyle(.plain)
     }
 }

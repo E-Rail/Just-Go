@@ -2,11 +2,13 @@ import SwiftUI
 
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
+    /// Pushing is the map stack's job, not this screen's — it owns the whole plan → results →
+    /// detail chain, so a route chosen here is handed back rather than presented from inside.
+    let onSelect: (Route) -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var selectedRouteID: UUID?
-    @State private var showRouteDetail = false
-    // Raw theme hex for the solid-fill chip below — see RoutePlannerView's identical
+    // Raw theme hex for the solid-fill chip below — see RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
     // isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
@@ -56,17 +58,6 @@ struct RouteResultsView: View {
         }
         .onChange(of: routeSelectionSignature) {
             ensureRouteSelection()
-        }
-        .navigationDestination(isPresented: $showRouteDetail) {
-            if let route = selectedRoute {
-                RouteDetailView(
-                    route: route,
-                    preference: viewModel.sortStrategy,
-                    alternatives: viewModel.routes,
-                    tripAnchor: viewModel.tripAnchor,
-                    accessibilityFilter: viewModel.accessibilityFilter
-                )
-            }
         }
     }
 
@@ -210,7 +201,7 @@ struct RouteResultsView: View {
                 cityID: route.networkCityID ?? viewModel.selectedCity?.id ?? "",
                 accessibilityFilter: viewModel.accessibilityFilter
             )
-            showRouteDetail = true
+            onSelect(route)
         } label: {
             VStack(alignment: .leading, spacing: 8) {
                 // Why this route is in the list at all — but only when there is something to

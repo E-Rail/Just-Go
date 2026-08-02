@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension RoutePlannerView {
+extension RouteEntryView {
     @ViewBuilder
     var smartCommuteSection: some View {
         if let (trip, isEvening) = smartCommuteTrip(for: appState.selectedCity?.id ?? "") {
@@ -9,17 +9,17 @@ extension RoutePlannerView {
                 isEvening: isEvening,
                 cityID: appState.selectedCity?.id ?? ""
             ) {
-                viewModel?.useSavedTrip(trip)
+                viewModel.useSavedTrip(trip)
                 if isEvening {
-                    viewModel?.swapOriginDestination()
+                    viewModel.swapOriginDestination()
                 }
                 Task {
                     // Credit the trip only when ITS OWN search published — inspecting the
                     // shared routes after the await would credit trip A for trip B's
                     // results when taps overlap.
-                    if await viewModel?.searchRoutes() == true {
+                    if await viewModel.searchRoutes() {
                         _ = tripMemoryService.markSavedTripUsed(id: trip.id)
-                        showResults = true
+                        onSearch()
                     }
                 }
             }
@@ -67,12 +67,12 @@ extension RoutePlannerView {
                                 // trip's coordinates against a selected Shanghai network
                                 // matches nonsense nearest stations.
                                 switchPlannerCity(toCityID: trip.cityID)
-                                viewModel?.useSavedTrip(trip)
+                                viewModel.useSavedTrip(trip)
                                 Task {
                                     // Same ownership rule as the smart-commute card above.
-                                    if await viewModel?.searchRoutes() == true {
+                                    if await viewModel.searchRoutes() {
                                         _ = tripMemoryService.markSavedTripUsed(id: trip.id)
-                                        showResults = true
+                                        onSearch()
                                     }
                                 }
                             } label: {
@@ -118,9 +118,9 @@ extension RoutePlannerView {
         .buttonStyle(.plain)
         // Gated on a current successful plan, not just filled fields: an unplanned save
         // has no planned-network city and would fall back to whatever city is selected.
-        .disabled(viewModel?.hasCurrentPlan != true)
-        .opacity(viewModel?.hasCurrentPlan == true ? 1 : 0.55)
-        .opacity(viewModel?.canSearch == true ? 1 : 0.55)
+        .disabled(!viewModel.hasCurrentPlan)
+        .opacity(viewModel.hasCurrentPlan ? 1 : 0.55)
+        .opacity(viewModel.canSearch ? 1 : 0.55)
     }
 
     var recentRoutesSection: some View {
@@ -128,7 +128,7 @@ extension RoutePlannerView {
             Text(AppLocalization.localized("Recent Routes"))
                 .font(.headline)
 
-            if (viewModel?.recentRoutes ?? []).isEmpty {
+            if (viewModel.recentRoutes).isEmpty {
                 HStack(spacing: 12) {
                     Image(systemName: "clock")
                         .foregroundStyle(.secondary)
@@ -140,7 +140,7 @@ extension RoutePlannerView {
                 .cardSurface()
             } else {
                 VStack(spacing: 0) {
-                    ForEach(viewModel?.recentRoutes ?? []) { route in
+                    ForEach(viewModel.recentRoutes) { route in
                         Button {
                             // Recents fill by NAME and resolve at search time in the
                             // current city — a Beijing name under Shanghai silently
@@ -149,7 +149,7 @@ extension RoutePlannerView {
                             if let cityID = route.resolvedCityID {
                                 switchPlannerCity(toCityID: cityID)
                             }
-                            viewModel?.useRecentRoute(route)
+                            viewModel.useRecentRoute(route)
                             scrollToTopTrigger.toggle()
                         } label: {
                             HStack {
@@ -168,7 +168,7 @@ extension RoutePlannerView {
                         }
                         .buttonStyle(.plain)
 
-                        if route.id != (viewModel?.recentRoutes.last?.id) {
+                        if route.id != viewModel.recentRoutes.last?.id {
                             Divider()
                                 .padding(.leading, 16)
                         }
@@ -206,15 +206,15 @@ extension RoutePlannerView {
                     Button(AppLocalization.localized("Save")) {
                         saveCurrentTrip()
                     }
-                    .disabled(viewModel?.hasCurrentPlan != true)
+                    .disabled(!viewModel.hasCurrentPlan)
                 }
             }
         }
     }
 
     private var defaultSavedTripName: String {
-        let origin = viewModel?.originSnapshot()?.name ?? AppLocalization.localized("Origin")
-        let destination = viewModel?.destinationSnapshot()?.name ?? AppLocalization.localized("Destination")
+        let origin = viewModel.originSnapshot()?.name ?? AppLocalization.localized("Origin")
+        let destination = viewModel.destinationSnapshot()?.name ?? AppLocalization.localized("Destination")
         return "\(origin) → \(destination)"
     }
 
@@ -222,10 +222,10 @@ extension RoutePlannerView {
         // Prefer the city of the network that actually planned the current routes: the
         // provider picks its network by coordinates, so a seam trip (Foshan network under
         // a selected Guangzhou) must not be persisted under the selection.
-        guard let city = plannerCity(forID: viewModel?.lastPlannedCityID) ?? appState.selectedCity,
-              let origin = viewModel?.originSnapshot(),
-              let destination = viewModel?.destinationSnapshot(),
-              let filter = viewModel?.accessibilityFilter else { return }
+        guard let city = plannerCity(forID: viewModel.lastPlannedCityID) ?? appState.selectedCity,
+              let origin = viewModel.originSnapshot(),
+              let destination = viewModel.destinationSnapshot() else { return }
+        let filter = viewModel.accessibilityFilter
 
         tripMemoryService.createSavedTrip(
             name: savedTripName,
@@ -233,7 +233,7 @@ extension RoutePlannerView {
             destination: destination,
             city: city,
             preferredStrategy: nil,
-            preferredRoutePreference: viewModel?.sortStrategy,
+            preferredRoutePreference: viewModel.sortStrategy,
             accessibilityFilter: filter
         )
         showSaveCurrentTrip = false

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import MapKit
 
 /// Reports the search bar's rendered bottom edge in `.global` space so the dropdown's
 /// height cap tracks the bar's real height (Dynamic Type) and the keyboard, instead of
@@ -11,34 +12,35 @@ private struct StationSearchBarBottomYKey: PreferenceKey {
     }
 }
 
-struct StationSearchView: View {
+/// The map's search page: one field over both the local station index and Apple's places.
+///
+/// Stations come first and instantly, because they are in memory and are what this app is for;
+/// places arrive behind them from a debounced network search. Choosing either hands back to the
+/// map, which is what owns navigation — a station pushes its detail, a place opens its card with
+/// the same "Route here" button a tapped pin gets. That sameness is the point: the rider should
+/// not be able to tell how they found the place.
+struct SearchPageView: View {
+    let onSelectStation: (Station) -> Void
+    let onSelectPlace: (TransitPlace) -> Void
+
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
-    @State private var selectedStation: Station?
     @State private var showFacilityPicker = false
     @State private var keyboardHeight: CGFloat = 0
     @State private var searchBarBottomY: CGFloat = 0
     // Tracked so a newer recent tap (or a direct station selection) supersedes an older
     // replay still loading its city — the loser must not overwrite the winner's push.
     @State private var recentReplayTask: Task<Void, Never>?
+    @State private var placeResults: [TransitPlace] = []
+    @State private var placeSearchTask: Task<Void, Never>?
+    @State private var isSearchingPlaces = false
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
-        NavigationStack {
             VStack(spacing: 0) {
                 searchBar
-                    // The dropdown hangs directly off the bar (its top aligned to the
-                    // bar's bottom), so it tracks the bar's actual position instead of a
-                    // fixed 58pt offset that Dynamic Type growth silently breaks.
-                    .overlay(alignment: .bottom) {
-                        if isSearchFocused && viewModel?.searchResults.isEmpty == false {
-                            searchDropdown
-                                .padding(.horizontal)
-                                .alignmentGuide(.bottom) { $0[.top] - 8 }
-                        }
-                    }
-                    .zIndex(40)
                 filterBar
                 resultsList
             }
@@ -57,20 +59,54 @@ struct StationSearchView: View {
                 }
             }
             .navigationTitle(AppLocalization.localized("Search"))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color.appBackground)
-            .navigationDestination(item: $selectedStation) { station in
-                StationDetailView(station: station)
-            }
-        }
         .onDisappear {
             recentReplayTask?.cancel()
+            placeSearchTask?.cancel()
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
                 viewModel = container.makeStationSearchViewModel()
             }
+            // The rider tapped a search field to get here, so start with it focused rather than
+            // making them tap a second time on a screen that exists only to be typed into.
+            isSearchFocused = true
             await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
+        }
+    }
+
+    /// Debounced hard, because this is a network search that runs on every keystroke and Apple
+    /// rate-limits it. Stations are already on screen by the time this returns.
+    private func schedulePlaceSearch(_ query: String) {
+        placeSearchTask?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2 else {
+            placeResults = []
+            isSearchingPlaces = false
+            return
+        }
+        isSearchingPlaces = true
+        placeSearchTask = Task {
+            try? await Task.sleep(for: .milliseconds(350))
+            guard !Task.isCancelled else { return }
+            let region = appState.selectedCity.map {
+                MKCoordinateRegion(
+                    center: $0.coordinate,
+                    span: MKCoordinateSpan(
+                        latitudeDelta: MapCameraSpan.city,
+                        longitudeDelta: MapCameraSpan.city
+                    )
+                )
+            }
+            let found = try? await container.placeSearchProvider.searchPlaces(
+                keyword: trimmed,
+                region: region,
+                limit: 12
+            )
+            guard !Task.isCancelled else { return }
+            isSearchingPlaces = false
+            placeResults = found ?? []
         }
     }
 
@@ -79,11 +115,16 @@ struct StationSearchView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
 
-            TextField(AppLocalization.localized("Search stations..."), text: Binding(
+            TextField(AppLocalization.text(
+                english: "Search places or stations",
+                simplified: "搜索地点或车站",
+                traditional: "搜尋地點或車站"
+            ), text: Binding(
                 get: { viewModel?.searchText ?? "" },
                 set: { newValue in
                     viewModel?.searchText = newValue
                     viewModel?.scheduleSearch(city: appState.selectedCity?.id ?? "")
+                    schedulePlaceSearch(newValue)
                 }
             ))
             .textFieldStyle(.plain)
@@ -97,6 +138,9 @@ struct StationSearchView: View {
             if !(viewModel?.searchText.isEmpty ?? true) {
                 Button {
                     viewModel?.clearSearch()
+                    placeSearchTask?.cancel()
+                    placeResults = []
+                    isSearchingPlaces = false
                     Task {
                         await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
                     }
@@ -116,66 +160,44 @@ struct StationSearchView: View {
         }
     }
 
-    // Both measured in `.global` (matching UIScreen bounds), so no coordinate conversion;
-    // when the keyboard is visible, cap strictly to the measured space above it.
-    private var searchDropdownMaxHeight: CGFloat {
-        let keyboardTopY = UIScreen.main.bounds.height - keyboardHeight
-        let available = max(0, keyboardTopY - searchBarBottomY - 16)
-        return keyboardHeight > 0 ? available : max(44, available)
-    }
-
-    private var searchDropdown: some View {
-        ScrollView {
-            searchDropdownRows
-        }
-        .scrollBounceBehavior(.basedOnSize)
-        .frame(maxHeight: searchDropdownMaxHeight)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
-    }
-
-    // All matches, scrollable — not a silent prefix(8) truncation.
-    private var searchDropdownRows: some View {
-        let results = viewModel?.searchResults ?? []
-        return VStack(spacing: 0) {
-            ForEach(results) { station in
+    /// Apple's places, under the stations. Choosing one hands straight back to the map rather than
+    /// pushing anything here: the place's card belongs over the map it sits on.
+    private var placesSection: some View {
+        Section {
+            ForEach(placeResults) { place in
                 Button {
                     isSearchFocused = false
-                    recentReplayTask?.cancel()
-                    viewModel?.selectStation(station)
-                    selectedStation = station
+                    onSelectPlace(place)
+                    dismiss()
                 } label: {
-                    HStack {
+                    HStack(spacing: 10) {
+                        Image(systemName: "mappin.circle.fill")
+                            .foregroundStyle(.secondary)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(station.localizedName)
+                            Text(place.name)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            if let alternateName = station.alternateLocalizedName {
-                                Text(alternateName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                            if let address = place.address, !address.isEmpty {
+                                Text(address)
+                                    .rowMeta()
+                                    .lineLimit(1)
                             }
                         }
-                        Spacer()
-                        if let distance = viewModel?.distanceText(for: station) {
-                            Text(distance)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+                        Spacer(minLength: 4)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-
-                if station.id != results.last?.id {
-                    Divider()
-                        .padding(.leading, 12)
+            }
+        } header: {
+            HStack(spacing: 6) {
+                Text(AppLocalization.text(english: "Places", simplified: "地点", traditional: "地點"))
+                if isSearchingPlaces {
+                    ProgressView().controlSize(.mini)
                 }
             }
         }
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 
     private var isAnyFilterActive: Bool {
@@ -273,15 +295,20 @@ struct StationSearchView: View {
             } else if viewModel?.isEnrichingForFacility == true && (viewModel?.searchResults.isEmpty ?? true) {
                 filterLoadingRow
             } else if let results = viewModel?.searchResults, !results.isEmpty {
-                ForEach(results) { station in
-                    StationRow(
-                        station: station,
-                        distanceText: viewModel?.distanceText(for: station)
-                    ) {
-                        recentReplayTask?.cancel()
-                        viewModel?.selectStation(station)
-                        selectedStation = station
+                Section {
+                    ForEach(results) { station in
+                        StationRow(
+                            station: station,
+                            distanceText: viewModel?.distanceText(for: station)
+                        ) {
+                            recentReplayTask?.cancel()
+                            viewModel?.selectStation(station)
+                            isSearchFocused = false
+                            onSelectStation(station)
+                        }
                     }
+                } header: {
+                    Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
                 }
             } else if isAnyFilterActive && viewModel?.errorMessage == nil {
                 // A real search error (filtered keyword search failing offline) must win
@@ -315,6 +342,14 @@ struct StationSearchView: View {
             }
             }
             .listRowBackground(Color.clear)
+
+            // Outside the if/else above on purpose: places are an additional answer to the same
+            // query, not an alternative to the station answer. When the station index has nothing
+            // ("No Results") but Apple does, the rider still gets somewhere to go.
+            if !placeResults.isEmpty {
+                placesSection
+                    .listRowBackground(Color.clear)
+            }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -372,7 +407,7 @@ struct StationSearchView: View {
                         guard !Task.isCancelled else { return }
                         if let station {
                             viewModel?.selectStation(station)
-                            selectedStation = station
+                            onSelectStation(station)
                         } else {
                             // Station no longer in the pack — fall back to a name search
                             // in its home city. scheduleSearch (not search) so the

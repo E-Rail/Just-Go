@@ -108,30 +108,22 @@ struct ContentView: View {
 
     var body: some View {
         @Bindable var appState = appState
+        // Two tabs, because the map is the app. Planning a trip and searching for a place are
+        // things you do *to* somewhere on the map, not separate destinations to walk to — a rider
+        // looking at a place had to leave it, switch tabs, and type its name back in. Both now
+        // live on the map's own navigation stack (see `MapRoute`).
         TabView(selection: $appState.selectedTab) {
             MapContainerView()
                 .tabItem {
                     Label(AppLocalization.localized("Map"), systemImage: "map.fill")
                 }
-                .tag(0)
-
-            RoutePlannerView()
-                .tabItem {
-                    Label(AppLocalization.localized("Route"), systemImage: "arrow.triangle.branch")
-                }
-                .tag(1)
-
-            StationSearchView()
-                .tabItem {
-                    Label(AppLocalization.localized("Search"), systemImage: "magnifyingglass")
-                }
-                .tag(2)
+                .tag(AppState.Tab.map)
 
             ProfileView()
                 .tabItem {
                     Label(AppLocalization.localized("Profile"), systemImage: "person.fill")
                 }
-                .tag(3)
+                .tag(AppState.Tab.profile)
         }
         .tint(Color.adaptive(hex: selectedThemeHex))
         .onAppear {

@@ -55,12 +55,23 @@ final class AppState {
     private let accessibilityPreferenceKey = "accessibilityPreference"
 
     var selectedCity: City?
+
+    /// Named rather than an Int, because the tags moved when the Route and Search tabs folded into
+    /// the map and a bare `selectedTab = 1` silently means something different afterwards.
+    enum Tab: Hashable {
+        case map
+        case profile
+    }
+
     #if DEBUG
-    // Lets a headless diagnostic launch open straight onto a given tab, since this
-    // environment has no way to inject a tap.
-    var selectedTab: Int = ProcessInfo.processInfo.environment["JUSTGO_START_TAB"].flatMap(Int.init) ?? 1
+    // Lets a headless diagnostic launch open straight onto a given tab, since this environment has
+    // no way to inject a tap — confirmed, not assumed: this Xcode install ships no Simulator.app,
+    // so the device is booted headlessly and there is no GUI to click.
+    var selectedTab: Tab = ProcessInfo.processInfo.environment["JUSTGO_START_TAB"] == "profile"
+        ? .profile
+        : .map
     #else
-    var selectedTab: Int = 1
+    var selectedTab: Tab = .map
     #endif
 
     struct PendingRouteInput: Equatable {

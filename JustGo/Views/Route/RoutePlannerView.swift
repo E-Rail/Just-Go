@@ -11,14 +11,25 @@ private struct SuggestionListTopYKey: PreferenceKey {
     }
 }
 
-struct RoutePlannerView: View {
+/// Where a trip is described, in words, with no map on screen.
+///
+/// The rider arrives here having already said *where* — by pointing at a pin, or picking a search
+/// result — so this page's job is the other end of the trip and nothing else. It opens with the
+/// destination already filled and the start defaulted to where the rider is standing, which is the
+/// answer nine times out of ten and was previously something they had to go and ask for.
+///
+/// Deliberately text-only. This used to be a tab with a map button, a commute card, a departure
+/// planner, saved trips and recents all competing above the fold; the fields were the one thing
+/// everybody came for and they were not at the top.
+struct RouteEntryView: View {
+    let viewModel: RoutePlannerViewModel
+    /// Push the results. Owned by the map's navigation stack, not by this screen.
+    let onSearch: () -> Void
+
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
-    @State var viewModel: RoutePlannerViewModel?
-    @State var showResults = false
     @FocusState var focusedField: RouteInputField?
-    @State private var showCityPicker = false
     /// Non-nil while the map picker is up, and its value is the field the result fills.
     @State private var mapPickerField: RouteInputField?
     @State var showSaveCurrentTrip = false
@@ -28,6 +39,7 @@ struct RoutePlannerView: View {
     @State private var showResumeLiveGo = false
     @State private var keyboardHeight: CGFloat = 0
     @State private var suggestionListTopY: CGFloat = 0
+    @State private var didSeedOrigin = false
     // Raw theme hex for solid-fill buttons/banners below — `Color.accentColor` (the global
     // tint, set from `Color.adaptive(hex:)` in ContentView) lightens toward white in dark
     // mode for *foreground* legibility; used as a fill under white text that collapses
@@ -35,162 +47,119 @@ struct RoutePlannerView: View {
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .top) {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            Color.clear.frame(height: 0).id("plannerTop")
-                            if let resumableTrip { resumeTripBanner(resumableTrip) }
-                            // Simplified UI (cognitive accessibility): only the essentials —
-                            // the fields and search. The resume banner stays: an active trip is
-                            // never noise. Accessibility needs live in Profile → Accessibility
-                            // Settings and seed the search directly.
-                            //
-                            // The city moved to the toolbar: it is picked once and then rarely
-                            // touched, so a full-width row above the From/To fields spent the top
-                            // of the screen on the one control the rider was not reaching for.
-                            if !simplifiedUI { smartCommuteSection }
-                            routeInputSection
-                            plannerActionRail
-                            if !simplifiedUI {
-                                departurePlannerSection
-                                savedTripsSection
-                                recentRoutesSection
-                            }
-                        }
-                        .padding()
-                    }
-                    // Dragging the planner down puts the keyboard away too, so the rider has two
-                    // ways out of a field rather than only the tap rule installed in ContentView.
-                    .scrollDismissesKeyboard(.interactively)
-                    .onChange(of: scrollToTopTrigger) { _, _ in
-                        withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
-                    }
-                    // Pin the input card to the top whenever a field is active — centering
-                    // the field wasted the space below it, squeezing the suggestion list.
-                    // With the card at the top, the active field, its capped list, and the
-                    // keyboard fit together even on small screens.
-                    .onChange(of: activeSuggestions?.field) { _, field in
-                        guard field != nil else { return }
-                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
-                    }
-                    .onChange(of: focusedField) { _, field in
-                        guard field != nil else { return }
-                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
-                    }
-                    .onChange(of: keyboardHeight) { _, height in
-                        guard height > 0, focusedField != nil else { return }
-                        withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 20) {
+                    Color.clear.frame(height: 0).id("plannerTop")
+                    if let resumableTrip { resumeTripBanner(resumableTrip) }
+                    routeInputSection
+                    plannerActionRail
+                    // Simplified UI (cognitive accessibility): only the fields and search.
+                    // The resume banner stays — an active trip is never noise.
+                    if !simplifiedUI {
+                        departurePlannerSection
+                        smartCommuteSection
+                        savedTripsSection
+                        recentRoutesSection
                     }
                 }
-
+                .padding()
             }
-            .navigationTitle(AppLocalization.localized("Route Planner"))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { showCityPicker = true }) {
-                        Label(
-                            appState.selectedCity?.localizedName ?? AppLocalization.localized("Select City"),
-                            systemImage: "building.2"
-                        )
-                        .labelStyle(.titleAndIcon)
-                    }
-                    .accessibilityLabel(AppLocalization.localized("City"))
-                }
+            // Dragging the page down puts the keyboard away too, so the rider has two ways out
+            // of a field rather than only the tap rule installed in ContentView.
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: scrollToTopTrigger) { _, _ in
+                withAnimation { proxy.scrollTo("plannerTop", anchor: .top) }
             }
-            .background(Color.appBackground)
-            .onPreferenceChange(SuggestionListTopYKey.self) { suggestionListTopY = $0 }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
-                guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-                withAnimation(.easeInOut(duration: duration)) {
-                    keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
-                }
+            // Pin the input card to the top whenever a field is active — centering the field
+            // wasted the space below it, squeezing the suggestion list. With the card at the
+            // top, the active field, its capped list, and the keyboard fit together even on
+            // small screens.
+            .onChange(of: activeSuggestions?.field) { _, field in
+                guard field != nil else { return }
+                withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
-                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-                withAnimation(.easeInOut(duration: duration)) {
-                    keyboardHeight = 0
-                }
+            .onChange(of: focusedField) { _, field in
+                guard field != nil else { return }
+                withAnimation { proxy.scrollTo("routeInputCard", anchor: .top) }
             }
-            .sheet(isPresented: $showCityPicker) {
-                CityPickerView(selectedCity: Binding(
-                    get: { appState.selectedCity },
-                    set: { appState.selectedCity = $0 }
-                ))
+        }
+        .navigationTitle(AppLocalization.text(english: "Route", simplified: "路线", traditional: "路線"))
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color.appBackground)
+        .onPreferenceChange(SuggestionListTopYKey.self) { suggestionListTopY = $0 }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+            withAnimation(.easeInOut(duration: duration)) {
+                keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
             }
-            .sheet(item: $mapPickerField) { field in
-                MapPlacePickerView(
-                    field: field,
-                    initialCoordinate: mapPickerStart(for: field)
-                ) { place in
-                    // Same bounded nearest-city rule the quick tags use, and before the fill:
-                    // a cross-city switch wipes the fields, so it has to precede the assignment.
-                    switchPlannerCity(forPlaceCityID: nil, coordinate: place.coordinate)
-                    viewModel?.selectPlace(place, for: field)
-                }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
+            let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+            withAnimation(.easeInOut(duration: duration)) {
+                keyboardHeight = 0
             }
-            .onChange(of: appState.selectedCity?.id) { _, newID in
-                // switchPlannerCity applies the city to the view model synchronously, so
-                // when this deferred onChange arrives with the VM already on the new city
-                // it's that switch's echo — resetting showResults then would race the
-                // saved-trip/quick-route flow and pop the results it just pushed.
-                let isProgrammaticEcho = viewModel?.selectedCity?.id == newID
-                viewModel?.cityChanged(to: appState.selectedCity)
-                // A pushed results screen belongs to the previous city's search, whose
-                // routes cityChanged just cleared — pop it rather than leave an empty
-                // "0 routes" page for the user to come back to.
-                if !isProgrammaticEcho { showResults = false }
+        }
+        .sheet(item: $mapPickerField) { field in
+            MapPlacePickerView(
+                field: field,
+                initialCoordinate: mapPickerStart(for: field)
+            ) { place in
+                // Same bounded nearest-city rule the quick tags use, and before the fill:
+                // a cross-city switch wipes the fields, so it has to precede the assignment.
+                switchPlannerCity(forPlaceCityID: nil, coordinate: place.coordinate)
+                viewModel.selectPlace(place, for: field)
             }
-            .onChange(of: appState.accessibilityPreference.routeAffectingSignature) { _, _ in
-                if viewModel?.syncAccessibilityPreference(appState.accessibilityPreference) == true {
-                    showResults = false
-                }
-            }
-            .navigationDestination(isPresented: $showResults) {
-                if let viewModel = viewModel {
-                    RouteResultsView(viewModel: viewModel)
-                }
-            }
-            .onChange(of: appState.pendingRouteInput) { _, pending in
-                applyPendingRouteInput(pending)
-            }
-            .sheet(isPresented: $showSaveCurrentTrip) {
-                saveCurrentTripSheet
-            }
-            .fullScreenCover(isPresented: $showResumeLiveGo, onDismiss: {
-                ActiveTripStore.clear()
-                resumableTrip = nil
-            }) {
-                if let resumableTrip {
-                    LiveGoView(route: resumableTrip)
-                }
+        }
+        .onChange(of: appState.selectedCity?.id) { _, _ in
+            viewModel.cityChanged(to: appState.selectedCity)
+        }
+        .onChange(of: appState.accessibilityPreference.routeAffectingSignature) { _, _ in
+            _ = viewModel.syncAccessibilityPreference(appState.accessibilityPreference)
+        }
+        .onChange(of: appState.pendingRouteInput) { _, pending in
+            applyPendingRouteInput(pending)
+        }
+        .sheet(isPresented: $showSaveCurrentTrip) {
+            saveCurrentTripSheet
+        }
+        .fullScreenCover(isPresented: $showResumeLiveGo, onDismiss: {
+            ActiveTripStore.clear()
+            resumableTrip = nil
+        }) {
+            if let resumableTrip {
+                LiveGoView(route: resumableTrip)
             }
         }
         .task {
-            if viewModel == nil {
-                viewModel = container.makeRoutePlannerViewModel()
-            }
-            if viewModel?.syncAccessibilityPreference(appState.accessibilityPreference) == true {
-                showResults = false
-            }
-            viewModel?.cityChanged(to: appState.selectedCity)
-            viewModel?.prewarmLocation()
+            _ = viewModel.syncAccessibilityPreference(appState.accessibilityPreference)
+            viewModel.cityChanged(to: appState.selectedCity)
             applyPendingRouteInput(appState.pendingRouteInput)
             resumableTrip = ActiveTripStore.load()
+            await seedOriginFromDevice()
+        }
+    }
+
+    /// "Start defaults to current place." Only when the rider has not already said otherwise —
+    /// a destination arriving from a place card fills `.destination`, so an empty `.origin` here
+    /// genuinely means unanswered rather than deliberately blank. Silent when there is no fix:
+    /// a rider who declined location gets an empty field, not an error about it.
+    private func seedOriginFromDevice() async {
+        guard !didSeedOrigin else { return }
+        didSeedOrigin = true
+        guard viewModel.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        await viewModel.useCurrentLocation(for: .origin) { coordinate in
+            switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
         }
     }
 
     @ViewBuilder
     private var departurePlannerSection: some View {
-        if let viewModel {
-            DeparturePlannerSection(anchor: Binding(
-                get: { viewModel.tripAnchor },
-                set: { viewModel.tripAnchor = $0 }
-            ))
-        }
+        DeparturePlannerSection(anchor: Binding(
+            get: { viewModel.tripAnchor },
+            set: { viewModel.tripAnchor = $0 }
+        ))
     }
 
     private var simplifiedUI: Bool {
@@ -202,20 +171,20 @@ struct RoutePlannerView: View {
     /// then the device, then the city.
     private func mapPickerStart(for field: RouteInputField) -> CLLocationCoordinate2D {
         let other: RouteInputField = field == .origin ? .destination : .origin
-        return viewModel?.place(for: field)?.coordinate
+        return viewModel.place(for: field)?.coordinate
             ?? container.locationService.currentLocation?.coordinate
-            ?? viewModel?.place(for: other)?.coordinate
+            ?? viewModel.place(for: other)?.coordinate
             ?? appState.selectedCity?.coordinate
             ?? CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
     }
 
     private func applyPendingRouteInput(_ pending: AppState.PendingRouteInput?) {
-        guard let pending, let vm = viewModel else { return }
+        guard let pending else { return }
         // A station-originated input can reference another city (Quick Tags → station
-        // detail → "From here"); a map POI names no city, so infer one when it's clearly
+        // detail → "Route here"); a map POI names no city, so infer one when it's clearly
         // outside the selected city's area (the map pans freely across cities).
         switchPlannerCity(forPlaceCityID: pending.cityID, coordinate: pending.place.coordinate)
-        vm.selectPlace(pending.place, for: pending.role)
+        viewModel.selectPlace(pending.place, for: pending.role)
         appState.pendingRouteInput = nil
     }
 
@@ -227,7 +196,7 @@ struct RoutePlannerView: View {
         guard cityID != appState.selectedCity?.id,
               let city = container.cityService.getCity(byID: cityID) else { return }
         appState.selectedCity = city
-        viewModel?.cityChanged(to: city)
+        viewModel.cityChanged(to: city)
     }
 
     /// City object for a pack cityID — lets the save-trip sheet persist the trip under
@@ -292,20 +261,18 @@ struct RoutePlannerView: View {
     }
 
     private var plannerActionRail: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 10) {
-                if !simplifiedUI {
-                    saveCurrentTripButton
-                }
-                searchButton
+        HStack(spacing: 10) {
+            if !simplifiedUI {
+                saveCurrentTripButton
             }
+            searchButton
         }
     }
 
     private var errorAlertIsPresented: Binding<Bool> {
         Binding(
-            get: { viewModel?.errorMessage != nil && viewModel?.routes.isEmpty == true },
-            set: { if !$0 { viewModel?.errorMessage = nil } }
+            get: { viewModel.errorMessage != nil && viewModel.routes.isEmpty },
+            set: { if !$0 { viewModel.errorMessage = nil } }
         )
     }
 
@@ -338,7 +305,7 @@ struct RoutePlannerView: View {
                         if let activeSuggestions, activeSuggestions.field == .origin {
                             suggestionDropdown(
                                 suggestions: activeSuggestions.suggestions,
-                                select: { viewModel?.selectPlace($0, for: .origin) }
+                                select: { viewModel.selectPlace($0, for: .origin) }
                             )
                         }
 
@@ -349,7 +316,7 @@ struct RoutePlannerView: View {
                         if let activeSuggestions, activeSuggestions.field == .destination {
                             suggestionDropdown(
                                 suggestions: activeSuggestions.suggestions,
-                                select: { viewModel?.selectPlace($0, for: .destination) }
+                                select: { viewModel.selectPlace($0, for: .destination) }
                             )
                         }
                     }
@@ -357,7 +324,7 @@ struct RoutePlannerView: View {
 
                 HStack(spacing: 8) {
                     quickTagRow
-                    Button(action: { viewModel?.swapOriginDestination() }) {
+                    Button(action: { viewModel.swapOriginDestination() }) {
                         Image(systemName: "arrow.up.arrow.down")
                             .font(.title3)
                             .foregroundStyle(Color.accentColor)
@@ -386,7 +353,7 @@ struct RoutePlannerView: View {
                         // rule) — filling a Beijing coordinate under a selected Shanghai
                         // otherwise leaves suggestions and name resolution keyed to the
                         // wrong city.
-                        await viewModel?.useCurrentLocation(for: field) { coordinate in
+                        await viewModel.useCurrentLocation(for: field) { coordinate in
                             switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
                         }
                     }
@@ -417,7 +384,7 @@ struct RoutePlannerView: View {
 
     private var quickTagTargetField: RouteInputField {
         focusedField
-            ?? ((viewModel?.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+            ?? (viewModel.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 ? .origin
                 : .destination)
     }
@@ -428,7 +395,7 @@ struct RoutePlannerView: View {
         let field = quickTagTargetField
         let coordinate = CLLocationCoordinate2D(latitude: quickTag.latitude, longitude: quickTag.longitude)
         switchPlannerCity(forPlaceCityID: quickTag.cityID, coordinate: coordinate)
-        viewModel?.selectPlace(
+        viewModel.selectPlace(
             quickTag.transitPlace,
             for: field
         )
@@ -452,7 +419,7 @@ struct RoutePlannerView: View {
     }
 
     private var activeSuggestions: (field: RouteInputField, suggestions: [TransitPlace])? {
-        let suggestions = viewModel?.suggestions(for: focusedField) ?? []
+        let suggestions = viewModel.suggestions(for: focusedField)
         guard let focusedField, !suggestions.isEmpty else { return nil }
         return (focusedField, suggestions)
     }
@@ -463,8 +430,8 @@ struct RoutePlannerView: View {
     ) -> some View {
         HStack(spacing: 4) {
             TextField(placeholder, text: Binding(
-                get: { viewModel?.name(for: field) ?? "" },
-                set: { viewModel?.updateName($0, for: field) }
+                get: { viewModel.name(for: field) },
+                set: { viewModel.updateName($0, for: field) }
             ))
                 .focused($focusedField, equals: field)
                 .textInputAutocapitalization(.never)
@@ -559,16 +526,17 @@ struct RoutePlannerView: View {
 
     private var searchButton: some View {
         Button(action: {
+            focusedField = nil
             Task {
-                // Push only when THIS search published; never set false here — a
-                // superseded continuation must not pop the owning search's results.
-                if await viewModel?.searchRoutes() == true {
-                    showResults = true
+                // Push only when THIS search published; never pop here — a superseded
+                // continuation must not close the owning search's results.
+                if await viewModel.searchRoutes() == true {
+                    onSearch()
                 }
             }
         }) {
             HStack {
-                if viewModel?.isLoading == true {
+                if viewModel.isLoading {
                     ProgressView()
                         .tint(.white)
                 } else {
@@ -583,15 +551,15 @@ struct RoutePlannerView: View {
             // Disabled was a solid mid-grey capsule, which has the same visual weight as the
             // enabled button and so read as the loudest thing on an empty planner — the screen
             // shouted its one unavailable action. A recessed fill reads as "not yet".
-            .background(viewModel?.canSearch == true ? Color(hex: selectedThemeHex) : Color(.tertiarySystemFill))
-            .foregroundStyle(viewModel?.canSearch == true ? Color.white : Color.secondary)
+            .background(viewModel.canSearch ? Color(hex: selectedThemeHex) : Color(.tertiarySystemFill))
+            .foregroundStyle(viewModel.canSearch ? Color.white : Color.secondary)
             .clipShape(Capsule())
         }
-        .disabled(viewModel?.canSearch != true || viewModel?.isLoading == true)
+        .disabled(!viewModel.canSearch || viewModel.isLoading)
         .alert(AppLocalization.localized("No Routes Found"), isPresented: errorAlertIsPresented) {
             Button(AppLocalization.localized("OK"), role: .cancel) {}
         } message: {
-            Text(viewModel?.errorMessage ?? "")
+            Text(viewModel.errorMessage ?? "")
         }
     }
 }

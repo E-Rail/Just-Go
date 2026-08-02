@@ -465,7 +465,7 @@ extension StationDetailView {
                 }
             }
         }
-        .frame(height: stationGuideMapHeight)
+        .frame(height: StationDetailView.entranceMapHeight)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .accessibilityLabel(AppLocalization.text(
             english: "Map of station entrances",
@@ -510,71 +510,6 @@ extension StationDetailView {
                 )
                 .accessibilityLabel(label)
         }
-    }
-
-    /// Drag to resize the map. The handle sits below the map rather than on it so the gesture never
-    /// competes with the enclosing ScrollView, and VoiceOver gets an adjustable action because
-    /// there is no way to drag a handle by voice.
-    private func clampedMapHeight(_ value: Double) -> Double {
-        min(
-            max(value, StationDetailView.mapHeightRange.lowerBound),
-            StationDetailView.mapHeightRange.upperBound
-        )
-    }
-
-    private var mapResizeHandle: some View {
-        let step: Double = 60
-        return HStack(spacing: 8) {
-            Capsule()
-                .fill(Color.secondary.opacity(0.5))
-                .frame(width: 40, height: 5)
-            // The bare capsule read as decoration — a divider, not a control. The arrows say it
-            // moves, and the double-tap gives it a use that does not require discovering the drag.
-            Image(systemName: "arrow.up.and.down")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.vertical, 11)
-        .frame(maxWidth: .infinity)
-        .contentShape(Rectangle())
-        .gesture(
-            DragGesture(minimumDistance: 2)
-                .onChanged { value in
-                    let base = mapHeightAtDragStart ?? stationGuideMapHeight
-                    mapHeightAtDragStart = base
-                    stationGuideMapHeight = clampedMapHeight(base + value.translation.height)
-                }
-                .onEnded { _ in mapHeightAtDragStart = nil }
-        )
-        .onTapGesture(count: 2) {
-            withAnimation(.easeInOut(duration: 0.25)) {
-                let maximum = StationDetailView.mapHeightRange.upperBound
-                stationGuideMapHeight = stationGuideMapHeight >= maximum - 1
-                    ? StationDetailView.defaultMapHeight
-                    : maximum
-            }
-        }
-            .accessibilityElement()
-            .accessibilityLabel(AppLocalization.text(
-                english: "Map height",
-                simplified: "地图高度",
-                traditional: "地圖高度"
-            ))
-            .accessibilityValue(AppLocalization.text(
-                english: "\(Int(stationGuideMapHeight)) points",
-                simplified: "\(Int(stationGuideMapHeight)) 点",
-                traditional: "\(Int(stationGuideMapHeight)) 點"
-            ))
-            .accessibilityAdjustableAction { direction in
-                switch direction {
-                case .increment:
-                    stationGuideMapHeight = clampedMapHeight(stationGuideMapHeight + step)
-                case .decrement:
-                    stationGuideMapHeight = clampedMapHeight(stationGuideMapHeight - step)
-                @unknown default:
-                    break
-                }
-            }
     }
 
     private func officialExitChip(_ exit: OfficialStationExitInformation) -> some View {
@@ -822,7 +757,6 @@ extension StationDetailView {
                         let mappable = mappableAccessPoints
                         if !mappable.isEmpty {
                             stationAccessPointMap(mappable)
-                            mapResizeHandle
                         }
 
                         // The official online surface lists this station's *named* exits already,

@@ -537,18 +537,19 @@ struct MapContainerView: View {
             // the start never overrules it.
             if planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 await planner.useCurrentLocation(for: .origin)
-                // A start in a different city cannot be planned against this network, and
-                // silently keeping it produces either nonsense or an unexplained failure. Drop
-                // it and let the header ask for one — planning across cities is a real trip this
-                // app cannot plan, and saying so beats guessing.
+                // A start that is *clearly* somewhere else cannot be planned against this
+                // network, and silently keeping it produces nonsense. Judged with the same
+                // bounded rule as everywhere else — not "which city centre is nearest", which
+                // called a Foshan start a different city from a Guangzhou destination and threw
+                // away a trip the app can plan perfectly well. Adjacent interconnected metros
+                // are one journey to a rider and the graph agrees.
                 if let seeded = planner.place(for: .origin),
-                   let planningCityID,
-                   container.cityService.findNearestCity(
-                       to: CLLocation(
-                           latitude: seeded.coordinate.latitude,
-                           longitude: seeded.coordinate.longitude
-                       )
-                   )?.id != planningCityID {
+                   let planningCity = planningCityID.flatMap({ container.cityService.getCity(byID: $0) }),
+                   container.cityService.cityToAdopt(
+                       forPlaceCityID: nil,
+                       coordinate: seeded.coordinate,
+                       whileSelecting: planningCity
+                   ) != nil {
                     planner.updateName("", for: .origin)
                 }
             }

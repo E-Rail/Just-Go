@@ -49,16 +49,11 @@ struct StationDetailView: View {
     @State var showQuickTagDialog = false
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
     @State var selectedTab: StationDetailTab = .trains
-    /// Riders drag the entrance map's handle to resize it. The choice persists because someone who
-    /// wants a big map wants it at every station, not once.
-    @AppStorage("stationGuideMapHeight") var stationGuideMapHeight = StationDetailView.defaultMapHeight
-    @State var mapHeightAtDragStart: Double?
 
-    // The map is the whole point of the Map tab, so it opens filling most of it rather than as a
-    // 190 pt strip with a list under it. The upper bound lets the list be driven nearly off-screen
-    // for riders who just want to look at where the doors are.
-    static let defaultMapHeight: Double = 380
-    static let mapHeightRange: ClosedRange<Double> = 140...760
+    /// Tall, because the map is the whole point of the Map tab — but fixed. This shows one
+    /// station's doors; there is nothing further to reveal by making it taller, and a resize
+    /// handle on a card inside a scroll view is a gesture competing with the scroll for no gain.
+    static let entranceMapHeight: Double = 380
 
     /// Only tabs with something behind them are offered — an empty tab is worse than no tab. The
     /// station tab is always present: lines and the data-confidence chips do not depend on a pack.

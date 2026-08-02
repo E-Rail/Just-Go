@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 extension RouteConfidenceLevel {
     var color: Color {
@@ -246,5 +247,74 @@ struct DataConfidenceChip: View {
         // pass comfortably against black (~5.9-9.6:1), in both light and dark appearance.
         .foregroundStyle(.black)
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// Reports the start of an interactive back-swipe, which SwiftUI has no signal for.
+///
+/// `onDisappear` is far too late for anything that needs to animate *with* the pop: by the time it
+/// runs the page is already off screen. UIKit has known since the first touch — the navigation
+/// controller's `interactivePopGestureRecognizer` — so this listens to that directly rather than
+/// taking over the navigation controller's delegate, which SwiftUI owns.
+struct InteractivePopObserver: UIViewControllerRepresentable {
+    let onPopBegan: () -> Void
+    /// The rider started the swipe and then changed their mind — put things back.
+    let onPopAbandoned: () -> Void
+
+    func makeUIViewController(context: Context) -> Controller {
+        let controller = Controller()
+        controller.onPopBegan = onPopBegan
+        controller.onPopAbandoned = onPopAbandoned
+        return controller
+    }
+
+    func updateUIViewController(_ controller: Controller, context: Context) {
+        controller.onPopBegan = onPopBegan
+        controller.onPopAbandoned = onPopAbandoned
+    }
+
+    final class Controller: UIViewController {
+        var onPopBegan: (() -> Void)?
+        var onPopAbandoned: (() -> Void)?
+        private weak var observed: UIGestureRecognizer?
+
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            attachIfNeeded()
+        }
+
+        // Also here: on the first pass this controller can be parented before its host has been
+        // pushed, and `navigationController` is nil until it has been.
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            attachIfNeeded()
+        }
+
+        private func attachIfNeeded() {
+            guard let recognizer = navigationController?.interactivePopGestureRecognizer,
+                  recognizer !== observed else { return }
+            observed = recognizer
+            recognizer.addTarget(self, action: #selector(popGestureChanged(_:)))
+        }
+
+        @objc private func popGestureChanged(_ recognizer: UIGestureRecognizer) {
+            switch recognizer.state {
+            case .began:
+                onPopBegan?()
+            case .cancelled, .failed:
+                onPopAbandoned?()
+            case .ended:
+                // `ended` covers both "let go past the threshold" (the pop commits and this
+                // controller is torn down) and "let go too early" (it is not). Nothing
+                // distinguishes them at this instant, so ask afterwards whether we are still on
+                // screen — a released-too-early swipe must not leave the card hidden.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    guard let self, self.view.window != nil else { return }
+                    self.onPopAbandoned?()
+                }
+            default:
+                break
+            }
+        }
     }
 }

@@ -92,8 +92,19 @@ struct RouteDetailView: View {
         // A sheet presented from a *pushed* view is presented on the navigation controller, not on
         // the view — so popping this screen does not reliably take the sheet with it, and the trip
         // card was left sitting on top of the route list. Tearing it down as this screen leaves is
-        // the only signal that always arrives, whether the rider used the back button or swiped.
+        // the signal that always arrives, whether the rider used the back button or swiped.
         .onDisappear { showsTripCard = false }
+        // …but `onDisappear` arrives when the page has already slid away, so the card sat there
+        // through the whole transition and then vanished. UIKit knows a back-swipe has started the
+        // moment it starts; SwiftUI does not expose that. Hooking the gesture lets the card slide
+        // down *while* the page slides right, which is the one motion this should be.
+        .background(
+            InteractivePopObserver(
+                onPopBegan: { showsTripCard = false },
+                onPopAbandoned: { showsTripCard = !isGuiding }
+            )
+            .frame(width: 0, height: 0)
+        )
         .navigationTitle(isGuiding
             ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
             : AppLocalization.localized("Route Details"))

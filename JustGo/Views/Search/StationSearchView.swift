@@ -1,16 +1,5 @@
 import SwiftUI
-import UIKit
 import MapKit
-
-/// Reports the search bar's rendered bottom edge in `.global` space so the dropdown's
-/// height cap tracks the bar's real height (Dynamic Type) and the keyboard, instead of
-/// a hardcoded offset — same pattern as the map's SearchBarBottomYKey.
-private struct StationSearchBarBottomYKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
 
 /// The map's search page: one field over both the local station index and Apple's places.
 ///
@@ -31,8 +20,6 @@ struct SearchPageView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
-    @State private var keyboardHeight: CGFloat = 0
-    @State private var searchBarBottomY: CGFloat = 0
     // Tracked so a newer recent tap (or a direct station selection) supersedes an older
     // replay still loading its city — the loser must not overwrite the winner's push.
     @State private var recentReplayTask: Task<Void, Never>?
@@ -48,20 +35,6 @@ struct SearchPageView: View {
                     quickTagBar
                 }
                 resultsList
-            }
-            .onPreferenceChange(StationSearchBarBottomYKey.self) { searchBarBottomY = $0 }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
-                guard let value = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-                withAnimation(.easeInOut(duration: duration)) {
-                    keyboardHeight = max(0, UIScreen.main.bounds.height - value.cgRectValue.origin.y)
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
-                let duration = note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
-                withAnimation(.easeInOut(duration: duration)) {
-                    keyboardHeight = 0
-                }
             }
             .navigationTitle(AppLocalization.localized("Search"))
             // The back button lives in the search bar itself, beside the field, so the field sits
@@ -138,11 +111,6 @@ struct SearchPageView: View {
         .padding(.horizontal, 12)
         .padding(.top, 6)
         .padding(.bottom, 4)
-        .background {
-            GeometryReader { proxy in
-                Color.clear.preference(key: StationSearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
-            }
-        }
     }
 
     /// Every place the rider has already told the app matters, one tap from the top of the page.

@@ -21,6 +21,12 @@ struct MetroGeometryAttributionView: View {
 struct TransitMapView: UIViewRepresentable {
     @Binding var visibleRegion: MapVisibleRegion?
     let stations: [Station]
+    /// Draws every supplied station regardless of zoom. The browse map hides non-transfer
+    /// stations above a 0.1° span, because a city's worth of them at that scale is a smear — but a
+    /// route map is handed only the ~30 stops the trip actually calls at, and hiding those is
+    /// hiding the answer. Whole-trip spans are wider than 0.1° almost by definition, which is why
+    /// the route map drew a line through an empty city.
+    var alwaysShowsStations = false
     let metroNetworks: [MetroNetwork]
     let route: Route?
     let showsUserLocation: Bool
@@ -376,7 +382,11 @@ struct TransitMapView: UIViewRepresentable {
             view.canShowCallout = false
             view.displayPriority = station.isTransferStation ? .required : .defaultLow
             view.collisionMode = .rectangle
-            let style = StationAnnotationStyle(region: region, isTransfer: station.isTransferStation)
+            let style = StationAnnotationStyle(
+                region: region,
+                isTransfer: station.isTransferStation,
+                alwaysVisible: parent.alwaysShowsStations
+            )
             guard style.isVisible else {
                 view.isHidden = true
                 return
@@ -530,9 +540,9 @@ private struct StationAnnotationStyle {
     let labelSize: CGFloat
     let id: String
 
-    init(region: MKCoordinateRegion, isTransfer: Bool) {
+    init(region: MKCoordinateRegion, isTransfer: Bool, alwaysVisible: Bool = false) {
         let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
-        isVisible = maxDelta <= (isTransfer ? 0.8 : 0.1)
+        isVisible = alwaysVisible || maxDelta <= (isTransfer ? 0.8 : 0.1)
         let bucket = maxDelta <= 0.055 ? 0 : (maxDelta <= 0.18 ? 1 : 2)
         let baseSize: CGFloat = bucket == 0 ? 18 : (bucket == 1 ? 9 : 6)
         symbolSize = baseSize + (isTransfer ? 3 : 0)

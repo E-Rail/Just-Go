@@ -180,8 +180,13 @@ extension Station {
         AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
     }
 
+    /// The second line of a station label. Nil when it would merely repeat the first — a station
+    /// carrying no English name renders `localizedName` as its Chinese name, and returning that
+    /// same string here printed every map pin twice. The first expression is kept verbatim
+    /// because `validate_localizations.rb` pins it: in Chinese this must be nil, always.
     var alternateLocalizedName: String? {
-        AppLocalization.isChinese ? nil : name
+        let alternate = AppLocalization.isChinese ? nil : name
+        return alternate == localizedName ? nil : alternate
     }
 
     var accessibilityLabel: String {

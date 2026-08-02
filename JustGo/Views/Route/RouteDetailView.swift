@@ -85,8 +85,13 @@ struct RouteDetailView: View {
         // Presented from `.task` rather than inline so the sheet goes up after the push has
         // settled — a presentation raised during a navigation transition is the one that fails
         // with "whose view is not in the window hierarchy".
-        .task { showsTripCard = !isGuiding }
-        .onChange(of: isGuiding) { _, guiding in showsTripCard = !guiding }
+        .task { updateTripCardPresentation(animated: false) }
+        .onChange(of: isGuiding) { _, _ in updateTripCardPresentation() }
+        // A sheet is not part of the navigation stack, so pushing a station from inside it left
+        // it sitting on top of the station — and coming back it snapped in with no animation at
+        // all. It now slides out of the way before the push and slides back after, which is what
+        // it looks like when the sheet belongs to this screen rather than to the window.
+        .onChange(of: detailDestination) { _, _ in updateTripCardPresentation() }
         .navigationTitle(isGuiding
             ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
             : AppLocalization.localized("Route Details"))
@@ -327,6 +332,25 @@ struct RouteDetailView: View {
         return nil
     }
 
+    /// The trip sheet is up whenever this screen is the one being looked at — not while the
+    /// navigator has taken the page over, and not while a station or transfer is pushed on top of
+    /// it. Routed through one function so those three conditions cannot drift apart.
+    private func updateTripCardPresentation(animated: Bool = true) {
+        let shouldShow = !isGuiding && detailDestination == nil
+        guard shouldShow != showsTripCard else { return }
+        // Dismissal is animated by the system; presentation needs the push to have finished
+        // first, so it waits a beat rather than racing the navigation transition.
+        if shouldShow, animated {
+            Task {
+                try? await Task.sleep(for: .milliseconds(320))
+                guard !isGuiding, detailDestination == nil else { return }
+                showsTripCard = true
+            }
+        } else {
+            showsTripCard = shouldShow
+        }
+    }
+
     /// Pinned rather than scrolled past. It is the only thing on this screen the rider must be able
     /// to reach at any scroll position, and it used to sit inside the top card.
     private var navigateBar: some View {
@@ -527,10 +551,31 @@ struct RouteDetailView: View {
     /// way back to the route list. The top stop deliberately leaves the bar showing.
     static let tripCardDetents: Set<PresentationDetent> = [.fraction(0.3), .medium, .fraction(0.92)]
 
+    /// The stops this route actually calls at, as map pins. The map used to draw the line and
+    /// nothing else, so a rider could see the shape of the trip but not a single station on it —
+    /// including the one they board at.
+    private var routeStations: [Station] {
+        route.stationTimelineStops.compactMap { stop in
+            guard let coordinate = stop.coordinate else { return nil }
+            return Station(
+                stationID: stop.stationID,
+                name: stop.name,
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                cityID: route.networkCityID ?? "",
+                // Carried through so interchanges get the larger symbol and win label collisions
+                // against the ordinary stops between them — on a route map they are the stations
+                // the rider has to act at.
+                isTransferStation: stop.isTransfer
+            )
+        }
+    }
+
     private func mapHeader() -> some View {
         TransitMapView(
             visibleRegion: .constant(route.previewRegion),
-            stations: [],
+            stations: routeStations,
+            alwaysShowsStations: true,
             metroNetworks: [],
             route: route,
             showsUserLocation: false,

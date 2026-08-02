@@ -37,23 +37,22 @@ final class StationSearchService {
             throw error
         }
         // Resolve all places to stations concurrently, preserving input order by index.
-        let mapKitMatches = await withTaskGroup(of: (Int, Station).self) { group in
+        //
+        // A place that does NOT resolve to a station is dropped. It used to be wrapped in a
+        // synthesised `Station` and returned anyway, which is how a noodle shop ended up listed
+        // under "Stations" with line dots and a distance — the app asserting something it had no
+        // basis for. The search page already lists Apple's places in their own section, so
+        // nothing is lost by refusing to relabel them.
+        let mapKitMatches = await withTaskGroup(of: (Int, Station?).self) { group in
             for (index, place) in places.enumerated() {
                 group.addTask { [officialStationData] in
-                    if let official = await officialStationData.matchingStation(place: place, cityID: city) {
-                        return (index, official)
-                    }
-                    return (index, Station(
-                        stationID: place.id,
-                        name: place.name,
-                        latitude: place.coordinate.latitude,
-                        longitude: place.coordinate.longitude,
-                        cityID: city
-                    ))
+                    (index, await officialStationData.matchingStation(place: place, cityID: city))
                 }
             }
             var indexed: [(Int, Station)] = []
-            for await pair in group { indexed.append(pair) }
+            for await (index, station) in group {
+                if let station { indexed.append((index, station)) }
+            }
             return indexed.sorted { $0.0 < $1.0 }.map(\.1)
         }
         return (bundledMatches + mapKitMatches).uniqued {

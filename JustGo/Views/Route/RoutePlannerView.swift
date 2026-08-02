@@ -40,6 +40,7 @@ struct RouteEntryView: View {
     @State private var keyboardHeight: CGFloat = 0
     @State private var suggestionListTopY: CGFloat = 0
     @State private var didSeedOrigin = false
+    @State private var originSeedTask: Task<Void, Never>?
     // Raw theme hex for solid-fill buttons/banners below — `Color.accentColor` (the global
     // tint, set from `Color.adaptive(hex:)` in ContentView) lightens toward white in dark
     // mode for *foreground* legibility; used as a fill under white text that collapses
@@ -137,7 +138,15 @@ struct RouteEntryView: View {
             viewModel.cityChanged(to: appState.selectedCity)
             applyPendingRouteInput(appState.pendingRouteInput)
             resumableTrip = ActiveTripStore.load()
-            await seedOriginFromDevice()
+            seedOriginFromDevice()
+        }
+        .onDisappear { originSeedTask?.cancel() }
+        // A GPS fix can take seconds. If the rider starts typing or searches in the meantime, the
+        // seed has been overtaken by an actual decision — landing it then would overwrite what they
+        // typed, and its city realignment would clear the routes of a search already in flight.
+        // That is what left the results page blank.
+        .onChange(of: focusedField) { _, field in
+            if field != nil { originSeedTask?.cancel() }
         }
     }
 
@@ -145,12 +154,16 @@ struct RouteEntryView: View {
     /// a destination arriving from a place card fills `.destination`, so an empty `.origin` here
     /// genuinely means unanswered rather than deliberately blank. Silent when there is no fix:
     /// a rider who declined location gets an empty field, not an error about it.
-    private func seedOriginFromDevice() async {
+    private func seedOriginFromDevice() {
         guard !didSeedOrigin else { return }
         didSeedOrigin = true
         guard viewModel.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        await viewModel.useCurrentLocation(for: .origin) { coordinate in
-            switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
+        originSeedTask?.cancel()
+        originSeedTask = Task {
+            await viewModel.useCurrentLocation(for: .origin) { coordinate in
+                guard !Task.isCancelled else { return }
+                switchPlannerCity(forPlaceCityID: nil, coordinate: coordinate)
+            }
         }
     }
 
@@ -527,6 +540,7 @@ struct RouteEntryView: View {
     private var searchButton: some View {
         Button(action: {
             focusedField = nil
+            originSeedTask?.cancel()
             Task {
                 // Push only when THIS search published; never pop here — a superseded
                 // continuation must not close the owning search's results.

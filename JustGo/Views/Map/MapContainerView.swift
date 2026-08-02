@@ -71,8 +71,11 @@ struct MapContainerView: View {
             // re-running on every city change would fight a city the rider just picked by hand.
             // When location is unavailable — denied, restricted, or the fix times out — this is
             // a no-op and the city view `loadStations` already set is what stays on screen.
+            // Retried until it actually lands, not merely until it has been attempted. The old
+            // guard was set before the fix arrived, so the very common launch sequence — centre on
+            // the rider, then realign to the city they are in, which reloads and resets the camera
+            // — ended on the city centroid with the retry already disarmed.
             guard !didCenterOnUser else { return }
-            didCenterOnUser = true
             centerOnUser()
             #if DEBUG
             seedDebugScreen()
@@ -323,10 +326,12 @@ struct MapContainerView: View {
     private func centerOnUser() {
         centerOnUserTask?.cancel()
         centerOnUserTask = Task {
+            guard let outcome = await viewModel?.centerOnUser() else { return }
+            if outcome.didCenter { didCenterOnUser = true }
             // Locating also aligns the app to the city the rider is physically in
             // (bounded — see centerOnUser): the camera alone moving left the city
             // pill, station search, and planner stuck on the old city.
-            if let city = await viewModel?.centerOnUser() {
+            if let city = outcome.cityToAdopt {
                 appState.selectedCity = city
             }
         }

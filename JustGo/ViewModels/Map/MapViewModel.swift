@@ -232,21 +232,34 @@ final class MapViewModel {
     /// the user is clearly outside the selected city's metro area — nil otherwise. The
     /// caller owns the actual `selectedCity` write; `loadStations` for the returned city
     /// then keeps the user-centered camera instead of recentering (pendingUserCameraCityID).
-    func centerOnUser() async -> City? {
+    /// Whether the camera actually reached the rider, and the city to adopt if they are in a
+    /// different one.
+    ///
+    /// Two separate answers, because they used to be one: this returned `City?`, and `nil` meant
+    /// both "no fix" *and* "already in the right city". Callers could not tell a failed locate from
+    /// a successful one, so launch treated a success in the current city as done-with-no-camera and
+    /// left the map on the city centroid.
+    struct UserCameraOutcome {
+        let didCenter: Bool
+        let cityToAdopt: City?
+    }
+
+    func centerOnUser() async -> UserCameraOutcome {
         do {
             let location = try await locationService.requestCurrentLocation()
             // A cancelled locate-me (city switch mid-fix) must not recenter the new
             // city's map onto the user's physical position.
-            guard !Task.isCancelled else { return nil }
+            guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false, cityToAdopt: nil) }
             updateCamera(to: location.coordinate)
-            guard let selected = activeCityID.flatMap({ cityService.getCity(byID: $0) }),
-                  let nearest = cityService.cityToAdopt(for: location, whileSelecting: selected) else {
-                return nil
-            }
-            pendingUserCameraCityID = nearest.id
-            return nearest
+            let selected = activeCityID.flatMap { cityService.getCity(byID: $0) }
+            let nearest = selected.flatMap { cityService.cityToAdopt(for: location, whileSelecting: $0) }
+            // Claim the camera for whichever city is about to load — including the current one.
+            // Only the cross-city case used to be claimed, so a same-city reload (a second
+            // `.task` run, a network refresh) yanked the camera back to the centroid.
+            pendingUserCameraCityID = nearest?.id ?? activeCityID
+            return UserCameraOutcome(didCenter: true, cityToAdopt: nearest)
         } catch {
-            return nil
+            return UserCameraOutcome(didCenter: false, cityToAdopt: nil)
         }
     }
 

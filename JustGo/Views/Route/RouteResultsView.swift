@@ -36,6 +36,19 @@ struct RouteResultsView: View {
                     } description: {
                         Text(error)
                     }
+                } else if viewModel.routes.isEmpty {
+                    // Reachable even though the entry page only pushes on a successful search: a
+                    // city change while this screen is up clears the routes underneath it, and the
+                    // result was a completely blank page with no explanation and nothing to do.
+                    ContentUnavailableView {
+                        Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
+                    } description: {
+                        Text(AppLocalization.text(
+                            english: "This search is no longer current. Go back and search again.",
+                            simplified: "此次搜索已失效，请返回重新搜索。",
+                            traditional: "此次搜尋已失效，請返回重新搜尋。"
+                        ))
+                    }
                 } else {
                     routesSection
                 }

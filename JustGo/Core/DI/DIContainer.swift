@@ -119,6 +119,23 @@ final class DIContainer {
         )
     }
 
+    @MainActor private var cachedRoutePlannerViewModel: RoutePlannerViewModel?
+
+    /// The one planner the map's whole plan → results → detail chain shares.
+    ///
+    /// Held here rather than in a `@State` on the map, because the map's navigation router has to
+    /// be able to build any of those three screens *synchronously*, at any moment, with no
+    /// dependency on whether some `.task` has run yet. When it was optional state, a push that
+    /// arrived before that task produced `EmptyView` — a pushed screen with no title and no
+    /// content, which is exactly what a blank page is.
+    @MainActor
+    func sharedRoutePlannerViewModel() -> RoutePlannerViewModel {
+        if let cachedRoutePlannerViewModel { return cachedRoutePlannerViewModel }
+        let created = makeRoutePlannerViewModel()
+        cachedRoutePlannerViewModel = created
+        return created
+    }
+
     @MainActor
     func makeStationSearchViewModel() -> StationSearchViewModel {
         StationSearchViewModel(

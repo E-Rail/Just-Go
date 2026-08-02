@@ -25,7 +25,12 @@ enum MapRoute: Hashable {
     case routeEntry
     case results
     case detail(UUID)
-    case station(Station)
+    /// The station's **id**, not the object. A navigation path value should be a small value type:
+    /// `Station` is a `final class`, and a reference type in the path is the kind of thing that
+    /// resolves fine on one iOS version and silently fails to resolve on another — and a value the
+    /// stack cannot resolve renders as a pushed screen with no title and no content, which is what
+    /// a blank page is. The object itself is held beside the path in `openedStations`.
+    case station(id: String)
 }
 
 struct MapContainerView: View {
@@ -33,9 +38,6 @@ struct MapContainerView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var viewModel: MapViewModel?
-    /// Owned here rather than by the entry screen: the planner's routes have to outlive the entry
-    /// page so that results and detail, both pushed above it, read the same search.
-    @State private var plannerViewModel: RoutePlannerViewModel?
     @State private var path: [MapRoute] = []
     @State private var tappedPlace: TappedPlace?
     @State private var showPlaceTagDialog = false
@@ -50,6 +52,8 @@ struct MapContainerView: View {
     // Holds an MKMapItem that resolved while station matching was still deciding whether to
     // present the place sheet — consumed (or discarded) when that decision lands.
     @State private var pendingResolvedItem: MKMapItem?
+    /// Stations that have been pushed, keyed by the id carried in the path.
+    @State private var openedStations: [String: Station] = [:]
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -60,10 +64,7 @@ struct MapContainerView: View {
             if viewModel == nil {
                 viewModel = container.makeMapViewModel()
             }
-            if plannerViewModel == nil {
-                plannerViewModel = container.makeRoutePlannerViewModel()
-            }
-            plannerViewModel?.cityChanged(to: appState.selectedCity)
+            planner.cityChanged(to: appState.selectedCity)
 
             guard let city = appState.selectedCity else { return }
             await viewModel?.loadStations(for: city)
@@ -373,7 +374,8 @@ struct MapContainerView: View {
 
             let selected = await viewModel?.selectStation(station) ?? station
             guard !Task.isCancelled, stationOpenGeneration == generation else { return }
-            path.append(.station(selected))
+            openedStations[selected.id] = selected
+            path.append(.station(id: selected.id))
         }
     }
 
@@ -456,6 +458,25 @@ struct MapContainerView: View {
 
     // MARK: - Pushed screens
 
+    /// Never optional, so a push can never resolve to nothing. See
+    /// `DIContainer.sharedRoutePlannerViewModel()`.
+    private var planner: RoutePlannerViewModel {
+        container.sharedRoutePlannerViewModel()
+    }
+
+    private var staleRouteNotice: some View {
+        ContentUnavailableView {
+            Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
+        } description: {
+            Text(AppLocalization.text(
+                english: "This search is no longer current. Go back and search again.",
+                simplified: "此次搜索已失效，请返回重新搜索。",
+                traditional: "此次搜尋已失效，請返回重新搜尋。"
+            ))
+        }
+        .background(Color.appBackground)
+    }
+
     @ViewBuilder
     private func destination(for route: MapRoute) -> some View {
         switch route {
@@ -465,30 +486,51 @@ struct MapContainerView: View {
                 onSelectPlace: { selectSearchResult($0) }
             )
         case .routeEntry:
-            if let plannerViewModel {
-                RouteEntryView(viewModel: plannerViewModel) {
-                    path.append(.results)
-                }
+            RouteEntryView(viewModel: planner) {
+                path.append(.results)
             }
         case .results:
-            if let plannerViewModel {
-                RouteResultsView(viewModel: plannerViewModel) { route in
-                    path.append(.detail(route.id))
-                }
+            RouteResultsView(viewModel: planner) { route in
+                path.append(.detail(route.id))
             }
         case .detail(let routeID):
-            if let plannerViewModel,
-               let route = plannerViewModel.routes.first(where: { $0.id == routeID }) {
+            if let route = planner.routes.first(where: { $0.id == routeID }) {
                 RouteDetailView(
                     route: route,
-                    preference: plannerViewModel.sortStrategy,
-                    alternatives: plannerViewModel.routes,
-                    tripAnchor: plannerViewModel.tripAnchor,
-                    accessibilityFilter: plannerViewModel.accessibilityFilter
+                    preference: planner.sortStrategy,
+                    alternatives: planner.routes,
+                    tripAnchor: planner.tripAnchor,
+                    accessibilityFilter: planner.accessibilityFilter
                 )
+            } else {
+                // The routes were cleared while this was pushed (a city change does that). Say so
+                // — a screen that explains itself beats a screen that is simply empty.
+                staleRouteNotice
             }
-        case .station(let station):
-            StationDetailView(station: station)
+        case .station(let stationID):
+            if let station = openedStations[stationID] {
+                StationDetailView(station: station)
+            } else {
+                // Cannot happen by construction — the station is stored before the push — but a
+                // screen that says something is strictly better than one that says nothing.
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(
+                            english: "Station unavailable",
+                            simplified: "车站不可用",
+                            traditional: "車站不可用"
+                        ),
+                        systemImage: "exclamationmark.triangle"
+                    )
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Go back and choose the station again.",
+                        simplified: "请返回重新选择车站。",
+                        traditional: "請返回重新選擇車站。"
+                    ))
+                }
+                .background(Color.appBackground)
+            }
         }
     }
 
@@ -515,7 +557,8 @@ struct MapContainerView: View {
     /// gets screenshotted is the real screen and not a fixture. Widest separation rather than a
     /// hardcoded pair so this works in any city, and so the route has transfers in it.
     private func seedDebugRoute(landingOn screen: String) async {
-        guard let plannerViewModel, let stations = viewModel?.stations, stations.count >= 2 else { return }
+        guard let stations = viewModel?.stations, stations.count >= 2 else { return }
+        let plannerViewModel = planner
         let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
         guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
         plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)

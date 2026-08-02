@@ -89,6 +89,11 @@ struct RouteDetailView: View {
         // with "whose view is not in the window hierarchy".
         .task { updateTripCardPresentation(animated: false) }
         .onChange(of: isGuiding) { _, _ in updateTripCardPresentation() }
+        // A sheet presented from a *pushed* view is presented on the navigation controller, not on
+        // the view — so popping this screen does not reliably take the sheet with it, and the trip
+        // card was left sitting on top of the route list. Tearing it down as this screen leaves is
+        // the only signal that always arrives, whether the rider used the back button or swiped.
+        .onDisappear { showsTripCard = false }
         .navigationTitle(isGuiding
             ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
             : AppLocalization.localized("Route Details"))

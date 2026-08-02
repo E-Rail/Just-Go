@@ -1,7 +1,6 @@
 "About" = "About";
 "Accessibility" = "Accessibility";
 "Accessibility Settings" = "Accessibility Settings";
-"Accessible" = "Accessible";
 "App Language" = "App Language";
 "Arriving" = "Arriving";
 "OK" = "OK";
@@ -16,17 +15,14 @@
 "Cognitive" = "Cognitive";
 "Current Profile" = "Current Profile";
 "Delete" = "Delete";
-"Destination" = "Destination";
 "Direct" = "Direct";
 "Distance" = "Distance";
 "Done" = "Done";
 "Elevator" = "Elevator";
 "Escalator" = "Escalator";
 "Fastest" = "Fastest";
-"Find Routes" = "Find Routes";
 "Finding routes..." = "Finding routes...";
 "Flash Alerts" = "Flash Alerts";
-"From" = "From";
 "Fully Accessible" = "Fully Accessible";
 "Fully Accessible Station" = "Fully Accessible Station";
 "Hearing" = "Hearing";
@@ -56,14 +52,12 @@
 "None" = "None";
 "Not available" = "Not available";
 "Not verified" = "Not verified";
-"Origin" = "Origin";
 "Partial Accessibility" = "Partial Accessibility";
 "Prefer Elevator" = "Prefer Elevator";
 "Primary Category" = "Primary Category";
 "Primary Disability Category" = "Primary Disability Category";
 "Privacy Policy" = "Privacy Policy";
 "Profile" = "Profile";
-"Recent Routes" = "Recent Routes";
 "Recent Searches" = "Recent Searches";
 "Requires Wheelchair Access" = "Requires Wheelchair Access";
 "Route Details" = "Route Details";
@@ -81,10 +75,8 @@
 "Some facilities are not verified" = "Some facilities are not verified";
 "station entrance" = "station entrance";
 "Step-by-Step Guidance" = "Step-by-Step Guidance";
-"Swap origin and destination" = "Swap origin and destination";
 "Tactile Path" = "Tactile Path";
 "Terms of Service" = "Terms of Service";
-"To" = "To";
 "Train Times" = "Train Times";
 "Transit Data" = "Transit Data";
 "Transit Data Sources" = "Transit Data Sources";
@@ -126,8 +118,6 @@
 "Tactile path available" = "Tactile path available";
 "Official schedule pending for this city/station" = "Official schedule pending for this city/station";
 "Search cities" = "Search cities";
-"Open route map full screen" = "Open route map full screen";
-"Close route map" = "Close route map";
 "More" = "More";
 "Fewest Transfers" = "Fewest Transfers";
 "Least Confusing" = "Least Confusing";
@@ -172,8 +162,6 @@
 "Journey is outside supported subway coverage" = "Journey is outside supported subway coverage";
 "Place search requires a network connection" = "Place search requires a network connection";
 "Walking distance is estimated" = "Walking distance is estimated";
-"Accessibility filters will be saved with this trip." = "Accessibility filters will be saved with this trip.";
-"Accessibility overrides" = "Accessibility overrides";
 "Accessibility risk" = "Accessibility risk";
 "Accessibility unknown" = "Accessibility unknown";
 "Apple Maps" = "Apple Maps";
@@ -198,8 +186,6 @@
 "Quick Tags" = "Quick Tags";
 "Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Save" = "Save";
-"Save Trip" = "Save Trip";
-"Saved Trip" = "Saved Trip";
 "Saved Trips" = "Saved Trips";
 "Saved locally on this device." = "Saved locally on this device.";
 "Specific entrance or exit is unavailable" = "Specific entrance or exit is unavailable";
@@ -220,7 +206,6 @@
 "Trip History" = "Trip History";
 "Trip Note" = "Trip Note";
 "Trip history is stored locally on this device." = "Trip history is stored locally on this device.";
-"Trip name" = "Trip name";
 "Unknown place" = "Unknown place";
 "Unknown source" = "Unknown source";
 "Verified" = "Verified";
@@ -235,9 +220,6 @@
 "Total trips" = "Total trips";
 "This month" = "This month";
 "Your stats" = "Your stats";
-"Search a route, then tap 'Save this trip' to reuse it quickly" = "Search a route, then tap 'Save this trip' to reuse it quickly";
-"Your last 10 routes will appear here for quick access" = "Your last 10 routes will appear here for quick access";
-"Clear" = "Clear";
 "Add Quick Tag" = "Add Quick Tag";
 "Edit Quick Tag" = "Edit Quick Tag";
 "Delete Quick Tag" = "Delete Quick Tag";

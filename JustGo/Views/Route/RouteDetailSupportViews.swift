@@ -200,67 +200,6 @@ struct RouteConfidenceDetailView: View {
     }
 }
 
-struct FullScreenRouteMapView: View {
-    let route: Route
-    @Environment(\.dismiss) private var dismiss
-    @State private var visibleRegion: MapVisibleRegion?
-
-    init(route: Route) {
-        self.route = route
-        _visibleRegion = State(initialValue: route.previewRegion)
-    }
-
-    /// Markers for every stop the route passes through, built from the route's own stop data
-    /// rather than a city-pack lookup — this is a map trace, not an interactive station picker.
-    private var routeStations: [Station] {
-        route.stationTimelineStops.map { $0.asStation(cityID: route.networkCityID ?? "") }
-    }
-
-    var body: some View {
-        ZStack {
-            TransitMapView(
-                visibleRegion: $visibleRegion,
-                stations: routeStations,
-                // Only the traveled geometry: the route's own per-segment polylines.
-                // Tracing the involved lines end to end made a short hop on a loop line
-                // read as riding the whole loop.
-                metroNetworks: [],
-                route: route,
-                showsUserLocation: false,
-                onRegionChanged: { visibleRegion = $0 },
-                onStationSelected: { _ in }
-            )
-            .ignoresSafeArea()
-
-            VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.4), radius: 3)
-                    }
-                    .accessibilityLabel(AppLocalization.localized("Close route map"))
-                    .padding(16)
-                }
-                Spacer()
-                // Bundled-network routes draw OSM-derived segment geometry, which requires
-                // attribution; Apple-transit routes carry Apple polylines and don't.
-                if route.networkCityID != nil {
-                    HStack {
-                        Spacer()
-                        MetroGeometryAttributionView()
-                            .padding(8)
-                    }
-                }
-            }
-        }
-    }
-}
-
 /// Single source of truth for how a `DataConfidence` reads visually — fixed semantic
 /// indicators (official/verified = green, anything estimated/pending/personal = orange,
 /// unavailable = red, unknown = gray), intentionally not theme-tinted. Shared by

@@ -1,7 +1,6 @@
 "About" = "关于";
 "Accessibility" = "无障碍";
 "Accessibility Settings" = "无障碍设置";
-"Accessible" = "无障碍";
 "App Language" = "App 语言";
 "Arriving" = "即将到站";
 "OK" = "好";
@@ -16,17 +15,14 @@
 "Cognitive" = "认知";
 "Current Profile" = "当前配置";
 "Delete" = "删除";
-"Destination" = "终点";
 "Direct" = "直达";
 "Distance" = "距离";
 "Done" = "完成";
 "Elevator" = "电梯";
 "Escalator" = "扶梯";
 "Fastest" = "最快";
-"Find Routes" = "查找路线";
 "Finding routes..." = "正在查找路线…";
 "Flash Alerts" = "闪光提醒";
-"From" = "起点";
 "Fully Accessible" = "完全无障碍";
 "Fully Accessible Station" = "完全无障碍车站";
 "Hearing" = "听力";
@@ -56,14 +52,12 @@
 "None" = "无";
 "Not available" = "不可用";
 "Not verified" = "未验证";
-"Origin" = "起点";
 "Partial Accessibility" = "部分无障碍";
 "Prefer Elevator" = "优先电梯";
 "Primary Category" = "主要类别";
 "Primary Disability Category" = "主要障碍类别";
 "Privacy Policy" = "隐私政策";
 "Profile" = "个人";
-"Recent Routes" = "最近路线";
 "Recent Searches" = "最近搜索";
 "Requires Wheelchair Access" = "需要轮椅通行";
 "Route Details" = "路线详情";
@@ -81,10 +75,8 @@
 "Some facilities are not verified" = "部分设施未验证";
 "station entrance" = "车站入口";
 "Step-by-Step Guidance" = "分步指引";
-"Swap origin and destination" = "交换起点和终点";
 "Tactile Path" = "盲道";
 "Terms of Service" = "服务条款";
-"To" = "终点";
 "Train Times" = "列车时刻";
 "Transit Data" = "公交数据";
 "Transit Data Sources" = "交通数据来源";
@@ -126,8 +118,6 @@
 "Tactile path available" = "盲道：有";
 "Official schedule pending for this city/station" = "此城市或车站的官方时刻表待接入";
 "Search cities" = "搜索城市";
-"Open route map full screen" = "全屏打开路线地图";
-"Close route map" = "关闭路线地图";
 "More" = "更多";
 "Fewest Transfers" = "最少换乘";
 "Least Confusing" = "最易理解";
@@ -172,8 +162,6 @@
 "Journey is outside supported subway coverage" = "此行程超出当前支持的地铁范围。";
 "Place search requires a network connection" = "地点搜索需要网络连接。";
 "Walking distance is estimated" = "步行距离为估算值。";
-"Accessibility filters will be saved with this trip." = "无障碍筛选条件会随此行程一起保存。";
-"Accessibility overrides" = "无障碍覆盖设置";
 "Accessibility risk" = "无障碍风险";
 "Accessibility unknown" = "无障碍情况未知";
 "Apple Maps" = "Apple 地图";
@@ -198,8 +186,6 @@
 "Quick Tags" = "快捷标签";
 "Try clearing filters or loading official city data." = "请尝试清除筛选条件，或加载官方城市数据。";
 "Save" = "保存";
-"Save Trip" = "保存行程";
-"Saved Trip" = "已保存行程";
 "Saved Trips" = "已保存行程";
 "Saved locally on this device." = "已保存在本设备。";
 "Specific entrance or exit is unavailable" = "暂无具体出入口信息";
@@ -220,7 +206,6 @@
 "Trip History" = "行程历史";
 "Trip Note" = "行程备注";
 "Trip history is stored locally on this device." = "行程历史会保存在本设备。";
-"Trip name" = "行程名称";
 "Unknown place" = "未知地点";
 "Unknown source" = "未知来源";
 "Verified" = "已验证";
@@ -235,9 +220,6 @@
 "Total trips" = "总行程";
 "This month" = "本月";
 "Your stats" = "我的统计";
-"Search a route, then tap 'Save this trip' to reuse it quickly" = "搜索路线后，点击“保存此行程”即可快速复用";
-"Your last 10 routes will appear here for quick access" = "最近 10 条路线会显示在这里，方便快速访问";
-"Clear" = "清除";
 "Add Quick Tag" = "添加快捷标签";
 "Edit Quick Tag" = "编辑快捷标签";
 "Delete Quick Tag" = "删除快捷标签";

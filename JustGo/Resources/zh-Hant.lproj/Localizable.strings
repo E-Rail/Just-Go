@@ -1,7 +1,6 @@
 "About" = "關於";
 "Accessibility" = "無障礙";
 "Accessibility Settings" = "無障礙設定";
-"Accessible" = "無障礙";
 "App Language" = "App 語言";
 "Arriving" = "即將到站";
 "Audio Announcement" = "語音播報";
@@ -15,17 +14,14 @@
 "Cognitive" = "認知";
 "Current Profile" = "目前設定檔";
 "Delete" = "刪除";
-"Destination" = "終點";
 "Direct" = "直達";
 "Distance" = "距離";
 "Done" = "完成";
 "Elevator" = "電梯";
 "Escalator" = "電扶梯";
 "Fastest" = "最快";
-"Find Routes" = "查找路線";
 "Finding routes..." = "正在查找路線…";
 "Flash Alerts" = "閃光提醒";
-"From" = "起點";
 "Fully Accessible" = "完全無障礙";
 "Fully Accessible Station" = "完全無障礙車站";
 "Hearing" = "聽力";
@@ -56,14 +52,12 @@
 "Not available" = "不可用";
 "Not verified" = "未驗證";
 "OK" = "好";
-"Origin" = "起點";
 "Partial Accessibility" = "部分無障礙";
 "Prefer Elevator" = "優先電梯";
 "Primary Category" = "主要類別";
 "Primary Disability Category" = "主要障礙類別";
 "Privacy Policy" = "隱私權政策";
 "Profile" = "個人";
-"Recent Routes" = "最近路線";
 "Recent Searches" = "最近搜尋";
 "Requires Wheelchair Access" = "需要輪椅通行";
 "Route Details" = "路線詳情";
@@ -81,10 +75,8 @@
 "Some facilities are not verified" = "部分設施未驗證";
 "station entrance" = "車站入口";
 "Step-by-Step Guidance" = "逐步指引";
-"Swap origin and destination" = "交換起點和終點";
 "Tactile Path" = "導盲磚";
 "Terms of Service" = "服務條款";
-"To" = "終點";
 "Train Times" = "列車時刻";
 "Transit Data" = "公共交通資料";
 "Transit Data Sources" = "交通資料來源";
@@ -126,8 +118,6 @@
 "Tactile path available" = "導盲磚：有";
 "Official schedule pending for this city/station" = "此城市或車站的官方時刻表待接入";
 "Search cities" = "搜尋城市";
-"Open route map full screen" = "全螢幕開啟路線地圖";
-"Close route map" = "關閉路線地圖";
 "More" = "更多";
 "Fewest Transfers" = "最少轉乘";
 "Least Confusing" = "最易理解";
@@ -172,8 +162,6 @@
 "Journey is outside supported subway coverage" = "此行程超出目前支援的地鐵範圍。";
 "Place search requires a network connection" = "地點搜尋需要網路連線。";
 "Walking distance is estimated" = "步行距離為估算值。";
-"Accessibility filters will be saved with this trip." = "無障礙篩選條件會隨此行程一起儲存。";
-"Accessibility overrides" = "無障礙覆蓋設定";
 "Accessibility risk" = "無障礙風險";
 "Accessibility unknown" = "無障礙情況未知";
 "Apple Maps" = "Apple 地圖";
@@ -198,8 +186,6 @@
 "Quick Tags" = "快捷標籤";
 "Try clearing filters or loading official city data." = "請嘗試清除篩選條件，或載入官方城市資料。";
 "Save" = "儲存";
-"Save Trip" = "儲存行程";
-"Saved Trip" = "已儲存行程";
 "Saved Trips" = "已儲存行程";
 "Saved locally on this device." = "已儲存在本裝置。";
 "Specific entrance or exit is unavailable" = "暫無具體出入口資訊";
@@ -220,7 +206,6 @@
 "Trip History" = "行程歷史";
 "Trip Note" = "行程備註";
 "Trip history is stored locally on this device." = "行程歷史會儲存在本裝置。";
-"Trip name" = "行程名稱";
 "Unknown place" = "未知地點";
 "Unknown source" = "未知來源";
 "Verified" = "已驗證";
@@ -235,9 +220,6 @@
 "Total trips" = "總行程";
 "This month" = "本月";
 "Your stats" = "我的統計";
-"Search a route, then tap 'Save this trip' to reuse it quickly" = "搜尋路線後，點擊「儲存此行程」即可快速重用";
-"Your last 10 routes will appear here for quick access" = "最近 10 條路線會顯示在這裡，方便快速取用";
-"Clear" = "清除";
 "Add Quick Tag" = "加入快捷標籤";
 "Edit Quick Tag" = "編輯快捷標籤";
 "Delete Quick Tag" = "刪除快捷標籤";

@@ -22,10 +22,6 @@ private struct StationSearchBarBottomYKey: PreferenceKey {
 struct SearchPageView: View {
     let onSelectStation: (Station) -> Void
     let onSelectPlace: (TransitPlace) -> Void
-    /// The per-row route shortcut. Nil while the page is being used to refill one end of a trip
-    /// already being planned, where every row already means "use this" and a second verb on it
-    /// would be asking the rider to answer a question they are in the middle of answering.
-    var onRouteTo: ((TransitPlace, String?) -> Void)? = nil
     /// True when this page exists to return one answer (endpoint editing) rather than to be
     /// browsed. Station rows then close the page like place rows already do.
     var dismissesOnSelection = false
@@ -35,7 +31,6 @@ struct SearchPageView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
-    @State private var showFacilityPicker = false
     @State private var keyboardHeight: CGFloat = 0
     @State private var searchBarBottomY: CGFloat = 0
     // Tracked so a newer recent tap (or a direct station selection) supersedes an older
@@ -52,7 +47,6 @@ struct SearchPageView: View {
                 if !quickTags.isEmpty && isIdle {
                     quickTagBar
                 }
-                filterBar
                 resultsList
             }
             .onPreferenceChange(StationSearchBarBottomYKey.self) { searchBarBottomY = $0 }
@@ -162,12 +156,8 @@ struct SearchPageView: View {
                         // A quick tag knows its own city, and it is frequently not the selected
                         // one — that cityID is exactly what stops a Beijing "Home" being planned
                         // against Shanghai's network.
-                        if let onRouteTo {
-                            onRouteTo(place, quickTag.cityID)
-                        } else {
-                            onSelectPlace(place)
-                        }
-                        if dismissesOnSelection || onRouteTo != nil { dismiss() }
+                        onSelectPlace(place)
+                        dismiss()
                     } label: {
                         HStack(spacing: 5) {
                             Image(systemName: quickTag.kind.icon)
@@ -195,10 +185,10 @@ struct SearchPageView: View {
         tripMemoryService.stationQuickTags
     }
 
-    /// Nothing typed and nothing filtered — the state where the page should be offering what the
-    /// rider already saved rather than a list of whatever happens to be nearby.
+    /// Nothing typed — the state where the page offers what the rider has already told it
+    /// matters, rather than a list of whatever happens to be nearby.
     private var isIdle: Bool {
-        (viewModel?.searchText.isEmpty ?? true) && !isAnyFilterActive
+        viewModel?.searchText.isEmpty ?? true
     }
 
     private var searchField: some View {
@@ -248,33 +238,9 @@ struct SearchPageView: View {
 
     /// Apple's places, under the stations. Choosing one hands straight back to the map rather than
     /// pushing anything here: the place's card belongs over the map it sits on.
-    /// The "route" verb on a result row — a straight line from a name to a set of routes, without
-    /// the place card in between. Renders nothing when this page is picking an endpoint.
-    @ViewBuilder
-    private func routeShortcut(to place: TransitPlace, cityID: String?) -> some View {
-        if let onRouteTo {
-            Button {
-                isSearchFocused = false
-                onRouteTo(place, cityID)
-            } label: {
-                VStack(spacing: 2) {
-                    Image(systemName: "arrow.triangle.turn.up.right.circle.fill")
-                        .font(.subheadline)
-                    Text(AppLocalization.text(english: "Route", simplified: "路线", traditional: "路線"))
-                        .font(.caption2)
-                }
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 52, height: 46)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
     private var placesSection: some View {
         Section {
             ForEach(placeResults) { place in
-                HStack(spacing: 0) {
                 Button {
                     isSearchFocused = false
                     onSelectPlace(place)
@@ -299,8 +265,6 @@ struct SearchPageView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                    routeShortcut(to: place, cityID: nil)
-                }
             }
         } header: {
             HStack(spacing: 6) {
@@ -312,90 +276,17 @@ struct SearchPageView: View {
         }
     }
 
-    private var isAnyFilterActive: Bool {
-        viewModel?.filter.accessibleOnly == true ||
-        viewModel?.filter.elevatorOnly == true ||
-        viewModel?.filter.transferOnly == true ||
-        viewModel?.filter.facilityType != nil
-    }
-
-    private var filterBar: some View {
-        ZStack(alignment: .trailing) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        FilterChip(
-                            title: AppLocalization.localized("Accessible"),
-                            icon: "figure.roll",
-                            isSelected: viewModel?.filter.accessibleOnly ?? false
-                        ) {
-                            viewModel?.toggleAccessibleFilter()
-                        }
-
-                        FilterChip(
-                            title: AppLocalization.localized("Elevator"),
-                            icon: "arrow.up.arrow.down.circle",
-                            isSelected: viewModel?.filter.elevatorOnly ?? false
-                        ) {
-                            viewModel?.toggleElevatorFilter()
-                        }
-
-                        FilterChip(
-                            title: AppLocalization.localized("Transfer"),
-                            icon: "arrow.triangle.2.circlepath",
-                            isSelected: viewModel?.filter.transferOnly ?? false
-                        ) {
-                            viewModel?.toggleTransferFilter()
-                        }
-
-                        FilterChip(
-                            title: viewModel?.filter.facilityType?.localizedName
-                                ?? AppLocalization.text(english: "Facility", simplified: "设施", traditional: "設施"),
-                            icon: viewModel?.filter.facilityType?.iconName ?? "building.2.crop.circle",
-                            isSelected: viewModel?.filter.facilityType != nil
-                        ) {
-                            showFacilityPicker = true
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                }
-
-                if viewModel?.isEnrichingForFacility == true {
-                    ProgressView()
-                        .padding(.trailing, 12)
-                } else if isAnyFilterActive {
-                    Button(AppLocalization.localized("Clear")) {
-                        viewModel?.clearFilters()
-                    }
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.regularMaterial, in: Capsule())
-                    .padding(.trailing, 8)
-                }
-        }
-        .confirmationDialog(
-            AppLocalization.text(english: "Filter by Facility", simplified: "按设施筛选", traditional: "按設施篩選"),
-            isPresented: $showFacilityPicker,
-            titleVisibility: .visible
-        ) {
-            ForEach(StationFacilityType.allCases.filter { $0 != .general }, id: \.self) { type in
-                Button(type.localizedName) {
-                    viewModel?.setFacilityFilter(type)
-                }
-            }
-            if viewModel?.filter.facilityType != nil {
-                Button(AppLocalization.text(english: "Clear Filter", simplified: "清除筛选", traditional: "清除篩選"), role: .destructive) {
-                    viewModel?.setFacilityFilter(nil)
-                }
-            }
-        }
-    }
-
     private var resultsList: some View {
         List {
+            // Above the stations rather than instead of them: what the rider looked up before is
+            // the shortest route to what they are looking up now, and the nearby-station list is
+            // still worth having under it. These used to be alternatives, so the recents were
+            // only ever visible on a screen with nothing else on it.
+            if isIdle, viewModel?.recentSearches.isEmpty == false {
+                recentSearchesSection
+                    .listRowBackground(Color.clear)
+            }
+
             Group {
             if viewModel?.isSearching ?? false {
                 HStack {
@@ -404,12 +295,9 @@ struct SearchPageView: View {
                         .padding()
                     Spacer()
                 }
-            } else if viewModel?.isEnrichingForFacility == true && (viewModel?.searchResults.isEmpty ?? true) {
-                filterLoadingRow
             } else if let results = viewModel?.searchResults, !results.isEmpty {
                 Section {
                     ForEach(results) { station in
-                        HStack(spacing: 0) {
                             StationRow(
                                 station: station,
                                 distanceText: viewModel?.distanceText(for: station)
@@ -420,16 +308,10 @@ struct SearchPageView: View {
                                 onSelectStation(station)
                                 if dismissesOnSelection { dismiss() }
                             }
-                            routeShortcut(to: station.asTransitPlace, cityID: station.cityID)
-                        }
                     }
                 } header: {
                     Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
                 }
-            } else if isAnyFilterActive && viewModel?.errorMessage == nil {
-                // A real search error (filtered keyword search failing offline) must win
-                // over the filter empty-state — fall through to the branches below.
-                activeFilterEmptyState
             } else if !(viewModel?.searchText.isEmpty ?? true) {
                 if let message = viewModel?.errorMessage {
                     ContentUnavailableView {
@@ -453,8 +335,6 @@ struct SearchPageView: View {
                 } description: {
                     Text(message)
                 }
-            } else if !isAnyFilterActive && viewModel?.recentSearches.isEmpty == false {
-                recentSearchesSection
             }
             }
             .listRowBackground(Color.clear)
@@ -551,29 +431,5 @@ struct SearchPageView: View {
                 viewModel?.deleteRecentSearches(at: offsets)
             }
         }
-    }
-}
-
-struct FilterChip: View {
-    let title: String
-    let icon: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.caption)
-                Text(title)
-                    .font(.caption)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color.accentColor : Color(.systemGray5))
-            .foregroundStyle(isSelected ? .white : .primary)
-            .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 }

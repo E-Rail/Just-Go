@@ -25,12 +25,6 @@ enum MapRoute: Hashable {
     /// The destination, if the rider came from a place card, travels in
     /// `AppState.pendingRouteInput` — `TransitPlace` is not `Hashable` and a navigation value is
     /// the wrong place to carry it anyway.
-    ///
-    /// Only reached when the trip cannot be planned as-is — no origin and no usable fix. "Route
-    /// here" otherwise goes straight to the results, which carry an editable From/To header of
-    /// their own; making every rider pass through a form to confirm a start the app already knew
-    /// was a step that existed only to be dismissed.
-    case routeEntry
     case results
     case detail(UUID)
     /// The station's **id**, not the object. A navigation path value should be a small value type:
@@ -495,11 +489,10 @@ struct MapContainerView: View {
 
     /// "Route here" — the one action every place card offers — from anywhere in the app.
     ///
-    /// Goes straight to the results. The entry page in between asked the rider to confirm a
-    /// destination they had just tapped and a start the app already knew, so it existed only to be
-    /// dismissed; the results now carry their own From/To header, which is where changing either
-    /// end belongs anyway. The entry page is still the answer when there is genuinely nothing to
-    /// plan from — see the `origin.isEmpty` branch.
+    /// Goes straight to the results, which carry their own From/To header. There is no form in
+    /// between: it asked the rider to confirm a destination they had just tapped and a start the
+    /// app already knew, so it existed only to be dismissed. When an end is genuinely missing the
+    /// results say so in that header, which is also where it gets filled in.
     private func beginPlan(to pending: AppState.PendingRouteInput) {
         // Consumed here rather than by the pushed screen: this is the only handler, and leaving it
         // set would re-fire the moment anything else observed it.
@@ -516,24 +509,43 @@ struct MapContainerView: View {
         }
         planner.selectPlace(pending.place, for: pending.role)
 
-        let other: RouteInputField = pending.role == .destination ? .origin : .destination
-        let otherIsEmpty = planner.name(for: other).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-
         // One assignment — see the note on MapRoute.station about a pop and a push in one frame.
         // The station card the rider pressed the button on is replaced, not stacked under.
         var next = path
         if case .station = next.last { next.removeLast() }
-        next.append(otherIsEmpty ? .routeEntry : .results)
+        next.append(.results)
         path = next
 
-        guard !otherIsEmpty else {
-            // Nothing to plan from yet. The entry page seeds the start from the device itself and
-            // says so when there is no fix, which is a better place to wait than a results screen
-            // that would have to explain why it is empty.
-            return
-        }
         planTask?.cancel()
-        planTask = Task { _ = await planner.searchRoutes() }
+        planTask = Task {
+            // "The start defaults to where you are." This used to be a form's job; the rider no
+            // longer sees that form, so the seeding happens here instead. A fix can take up to
+            // 15 s, which the results page spends saying it is loading — a better wait than an
+            // empty field on a page whose only purpose is to be dismissed.
+            if planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                await planner.useCurrentLocation(for: .origin) { coordinate in
+                    guard let city = container.cityService.cityToAdopt(
+                        forPlaceCityID: nil,
+                        coordinate: coordinate,
+                        whileSelecting: appState.selectedCity
+                    ) else { return }
+                    appState.selectedCity = city
+                    planner.cityChanged(to: city)
+                }
+            }
+            guard !Task.isCancelled else { return }
+            guard !planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                // No fix and nothing typed. Say which end is missing rather than running a search
+                // that can only fail — the header above is where the rider fixes it.
+                planner.errorMessage = AppLocalization.text(
+                    english: "Choose a start above to see routes.",
+                    simplified: "请在上方选择起点后查看路线。",
+                    traditional: "請在上方選擇起點後查看路線。"
+                )
+                return
+            }
+            _ = await planner.searchRoutes()
+        }
     }
 
     /// Fills one end of the trip from the search page and re-plans. Deliberately not routed
@@ -579,16 +591,7 @@ struct MapContainerView: View {
         case .search:
             SearchPageView(
                 onSelectStation: { openStation($0) },
-                onSelectPlace: { selectSearchResult($0) },
-                // The per-row route shortcut. Routed through the same pendingRouteInput channel a
-                // place card uses, so "Route here" means one thing wherever it is pressed.
-                onRouteTo: { place, cityID in
-                    appState.pendingRouteInput = AppState.PendingRouteInput(
-                        place: place,
-                        role: .destination,
-                        cityID: cityID
-                    )
-                }
+                onSelectPlace: { selectSearchResult($0) }
             )
         case .editEndpoint(let field):
             SearchPageView(
@@ -596,15 +599,8 @@ struct MapContainerView: View {
                     fillEndpoint(field, with: station.asTransitPlace, cityID: station.cityID)
                 },
                 onSelectPlace: { fillEndpoint(field, with: $0, cityID: nil) },
-                // No route shortcut while editing an endpoint: the rider is already planning a
-                // trip, and every row here means "use this as the \(field) end".
-                onRouteTo: nil,
                 dismissesOnSelection: true
             )
-        case .routeEntry:
-            RouteEntryView(viewModel: planner) {
-                path.append(.results)
-            }
         case .results:
             RouteResultsView(
                 viewModel: planner,
@@ -667,8 +663,6 @@ struct MapContainerView: View {
         switch screen {
         case "search":
             path = [.search]
-        case "entry":
-            path = [.routeEntry]
         case "results", "detail", "guiding", "editEndpoint":
             Task { await seedDebugRoute(landingOn: screen) }
         default:
@@ -731,170 +725,6 @@ private struct PlaceLoadingView: View {
     }
 }
 
-
-/// Pick a place by pointing at it, for riders who know where they mean but not what it is called.
-///
-/// Centre-pin rather than tap-to-drop: the pin is fixed at the middle of the screen and the map
-/// moves under it. That is what Apple Maps, Uber and Didi all do for this task, and it needs no
-/// new gesture plumbing — `TransitMapView` already reports every camera move through
-/// `onRegionChanged`, which is the only signal this needs.
-struct MapPlacePickerView: View {
-    let field: RouteInputField
-    let initialCoordinate: CLLocationCoordinate2D
-    let onSelect: (TransitPlace) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @Environment(DIContainer.self) private var container
-    @State private var visibleRegion: MapVisibleRegion?
-    @State private var resolvedPlace: TransitPlace?
-    @State private var isResolving = false
-    @State private var resolveTask: Task<Void, Never>?
-
-    init(
-        field: RouteInputField,
-        initialCoordinate: CLLocationCoordinate2D,
-        onSelect: @escaping (TransitPlace) -> Void
-    ) {
-        self.field = field
-        self.initialCoordinate = initialCoordinate
-        self.onSelect = onSelect
-        _visibleRegion = State(initialValue: MapVisibleRegion(
-            center: initialCoordinate,
-            latitudeDelta: MapCameraSpan.focused,
-            longitudeDelta: MapCameraSpan.focused
-        ))
-    }
-
-    private var centerCoordinate: CLLocationCoordinate2D {
-        visibleRegion?.center ?? initialCoordinate
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                TransitMapView(
-                    visibleRegion: $visibleRegion,
-                    stations: [],
-                    metroNetworks: [],
-                    route: nil,
-                    showsUserLocation: container.locationService.isAuthorized,
-                    onRegionChanged: { region in
-                        visibleRegion = region
-                        scheduleResolve(for: region.center)
-                    },
-                    onStationSelected: { _ in }
-                )
-                .ignoresSafeArea()
-
-                centerPin
-            }
-            .safeAreaInset(edge: .bottom) { selectionBar }
-            .navigationTitle(field == .origin
-                ? AppLocalization.text(english: "Choose start", simplified: "选择起点", traditional: "選擇起點")
-                : AppLocalization.text(english: "Choose destination", simplified: "选择终点", traditional: "選擇終點"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(AppLocalization.localized("Cancel")) { dismiss() }
-                }
-            }
-        }
-        .task { scheduleResolve(for: initialCoordinate) }
-        .onDisappear { resolveTask?.cancel() }
-    }
-
-    /// Drawn at the map's centre and lifted by half its own height so the point of the pin — not
-    /// the middle of the glyph — sits on the coordinate being chosen.
-    private var centerPin: some View {
-        Image(systemName: "mappin")
-            .font(.system(size: 34, weight: .semibold))
-            .foregroundStyle(Color.accentColor)
-            .shadow(color: .black.opacity(0.35), radius: 4, y: 2)
-            .offset(y: -17)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-    }
-
-    private var selectionBar: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(resolvedPlace?.name ?? coordinateLabel)
-                    .font(.headline)
-                    .lineLimit(1)
-                if let address = resolvedPlace?.address, !address.isEmpty {
-                    Text(address).rowMeta().lineLimit(1)
-                } else if isResolving {
-                    Text(AppLocalization.text(
-                        english: "Looking up this place…",
-                        simplified: "正在识别该地点…",
-                        traditional: "正在辨識該地點…"
-                    ))
-                    .rowMeta()
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .animation(.default, value: resolvedPlace)
-
-            Button {
-                onSelect(selectedPlace)
-                dismiss()
-            } label: {
-                Text(field == .origin
-                    ? AppLocalization.text(english: "Set as start", simplified: "设为起点", traditional: "設為起點")
-                    : AppLocalization.text(english: "Set as destination", simplified: "设为终点", traditional: "設為終點"))
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(Color.accentColor.opacity(0.18), in: Capsule())
-                .foregroundStyle(Color.accentColor)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(16)
-        .background(.regularMaterial)
-    }
-
-    /// Shown until the geocode lands, and kept as the name when nothing resolves. A coordinate is
-    /// a perfectly good destination, so confirm stays enabled throughout rather than making the
-    /// rider wait on a lookup that may never return a name for a spot in a park.
-    private var coordinateLabel: String {
-        String(format: "%.5f, %.5f", centerCoordinate.latitude, centerCoordinate.longitude)
-    }
-
-    private var selectedPlace: TransitPlace {
-        if let resolvedPlace, resolvedPlace.coordinate.isEssentiallyEqual(to: centerCoordinate) {
-            return resolvedPlace
-        }
-        return TransitPlace(name: coordinateLabel, coordinate: centerCoordinate, source: .mapKit)
-    }
-
-    /// Debounced: the map reports a region on every frame of a pan, and CLGeocoder rate-limits
-    /// hard enough that resolving each one would return nothing at all.
-    private func scheduleResolve(for coordinate: CLLocationCoordinate2D) {
-        resolveTask?.cancel()
-        isResolving = true
-        resolveTask = Task {
-            try? await Task.sleep(for: .milliseconds(400))
-            guard !Task.isCancelled else { return }
-            let place = try? await container.placeSearchProvider.reverseGeocode(
-                location: coordinate,
-                name: nil
-            )
-            guard !Task.isCancelled else { return }
-            isResolving = false
-            guard let place, coordinate.isEssentiallyEqual(to: centerCoordinate) else { return }
-            resolvedPlace = place.withSource(.mapKit)
-        }
-    }
-}
-
-private extension CLLocationCoordinate2D {
-    /// Same coordinate to roughly a metre — enough to tell "the map has not moved since this
-    /// lookup started" from "the rider panned away and this result is stale".
-    func isEssentiallyEqual(to other: CLLocationCoordinate2D) -> Bool {
-        abs(latitude - other.latitude) < 0.00001 && abs(longitude - other.longitude) < 0.00001
-    }
-}
 
 struct CityPickerView: View {
     @Binding var selectedCity: City?

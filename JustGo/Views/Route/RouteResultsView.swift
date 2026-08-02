@@ -144,65 +144,10 @@ struct RouteResultsView: View {
             : AppLocalization.text(english: "Choose a destination", simplified: "选择终点", traditional: "選擇終點")
     }
 
-    private var activeTimeChip: some View {
-        Group {
-            switch viewModel.tripAnchor {
-            case .departBy(let date):
-                timeChip(
-                    label: AppLocalization.text(
-                        english: "Departing \(date.formatted(.dateTime.hour().minute()))",
-                        simplified: "\(date.formatted(.dateTime.hour().minute()))出发",
-                        traditional: "\(date.formatted(.dateTime.hour().minute()))出發"
-                    )
-                )
-            case .arriveBy(let date):
-                timeChip(
-                    label: AppLocalization.text(
-                        english: "Arriving by \(date.formatted(.dateTime.hour().minute()))",
-                        simplified: "\(date.formatted(.dateTime.hour().minute()))前到达",
-                        traditional: "\(date.formatted(.dateTime.hour().minute()))前到達"
-                    )
-                )
-            case .now:
-                EmptyView()
-            }
-        }
-    }
-
-    private func timeChip(label: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "clock.fill")
-                .font(.caption2)
-            Text(label)
-                .font(.caption)
-                .fontWeight(.medium)
-            Button {
-                // Re-plan rather than re-sort: serviceStatus (and its last-train warnings)
-                // was enriched for the explicit anchor at plan time, so keeping the old
-                // routes would keep stale warnings under a chip that now says "now". The
-                // list already renders isLoading/errorMessage during the re-search.
-                viewModel.tripAnchor = .now
-                Task { await viewModel.searchRoutes() }
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 7)
-        .background(Color(hex: selectedThemeHex), in: Capsule())
-        .foregroundStyle(.white)
-    }
-
     private var sortOptionsSection: some View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    if viewModel.tripAnchor.isExplicit {
-                        activeTimeChip
-                    }
                     // The active strategy leads, whether or not it is one of the three that get
                     // their own chip. The default sort is "Transit First", which is *not* primary,
                     // so it rendered only inside the overflow chip at the far right — off the edge

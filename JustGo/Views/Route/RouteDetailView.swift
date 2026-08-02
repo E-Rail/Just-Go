@@ -20,7 +20,6 @@ struct RouteDetailView: View {
     let accessibilityFilter: AccessibilityFilter
     @State var selectedRouteID: UUID
     @State var showTripNote = false
-    @State var showExpandedRouteMap = false
     @State private var scheduledReminderRouteID: UUID?
     @State var tripLoggedConfirmation = false
     @State private var showReminderDenied = false
@@ -29,10 +28,9 @@ struct RouteDetailView: View {
     @State var detailDestination: RouteDetailDestination?
     @State private var expandedLegs: Set<UUID> = []
     @State private var boardingServiceWindows: [StationServiceWindow] = []
-    /// The map's share of the screen. Nil until the rider drags it, so the default can change
-    /// without stranding anyone on a stored value from an older layout.
-    @State private var mapFraction: CGFloat?
-    @State private var mapDragTranslation: CGFloat = 0
+    /// Which of the three stops the trip sheet is resting at.
+    @State private var tripCardDetent: PresentationDetent = .medium
+    @State private var showsTripCard = false
     /// Guidance replaces this page's content rather than covering it — "but in the same page".
     @State private var isGuiding = false
     @State private var cityResources: [ExternalTransitResource] = []
@@ -71,14 +69,24 @@ struct RouteDetailView: View {
                     isGuiding = false
                     ActiveTripStore.clear()
                 }
+                .safeAreaInset(edge: .bottom) { EmptyView() }
             } else {
-                planningSurface(feasibility: feasibility, confidence: confidence)
+                mapHeader()
             }
         }
         .background(Color.appBackground)
-        .safeAreaInset(edge: .bottom) {
-            if !isGuiding { navigateBar }
+        // The trip rides in a real sheet with real detents, which is the system's own three-stop
+        // slider: it snaps, it rubber-bands, it has the standard grabber, and VoiceOver and
+        // Dynamic Type already know what it is. The hand-rolled drag handle this replaces had to
+        // reimplement every one of those and got the snapping wrong.
+        .sheet(isPresented: $showsTripCard) {
+            tripCard(feasibility: feasibility, confidence: confidence)
         }
+        // Presented from `.task` rather than inline so the sheet goes up after the push has
+        // settled — a presentation raised during a navigation transition is the one that fails
+        // with "whose view is not in the window hierarchy".
+        .task { showsTripCard = !isGuiding }
+        .onChange(of: isGuiding) { _, guiding in showsTripCard = !guiding }
         .navigationTitle(isGuiding
             ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
             : AppLocalization.localized("Route Details"))
@@ -103,8 +111,9 @@ struct RouteDetailView: View {
             // The map divider is a drag, and drags cannot be injected in this environment, so its
             // range is verified by driving it to each end and screenshotting instead.
             switch ProcessInfo.processInfo.environment["JUSTGO_DEBUG_MAP_FRACTION"] {
-            case "min": mapFraction = Self.minimumMapFraction
-            case "max": mapFraction = Self.maximumMapFraction
+            case "low": tripCardDetent = .fraction(0.3)
+            case "medium": tripCardDetent = .medium
+            case "top": tripCardDetent = .fraction(0.92)
             default: break
             }
             #endif
@@ -136,9 +145,6 @@ struct RouteDetailView: View {
                     feasibility: feasibility
                 )
             }
-        }
-        .fullScreenCover(isPresented: $showExpandedRouteMap) {
-            FullScreenRouteMapView(route: route)
         }
         .onChange(of: selectedRouteID) { _, _ in
             tripLoggedConfirmation = false
@@ -340,44 +346,48 @@ struct RouteDetailView: View {
         }
         .buttonStyle(.plain)
         .padding(.horizontal)
+        .padding(.top, 8)
         .padding(.bottom, 8)
-        // No `.background(.bar)`. The capsule is opaque and carries its own contrast, so the bar
-        // was protecting nothing — it just laid an opaque grey slab across the full width and
-        // covered the bottom of the last card. The safeAreaInset still reserves this height, so
-        // scrolled content ends above the button rather than under it.
+        // Opaque now that this sits inside a sheet. It was transparent when the trip was the whole
+        // page and the safeAreaInset alone kept content clear of it; in a sheet at the shortest
+        // detent the scroll view is taller than the visible card, so rows ran on underneath the
+        // capsule and showed either side of it.
+        .background(Color.appBackground)
     }
 
-    /// The trip as something to read: map on top, journey underneath, boundary draggable.
-    private func planningSurface(
+    /// The trip as something to read, in the sheet over the map.
+    private func tripCard(
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        GeometryReader { proxy in
-            VStack(spacing: 0) {
-                mapHeader(height: mapHeight(in: proxy.size.height))
-                grabber(in: proxy.size.height)
-                ScrollView {
-                    VStack(spacing: 14) {
-                        routeHero(feasibility: feasibility, confidence: confidence)
-                        if let departurePlan {
-                            DeparturePlanBanner(plan: departurePlan)
-                        }
-                        officialNoticeCard
-                        journeyCard
-                        detailsCard(feasibility: feasibility, confidence: confidence)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
+        ScrollView {
+            VStack(spacing: 14) {
+                routeHero(feasibility: feasibility, confidence: confidence)
+                if let departurePlan {
+                    DeparturePlanBanner(plan: departurePlan)
                 }
-                // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings,
-                // where every section is an unrelated peer, and it opened this screen with roughly
-                // 250 pt of empty space above the duration; worse, a list row cannot draw the
-                // unbroken vertical rail that makes the legs read as one journey rather than five
-                // separate rows.
-                .background(Color.appBackground)
+                officialNoticeCard
+                journeyCard
+                detailsCard(feasibility: feasibility, confidence: confidence)
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
+            .padding(.bottom, 20)
         }
+        // A `List` was the wrong container. Inset-grouped spacing is tuned for Settings, where
+        // every section is an unrelated peer, and it opened this screen with roughly 250 pt of
+        // empty space above the duration; worse, a list row cannot draw the unbroken vertical rail
+        // that makes the legs read as one journey rather than five separate rows.
+        .background(Color.appBackground)
+        .safeAreaInset(edge: .bottom) { navigateBar }
+        .presentationDetents(Self.tripCardDetents, selection: $tripCardDetent)
+        .presentationDragIndicator(.visible)
+        // The map behind stays live at the two lower stops — the whole point of putting the trip
+        // on a sheet is that the map does not stop existing while it is up.
+        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        // There is nowhere for this to be dismissed *to*: the page underneath is the map for this
+        // one route, and a trip card swiped away would leave a screen with no trip on it.
+        .interactiveDismissDisabled()
     }
 
     // MARK: - Official notices
@@ -512,25 +522,12 @@ struct RouteDetailView: View {
 
     // MARK: - Resizable map header
 
-    /// Bounds on the map's share of the screen. The floor keeps enough map to read the shape of
-    /// the trip; the ceiling keeps the first leg visible, so dragging the map up can never hide
-    /// the instruction the rider is standing there to read.
-    private static let minimumMapFraction: CGFloat = 0.22
-    private static let maximumMapFraction: CGFloat = 0.66
-    private static let defaultMapFraction: CGFloat = 0.34
+    /// The three stops the trip card rests at. `.medium` and the two fractions rather than
+    /// `.large`: a truly full-height sheet covers the navigation bar, and the rider would have no
+    /// way back to the route list. The top stop deliberately leaves the bar showing.
+    static let tripCardDetents: Set<PresentationDetent> = [.fraction(0.3), .medium, .fraction(0.92)]
 
-    private func mapHeight(in available: CGFloat) -> CGFloat {
-        guard available > 0 else { return 0 }
-        let fraction = (mapFraction ?? Self.defaultMapFraction) + dragFraction(in: available)
-        return available * min(max(fraction, Self.minimumMapFraction), Self.maximumMapFraction)
-    }
-
-    private func dragFraction(in available: CGFloat) -> CGFloat {
-        guard available > 0 else { return 0 }
-        return mapDragTranslation / available
-    }
-
-    private func mapHeader(height: CGFloat) -> some View {
+    private func mapHeader() -> some View {
         TransitMapView(
             visibleRegion: .constant(route.previewRegion),
             stations: [],
@@ -540,23 +537,7 @@ struct RouteDetailView: View {
             onRegionChanged: nil,
             onStationSelected: { _ in }
         )
-        .frame(height: height)
-        .clipped()
-        .overlay(alignment: .topTrailing) {
-            Button {
-                showExpandedRouteMap = true
-            } label: {
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .padding(8)
-                    .background(.black.opacity(0.55), in: Circle())
-                    .padding(10)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(AppLocalization.localized("Open route map full screen"))
-        }
+        .ignoresSafeArea(edges: .bottom)
         // Floating over the map's bottom edge rather than sitting in the scroll content: which
         // alternative is being shown is a property of the whole screen, and scrolling the journey
         // used to carry the answer off the top of it.
@@ -566,43 +547,6 @@ struct RouteDetailView: View {
                     .padding(.bottom, 10)
             }
         }
-    }
-
-    /// The handle between map and trip. Dragging it trades one for the other; the whole strip is
-    /// the target rather than the 36pt pill, because a 5pt-tall grab handle is not a control
-    /// anybody can reliably hit.
-    private func grabber(in available: CGFloat) -> some View {
-        Capsule()
-            .fill(Color.secondary.opacity(0.45))
-            .frame(width: 40, height: 5)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(Color.appBackground)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture()
-                    .onChanged { mapDragTranslation = $0.translation.height }
-                    .onEnded { value in
-                        let settled = (mapFraction ?? Self.defaultMapFraction)
-                            + value.translation.height / max(available, 1)
-                        mapFraction = min(max(settled, Self.minimumMapFraction), Self.maximumMapFraction)
-                        mapDragTranslation = 0
-                    }
-            )
-            .accessibilityLabel(AppLocalization.text(
-                english: "Resize map",
-                simplified: "调整地图大小",
-                traditional: "調整地圖大小"
-            ))
-            .accessibilityAddTraits(.isButton)
-            // VoiceOver cannot drag: give it the two ends of the range as an action instead of a
-            // gesture it has no way to perform.
-            .accessibilityAction(named: AppLocalization.text(
-                english: "Expand map", simplified: "放大地图", traditional: "放大地圖"
-            )) { mapFraction = Self.maximumMapFraction }
-            .accessibilityAction(named: AppLocalization.text(
-                english: "Shrink map", simplified: "缩小地图", traditional: "縮小地圖"
-            )) { mapFraction = Self.minimumMapFraction }
     }
 
     private var decisionDataConfidence: DataConfidence {

@@ -18,7 +18,6 @@
 		A1000006 /* Map/MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* Map/MapViewModel.swift */; };
 		A1000008 /* Station/StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* Station/StationDetailView.swift */; };
 		A1000009 /* Map/StationDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* Map/StationDetailViewModel.swift */; };
-		A100000A /* Route/RoutePlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000A /* Route/RoutePlannerView.swift */; };
 		A100000B /* Route/RouteResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000B /* Route/RouteResultsView.swift */; };
 		A100000C /* Route/RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000C /* Route/RouteDetailView.swift */; };
 		A100000E /* Route/RoutePlannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000E /* Route/RoutePlannerViewModel.swift */; };
@@ -76,7 +75,6 @@
 		A1000065 /* Route/RouteDetailView+Segments.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000065 /* Route/RouteDetailView+Segments.swift */; };
 		A1000066 /* Route/RouteDetailView+Sheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000066 /* Route/RouteDetailView+Sheets.swift */; };
 		A1000067 /* Route/RouteDetailSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000067 /* Route/RouteDetailSupportViews.swift */; };
-		A1000068 /* Route/RoutePlannerView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000068 /* Route/RoutePlannerView+Sections.swift */; };
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A100006B /* Components/Transit/RouteStationTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006B /* Components/Transit/RouteStationTimeline.swift */; };
 		A1000073 /* Components/Transit/PlatformHintRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000073 /* Components/Transit/PlatformHintRow.swift */; };
@@ -130,7 +128,6 @@
 		A2000006 /* Map/MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapViewModel.swift; sourceTree = "<group>"; };
 		A2000008 /* Station/StationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationDetailView.swift; sourceTree = "<group>"; };
 		A2000009 /* Map/StationDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/StationDetailViewModel.swift; sourceTree = "<group>"; };
-		A200000A /* Route/RoutePlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RoutePlannerView.swift; sourceTree = "<group>"; };
 		A200000B /* Route/RouteResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RouteResultsView.swift; sourceTree = "<group>"; };
 		A200000C /* Route/RouteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RouteDetailView.swift; sourceTree = "<group>"; };
 		A200000E /* Route/RoutePlannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RoutePlannerViewModel.swift; sourceTree = "<group>"; };
@@ -195,7 +192,6 @@
 		A2000065 /* Route/RouteDetailView+Segments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteDetailView+Segments.swift"; sourceTree = "<group>"; };
 		A2000066 /* Route/RouteDetailView+Sheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RouteDetailView+Sheets.swift"; sourceTree = "<group>"; };
 		A2000067 /* Route/RouteDetailSupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RouteDetailSupportViews.swift; sourceTree = "<group>"; };
-		A2000068 /* Route/RoutePlannerView+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Route/RoutePlannerView+Sections.swift"; sourceTree = "<group>"; };
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A200006B /* Components/Transit/RouteStationTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteStationTimeline.swift; sourceTree = "<group>"; };
 		A2000073 /* Components/Transit/PlatformHintRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/PlatformHintRow.swift; sourceTree = "<group>"; };
@@ -384,8 +380,6 @@
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
 				A2000503 /* Station/PersonalStationMediaSection.swift */,
 				A2000064 /* Station/FullScreenStationImageView.swift */,
-				A200000A /* Route/RoutePlannerView.swift */,
-				A2000068 /* Route/RoutePlannerView+Sections.swift */,
 				A200000B /* Route/RouteResultsView.swift */,
 				A200000C /* Route/RouteDetailView.swift */,
 				A2000065 /* Route/RouteDetailView+Segments.swift */,
@@ -550,8 +544,6 @@
 				A1000063 /* Station/StationDetailView+DataSections.swift in Sources */,
 				A1000064 /* Station/FullScreenStationImageView.swift in Sources */,
 				A1000009 /* Map/StationDetailViewModel.swift in Sources */,
-				A100000A /* Route/RoutePlannerView.swift in Sources */,
-				A1000068 /* Route/RoutePlannerView+Sections.swift in Sources */,
 				A100000B /* Route/RouteResultsView.swift in Sources */,
 				A100000C /* Route/RouteDetailView.swift in Sources */,
 				A1000065 /* Route/RouteDetailView+Segments.swift in Sources */,

@@ -974,3 +974,124 @@ private extension Array {
         return filter { seen.insert($0[keyPath: keyPath]).inserted }
     }
 }
+
+/// One operating notice as the operator published it: their headline, their date, their page.
+///
+/// Nothing here is summarised, ranked or reworded. A notice is the operator speaking, and the only
+/// value this app adds is putting it in front of a rider who is about to ride the line it is about.
+struct OperatorServiceNotice: Identifiable, Sendable, Equatable {
+    let title: String
+    /// As published, `YYYY-MM-DD`. Shown verbatim so a stale feed is visibly stale rather than
+    /// quietly presented as today's news.
+    let publishedOn: String
+    let url: URL
+
+    var id: String { url.absoluteString }
+}
+
+/// Fetches Beijing Subway's 运营信息 notices from the operator's own site, on the rider's device.
+///
+/// The operator's content is `LicenseRef-External-Link-Only`: it may not be committed to this
+/// repository, and it is not — this fetches at runtime, holds the result in memory only, and
+/// redistributes it to nobody. That is the same arrangement the station-information providers in
+/// this file already operate under.
+///
+/// **This is not a live advisory feed and must not be presented as one.** Beijing publishes here
+/// irregularly — at the time this was written the newest notice was 2026-05-16 — so every notice
+/// carries its own publication date and the UI shows it. A rider needs to know they are reading
+/// something from May.
+actor BeijingServiceNoticeProvider {
+    static let cityID = "1100"
+    private static let host = "www.bjsubway.com"
+    private static let listPath = "/news/qyxw/yyzd/"
+    private static let maximumResponseBytes = 512_000
+    private static let requestTimeout: TimeInterval = 5
+    private static let cacheLifetime: TimeInterval = 1800
+    private static let clock = ContinuousClock()
+
+    private var cached: [OperatorServiceNotice] = []
+    private var cachedAt: ContinuousClock.Instant?
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
+    func notices(limit: Int = 3) async throws -> [OperatorServiceNotice] {
+        if let cachedAt, Self.clock.now - cachedAt < .seconds(Self.cacheLifetime) {
+            return Array(cached.prefix(limit))
+        }
+
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = Self.host
+        components.path = Self.listPath
+        guard let url = components.url else { return [] }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = Self.requestTimeout
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200,
+              // A redirect off this host would mean fetching operator content from somewhere the
+              // rights statement says nothing about.
+              http.url?.host?.lowercased() == Self.host,
+              data.count <= Self.maximumResponseBytes else { return [] }
+
+        // The site is GB18030, declared in a meta tag rather than the HTTP header, so decoding as
+        // UTF-8 silently yields mojibake instead of failing.
+        let encoding = CFStringConvertEncodingToNSStringEncoding(
+            CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue)
+        )
+        guard let html = String(data: data, encoding: String.Encoding(rawValue: encoding))
+            ?? String(data: data, encoding: .utf8) else { return [] }
+
+        let parsed = Self.parse(html: html)
+        cached = parsed
+        cachedAt = Self.clock.now
+        return Array(parsed.prefix(limit))
+    }
+
+    /// Pulls `<a href="/news/qyxw/yyzd/2026-05-16/129685.html">标题2026-05-16</a>` rows out of the
+    /// listing page. The date is taken from the *path*, not the link text, because the text runs
+    /// the title and date together with no separator.
+    nonisolated static func parse(html: String) -> [OperatorServiceNotice] {
+        let pattern = #"<a[^>]+href="(/news/qyxw/yyzd/(\d{4}-\d{2}-\d{2})/\d+\.html)"[^>]*>(.*?)</a>"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {
+            return []
+        }
+        let range = NSRange(html.startIndex..<html.endIndex, in: html)
+        var seen = Set<String>()
+        var notices: [OperatorServiceNotice] = []
+        for match in regex.matches(in: html, range: range) {
+            guard let pathRange = Range(match.range(at: 1), in: html),
+                  let dateRange = Range(match.range(at: 2), in: html),
+                  let textRange = Range(match.range(at: 3), in: html) else { continue }
+            let path = String(html[pathRange])
+            let published = String(html[dateRange])
+            var title = String(html[textRange])
+                .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+                .replacingOccurrences(of: "&nbsp;", with: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            // The anchor text ends with the same date it links to; it is shown separately.
+            if title.hasSuffix(published) { title = String(title.dropLast(published.count)) }
+            title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            var components = URLComponents()
+            components.scheme = "https"
+            components.host = host
+            components.path = path
+            guard !title.isEmpty, let url = components.url, seen.insert(path).inserted else { continue }
+            notices.append(OperatorServiceNotice(title: title, publishedOn: published, url: url))
+        }
+        // Newest first regardless of the page's own ordering.
+        return notices.sorted { $0.publishedOn > $1.publishedOn }
+    }
+
+    func releaseMemory() {
+        cached = []
+        cachedAt = nil
+    }
+}

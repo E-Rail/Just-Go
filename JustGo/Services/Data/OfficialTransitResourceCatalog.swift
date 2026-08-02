@@ -149,6 +149,31 @@ struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
         case stationID
     }
 
+    /// Explicit because the custom `init(from:)` below suppresses the memberwise one. Used to
+    /// wrap a notice fetched at runtime so it can be opened through the same viewer as a
+    /// catalogued resource, rather than growing a second web surface beside it.
+    init(
+        kind: ExternalTransitResourceKind,
+        title: String,
+        targetURL: String,
+        sourcePageURL: String,
+        provider: String,
+        scope: ExternalTransitResourceScope,
+        format: ExternalTransitResourceFormat,
+        verifiedAt: String,
+        stationID: String?
+    ) {
+        self.kind = kind
+        self.title = title
+        self.targetURL = targetURL
+        self.sourcePageURL = sourcePageURL
+        self.provider = provider
+        self.scope = scope
+        self.format = format
+        self.verifiedAt = verifiedAt
+        self.stationID = stationID
+    }
+
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         kind = try values.decode(ExternalTransitResourceKind.self, forKey: .kind)

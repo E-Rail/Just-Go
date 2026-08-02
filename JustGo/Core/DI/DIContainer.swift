@@ -31,6 +31,9 @@ final class DIContainer {
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
     let stationInformationDiskCache: OfficialStationInformationDiskCache?
+    /// Operator notices, fetched on the device and held in memory only. Not in `init` because it
+    /// has no configuration and no test seam yet — one city publishes a parseable list.
+    let serviceNoticeProvider = BeijingServiceNoticeProvider()
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
     private var memoryWarningObserver: NSObjectProtocol?
 

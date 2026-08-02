@@ -36,6 +36,8 @@ struct RouteDetailView: View {
     /// Guidance replaces this page's content rather than covering it — "but in the same page".
     @State private var isGuiding = false
     @State private var cityResources: [ExternalTransitResource] = []
+    @State private var serviceNotices: [OperatorServiceNotice] = []
+    @State private var openedNotice: OperatorServiceNotice?
     @State private var officialNoticeResource: ExternalTransitResource?
     // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
@@ -144,7 +146,7 @@ struct RouteDetailView: View {
         .onChange(of: routeSelectionSignature) {
             ensureSelectedRouteIsCurrent()
         }
-        .task(id: "\(route.networkCityID ?? appState.selectedCity?.id ?? "")|\(selectedRouteID)") {
+        .task(id: routeDataKey) {
             boardingServiceWindows = []
             async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
                 for: route
@@ -152,12 +154,20 @@ struct RouteDetailView: View {
             if let cityID = route.networkCityID ?? appState.selectedCity?.id {
                 cityResources = await container.officialStationData
                     .cityExternalResources(for: [cityID])[cityID] ?? []
+                if cityID == BeijingServiceNoticeProvider.cityID {
+                    // Best effort by design: a failed or slow fetch leaves the card showing what
+                    // is already verifiable. Operator notices are never a blocker.
+                    serviceNotices = (try? await container.serviceNoticeProvider.notices()) ?? []
+                }
                 await loadServiceHours(cityID: cityID)
             }
             await transferAssets
         }
         .sheet(item: $officialNoticeResource) { resource in
             OfficialTransitResourceViewer(resource: resource)
+        }
+        .sheet(item: $openedNotice) { item in
+            OfficialTransitResourceViewer(resource: Self.resource(for: item))
         }
     }
 
@@ -180,6 +190,12 @@ struct RouteDetailView: View {
 
     var route: Route {
         alternatives.first { $0.id == selectedRouteID } ?? initialRoute
+    }
+
+    /// City + selected route: the two things every load on this screen is keyed to.
+    private var routeDataKey: String {
+        let cityID = route.networkCityID ?? appState.selectedCity?.id ?? ""
+        return cityID + "|" + selectedRouteID.uuidString
     }
 
     private var routeSelectionSignature: String {
@@ -377,15 +393,21 @@ struct RouteDetailView: View {
     @ViewBuilder
     private var officialNoticeCard: some View {
         let notice = route.serviceStatus.bannerText
-        if notice != nil || officialResource != nil {
+        if notice != nil || officialResource != nil || !serviceNotices.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 if notice != nil {
                     ServiceStatusBanner(status: route.serviceStatus)
                         .padding(.horizontal, 4)
                         .padding(.top, 4)
                 }
+                ForEach(serviceNotices) { item in
+                    if notice != nil || item.id != serviceNotices.first?.id { rowDivider }
+                    Button { openedNotice = item } label: { noticeRow(item) }
+                        .buttonStyle(.plain)
+                }
+                if !serviceNotices.isEmpty, officialResource != nil { rowDivider }
                 if let resource = officialResource {
-                    if notice != nil { rowDivider.padding(.top, 8) }
+                    if notice != nil, serviceNotices.isEmpty { rowDivider.padding(.top, 8) }
                     Button {
                         officialNoticeResource = resource
                     } label: {
@@ -425,6 +447,59 @@ struct RouteDetailView: View {
     /// nothing almost everywhere. The row is labelled with the resource's own title rather than a
     /// generic "Service status", so an operator-information page is never presented as an
     /// advisory feed it is not.
+
+    /// Wraps a fetched notice so the existing official-resource viewer can open it — same
+    /// ephemeral web stack, same provenance header, no second browser.
+    private static func resource(for item: OperatorServiceNotice) -> ExternalTransitResource {
+        ExternalTransitResource(
+            kind: .serviceStatus,
+            title: item.title,
+            targetURL: item.url.absoluteString,
+            sourcePageURL: item.url.absoluteString,
+            provider: AppLocalization.text(
+                english: "Beijing Subway", simplified: "北京地铁", traditional: "北京地鐵"
+            ),
+            scope: .city,
+            format: .webPage,
+            verifiedAt: item.publishedOn,
+            stationID: nil
+        )
+    }
+
+    /// One operator notice, verbatim, with its own publication date under it.
+    private func noticeRow(_ item: OperatorServiceNotice) -> some View {
+        let attribution = AppLocalization.text(
+            english: "Beijing Subway · published \(item.publishedOn)",
+            simplified: "北京地铁 · 发布于 \(item.publishedOn)",
+            traditional: "北京地鐵 · 發布於 \(item.publishedOn)"
+        )
+        return HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "megaphone.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.orange)
+                .frame(width: 28, height: 28)
+                .background(Color.orange.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.title)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3)
+                // The date is not decoration. Beijing publishes these irregularly, so a rider has
+                // to be able to see they are reading something from May before acting on it.
+                Text(attribution).rowMeta()
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "arrow.up.right")
+                .font(.footnote)
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 11)
+        .contentShape(Rectangle())
+    }
+
+
     private var officialResource: ExternalTransitResource? {
         let preference: [ExternalTransitResourceKind] = [
             .serviceStatus, .operatorInformation, .stationInformation

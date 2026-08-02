@@ -22,9 +22,17 @@ private struct StationSearchBarBottomYKey: PreferenceKey {
 struct SearchPageView: View {
     let onSelectStation: (Station) -> Void
     let onSelectPlace: (TransitPlace) -> Void
+    /// The per-row route shortcut. Nil while the page is being used to refill one end of a trip
+    /// already being planned, where every row already means "use this" and a second verb on it
+    /// would be asking the rider to answer a question they are in the middle of answering.
+    var onRouteTo: ((TransitPlace, String?) -> Void)? = nil
+    /// True when this page exists to return one answer (endpoint editing) rather than to be
+    /// browsed. Station rows then close the page like place rows already do.
+    var dismissesOnSelection = false
 
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
     @State private var showFacilityPicker = false
@@ -41,6 +49,9 @@ struct SearchPageView: View {
     var body: some View {
             VStack(spacing: 0) {
                 searchBar
+                if !quickTags.isEmpty && isIdle {
+                    quickTagBar
+                }
                 filterBar
                 resultsList
             }
@@ -59,7 +70,10 @@ struct SearchPageView: View {
                 }
             }
             .navigationTitle(AppLocalization.localized("Search"))
-            .navigationBarTitleDisplayMode(.inline)
+            // The back button lives in the search bar itself, beside the field, so the field sits
+            // where the thumb already is instead of under a title bar that only repeats what the
+            // field's own placeholder says.
+            .toolbar(.hidden, for: .navigationBar)
             .background(Color.appBackground)
         .onDisappear {
             recentReplayTask?.cancel()
@@ -111,6 +125,83 @@ struct SearchPageView: View {
     }
 
     private var searchBar: some View {
+        HStack(spacing: 10) {
+            Button {
+                isSearchFocused = false
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundStyle(Color.primary)
+                    .frame(width: 34, height: 34)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalization.text(english: "Back", simplified: "返回", traditional: "返回"))
+
+            searchField
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 4)
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(key: StationSearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
+            }
+        }
+    }
+
+    /// Every place the rider has already told the app matters, one tap from the top of the page.
+    private var quickTagBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(quickTags) { quickTag in
+                    Button {
+                        isSearchFocused = false
+                        let place = quickTag.transitPlace
+                        // A quick tag knows its own city, and it is frequently not the selected
+                        // one — that cityID is exactly what stops a Beijing "Home" being planned
+                        // against Shanghai's network.
+                        if let onRouteTo {
+                            onRouteTo(place, quickTag.cityID)
+                        } else {
+                            onSelectPlace(place)
+                        }
+                        if dismissesOnSelection || onRouteTo != nil { dismiss() }
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: quickTag.kind.icon)
+                                .font(.caption)
+                            Text(quickTag.kind.title)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.appSurface, in: Capsule())
+                        .overlay(Capsule().stroke(Color(.separator), lineWidth: 1))
+                        .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+        }
+    }
+
+    private var quickTags: [StationQuickTag] {
+        tripMemoryService.stationQuickTags
+    }
+
+    /// Nothing typed and nothing filtered — the state where the page should be offering what the
+    /// rider already saved rather than a list of whatever happens to be nearby.
+    private var isIdle: Bool {
+        (viewModel?.searchText.isEmpty ?? true) && !isAnyFilterActive
+    }
+
+    private var searchField: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
@@ -150,21 +241,40 @@ struct SearchPageView: View {
                 }
             }
         }
-        .padding()
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .padding(.horizontal)
-        .background {
-            GeometryReader { proxy in
-                Color.clear.preference(key: StationSearchBarBottomYKey.self, value: proxy.frame(in: .global).maxY)
-            }
-        }
     }
 
     /// Apple's places, under the stations. Choosing one hands straight back to the map rather than
     /// pushing anything here: the place's card belongs over the map it sits on.
+    /// The "route" verb on a result row — a straight line from a name to a set of routes, without
+    /// the place card in between. Renders nothing when this page is picking an endpoint.
+    @ViewBuilder
+    private func routeShortcut(to place: TransitPlace, cityID: String?) -> some View {
+        if let onRouteTo {
+            Button {
+                isSearchFocused = false
+                onRouteTo(place, cityID)
+            } label: {
+                VStack(spacing: 2) {
+                    Image(systemName: "arrow.triangle.turn.up.right.circle.fill")
+                        .font(.subheadline)
+                    Text(AppLocalization.text(english: "Route", simplified: "路线", traditional: "路線"))
+                        .font(.caption2)
+                }
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 52, height: 46)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     private var placesSection: some View {
         Section {
             ForEach(placeResults) { place in
+                HStack(spacing: 0) {
                 Button {
                     isSearchFocused = false
                     onSelectPlace(place)
@@ -189,6 +299,8 @@ struct SearchPageView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                    routeShortcut(to: place, cityID: nil)
+                }
             }
         } header: {
             HStack(spacing: 6) {
@@ -297,14 +409,18 @@ struct SearchPageView: View {
             } else if let results = viewModel?.searchResults, !results.isEmpty {
                 Section {
                     ForEach(results) { station in
-                        StationRow(
-                            station: station,
-                            distanceText: viewModel?.distanceText(for: station)
-                        ) {
-                            recentReplayTask?.cancel()
-                            viewModel?.selectStation(station)
-                            isSearchFocused = false
-                            onSelectStation(station)
+                        HStack(spacing: 0) {
+                            StationRow(
+                                station: station,
+                                distanceText: viewModel?.distanceText(for: station)
+                            ) {
+                                recentReplayTask?.cancel()
+                                viewModel?.selectStation(station)
+                                isSearchFocused = false
+                                onSelectStation(station)
+                                if dismissesOnSelection { dismiss() }
+                            }
+                            routeShortcut(to: station.asTransitPlace, cityID: station.cityID)
                         }
                     }
                 } header: {
@@ -408,6 +524,7 @@ struct SearchPageView: View {
                         if let station {
                             viewModel?.selectStation(station)
                             onSelectStation(station)
+                            if dismissesOnSelection { dismiss() }
                         } else {
                             // Station no longer in the pack — fall back to a name search
                             // in its home city. scheduleSearch (not search) so the

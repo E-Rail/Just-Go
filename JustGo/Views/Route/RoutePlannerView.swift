@@ -229,19 +229,15 @@ struct RouteEntryView: View {
     }
 
     /// City switch for a place that may not name its city (map POIs, legacy quick places).
-    /// A known cityID is authoritative. Otherwise infer only when the coordinate is clearly
-    /// outside the selected city's metro area (beyond the 80km suggestion-search radius):
-    /// seam places in adjacent, interconnected metros (Guangzhou/Foshan) must keep the
-    /// user's selected network, since nearest-city-center would misassign them.
+    /// The rule itself lives on `CityService` — the map and the search page decide the same thing
+    /// and used to each carry their own copy of it.
     func switchPlannerCity(forPlaceCityID cityID: String?, coordinate: CLLocationCoordinate2D) {
-        if let cityID {
-            switchPlannerCity(toCityID: cityID)
-            return
-        }
-        guard let selected = appState.selectedCity else { return }
-        let place = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        guard let nearest = container.cityService.cityToAdopt(for: place, whileSelecting: selected) else { return }
-        switchPlannerCity(toCityID: nearest.id)
+        guard let city = container.cityService.cityToAdopt(
+            forPlaceCityID: cityID,
+            coordinate: coordinate,
+            whileSelecting: appState.selectedCity
+        ) else { return }
+        switchPlannerCity(toCityID: city.id)
     }
 
     private func resumeTripBanner(_ route: Route) -> some View {

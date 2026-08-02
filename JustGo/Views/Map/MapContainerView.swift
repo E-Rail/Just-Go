@@ -19,9 +19,17 @@ private struct TappedPlace: Identifiable {
 /// to reach a screen it cannot tap its way to.
 enum MapRoute: Hashable {
     case search
+    /// The search page again, opened from the results header to refill one end of the trip.
+    /// Picking a result fills that field and returns; it does not open a place card.
+    case editEndpoint(RouteInputField)
     /// The destination, if the rider came from a place card, travels in
     /// `AppState.pendingRouteInput` — `TransitPlace` is not `Hashable` and a navigation value is
     /// the wrong place to carry it anyway.
+    ///
+    /// Only reached when the trip cannot be planned as-is — no origin and no usable fix. "Route
+    /// here" otherwise goes straight to the results, which carry an editable From/To header of
+    /// their own; making every rider pass through a form to confirm a start the app already knew
+    /// was a step that existed only to be dismissed.
     case routeEntry
     case results
     case detail(UUID)
@@ -46,6 +54,7 @@ struct MapContainerView: View {
     @State private var placeMatchTask: Task<Void, Never>?
     @State private var stationOpenTask: Task<Void, Never>?
     @State private var centerOnUserTask: Task<Void, Never>?
+    @State private var planTask: Task<Void, Never>?
     @State private var didCenterOnUser = false
     /// Non-nil for a few seconds after a locate attempt that could not produce a fix.
     @State private var locateFailure: String?
@@ -88,18 +97,8 @@ struct MapContainerView: View {
         // sender — map POI, search result, station detail — reaches the entry page the same way
         // and none of them has to know what the navigation stack looks like.
         .onChange(of: appState.pendingRouteInput) { _, pending in
-            guard pending != nil, !path.contains(.routeEntry) else { return }
-            // ONE write to `path`, never a removal followed by an append. A pushed station detail
-            // used to pop *itself* (`dismiss()`) in the same button action that set the pending
-            // input, so the stack was mutated twice inside a single update — which SwiftUI logs as
-            // "NavigationRequestObserver tried to update multiple times per frame". iOS 26 coalesces
-            // the two; iOS 18 does not, and what survives is a pushed screen with a back button and
-            // no content. That is the blank page. Dropping the station here instead keeps the whole
-            // transition in one assignment, so there is no ordering left to get wrong.
-            var next = path
-            if case .station = next.last { next.removeLast() }
-            next.append(.routeEntry)
-            path = next
+            guard let pending else { return }
+            beginPlan(to: pending)
         }
         // A city switch invalidates any in-flight POI/station interaction from the old city.
         // During a POI tap's station match no sheet is presented yet, so the city picker stays
@@ -494,6 +493,73 @@ struct MapContainerView: View {
         container.sharedRoutePlannerViewModel()
     }
 
+    /// "Route here" — the one action every place card offers — from anywhere in the app.
+    ///
+    /// Goes straight to the results. The entry page in between asked the rider to confirm a
+    /// destination they had just tapped and a start the app already knew, so it existed only to be
+    /// dismissed; the results now carry their own From/To header, which is where changing either
+    /// end belongs anyway. The entry page is still the answer when there is genuinely nothing to
+    /// plan from — see the `origin.isEmpty` branch.
+    private func beginPlan(to pending: AppState.PendingRouteInput) {
+        // Consumed here rather than by the pushed screen: this is the only handler, and leaving it
+        // set would re-fire the moment anything else observed it.
+        appState.pendingRouteInput = nil
+        let planner = self.planner
+        // Before the fill, never after — a cross-city switch wipes the planner's fields.
+        if let city = container.cityService.cityToAdopt(
+            forPlaceCityID: pending.cityID,
+            coordinate: pending.place.coordinate,
+            whileSelecting: appState.selectedCity
+        ) {
+            appState.selectedCity = city
+            planner.cityChanged(to: city)
+        }
+        planner.selectPlace(pending.place, for: pending.role)
+
+        let other: RouteInputField = pending.role == .destination ? .origin : .destination
+        let otherIsEmpty = planner.name(for: other).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+
+        // One assignment — see the note on MapRoute.station about a pop and a push in one frame.
+        // The station card the rider pressed the button on is replaced, not stacked under.
+        var next = path
+        if case .station = next.last { next.removeLast() }
+        next.append(otherIsEmpty ? .routeEntry : .results)
+        path = next
+
+        guard !otherIsEmpty else {
+            // Nothing to plan from yet. The entry page seeds the start from the device itself and
+            // says so when there is no fix, which is a better place to wait than a results screen
+            // that would have to explain why it is empty.
+            return
+        }
+        planTask?.cancel()
+        planTask = Task { _ = await planner.searchRoutes() }
+    }
+
+    /// Fills one end of the trip from the search page and re-plans. Deliberately not routed
+    /// through `pendingRouteInput`: that channel *starts* a plan, and starting one from here would
+    /// push a second results screen on top of the one the rider is editing.
+    private func fillEndpoint(_ field: RouteInputField, with place: TransitPlace, cityID: String?) {
+        let planner = self.planner
+        if let city = container.cityService.cityToAdopt(
+            forPlaceCityID: cityID,
+            coordinate: place.coordinate,
+            whileSelecting: appState.selectedCity
+        ) {
+            appState.selectedCity = city
+            planner.cityChanged(to: city)
+        }
+        planner.selectPlace(place, for: field)
+        replan()
+    }
+
+    /// Re-runs the current plan. Shared by the endpoint editor and the header's swap button so the
+    /// two cannot disagree about what a changed endpoint means.
+    private func replan() {
+        planTask?.cancel()
+        planTask = Task { _ = await planner.searchRoutes() }
+    }
+
     private var staleRouteNotice: some View {
         ContentUnavailableView {
             Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
@@ -513,16 +579,42 @@ struct MapContainerView: View {
         case .search:
             SearchPageView(
                 onSelectStation: { openStation($0) },
-                onSelectPlace: { selectSearchResult($0) }
+                onSelectPlace: { selectSearchResult($0) },
+                // The per-row route shortcut. Routed through the same pendingRouteInput channel a
+                // place card uses, so "Route here" means one thing wherever it is pressed.
+                onRouteTo: { place, cityID in
+                    appState.pendingRouteInput = AppState.PendingRouteInput(
+                        place: place,
+                        role: .destination,
+                        cityID: cityID
+                    )
+                }
+            )
+        case .editEndpoint(let field):
+            SearchPageView(
+                onSelectStation: { station in
+                    fillEndpoint(field, with: station.asTransitPlace, cityID: station.cityID)
+                },
+                onSelectPlace: { fillEndpoint(field, with: $0, cityID: nil) },
+                // No route shortcut while editing an endpoint: the rider is already planning a
+                // trip, and every row here means "use this as the \(field) end".
+                onRouteTo: nil,
+                dismissesOnSelection: true
             )
         case .routeEntry:
             RouteEntryView(viewModel: planner) {
                 path.append(.results)
             }
         case .results:
-            RouteResultsView(viewModel: planner) { route in
-                path.append(.detail(route.id))
-            }
+            RouteResultsView(
+                viewModel: planner,
+                onSelect: { route in path.append(.detail(route.id)) },
+                onEditEndpoint: { path.append(.editEndpoint($0)) },
+                onSwap: {
+                    planner.swapOriginDestination()
+                    replan()
+                }
+            )
         case .detail(let routeID):
             if let route = planner.routes.first(where: { $0.id == routeID }) {
                 RouteDetailView(
@@ -577,7 +669,7 @@ struct MapContainerView: View {
             path = [.search]
         case "entry":
             path = [.routeEntry]
-        case "results", "detail", "guiding":
+        case "results", "detail", "guiding", "editEndpoint":
             Task { await seedDebugRoute(landingOn: screen) }
         default:
             break
@@ -596,9 +688,14 @@ struct MapContainerView: View {
         plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)
         plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
-        path = screen == "results"
-            ? [.routeEntry, .results]
-            : [.routeEntry, .results, .detail(first.id)]
+        switch screen {
+        case "results":
+            path = [.results]
+        case "editEndpoint":
+            path = [.results, .editEndpoint(.origin)]
+        default:
+            path = [.results, .detail(first.id)]
+        }
     }
 
     private func debugPlace(for station: Station) -> TransitPlace {

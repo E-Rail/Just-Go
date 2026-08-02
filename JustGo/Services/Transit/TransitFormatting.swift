@@ -166,6 +166,12 @@ extension Station {
     var uniqueLogicalLines: [SubwayLine] {
         lines.uniqued(by: \.logicalLineIdentity)
     }
+
+    /// This station as a trip endpoint. Three screens built this by hand from the same three
+    /// fields; they agreed, but only by coincidence.
+    var asTransitPlace: TransitPlace {
+        TransitPlace(name: localizedName, coordinate: coordinate, source: .mapKit)
+    }
 }
 
 private func compactLineName(_ value: String) -> String {

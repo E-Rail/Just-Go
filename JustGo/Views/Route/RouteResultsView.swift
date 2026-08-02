@@ -5,6 +5,9 @@ struct RouteResultsView: View {
     /// Pushing is the map stack's job, not this screen's — it owns the whole plan → results →
     /// detail chain, so a route chosen here is handed back rather than presented from inside.
     let onSelect: (Route) -> Void
+    /// Open the search page to refill one end. Handed back for the same reason as `onSelect`.
+    let onEditEndpoint: (RouteInputField) -> Void
+    let onSwap: () -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var selectedRouteID: UUID?
@@ -64,6 +67,10 @@ struct RouteResultsView: View {
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
+        // Pinned, not the first row of the list. Where the trip starts and ends is the thing the
+        // rider checks first and changes most; scrolling it away to compare the fourth alternative
+        // means scrolling back up to fix a wrong start.
+        .safeAreaInset(edge: .top, spacing: 0) { endpointHeader }
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -72,6 +79,69 @@ struct RouteResultsView: View {
         .onChange(of: routeSelectionSignature) {
             ensureRouteSelection()
         }
+    }
+
+    /// From and To, always visible, both editable in place. This is the whole reason the entry
+    /// page is no longer in the way: everything it existed to collect is here, on the screen that
+    /// shows the consequence of changing it.
+    private var endpointHeader: some View {
+        HStack(spacing: 12) {
+            VStack(spacing: 0) {
+                endpointRow(.origin)
+                Divider().padding(.leading, 26)
+                endpointRow(.destination)
+            }
+
+            Button(action: onSwap) {
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.headline)
+                    .foregroundStyle(Color.accentColor)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppLocalization.text(
+                english: "Swap start and destination",
+                simplified: "交换起点和终点",
+                traditional: "交換起點和終點"
+            ))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(.regularMaterial)
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
+    }
+
+    private func endpointRow(_ field: RouteInputField) -> some View {
+        let name = viewModel.name(for: field).trimmingCharacters(in: .whitespacesAndNewlines)
+        return Button {
+            onEditEndpoint(field)
+        } label: {
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(field == .origin ? Color.green : Color.red)
+                    .frame(width: 9, height: 9)
+                // An unfilled end says what to do about it rather than sitting blank — this
+                // header is the only place the trip's ends can be corrected now.
+                Text(name.isEmpty ? placeholder(for: field) : name)
+                    .font(.subheadline)
+                    .fontWeight(name.isEmpty ? .regular : .medium)
+                    .foregroundStyle(name.isEmpty ? Color.secondary : Color.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 9)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func placeholder(for field: RouteInputField) -> String {
+        field == .origin
+            ? AppLocalization.text(english: "Choose a start", simplified: "选择起点", traditional: "選擇起點")
+            : AppLocalization.text(english: "Choose a destination", simplified: "选择终点", traditional: "選擇終點")
     }
 
     private var activeTimeChip: some View {

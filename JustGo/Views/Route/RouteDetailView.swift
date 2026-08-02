@@ -1126,6 +1126,15 @@ private struct RouteStationGuideSheet: View {
             }
             didResolve = true
         }
+        // The screen resolves to something within 8 seconds whatever the lookup does. `didResolve`
+        // used to depend entirely on `matchingStation` returning, and that call can reach the
+        // network — so a request that never came back left a spinner on screen with no way out.
+        // The name-based fallback is a real screen; a spinner is not. A lookup that lands late
+        // still wins, because it sets `station`, which this branch prefers.
+        .task {
+            try? await Task.sleep(for: .seconds(8))
+            didResolve = true
+        }
     }
 
     private var fallbackStation: Station {

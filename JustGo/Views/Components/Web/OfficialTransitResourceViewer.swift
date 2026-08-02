@@ -619,6 +619,14 @@ private final class OfficialTransitResourceWebState: ObservableObject {
 
     private weak var webView: WKWebView?
     private var initialRequest: URLRequest?
+    private var loadWatchdog: Task<Void, Never>?
+
+    /// Nothing else here has a time limit. WebKit reports a failed load through its delegate, but
+    /// a DNS lookup that never answers produces no delegate call at all — the operator hosts this
+    /// app links to are exactly the ones that do that on a restricted network, and the result was
+    /// a screen showing a spinner and nothing else, forever. Every load now ends one way or the
+    /// other within this window.
+    private static let loadTimeout: TimeInterval = 20
 
     func attach(_ webView: WKWebView, initialRequest: URLRequest) {
         self.webView = webView
@@ -628,6 +636,7 @@ private final class OfficialTransitResourceWebState: ObservableObject {
 
     func detach(_ webView: WKWebView) {
         guard self.webView === webView else { return }
+        loadWatchdog?.cancel()
         self.webView = nil
     }
 
@@ -635,18 +644,38 @@ private final class OfficialTransitResourceWebState: ObservableObject {
         isLoading = true
         errorMessage = nil
         updateNavigationState(webView)
+        startLoadWatchdog()
     }
 
     func finished(_ webView: WKWebView) {
+        loadWatchdog?.cancel()
         isLoading = false
         errorMessage = nil
         updateNavigationState(webView)
     }
 
     func failed(_ webView: WKWebView, message: String) {
+        loadWatchdog?.cancel()
         isLoading = false
         errorMessage = message
         updateNavigationState(webView)
+    }
+
+    private func startLoadWatchdog() {
+        loadWatchdog?.cancel()
+        loadWatchdog = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(Self.loadTimeout))
+            guard let self, !Task.isCancelled, self.isLoading else { return }
+            self.webView?.stopLoading()
+            self.isLoading = false
+            // Says what happened and leaves Reload and "Open in Safari" reachable, rather than
+            // implying the page is still on its way.
+            self.errorMessage = AppLocalization.text(
+                english: "This official page did not respond. It may be unavailable on your network.",
+                simplified: "该官方页面没有响应，可能在当前网络下无法访问。",
+                traditional: "該官方頁面沒有回應，可能在目前網路下無法存取。"
+            )
+        }
     }
 
     func goBack() {

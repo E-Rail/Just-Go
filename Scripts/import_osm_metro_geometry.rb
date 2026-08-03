@@ -352,6 +352,33 @@ def same_named_service?(left, right, evidence)
   evidence[:stationContainment] >= 0.8 || evidence[:trackContainment] >= 0.5
 end
 
+# The express service on a line the local service also runs: 广惠城际快车 is 广惠城际 skipping
+# stops, not a second railway. OSM publishes them as separate relations, so the intercity corridors
+# imported as two lines each — and a station on both then claimed two interchanges where a rider
+# sees one line with two kinds of train.
+#
+# `servicePatterns` is exactly the field for this, and until now it went unused for the case it
+# was built for. The suffix is the whole rule: 快车/大站快车 appended to a name the city already
+# has. Not inferred from station containment, which would also fuse 广清城际 into 广惠城际 (they
+# share the whole Guangzhou trunk); the express variant has to *say* it is one.
+def express_variant_service?(left, right, evidence)
+  base, express = if express_of(right[:name_key]) == left[:name_key]
+                    [left, right]
+                  elsif express_of(left[:name_key]) == right[:name_key]
+                    [right, left]
+                  end
+  return false if base.nil?
+  return false unless network_compatible?(base, express)
+
+  # An express calls at a subset of the local's stops, so it is the express that must be contained.
+  evidence[:sharedStations] >= 2 && evidence[:trackContainment] >= 0.5
+end
+
+def express_of(name_key)
+  stripped = name_key.sub(/大?站?快车\z/, "")
+  stripped == name_key ? nil : stripped
+end
+
 def combined_service?(combined, component, evidence)
   return false if combined[:name_tokens].length < 2
   return false unless combined[:name_tokens].include?(component[:name_key])
@@ -415,6 +442,8 @@ def canonicalize_relations(relations, elements_by_key, ways)
                "structuredIdentity"
              elsif same_named_service?(left, right, evidence)
                "sameName"
+             elsif express_variant_service?(left, right, evidence)
+               "expressVariant"
              elsif combined_service?(left, right, evidence) || combined_service?(right, left, evidence)
                "combinedService"
              elsif same_corridor_service?(left, right)

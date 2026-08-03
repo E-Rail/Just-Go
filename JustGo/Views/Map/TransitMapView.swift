@@ -82,6 +82,7 @@ struct TransitMapView: UIViewRepresentable {
         private var stationAnnotationsByID: [String: StationAnnotation] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
         private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
+        private var overlayDashes: [ObjectIdentifier: [NSNumber]] = [:]
         private var networkOverlays: [MKOverlay] = []
         private var routeOverlays: [MKOverlay] = []
         private var stationSymbolImages: [String: UIImage] = [:]
@@ -196,6 +197,7 @@ struct TransitMapView: UIViewRepresentable {
             for overlay in overlays {
                 overlayColors.removeValue(forKey: ObjectIdentifier(overlay))
                 overlayWidths.removeValue(forKey: ObjectIdentifier(overlay))
+                overlayDashes.removeValue(forKey: ObjectIdentifier(overlay))
             }
         }
 
@@ -224,10 +226,15 @@ struct TransitMapView: UIViewRepresentable {
                         CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                     }
                 guard coordinates.count >= 2 else { continue }
+                let isWalking = segment.type == .walking
                 addPolyline(
                     coordinates,
                     colorHex: routeColorHex(for: segment),
-                    lineWidth: 6,
+                    lineWidth: isWalking ? 7 : 6,
+                    // Round dots, the convention every map app uses for a leg on foot, and the
+                    // thing that makes a walk legible at all: solid grey at this width is the same
+                    // mark the basemap draws roads with, so a walking-only route read as no route.
+                    dashPattern: isWalking ? [0.1, 11] : nil,
                     simplify: true,
                     collection: &routeOverlays
                 )
@@ -254,6 +261,7 @@ struct TransitMapView: UIViewRepresentable {
             _ coordinates: [CLLocationCoordinate2D],
             colorHex: String,
             lineWidth: CGFloat,
+            dashPattern: [NSNumber]? = nil,
             simplify: Bool,
             collection: inout [MKOverlay]
         ) {
@@ -261,6 +269,7 @@ struct TransitMapView: UIViewRepresentable {
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))
             overlayWidths[ObjectIdentifier(polyline)] = lineWidth
+            overlayDashes[ObjectIdentifier(polyline)] = dashPattern
             collection.append(polyline)
         }
 
@@ -455,6 +464,7 @@ struct TransitMapView: UIViewRepresentable {
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
             renderer.lineWidth = overlayWidths[ObjectIdentifier(polyline)] ?? 5
+            renderer.lineDashPattern = overlayDashes[ObjectIdentifier(polyline)] ?? nil
             renderer.lineCap = .round
             renderer.lineJoin = .round
             return renderer

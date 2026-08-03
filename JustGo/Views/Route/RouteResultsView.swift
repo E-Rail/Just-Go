@@ -247,7 +247,7 @@ struct RouteResultsView: View {
             selectedRouteID = route.id
             _ = tripMemoryService.recordPlannedTrip(
                 route: route,
-                cityID: route.networkCityID ?? viewModel.selectedCity?.id ?? "",
+                cityID: route.networkCityID ?? "",
                 accessibilityFilter: viewModel.accessibilityFilter
             )
             onSelect(route)

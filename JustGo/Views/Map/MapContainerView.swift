@@ -42,8 +42,8 @@ struct MapContainerView: View {
     @State private var path: [MapRoute] = []
     @State private var tappedPlace: TappedPlace?
     @State private var showPlaceTagDialog = false
-    @State private var showCityPicker = false
     @State private var isLoadingStationDetail = false
+    @State private var cameraSaveTask: Task<Void, Never>?
     @State private var placeMatchTask: Task<Void, Never>?
     @State private var stationOpenTask: Task<Void, Never>?
     @State private var centerOnUserTask: Task<Void, Never>?
@@ -64,28 +64,20 @@ struct MapContainerView: View {
             mapContent
                 .navigationDestination(for: MapRoute.self) { destination(for: $0) }
         }
-        .task(id: appState.selectedCity?.id) {
+        .task {
             if viewModel == nil {
                 viewModel = container.makeMapViewModel()
             }
-            planner.cityChanged(to: appState.selectedCity)
-
-            guard let city = appState.selectedCity else { return }
-            await viewModel?.loadStations(for: city)
-            // Open on the rider, not on a city centroid. Only the first time the map appears:
-            // re-running on every city change would fight a city the rider just picked by hand.
-            // When location is unavailable — denied, restricted, or the fix times out — this is
-            // a no-op and the city view `loadStations` already set is what stays on screen.
-            // Retried until it actually lands, not merely until it has been attempted. The old
-            // guard was set before the fix arrived, so the very common launch sequence — centre on
-            // the rider, then realign to the city they are in, which reloads and resets the camera
-            // — ended on the city centroid with the retry already disarmed.
+            restoreCamera()
             #if DEBUG
             // Ahead of the centring guard below, which returns early once a fix has landed — the
             // seeding used to sit after it and so silently did nothing on any second run of this
             // task, which reads as "the harness is flaky" rather than "the harness never ran".
             seedDebugScreen()
             #endif
+            // Open on the rider. Retried until it actually lands, not merely until it has been
+            // attempted; when location is unavailable — denied, restricted, or the fix times out
+            // — this is a no-op and the restored camera is what stays on screen.
             guard !didCenterOnUser else { return }
             centerOnUser()
         }
@@ -96,22 +88,40 @@ struct MapContainerView: View {
             guard let pending else { return }
             beginPlan(to: pending)
         }
-        // A city switch invalidates any in-flight POI/station interaction from the old city.
-        // During a POI tap's station match no sheet is presented yet, so the city picker stays
-        // reachable — without this reset a slow match started in city A presents its place
-        // sheet (or pushes its station detail) over city B's map, and a slow locate-me fix
-        // (up to the 15s GPS timeout) yanks city B's camera back to the user's position.
-        .onChange(of: appState.selectedCity?.id) { _, _ in
-            placeMatchTask?.cancel()
-            stationOpenTask?.cancel()
-            centerOnUserTask?.cancel()
-            // Kill the old city's place search here rather than waiting for the deferred
-            // .task(id:) reload — its results must not flash under the new city.
-            viewModel?.clearSearch()
-            stationOpenGeneration += 1
-            isLoadingStationDetail = false
-            pendingResolvedItem = nil
-            tappedPlace = nil
+    }
+
+    /// Opens the map where the rider left it. Nothing is loaded from this — the viewport decides
+    /// that — so a stale camera costs a pan, not a wrong network.
+    private func restoreCamera() {
+        guard viewModel?.visibleRegion == nil else { return }
+        guard let camera = appState.lastMapCamera else {
+            // First launch, before any pan and before any fix. Somewhere with a network rather
+            // than the whole globe; `centerOnUser` replaces it the moment a fix arrives.
+            viewModel?.updateCamera(to: Self.firstLaunchCenter, spanDelta: MapCameraSpan.city)
+            return
+        }
+        viewModel?.updateCamera(
+            to: CLLocationCoordinate2D(latitude: camera.latitude, longitude: camera.longitude),
+            spanDelta: camera.spanDelta
+        )
+    }
+
+    /// Tiananmen. Only ever seen on a first launch with location off — the largest bundled
+    /// network, so the opening screen has something drawn on it.
+    private static let firstLaunchCenter = CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
+
+    /// Debounced: a pan reports its region every frame, and each save is a JSON encode plus a
+    /// `UserDefaults` write on the main thread. Only where the pan *stopped* is worth keeping.
+    private func rememberCamera(_ region: MapVisibleRegion) {
+        cameraSaveTask?.cancel()
+        cameraSaveTask = Task {
+            try? await Task.sleep(for: .milliseconds(600))
+            guard !Task.isCancelled else { return }
+            appState.lastMapCamera = AppState.MapCamera(
+                latitude: region.center.latitude,
+                longitude: region.center.longitude,
+                spanDelta: region.maxDelta
+            )
         }
     }
 
@@ -208,16 +218,11 @@ struct MapContainerView: View {
             .presentationDetents([.medium, .large], selection: $placeCardDetent)
             .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showCityPicker) {
-            CityPickerView(selectedCity: Binding(
-                get: { appState.selectedCity },
-                set: { appState.selectedCity = $0 }
-            ))
-        }
         .onDisappear {
             placeMatchTask?.cancel()
             stationOpenTask?.cancel()
             centerOnUserTask?.cancel()
+            cameraSaveTask?.cancel()
             isLoadingStationDetail = false
             pendingResolvedItem = nil
         }
@@ -239,6 +244,7 @@ struct MapContainerView: View {
             },
             onRegionChanged: { region in
                 viewModel?.viewportChanged(to: region)
+                rememberCamera(region)
             },
             onStationSelected: openStation,
             onPlaceTapped: handlePlaceTapped,
@@ -272,9 +278,7 @@ struct MapContainerView: View {
 
     private func savePlaceTag(_ place: TransitPlace, kind: StationQuickTagKind) {
         let location = CLLocation(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
-        guard let city = container.cityService.findNearestCity(to: location) ?? appState.selectedCity else {
-            return
-        }
+        guard let city = container.cityService.findNearestCity(to: location) else { return }
         tripMemoryService.setQuickTag(
             place: place,
             cityID: city.id,
@@ -310,20 +314,6 @@ struct MapContainerView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-
-                Button(action: { showCityPicker = true }) {
-                    HStack(spacing: 4) {
-                        Text(appState.selectedCity?.localizedName ?? AppLocalization.localized("City"))
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Image(systemName: "chevron.down")
-                            .font(.caption)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.ultraThinMaterial, in: Capsule())
-                }
-                .buttonStyle(.plain)
             }
             .padding(12)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -341,21 +331,15 @@ struct MapContainerView: View {
     }
 
     /// The one way this screen ever puts the camera on the rider — used by the locate button and
-    /// by the map's first appearance, so the two cannot land at different zooms or disagree about
-    /// the city. That inconsistency was the complaint: the same intent behaved differently
-    /// depending on which path ran it.
+    /// by the map's first appearance, so the two cannot land at different zooms. That
+    /// inconsistency was the complaint: the same intent behaved differently depending on which
+    /// path ran it.
     private func centerOnUser() {
         centerOnUserTask?.cancel()
         locateFailure = nil
         centerOnUserTask = Task {
             guard let outcome = await viewModel?.centerOnUser() else { return }
             if outcome.didCenter { didCenterOnUser = true }
-            // Locating also aligns the app to the city the rider is physically in
-            // (bounded — see centerOnUser): the camera alone moving left the city
-            // pill, station search, and planner stuck on the old city.
-            if let city = outcome.cityToAdopt {
-                appState.selectedCity = city
-            }
             // Say why nothing moved. A fix that never arrives burns the location request's full
             // 15 s timeout and then did nothing at all — no camera move, no message — which reads
             // as the button being broken rather than the fix being missing.
@@ -423,7 +407,7 @@ struct MapContainerView: View {
         tappedPlace = nil
         placeCardDetent = .medium
         placeMatchTask = Task {
-            if let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity) {
+            if let station = await viewModel?.matchingStation(for: place) {
                 guard !Task.isCancelled else { return }
                 openStation(station)
             } else {
@@ -456,7 +440,7 @@ struct MapContainerView: View {
         // change would silently route the new resolve into the old sheet).
         tappedPlace = nil
         placeMatchTask = Task {
-            let station = await viewModel?.matchingStation(for: place, city: appState.selectedCity)
+            let station = await viewModel?.matchingStation(for: place)
             guard !Task.isCancelled else { return }
             if let station {
                 pendingResolvedItem = nil
@@ -504,15 +488,6 @@ struct MapContainerView: View {
         // set would re-fire the moment anything else observed it.
         appState.pendingRouteInput = nil
         let planner = self.planner
-        // Before the fill, never after — a cross-city switch wipes the planner's fields.
-        if let city = container.cityService.cityToAdopt(
-            forPlaceCityID: pending.cityID,
-            coordinate: pending.place.coordinate,
-            whileSelecting: appState.selectedCity
-        ) {
-            appState.selectedCity = city
-            planner.cityChanged(to: city)
-        }
         planner.selectPlace(pending.place, for: pending.role)
 
         // One assignment — see the note on MapRoute.station about a pop and a push in one frame.
@@ -522,9 +497,7 @@ struct MapContainerView: View {
         next.append(.results)
         path = next
 
-        // The city this trip is being planned against, captured before the seeding below can
-        // have an opinion about it.
-        let planningCityID = appState.selectedCity?.id
+        let target = pending.place.coordinate
 
         planTask?.cancel()
         planTask = Task {
@@ -532,27 +505,15 @@ struct MapContainerView: View {
             // longer sees that form, so the seeding happens here instead. A fix can take up to
             // 15 s, which the results page spends saying it is loading — a better wait than an
             // empty field on a page whose only purpose is to be dismissed.
-            //
-            // Deliberately no `alignCity` closure. Passing one meant that looking up a place in
-            // another city adopted that city, and then the device fix immediately adopted the
-            // city the rider is physically standing in — dragging the whole app back and
-            // planning the trip against the wrong network. The destination decides the city here;
-            // the start never overrules it.
             if planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 await planner.useCurrentLocation(for: .origin)
-                // A start that is *clearly* somewhere else cannot be planned against this
-                // network, and silently keeping it produces nonsense. Judged with the same
-                // bounded rule as everywhere else — not "which city centre is nearest", which
-                // called a Foshan start a different city from a Guangzhou destination and threw
-                // away a trip the app can plan perfectly well. Adjacent interconnected metros
-                // are one journey to a rider and the graph agrees.
+                // A rider in Beijing tapping a place in Guangzhou is not starting from where they
+                // are standing, and silently seeding it produces nonsense. Judged in metres rather
+                // than by city, because "different city" was never the question: Foshan→Guangzhou
+                // is two cities and one perfectly plannable journey. 150 km is past the span of
+                // the widest bundled network, intercity corridors included.
                 if let seeded = planner.place(for: .origin),
-                   let planningCity = planningCityID.flatMap({ container.cityService.getCity(byID: $0) }),
-                   container.cityService.cityToAdopt(
-                       forPlaceCityID: nil,
-                       coordinate: seeded.coordinate,
-                       whileSelecting: planningCity
-                   ) != nil {
+                   seeded.coordinate.distance(to: target) > 150_000 {
                     planner.updateName("", for: .origin)
                 }
             }
@@ -574,16 +535,7 @@ struct MapContainerView: View {
     /// Fills one end of the trip from the search page and re-plans. Deliberately not routed
     /// through `pendingRouteInput`: that channel *starts* a plan, and starting one from here would
     /// push a second results screen on top of the one the rider is editing.
-    private func fillEndpoint(_ field: RouteInputField, with place: TransitPlace, cityID: String?) {
-        let planner = self.planner
-        if let city = container.cityService.cityToAdopt(
-            forPlaceCityID: cityID,
-            coordinate: place.coordinate,
-            whileSelecting: appState.selectedCity
-        ) {
-            appState.selectedCity = city
-            planner.cityChanged(to: city)
-        }
+    private func fillEndpoint(_ field: RouteInputField, with place: TransitPlace) {
         planner.selectPlace(place, for: field)
         replan()
     }
@@ -618,10 +570,8 @@ struct MapContainerView: View {
             )
         case .editEndpoint(let field):
             SearchPageView(
-                onSelectStation: { station in
-                    fillEndpoint(field, with: station.asTransitPlace, cityID: station.cityID)
-                },
-                onSelectPlace: { fillEndpoint(field, with: $0, cityID: nil) },
+                onSelectStation: { fillEndpoint(field, with: $0.asTransitPlace) },
+                onSelectPlace: { fillEndpoint(field, with: $0) },
                 dismissesOnSelection: true
             )
         case .results:
@@ -652,8 +602,8 @@ struct MapContainerView: View {
                     accessibilityFilter: planner.accessibilityFilter
                 )
             } else {
-                // The routes were cleared while this was pushed (a city change does that). Say so
-                // — a screen that explains itself beats a screen that is simply empty.
+                // The routes were cleared while this was pushed. Say so — a screen that
+                // explains itself beats a screen that is simply empty.
                 staleRouteNotice
             }
         case .station(let stationID):
@@ -766,97 +716,5 @@ private struct PlaceLoadingView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-
-struct CityPickerView: View {
-    @Binding var selectedCity: City?
-    @Environment(\.dismiss) private var dismiss
-    @Environment(DIContainer.self) private var container
-    @State private var searchText = ""
-    @State private var debouncedQuery = ""
-    @State private var debounceTask: Task<Void, Never>?
-
-    private var cities: [City] {
-        container.cityService.getAllCities()
-    }
-
-    private var filteredCities: [City] {
-        let query = debouncedQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !query.isEmpty else { return cities }
-        return cities.filter { city in
-            [
-                city.id,
-                city.name,
-                city.nameEn,
-                city.localizedName,
-                city.alternateLocalizedName
-            ]
-            .compactMap { $0?.lowercased() }
-            .contains { $0.contains(query) }
-        }
-    }
-
-    var body: some View {
-        NavigationStack {
-            List(filteredCities) { city in
-                Button(action: {
-                    selectedCity = city
-                    dismiss()
-                }) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(city.localizedName)
-                                    .font(.headline)
-                                if let alternateName = city.alternateLocalizedName {
-                                    Text(alternateName)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-
-                            Spacer(minLength: 8)
-
-                            if selectedCity?.id == city.id {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.accentColor)
-                            }
-
-                            Text(AppLocalization.stationCount(city.stationCount))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-
-                        CityCapabilityTags(
-                            coverage: city.dataCapabilities.coverage,
-                            hasOfficialOnlineStationInformation:
-                                container.stationInformationDirectory.servesStationInformation(cityID: city.id)
-                        )
-                        .equatable()
-                    }
-                    .padding(.vertical, 4)
-                }
-                .buttonStyle(.plain)
-            }
-            .navigationTitle(AppLocalization.localized("Select City"))
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: AppLocalization.localized("Search cities"))
-            .onChange(of: searchText) { _, newValue in
-                debounceTask?.cancel()
-                debounceTask = Task {
-                    try? await Task.sleep(for: .milliseconds(200))
-                    guard !Task.isCancelled else { return }
-                    debouncedQuery = newValue
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(AppLocalization.localized("Cancel")) { dismiss() }
-                }
-            }
-        }
     }
 }

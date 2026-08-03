@@ -27,7 +27,8 @@ struct MapVisibleRegion {
 /// The same intent therefore landed at a different scale depending on which code path served it,
 /// and pressing locate answered "where am I" with an 11km-wide view of the whole city.
 enum MapCameraSpan {
-    /// Whole metro area. Only for a city with no fix to centre on.
+    /// Whole metro area. For a first launch with no fix to centre on, and as the bias region
+    /// for a place search.
     static let city: CLLocationDegrees = 0.22
     /// Walkable surroundings — the default answer to "where am I". Deliberately below the 0.12
     /// threshold at which `refreshVisibleStations` starts drawing non-interchange stations, so
@@ -40,9 +41,6 @@ enum MapCameraSpan {
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
-    var searchText = ""
-    var searchResults: [TransitPlace] = []
-    var errorMessage: String?
     var visibleRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
     var isLocationAuthorized: Bool {
@@ -54,20 +52,9 @@ final class MapViewModel {
     private let cityService: CityService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
-    // The city the map is currently loaded for — search publishes are guarded on it so
-    // a slow city-A place search can't flash its results under city B's map.
-    private var activeCityID: String?
-    // Set when the locate flow has already centered the camera on the user inside the
-    // city about to be selected — that city's loadStations must not yank the camera to
-    // the city center. Cleared on every load so a manual pick invalidates it.
-    private var pendingUserCameraCityID: String?
     private var viewportLoadTask: Task<Void, Never>?
-    private var cityLoadTask: Task<Void, Never>?
-    // Publish token. A load only writes its results if no newer load has started since,
-    // which lets the city load and a viewport load coexist without either cancelling the
-    // other — the newest request simply wins. See `viewportChanged`.
+    // Publish token. A load only writes its results if no newer load has started since.
     private var networkLoadGeneration = 0
-    private var searchTask: Task<Void, Never>?
     private var markerRefreshTask: Task<Void, Never>?
 
     init(
@@ -84,97 +71,22 @@ final class MapViewModel {
 
     deinit {
         viewportLoadTask?.cancel()
-        cityLoadTask?.cancel()
-        searchTask?.cancel()
         markerRefreshTask?.cancel()
-    }
-
-    func loadStations(for city: City) async {
-        activeCityID = city.id
-        let keepUserCamera = pendingUserCameraCityID == city.id
-        pendingUserCameraCityID = nil
-        clearSearch()
-        viewportLoadTask?.cancel()
-        cityLoadTask?.cancel()
-        markerRefreshTask?.cancel()
-        if !keepUserCamera {
-            // Skipped only when the locate flow triggered this switch — the camera is
-            // already on the user inside this city, and recentering would undo the locate.
-            updateCamera(to: city.coordinate, spanDelta: MapCameraSpan.city)
-        }
-        metroNetworks = []
-        stations = []
-        networkLoadGeneration += 1
-        let generation = networkLoadGeneration
-        cityLoadTask = Task { [weak self] in
-            await self?.loadNetworks(cityIDs: [city.id], generation: generation)
-        }
-    }
-
-    func searchEverywhere(in city: City?) async {
-        guard let city else { return }
-        let cityID = city.id
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else {
-            searchResults = []
-            return
-        }
-
-        errorMessage = nil
-        do {
-            let results = try await stationSearchService.searchPlaces(
-                keyword: query,
-                city: cityID,
-                region: visibleRegion?.mkCoordinateRegion
-            )
-            // MKLocalSearch ignores Swift task cancellation, so a superseded query can return
-            // after a newer one — drop it instead of stomping the current results. The city
-            // guard covers the window before a city switch's deferred clearSearch runs.
-            guard !Task.isCancelled,
-                  activeCityID == cityID,
-                  searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
-            errorMessage = nil
-            searchResults = results
-        } catch {
-            guard !Task.isCancelled,
-                  activeCityID == cityID,
-                  searchText.trimmingCharacters(in: .whitespacesAndNewlines) == query else { return }
-            searchResults = []
-            errorMessage = AppLocalization.localized("Place search requires a network connection")
-        }
-    }
-
-    func scheduleSearch(in city: City?) {
-        searchTask?.cancel()
-        searchTask = Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(180))
-            guard !Task.isCancelled else { return }
-            await self?.searchEverywhere(in: city)
-        }
     }
 
     /// The programmed station a place/POI corresponds to, if any (so a searched or tapped
     /// place that *is* a station opens the station detail instead of the Apple place card).
-    func matchingStation(for place: TransitPlace, city: City?) async -> Station? {
-        guard let city else { return nil }
-        return await stationSearchService.station(matching: place, city: city.id)
+    func matchingStation(for place: TransitPlace) async -> Station? {
+        await stationSearchService.station(matching: place)
     }
 
-    func clearSearch() {
-        searchTask?.cancel()
-        markerRefreshTask?.cancel()
-        searchText = ""
-        searchResults = []
-        errorMessage = nil
-    }
-
+    /// The only thing that decides what the map has loaded: what the map is looking at.
+    ///
+    /// There was a second, competing loader keyed on a selected city, and the two disagreed —
+    /// a city load reset the camera to a centroid the rider had not asked for, and a viewport
+    /// load could be cancelled by it mid-flight. The camera is now the single input.
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
-        // Deliberately does NOT cancel `cityLoadTask`. Setting the camera in `loadStations`
-        // makes MKMapView answer with `regionDidChangeAnimated`, which lands here — cancelling
-        // on that killed the very load that draws the lines, and every further frame of the
-        // opening animation cancelled the debounced retry too, so nothing drew until the map
-        // stopped moving. The generation token below supersedes stale results instead.
         viewportLoadTask?.cancel()
         scheduleVisibleStationsRefresh()
 
@@ -194,7 +106,7 @@ final class MapViewModel {
                 .map(\.cityID)
             let visibleCityIDs = Array(Set(centerCityIDs + intersectingLoadedCityIDs))
             // Claim the token only now, once this load is actually starting — during the
-            // debounce window an in-flight city load is still the freshest thing there is
+            // debounce window a still-running earlier load is the freshest thing there is
             // and must be allowed to publish.
             networkLoadGeneration += 1
             await loadNetworks(cityIDs: visibleCityIDs, generation: networkLoadGeneration)
@@ -249,20 +161,13 @@ final class MapViewModel {
         }
     }
 
-    /// Centers the camera on the user and returns the city the app should switch to when
-    /// the user is clearly outside the selected city's metro area — nil otherwise. The
-    /// caller owns the actual `selectedCity` write; `loadStations` for the returned city
-    /// then keeps the user-centered camera instead of recentering (pendingUserCameraCityID).
-    /// Whether the camera actually reached the rider, and the city to adopt if they are in a
-    /// different one.
+    /// Whether the camera actually reached the rider, and why not when it did not.
     ///
-    /// Two separate answers, because they used to be one: this returned `City?`, and `nil` meant
-    /// both "no fix" *and* "already in the right city". Callers could not tell a failed locate from
-    /// a successful one, so launch treated a success in the current city as done-with-no-camera and
-    /// left the map on the city centroid.
+    /// It used to also answer "which city should the app switch to", because putting the camera
+    /// on the rider meant changing what the whole app was looking at. Panning the map to another
+    /// city is now just panning the map, so locating is just moving the camera.
     struct UserCameraOutcome {
         let didCenter: Bool
-        let cityToAdopt: City?
         /// Why the camera did not move, when the reason is one a rider should hear about.
         /// Cancellation is not such a reason and leaves this nil — see `centerOnUser`.
         var failureMessage: String? = nil
@@ -271,33 +176,21 @@ final class MapViewModel {
     func centerOnUser() async -> UserCameraOutcome {
         do {
             let fix = try await locationService.requestCurrentLocation()
-            // A cancelled locate-me (city switch mid-fix) must not recenter the new
-            // city's map onto the user's physical position.
-            guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false, cityToAdopt: nil) }
+            // A superseded locate-me must not drag the camera off wherever the rider went next.
+            guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false) }
             // Not `fix.coordinate`. Core Location reports WGS-84 and the map is GCJ-02 — measured
             // at 540.2 m apart in Beijing, which put the camera half a station southwest of the
             // rider's own dot while both were "correct". See LocationService.mapSpaceCorrection.
-            let location = locationService.mapSpaceLocation(from: fix)
-            updateCamera(to: location.coordinate)
-            let selected = activeCityID.flatMap { cityService.getCity(byID: $0) }
-            let nearest = selected.flatMap { cityService.cityToAdopt(for: location, whileSelecting: $0) }
-            // Claim the camera for whichever city is about to load — including the current one.
-            // Only the cross-city case used to be claimed, so a same-city reload (a second
-            // `.task` run, a network refresh) yanked the camera back to the centroid.
-            pendingUserCameraCityID = nearest?.id ?? activeCityID
-            return UserCameraOutcome(didCenter: true, cityToAdopt: nearest)
+            updateCamera(to: locationService.mapSpaceLocation(from: fix).coordinate)
+            return UserCameraOutcome(didCenter: true)
         } catch is CancellationError {
             // Superseded, not failed. The rider asked for something else; say nothing.
-            return UserCameraOutcome(didCenter: false, cityToAdopt: nil)
+            return UserCameraOutcome(didCenter: false)
         } catch {
             // A fix that never arrives takes the request's full 15 s timeout and then this path,
-            // which used to be silent — the map simply stayed on the city centroid and the rider
-            // was left to conclude the app ignores their location. Missing is shown as missing.
-            return UserCameraOutcome(
-                didCenter: false,
-                cityToAdopt: nil,
-                failureMessage: error.localizedDescription
-            )
+            // which used to be silent — the map simply stayed where it was and the rider was left
+            // to conclude the app ignores their location. Missing is shown as missing.
+            return UserCameraOutcome(didCenter: false, failureMessage: error.localizedDescription)
         }
     }
 
@@ -373,48 +266,18 @@ final class MapViewModel {
         }
 
         let showsNormalStations = region.maxDelta <= 0.12
-        let visibleStations = oneMarkerPerPlace(
-            metroNetworks
-                .flatMap { stationsByCity[$0.cityID] ?? [] }
-                .filter { station in
-                    region.contains(station.coordinate, paddingFactor: 0.2) &&
-                        (showsNormalStations || station.isTransferStation)
-                }
-        )
+        let inView = metroNetworks
+            .flatMap { stationsByCity[$0.cityID] ?? [] }
+            .filter { station in
+                region.contains(station.coordinate, paddingFactor: 0.2) &&
+                    (showsNormalStations || station.isTransferStation)
+            }
+        // Only one pack in view means no pack can be duplicating another's stations.
+        let visibleStations = metroNetworks.count > 1 ? inView.oneEntryPerPlace() : inView
         // Cheap identity comparison (short-circuits, no temporary arrays) before publishing.
         if !sameStations(visibleStations, stations) {
             stations = visibleStations
         }
-    }
-
-    /// Collapses the copies of one station that several packs each ship.
-    ///
-    /// Neighbouring cities' packs carry the intercity corridor they share, so a station on it is
-    /// shipped two or three times — 174 such pairs across the bundled data. The map drew every
-    /// copy, which is why Guangzhou's 科韵路 appeared as a stack of interchange markers on one spot.
-    ///
-    /// Same rule as the router's `canonicalStationIDs`: identical name **and** colocation, never
-    /// distance alone — 体育西路 and 天河南 are 281 m apart and are different stations. The copy
-    /// that knows the most lines survives, which is the one carrying the metro service rather than
-    /// the intercity-only stub.
-    private func oneMarkerPerPlace(_ stations: [Station]) -> [Station] {
-        guard metroNetworks.count > 1 else { return stations }
-        var kept: [Station] = []
-        kept.reserveCapacity(stations.count)
-        var indicesByName: [String: [Int]] = [:]
-        for station in stations {
-            let key = normalizedStationName(station.name)
-            let match = indicesByName[key, default: []].first {
-                kept[$0].coordinate.distance(to: station.coordinate) <= 250
-            }
-            if let match {
-                if station.lines.count > kept[match].lines.count { kept[match] = station }
-            } else {
-                indicesByName[key, default: []].append(kept.count)
-                kept.append(station)
-            }
-        }
-        return kept
     }
 
     private func sameStations(_ lhs: [Station], _ rhs: [Station]) -> Bool {

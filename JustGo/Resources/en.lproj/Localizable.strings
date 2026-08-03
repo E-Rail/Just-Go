@@ -11,7 +11,6 @@
 "Arrival Exit" = "Arrival Exit";
 "Boarding Access" = "Boarding Access";
 "Cancel" = "Cancel";
-"City" = "City";
 "Cognitive" = "Cognitive";
 "Current Profile" = "Current Profile";
 "Delete" = "Delete";
@@ -65,7 +64,6 @@
 "Schedule unavailable" = "Schedule unavailable";
 "Bundled schedule" = "Bundled schedule";
 "Search" = "Search";
-"Select City" = "Select City";
 "Settings" = "Settings";
 "Show Accessibility Badges" = "Show Accessibility Badges";
 "Simplified UI" = "Simplified UI";
@@ -117,7 +115,6 @@
 "Official city data could not be reached; basic station data still works." = "Official city data could not be reached; basic station data still works.";
 "Tactile path available" = "Tactile path available";
 "Official schedule pending for this city/station" = "Official schedule pending for this city/station";
-"Search cities" = "Search cities";
 "More" = "More";
 "Fewest Transfers" = "Fewest Transfers";
 "Least Confusing" = "Least Confusing";
@@ -158,7 +155,6 @@
 "Metro geometry © OpenStreetMap contributors" = "Metro geometry © OpenStreetMap contributors";
 "Metro track geometry" = "Metro track geometry";
 "OpenStreetMap physical track geometry" = "OpenStreetMap physical track geometry";
-"Choose a city to browse stations" = "Choose a city to browse stations";
 "Journey is outside supported subway coverage" = "Journey is outside supported subway coverage";
 "Place search requires a network connection" = "Place search requires a network connection";
 "Walking distance is estimated" = "Walking distance is estimated";
@@ -169,7 +165,6 @@
 "Apple Maps walking directions mention an elevator." = "Apple Maps walking directions mention an elevator.";
 "Apple Maps walking directions mention an escalator." = "Apple Maps walking directions mention an escalator.";
 "Apple Maps walking directions mention stairs." = "Apple Maps walking directions mention stairs.";
-"Choose City" = "Choose City";
 "Checking station details..." = "Checking station details...";
 "Complete Trip" = "Complete Trip";
 "First" = "First";

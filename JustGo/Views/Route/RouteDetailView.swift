@@ -156,7 +156,7 @@ struct RouteDetailView: View {
             async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
                 for: route
             )
-            if let cityID = route.networkCityID ?? appState.selectedCity?.id {
+            if let cityID = route.networkCityID {
                 cityResources = await container.officialStationData
                     .cityExternalResources(for: [cityID])[cityID] ?? []
                 if cityID == BeijingServiceNoticeProvider.cityID {
@@ -199,7 +199,7 @@ struct RouteDetailView: View {
 
     /// City + selected route: the two things every load on this screen is keyed to.
     private var routeDataKey: String {
-        let cityID = route.networkCityID ?? appState.selectedCity?.id ?? ""
+        let cityID = route.networkCityID ?? ""
         return cityID + "|" + selectedRouteID.uuidString
     }
 
@@ -379,13 +379,13 @@ struct RouteDetailView: View {
                     TransferStationSheet(
                         transferSegment: segment,
                         nextTransitSegment: nextTransitSegment(after: segment),
-                        cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                        cityID: route.networkCityID ?? "",
                         accessibilityFilter: accessibilityFilter
                     )
                 case .station(let stop):
                     RouteStationGuideSheet(
                         stop: stop,
-                        cityID: route.networkCityID ?? appState.selectedCity?.id ?? ""
+                        cityID: route.networkCityID ?? ""
                     )
                 case .confidence:
                     let feasibility = currentFeasibility()

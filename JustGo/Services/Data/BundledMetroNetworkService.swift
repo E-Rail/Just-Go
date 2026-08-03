@@ -60,6 +60,57 @@ struct MetroNetworkSummary: Decodable {
     let geometryKind: String
 }
 
+/// A network file's stations and the lines they belong to, without `lines[].paths`.
+///
+/// The polylines are 69% of the bundled bytes (3.25 MB of 4.73 MB) and exist only to be drawn.
+/// Leaving them undecoded is what makes one nationwide station list affordable: all 53 packs,
+/// 6,711 stations, held at once so search can rank by distance instead of by which city the
+/// rider had been made to pick.
+struct MetroNetworkStationIndex: Decodable {
+    struct Line: Decodable {
+        let id: String
+        let name: String
+        let nameEn: String?
+        let colorHex: String
+    }
+
+    let cityID: String
+    let geometryKind: String
+    let lines: [Line]
+    let stations: [MetroStation]
+
+    var displayStations: [Station] {
+        let linesByID = Dictionary(
+            lines.map { ($0.id, SubwayLine(lineID: $0.id, name: $0.name, nameEn: $0.nameEn, colorHex: $0.colorHex, cityID: cityID)) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        return stations.map { makeDisplayStation($0, cityID: cityID, linesByID: linesByID) }
+    }
+}
+
+/// The one place a `MetroStation` becomes a rider-facing `Station`. Shared by the full network
+/// and the station-only index above so the two can never disagree about an ID or a line list —
+/// the map draws one and search lists the other, and a station that differs between them reads
+/// as two different places.
+private func makeDisplayStation(
+    _ item: MetroStation,
+    cityID: String,
+    linesByID: [String: SubwayLine]
+) -> Station {
+    let displayLines = item.lineIDs.compactMap { linesByID[$0] }
+    let station = Station(
+        stationID: "network-\(cityID)-\(item.id)",
+        name: item.name,
+        nameEn: item.nameEn,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        cityID: cityID,
+        isTransferStation: Set(displayLines.map(\.lineID)).count > 1
+    )
+    station.lines = displayLines
+    return station
+}
+
 struct MetroNetwork: Codable, Equatable, Identifiable {
     let cityID: String
     let version: String
@@ -108,18 +159,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 
     private func displayStation(_ item: MetroStation, linesByID: [String: SubwayLine]) -> Station {
-        let displayLines = item.lineIDs.compactMap { linesByID[$0] }
-        let station = Station(
-            stationID: "network-\(cityID)-\(item.id)",
-            name: item.name,
-            nameEn: item.nameEn,
-            latitude: item.latitude,
-            longitude: item.longitude,
-            cityID: cityID,
-            isTransferStation: Set(displayLines.map(\.lineID)).count > 1
-        )
-        station.lines = displayLines
-        return station
+        makeDisplayStation(item, cityID: cityID, linesByID: linesByID)
     }
 
     // Normalized-name → stations index, built once per (cityID, version) and cached, so
@@ -165,6 +205,9 @@ protocol MetroNetworkProviding: Sendable {
     func network(for cityID: String) async -> MetroNetwork?
     func networkSummaries() async -> [MetroNetworkSummary]
     func stations(in cityID: String) async -> [Station]
+    /// Every bundled station, everywhere. Search ranks these by distance from the rider; there
+    /// is no selected city to scope them to any more.
+    func allStations() async -> [Station]
 }
 
 extension MetroNetworkProviding {
@@ -175,6 +218,10 @@ extension MetroNetworkProviding {
     func networkSummaries() async -> [MetroNetworkSummary] {
         []
     }
+
+    func allStations() async -> [Station] {
+        []
+    }
 }
 
 actor BundledMetroNetworkService: MetroNetworkProviding {
@@ -183,6 +230,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     private var stationsByCity: [String: [Station]] = [:]
     private var summaries: [String: MetroNetworkSummary] = [:]
     private var missingCityIDs: Set<String> = []
+    private var allStationsCache: [Station]?
 
     func network(for cityID: String) async -> MetroNetwork? {
         if let network = networks[cityID] {
@@ -223,6 +271,50 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         guard let network = await network(for: cityID) else { return [] }
         let stations = network.displayStations
         stationsByCity[cityID] = stations
+        return stations
+    }
+
+    /// Every bundled station, built once and kept.
+    ///
+    /// Decodes the station-only projection of each pack rather than the full network: the
+    /// polylines it skips are 69% of the bytes and are drawn from the viewport-loaded networks
+    /// anyway. A city already fully loaded contributes its cached `Station` objects instead of
+    /// being read a second time.
+    func allStations() async -> [Station] {
+        if let allStationsCache { return allStationsCache }
+        var stations: [Station] = []
+        var pendingURLs: [(cityID: String, url: URL)] = []
+        for cityID in Self.supportedCityIDs {
+            if let cached = stationsByCity[cityID] {
+                stations += cached
+            } else if !missingCityIDs.contains(cityID), let url = bundledNetworkURL(for: cityID) {
+                pendingURLs.append((cityID, url))
+            }
+        }
+
+        // Only the decode fans out. `Station` is a reference type and deliberately not Sendable,
+        // so the objects are built here on the actor from the value-typed indexes the group
+        // returns, rather than being passed across task boundaries.
+        let indexes = await withTaskGroup(of: MetroNetworkStationIndex?.self) { group in
+            for pending in pendingURLs {
+                group.addTask { try? await Self.decode(MetroNetworkStationIndex.self, at: pending.url) }
+            }
+            var decoded: [MetroNetworkStationIndex] = []
+            for await index in group {
+                if let index { decoded.append(index) }
+            }
+            return decoded
+        }
+
+        for index in indexes where index.geometryKind == "physicalTrack" {
+            let cityStations = index.displayStations
+            stationsByCity[index.cityID] = cityStations
+            stations += cityStations
+        }
+        // Sorted so the list is stable across launches regardless of which city's decode
+        // finished first — the ranking that matters is applied by the caller, per rider.
+        stations.sort { $0.stationID < $1.stationID }
+        allStationsCache = stations
         return stations
     }
 
@@ -292,6 +384,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     func releaseMemory() {
         networks.removeAll()
         stationsByCity.removeAll()
+        allStationsCache = nil
         MetroNetwork.clearNormalizedIndexCache()
     }
 }

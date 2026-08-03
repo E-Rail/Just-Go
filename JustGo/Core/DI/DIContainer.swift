@@ -203,8 +203,7 @@ final class DIContainer {
         let stationSearchService = StationSearchService(
             placeSearchProvider: placeSearchProvider,
             officialStationData: officialStationData,
-            metroNetworkProvider: metroNetworkProvider,
-            cityService: cityService
+            metroNetworkProvider: metroNetworkProvider
         )
         let routePlanningService = RoutePlanningService(
             placeSearchProvider: placeSearchProvider,

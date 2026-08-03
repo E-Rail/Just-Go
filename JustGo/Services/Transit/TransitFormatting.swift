@@ -162,6 +162,38 @@ extension SubwayLine {
     }
 }
 
+extension Array where Element == Station {
+    /// Collapses the copies of one station that several packs each ship.
+    ///
+    /// Neighbouring cities' packs carry the intercity corridor they share, so a station on it is
+    /// shipped two or three times — 174 such pairs across the bundled data. Guangzhou's 科韵路
+    /// exists in three, and both the map and search would otherwise show all three.
+    ///
+    /// Identity is identical name **and** colocation, never distance alone: 体育西路 and 天河南 are
+    /// 281 m apart and are different stations. The copy that knows the most lines survives, which
+    /// is the one carrying the metro service rather than the intercity-only stub.
+    ///
+    /// One rule, two callers — the marker list and the search results drifted apart once already.
+    func oneEntryPerPlace() -> [Station] {
+        var kept: [Station] = []
+        kept.reserveCapacity(count)
+        var indicesByName: [String: [Int]] = [:]
+        for station in self {
+            let key = normalizedStationName(station.name)
+            let match = indicesByName[key, default: []].first {
+                kept[$0].coordinate.distance(to: station.coordinate) <= 250
+            }
+            if let match {
+                if station.lines.count > kept[match].lines.count { kept[match] = station }
+            } else {
+                indicesByName[key, default: []].append(kept.count)
+                kept.append(station)
+            }
+        }
+        return kept
+    }
+}
+
 extension Station {
     var uniqueLogicalLines: [SubwayLine] {
         lines.uniqued(by: \.logicalLineIdentity)

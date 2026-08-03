@@ -20,7 +20,6 @@ final class RoutePlannerViewModel {
     var destinationPlace: TransitPlace?
     var originSuggestions: [TransitPlace] = []
     var destinationSuggestions: [TransitPlace] = []
-    var selectedCity: City?
     var routes: [Route] = []
     var recentRoutes: [RecentRoute] = []
     var isLoading = false
@@ -34,10 +33,13 @@ final class RoutePlannerViewModel {
 
     private var suggestionTask: Task<Void, Never>?
     private var routeSearchGeneration = 0
-    /// City of the network that produced the current `routes`; nil once any input changes.
-    /// The metro provider picks its network by coordinates, so this can differ from
-    /// `selectedCity` on seam trips — "Save this trip" persists under this city.
-    private(set) var lastPlannedCityID: String?
+    /// A search published routes and no input has changed since. Cleared by every mutation, so
+    /// "Save this trip" can trust that what it snapshots is what is on screen.
+    ///
+    /// This used to be the planned network's city ID, doing double duty as a has-a-plan flag —
+    /// which quietly stopped working the moment a plan could be a walk, since a walk enters no
+    /// network and so had no city to record.
+    private(set) var hasPlannedForCurrentInputs = false
 
     /// Persisted app-wide accessibility defaults (the 无障碍 sheet), refreshed by the view
     /// on each appearance. Feeds max-walk warnings and ranking; the chips below override
@@ -89,8 +91,25 @@ final class RoutePlannerViewModel {
 
     var canSearch: Bool {
         !originName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !destinationName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        selectedCity != nil
+        !destinationName.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    /// Where to bias a place lookup: the other end of the trip when it is already resolved, else
+    /// the rider's own position, else nowhere.
+    ///
+    /// This used to be a city centroid, which is what made typing a station name resolve to the
+    /// same-named station in whichever city the app happened to be set to. The trip itself is a
+    /// better answer than any city: if one end is known, the other is near it.
+    private func searchRegion(for field: RouteInputField, radiusMeters: CLLocationDistance) -> MKCoordinateRegion? {
+        let other: RouteInputField = field == .origin ? .destination : .origin
+        guard let center = place(for: other)?.coordinate ?? locationService.mapSpaceLocation?.coordinate else {
+            return nil
+        }
+        return MKCoordinateRegion(
+            center: center,
+            latitudinalMeters: radiusMeters,
+            longitudinalMeters: radiusMeters
+        )
     }
 
     func name(for field: RouteInputField) -> String {
@@ -112,18 +131,18 @@ final class RoutePlannerViewModel {
     /// Any input mutation supersedes an in-flight route search: bump the generation so a
     /// slow search's publish/error guards fail, and clear the spinner here — the superseded
     /// search's defer (correctly) refuses to touch it once the token has moved on. Also
-    /// voids the planned-city association and any error, both of which described the
+    /// voids the has-a-plan flag and any error, both of which described the
     /// previous inputs (a "No Routes Found" alert must not outlive the query it was for).
     private func invalidateInFlightSearch() {
         routeSearchGeneration += 1
         isLoading = false
-        lastPlannedCityID = nil
+        hasPlannedForCurrentInputs = false
         errorMessage = nil
     }
 
     private func clearCurrentPlan() {
         routes = []
-        lastPlannedCityID = nil
+        hasPlannedForCurrentInputs = false
     }
 
     private func routeAffectingSettingsChanged() {
@@ -161,10 +180,9 @@ final class RoutePlannerViewModel {
         return shouldClearCurrentPlan
     }
 
-    /// A successful plan matching the current inputs exists — lastPlannedCityID survives
-    /// only while no input has mutated since the publish, so "Save this trip" can trust it.
+    /// A successful plan matching the current inputs exists.
     var hasCurrentPlan: Bool {
-        lastPlannedCityID != nil && !routes.isEmpty
+        hasPlannedForCurrentInputs && !routes.isEmpty
     }
 
     func selectPlace(_ place: TransitPlace, for field: RouteInputField) {
@@ -180,16 +198,13 @@ final class RoutePlannerViewModel {
     @discardableResult
     func useCurrentLocation(for field: RouteInputField) async -> Bool {
         // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
-        // error) landing after the user switched city, edited the field, picked a suggestion,
-        // or entered quick-place setup must be dropped, not applied over the newer input.
-        let expectedCityID = selectedCity?.id
+        // error) landing after the user edited the field, picked a suggestion, or entered
+        // quick-place setup must be dropped, not applied over the newer input.
         let expectedName = name(for: field)
         let expectedPlace = self.place(for: field)
         // self.place(for:) — the local `place` declared below shadows the method in here.
         func contextUnchanged() -> Bool {
-            selectedCity?.id == expectedCityID &&
-                name(for: field) == expectedName &&
-                self.place(for: field) == expectedPlace
+            name(for: field) == expectedName && self.place(for: field) == expectedPlace
         }
 
         let resolver = CurrentPlaceResolver(
@@ -218,36 +233,11 @@ final class RoutePlannerViewModel {
         locationService.prewarmLocation()
     }
 
-    func cityChanged(to city: City?) {
-        let cityActuallyChanged = city?.id != selectedCity?.id
-        selectedCity = city
-        if cityActuallyChanged {
-            // Only reset the resolved places + typed names when the city truly changes. This
-            // runs on every planner re-appearance (tab switch); wiping the places unconditionally
-            // would silently drop a station the user already picked and force a redundant
-            // geocode (which fails offline) on the next search.
-            originPlace = nil
-            destinationPlace = nil
-            originName = ""
-            destinationName = ""
-            // Invalidate any in-flight route search too: its generation guard alone can't
-            // see a city change, so a slow city-A plan would publish routes (and save a
-            // recent route) under city B.
-            invalidateInFlightSearch()
-            routes = []
-        }
-        suggestionTask?.cancel()
-        suggestionTask = nil
-        clearSuggestions()
-    }
-
     /// Returns whether THIS invocation published non-empty routes — a superseded or failed
     /// search returns false, so callers (saved-trip credit, results push) act only on the
     /// search they own instead of inspecting the shared `routes` after the await.
     @discardableResult
     func searchRoutes() async -> Bool {
-        guard let city = selectedCity else { return false }
-
         // Generation guard: a second search (e.g. a stray tap during a quick-route location
         // fetch, while isLoading is still false) must not let a slower, superseded result
         // overwrite the newest one or flip the spinner off mid-search.
@@ -257,7 +247,7 @@ final class RoutePlannerViewModel {
         errorMessage = nil
         routes = []
         // The association describes the previous plan; void it until this one publishes.
-        lastPlannedCityID = nil
+        hasPlannedForCurrentInputs = false
         defer { if generation == routeSearchGeneration { isLoading = false } }
 
         do {
@@ -271,27 +261,24 @@ final class RoutePlannerViewModel {
                 planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destinationPlace,
-                    city: city.id,
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor
                 )
             case let (originPlace?, nil):
-                let destination = try await resolveTypedPlace(destinationName, city: city, field: .destination, generation: generation)
+                let destination = try await resolveTypedPlace(destinationName, field: .destination, generation: generation)
                 resolvedDestination = destination
                 planned = try await routePlanningService.planRoute(
                     from: originPlace,
                     to: destination,
-                    city: city.id,
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor
                 )
             case let (nil, destinationPlace?):
-                let origin = try await resolveTypedPlace(originName, city: city, field: .origin, generation: generation)
+                let origin = try await resolveTypedPlace(originName, field: .origin, generation: generation)
                 resolvedOrigin = origin
                 planned = try await routePlanningService.planRoute(
                     from: origin,
                     to: destinationPlace,
-                    city: city.id,
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor
                 )
@@ -305,11 +292,8 @@ final class RoutePlannerViewModel {
                 guard !originQuery.isEmpty, !destinationQuery.isEmpty else {
                     throw RoutePlanningError.stationNotFound
                 }
-                let region = MKCoordinateRegion(
-                    center: city.coordinate,
-                    latitudinalMeters: 120_000,
-                    longitudinalMeters: 120_000
-                )
+                // Neither end is resolved, so there is nothing to bias against but the rider.
+                let region = searchRegion(for: .origin, radiusMeters: 120_000)
                 // Local so the child tasks capture the provider, not non-Sendable self.
                 let provider = placeSearchProvider
                 async let originCandidates = provider.searchPlaces(keyword: originQuery, region: region, limit: 8)
@@ -324,7 +308,6 @@ final class RoutePlannerViewModel {
                 planned = try await routePlanningService.planRoute(
                     from: origin,
                     to: destination,
-                    city: city.id,
                     accessibilityFilter: accessibilityFilter,
                     tripAnchor: tripAnchor
                 )
@@ -336,15 +319,14 @@ final class RoutePlannerViewModel {
             // would supersede this very search and strand the spinner.
             if let resolvedOrigin { setPlace(resolvedOrigin, for: .origin) }
             if let resolvedDestination { setPlace(resolvedDestination, for: .destination) }
-            lastPlannedCityID = planned.first?.networkCityID ?? city.id
+            hasPlannedForCurrentInputs = true
             routes = planned.map(withMaxWalkWarning)
             sortRoutes()
             if let firstRoute = routes.first {
-                // The metro provider picks its network by coordinates, not the selected
-                // city — a seam route (Foshan network under a selected Guangzhou) must be
-                // saved under the network that actually planned it, or replaying the
-                // recent resolves its station names in the wrong city.
-                saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID ?? city.id)
+                // The network that actually planned it, so replaying the recent resolves its
+                // station names in the right pack. A walking-only route has no network and
+                // stores none — `resolvedCityID` recovers one from the station ID when it can.
+                saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID)
             }
             return !routes.isEmpty
         } catch is CancellationError {
@@ -456,17 +438,12 @@ final class RoutePlannerViewModel {
     private func updateSuggestions(for field: RouteInputField) {
         suggestionTask?.cancel()
 
-        guard let city = selectedCity else {
-            clearSuggestions(for: field)
-            return
-        }
-
         let keyword = name(for: field)
         guard !keyword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             clearSuggestions(for: field)
             return
         }
-        let cityID = city.id
+        let region = searchRegion(for: field, radiusMeters: 80_000)
 
         // [weak self]: MKLocalSearch (behind placeSearchProvider) is known to ignore Swift
         // task cancellation elsewhere in this codebase, so a superseded keystroke's search
@@ -475,15 +452,9 @@ final class RoutePlannerViewModel {
         suggestionTask = Task { [weak self, placeSearchProvider] in
             do {
                 try await Task.sleep(for: .milliseconds(120))
-                let region = MKCoordinateRegion(
-                    center: city.coordinate,
-                    latitudinalMeters: 80_000,
-                    longitudinalMeters: 80_000
-                )
                 let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
                 guard let self,
                       !Task.isCancelled,
-                      selectedCity?.id == cityID,
                       name(for: field) == keyword,
                       place(for: field) == nil else { return }
                 setSuggestions(suggestions, for: field)
@@ -505,19 +476,14 @@ final class RoutePlannerViewModel {
         destinationSuggestions = []
     }
 
-    private func resolveTypedPlace(_ name: String, city: City, field: RouteInputField, generation: Int) async throws -> TransitPlace {
+    private func resolveTypedPlace(_ name: String, field: RouteInputField, generation: Int) async throws -> TransitPlace {
         let query = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { throw RoutePlanningError.stationNotFound }
-        let region = MKCoordinateRegion(
-            center: city.coordinate,
-            latitudinalMeters: 120_000,
-            longitudinalMeters: 120_000
-        )
+        let region = searchRegion(for: field, radiusMeters: 120_000)
         guard let place = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 8).first else {
             throw RoutePlanningError.stationNotFound
         }
         guard routeSearchGeneration == generation,
-              selectedCity?.id == city.id,
               self.name(for: field).trimmingCharacters(in: .whitespacesAndNewlines) == query,
               self.place(for: field) == nil else {
             throw CancellationError()
@@ -562,7 +528,7 @@ final class RoutePlannerViewModel {
         }
     }
 
-    private func saveRecentRoute(_ route: Route, cityID: String) {
+    private func saveRecentRoute(_ route: Route, cityID: String?) {
         let recentRoute = RecentRoute(
             originStationID: route.originStationID,
             originStationName: route.origin,

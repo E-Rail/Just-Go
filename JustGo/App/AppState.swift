@@ -53,8 +53,23 @@ enum LaunchStage: Int, CaseIterable, Comparable {
 final class AppState {
     private let userDefaults: UserDefaults
     private let accessibilityPreferenceKey = "accessibilityPreference"
+    private let lastMapCameraKey = "lastMapCamera"
 
-    var selectedCity: City?
+    /// Where the map was last looking.
+    ///
+    /// This is what is left of "the selected city". The app used to hold one city as a mode —
+    /// gating what was loaded, searched, drawn and routed — and every screen had to agree about
+    /// it. What a rider actually wants on relaunch is the view they left, so that is the only
+    /// thing kept: a camera, not a mode. Nothing is gated on it.
+    var lastMapCamera: MapCamera? {
+        didSet { userDefaults.setCodable(lastMapCamera, forKey: lastMapCameraKey) }
+    }
+
+    struct MapCamera: Codable, Equatable {
+        let latitude: Double
+        let longitude: Double
+        let spanDelta: Double
+    }
 
     /// Named rather than an Int, because the tags moved when the Route and Search tabs folded into
     /// the map and a bare `selectedTab = 1` silently means something different afterwards.
@@ -77,10 +92,6 @@ final class AppState {
     struct PendingRouteInput: Equatable {
         let place: TransitPlace
         let role: RouteInputField
-        /// The place's home city when the sender knows it (station-originated inputs);
-        /// nil for map POIs, which carry no city. The planner switches to this city on
-        /// apply so a cross-city quick tag doesn't plan against the wrong network.
-        let cityID: String?
     }
     var pendingRouteInput: PendingRouteInput?
 
@@ -89,8 +100,6 @@ final class AppState {
             userDefaults.setCodable(accessibilityPreference, forKey: accessibilityPreferenceKey)
         }
     }
-    private(set) var hasInitialized = false
-
     /// The stage currently running. `launchProgress` reports the work already behind it, so the
     /// bar shows progress made rather than progress promised.
     private(set) var launchStage: LaunchStage = .preparing
@@ -112,24 +121,10 @@ final class AppState {
             as: AccessibilityPreference.self,
             default: .default
         )
-    }
-
-    func initialize(container: DIContainer) {
-        guard !hasInitialized else { return }
-
-        defer {
-            hasInitialized = true
-        }
-
-        let nearestCity: City?
-        if let location = container.locationService.currentLocation {
-            nearestCity = container.cityService.findNearestCity(to: location)
-        } else {
-            nearestCity = nil
-        }
-
-        selectedCity = nearestCity
-            ?? container.cityService.getCity(byID: "1100")
-            ?? container.cityService.getAllCities().first
+        self.lastMapCamera = userDefaults.codableValue(
+            forKey: lastMapCameraKey,
+            as: AppState.MapCamera?.self,
+            default: nil
+        )
     }
 }

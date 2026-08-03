@@ -59,7 +59,6 @@ final class RoutePlanningService {
     func planRoute(
         from origin: TransitPlace,
         to destination: TransitPlace,
-        city: String,
         accessibilityFilter: AccessibilityFilter = .none,
         tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
@@ -110,7 +109,6 @@ final class RoutePlanningService {
                 group.addTask {
                     let enriched = await self.enrichedRoute(
                         route,
-                        city: city,
                         // A POI's own entrance beats its centroid when MapKit knows one — it is
                         // the door the rider actually walks to, so it is the right thing to
                         // measure the station's exits against.
@@ -179,7 +177,6 @@ final class RoutePlanningService {
 
     private func enrichedRoute(
         _ route: Route,
-        city: String,
         originTarget: CodableCoordinate,
         destinationTarget: CodableCoordinate,
         accessibilityFilter: AccessibilityFilter,
@@ -187,7 +184,10 @@ final class RoutePlanningService {
         legs: WalkingLegMemo
     ) async -> Route {
         var route = route
-        let routeCityID = route.networkCityID ?? city
+        // The pack that actually produced the route. A walking-only plan has none, and every
+        // official-data lookup below then finds nothing and reports unavailable — which is the
+        // truth: no station was involved, so there is nothing to say about one.
+        let routeCityID = route.networkCityID ?? ""
         let criticalStops = criticalStops(for: route)
         let criticalStopNames = criticalStops.map(\.name)
 

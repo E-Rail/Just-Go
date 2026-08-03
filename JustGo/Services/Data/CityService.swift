@@ -71,55 +71,14 @@ final class CityService {
         cities.first { $0.id == id }
     }
 
+    /// The city a coordinate belongs to. Used to *label* things — which pack a quick tag files
+    /// under, which network to warm on launch — never to gate what the app will load, search,
+    /// draw or route. That gate is gone: the map is one network you pan.
     func findNearestCity(to location: CLLocation) -> City? {
         cities.min { city1, city2 in
             let loc1 = CLLocation(latitude: city1.latitude, longitude: city1.longitude)
             let loc2 = CLLocation(latitude: city2.latitude, longitude: city2.longitude)
             return location.distance(from: loc1) < location.distance(from: loc2)
         }
-    }
-
-    /// The city to switch to for a coordinate, or nil to keep the current selection.
-    ///
-    /// Bounded on purpose: within 80km of the selected city's centre the rider is plausibly still
-    /// inside its metro area, and a seam position in adjacent interconnected metros
-    /// (Guangzhou/Foshan) must not flip the selection. Beyond that, follow them to the nearest.
-    ///
-    /// One rule rather than three. The map's locate button, the planner's cross-city fills and the
-    /// launch realignment all ask this same question, and each used to carry its own copy of the
-    /// answer — including the 80km constant.
-    func cityToAdopt(for location: CLLocation, whileSelecting selected: City?) -> City? {
-        guard let selected else { return findNearestCity(to: location) }
-        let selectedCentre = CLLocation(
-            latitude: selected.coordinate.latitude,
-            longitude: selected.coordinate.longitude
-        )
-        guard location.distance(from: selectedCentre) > 80_000,
-              let nearest = findNearestCity(to: location),
-              nearest.id != selected.id else { return nil }
-        return nearest
-    }
-
-    /// The city a *place* should be planned against, for places that may not name their own city.
-    ///
-    /// A known cityID is authoritative — a saved trip or a quick tag knows which network it came
-    /// from. A map POI names nothing, so fall back to the bounded rule above: adopt only when the
-    /// coordinate is clearly outside the selected city's metro area, because seam places in
-    /// adjacent interconnected metros (Guangzhou/Foshan) must keep the rider's selected network.
-    ///
-    /// Returns nil when the selection is already right, so callers can treat non-nil as "switch".
-    /// One rule rather than one per screen: the planner entry page, the map and the search page
-    /// all decide this, and they used to decide it in three separate copies.
-    func cityToAdopt(
-        forPlaceCityID cityID: String?,
-        coordinate: CLLocationCoordinate2D,
-        whileSelecting selected: City?
-    ) -> City? {
-        if let cityID {
-            guard let city = getCity(byID: cityID), city.id != selected?.id else { return nil }
-            return city
-        }
-        let place = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        return cityToAdopt(for: place, whileSelecting: selected)
     }
 }

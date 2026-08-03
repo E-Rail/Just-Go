@@ -23,7 +23,7 @@ extension RouteDetailView {
                     Button(AppLocalization.localized("Save")) {
                         tripMemoryService.markTripComplete(
                             route: route,
-                            cityID: route.networkCityID ?? appState.selectedCity?.id ?? "",
+                            cityID: route.networkCityID ?? "",
                             accessibilityFilter: accessibilityFilter,
                             note: tripNote
                         )

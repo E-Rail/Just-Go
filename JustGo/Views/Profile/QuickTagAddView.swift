@@ -6,7 +6,6 @@ import CoreLocation
 /// and arbitrary map places, each saving through the shared quick-tag editor.
 struct QuickTagAddView: View {
     @Environment(DIContainer.self) private var container
-    @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
 
@@ -172,15 +171,17 @@ struct QuickTagAddView: View {
             return
         }
         isSearching = true
-        let city = appState.selectedCity
+        // Both halves are biased to the rider rather than to a selected city — a quick tag is
+        // almost always somewhere they have been, and there is no selected city to fall back to.
+        let here = container.locationService.mapSpaceLocation?.coordinate
         searchTask = Task {
             do {
                 try await Task.sleep(for: .milliseconds(300))
             } catch {
                 return
             }
-            async let stationsFound = searchStations(keyword: trimmed, city: city)
-            async let placesFound = searchMapPlaces(keyword: trimmed, city: city)
+            async let stationsFound = searchStations(keyword: trimmed, near: here)
+            async let placesFound = searchMapPlaces(keyword: trimmed, near: here)
             let (stations, places) = await (stationsFound, placesFound)
             // MKLocalSearch ignores task cancellation, so guard on the live query text
             // instead of trusting Task.isCancelled alone.
@@ -192,18 +193,14 @@ struct QuickTagAddView: View {
         }
     }
 
-    private func searchStations(keyword: String, city: City?) async -> [Station] {
-        guard let city else { return [] }
-        let matches = await container.stationSearchService.stations(in: city.id).filter { station in
-            station.name.localizedCaseInsensitiveContains(keyword) ||
-                station.nameEn?.localizedCaseInsensitiveContains(keyword) == true
-        }
+    private func searchStations(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [Station] {
+        let matches = (try? await container.stationSearchService.search(keyword: keyword, near: coordinate)) ?? []
         return await container.stationSearchService.enrichStations(Array(matches.prefix(6)))
     }
 
-    private func searchMapPlaces(keyword: String, city: City?) async -> [TransitPlace] {
-        let region = city.map {
-            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
+    private func searchMapPlaces(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [TransitPlace] {
+        let region = coordinate.map {
+            MKCoordinateRegion(center: $0, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
         }
         let places = (try? await container.placeSearchProvider.searchPlaces(
             keyword: keyword,
@@ -247,9 +244,7 @@ struct QuickTagAddView: View {
             )
         case .place(let place):
             let location = CLLocation(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
-            guard let city = container.cityService.findNearestCity(to: location) ?? appState.selectedCity else {
-                return
-            }
+            guard let city = container.cityService.findNearestCity(to: location) else { return }
             tripMemoryService.setQuickTag(
                 place: place,
                 cityID: city.id,

@@ -6,28 +6,35 @@ final class StationSearchService {
     private let placeSearchProvider: PlaceSearchProviding
     private let officialStationData: OfficialStationDataProviding
     private let metroNetworkProvider: MetroNetworkProviding
-    private let cityService: CityService
 
     init(
         placeSearchProvider: PlaceSearchProviding,
         officialStationData: OfficialStationDataProviding,
-        metroNetworkProvider: MetroNetworkProviding,
-        cityService: CityService
+        metroNetworkProvider: MetroNetworkProviding
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.officialStationData = officialStationData
         self.metroNetworkProvider = metroNetworkProvider
-        self.cityService = cityService
     }
 
-    func search(keyword: String, city: String) async throws -> [Station] {
+    /// Every bundled station whose name matches, nearest first, plus anything Apple knows about
+    /// that resolves to a station.
+    ///
+    /// There is no city argument because there is no selected city: the rider's own position
+    /// orders the answers instead of gating them. Searching 人民广场 from Beijing therefore lists
+    /// Shanghai's — last, but listed, which is what "distance-ranked" means and what a city filter
+    /// could never do.
+    func search(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return await stations(in: city) }
-        let bundledMatches = await stations(in: city).filter {
-            stationSearchText($0).localizedCaseInsensitiveContains(query)
-        }
-        let region = cityService.getCity(byID: city).map {
-            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
+        guard !query.isEmpty else { return await nearestStations(to: coordinate, limit: nearbyStationLimit) }
+        let bundledMatches = rankedByDistance(
+            await metroNetworkProvider.allStations().filter {
+                stationSearchText($0).localizedCaseInsensitiveContains(query)
+            },
+            from: coordinate
+        )
+        let region = coordinate.map {
+            MKCoordinateRegion(center: $0, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
         }
         let places: [TransitPlace]
         do {
@@ -45,8 +52,13 @@ final class StationSearchService {
         // nothing is lost by refusing to relabel them.
         let mapKitMatches = await withTaskGroup(of: (Int, Station?).self) { group in
             for (index, place) in places.enumerated() {
+                // Each place carries its own city now — the network whose bounds it falls in.
+                // A nationwide search returns places in several, so one shared cityID would have
+                // matched most of them against the wrong pack.
+                let cityID = await cityID(covering: place.coordinate)
                 group.addTask { [officialStationData] in
-                    (index, await officialStationData.matchingStation(place: place, cityID: city))
+                    guard let cityID else { return (index, nil) }
+                    return (index, await officialStationData.matchingStation(place: place, cityID: cityID))
                 }
             }
             var indexed: [(Int, Station)] = []
@@ -55,10 +67,28 @@ final class StationSearchService {
             }
             return indexed.sorted { $0.0 < $1.0 }.map(\.1)
         }
-        return (bundledMatches + mapKitMatches).uniqued {
+        // `oneEntryPerPlace` before `uniqued`: the first collapses one station shipped by several
+        // packs (科韵路 is in Guangzhou's, Foshan's and Dongguan's, and a nationwide search now
+        // reaches all three), the second drops a MapKit hit that repeats a bundled one.
+        return (bundledMatches + mapKitMatches).oneEntryPerPlace().uniqued {
             "\($0.cityID)|\(normalizedStationName($0.name))"
         }
     }
+
+    /// The stations closest to the rider, whichever cities they happen to be in. Empty when the
+    /// device has no position: there is no centroid left to guess from, and a list of arbitrary
+    /// stations claiming to be "nearby" would be a worse answer than none.
+    func nearestStations(to coordinate: CLLocationCoordinate2D?, limit: Int) async -> [Station] {
+        guard let coordinate else { return [] }
+        // Collapse after ranking but before the limit: the duplicates sit next to each other once
+        // sorted, so taking the limit first would spend rows on the same station twice.
+        let ranked = rankedByDistance(await metroNetworkProvider.allStations(), from: coordinate)
+        return Array(Array(ranked.prefix(limit * 2)).oneEntryPerPlace().prefix(limit))
+    }
+
+    /// How many stations the no-query list offers. Enough to cover a rider standing anywhere in a
+    /// metro area, far short of the 6,711 that exist.
+    var nearbyStationLimit: Int { 60 }
 
     func stations(in cityID: String) async -> [Station] {
         guard !cityID.isEmpty else { return [] }
@@ -69,38 +99,54 @@ final class StationSearchService {
         await officialStationData.enrichStations(stations)
     }
 
-    func suggestions(keyword: String, city: String, limit: Int = 6) async throws -> [Station] {
-        let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return [] }
-        return Array(try await search(keyword: query, city: city).prefix(limit))
-    }
-
     /// Enrich an already-resolved station with official accessibility/facility data,
     /// without a keyword round-trip (avoids matching the wrong similarly-named station).
     func enrichStation(_ station: Station) async -> Station {
         await officialStationData.enrichStation(station)
     }
 
-    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps — not just metro
-    /// stations. Biased to `region` (the visible map area) when provided, else the city.
-    func searchPlaces(keyword: String, city: String, region: MKCoordinateRegion?) async throws -> [TransitPlace] {
+    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps — not just metro stations.
+    /// Biased to `region` (the visible map area, or the rider) when one is known; unbiased
+    /// otherwise, which is honest about having nowhere to bias it to.
+    func searchPlaces(keyword: String, region: MKCoordinateRegion?) async throws -> [TransitPlace] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return [] }
-        let searchRegion = region ?? cityService.getCity(byID: city).map {
-            MKCoordinateRegion(center: $0.coordinate, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
-        }
-        return try await placeSearchProvider.searchPlaces(keyword: query, region: searchRegion, limit: 12)
+        return try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 12)
     }
 
-    /// The programmed metro station a place corresponds to, if any — matched by name
-    /// against the bundled network first, then the official city pack. Returns nil for
+    /// The programmed metro station a place corresponds to, if any — matched by name against the
+    /// bundled network covering that place, then the official city pack. Returns nil for
     /// non-station places (e.g. a shop), so only true stations resolve to a station.
-    func station(matching place: TransitPlace, city: String) async -> Station? {
-        if let network = await metroNetworkProvider.network(for: city),
+    ///
+    /// The pack is chosen by where the place *is*, not by what the app was set to: a Foshan
+    /// station tapped while the map sat over Guangzhou used to be matched against Guangzhou's
+    /// network and so resolved to nothing.
+    func station(matching place: TransitPlace) async -> Station? {
+        guard let cityID = await cityID(covering: place.coordinate) else { return nil }
+        if let network = await metroNetworkProvider.network(for: cityID),
            let match = network.matchingStation(named: place.name, near: place.coordinate) {
             return await enrichStation(network.displayStation(match))
         }
-        return await officialStationData.matchingStation(place: place, cityID: city)
+        return await officialStationData.matchingStation(place: place, cityID: cityID)
+    }
+
+    /// The bundled network a coordinate sits in — nearest bounding box within 25 km, the same
+    /// tolerance the route provider uses to decide which packs a trip can reach.
+    private func cityID(covering coordinate: CLLocationCoordinate2D) async -> String? {
+        await metroNetworkProvider.networkSummaries()
+            .filter { $0.bounds.distance(to: coordinate) <= 25_000 }
+            .min { $0.bounds.distance(to: coordinate) < $1.bounds.distance(to: coordinate) }?
+            .cityID
+    }
+
+    /// Nearest first when the rider's position is known, input order otherwise. Each distance is
+    /// computed once — the comparator runs O(n log n) times and the maths is trig-heavy.
+    private func rankedByDistance(_ stations: [Station], from coordinate: CLLocationCoordinate2D?) -> [Station] {
+        guard let coordinate else { return stations }
+        return stations
+            .map { (station: $0, distance: $0.coordinate.distance(to: coordinate)) }
+            .sorted { $0.distance < $1.distance }
+            .map(\.station)
     }
 
     func filterStations(

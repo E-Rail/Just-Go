@@ -9,6 +9,8 @@ final class StationSearchViewModel {
     var isSearching = false
     var errorMessage: String?
     private var unfilteredResults: [Station] = []
+    /// Distance from the rider to each listed station, measured once when the list was ordered.
+    private var distanceByStationID: [String: CLLocationDistance] = [:]
     private var hasEnrichedUnfilteredResultsForFacilities = false
 
     var filter = StationFilter()
@@ -22,7 +24,6 @@ final class StationSearchViewModel {
     private var hasRequestedSearchLocation = false
     private var stationLoadID = UUID()
     private var searchTask: Task<Void, Never>?
-    private var currentCityID: String?
 
     init(
         stationSearchService: StationSearchService,
@@ -38,7 +39,9 @@ final class StationSearchViewModel {
         facilityEnrichmentTask?.cancel()
     }
 
-    func loadInitialStations(city: String) async {
+    /// The no-query list: the stations closest to the rider, wherever they are. There is no city
+    /// to browse any more, so the only question left is "what is near me".
+    func loadInitialStations() async {
         let loadID = UUID()
         stationLoadID = loadID
         // Minting a new token supersedes any in-flight keyword search AND facility
@@ -48,36 +51,32 @@ final class StationSearchViewModel {
         isSearching = false
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
-        if city != currentCityID {
-            currentCityID = city
-            filter = StationFilter()
-            // A real city switch also invalidates the previous city's query: without this,
-            // a non-empty searchText returns at the guard below and leaves the old city's
-            // results listed under the new one — with a still-pending debounced searchTask
-            // that would reload the OLD city once its 180ms sleep elapses.
-            searchTask?.cancel()
-            searchText = ""
-            unfilteredResults = []
-            hasEnrichedUnfilteredResultsForFacilities = false
-            searchResults = []
-            errorMessage = nil
-        }
         guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             // Keyword results stay listed; the entry cancel above killed any in-flight
             // enrichment, so restart it under the fresh token if filters still need it.
             enrichForActiveFacilityFiltersIfNeeded()
             return
         }
-        guard !city.isEmpty else {
+        await refreshLocationIfAlreadyAllowed()
+        guard stationLoadID == loadID else { return }
+        guard let here = locationService.mapSpaceLocation?.coordinate else {
             unfilteredResults = []
             hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
-            errorMessage = AppLocalization.localized("Choose a city to browse stations")
+            // Not a fallback to some city's stations: without a position "nearby" has no
+            // meaning, and typing a name still works. Say which of the two is missing.
+            errorMessage = AppLocalization.text(
+                english: "Turn on location to see stations near you, or search by name.",
+                simplified: "开启定位以查看附近车站，或直接搜索名称。",
+                traditional: "開啟定位以查看附近車站，或直接搜尋名稱。"
+            )
             return
         }
-        await refreshLocationIfAlreadyAllowed()
         errorMessage = nil
-        let stations = await stationSearchService.stations(in: city)
+        let stations = await stationSearchService.nearestStations(
+            to: here,
+            limit: stationSearchService.nearbyStationLimit
+        )
         guard stationLoadID == loadID else { return }
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
@@ -93,10 +92,10 @@ final class StationSearchViewModel {
         applyFilters()
     }
 
-    func search(city: String) async {
+    func search() async {
         let query = searchText.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else {
-            await loadInitialStations(city: city)
+            await loadInitialStations()
             return
         }
 
@@ -126,7 +125,10 @@ final class StationSearchViewModel {
         await refreshLocationIfAlreadyAllowed()
 
         do {
-            let results = try await stationSearchService.search(keyword: query, city: city)
+            let results = try await stationSearchService.search(
+                keyword: query,
+                near: locationService.mapSpaceLocation?.coordinate
+            )
             guard stationLoadID == loadID,
                   searchText.trimmingCharacters(in: .whitespaces) == query else { return }
             replaceUnfilteredResults(results, loadID: loadID)
@@ -137,12 +139,12 @@ final class StationSearchViewModel {
         }
     }
 
-    func scheduleSearch(city: String) {
+    func scheduleSearch() {
         searchTask?.cancel()
         searchTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(180))
             guard !Task.isCancelled else { return }
-            await self?.search(city: city)
+            await self?.search()
         }
     }
 
@@ -198,10 +200,8 @@ final class StationSearchViewModel {
     }
 
     func distanceText(for station: Station) -> String? {
-        // Station coordinates are GCJ-02; a raw Core Location fix is not, and the gap is ~540 m —
-        // larger than most of the distances this line prints. See LocationService.mapSpaceLocation.
-        guard let location = locationService.mapSpaceLocation else { return nil }
-        let meters = station.coordinate.distance(to: location.coordinate)
+        // The distance this row was ordered by, not a fresh measurement. See `applyFilters`.
+        guard let meters = distanceByStationID[station.stationID] else { return nil }
         return AppLocalization.text(
             english: "\(AppLocalization.distance(meters)) from here",
             simplified: "距当前位置 \(AppLocalization.distance(meters))",
@@ -232,24 +232,40 @@ final class StationSearchViewModel {
         UserDefaults.standard.setCodable(recentSearches, forKey: recentSearchesKey)
     }
 
+    /// The rider moved, or the map told us how far Core Location's frame sits from its own.
+    /// Re-orders what is listed against the new position rather than reloading it.
+    func riderPositionChanged() {
+        guard !unfilteredResults.isEmpty else { return }
+        applyFilters()
+    }
+
     private func applyFilters() {
         let filtered = stationSearchService.filterStations(unfilteredResults, by: filter)
-        if let location = locationService.mapSpaceLocation {
-            // Compute each distance once (Haversine is trig-heavy) rather than recomputing it
-            // inside every comparator call.
-            let origin = location.coordinate
-            searchResults = filtered
-                .map { (station: $0, distance: $0.coordinate.distance(to: origin)) }
-                .sorted { $0.distance < $1.distance }
-                .map(\.station)
-        } else {
+        guard let origin = locationService.mapSpaceLocation?.coordinate else {
+            distanceByStationID = [:]
             // Transform the localized name (a Hans→Hant StringTransform in zh-Hant) once per
             // element instead of on every comparison.
             searchResults = filtered
                 .map { (station: $0, key: $0.localizedName) }
                 .sorted { $0.key < $1.key }
                 .map(\.station)
+            return
         }
+        // One distance per station, kept, and used for BOTH the order and the printed label.
+        // They used to be measured separately — order here, label at render time — so the map's
+        // GCJ-02 correction landing between the two produced a list that read 396 m, 1.1 km,
+        // 1.5 km, 620 m, 574 m: sorted by one origin, labelled from another.
+        var distances: [String: CLLocationDistance] = [:]
+        distances.reserveCapacity(filtered.count)
+        searchResults = filtered
+            .map { station -> (station: Station, distance: CLLocationDistance) in
+                let distance = station.coordinate.distance(to: origin)
+                distances[station.stationID] = distance
+                return (station, distance)
+            }
+            .sorted { $0.distance < $1.distance }
+            .map(\.station)
+        distanceByStationID = distances
     }
 
     private func replaceUnfilteredResults(_ stations: [Station], loadID: UUID) {

@@ -357,7 +357,7 @@ struct StationDetailView: View {
             coordinate: station.coordinate,
             source: .mapKit
         )
-        return PlanRouteButtons(place: place, cityID: station.cityID, onSelected: {
+        return PlanRouteButtons(place: place, onSelected: {
             if dismissesOnRouteSelection { dismiss() }
         })
     }
@@ -422,8 +422,6 @@ struct StationDetailView: View {
 /// matches the app accent (and lifts for legibility in dark mode).
 struct PlanRouteButtons: View {
     let place: TransitPlace
-    /// Set when the place belongs to a known city (a station detail); nil for map POIs.
-    var cityID: String? = nil
     var onSelected: () -> Void = {}
 
     @Environment(AppState.self) private var appState
@@ -431,7 +429,7 @@ struct PlanRouteButtons: View {
 
     var body: some View {
         Button {
-            appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination, cityID: cityID)
+            appState.pendingRouteInput = AppState.PendingRouteInput(place: place, role: .destination)
             appState.selectedTab = .map
             onSelected()
         } label: {

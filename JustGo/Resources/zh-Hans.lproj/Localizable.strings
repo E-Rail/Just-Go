@@ -11,7 +11,6 @@
 "Arrival Exit" = "出站出口";
 "Boarding Access" = "进站入口";
 "Cancel" = "取消";
-"City" = "城市";
 "Cognitive" = "认知";
 "Current Profile" = "当前配置";
 "Delete" = "删除";
@@ -65,7 +64,6 @@
 "Schedule unavailable" = "暂无时刻信息";
 "Bundled schedule" = "内置时刻";
 "Search" = "搜索";
-"Select City" = "选择城市";
 "Settings" = "设置";
 "Show Accessibility Badges" = "显示无障碍标记";
 "Simplified UI" = "简化界面";
@@ -117,7 +115,6 @@
 "Official city data could not be reached; basic station data still works." = "暂时无法连接官方城市数据；基础车站数据仍可使用。";
 "Tactile path available" = "盲道：有";
 "Official schedule pending for this city/station" = "此城市或车站的官方时刻表待接入";
-"Search cities" = "搜索城市";
 "More" = "更多";
 "Fewest Transfers" = "最少换乘";
 "Least Confusing" = "最易理解";
@@ -158,7 +155,6 @@
 "Metro geometry © OpenStreetMap contributors" = "地铁线路几何 © OpenStreetMap 贡献者";
 "Metro track geometry" = "地铁真实线路";
 "OpenStreetMap physical track geometry" = "OpenStreetMap 实际轨道几何";
-"Choose a city to browse stations" = "请选择城市以浏览车站";
 "Journey is outside supported subway coverage" = "此行程超出当前支持的地铁范围。";
 "Place search requires a network connection" = "地点搜索需要网络连接。";
 "Walking distance is estimated" = "步行距离为估算值。";
@@ -169,7 +165,6 @@
 "Apple Maps walking directions mention an elevator." = "Apple 地图步行指引提到电梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地图步行指引提到扶梯。";
 "Apple Maps walking directions mention stairs." = "Apple 地图步行指引提到楼梯。";
-"Choose City" = "选择城市";
 "Checking station details..." = "正在检查车站详情…";
 "Complete Trip" = "完成行程";
 "First" = "首班";

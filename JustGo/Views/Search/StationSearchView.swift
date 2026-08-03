@@ -16,7 +16,6 @@ struct SearchPageView: View {
     var dismissesOnSelection = false
 
     @Environment(DIContainer.self) private var container
-    @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
@@ -51,14 +50,19 @@ struct SearchPageView: View {
             placeSearchTask?.cancel()
             currentPlaceTask?.cancel()
         }
-        .task(id: appState.selectedCity?.id) {
+        .task {
             if viewModel == nil {
                 viewModel = container.makeStationSearchViewModel()
             }
             // The rider tapped a search field to get here, so start with it focused rather than
             // making them tap a second time on a screen that exists only to be typed into.
             isSearchFocused = true
-            await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
+            await viewModel?.loadInitialStations()
+        }
+        // The map's GCJ-02 correction can land while this page is open, moving the rider ~540 m.
+        // Re-order against it rather than leaving a list sorted from where they were not.
+        .onChange(of: container.locationService.mapSpaceLocation?.coordinate.latitude) { _, _ in
+            viewModel?.riderPositionChanged()
         }
     }
 
@@ -76,7 +80,9 @@ struct SearchPageView: View {
         placeSearchTask = Task {
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled else { return }
-            let region = appState.selectedCity.map {
+            // Biased to the rider, not to a city centroid — the same position the station list
+            // is ranked by, so both halves of this page answer "near me" the same way.
+            let region = container.locationService.mapSpaceLocation.map {
                 MKCoordinateRegion(
                     center: $0.coordinate,
                     span: MKCoordinateSpan(
@@ -128,11 +134,10 @@ struct SearchPageView: View {
                 ForEach(quickTags) { quickTag in
                     Button {
                         isSearchFocused = false
-                        let place = quickTag.transitPlace
-                        // A quick tag knows its own city, and it is frequently not the selected
-                        // one — that cityID is exactly what stops a Beijing "Home" being planned
-                        // against Shanghai's network.
-                        onSelectPlace(place)
+                        // Its coordinate is the whole answer: a Beijing "Home" plans against
+                        // Beijing's network because that is where it is, not because the app
+                        // was set to Beijing at the time.
+                        onSelectPlace(quickTag.transitPlace)
                         dismiss()
                     } label: {
                         HStack(spacing: 5) {
@@ -252,7 +257,7 @@ struct SearchPageView: View {
                 get: { viewModel?.searchText ?? "" },
                 set: { newValue in
                     viewModel?.searchText = newValue
-                    viewModel?.scheduleSearch(city: appState.selectedCity?.id ?? "")
+                    viewModel?.scheduleSearch()
                     schedulePlaceSearch(newValue)
                 }
             ))
@@ -261,7 +266,7 @@ struct SearchPageView: View {
             .onSubmit {
                 // Route through the single debounced searchTask slot rather than spawning an
                 // untracked Task that races the in-flight debounced search on stationLoadID.
-                viewModel?.scheduleSearch(city: appState.selectedCity?.id ?? "")
+                viewModel?.scheduleSearch()
             }
 
             if !(viewModel?.searchText.isEmpty ?? true) {
@@ -271,7 +276,7 @@ struct SearchPageView: View {
                     placeResults = []
                     isSearchingPlaces = false
                     Task {
-                        await viewModel?.loadInitialStations(city: appState.selectedCity?.id ?? "")
+                        await viewModel?.loadInitialStations()
                     }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -379,7 +384,14 @@ struct SearchPageView: View {
                 }
             } else if let message = viewModel?.errorMessage {
                 ContentUnavailableView {
-                    Label(AppLocalization.localized("Choose City"), systemImage: "building.2")
+                    Label(
+                        AppLocalization.text(
+                            english: "Nothing nearby yet",
+                            simplified: "暂无附近车站",
+                            traditional: "暫無附近車站"
+                        ),
+                        systemImage: "location.slash"
+                    )
                 } description: {
                     Text(message)
                 }
@@ -430,35 +442,23 @@ struct SearchPageView: View {
                     recentReplayTask?.cancel()
                     recentReplayTask = Task {
                         // A recent replays in ITS city — same-named stations exist across
-                        // cities, so name-searching the currently selected one can open
-                        // the wrong station entirely. Cancellation checks after each await
-                        // keep a superseded replay from overwriting the newer tap's push.
-                        // (No cancel-on-city-change anywhere: this task switches the city
-                        // itself and must survive its own switch.)
-                        var cityID = search.cityID
-                        if cityID.isEmpty { cityID = appState.selectedCity?.id ?? "" }
-                        if cityID != appState.selectedCity?.id,
-                           let city = container.cityService.getCity(byID: cityID) {
-                            appState.selectedCity = city
-                            // Load the city ourselves so currentCityID is already correct
-                            // when the deferred .task(id:) reload fires — otherwise that
-                            // reload's real-city-change reset would wipe the fallback
-                            // query set below.
-                            await viewModel?.loadInitialStations(city: cityID)
-                            guard !Task.isCancelled else { return }
-                        }
-                        let station = await viewModel?.station(withID: search.stationID, in: cityID)
+                        // cities, so re-resolving by name can open the wrong station
+                        // entirely. The stored cityID is what makes that exact; nothing
+                        // about the app's state has to change to honour it any more.
+                        // Cancellation checks after each await keep a superseded replay
+                        // from overwriting the newer tap's push.
+                        let station = await viewModel?.station(withID: search.stationID, in: search.cityID)
                         guard !Task.isCancelled else { return }
                         if let station {
                             viewModel?.selectStation(station)
                             onSelectStation(station)
                             if dismissesOnSelection { dismiss() }
                         } else {
-                            // Station no longer in the pack — fall back to a name search
-                            // in its home city. scheduleSearch (not search) so the
-                            // debounce orders it after the .task(id:) reload's token mint.
+                            // Station no longer in the pack — fall back to a name search.
+                            // scheduleSearch (not search) so it goes through the single
+                            // debounced slot the field itself uses.
                             viewModel?.searchText = search.stationName
-                            viewModel?.scheduleSearch(city: cityID)
+                            viewModel?.scheduleSearch()
                         }
                     }
                 } label: {

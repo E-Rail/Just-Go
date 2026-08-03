@@ -346,10 +346,7 @@ struct LiveGoView: View {
 
         let transferSegment = viewModel.route.segments[segmentIndex]
         let context = step.transferContext ?? transferSegment.transferContext
-        let cityID = context?.cityID
-            ?? viewModel.route.networkCityID
-            ?? appState.selectedCity?.id
-            ?? ""
+        let cityID = context?.cityID ?? viewModel.route.networkCityID ?? ""
         let stationName = context?.stationName
             ?? step.fromStationName
             ?? AppLocalization.localized("Transfer station")
@@ -614,7 +611,6 @@ struct LiveGoView: View {
                     source: .currentLocation
                 ),
                 to: TransitPlace(name: viewModel.plan.destination, coordinate: destination, source: .mapKit),
-                city: viewModel.route.networkCityID ?? appState.selectedCity?.id ?? "",
                 accessibilityFilter: AccessibilityFilter(
                     requiresWheelchairAccess: preference.requiresWheelchairAccess,
                     requiresElevator: preference.prefersElevator,

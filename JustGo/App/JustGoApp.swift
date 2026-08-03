@@ -70,9 +70,7 @@ struct JustGoApp: App {
         // Stage 1 — services. `DIContainer.configure()` already ran in `init`; the city
         // capabilities manifest is the remaining piece, and it is what the city rows render from.
         appState.advanceLaunch(to: .loadingCities)
-        // Ask for a fix before `appState.initialize` below reads one. Without this its
-        // nearest-city branch was dead code — `currentLocation` is always nil this early, so
-        // every launch seeded Beijing and a rider in Shanghai opened the app on the wrong city.
+        // Starts a fix so the map's opening centre-on-user has something to land on quickly.
         // A no-op (and no permission prompt) when location has not been granted; the Map tab
         // asks for that at the moment it can explain why.
         container.locationService.prewarmLocation()
@@ -80,24 +78,24 @@ struct JustGoApp: App {
             CityDataCapabilities.prewarm()
         }.value
 
-        // Stage 2 — resolve the city, then decode its network so the Map tab opens with its
-        // geometry already in memory instead of paying for the decode on first appearance.
+        // Stage 2 — decode the network the map is about to open on, so its geometry is already
+        // in memory instead of being paid for on first appearance. Which one that is comes from
+        // the camera the rider left behind, not from a city they were made to pick.
         // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
         // is a warmup — if it overruns, hand off and let it land in the actor's cache behind us.
         #if DEBUG
         LaunchClock.mark("stage1.capabilities.done")
         #endif
-        appState.initialize(container: container)
-        #if DEBUG
-        LaunchClock.mark("stage2.initialize.done")
-        #endif
         appState.advanceLaunch(to: .loadingMapData)
-        if let cityID = appState.selectedCity?.id {
+        if let camera = appState.lastMapCamera,
+           let city = container.cityService.findNearestCity(
+               to: CLLocation(latitude: camera.latitude, longitude: camera.longitude)
+           ) {
             let provider = container.metroNetworkProvider
             _ = try? await withDeadline(seconds: 8) {
                 LaunchStageTimeout.overran
             } operation: {
-                await provider.network(for: cityID)
+                await provider.network(for: city.id)
             }
         }
 
@@ -107,40 +105,26 @@ struct JustGoApp: App {
         // Essentials done — hand off.
         appState.advanceLaunch(to: .ready)
 
-        // Then correct the city, rather than making the launch screen wait on GPS. `prewarm`
-        // above only *starts* the fix; it cannot land before this point, so `initialize` always
-        // seeded the fallback and a rider in Shanghai opened the app on Beijing. Waiting for the
-        // fix before handing off would trade a wrong city for a slow launch — do it behind the
-        // live UI instead, and only when the rider is clearly outside the seeded city.
-        // Stage 3 — runs after the handoff, so it never holds the first screen. Quick-tag
-        // repair touches a network decode and a city-pack load per tag, and the rows it
-        // repairs are several taps away.
+        // Stage 3 — runs after the handoff, so it never holds the first screen.
         //
-        // Started *beside* the realign rather than after it. Realigning waits on a GPS fix, and
-        // a fix that never arrives is not fast to fail: a launch log from a device with no
-        // usable fix marked `stage3.realignCity.done` at +16.1 s — the location request's full
-        // 15 s timeout. Sequencing the repair behind that meant a rider whose GPS was cold got
-        // stale quick-tag rows for a quarter of a minute, for no reason: the two share nothing.
+        // The nationwide station index is 53 packs' worth of decoding and search is the only
+        // thing that needs it, several taps away; quick-tag repair touches a network decode and
+        // a city-pack load per tag. Neither blocks anything on screen, and they share nothing,
+        // so they run beside each other.
         async let quickTagRepair: Void = repairQuickTags()
-
-        await realignCityToDevice()
-        #if DEBUG
-        LaunchClock.mark("stage3.realignCity.done")
-        #endif
+        async let stationIndex: Void = warmStationIndex()
 
         await quickTagRepair
+        await stationIndex
+        #if DEBUG
+        LaunchClock.mark("stage3.background.done")
+        #endif
     }
 
-    /// Adopts the city the device is actually in, once a fix arrives. No-op without location
-    /// permission, and deliberately silent: this is a correction, not something to announce.
-    private func realignCityToDevice() async {
-        guard container.locationService.isAuthorized else { return }
-        guard let location = try? await container.locationService.requestCurrentLocation() else { return }
-        guard let city = container.cityService.cityToAdopt(
-            for: location,
-            whileSelecting: appState.selectedCity
-        ) else { return }
-        appState.selectedCity = city
+    /// Builds the nationwide station list behind the live UI, so the first search does not wait
+    /// on it. Idempotent — the provider caches, and the search page calls the same method.
+    private func warmStationIndex() async {
+        _ = await container.metroNetworkProvider.allStations()
     }
 
     private func repairQuickTags() async {

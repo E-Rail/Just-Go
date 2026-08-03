@@ -250,71 +250,59 @@ struct DataConfidenceChip: View {
     }
 }
 
-/// Reports the start of an interactive back-swipe, which SwiftUI has no signal for.
+/// Reports that the page it sits on is *starting* to leave, which SwiftUI has no signal for.
 ///
-/// `onDisappear` is far too late for anything that needs to animate *with* the pop: by the time it
-/// runs the page is already off screen. UIKit has known since the first touch — the navigation
-/// controller's `interactivePopGestureRecognizer` — so this listens to that directly rather than
-/// taking over the navigation controller's delegate, which SwiftUI owns.
-struct InteractivePopObserver: UIViewControllerRepresentable {
-    let onPopBegan: () -> Void
-    /// The rider started the swipe and then changed their mind — put things back.
-    let onPopAbandoned: () -> Void
+/// `onDisappear` is far too late for anything that has to animate *with* the pop: by the time it
+/// runs the page is already off screen, so a sheet torn down there sits through the whole
+/// transition and then blinks out at the end.
+///
+/// This hooked `interactivePopGestureRecognizer` before, which covered exactly one way of going
+/// back. A tapped back button produces no gesture and no `.began`, so nothing fired for it at all —
+/// and that is the more common way to leave. `viewWillDisappear` is the signal UIKit sends for
+/// both: at the start of the push-pop animation for a tapped back, and at the start of the
+/// interactive transition for a swipe, with `viewWillAppear` again if that swipe is abandoned.
+/// Appearance callbacks propagate to child view controllers, which is what this is.
+///
+/// It does not fire for a sheet presented over the page — `.pageSheet` leaves the presenter on
+/// screen and UIKit sends it no appearance callbacks — so the trip card cannot dismiss itself.
+struct PageTransitionObserver: UIViewControllerRepresentable {
+    /// The page is starting to leave. Runs for a back button and for a back-swipe alike.
+    let onLeaving: () -> Void
+    /// It came back: an abandoned swipe, or the page being returned to.
+    let onReturned: () -> Void
 
     func makeUIViewController(context: Context) -> Controller {
         let controller = Controller()
-        controller.onPopBegan = onPopBegan
-        controller.onPopAbandoned = onPopAbandoned
+        controller.onLeaving = onLeaving
+        controller.onReturned = onReturned
         return controller
     }
 
     func updateUIViewController(_ controller: Controller, context: Context) {
-        controller.onPopBegan = onPopBegan
-        controller.onPopAbandoned = onPopAbandoned
+        controller.onLeaving = onLeaving
+        controller.onReturned = onReturned
     }
 
     final class Controller: UIViewController {
-        var onPopBegan: (() -> Void)?
-        var onPopAbandoned: (() -> Void)?
-        private weak var observed: UIGestureRecognizer?
+        var onLeaving: (() -> Void)?
+        var onReturned: (() -> Void)?
+        private var hasAppeared = false
 
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
-            attachIfNeeded()
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            onLeaving?()
         }
 
-        // Also here: on the first pass this controller can be parented before its host has been
-        // pushed, and `navigationController` is nil until it has been.
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            attachIfNeeded()
-        }
-
-        private func attachIfNeeded() {
-            guard let recognizer = navigationController?.interactivePopGestureRecognizer,
-                  recognizer !== observed else { return }
-            observed = recognizer
-            recognizer.addTarget(self, action: #selector(popGestureChanged(_:)))
-        }
-
-        @objc private func popGestureChanged(_ recognizer: UIGestureRecognizer) {
-            switch recognizer.state {
-            case .began:
-                onPopBegan?()
-            case .cancelled, .failed:
-                onPopAbandoned?()
-            case .ended:
-                // `ended` covers both "let go past the threshold" (the pop commits and this
-                // controller is torn down) and "let go too early" (it is not). Nothing
-                // distinguishes them at this instant, so ask afterwards whether we are still on
-                // screen — a released-too-early swipe must not leave the card hidden.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                    guard let self, self.view.window != nil else { return }
-                    self.onPopAbandoned?()
-                }
-            default:
-                break
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            // The first call is the page arriving, not returning. Reporting that as a return is
+            // harmless today (it restores the state the page starts in anyway) but it would make
+            // this observer lie about which event it saw, and the next reader would believe it.
+            guard hasAppeared else {
+                hasAppeared = true
+                return
             }
+            onReturned?()
         }
     }
 }

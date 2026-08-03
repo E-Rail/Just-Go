@@ -204,8 +204,12 @@ struct LiveGoView: View {
             announceCurrentStep()
         }
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
-        .onChange(of: container.locationService.currentLocation) { _, location in
-            handleLocationUpdate(location)
+        // Observes the raw fix because that is what changes, but hands on the corrected one: off-route
+        // detection, the arrival alert and the reroute origin are all measured against GCJ-02 route
+        // geometry, and a raw WGS-84 fix is ~540 m from it — enough to declare a rider off a route
+        // they are standing on. See LocationService.mapSpaceCorrection.
+        .onChange(of: container.locationService.currentLocation) { _, _ in
+            handleLocationUpdate(container.locationService.mapSpaceLocation)
         }
         .task(id: transferGuidanceRequest) {
             guard let request = transferGuidanceRequest else {
@@ -783,7 +787,7 @@ struct LiveGoView: View {
                 ) {
                     followsRider.toggle()
                     if followsRider {
-                        handleLocationUpdate(container.locationService.currentLocation)
+                        handleLocationUpdate(container.locationService.mapSpaceLocation)
                     } else {
                         frameCurrentStep(animated: true)
                     }

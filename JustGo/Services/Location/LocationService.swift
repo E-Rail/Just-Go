@@ -10,9 +10,33 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     /// one-shot request resolving must not stop the hardware while a session is active.
     private var continuousSessionCount = 0
 
+    /// The fix exactly as Core Location reported it. Correct for asking "which city is this" and
+    /// for measuring the correction below — and wrong for everything else. See `mapSpaceLocation`.
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
+
+    /// How far Core Location's frame sits from the map's, measured rather than assumed.
+    ///
+    /// Every coordinate this app stores, draws and measures against is GCJ-02 — each bundled
+    /// network declares `"coordinateSystem": "gcj02"`, and Apple's basemap uses it across Greater
+    /// China. A `CLLocation` is the sole input nothing converts, so on a device that reports
+    /// WGS-84 the rider's own position is the one coordinate in the whole app in a different
+    /// frame. In Beijing that is ~540 m: half the distance between two stops.
+    ///
+    /// Deliberately not a datum transform. Whether a given iPhone reports WGS-84 or already-shifted
+    /// GCJ-02 is not something this code can know, and converting a coordinate that was already
+    /// converted would double the error rather than remove it. So the offset is *observed* — the
+    /// difference between what MapKit says (always the map's frame) and what Core Location said at
+    /// the same instant. A phone that needs no correction measures ~0 and nothing moves.
+    private(set) var mapSpaceCorrection: (latitude: CLLocationDegrees, longitude: CLLocationDegrees)?
+
+    /// The fix in the frame the rest of the app lives in. Identical to `currentLocation` until the
+    /// map has reported a user location — unknown is left uncorrected rather than guessed at.
+    var mapSpaceLocation: CLLocation? {
+        guard let currentLocation else { return nil }
+        return mapSpaceLocation(from: currentLocation)
+    }
 
     override init() {
         super.init()
@@ -74,6 +98,44 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
                 self?.cancelPendingLocationRequest(requestID)
             }
         }
+    }
+
+    /// Called by the map every time MapKit reports the rider's position. Paired against the fix
+    /// Core Location delivered for the same moment, the difference *is* the correction.
+    func observeMapSpaceUserLocation(_ coordinate: CLLocationCoordinate2D) {
+        guard let raw = currentLocation?.coordinate else { return }
+        // A fix that arrived seconds ago and a MapKit update from now can differ because the rider
+        // moved, which is not a frame difference. Anything past a plausible datum shift (the GCJ-02
+        // obfuscation peaks around 800 m) is movement or a bad fix, so ignore it — a wrong
+        // correction is worse than none.
+        let latitude = coordinate.latitude - raw.latitude
+        let longitude = coordinate.longitude - raw.longitude
+        guard coordinate.distance(to: raw) <= 900 else { return }
+        mapSpaceCorrection = (latitude, longitude)
+    }
+
+    /// Applies the measured correction to an arbitrary fix. Same instance back when nothing has
+    /// been measured yet, so callers never have to branch on it.
+    func mapSpaceLocation(from location: CLLocation) -> CLLocation {
+        guard let mapSpaceCorrection else { return location }
+        return CLLocation(
+            coordinate: CLLocationCoordinate2D(
+                latitude: location.coordinate.latitude + mapSpaceCorrection.latitude,
+                longitude: location.coordinate.longitude + mapSpaceCorrection.longitude
+            ),
+            altitude: location.altitude,
+            horizontalAccuracy: location.horizontalAccuracy,
+            verticalAccuracy: location.verticalAccuracy,
+            timestamp: location.timestamp
+        )
+    }
+
+    func mapSpaceCoordinate(from coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        guard let mapSpaceCorrection else { return coordinate }
+        return CLLocationCoordinate2D(
+            latitude: coordinate.latitude + mapSpaceCorrection.latitude,
+            longitude: coordinate.longitude + mapSpaceCorrection.longitude
+        )
     }
 
     func startUpdatingLocation() {

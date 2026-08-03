@@ -30,6 +30,74 @@ protocol PlaceSearchProviding {
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace
 }
 
+/// "Where I am", as somewhere a trip can start from.
+///
+/// The ladder below has four ways to go wrong — a cached fix that is fresh enough, a live request,
+/// a coarser last-known fallback, and a reverse-geocode that may fail on its own — and it used to
+/// live inside `RoutePlannerViewModel.useCurrentLocation` because the deleted route-entry page was
+/// the only thing that ever asked. Two screens ask now, and a second copy of a four-branch fallback
+/// is exactly the drift `CLAUDE.md` warns about.
+struct CurrentPlaceResolver {
+    let locationService: LocationService
+    let placeSearchProvider: PlaceSearchProviding
+
+    /// A fix good enough to route from, already in the map's coordinate frame. Throws rather than
+    /// returning nil: "you have not allowed this" and "it never arrived" need different words on
+    /// screen, and only the error carries which one happened.
+    func coordinate() async throws -> CLLocationCoordinate2D {
+        if let recent = locationService.currentLocation,
+           recent.horizontalAccuracy >= 0,
+           recent.horizontalAccuracy <= 100,
+           abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
+            // A recent, sufficiently accurate fix (e.g. from pre-warming) is good enough for a
+            // route origin — use it instead of waiting on a fresh one that can stall indoors, on
+            // weak GPS, or in the simulator. The ≤120 s window is looser than
+            // requestCurrentLocation's 30 s so a just-prewarmed fix answers instantly; the
+            // accuracy gate is what keeps it safe.
+            return locationService.mapSpaceCoordinate(from: recent.coordinate)
+        }
+
+        do {
+            let fix = try await locationService.requestCurrentLocation()
+            return locationService.mapSpaceCoordinate(from: fix.coordinate)
+        } catch {
+            if let locationError = error as? LocationServiceError, locationError == .permissionDenied {
+                throw error
+            }
+            // Last resort: a last-known fix so the field still fills, but reject an obviously
+            // coarse one (accuracy relaxed only to a city-level bound) rather than seed routing
+            // with a km-off origin.
+            guard let lastKnown = locationService.currentLocation,
+                  lastKnown.horizontalAccuracy >= 0,
+                  lastKnown.horizontalAccuracy <= 1000 else {
+                throw error
+            }
+            return locationService.mapSpaceCoordinate(from: lastKnown.coordinate)
+        }
+    }
+
+    /// Names the coordinate. A failed reverse-geocode is not a failed locate — the rider still
+    /// gets a start they can route from, just labelled generically.
+    func place(at coordinate: CLLocationCoordinate2D) async -> TransitPlace {
+        do {
+            return try await placeSearchProvider.reverseGeocode(
+                location: coordinate,
+                name: AppLocalization.localized("Current Location")
+            ).withSource(.currentLocation)
+        } catch {
+            return TransitPlace(
+                name: AppLocalization.localized("Current Location"),
+                coordinate: coordinate,
+                source: .currentLocation
+            )
+        }
+    }
+
+    func place() async throws -> TransitPlace {
+        await place(at: try await coordinate())
+    }
+}
+
 protocol TransitRouteProviding {
     func routes(
         from origin: TransitPlace,

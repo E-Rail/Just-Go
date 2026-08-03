@@ -7,6 +7,10 @@ struct RouteResultsView: View {
     let onSelect: (Route) -> Void
     /// Open the search page to refill one end. Handed back for the same reason as `onSelect`.
     let onEditEndpoint: (RouteInputField) -> Void
+    /// Refill the start from the device. Its own control rather than a row in the search page,
+    /// because "start from where I am" is the single most common correction to make here and
+    /// sending it through a search screen to answer a question the phone already knows is silly.
+    let onUseCurrentLocation: () -> Void
     let onSwap: () -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -136,6 +140,23 @@ struct RouteResultsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .overlay(alignment: .trailing) {
+            if field == .origin, container.locationService.isAuthorized {
+                Button(action: onUseCurrentLocation) {
+                    Image(systemName: "location.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 34, height: 34)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(AppLocalization.text(
+                    english: "Start from my location",
+                    simplified: "从我的位置出发",
+                    traditional: "從我的位置出發"
+                ))
+            }
+        }
     }
 
     private func placeholder(for field: RouteInputField) -> String {

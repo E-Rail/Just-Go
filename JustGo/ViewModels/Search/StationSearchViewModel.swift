@@ -198,7 +198,9 @@ final class StationSearchViewModel {
     }
 
     func distanceText(for station: Station) -> String? {
-        guard let location = locationService.currentLocation else { return nil }
+        // Station coordinates are GCJ-02; a raw Core Location fix is not, and the gap is ~540 m —
+        // larger than most of the distances this line prints. See LocationService.mapSpaceLocation.
+        guard let location = locationService.mapSpaceLocation else { return nil }
         let meters = station.coordinate.distance(to: location.coordinate)
         return AppLocalization.text(
             english: "\(AppLocalization.distance(meters)) from here",
@@ -232,7 +234,7 @@ final class StationSearchViewModel {
 
     private func applyFilters() {
         let filtered = stationSearchService.filterStations(unfilteredResults, by: filter)
-        if let location = locationService.currentLocation {
+        if let location = locationService.mapSpaceLocation {
             // Compute each distance once (Haversine is trig-heavy) rather than recomputing it
             // inside every comparator call.
             let origin = location.coordinate

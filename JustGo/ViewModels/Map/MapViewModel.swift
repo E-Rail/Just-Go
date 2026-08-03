@@ -218,6 +218,27 @@ final class MapViewModel {
         updateCamera(to: coordinate, spanDelta: MapCameraSpan.focused)
     }
 
+    /// MapKit has told us where it draws the rider. Corrects a camera that was placed before we
+    /// knew how far Core Location's frame sits from the map's.
+    ///
+    /// The launch centring races the first user-location report and usually wins, so it runs off an
+    /// uncorrected fix and lands ~540 m southwest of the dot — the reported bug. This is the first
+    /// moment the right answer exists, so it is taken.
+    ///
+    /// Deliberately stateless. The guard *is* the question being asked — "is the camera sitting on
+    /// the uncorrected fix, and is that not where the rider is?" — so it can only fire on a camera
+    /// this bug actually misplaced. Once corrected the camera is 540 m from the raw fix and the
+    /// first condition can never hold again; if the rider has panned away it never held at all; if
+    /// their phone needs no correction the second condition never holds. No follow-mode, no flag to
+    /// get out of sync.
+    func mapUserLocationChanged(_ coordinate: CLLocationCoordinate2D) {
+        guard let raw = locationService.currentLocation?.coordinate,
+              let region = visibleRegion,
+              region.center.distance(to: raw) < 50,
+              region.center.distance(to: coordinate) > 50 else { return }
+        updateCamera(to: coordinate, spanDelta: region.maxDelta)
+    }
+
     func updateCamera(to coordinate: CLLocationCoordinate2D, spanDelta: CLLocationDegrees) {
         withAnimation {
             visibleRegion = MapVisibleRegion(
@@ -249,10 +270,14 @@ final class MapViewModel {
 
     func centerOnUser() async -> UserCameraOutcome {
         do {
-            let location = try await locationService.requestCurrentLocation()
+            let fix = try await locationService.requestCurrentLocation()
             // A cancelled locate-me (city switch mid-fix) must not recenter the new
             // city's map onto the user's physical position.
             guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false, cityToAdopt: nil) }
+            // Not `fix.coordinate`. Core Location reports WGS-84 and the map is GCJ-02 — measured
+            // at 540.2 m apart in Beijing, which put the camera half a station southwest of the
+            // rider's own dot while both were "correct". See LocationService.mapSpaceCorrection.
+            let location = locationService.mapSpaceLocation(from: fix)
             updateCamera(to: location.coordinate)
             let selected = activeCityID.flatMap { cityService.getCity(byID: $0) }
             let nearest = selected.flatMap { cityService.cityToAdopt(for: location, whileSelecting: $0) }

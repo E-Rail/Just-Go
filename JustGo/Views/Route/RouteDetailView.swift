@@ -87,21 +87,22 @@ struct RouteDetailView: View {
         // Presented from `.task` rather than inline so the sheet goes up after the push has
         // settled — a presentation raised during a navigation transition is the one that fails
         // with "whose view is not in the window hierarchy".
-        .task { updateTripCardPresentation(animated: false) }
-        .onChange(of: isGuiding) { _, _ in updateTripCardPresentation() }
+        .task { showsTripCard = !isGuiding }
+        .onChange(of: isGuiding) { _, _ in showsTripCard = !isGuiding }
         // A sheet presented from a *pushed* view is presented on the navigation controller, not on
         // the view — so popping this screen does not reliably take the sheet with it, and the trip
-        // card was left sitting on top of the route list. Tearing it down as this screen leaves is
-        // the signal that always arrives, whether the rider used the back button or swiped.
+        // card was left sitting on top of the route list.
+        //
+        // `onDisappear` is the backstop, but on its own it arrives when the page has already slid
+        // away, so the card sat there through the whole transition and then blinked out.
+        // `PageTransitionObserver` reports the pop *starting* — for a tapped back button as well as
+        // a swipe — so the card slides down while the page slides right, which is the one motion
+        // this should be.
         .onDisappear { showsTripCard = false }
-        // …but `onDisappear` arrives when the page has already slid away, so the card sat there
-        // through the whole transition and then vanished. UIKit knows a back-swipe has started the
-        // moment it starts; SwiftUI does not expose that. Hooking the gesture lets the card slide
-        // down *while* the page slides right, which is the one motion this should be.
         .background(
-            InteractivePopObserver(
-                onPopBegan: { showsTripCard = false },
-                onPopAbandoned: { showsTripCard = !isGuiding }
+            PageTransitionObserver(
+                onLeaving: { showsTripCard = false },
+                onReturned: { showsTripCard = !isGuiding }
             )
             .frame(width: 0, height: 0)
         )
@@ -318,14 +319,6 @@ struct RouteDetailView: View {
             return (confidence.level.title, confidenceIcon(for: confidence.level), confidence.level.color)
         }
         return nil
-    }
-
-    /// The trip sheet is up whenever this screen is the one being looked at — not while the
-    /// navigator has taken the page over, and not while a station or transfer is pushed on top of
-    /// it. Routed through one function so those three conditions cannot drift apart.
-    private func updateTripCardPresentation(animated: Bool = true) {
-        _ = animated
-        showsTripCard = !isGuiding
     }
 
     /// Pinned rather than scrolled past. It is the only thing on this screen the rider must be able

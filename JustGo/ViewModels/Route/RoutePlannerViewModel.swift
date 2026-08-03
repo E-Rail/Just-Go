@@ -171,18 +171,20 @@ final class RoutePlannerViewModel {
         assignPlace(place, for: field)
     }
 
-    /// `alignCity` lets the caller switch the app to the city the device is actually in
-    /// (the view owns that decision) once a coordinate is accepted, before the fill.
-    /// Returns whether THIS invocation applied a fill — false on failure, denial, or a
-    /// stale-context drop.
+    /// Fills one end of the trip from the device. Returns whether THIS invocation applied a fill —
+    /// false on failure, denial, or a stale-context drop.
+    ///
+    /// The ladder that produces the coordinate lives in `CurrentPlaceResolver`, shared with the
+    /// search page's "my location" chip. What stays here is the only part that is the planner's
+    /// business: deciding whether the answer is still wanted by the time it arrives.
     @discardableResult
-    func useCurrentLocation(for field: RouteInputField, alignCity: ((CLLocationCoordinate2D) -> Void)? = nil) async -> Bool {
+    func useCurrentLocation(for field: RouteInputField) async -> Bool {
         // Snapshot the call context: the GPS fix below can take up to 15s, and a fill (or
         // error) landing after the user switched city, edited the field, picked a suggestion,
         // or entered quick-place setup must be dropped, not applied over the newer input.
-        var expectedCityID = selectedCity?.id
-        var expectedName = name(for: field)
-        var expectedPlace = self.place(for: field)
+        let expectedCityID = selectedCity?.id
+        let expectedName = name(for: field)
+        let expectedPlace = self.place(for: field)
         // self.place(for:) — the local `place` declared below shadows the method in here.
         func contextUnchanged() -> Bool {
             selectedCity?.id == expectedCityID &&
@@ -190,66 +192,20 @@ final class RoutePlannerViewModel {
                 self.place(for: field) == expectedPlace
         }
 
+        let resolver = CurrentPlaceResolver(
+            locationService: locationService,
+            placeSearchProvider: placeSearchProvider
+        )
         let coordinate: CLLocationCoordinate2D
-        if let recent = locationService.currentLocation,
-           recent.horizontalAccuracy >= 0,
-           recent.horizontalAccuracy <= 100,
-           abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
-            // A recent, sufficiently accurate fix (e.g. from pre-warming when the planner
-            // appeared) is good enough for a route origin — use it immediately instead of
-            // waiting on a fresh fix that can stall indoors / on weak GPS / in the simulator.
-            // The ≤120s window is intentionally looser than requestCurrentLocation's 30s so a
-            // just-prewarmed fix fills instantly; the accuracy gate is what keeps it safe.
-            coordinate = recent.coordinate
-        } else {
-            do {
-                coordinate = try await locationService.requestCurrentLocation().coordinate
-            } catch {
-                guard contextUnchanged() else { return false }
-                if let locationError = error as? LocationServiceError,
-                   locationError == .permissionDenied {
-                    errorMessage = userFacingErrorMessage(for: error)
-                    return false
-                }
-                // Last resort once the strict request fails: fall back to a last-known fix so
-                // the field still fills, but reject an obviously coarse one (accuracy-relaxed
-                // to a city-level bound) rather than seed routing with a km-off origin.
-                guard let lastKnown = locationService.currentLocation,
-                      lastKnown.horizontalAccuracy >= 0,
-                      lastKnown.horizontalAccuracy <= 1000 else {
-                    errorMessage = userFacingErrorMessage(for: error)
-                    return false
-                }
-                coordinate = lastKnown.coordinate
-            }
-        }
-
-        // Align the planner's city to where the device actually is BEFORE filling: the
-        // switch wipes the fields (so it must precede the assignment), and the pending
-        // quick-place save below must stamp the aligned city, not the one selected before
-        // the fix arrived. Re-snapshot afterwards so our own switch (and its field wipe)
-        // isn't mistaken for user interference by the guards below.
-        if let alignCity {
-            guard contextUnchanged() else { return false }
-            alignCity(coordinate)
-            expectedCityID = selectedCity?.id
-            expectedName = name(for: field)
-            expectedPlace = self.place(for: field)
-        }
-
-        let place: TransitPlace
         do {
-            place = try await placeSearchProvider.reverseGeocode(
-                location: coordinate,
-                name: AppLocalization.localized("Current Location")
-            ).withSource(.currentLocation)
+            coordinate = try await resolver.coordinate()
         } catch {
-            place = TransitPlace(
-                name: AppLocalization.localized("Current Location"),
-                coordinate: coordinate,
-                source: .currentLocation
-            )
+            guard contextUnchanged() else { return false }
+            errorMessage = userFacingErrorMessage(for: error)
+            return false
         }
+
+        let place = await resolver.place(at: coordinate)
         guard contextUnchanged() else { return false }
         assignPlace(place, for: field)
         return true

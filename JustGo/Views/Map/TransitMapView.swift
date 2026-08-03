@@ -30,6 +30,14 @@ struct TransitMapView: UIViewRepresentable {
     let metroNetworks: [MetroNetwork]
     let route: Route?
     let showsUserLocation: Bool
+    /// Where *MapKit* thinks the rider is, which is not always what Core Location said.
+    ///
+    /// Everything this app draws and measures against is GCJ-02 (`coordinateSystem` in every
+    /// bundled network, and Apple's basemap across Greater China). A `CLLocation` is the one input
+    /// that nothing converts — so on a device that reports WGS-84 the rider's own position is the
+    /// only coordinate in the app in the wrong frame, ~540 m out in Beijing. This is the map's
+    /// answer, in the map's frame, by definition: see `LocationService.mapSpaceCorrection`.
+    var onUserLocationChanged: ((CLLocationCoordinate2D) -> Void)?
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
     // Two-phase POI tap: `onPlaceTapped` fires synchronously with the feature's name +
@@ -331,6 +339,11 @@ struct TransitMapView: UIViewRepresentable {
                     self.parent.onPlaceResolved?(mapItem)
                 }
             }
+        }
+
+        func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+            guard let coordinate = userLocation.location?.coordinate else { return }
+            parent.onUserLocationChanged?(coordinate)
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

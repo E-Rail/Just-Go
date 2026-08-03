@@ -1,7 +1,6 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-import UIKit
 
 /// A tapped Apple POI. `id` is stable for the lifetime of the tap so that flipping
 /// `resolvedItem` from nil → the resolved `MKMapItem` updates the already-presented sheet
@@ -234,6 +233,10 @@ struct MapContainerView: View {
             metroNetworks: viewModel?.metroNetworks ?? [],
             route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
+            onUserLocationChanged: { coordinate in
+                container.locationService.observeMapSpaceUserLocation(coordinate)
+                viewModel?.mapUserLocationChanged(coordinate)
+            },
             onRegionChanged: { region in
                 viewModel?.viewportChanged(to: region)
             },
@@ -626,6 +629,14 @@ struct MapContainerView: View {
                 viewModel: planner,
                 onSelect: { route in path.append(.detail(route.id)) },
                 onEditEndpoint: { path.append(.editEndpoint($0)) },
+                onUseCurrentLocation: {
+                    planTask?.cancel()
+                    planTask = Task {
+                        await planner.useCurrentLocation(for: .origin)
+                        guard !Task.isCancelled else { return }
+                        _ = await planner.searchRoutes()
+                    }
+                },
                 onSwap: {
                     planner.swapOriginDestination()
                     replan()

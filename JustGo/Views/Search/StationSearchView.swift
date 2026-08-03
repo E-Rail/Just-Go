@@ -26,12 +26,16 @@ struct SearchPageView: View {
     @State private var placeResults: [TransitPlace] = []
     @State private var placeSearchTask: Task<Void, Never>?
     @State private var isSearchingPlaces = false
+    @State private var currentPlaceTask: Task<Void, Never>?
+    @State private var isResolvingCurrentPlace = false
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
             VStack(spacing: 0) {
                 searchBar
-                if !quickTags.isEmpty && isIdle {
+                // Rendered whether or not any tags are saved: the current-location chip alone
+                // earns the row, and without it there is no way in the whole app to say "here".
+                if isIdle {
                     quickTagBar
                 }
                 resultsList
@@ -45,6 +49,7 @@ struct SearchPageView: View {
         .onDisappear {
             recentReplayTask?.cancel()
             placeSearchTask?.cancel()
+            currentPlaceTask?.cancel()
         }
         .task(id: appState.selectedCity?.id) {
             if viewModel == nil {
@@ -113,10 +118,13 @@ struct SearchPageView: View {
         .padding(.bottom, 4)
     }
 
-    /// Every place the rider has already told the app matters, one tap from the top of the page.
+    /// Every place the rider has already told the app matters, one tap from the top of the page —
+    /// starting with the one it can work out for itself.
     private var quickTagBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
+                currentLocationChip
+
                 ForEach(quickTags) { quickTag in
                     Button {
                         isSearchFocused = false
@@ -146,6 +154,78 @@ struct SearchPageView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
+        }
+    }
+
+    /// "Here", as somewhere a trip can start from.
+    ///
+    /// This is the only control in the app that offers the device's own position. The route entry
+    /// page that used to have the button was removed, which left the automatic fill in `beginPlan`
+    /// as the sole caller — so whenever that fill did not land (GPS timeout, permission, or a start
+    /// dropped as belonging to another city) the rider had a start field they could open but not
+    /// answer.
+    private var currentLocationChip: some View {
+        Button {
+            isSearchFocused = false
+            resolveCurrentPlace()
+        } label: {
+            HStack(spacing: 5) {
+                if isResolvingCurrentPlace {
+                    ProgressView().controlSize(.mini)
+                } else {
+                    Image(systemName: "location.fill")
+                        .font(.caption)
+                }
+                Text(AppLocalization.text(
+                    english: "My Location",
+                    simplified: "我的位置",
+                    traditional: "我的位置"
+                ))
+                .font(.caption)
+                .fontWeight(.medium)
+                .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.appSurface, in: Capsule())
+            .overlay(Capsule().stroke(Color.accentColor.opacity(0.4), lineWidth: 1))
+            .foregroundStyle(isLocationAvailable ? Color.accentColor : Color.secondary)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(!isLocationAvailable || isResolvingCurrentPlace)
+        // Says which of the two it is rather than being inertly greyed out. "Off" and "not
+        // allowed" are different problems with different fixes.
+        .accessibilityHint(isLocationAvailable ? "" : currentLocationUnavailableReason)
+    }
+
+    private var isLocationAvailable: Bool {
+        container.locationService.isAuthorized
+    }
+
+    private var currentLocationUnavailableReason: String {
+        AppLocalization.text(
+            english: "Location access is off for JustGo",
+            simplified: "JustGo 没有定位权限",
+            traditional: "JustGo 沒有定位權限"
+        )
+    }
+
+    private func resolveCurrentPlace() {
+        currentPlaceTask?.cancel()
+        isResolvingCurrentPlace = true
+        currentPlaceTask = Task {
+            defer { isResolvingCurrentPlace = false }
+            let resolver = CurrentPlaceResolver(
+                locationService: container.locationService,
+                placeSearchProvider: container.placeSearchProvider
+            )
+            guard let place = try? await resolver.place(), !Task.isCancelled else { return }
+            // Same hand-back as a quick tag or a place row: the map owns what happens next, so
+            // this fills an endpoint when the page was opened to edit one and opens a place card
+            // when it was opened to browse. One control, both modes.
+            onSelectPlace(place)
+            dismiss()
         }
     }
 

@@ -63,11 +63,38 @@ final class RoutePlanningService {
         accessibilityFilter: AccessibilityFilter = .none,
         tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
-        let routes = try await routeProvider.routes(
-            from: origin,
-            to: destination,
-            accessibilityFilter: accessibilityFilter
-        )
+        // Walking is a real answer, and until now it was one the app could not give: every result
+        // had to contain a train. Asking for a route to your nearest station therefore produced a
+        // ride one stop out and back, because that was the cheapest thing the graph was allowed to
+        // return. Built alongside the search rather than after it — it costs one MKDirections call
+        // and the two are independent.
+        async let directWalk = directWalkingRoute(from: origin, to: destination)
+
+        let metroRoutes: [Route]
+        do {
+            metroRoutes = try await routeProvider.routes(
+                from: origin,
+                to: destination,
+                accessibilityFilter: accessibilityFilter
+            )
+        } catch {
+            // No train answer at all. If the two ends are within walking distance that is not a
+            // failure, it is the answer; otherwise the original error is still the honest reply.
+            if let walk = await directWalk { return [walk] }
+            throw error
+        }
+
+        // Anything the rider could beat on foot is not worth showing. This is also the backstop for
+        // the out-and-back above: even if some future cost change makes such a path legal again, it
+        // cannot survive a comparison with simply walking there.
+        let walk = await directWalk
+        let routes = walk.map { walk in metroRoutes.filter { $0.totalDuration < walk.totalDuration } }
+            ?? metroRoutes
+        guard !routes.isEmpty else {
+            // Every alternative lost to walking, which means walking is the plan.
+            if let walk { return [walk] }
+            throw RoutePlanningError.noRouteFound
+        }
 
         // Alternatives overwhelmingly share their first and last stations, so one memo across the
         // whole plan collapses their duplicate door-walk lookups into a single call each.
@@ -106,6 +133,48 @@ final class RoutePlanningService {
             }
             return collected.sorted { $0.0 < $1.0 }.map(\.1)
         }
+    }
+
+    /// The trip on foot, when that is a thing a person would actually do.
+    ///
+    /// Bounded at 3 km straight-line: past that walking stops being an answer and starts being a
+    /// way to make `MKDirections` slow for nothing. Deliberately carries no station IDs — it calls
+    /// at none — which leaves `networkCityID` nil, the value every reader of it already handles.
+    /// `strategy` is `.fastest` because when walking wins it *is* the fastest option, so this needs
+    /// no new strategy case, no new localized strings, and no change to the sort chips.
+    private func directWalkingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
+        let from = origin.routeCoordinate
+        let to = destination.routeCoordinate
+        guard from.distance(to: to) <= 3_000 else { return nil }
+        guard let segment = await walkingRoutes.walkingSegment(
+            from: from,
+            to: to,
+            fromName: origin.name,
+            toName: destination.name
+        ) else {
+            return nil
+        }
+
+        return Route(
+            id: UUID(),
+            origin: origin.name,
+            destination: destination.name,
+            originStationID: "",
+            destinationStationID: "",
+            strategy: .fastest,
+            segments: [segment],
+            totalDuration: segment.duration,
+            walkingDistance: segment.distance,
+            totalStops: 0,
+            transferCount: 0,
+            isFullyAccessible: false,
+            stepFreeAssessment: segment.walkingDirections?.contains(where: \.hasStairs) == true
+                ? .barrierDetected
+                : .unknown,
+            warnings: [],
+            accessGuidance: [],
+            dataCoverage: .unknown
+        )
     }
 
     private func enrichedRoute(

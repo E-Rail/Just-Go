@@ -181,7 +181,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
 
             if item.state.lineID != nil, let destination = destinationsByID[item.state.stationID] {
                 let total = item.cost + walkingCost(destination.distance, preference: preference)
-                if total < (best?.cost ?? .infinity) {
+                if total < (best?.cost ?? .infinity),
+                   !revisitsAStation(endingAt: item.state, previous: previous) {
                     best = (item.state, destination, total)
                 }
             }
@@ -213,6 +214,30 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             return nil
         }
         return MetroPath(origin: originCandidate, destination: best.destination, edges: edges)
+    }
+
+    /// Whether the path ending here already called at one of its own stations.
+    ///
+    /// A ride that comes back to a station it has passed through is never the answer, and the
+    /// search will otherwise choose one. A destination is only accepted with `lineID != nil` —
+    /// i.e. having ridden at least one edge — so when the rider's destination *is* the station
+    /// they are stood next to, the cheapest **legal** path is out one stop and back. That is what
+    /// "route me to my nearest station" returned: one south, then north to where it started.
+    ///
+    /// Rejecting at acceptance rather than after reconstruction matters: the search keeps running
+    /// and can still settle on a genuine alternative among the other destination candidates,
+    /// instead of the whole query collapsing to no result.
+    private func revisitsAStation(
+        endingAt state: MetroSearchState,
+        previous: [MetroSearchState: MetroPreviousStep]
+    ) -> Bool {
+        var seen = Set<String>()
+        var cursor: MetroSearchState? = state
+        while let current = cursor {
+            guard seen.insert(current.stationID).inserted else { return true }
+            cursor = previous[current]?.state
+        }
+        return false
     }
 
     private func walkingCost(_ distance: Double, preference: MetroSearchPreference) -> Double {

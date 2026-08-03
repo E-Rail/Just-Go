@@ -690,6 +690,19 @@ struct MapContainerView: View {
     /// this Xcode install ships no Simulator.app at all — so without a way to seed the path, every
     /// screen above the map root is unreachable and therefore unverifiable.
     private func seedDebugScreen() {
+        // Puts the camera somewhere specific without a pan gesture — the sibling of
+        // JUSTGO_DEBUG_SCREEN, and the only way to screenshot a named station in this
+        // environment, which has no gesture injection at all.
+        if let camera = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_CAMERA"] {
+            let parts = camera.split(separator: ",").compactMap { Double($0) }
+            if parts.count >= 3 {
+                didCenterOnUser = true
+                viewModel?.updateCamera(
+                    to: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]),
+                    spanDelta: parts[2]
+                )
+            }
+        }
         guard let screen = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] else { return }
         switch screen {
         case "search":

@@ -148,6 +148,11 @@ struct RouteDetailView: View {
         }
         .task(id: routeDataKey) {
             boardingServiceWindows = []
+            // Operator content belongs to a trip that actually uses that operator. A walking-only
+            // route rides nothing, and `networkCityID` is nil for it — falling back to the selected
+            // city put Beijing Subway service advisories and first/last-train times on a trip that
+            // never enters a station. Wrong operator content is worse than none.
+            guard route.boardingTransitSegment != nil else { return }
             async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
                 for: route
             )
@@ -312,6 +317,11 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> (title: String, icon: String, tint: Color)? {
+        // Both of these grade *metro* data — station access, step-free status, service hours,
+        // network coverage. A walking-only route rides nothing, so there is no such data to be
+        // uncertain about, and scoring it anyway told the rider an 832 m walk was 44% trustworthy.
+        // Nothing was inferred here: Apple Maps returned a walk, and that is the whole plan.
+        guard route.boardingTransitSegment != nil else { return nil }
         if feasibility.level != .good, feasibility.level != .unknown {
             return (feasibility.title, feasibility.level.iconName, feasibility.level.color)
         }
@@ -662,6 +672,10 @@ struct RouteDetailView: View {
                 rowDivider
             }
 
+            // Same reason as `heroConcern`: the score grades station and network data, and a walk
+            // uses neither. Offering the rider a breakdown of how sure we are about a footpath
+            // Apple Maps drew is a question with no content behind it.
+            if route.boardingTransitSegment != nil {
             Button { detailDestination = .confidence(route.id) } label: {
                 detailRow(
                     icon: "checkmark.seal.fill",
@@ -681,6 +695,7 @@ struct RouteDetailView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            }
 
             if departurePlan != nil {
                 rowDivider

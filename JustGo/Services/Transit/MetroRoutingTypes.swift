@@ -40,9 +40,18 @@ struct MetroGraphEdge {
     let toStationID: String
     let lineID: String
     let distance: Double
+    /// nil for a ride between two stops. Set on the link between two stations riders treat as one
+    /// interchange, which is walked rather than ridden and belongs to no line.
+    var interchange: MetroInterchange.Kind? = nil
 
     var reversed: MetroGraphEdge {
-        MetroGraphEdge(fromStationID: toStationID, toStationID: fromStationID, lineID: lineID, distance: distance)
+        MetroGraphEdge(
+            fromStationID: toStationID,
+            toStationID: fromStationID,
+            lineID: lineID,
+            distance: distance,
+            interchange: interchange
+        )
     }
 
     var key: MetroGraphEdgeKey {
@@ -55,6 +64,12 @@ struct MetroGraphEdgeKey: Hashable {
     let toStationID: String
     let lineID: String
 }
+
+/// The synthetic line an interchange link rides on. Interchange links belong to no real line, and
+/// the route assembly chunks by line — giving them their own identifier is what keeps them from
+/// being folded into the ride on either side of them.
+let metroInterchangeLineID = "__interchange__"
+
 
 struct MetroPath {
     let origin: MetroStationCandidate

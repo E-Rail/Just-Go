@@ -49,7 +49,6 @@ final class MapViewModel {
 
     private let locationService: LocationService
     private let stationSearchService: StationSearchService
-    private let cityService: CityService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
     private var viewportLoadTask: Task<Void, Never>?
@@ -60,12 +59,10 @@ final class MapViewModel {
     init(
         locationService: LocationService,
         stationSearchService: StationSearchService,
-        cityService: CityService,
         metroNetworkProvider: MetroNetworkProviding
     ) {
         self.locationService = locationService
         self.stationSearchService = stationSearchService
-        self.cityService = cityService
         self.metroNetworkProvider = metroNetworkProvider
     }
 
@@ -98,13 +95,14 @@ final class MapViewModel {
         viewportLoadTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled, let self else { return }
-            let centerCityIDs = cityService.getAllCities()
-                .filter { region.contains($0.coordinate, paddingFactor: 0.8) }
-                .map(\.id)
-            let intersectingLoadedCityIDs = metroNetworks
+            // Which packs the viewport touches, by their own bounding boxes. This used to ask
+            // which *city centroids* were in view, which is only ever true zoomed out to a whole
+            // metro area — so at any useful zoom the answer was "none". A second, city-keyed
+            // loader was covering for that; with it gone the map drew nothing at all.
+            let visibleCityIDs = await metroNetworkProvider.networkSummaries()
                 .filter { $0.bounds.intersects(region) }
                 .map(\.cityID)
-            let visibleCityIDs = Array(Set(centerCityIDs + intersectingLoadedCityIDs))
+            guard !Task.isCancelled else { return }
             // Claim the token only now, once this load is actually starting — during the
             // debounce window a still-running earlier load is the freshest thing there is
             // and must be allowed to publish.

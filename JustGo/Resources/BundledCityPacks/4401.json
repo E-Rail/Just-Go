@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 407,
+    "networkStations": 414,
     "matchedStations": {
-      "covered": 326,
-      "total": 407
+      "covered": 329,
+      "total": 414
     },
     "accessibility": {
       "covered": 37,
-      "total": 407
+      "total": 414
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 407
+      "total": 414
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 407
+      "total": 414
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 407
+      "total": 414
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 407
+      "total": 414
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 407
+      "total": 414
     }
   },
   "stations": [
@@ -4252,6 +4252,33 @@
           "kind": "exit",
           "latitude": 22.993378,
           "longitude": 113.329832,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2702871214",
+          "name": "汉溪长隆站 D出入口",
+          "kind": "exit",
+          "latitude": 22.99486,
+          "longitude": 113.330502,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2702871216",
+          "name": "汉溪长隆站 E出入口",
+          "kind": "exit",
+          "latitude": 22.994332,
+          "longitude": 113.329577,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5154657248",
+          "name": "汉溪长隆站 G出入口",
+          "kind": "exit",
+          "latitude": 22.994269,
+          "longitude": 113.330955,
           "isAccessible": false,
           "source": "specificEntrance"
         }
@@ -9600,24 +9627,7 @@
       "aliases": [
 
       ],
-      "accessibility": {
-        "source": "openstreetmap/subway-entrances",
-        "hasElevator": null,
-        "hasEscalator": null,
-        "hasWheelchairRamp": null,
-        "hasTactilePath": null,
-        "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-          "顺德北站 E出入口",
-          "顺德北站 C出入口"
-        ],
-        "facilityNotes": [
-
-        ]
-      },
+      "accessibility": null,
       "schedules": [
 
       ],
@@ -9644,101 +9654,11 @@
           "source": "specificEntrance"
         },
         {
-          "id": "osm-14039038257",
-          "name": "顺德北站 E出入口",
-          "kind": "exit",
-          "latitude": 22.96282,
-          "longitude": 113.128317,
-          "isAccessible": true,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038258",
-          "name": "顺德北站 F出入口",
-          "kind": "exit",
-          "latitude": 22.962815,
-          "longitude": 113.127825,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038259",
-          "name": "顺德北站 出入口",
-          "kind": "exit",
-          "latitude": 22.962816,
-          "longitude": 113.126803,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038260",
-          "name": "顺德北站 D出入口",
-          "kind": "exit",
-          "latitude": 22.962822,
-          "longitude": 113.129917,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038261",
-          "name": "顺德北站 C出入口",
-          "kind": "exit",
-          "latitude": 22.961876,
-          "longitude": 113.1297,
-          "isAccessible": true,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038262",
-          "name": "顺德北站 B出入口",
-          "kind": "exit",
-          "latitude": 22.962205,
-          "longitude": 113.12902,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038263",
-          "name": "顺德北站 出入口",
-          "kind": "exit",
-          "latitude": 22.962975,
-          "longitude": 113.129011,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038264",
-          "name": "顺德北站 A出入口",
-          "kind": "exit",
-          "latitude": 22.962015,
-          "longitude": 113.128122,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038266",
-          "name": "顺德北站 出入口",
-          "kind": "exit",
-          "latitude": 22.963146,
-          "longitude": 113.126615,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
           "id": "osm-14039038271",
           "name": "东平站 D出入口",
           "kind": "exit",
           "latitude": 22.964736,
           "longitude": 113.128935,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-14039038272",
-          "name": "顺德北站 出入口",
-          "kind": "exit",
-          "latitude": 22.963108,
-          "longitude": 113.129672,
           "isAccessible": false,
           "source": "specificEntrance"
         },
@@ -16232,6 +16152,50 @@
       ]
     },
     {
+      "stationID": "cc533cca97812d34",
+      "stationName": "广州白云",
+      "stationNameEn": "Guangzhou Baiyun",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12981494083",
+          "name": "广州白云站A出口",
+          "kind": "exit",
+          "latitude": 23.19018,
+          "longitude": 113.248845,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12981499236",
+          "name": "广州白云站B1出口",
+          "kind": "exit",
+          "latitude": 23.190907,
+          "longitude": 113.248299,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "ce164e6523860161",
       "stationName": "滘心",
       "stationNameEn": "Jiaoxin",
@@ -16701,6 +16665,68 @@
       ]
     },
     {
+      "stationID": "d13d9cc0b157ed62",
+      "stationName": "大石东",
+      "stationNameEn": "Dashidong",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13171592201",
+          "name": "E",
+          "kind": "exit",
+          "latitude": 23.018576,
+          "longitude": 113.323574,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13171592202",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 23.018613,
+          "longitude": 113.325506,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13171592203",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 23.01931,
+          "longitude": 113.325334,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13171592204",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 23.019206,
+          "longitude": 113.323707,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "d1b7985e2250d485",
       "stationName": "员村",
       "stationNameEn": "Yuancun",
@@ -17131,33 +17157,6 @@
 
       ],
       "stationAccessPoints": [
-        {
-          "id": "osm-12981494066",
-          "name": "广州白云站B2出口",
-          "kind": "exit",
-          "latitude": 23.191738,
-          "longitude": 113.248343,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-12981494083",
-          "name": "广州白云站A出口",
-          "kind": "exit",
-          "latitude": 23.19018,
-          "longitude": 113.248845,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-12981499236",
-          "name": "广州白云站B1出口",
-          "kind": "exit",
-          "latitude": 23.190907,
-          "longitude": 113.248299,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
         {
           "id": "osm-12981499249",
           "name": "广州白云站C出口",
@@ -19309,33 +19308,6 @@
       ],
       "stationAccessPoints": [
         {
-          "id": "osm-13171592201",
-          "name": "E",
-          "kind": "exit",
-          "latitude": 23.018576,
-          "longitude": 113.323574,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13171592204",
-          "name": "D",
-          "kind": "exit",
-          "latitude": 23.019206,
-          "longitude": 113.323707,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13171592205",
-          "name": "A",
-          "kind": "exit",
-          "latitude": 23.018525,
-          "longitude": 113.32277,
-          "isAccessible": false,
-          "source": "specificEntrance"
-        },
-        {
           "id": "osm-3016873326",
           "name": "大石站 D出入口",
           "kind": "exit",
@@ -20456,6 +20428,139 @@
           "kind": "exit",
           "latitude": 23.067293,
           "longitude": 113.409632,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "fffac67c0aac9801",
+      "stationName": "顺德北",
+      "stationNameEn": "顺德北",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "顺德北站 E出入口",
+          "顺德北站 C出入口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14039038257",
+          "name": "顺德北站 E出入口",
+          "kind": "exit",
+          "latitude": 22.96282,
+          "longitude": 113.128317,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038258",
+          "name": "顺德北站 F出入口",
+          "kind": "exit",
+          "latitude": 22.962815,
+          "longitude": 113.127825,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038259",
+          "name": "顺德北站 出入口",
+          "kind": "exit",
+          "latitude": 22.962816,
+          "longitude": 113.126803,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038260",
+          "name": "顺德北站 D出入口",
+          "kind": "exit",
+          "latitude": 22.962822,
+          "longitude": 113.129917,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038261",
+          "name": "顺德北站 C出入口",
+          "kind": "exit",
+          "latitude": 22.961876,
+          "longitude": 113.1297,
+          "isAccessible": true,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038262",
+          "name": "顺德北站 B出入口",
+          "kind": "exit",
+          "latitude": 22.962205,
+          "longitude": 113.12902,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038263",
+          "name": "顺德北站 出入口",
+          "kind": "exit",
+          "latitude": 22.962975,
+          "longitude": 113.129011,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038264",
+          "name": "顺德北站 A出入口",
+          "kind": "exit",
+          "latitude": 22.962015,
+          "longitude": 113.128122,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038266",
+          "name": "顺德北站 出入口",
+          "kind": "exit",
+          "latitude": 22.963146,
+          "longitude": 113.126615,
+          "isAccessible": false,
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14039038272",
+          "name": "顺德北站 出入口",
+          "kind": "exit",
+          "latitude": 22.963108,
+          "longitude": 113.129672,
           "isAccessible": false,
           "source": "specificEntrance"
         }

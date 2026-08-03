@@ -242,6 +242,35 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 }
             }
         }
+        // Interchange links, both kinds. An `outOfStation` pair is two separately gated stations
+        // and a street walk; an `inStation` pair is two stations inside one paid area. Either way
+        // the graph needs an edge, or the two are unreachable from each other however close they
+        // sit — which is why Beijing's 广安门内 ↔ 牛街 could not be planned at all.
+        for network in networks {
+            for link in network.interchanges {
+                let fromID = resolve(link.fromStationID)
+                let toID = resolve(link.toStationID)
+                guard let from = stationsByID[fromID], let to = stationsByID[toID], from.id != to.id else { continue }
+                let edge = MetroGraphEdge(
+                    fromStationID: from.id,
+                    toStationID: to.id,
+                    lineID: metroInterchangeLineID,
+                    distance: link.walkingDistanceMeters,
+                    interchange: link.kind
+                )
+                guard seenEdges.insert(edge.key).inserted else { continue }
+                seenEdges.insert(edge.reversed.key)
+                adjacency[from.id, default: []].append(edge)
+                adjacency[to.id, default: []].append(edge.reversed)
+                let geometry = [
+                    CodableCoordinate(latitude: from.latitude, longitude: from.longitude),
+                    CodableCoordinate(latitude: to.latitude, longitude: to.longitude)
+                ]
+                edgeGeometries[edge.key] = geometry
+                edgeGeometries[edge.reversed.key] = Array(geometry.reversed())
+            }
+        }
+
         let graph = MetroRoutingGraph(
             stationsByID: stationsByID,
             linesByID: linesByID,
@@ -276,7 +305,11 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         while let item = heap.removeMin() {
             guard item.cost <= distances[item.state, default: .infinity] else { continue }
 
-            if item.state.lineID != nil, let destination = destinationsByID[item.state.stationID] {
+            // A ride, not merely an interchange walk: arriving somewhere on foot is the direct-walk
+            // route's job (see RoutePlanningService), and accepting it here would let the graph
+            // answer "walk between these two stations" as though it were a journey.
+            let hasRidden = item.state.lineID != nil && item.state.lineID != metroInterchangeLineID
+            if hasRidden, let destination = destinationsByID[item.state.stationID] {
                 let total = item.cost + walkingCost(destination.distance, preference: preference)
                 if total < (best?.cost ?? .infinity),
                    !revisitsAStation(endingAt: item.state, previous: previous) {
@@ -286,9 +319,17 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             if let best, item.cost >= best.cost { break }
 
             for edge in graph.adjacency[item.state.stationID, default: []] {
-                let transfer = item.state.lineID != nil && item.state.lineID != edge.lineID
+                // An interchange link is the transfer, so it pays the penalty and the boarding on
+                // the far side of it does not — charging both would price one change as two.
+                let arrivedByInterchange = item.state.lineID == metroInterchangeLineID
+                let transfer = !arrivedByInterchange &&
+                    item.state.lineID != nil &&
+                    item.state.lineID != edge.lineID
                 let next = MetroSearchState(stationID: edge.toStationID, lineID: edge.lineID)
-                let cost = item.cost + trainCost(edge.distance) + (transfer ? preference.transferPenalty : 0)
+                let step = edge.interchange == nil
+                    ? trainCost(edge.distance) + (transfer ? preference.transferPenalty : 0)
+                    : walkingCost(edge.distance, preference: preference) + preference.transferPenalty
+                let cost = item.cost + step
                 if cost < distances[next, default: .infinity] {
                     distances[next] = cost
                     previous[next] = MetroPreviousStep(state: item.state, edge: edge)

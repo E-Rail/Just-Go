@@ -9,11 +9,11 @@
   "maxMatchMetres": 300.0,
   "stats": {
     "entranceCount": 2419,
-    "boundCount": 1259,
-    "unmatchedCount": 1160,
-    "ambiguousCount": 0,
-    "stationsWithEntrances": 326,
-    "networkStationCount": 407
+    "boundCount": 1262,
+    "unmatchedCount": 1155,
+    "ambiguousCount": 2,
+    "stationsWithEntrances": 329,
+    "networkStationCount": 414
   },
   "stations": {
     "021f71d3c5a2ab84": [
@@ -1923,11 +1923,32 @@
         "name": "汉溪长隆站 A出入口"
       },
       {
+        "osmNodeID": "2702871214",
+        "latitude": 22.9948601,
+        "longitude": 113.3305023,
+        "ref": "D",
+        "name": "汉溪长隆站 D出入口"
+      },
+      {
+        "osmNodeID": "2702871216",
+        "latitude": 22.9943315,
+        "longitude": 113.3295768,
+        "ref": "E",
+        "name": "汉溪长隆站 E出入口"
+      },
+      {
         "osmNodeID": "2702871213",
         "latitude": 22.9933778,
         "longitude": 113.329832,
         "ref": "F",
         "name": "汉溪长隆站 F出入口"
+      },
+      {
+        "osmNodeID": "5154657248",
+        "latitude": 22.9942693,
+        "longitude": 113.3309548,
+        "ref": "G",
+        "name": "汉溪长隆站 G出入口"
       }
     ],
     "384bee9df7f7533a": [
@@ -4356,42 +4377,11 @@
     ],
     "800b536390185ccd": [
       {
-        "osmNodeID": "14039038259",
-        "latitude": 22.9628155,
-        "longitude": 113.1268027,
-        "name": "顺德北站 出入口"
-      },
-      {
-        "osmNodeID": "14039038263",
-        "latitude": 22.9629752,
-        "longitude": 113.1290108,
-        "name": "顺德北站 出入口"
-      },
-      {
-        "osmNodeID": "14039038266",
-        "latitude": 22.9631462,
-        "longitude": 113.1266154,
-        "name": "顺德北站 出入口"
-      },
-      {
-        "osmNodeID": "14039038272",
-        "latitude": 22.9631075,
-        "longitude": 113.1296719,
-        "name": "顺德北站 出入口"
-      },
-      {
         "osmNodeID": "5195581669",
         "latitude": 22.965446,
         "longitude": 113.1302406,
         "ref": "A",
         "name": "东平站 A出入口"
-      },
-      {
-        "osmNodeID": "14039038264",
-        "latitude": 22.962015,
-        "longitude": 113.1281219,
-        "ref": "A",
-        "name": "顺德北站 A出入口"
       },
       {
         "osmNodeID": "5195581668",
@@ -4401,33 +4391,11 @@
         "name": "东平站 B出入口"
       },
       {
-        "osmNodeID": "14039038262",
-        "latitude": 22.9622049,
-        "longitude": 113.1290204,
-        "ref": "B",
-        "name": "顺德北站 B出入口"
-      },
-      {
         "osmNodeID": "14006755399",
         "latitude": 22.9649082,
         "longitude": 113.1284264,
         "ref": "C",
         "name": "东平站 C出入口"
-      },
-      {
-        "osmNodeID": "14039038261",
-        "latitude": 22.9618755,
-        "longitude": 113.1297004,
-        "ref": "C",
-        "name": "顺德北站 C出入口",
-        "wheelchair": "yes"
-      },
-      {
-        "osmNodeID": "14039038260",
-        "latitude": 22.9628223,
-        "longitude": 113.1299165,
-        "ref": "D",
-        "name": "顺德北站 D出入口"
       },
       {
         "osmNodeID": "14039038271",
@@ -4442,21 +4410,6 @@
         "longitude": 113.1295734,
         "ref": "E",
         "name": "东平站 E出入口"
-      },
-      {
-        "osmNodeID": "14039038257",
-        "latitude": 22.9628202,
-        "longitude": 113.128317,
-        "ref": "E",
-        "name": "顺德北站 E出入口",
-        "wheelchair": "yes"
-      },
-      {
-        "osmNodeID": "14039038258",
-        "latitude": 22.9628146,
-        "longitude": 113.1278247,
-        "ref": "F",
-        "name": "顺德北站 F出入口"
       }
     ],
     "80d60bd01635b7ce": [
@@ -7317,6 +7270,22 @@
         "name": "新和站 C出入口"
       }
     ],
+    "cc533cca97812d34": [
+      {
+        "osmNodeID": "12981494083",
+        "latitude": 23.1901803,
+        "longitude": 113.2488446,
+        "ref": "A",
+        "name": "广州白云站A出口"
+      },
+      {
+        "osmNodeID": "12981499236",
+        "latitude": 23.1909067,
+        "longitude": 113.2482994,
+        "ref": "B1",
+        "name": "广州白云站B1出口"
+      }
+    ],
     "ce164e6523860161": [
       {
         "osmNodeID": "8170666544",
@@ -7538,6 +7507,32 @@
         "ref": "B"
       }
     ],
+    "d13d9cc0b157ed62": [
+      {
+        "osmNodeID": "13171592202",
+        "latitude": 23.0186128,
+        "longitude": 113.3255055,
+        "ref": "B"
+      },
+      {
+        "osmNodeID": "13171592203",
+        "latitude": 23.0193097,
+        "longitude": 113.3253336,
+        "ref": "C"
+      },
+      {
+        "osmNodeID": "13171592204",
+        "latitude": 23.0192057,
+        "longitude": 113.3237066,
+        "ref": "D"
+      },
+      {
+        "osmNodeID": "13171592201",
+        "latitude": 23.0185761,
+        "longitude": 113.3235743,
+        "ref": "E"
+      }
+    ],
     "d1b7985e2250d485": [
       {
         "osmNodeID": "8077680589",
@@ -7726,27 +7721,6 @@
       }
     ],
     "d53fedad3ea737ed": [
-      {
-        "osmNodeID": "12981494083",
-        "latitude": 23.1901803,
-        "longitude": 113.2488446,
-        "ref": "A",
-        "name": "广州白云站A出口"
-      },
-      {
-        "osmNodeID": "12981499236",
-        "latitude": 23.1909067,
-        "longitude": 113.2482994,
-        "ref": "B1",
-        "name": "广州白云站B1出口"
-      },
-      {
-        "osmNodeID": "12981494066",
-        "latitude": 23.1917378,
-        "longitude": 113.2483429,
-        "ref": "B2",
-        "name": "广州白云站B2出口"
-      },
       {
         "osmNodeID": "12981499249",
         "latitude": 23.1925976,
@@ -8726,12 +8700,6 @@
         "name": "大石站 A出入口"
       },
       {
-        "osmNodeID": "13171592205",
-        "latitude": 23.0185251,
-        "longitude": 113.3227702,
-        "ref": "A"
-      },
-      {
         "osmNodeID": "3016873354",
         "latitude": 23.0170278,
         "longitude": 113.321194,
@@ -8751,18 +8719,6 @@
         "longitude": 113.3223417,
         "ref": "D",
         "name": "大石站 D出入口"
-      },
-      {
-        "osmNodeID": "13171592204",
-        "latitude": 23.0192057,
-        "longitude": 113.3237066,
-        "ref": "D"
-      },
-      {
-        "osmNodeID": "13171592201",
-        "latitude": 23.0185761,
-        "longitude": 113.3235743,
-        "ref": "E"
       }
     ],
     "f39732245b466893": [
@@ -9283,6 +9239,76 @@
         "latitude": 23.0672933,
         "longitude": 113.4096318,
         "ref": "H"
+      }
+    ],
+    "fffac67c0aac9801": [
+      {
+        "osmNodeID": "14039038259",
+        "latitude": 22.9628155,
+        "longitude": 113.1268027,
+        "name": "顺德北站 出入口"
+      },
+      {
+        "osmNodeID": "14039038263",
+        "latitude": 22.9629752,
+        "longitude": 113.1290108,
+        "name": "顺德北站 出入口"
+      },
+      {
+        "osmNodeID": "14039038266",
+        "latitude": 22.9631462,
+        "longitude": 113.1266154,
+        "name": "顺德北站 出入口"
+      },
+      {
+        "osmNodeID": "14039038272",
+        "latitude": 22.9631075,
+        "longitude": 113.1296719,
+        "name": "顺德北站 出入口"
+      },
+      {
+        "osmNodeID": "14039038264",
+        "latitude": 22.962015,
+        "longitude": 113.1281219,
+        "ref": "A",
+        "name": "顺德北站 A出入口"
+      },
+      {
+        "osmNodeID": "14039038262",
+        "latitude": 22.9622049,
+        "longitude": 113.1290204,
+        "ref": "B",
+        "name": "顺德北站 B出入口"
+      },
+      {
+        "osmNodeID": "14039038261",
+        "latitude": 22.9618755,
+        "longitude": 113.1297004,
+        "ref": "C",
+        "name": "顺德北站 C出入口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "14039038260",
+        "latitude": 22.9628223,
+        "longitude": 113.1299165,
+        "ref": "D",
+        "name": "顺德北站 D出入口"
+      },
+      {
+        "osmNodeID": "14039038257",
+        "latitude": 22.9628202,
+        "longitude": 113.128317,
+        "ref": "E",
+        "name": "顺德北站 E出入口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "14039038258",
+        "latitude": 22.9628146,
+        "longitude": 113.1278247,
+        "ref": "F",
+        "name": "顺德北站 F出入口"
       }
     ]
   }

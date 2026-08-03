@@ -149,7 +149,6 @@ final class DIContainer {
         MapViewModel(
             locationService: locationService,
             stationSearchService: stationSearchService,
-            cityService: cityService,
             metroNetworkProvider: metroNetworkProvider
         )
     }

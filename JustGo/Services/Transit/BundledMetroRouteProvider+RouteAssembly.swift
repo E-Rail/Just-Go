@@ -54,7 +54,11 @@ extension BundledMetroRouteProvider {
             totalDuration: segments.reduce(0) { $0 + $1.duration },
             walkingDistance: walkingDistance,
             totalStops: path.edges.count,
-            transferCount: max(0, path.edges.map(\.lineID).consecutiveUnique.count - 1),
+            // Count line changes, which is what a transfer is. The interchange link's synthetic
+            // line ID is dropped first: it sits between two different real lines by construction
+            // (the importer rejects a pair that shares one), so the change is already counted —
+            // adding the link itself priced one change as two.
+            transferCount: max(0, path.edges.map(\.lineID).filter { $0 != metroInterchangeLineID }.consecutiveUnique.count - 1),
             isFullyAccessible: false,
             stepFreeAssessment: hasStairs ? .barrierDetected : .unknown,
             warnings: warnings,
@@ -71,8 +75,14 @@ extension BundledMetroRouteProvider {
         graph: MetroRoutingGraph
     ) -> [RouteSegment] {
         var segments: [RouteSegment] = []
-        let groups = edges.chunked { $0.lineID == $1.lineID }
+        // Also split on `interchange`, so two interchange links that happen to sit next to each
+        // other stay two legs rather than being folded into one by their shared synthetic line.
+        let groups = edges.chunked { $0.lineID == $1.lineID && $0.interchange == $1.interchange }
         for (index, group) in groups.enumerated() {
+            if let first = group.first, let kind = first.interchange {
+                segments.append(contentsOf: group.compactMap { interchangeSegment($0, kind: kind, graph: graph) })
+                continue
+            }
             guard let first = group.first,
                   let last = group.last,
                   let line = graph.linesByID[first.lineID],
@@ -85,7 +95,11 @@ extension BundledMetroRouteProvider {
                 line: line,
                 graph: graph
             )
-            if index > 0 {
+            // `index > 0`, but not straight after an interchange link: that link *is* the
+            // change, and appending a second zero-length transfer on top of it listed the same
+            // change twice — "walk 广安门内 → 牛街" followed by "transfer at 牛街".
+            let followsInterchange = index > 0 && groups[index - 1].first?.interchange != nil
+            if index > 0, !followsInterchange {
                 // `lineName` below is the outgoing line (correct for "Transfer to X" display
                 // text) — the incoming line, for resolving a real indoor transfer path, is the
                 // *previous* group's line, only available here, not reconstructable later.
@@ -159,6 +173,48 @@ extension BundledMetroRouteProvider {
             ))
         }
         return segments
+    }
+
+    /// The leg where the rider walks from one station to the other one riders treat as the same
+    /// interchange. A `.transfer` either way — it is a change of train, not a journey — but an
+    /// `outOfStation` link says so, because leaving the paid area costs a second fare and the
+    /// rider needs to know before they tap out.
+    private func interchangeSegment(
+        _ edge: MetroGraphEdge,
+        kind: MetroInterchange.Kind,
+        graph: MetroRoutingGraph
+    ) -> RouteSegment? {
+        guard let from = graph.stationsByID[edge.fromStationID],
+              let to = graph.stationsByID[edge.toStationID] else { return nil }
+        let note = kind == .outOfStation
+            ? AppLocalization.text(
+                english: "Leaves the paid area — a second fare applies",
+                simplified: "需出站换乘，将重新计费",
+                traditional: "需出站換乘，將重新計費"
+            )
+            : AppLocalization.text(
+                english: "Inside the paid area — no need to tap out",
+                simplified: "站内换乘，无需出闸",
+                traditional: "站內換乘，無需出閘"
+            )
+        return RouteSegment(
+            id: UUID(),
+            type: .transfer,
+            lineName: to.name,
+            lineColorHex: nil,
+            fromStationName: from.name,
+            toStationName: to.name,
+            fromStationID: graph.qualifiedID(for: from.id),
+            toStationID: graph.qualifiedID(for: to.id),
+            // Walking pace, plus the same fixed allowance an in-station change already carries.
+            duration: edge.distance / 1.25 + 300,
+            distance: edge.distance,
+            stops: 0,
+            stationStops: [],
+            polylineCoordinates: graph.edgeGeometries[edge.key] ?? [],
+            walkingDirections: nil,
+            accessibilityNotes: [note]
+        )
     }
 
     private func transitLegContext(

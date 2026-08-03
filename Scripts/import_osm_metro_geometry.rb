@@ -38,16 +38,27 @@ SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 # mainline/high-speed railway inside the same bounding boxes (国铁/高铁) stays out.
 GUANGDONG_INTERCITY_NETWORKS = ["珠三角城际", "粤港澳大湾区城际铁路"].freeze
 
-# Sanity bound on a declared `interchange_aliases` pair — far enough to cover a genuine
-# metro/intercity concourse (Guangzhou's widest real pair is 350m) and tight enough that a typo
-# naming the wrong station fails the import instead of inventing a transfer across the city.
-MAX_INTERCHANGE_ALIAS_METERS = 500
+# Sanity bounds on a declared `interchanges` pair, per kind. Far enough to cover the real thing
+# — Guangzhou's widest shared concourse is 350m, Beijing's longest street interchange is 太平桥/
+# 复兴门 at 625m — and tight enough that a typo naming the wrong station fails the import instead
+# of inventing a transfer across the city.
+MAX_INTERCHANGE_METERS = {
+  "inStation" => 500,
+  "outOfStation" => 1_000
+}.freeze
 
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
     networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
-    own_unknown_lines: ["前门大街有轨电车"]
+    own_unknown_lines: ["前门大街有轨电车"],
+    # Beijing's two street interchanges (出站换乘): the rider leaves the paid area, walks a block
+    # and re-enters. Riders make both every day and the app could not plan either, because two
+    # named stations with no shared line are two unconnected nodes in the graph.
+    interchanges: [
+      { from: "广安门内", to: "牛街", kind: "outOfStation" },
+      { from: "太平桥", to: "复兴门", kind: "outOfStation" }
+    ]
   },
   "3100" => {
     name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20],
@@ -58,17 +69,19 @@ CITIES = {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
     networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
     own_unknown_lines: [],
-    # Metro station first, the intercity station it shares a concourse with second. Every pair
-    # here is one place a rider walks across; OSM names the two halves separately. See the
-    # merge in build_city for why this is a list and not a distance rule.
-    interchange_aliases: [
-      %w[机场北 白云机场北],
-      %w[机场南 白云机场南],
-      %w[广州白云站 广州白云],
-      %w[广州北站 花都],
-      %w[大石 大石东],
-      %w[东平 顺德北],
-      %w[汉溪长隆 广州长隆]
+    # Metro station first, the intercity station it shares a concourse with second. Two stations
+    # inside one paid area, not one station with two names — they were fused into a single node
+    # at the mean of both halves, which put the marker in the gap between two platforms and made
+    # the city's station count 7 short. See `build_interchanges` for why this is a list and not
+    # a distance rule.
+    interchanges: [
+      { from: "机场北", to: "白云机场北", kind: "inStation" },
+      { from: "机场南", to: "白云机场南", kind: "inStation" },
+      { from: "广州白云站", to: "广州白云", kind: "inStation" },
+      { from: "广州北站", to: "花都", kind: "inStation" },
+      { from: "大石", to: "大石东", kind: "inStation" },
+      { from: "东平", to: "顺德北", kind: "inStation" },
+      { from: "汉溪长隆", to: "广州长隆", kind: "inStation" }
     ]
   },
   "4403" => {
@@ -575,6 +588,53 @@ def average_coordinate(station)
   ]
 end
 
+# Two named stations riders treat as one interchange.
+#
+# Two cases, one mechanism, differing only in `kind`. `inStation` is two stations inside one paid
+# area — Guangzhou's metro/intercity concourses, where the rider never passes a gate. `outOfStation`
+# is a street walk between two separately-gated stations, as at Beijing's 广安门内/牛街. The app
+# draws the first solid and the second dashed, and charges the second a fare it does not charge
+# the first.
+#
+# Declared per pair rather than inferred from distance, because distance cannot separate an
+# interchange from two nearby stations that are not one. Measured over Guangzhou's 414 stations,
+# the real concourse pairs run out to 350m (汉溪长隆/广州长隆) while 体育西路 and 天河南 — different
+# stations, no interchange — are 281m apart. In Beijing 南礼士路 and 复兴门 are 372m apart and are
+# *not* an interchange, while 太平桥 and 复兴门 at 625m are. No threshold separates those, so a
+# threshold would invent transfers between the busiest stations in both cities. A wrong transfer
+# is worse than a missing one.
+#
+# These used to be merges: the two nodes were fused into one at the mean of their coordinates.
+# That put the marker in the gap between two platforms, undercounted the city's stations by one
+# per pair, and could only ever express the in-station case.
+def build_interchanges(city, city_id, station_groups)
+  (city[:interchanges] || []).map do |link|
+    from_key = normalized_station_name(link.fetch(:from))
+    to_key = normalized_station_name(link.fetch(:to))
+    from = station_groups[from_key]
+    to = station_groups[to_key]
+    # Loud, not skipped: a typo or a renamed station would otherwise silently drop the link and
+    # the interchange would quietly stop being plannable again.
+    fail_with("#{city[:name]} interchange names an absent station: #{link[:from]}") if from.nil?
+    fail_with("#{city[:name]} interchange names an absent station: #{link[:to]}") if to.nil?
+    unless (from["lineIDs"] & to["lineIDs"]).empty?
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} already share a line")
+    end
+    limit = MAX_INTERCHANGE_METERS[link.fetch(:kind)]
+    fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown kind #{link[:kind]}") if limit.nil?
+    separation = meters_between(average_coordinate(from), average_coordinate(to))
+    if separation > limit
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
+    end
+    {
+      "fromStationID" => station_id(city_id, from_key),
+      "toStationID" => station_id(city_id, to_key),
+      "kind" => link.fetch(:kind),
+      "walkingDistanceMeters" => separation.round
+    }
+  end.sort_by { |link| [link["fromStationID"], link["toStationID"]] }
+end
+
 def meters_between(a, b)
   latitude = (a[0] + b[0]) / 2 * PI / 180
   x = (b[1] - a[1]) * PI / 180 * Math.cos(latitude)
@@ -1021,55 +1081,7 @@ def build_network(city_id, city, source)
     base
   end
 
-  # Two names, one place. OSM names a metro station and the intercity station it interchanges
-  # with separately, so the name-keyed grouping above emits two nodes — and because the routing
-  # graph only charges a transfer where the line changes *at one node*
-  # (BundledMetroRouteProvider), no transfer edge exists between them at all. The app cannot plan
-  # an interchange riders make every day, and the city's station count double-counts it.
-  #
-  # Declared per pair rather than inferred from distance, because distance cannot separate the
-  # two cases. Measured over Guangzhou's 414 stations, the genuine cross-mode pairs run out to
-  # 350m (汉溪长隆/广州长隆) while 体育西路 and 天河南 — different stations — are 281m apart. Any
-  # threshold that catches the first fuses the second, inventing a transfer between two of the
-  # city's busiest stations. A wrong transfer is worse than a double count.
-  alias_id_rewrites = {}
-  (city[:interchange_aliases] || []).each do |primary_name, secondary_name|
-    primary_key = normalized_station_name(primary_name)
-    secondary_key = normalized_station_name(secondary_name)
-    primary = station_groups[primary_key]
-    secondary = station_groups[secondary_key]
-    # Loud, not skipped: a typo or a renamed station would otherwise silently stop merging and
-    # the double count would quietly come back.
-    fail_with("#{city[:name]} interchange alias names an absent station: #{primary_name}") if primary.nil?
-    fail_with("#{city[:name]} interchange alias names an absent station: #{secondary_name}") if secondary.nil?
-    unless (primary["lineIDs"] & secondary["lineIDs"]).empty?
-      fail_with("#{city[:name]} interchange alias #{primary_name}/#{secondary_name} already share a line")
-    end
-    separation = meters_between(average_coordinate(primary), average_coordinate(secondary))
-    if separation > MAX_INTERCHANGE_ALIAS_METERS
-      fail_with(
-        "#{city[:name]} interchange alias #{primary_name}/#{secondary_name} is #{separation.round}m apart"
-      )
-    end
-    # The merged node sits at the mean of both halves' mapped positions. Anchoring it on the
-    # primary (metro) station instead was tried and measured worse: 1257 entrances bound against
-    # 1259 for the mean, because the entrance importer's 300m match radius then excludes the
-    # intercity half's exits entirely rather than trimming the far end of each.
-    primary["coordinates"].concat(secondary["coordinates"])
-    primary["lineIDs"].merge(secondary["lineIDs"])
-    primary["nameEn"] ||= secondary["nameEn"]
-    station_groups.delete(secondary_key)
-    alias_id_rewrites[station_id(city_id, secondary_key)] = station_id(city_id, primary_key)
-  end
-  unless alias_id_rewrites.empty?
-    lines.each do |line|
-      line["servicePatterns"] = line["servicePatterns"].map do |pattern|
-        # chunk_while collapses the adjacent repeat a rewrite can create if one line somehow
-        # called at both names; `uniq` then drops a pattern that became a duplicate of another.
-        pattern.map { |id| alias_id_rewrites.fetch(id, id) }.chunk_while { |a, b| a == b }.map(&:first)
-      end.uniq
-    end
-  end
+  interchanges = build_interchanges(city, city_id, station_groups)
 
   stations = station_groups.map do |name_key, station|
     next if station["lineIDs"].empty?
@@ -1125,7 +1137,8 @@ def build_network(city_id, city, source)
     "coordinateSystem" => "gcj02",
     "sourceURLs" => [SOURCE_URL, *OVERPASS_URLS.map(&:to_s)],
     "lines" => lines.sort_by { |line| line["name"] },
-    "stations" => stations.sort_by { |station| station["name"] }
+    "stations" => stations.sort_by { |station| station["name"] },
+    "interchanges" => interchanges
   }
   report = canonicalization_report.merge(
     "cityID" => city_id,

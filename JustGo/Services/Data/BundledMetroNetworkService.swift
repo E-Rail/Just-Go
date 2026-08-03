@@ -42,6 +42,29 @@ struct MetroLine: Codable, Equatable, Identifiable {
     let paths: [[MetroCoordinate]]
 }
 
+/// Two named stations riders treat as one interchange.
+///
+/// The network graph only charges a transfer where a line changes *at one node*, so two stations
+/// with no line in common were two unconnected places however close together they sat — the app
+/// could not plan Beijing's 广安门内 ↔ 牛街 at all, and drew nothing between them.
+///
+/// Declared per pair in the importer, never inferred from distance: 南礼士路 and 复兴门 are 372 m
+/// apart and are *not* an interchange, while 太平桥 and 复兴门 at 625 m are.
+struct MetroInterchange: Codable, Equatable {
+    /// `inStation` — two stations inside one paid area (Guangzhou's metro/intercity concourses).
+    /// `outOfStation` — a street walk between two separately gated stations, which costs a
+    /// second fare. Drawn solid and dashed respectively.
+    enum Kind: String, Codable {
+        case inStation
+        case outOfStation
+    }
+
+    let fromStationID: String
+    let toStationID: String
+    let kind: Kind
+    let walkingDistanceMeters: Double
+}
+
 struct MetroStation: Codable, Equatable, Identifiable {
     let id: String
     let name: String
@@ -76,8 +99,10 @@ struct MetroNetworkStationIndex: Decodable {
 
     let cityID: String
     let geometryKind: String
+    let bounds: MetroBounds
     let lines: [Line]
     let stations: [MetroStation]
+    let interchanges: [MetroInterchange]
 
     var displayStations: [Station] {
         let linesByID = Dictionary(
@@ -118,6 +143,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     let geometryKind: String
     let lines: [MetroLine]
     let stations: [MetroStation]
+    let interchanges: [MetroInterchange]
 
     var id: String { cityID }
 
@@ -310,6 +336,13 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             let cityStations = index.displayStations
             stationsByCity[index.cityID] = cityStations
             stations += cityStations
+            // The file is open and its bounds are already decoded — record them, so the map's
+            // "which packs are in view" question is answered without a second pass over all 53.
+            summaries[index.cityID] = MetroNetworkSummary(
+                cityID: index.cityID,
+                bounds: index.bounds,
+                geometryKind: index.geometryKind
+            )
         }
         // Sorted so the list is stable across launches regardless of which city's decode
         // finished first — the ranking that matters is applied by the caller, per rider.

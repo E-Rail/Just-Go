@@ -213,6 +213,33 @@ struct TransitMapView: UIViewRepresentable {
                     )
                 }
             }
+            addInterchanges(network)
+        }
+
+        /// The links between two stations riders treat as one interchange.
+        ///
+        /// Drawn on the network, not only inside a planned route: the rider needs to see that
+        /// 广安门内 and 牛街 are connected *before* deciding to plan through them. Solid when the
+        /// walk stays inside the paid area, dashed when it crosses the street and a second fare —
+        /// the same distinction the data draws, made visible rather than described.
+        private func addInterchanges(_ network: MetroNetwork) {
+            guard !network.interchanges.isEmpty else { return }
+            let coordinatesByID = Dictionary(
+                network.stations.map { ($0.id, $0.coordinate) },
+                uniquingKeysWith: { first, _ in first }
+            )
+            for link in network.interchanges {
+                guard let from = coordinatesByID[link.fromStationID],
+                      let to = coordinatesByID[link.toStationID] else { continue }
+                addPolyline(
+                    [from, to],
+                    colorHex: "#8E8E93",
+                    lineWidth: 5,
+                    dashPattern: link.kind == .outOfStation ? [2, 6] : nil,
+                    simplify: false,
+                    collection: &networkOverlays
+                )
+            }
         }
 
         private func addRoute(_ route: Route) {

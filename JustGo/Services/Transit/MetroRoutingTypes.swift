@@ -2,10 +2,12 @@ import CoreLocation
 import MapKit
 
 struct MetroRouteContext {
-    let network: MetroNetwork
+    /// Every pack the trip can use, not the single closest one. A trip from Foshan's metro to
+    /// Guangzhou's crosses two packs and calls at an intercity corridor carried by both; picking
+    /// one network made that trip unplannable rather than merely badly planned.
+    let networks: [MetroNetwork]
     let originStations: [MetroStationCandidate]
     let destinationStations: [MetroStationCandidate]
-    let accessDistance: Double
 }
 
 struct MetroRoutingGraph {
@@ -13,6 +15,19 @@ struct MetroRoutingGraph {
     let linesByID: [String: MetroLine]
     let adjacency: [String: [MetroGraphEdge]]
     let edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]]
+    /// Which pack each station came from. The graph spans several, and every rider-facing station
+    /// ID is `network-<city>-<station>` — so the city is a property of the station now, not of the
+    /// search.
+    let cityIDByStationID: [String: String]
+
+    func cityID(for stationID: String) -> String {
+        cityIDByStationID[stationID] ?? ""
+    }
+
+    /// The `network-<city>-<station>` identifier the rest of the app indexes stations by.
+    func qualifiedID(for stationID: String) -> String {
+        "network-\(cityID(for: stationID))-\(stationID)"
+    }
 }
 
 struct MetroStationCandidate {

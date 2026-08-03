@@ -29,7 +29,6 @@ extension BundledMetroRouteProvider {
         if let walk = await originWalk { segments.append(walk) }
         segments.append(contentsOf: transitSegments(
             path.edges,
-            cityID: context.network.cityID,
             graph: graph
         ))
         if let walk = await destinationWalk { segments.append(walk) }
@@ -48,8 +47,8 @@ extension BundledMetroRouteProvider {
             id: UUID(),
             origin: origin.name,
             destination: destination.name,
-            originStationID: "network-\(context.network.cityID)-\(originStation.id)",
-            destinationStationID: "network-\(context.network.cityID)-\(destinationStation.id)",
+            originStationID: graph.qualifiedID(for: originStation.id),
+            destinationStationID: graph.qualifiedID(for: destinationStation.id),
             strategy: preference.strategy,
             segments: segments,
             totalDuration: segments.reduce(0) { $0 + $1.duration },
@@ -69,7 +68,6 @@ extension BundledMetroRouteProvider {
 
     func transitSegments(
         _ edges: [MetroGraphEdge],
-        cityID: String,
         graph: MetroRoutingGraph
     ) -> [RouteSegment] {
         var segments: [RouteSegment] = []
@@ -85,7 +83,6 @@ extension BundledMetroRouteProvider {
             let currentContext = transitLegContext(
                 group: group,
                 line: line,
-                cityID: cityID,
                 graph: graph
             )
             if index > 0 {
@@ -95,7 +92,7 @@ extension BundledMetroRouteProvider {
                 let previousGroup = groups[index - 1]
                 let previousLine = previousGroup.last.flatMap { graph.linesByID[$0.lineID] }
                 let incomingContext = previousLine.map {
-                    transitLegContext(group: previousGroup, line: $0, cityID: cityID, graph: graph)
+                    transitLegContext(group: previousGroup, line: $0, graph: graph)
                 }
                 segments.append(RouteSegment(
                     id: UUID(),
@@ -104,8 +101,8 @@ extension BundledMetroRouteProvider {
                     lineColorHex: line.colorHex,
                     fromStationName: from.name,
                     toStationName: from.name,
-                    fromStationID: "network-\(cityID)-\(from.id)",
-                    toStationID: "network-\(cityID)-\(from.id)",
+                    fromStationID: graph.qualifiedID(for: from.id),
+                    toStationID: graph.qualifiedID(for: from.id),
                     duration: 300,
                     distance: 0,
                     stops: 0,
@@ -115,8 +112,8 @@ extension BundledMetroRouteProvider {
                     accessibilityNotes: [],
                     transferContext: incomingContext.map {
                         TransferContext(
-                            cityID: cityID,
-                            stationID: "network-\(cityID)-\(from.id)",
+                            cityID: graph.cityID(for: from.id),
+                            stationID: graph.qualifiedID(for: from.id),
                             stationName: from.name,
                             incoming: $0,
                             outgoing: currentContext
@@ -131,7 +128,7 @@ extension BundledMetroRouteProvider {
                 guard let station = graph.stationsByID[id] else { return nil }
                 let lineCount = Set(station.lineIDs.filter { graph.linesByID[$0] != nil }).count
                 return RouteStationStop(
-                    stationID: "network-\(cityID)-\(station.id)",
+                    stationID: graph.qualifiedID(for: station.id),
                     name: station.name,
                     lineName: line.name,
                     lineColorHex: line.colorHex,
@@ -149,8 +146,8 @@ extension BundledMetroRouteProvider {
                 lineColorHex: line.colorHex,
                 fromStationName: from.name,
                 toStationName: to.name,
-                fromStationID: "network-\(cityID)-\(from.id)",
-                toStationID: "network-\(cityID)-\(to.id)",
+                fromStationID: graph.qualifiedID(for: from.id),
+                toStationID: graph.qualifiedID(for: to.id),
                 duration: group.reduce(0) { $0 + trainCost($1.distance) },
                 distance: group.reduce(0) { $0 + $1.distance },
                 stops: group.count,
@@ -167,7 +164,6 @@ extension BundledMetroRouteProvider {
     private func transitLegContext(
         group: [MetroGraphEdge],
         line: MetroLine,
-        cityID: String,
         graph: MetroRoutingGraph
     ) -> TransitLegContext {
         let first = group.first!
@@ -178,13 +174,13 @@ extension BundledMetroRouteProvider {
         return TransitLegContext(
             lineID: line.id,
             lineName: line.name,
-            boardingStationID: "network-\(cityID)-\(first.fromStationID)",
-            alightingStationID: "network-\(cityID)-\(last.toStationID)",
-            directionNextStationID: next.map { "network-\(cityID)-\($0.id)" },
+            boardingStationID: graph.qualifiedID(for: first.fromStationID),
+            alightingStationID: graph.qualifiedID(for: last.toStationID),
+            directionNextStationID: next.map { graph.qualifiedID(for: $0.id) },
             directionNextStationName: next?.name,
-            arrivalPreviousStationID: previous.map { "network-\(cityID)-\($0.id)" },
+            arrivalPreviousStationID: previous.map { graph.qualifiedID(for: $0.id) },
             arrivalPreviousStationName: previous?.name,
-            directionTerminalStationID: terminal.map { "network-\(cityID)-\($0.id)" },
+            directionTerminalStationID: terminal.map { graph.qualifiedID(for: $0.id) },
             directionTerminalStationName: terminal?.name
         )
     }

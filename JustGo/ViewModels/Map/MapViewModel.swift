@@ -373,16 +373,48 @@ final class MapViewModel {
         }
 
         let showsNormalStations = region.maxDelta <= 0.12
-        let visibleStations = metroNetworks
-            .flatMap { stationsByCity[$0.cityID] ?? [] }
-            .filter { station in
-                region.contains(station.coordinate, paddingFactor: 0.2) &&
-                    (showsNormalStations || station.isTransferStation)
-            }
+        let visibleStations = oneMarkerPerPlace(
+            metroNetworks
+                .flatMap { stationsByCity[$0.cityID] ?? [] }
+                .filter { station in
+                    region.contains(station.coordinate, paddingFactor: 0.2) &&
+                        (showsNormalStations || station.isTransferStation)
+                }
+        )
         // Cheap identity comparison (short-circuits, no temporary arrays) before publishing.
         if !sameStations(visibleStations, stations) {
             stations = visibleStations
         }
+    }
+
+    /// Collapses the copies of one station that several packs each ship.
+    ///
+    /// Neighbouring cities' packs carry the intercity corridor they share, so a station on it is
+    /// shipped two or three times — 174 such pairs across the bundled data. The map drew every
+    /// copy, which is why Guangzhou's 科韵路 appeared as a stack of interchange markers on one spot.
+    ///
+    /// Same rule as the router's `canonicalStationIDs`: identical name **and** colocation, never
+    /// distance alone — 体育西路 and 天河南 are 281 m apart and are different stations. The copy
+    /// that knows the most lines survives, which is the one carrying the metro service rather than
+    /// the intercity-only stub.
+    private func oneMarkerPerPlace(_ stations: [Station]) -> [Station] {
+        guard metroNetworks.count > 1 else { return stations }
+        var kept: [Station] = []
+        kept.reserveCapacity(stations.count)
+        var indicesByName: [String: [Int]] = [:]
+        for station in stations {
+            let key = normalizedStationName(station.name)
+            let match = indicesByName[key, default: []].first {
+                kept[$0].coordinate.distance(to: station.coordinate) <= 250
+            }
+            if let match {
+                if station.lines.count > kept[match].lines.count { kept[match] = station }
+            } else {
+                indicesByName[key, default: []].append(kept.count)
+                kept.append(station)
+            }
+        }
+        return kept
     }
 
     private func sameStations(_ lhs: [Station], _ rhs: [Station]) -> Bool {

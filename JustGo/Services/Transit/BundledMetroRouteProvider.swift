@@ -29,18 +29,23 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 $0.bounds.distance(to: destination.routeCoordinate) <= 25_000
         }.map(\.cityID)
 
-        var candidates: [MetroRouteContext] = []
+        var networks: [MetroNetwork] = []
         for cityID in candidateCityIDs {
-            guard let network = await metroNetworks.network(for: cityID),
-                  let context = routeContext(network: network, origin: origin.routeCoordinate, destination: destination.routeCoordinate) else {
-                continue
-            }
-            candidates.append(context)
+            guard let network = await metroNetworks.network(for: cityID) else { continue }
+            networks.append(network)
         }
-        guard let context = candidates.min(by: { $0.accessDistance < $1.accessDistance }) else {
+        // Every network the trip can reach, searched as one. Choosing the single closest one is
+        // what made Foshan-metro → intercity → Guangzhou-metro unplannable: Foshan's pack holds 3
+        // metro lines and Guangzhou's 23, neither contains the other's, and whichever won the
+        // tie-break could only offer half the journey.
+        guard let context = routeContext(
+            networks: networks,
+            origin: origin.routeCoordinate,
+            destination: destination.routeCoordinate
+        ) else {
             throw RoutePlanningError.outsideSubwayCoverage
         }
-        let graph = routingGraph(for: context.network)
+        let graph = routingGraph(for: context.networks)
 
         let preferences: [MetroSearchPreference] = [.fastest, .fewestTransfers, .leastWalking]
         var seen = Set<String>()
@@ -80,12 +85,15 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     }
 
     private func routeContext(
-        network: MetroNetwork,
+        networks: [MetroNetwork],
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D
     ) -> MetroRouteContext? {
-        let originStations = nearestStations(to: origin, in: network)
-        let destinationStations = nearestStations(to: destination, in: network)
+        guard !networks.isEmpty else { return nil }
+        // Nearest across all of them together, so the boarding station can belong to one pack and
+        // the alighting station to another.
+        let originStations = nearestStations(to: origin, in: networks)
+        let destinationStations = nearestStations(to: destination, in: networks)
         guard let originDistance = originStations.first?.distance,
               let destinationDistance = destinationStations.first?.distance,
               originDistance <= 25_000,
@@ -93,20 +101,34 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             return nil
         }
         return MetroRouteContext(
-            network: network,
+            networks: networks,
             originStations: originStations,
-            destinationStations: destinationStations,
-            accessDistance: originDistance + destinationDistance
+            destinationStations: destinationStations
         )
     }
 
-    private func nearestStations(to coordinate: CLLocationCoordinate2D, in network: MetroNetwork) -> [MetroStationCandidate] {
+    private func nearestStations(to coordinate: CLLocationCoordinate2D, in networks: [MetroNetwork]) -> [MetroStationCandidate] {
+        // Duplicate copies of one station would otherwise fill the 4 candidate slots with the same
+        // place shipped by three packs. Resolving first keeps them genuinely distinct options.
+        let canonical = canonicalStationIDs(across: networks)
+        var seen = Set<String>()
+        var stations: [MetroStation] = []
+        for network in networks {
+            for station in network.stations where canonical[station.id] == nil {
+                guard seen.insert(station.id).inserted else { continue }
+                stations.append(station)
+            }
+        }
+        return nearestStations(to: coordinate, among: stations)
+    }
+
+    private func nearestStations(to coordinate: CLLocationCoordinate2D, among stations: [MetroStation]) -> [MetroStationCandidate] {
         // Keep only the 4 nearest in a single linear pass (sorted ascending) instead of
         // sorting every station (O(N) vs O(N log N)); ties preserve input order to match
         // the previous stable-sort behaviour.
         var nearest: [MetroStationCandidate] = []
         nearest.reserveCapacity(5)
-        for station in network.stations {
+        for station in stations {
             let distance = coordinate.distance(to: CLLocationCoordinate2D(latitude: station.latitude, longitude: station.longitude))
             if nearest.count == 4, distance >= nearest[3].distance { continue }
             let insertionIndex = nearest.firstIndex { distance < $0.distance } ?? nearest.count
@@ -116,33 +138,107 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return nearest
     }
 
-    private func routingGraph(for network: MetroNetwork) -> MetroRoutingGraph {
-        let key = "\(network.cityID):\(network.version)"
+    /// Which duplicate copies of a station collapse onto which surviving one.
+    ///
+    /// Adjacent cities' packs each carry the intercity corridor they share, so a station on that
+    /// corridor is shipped two or three times — 174 such pairs across the bundled data, 170 of them
+    /// in the Guangzhou/Foshan/Dongguan cluster. Left alone the merged graph would hold two
+    /// disconnected copies of 科韵路 and a rider could not change trains there.
+    ///
+    /// Resolved here rather than in the packs: the duplication is how the data is *packaged*, not
+    /// something wrong with it. Each pack stays independently valid, independently licensed, and
+    /// usable on its own.
+    ///
+    /// Keyed on identical normalized name **and** colocation — never distance alone. 体育西路 and
+    /// 天河南 are 281 m apart and are different stations; requiring the name to match as well is
+    /// what separates "the same station shipped twice" from "two stations that are close".
+    private func canonicalStationIDs(across networks: [MetroNetwork]) -> [String: String] {
+        guard networks.count > 1 else { return [:] }
+
+        var byName: [String: [MetroStation]] = [:]
+        for network in networks {
+            for station in network.stations {
+                byName[normalizedStationName(station.name), default: []].append(station)
+            }
+        }
+
+        var canonical: [String: String] = [:]
+        for (_, group) in byName where group.count > 1 {
+            var clusters: [[MetroStation]] = []
+            for station in group {
+                let index = clusters.firstIndex { cluster in
+                    cluster.contains { $0.coordinate.distance(to: station.coordinate) <= 250 }
+                }
+                if let index {
+                    clusters[index].append(station)
+                } else {
+                    clusters.append([station])
+                }
+            }
+            for cluster in clusters where cluster.count > 1 {
+                // The copy that knows the most lines survives — that is the one the importer merged
+                // the metro service into, so it sits on the platform rather than beside it. The id
+                // tie-break only exists to keep the choice stable between runs.
+                let winner = cluster.sorted {
+                    $0.lineIDs.count != $1.lineIDs.count
+                        ? $0.lineIDs.count > $1.lineIDs.count
+                        : $0.id < $1.id
+                }[0]
+                for station in cluster where station.id != winner.id {
+                    canonical[station.id] = winner.id
+                }
+            }
+        }
+        return canonical
+    }
+
+    private func routingGraph(for networks: [MetroNetwork]) -> MetroRoutingGraph {
+        let key = networks.map { "\($0.cityID):\($0.version)" }.sorted().joined(separator: "|")
         if let graph = graphs[key] {
             return graph
         }
+
+        let canonical = canonicalStationIDs(across: networks)
+        func resolve(_ stationID: String) -> String { canonical[stationID] ?? stationID }
+
         // Tolerate duplicated ids in a data pack (keep the first) instead of trapping —
         // a single malformed pack entry must not crash route search.
-        let stationsByID = Dictionary(network.stations.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        let linesByID = Dictionary(network.lines.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        var stationsByID: [String: MetroStation] = [:]
+        var linesByID: [String: MetroLine] = [:]
+        var cityIDByStationID: [String: String] = [:]
+        for network in networks {
+            for station in network.stations where canonical[station.id] == nil {
+                guard stationsByID[station.id] == nil else { continue }
+                stationsByID[station.id] = station
+                cityIDByStationID[station.id] = network.cityID
+            }
+            for line in network.lines where linesByID[line.id] == nil {
+                linesByID[line.id] = line
+            }
+        }
+
         var adjacency: [String: [MetroGraphEdge]] = [:]
         var edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]] = [:]
         var seenEdges = Set<MetroGraphEdgeKey>()
-        for line in network.lines {
-            for pattern in line.servicePatterns {
-                for pair in pattern.adjacentPairs {
-                    guard let from = stationsByID[pair.0], let to = stationsByID[pair.1] else { continue }
-                    let distance = from.coordinate.distance(to: to.coordinate)
-                    let edge = MetroGraphEdge(fromStationID: from.id, toStationID: to.id, lineID: line.id, distance: distance)
-                    guard seenEdges.insert(edge.key).inserted else { continue }
-                    let reversed = edge.reversed
-                    seenEdges.insert(reversed.key)
-                    adjacency[from.id, default: []].append(edge)
-                    adjacency[to.id, default: []].append(reversed)
+        for network in networks {
+            for line in network.lines {
+                for pattern in line.servicePatterns {
+                    for pair in pattern.adjacentPairs {
+                        guard let from = stationsByID[resolve(pair.0)],
+                              let to = stationsByID[resolve(pair.1)],
+                              from.id != to.id else { continue }
+                        let distance = from.coordinate.distance(to: to.coordinate)
+                        let edge = MetroGraphEdge(fromStationID: from.id, toStationID: to.id, lineID: line.id, distance: distance)
+                        guard seenEdges.insert(edge.key).inserted else { continue }
+                        let reversed = edge.reversed
+                        seenEdges.insert(reversed.key)
+                        adjacency[from.id, default: []].append(edge)
+                        adjacency[to.id, default: []].append(reversed)
 
-                    let geometry = edgeGeometry(edge, stations: stationsByID, line: line)
-                    edgeGeometries[edge.key] = geometry
-                    edgeGeometries[reversed.key] = Array(geometry.reversed())
+                        let geometry = edgeGeometry(edge, stations: stationsByID, line: line)
+                        edgeGeometries[edge.key] = geometry
+                        edgeGeometries[reversed.key] = Array(geometry.reversed())
+                    }
                 }
             }
         }
@@ -150,7 +246,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             stationsByID: stationsByID,
             linesByID: linesByID,
             adjacency: adjacency,
-            edgeGeometries: edgeGeometries
+            edgeGeometries: edgeGeometries,
+            cityIDByStationID: cityIDByStationID
         )
         graphs[key] = graph
         return graph

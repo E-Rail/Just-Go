@@ -222,24 +222,17 @@ struct StationDetailView: View {
                         icon: "clock"
                     )
                     confidenceChip(
-                        title: AppLocalization.text(
-                            english: "Layout link",
-                            simplified: "布局链接",
-                            traditional: "佈局連結"
-                        ),
-                        confidence: viewModel?.stationMapConfidence ?? .unknown,
-                        icon: "map"
-                    )
-                    confidenceChip(
                         title: AppLocalization.localized("Accessibility"),
                         confidence: viewModel?.accessibilityConfidence ?? .unknown,
                         icon: "accessibility"
                     )
-                    confidenceChip(
-                        title: AppLocalization.localized("Live arrivals"),
-                        confidence: viewModel?.liveArrivalConfidence ?? .unknown,
-                        icon: "wave.3.right"
-                    )
+                    if viewModel?.showsLiveArrivalConfidence == true {
+                        confidenceChip(
+                            title: AppLocalization.localized("Live arrivals"),
+                            confidence: viewModel?.liveArrivalConfidence ?? .unknown,
+                            icon: "wave.3.right"
+                        )
+                    }
                 }
             }
         }

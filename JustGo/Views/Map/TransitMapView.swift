@@ -84,6 +84,8 @@ struct TransitMapView: UIViewRepresentable {
         private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
         private var overlayDashes: [ObjectIdentifier: [NSNumber]] = [:]
         private var networkOverlays: [MKOverlay] = []
+        /// Held apart from the rest of the network because these come and go with zoom.
+        private var interchangeOverlays: [MKOverlay] = []
         private var routeOverlays: [MKOverlay] = []
         private var stationSymbolImages: [String: UIImage] = [:]
         private var poiTask: Task<Void, Never>?
@@ -132,13 +134,39 @@ struct TransitMapView: UIViewRepresentable {
             guard nextSignature != networkSignature else { return }
             networkSignature = nextSignature
             mapView.removeOverlays(networkOverlays)
+            mapView.removeOverlays(interchangeOverlays)
             clearOverlayMetadata(networkOverlays)
+            clearOverlayMetadata(interchangeOverlays)
             networkOverlays = []
+            interchangeOverlays = []
 
             addNetworks(parent.metroNetworks)
             addInterchanges(across: parent.metroNetworks)
             if !networkOverlays.isEmpty {
                 mapView.addOverlays(networkOverlays, level: .aboveRoads)
+            }
+            syncInterchangeVisibility(on: mapView)
+        }
+
+        /// Interchange links are drawn exactly while the stations they join are.
+        ///
+        /// They were drawn at every zoom, and 广安门内 ↔ 牛街 is 498 m: viewed across a whole city
+        /// that is a grey lozenge a few points long, sitting on a map where neither of its two
+        /// endpoints is drawn at all. A link is an instruction to walk somewhere, and it can only
+        /// mean something when the rider can see both ends of the walk — which is the same
+        /// threshold `StationAnnotationStyle` already uses for an ordinary station.
+        private func syncInterchangeVisibility(on mapView: MKMapView) {
+            guard !interchangeOverlays.isEmpty else { return }
+            let maxDelta = max(mapView.region.span.latitudeDelta, mapView.region.span.longitudeDelta)
+            let shouldShow = maxDelta <= StationAnnotationStyle.ordinaryStationMaxDelta
+            let isShowing = mapView.overlays.contains { overlay in
+                interchangeOverlays.contains { $0 === overlay }
+            }
+            guard shouldShow != isShowing else { return }
+            if shouldShow {
+                mapView.addOverlays(interchangeOverlays, level: .aboveRoads)
+            } else {
+                mapView.removeOverlays(interchangeOverlays)
             }
         }
 
@@ -260,7 +288,7 @@ struct TransitMapView: UIViewRepresentable {
                     lineWidth: 5,
                     dashPattern: Self.dashPattern(forInterchange: link.kind),
                     simplify: false,
-                    collection: &networkOverlays
+                    collection: &interchangeOverlays
                 )
             }
         }
@@ -445,6 +473,7 @@ struct TransitMapView: UIViewRepresentable {
             if band != markerVisibilityBand {
                 markerVisibilityBand = band
                 refreshMarkerVisibility(on: mapView)
+                syncInterchangeVisibility(on: mapView)
             }
             parent.onRegionChanged?(visibleRegion)
         }
@@ -632,6 +661,10 @@ private final class StationAnnotationView: MKAnnotationView {
 }
 
 private struct StationAnnotationStyle {
+    /// Above this span an ordinary station is a dot in a smear of dots, so it is not drawn. Shared
+    /// with the interchange links, which join two ordinary stations and mean nothing without them.
+    static let ordinaryStationMaxDelta: CLLocationDegrees = 0.1
+
     let isVisible: Bool
     let symbolSize: CGFloat
     let labelSize: CGFloat
@@ -639,7 +672,7 @@ private struct StationAnnotationStyle {
 
     init(region: MKCoordinateRegion, isTransfer: Bool, alwaysVisible: Bool = false) {
         let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
-        isVisible = alwaysVisible || maxDelta <= (isTransfer ? 0.8 : 0.1)
+        isVisible = alwaysVisible || maxDelta <= (isTransfer ? 0.8 : Self.ordinaryStationMaxDelta)
         let bucket = maxDelta <= 0.055 ? 0 : (maxDelta <= 0.18 ? 1 : 2)
         let baseSize: CGFloat = bucket == 0 ? 18 : (bucket == 1 ? 9 : 6)
         symbolSize = baseSize + (isTransfer ? 3 : 0)

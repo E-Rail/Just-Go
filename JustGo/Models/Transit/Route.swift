@@ -126,14 +126,12 @@ struct RouteDataCoverage: Codable, Equatable {
     let stationCount: Int
     let officialAccessibilityCount: Int
     let officialScheduleCount: Int
-    let officialStationMapCount: Int
     let officialFacilityCount: Int
 
     static let unknown = RouteDataCoverage(
         stationCount: 0,
         officialAccessibilityCount: 0,
         officialScheduleCount: 0,
-        officialStationMapCount: 0,
         officialFacilityCount: 0
     )
 
@@ -145,21 +143,19 @@ struct RouteDataCoverage: Codable, Equatable {
         confidence(available: officialScheduleCount)
     }
 
-    var stationMapConfidence: DataConfidence {
-        confidence(available: officialStationMapCount)
-    }
-
     var hasOfficialCoreData: Bool {
-        officialAccessibilityCount > 0 || officialScheduleCount > 0 ||
-            officialStationMapCount > 0 || officialFacilityCount > 0
+        officialAccessibilityCount > 0 || officialScheduleCount > 0 || officialFacilityCount > 0
     }
 
+    /// How many of the things a rider can actually act on are missing. Station layout used to be
+    /// a third entry here, and `officialStationMapCount` is hardcoded to zero on purpose — browser
+    /// links are catalog coverage, not route evidence — so every route in every city was docked
+    /// for it, permanently and unearnably. A score nobody can move is not a score.
     var unknownCoreCount: Int {
-        guard stationCount > 0 else { return 3 }
+        guard stationCount > 0 else { return 2 }
         return [
             officialAccessibilityCount,
-            officialScheduleCount,
-            officialStationMapCount
+            officialScheduleCount
         ].filter { $0 == 0 }.count
     }
 

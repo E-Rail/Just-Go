@@ -640,8 +640,7 @@ struct RouteDetailView: View {
     private var decisionDataConfidence: DataConfidence {
         let coverage = route.dataCoverage
         if coverage.scheduleConfidence == .official,
-           coverage.accessibilityConfidence == .official,
-           coverage.stationMapConfidence == .official {
+           coverage.accessibilityConfidence == .official {
             return .official
         }
         if coverage.hasOfficialCoreData {

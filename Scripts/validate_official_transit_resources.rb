@@ -290,7 +290,13 @@ city_method = service_source[/func cityExternalResources\(for cityIDs: \[String\
 fail_validation("station resources do not use the bundled catalog") unless station_method&.include?("officialResourceCatalog")
 fail_validation("station resources still trust city-pack records") if station_method&.include?("stationRecord")
 fail_validation("city resources do not use the bundled catalog") unless city_method&.include?("officialResourceCatalog")
-fail_validation("route coverage still trusts pack or hyperlink station maps") unless service_source.include?("officialStationMapCount: 0")
+# Station-layout coverage is gone from route scoring entirely, so the guarantee this used to make
+# by pinning `officialStationMapCount: 0` is now made by there being nothing to count. It was a
+# criterion no city could ever satisfy — the browser links are catalog coverage, never route
+# evidence — so every route in every city lost the same points for it, permanently.
+route_model_source = File.read(File.join(ROOT, "JustGo", "Models", "Transit", "Route.swift"))
+fail_validation("route coverage must not carry a station-map count at all") if
+  service_source.include?("officialStationMapCount") || route_model_source.include?("let officialStationMapCount")
 
 unique_targets = all_resources.map { |resource| resource.fetch("targetURL") }.uniq.length
 puts "official transit resource validation ok: cities=#{cities.length} links=#{all_resources.length} uniqueTargets=#{unique_targets} hkHeavyPDFs=#{heavy_pdfs.length} hkLightRailPDFs=#{light_rail_pdfs.length}"

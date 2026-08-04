@@ -27,20 +27,6 @@ final class RouteConfidenceService {
             score -= 10
             warnings.append(AppLocalization.localized("Official schedule is incomplete"))
         }
-        if coverage.stationMapConfidence == .official {
-            positives.append(AppLocalization.text(
-                english: "Official station-layout links available",
-                simplified: "有官方车站布局链接",
-                traditional: "有官方車站佈局連結"
-            ))
-        } else {
-            score -= 10
-            warnings.append(AppLocalization.text(
-                english: "Some station layouts are unavailable",
-                simplified: "部分车站布局不可用",
-                traditional: "部分車站佈局不可用"
-            ))
-        }
         if coverage.accessibilityConfidence == .official {
             positives.append(AppLocalization.localized("Official accessibility information available"))
         } else {

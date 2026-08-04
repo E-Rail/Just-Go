@@ -552,10 +552,6 @@ final class StationDetailViewModel {
         return arrivals.isEmpty ? cityPackPendingConfidence : .estimated
     }
 
-    var stationMapConfidence: DataConfidence {
-        cityPackPendingConfidence
-    }
-
     var accessibilityConfidence: DataConfidence {
         if station?.accessibility?.hasVerifiedAccessibilityData == true {
             return .official
@@ -578,6 +574,14 @@ final class StationDetailViewModel {
             return .official
         }
         return .unavailable
+    }
+
+    /// Whether live arrivals are a thing this station could have at all. Hong Kong publishes them;
+    /// no mainland operator here does, so the chip was a permanent "Not available" telling the
+    /// rider nothing about the station they are standing in. A row of dead chips is not honesty,
+    /// it is furniture — the ones that remain are the ones that can change.
+    var showsLiveArrivalConfidence: Bool {
+        realtimeAvailability != .notConfigured
     }
 
     /// Best-available exits/entrances for the Station Guide section (official or text-estimated).

@@ -831,9 +831,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             stationCount: names.count,
             officialAccessibilityCount: stations.filter { $0.accessibility != nil }.count,
             officialScheduleCount: stations.filter { !$0.schedules.isEmpty }.count,
-            // Browser links are catalog coverage, not route evidence. They must never raise
-            // feasibility or confidence as though JustGo bundled a verified station map.
-            officialStationMapCount: 0,
             officialFacilityCount: stations.filter { !$0.stationFacilities.isEmpty || !($0.accessibility?.facilityNotes ?? []).isEmpty }.count
         )
     }

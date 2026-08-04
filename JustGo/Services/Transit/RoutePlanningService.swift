@@ -785,7 +785,6 @@ final class RoutePlanningService {
         return Double(
             coverage.officialAccessibilityCount * 3 +
             coverage.officialScheduleCount * 2 +
-            coverage.officialStationMapCount * 2 +
             coverage.officialFacilityCount
         )
     }

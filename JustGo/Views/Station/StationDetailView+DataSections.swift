@@ -724,17 +724,14 @@ extension StationDetailView {
     /// Map tab is offered. One property, so the tab and its content cannot disagree. It stays true
     /// while the pack is loading: the tab should appear with a spinner rather than pop in late.
     var hasStationGuideContent: Bool {
-        viewModel?.isLoadingCityPack == true ||
-            !(viewModel?.accessPoints ?? []).isEmpty ||
-            !(viewModel?.platformHints ?? []).isEmpty
+        viewModel?.isLoadingCityPack == true || !(viewModel?.accessPoints ?? []).isEmpty
     }
 
-    /// "Station Guide" — the specific entrance/exit guidance riders ask for, plus any authored
-    /// platform hints, labeled with a confidence chip.
+    /// "Station Guide" — the specific entrance/exit guidance riders ask for, labeled with a
+    /// confidence chip.
     @ViewBuilder
     var stationGuideSection: some View {
         let exits = viewModel?.accessPoints ?? []
-        let platformHints = viewModel?.platformHints ?? []
         if hasStationGuideContent {
             GlassCard {
                 VStack(alignment: .leading, spacing: 12) {
@@ -768,19 +765,6 @@ extension StationDetailView {
                             StationAccessPointRow(group: group)
                         }
                     }
-
-                    if !platformHints.isEmpty {
-                        if !exits.isEmpty {
-                            Divider()
-                        }
-                        Text(AppLocalization.text(english: "On the platform", simplified: "站台提示", traditional: "月台提示"))
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
-                            PlatformHintRow(hint: hint)
-                        }
-                    }
-
                 }
             }
         }

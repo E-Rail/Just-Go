@@ -349,10 +349,6 @@ struct RouteResultsView: View {
         if route.transferCount == 0 {
             return AppLocalization.text(english: "Direct", simplified: "直达", traditional: "直達")
         }
-        let minutes = route.transferWalkingMinutes
-        if minutes > 0 {
-            return "\(route.formattedTransfers) · \(AppLocalization.minutes(Int(minutes)))"
-        }
         return route.formattedTransfers
     }
 

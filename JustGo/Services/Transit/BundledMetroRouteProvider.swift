@@ -24,8 +24,13 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         // bounding boxes was the dominant cost of a cold route search. Only the (typically 0-2)
         // cities that actually pass the bounds check get their full network loaded below.
         let summaries = await metroNetworks.networkSummaries()
+        // Near either end, not near both. Requiring both is what made Suzhou → Shanghai return
+        // nothing at all: Suzhou's pack is 34.9 km from a central Shanghai destination and
+        // Shanghai's is 32.7 km from a central Suzhou origin, so the `&&` dropped *both* — even
+        // though 花桥 sits in both packs, 60 m apart, and is exactly where the two 11号线s meet.
+        // A pack that reaches only one end is precisely the pack that carries the corridor out.
         let candidateCityIDs = summaries.filter {
-            $0.bounds.distance(to: origin.routeCoordinate) <= 25_000 &&
+            $0.bounds.distance(to: origin.routeCoordinate) <= 25_000 ||
                 $0.bounds.distance(to: destination.routeCoordinate) <= 25_000
         }.map(\.cityID)
 

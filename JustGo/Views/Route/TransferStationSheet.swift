@@ -39,7 +39,7 @@ struct TransferStationSheet: View {
             VStack(alignment: .leading, spacing: 16) {
                 rideSection
                 stationMapSection
-                transferGuideSection
+                stationExitsSection
                 riderPhotosSection
                 accessibilitySection
                 lookAroundSection
@@ -145,10 +145,9 @@ struct TransferStationSheet: View {
     /// shown when the pack has it, and honestly marked pending when it doesn't.
     /// The same photo grid the station screen shows, on the screen where the gap is worst.
     ///
-    /// Interchange corridors are exactly what no open dataset covers — `transferGuideSection`
-    /// above says "specific exit data is unavailable" at most of them — and the rider reading
-    /// this is standing in one. Deliberately the shared component rather than a copy: the two
-    /// screens drifted once already and shipped blank rows.
+    /// Interchange corridors are exactly what no open dataset covers, and the rider reading this
+    /// is standing in one. Deliberately the shared component rather than a copy: the two screens
+    /// drifted once already and shipped blank rows.
     @ViewBuilder
     private var riderPhotosSection: some View {
         if let station = enrichedStation,
@@ -160,94 +159,33 @@ struct TransferStationSheet: View {
         }
     }
 
-    private var transferGuideSection: some View {
+    /// The station's exits. What used to sit here was a "Transfer Guide" — a heading, a
+    /// confidence chip that read `unknown` on every route in the app, a sentence apologising for
+    /// having no exit data, and rows for corridor and platform hints. Not one of the 58 bundled
+    /// packs carries an `interchangeHints` or `platformHints` entry, and none ever has: the card
+    /// promised to tell riders how to make the change and had nothing to say. The exits are real
+    /// — 329 of Guangzhou's 329 stations carry them — so they stay, as themselves.
+    @ViewBuilder
+    private var stationExitsSection: some View {
         let exits = guidance?.accessPoints ?? []
-        let corridorHints = guidance?.interchangeHints ?? []
-        let platformHints = guidance?.platformHints ?? []
-        return GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text(AppLocalization.text(english: "Transfer Guide", simplified: "换乘指引", traditional: "換乘指引"))
+        if isLoadingStation || !exits.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Spacer()
-                    DataConfidenceChip(confidence: guidance?.confidence ?? .unknown, compact: true)
-                }
-
-                if isLoadingStation {
-                    ProgressView()
-                } else {
-                    if exits.isEmpty {
-                        Text(AppLocalization.text(
-                            english: "Specific exit data is unavailable. Official operator resources appear below when provided.",
-                            simplified: "暂无具体出入口数据；如有官方运营方页面，可在下方打开。",
-                            traditional: "暫無具體出入口資料；如有官方營運方頁面，可在下方開啟。"
-                        ))
-                        .rowMeta()
+                    if isLoadingStation {
+                        ProgressView()
                     } else {
-                        Text(AppLocalization.text(english: "Exits & entrances", simplified: "出入口", traditional: "出入口"))
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.secondary)
                         ForEach(exits.presentationGroups(relativeTo: stationCoordinate)) { group in
                             StationAccessPointRow(group: group)
                         }
                     }
-
-                    if !corridorHints.isEmpty {
-                        Divider()
-                        ForEach(Array(corridorHints.enumerated()), id: \.offset) { _, hint in
-                            corridorHintRow(hint)
-                        }
-                    }
-
-                    if !platformHints.isEmpty {
-                        Divider()
-                        ForEach(Array(platformHints.enumerated()), id: \.offset) { _, hint in
-                            PlatformHintRow(hint: hint)
-                        }
-                    }
                 }
             }
         }
     }
 
-    /// Corridor hint between the two lines: "2号线 → 8号线 · 约180米 · 3分钟" plus notes.
-    private func corridorHintRow(_ hint: StationInterchangeHint) -> some View {
-        var parts: [String] = []
-        if let from = hint.fromLineName, let to = hint.toLineName {
-            parts.append("\(from) → \(to)")
-        }
-        if let meters = hint.walkingMeters {
-            parts.append(AppLocalization.text(
-                english: "about \(Int(meters)) m",
-                simplified: "约\(Int(meters))米",
-                traditional: "約\(Int(meters))米"
-            ))
-        }
-        if let minutes = hint.walkingMinutes {
-            parts.append(AppLocalization.minutes(Int(minutes.rounded())))
-        }
-        return HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 22)
-            VStack(alignment: .leading, spacing: 2) {
-                if !parts.isEmpty {
-                    Text(parts.joined(separator: " · "))
-                        .font(.subheadline)
-                }
-                ForEach(hint.notes, id: \.self) { note in
-                    Text(note)
-                        .rowMeta()
-                }
-            }
-            Spacer()
-        }
-    }
-
-    /// Official pages remain user-initiated reference material and never become route geometry.
     @ViewBuilder
     private var stationMapSection: some View {
         let relevantResources = externalResources.filter(\.kind.isTransferRelevant)

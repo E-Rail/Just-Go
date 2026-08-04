@@ -884,21 +884,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 result[name] = .empty
                 continue
             }
-            let platformHints = (record.platformHints ?? []).map(\.value)
-            let interchangeHints = (record.interchangeHints ?? []).map(\.value)
             if let structured = record.stationAccessPoints, !structured.isEmpty {
                 result[name] = StationAccessGuidance(
                     accessPoints: structured.map(\.value),
-                    platformHints: platformHints,
-                    interchangeHints: interchangeHints,
                     confidence: .official
                 )
             } else {
                 let extracted = Self.extractAccessPoints(from: record.accessibility)
                 result[name] = StationAccessGuidance(
                     accessPoints: extracted,
-                    platformHints: platformHints,
-                    interchangeHints: interchangeHints,
                     confidence: extracted.isEmpty ? .unavailable : .estimated
                 )
             }
@@ -1255,9 +1249,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             // A downloaded pack is remote content. It must not be able to introduce authored
             // guidance or licensed media that the app would then present to riders as official.
             return station.licensedMedia.isEmpty &&
-                (station.stationAccessPoints ?? []).isEmpty &&
-                (station.platformHints ?? []).isEmpty &&
-                (station.interchangeHints ?? []).isEmpty
+                (station.stationAccessPoints ?? []).isEmpty
         }
     }
 
@@ -1709,16 +1701,13 @@ private struct OfficialStation: Decodable {
     let stationFacilities: [OfficialFacility]
     // Optional, backward-compatible transit-guidance fields (absent in current packs).
     let stationAccessPoints: [OfficialAccessPoint]?
-    let platformHints: [OfficialPlatformHint]?
-    let interchangeHints: [OfficialInterchangeHint]?
     let externalResources: [ExternalTransitResource]
     let licensedMedia: [LicensedStationMedia]
     let liveArrivalReferences: [OfficialLiveArrivalReference]
 
     enum CodingKeys: String, CodingKey {
         case stationName, stationNameEn, stationID, aliases, accessibility, schedules,
-             stationFacilities, stationAccessPoints,
-             platformHints, interchangeHints, externalResources, licensedMedia,
+             stationFacilities, stationAccessPoints, externalResources, licensedMedia,
              liveArrivalReferences
     }
 
@@ -1732,8 +1721,6 @@ private struct OfficialStation: Decodable {
         schedules = try values.decodeIfPresent([OfficialSchedule].self, forKey: .schedules) ?? []
         stationFacilities = try values.decodeIfPresent([OfficialFacility].self, forKey: .stationFacilities) ?? []
         stationAccessPoints = try values.decodeIfPresent([OfficialAccessPoint].self, forKey: .stationAccessPoints)
-        platformHints = try values.decodeIfPresent([OfficialPlatformHint].self, forKey: .platformHints)
-        interchangeHints = try values.decodeIfPresent([OfficialInterchangeHint].self, forKey: .interchangeHints)
         externalResources = try values.decodeIfPresent(
             [ExternalTransitResource].self,
             forKey: .externalResources
@@ -1856,42 +1843,6 @@ private struct OfficialAccessPoint: Decodable {
             notes: notes ?? [],
             source: RouteAccessPointSource(rawValue: source ?? "") ?? .specificEntrance,
             confidence: .official
-        )
-    }
-}
-
-private struct OfficialPlatformHint: Decodable {
-    let lineName: String?
-    let directionText: String?
-    let boardingCarText: String?
-    let doorSideText: String?
-    let notes: [String]?
-
-    var value: StationPlatformHint {
-        StationPlatformHint(
-            lineName: lineName,
-            directionText: directionText,
-            boardingCarText: boardingCarText,
-            doorSideText: doorSideText,
-            notes: notes ?? []
-        )
-    }
-}
-
-private struct OfficialInterchangeHint: Decodable {
-    let fromLineName: String?
-    let toLineName: String?
-    let walkingMeters: Double?
-    let walkingMinutes: Double?
-    let notes: [String]?
-
-    var value: StationInterchangeHint {
-        StationInterchangeHint(
-            fromLineName: fromLineName,
-            toLineName: toLineName,
-            walkingMeters: walkingMeters,
-            walkingMinutes: walkingMinutes,
-            notes: notes ?? []
         )
     }
 }

@@ -84,12 +84,6 @@ struct Route: Identifiable, Codable {
         stationGuidance.first { $0.role == .arrival }
     }
 
-    /// Total estimated walking time across every transfer this route requires, from whichever
-    /// interchange hints are authored (0 when none are).
-    var transferWalkingMinutes: Double {
-        stationGuidance.compactMap { $0.interchange?.walkingMinutes }.reduce(0, +)
-    }
-
     var previewRegion: MapVisibleRegion? {
         let coordinates = segments.flatMap { segment -> [CodableCoordinate] in
             if !segment.polylineCoordinates.isEmpty {
@@ -608,24 +602,6 @@ extension StationAccessPoint {
     }
 }
 
-/// Boarding tips for a platform (which car, which door side). Authored-only; absent in packs today.
-struct StationPlatformHint: Codable {
-    let lineName: String?
-    let directionText: String?
-    let boardingCarText: String?
-    let doorSideText: String?
-    let notes: [String]
-}
-
-/// Transfer-corridor hint between two lines at an interchange. Authored-only; absent today.
-struct StationInterchangeHint: Codable {
-    let fromLineName: String?
-    let toLineName: String?
-    let walkingMeters: Double?
-    let walkingMinutes: Double?
-    let notes: [String]
-}
-
 /// Per-route, per-station guidance attached during route enrichment (boarding/transfer/arrival).
 struct RouteStationGuidance: Identifiable, Codable {
     enum Role: String, Codable {
@@ -638,7 +614,6 @@ struct RouteStationGuidance: Identifiable, Codable {
     let stationName: String
     let role: Role
     let exit: StationAccessPoint?
-    let interchange: StationInterchangeHint?
     let confidence: DataConfidence
 
     var id: String { "\(stationID)-\(role.rawValue)" }
@@ -656,18 +631,19 @@ struct RouteComparisonMetrics: Identifiable {
     let summaryLine: String
 }
 
-/// Per-station access guidance returned by the city-pack service: best-available exits/entrances,
-/// optional platform/interchange hints, and a confidence describing the data source.
+/// Per-station access guidance returned by the city-pack service: best-available exits/entrances
+/// and a confidence describing the data source.
+///
+/// It also used to carry platform hints ("board the third car") and interchange-corridor hints
+/// ("2号线 → 8号线 · 约180米"). Both were authored-only fields that no pack has ever contained, and
+/// `validate_indoor_maps.rb` exists to keep it that way — so every screen built on them rendered a
+/// heading, an `unknown` confidence chip and nothing else.
 struct StationAccessGuidance {
     let accessPoints: [StationAccessPoint]
-    let platformHints: [StationPlatformHint]
-    let interchangeHints: [StationInterchangeHint]
     let confidence: DataConfidence
 
     static let empty = StationAccessGuidance(
         accessPoints: [],
-        platformHints: [],
-        interchangeHints: [],
         confidence: .unavailable
     )
 

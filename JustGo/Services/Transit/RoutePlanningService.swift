@@ -488,7 +488,7 @@ final class RoutePlanningService {
         var result: [RouteStationGuidance] = []
         var seen = Set<String>()
 
-        func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role, interchange: StationInterchangeHint? = nil) {
+        func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role) {
             guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
             let access = guidance[stop.name] ?? .empty
             // The boarding and arrival doors were already chosen — by measured walking distance —
@@ -511,7 +511,6 @@ final class RoutePlanningService {
                 stationName: stop.name,
                 role: role,
                 exit: exit,
-                interchange: interchange,
                 confidence: access.confidence
             ))
         }
@@ -524,11 +523,7 @@ final class RoutePlanningService {
             if index == transitSegments.count - 1 {
                 add(alight, role: .arrival)
             } else {
-                let next = transitSegments[index + 1]
-                let interchange = (guidance[alight.name] ?? .empty).interchangeHints.first {
-                    $0.fromLineName == segment.lineName && $0.toLineName == next.lineName
-                }
-                add(alight, role: .transfer, interchange: interchange)
+                add(alight, role: .transfer)
             }
         }
         return result

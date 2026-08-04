@@ -585,9 +585,6 @@ final class StationDetailViewModel {
         accessGuidance?.accessPoints ?? []
     }
 
-    var platformHints: [StationPlatformHint] {
-        accessGuidance?.platformHints ?? []
-    }
 
     /// Source label for the Station Guide header: the exit-data confidence when present,
     /// otherwise the broader accessibility-data confidence.

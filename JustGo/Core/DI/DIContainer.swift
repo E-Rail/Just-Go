@@ -208,7 +208,9 @@ final class DIContainer {
             placeSearchProvider: placeSearchProvider,
             routeProvider: transitRouteProvider,
             officialStationData: officialStationData,
-            walkingRoutes: walkingRouteProvider
+            walkingRoutes: walkingRouteProvider,
+            officialStationInformation: stationInformationRouter,
+            stationInformationDirectory: stationInformationDirectory
         )
         let tripMemoryService = TripMemoryService()
         let routeFeasibilityService = RouteFeasibilityService()

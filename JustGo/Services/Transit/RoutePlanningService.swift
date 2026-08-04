@@ -42,18 +42,26 @@ final class RoutePlanningService {
     private let routeProvider: TransitRouteProviding
     private let officialStationData: OfficialStationDataProviding
     private let walkingRoutes: WalkingRouteProviding
+    /// The operator's own answer about a station, fetched on the rider's device. Optional because
+    /// a route is still a route without it — and because most cities have no such source.
+    private let officialStationInformation: (any OfficialStationInformationProviding)?
+    private let stationInformationDirectory: StationInformationDirectory?
     private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
         placeSearchProvider: PlaceSearchProviding,
         routeProvider: TransitRouteProviding,
         officialStationData: OfficialStationDataProviding,
-        walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider()
+        walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider(),
+        officialStationInformation: (any OfficialStationInformationProviding)? = nil,
+        stationInformationDirectory: StationInformationDirectory? = nil
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
         self.officialStationData = officialStationData
         self.walkingRoutes = walkingRoutes
+        self.officialStationInformation = officialStationInformation
+        self.stationInformationDirectory = stationInformationDirectory
     }
 
     func planRoute(
@@ -131,6 +139,174 @@ final class RoutePlanningService {
             }
             return collected.sorted { $0.0 < $1.0 }.map(\.1)
         }
+    }
+
+    // MARK: - Official station information
+
+    /// The operator's own page for each stop the trip calls at, keyed by station name.
+    ///
+    /// Best effort in every direction: no source for the city, no directory entry, a timeout or a
+    /// refusal all mean "no official answer", never a failed plan. Bounded at four seconds because
+    /// this is an *upgrade* to an answer that already exists — a rider waiting on a route must not
+    /// wait on an operator's website.
+    private func officialStationSnapshots(
+        for stops: [RouteStationStop]
+    ) async -> [String: OfficialStationInformationSnapshot] {
+        guard let provider = officialStationInformation,
+              let directory = stationInformationDirectory else { return [:] }
+        let requests: [(name: String, request: OfficialStationInformationRequest)] = stops.compactMap { stop in
+            guard let reference = directory.officialReference(
+                forStationID: stop.stationID,
+                name: stop.name,
+                nameEn: nil
+            ) else { return nil }
+            return (stop.name, OfficialStationInformationRequest(stationID: stop.stationID, reference: reference))
+        }
+        guard !requests.isEmpty else { return [:] }
+
+        return await withTaskGroup(of: (String, OfficialStationInformationSnapshot?).self) { group in
+            for entry in requests {
+                group.addTask {
+                    let snapshot = try? await withDeadline(seconds: 4) {
+                        OfficialStationInformationProviderError.timedOut
+                    } operation: {
+                        try await provider.information(for: entry.request)
+                    }
+                    return (entry.name, snapshot)
+                }
+            }
+            var result: [String: OfficialStationInformationSnapshot] = [:]
+            for await (name, snapshot) in group {
+                if let snapshot { result[name] = snapshot }
+            }
+            return result
+        }
+    }
+
+    /// Counts a stop as having official accessibility when the operator publishes a lift for it.
+    ///
+    /// The pack's count comes from OpenStreetMap `wheelchair` tags, which cover 20% of the bundled
+    /// network — so a Beijing trip reported "accessibility source pending" for stations whose
+    /// operator page lists a 直梯 and where it is. Taken as the larger of the two rather than a
+    /// replacement: the pack still speaks for cities with no official source.
+    private func coverage(
+        _ coverage: RouteDataCoverage,
+        upgradedWith snapshots: [String: OfficialStationInformationSnapshot]
+    ) -> RouteDataCoverage {
+        guard !snapshots.isEmpty else { return coverage }
+        let officialCount = snapshots.values.filter { snapshot in
+            snapshot.exits.contains { $0.isAccessible == true } ||
+                snapshot.facilityGroups.contains { group in
+                    group.items.contains { Self.describesStepFreeFacility($0.name) }
+                }
+        }.count
+        // Same argument for the timetable: the operator publishes first and last train per line
+        // per direction, and the app was reading only the pack — so a Beijing trip was docked for
+        // an "incomplete official schedule" while bjsubway.com was answering with one.
+        let scheduleCount = snapshots.values.filter { snapshot in
+            snapshot.lines.contains { line in
+                line.services.contains { $0.firstTrain != nil || $0.lastTrain != nil }
+            }
+        }.count
+        return RouteDataCoverage(
+            stationCount: coverage.stationCount,
+            officialAccessibilityCount: min(coverage.stationCount, max(coverage.officialAccessibilityCount, officialCount)),
+            officialScheduleCount: min(coverage.stationCount, max(coverage.officialScheduleCount, scheduleCount)),
+            officialFacilityCount: max(coverage.officialFacilityCount, officialCount)
+        )
+    }
+
+    /// A lift, by the words the operators actually use. Escalators are deliberately absent: an
+    /// escalator is not step-free access, and counting one as though it were is the difference
+    /// between a wheelchair user reaching the platform and being stranded at the concourse.
+    private static func describesStepFreeFacility(_ name: String) -> Bool {
+        let stepFree = ["直梯", "垂直电梯", "电梯", "升降平台", "无障碍电梯", "轮椅", "無障礙", "升降機"]
+        return stepFree.contains { name.contains($0) }
+    }
+
+    /// The operator's exit list laid over the pack's.
+    ///
+    /// Beijing signs its exits `A`, `B`, `D2`. OpenStreetMap surveyed 1,095 doors for Beijing and
+    /// left 200 of them unnamed, calling another 246 things like 东南口 — so the app sent riders to
+    /// a door whose sign says something else, or to one with no name at all. Where the two agree on
+    /// a name the surveyed coordinate is kept and the point is marked official; where the operator
+    /// lists an exit nobody surveyed it is added without a coordinate, which is the honest shape —
+    /// the exit exists and is called `A`, and where exactly it stands is not known.
+    private func merged(
+        _ guidance: [String: StationAccessGuidance],
+        with snapshots: [String: OfficialStationInformationSnapshot]
+    ) -> [String: StationAccessGuidance] {
+        guard !snapshots.isEmpty else { return guidance }
+        var merged = guidance
+        for (stationName, snapshot) in snapshots where !snapshot.exits.isEmpty {
+            let existing = guidance[stationName]?.accessPoints ?? []
+            var matchedOfficialNames = Set<String>()
+            let upgraded = existing.map { point -> StationAccessPoint in
+                guard let exit = snapshot.exits.first(where: {
+                    Self.exitNamesMatch($0.name, point.name)
+                }) else { return point }
+                matchedOfficialNames.insert(exit.name)
+                return StationAccessPoint(
+                    id: point.id,
+                    name: exit.name,
+                    kind: point.kind,
+                    coordinate: point.coordinate,
+                    isAccessible: exit.isAccessible ?? point.isAccessible,
+                    notes: (point.notes + exit.details).uniqued(),
+                    source: point.source,
+                    confidence: .official
+                )
+            }
+            // One door, one exit: the operator says this station has exactly one exit and exactly
+            // one was surveyed, so they are the same door and it is called what the sign says. Any
+            // looser pairing would be a guess — with two surveyed doors and exits A and B there is
+            // nothing in either dataset that says which is which, and a wrong exit letter sends a
+            // rider up the wrong staircase with full confidence.
+            var bound = upgraded
+            let unnamed = upgraded.enumerated().filter { $0.element.name.trimmingCharacters(in: .whitespaces).isEmpty }
+            let unmatched = snapshot.exits.filter { !matchedOfficialNames.contains($0.name) && !$0.name.isEmpty }
+            if unnamed.count == 1, unmatched.count == 1, let exit = unmatched.first, let slot = unnamed.first {
+                matchedOfficialNames.insert(exit.name)
+                let point = slot.element
+                bound[slot.offset] = StationAccessPoint(
+                    id: point.id,
+                    name: exit.name,
+                    kind: point.kind,
+                    coordinate: point.coordinate,
+                    isAccessible: exit.isAccessible ?? point.isAccessible,
+                    notes: (point.notes + exit.details).uniqued(),
+                    source: point.source,
+                    confidence: .official
+                )
+            }
+            let unsurveyed = snapshot.exits
+                .filter { !matchedOfficialNames.contains($0.name) && !$0.name.isEmpty }
+                .map { exit in
+                    StationAccessPoint(
+                        id: "official-\(stationName)-\(exit.name)",
+                        name: exit.name,
+                        kind: .exit,
+                        coordinate: nil,
+                        isAccessible: exit.isAccessible ?? false,
+                        notes: exit.details,
+                        source: .stationPOI,
+                        confidence: .official
+                    )
+                }
+            merged[stationName] = StationAccessGuidance(
+                accessPoints: bound + unsurveyed,
+                confidence: .official
+            )
+        }
+        return merged
+    }
+
+    /// Exit names match when they name the same sign. Compared case- and whitespace-insensitively
+    /// because OpenStreetMap records `a`, `A` and `A ` for the same door.
+    private static func exitNamesMatch(_ official: String, _ surveyed: String) -> Bool {
+        let left = official.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let right = surveyed.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        return !left.isEmpty && !right.isEmpty && left == right
     }
 
     /// The trip on foot, when that is a thing a person would actually do.
@@ -212,7 +388,12 @@ final class RoutePlanningService {
                 )
             }
         )
+        // The operator's own station pages, for the stops this trip actually calls at. Started
+        // here so the network time overlaps the pack lookups above rather than adding to them.
+        async let officialSnapshotsResult = officialStationSnapshots(for: criticalStops)
         route.dataCoverage = await dataCoverage
+        let officialSnapshots = await officialSnapshotsResult
+        route.dataCoverage = coverage(route.dataCoverage, upgradedWith: officialSnapshots)
         let criticalStations = await criticalStationsResult
         route.stepFreeAssessment = stepFreeAssessment(
             route: route,
@@ -254,10 +435,11 @@ final class RoutePlanningService {
         ))
 
         // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
-        let guidanceByStation = await officialStationData.stationGuidance(
+        let packGuidance = await officialStationData.stationGuidance(
             cityID: routeCityID,
             stationNames: criticalStopNames
         )
+        let guidanceByStation = merged(packGuidance, with: officialSnapshots)
         let stationPositions = criticalStops.reduce(into: [String: CodableCoordinate]()) { index, stop in
             if let coordinate = stop.coordinate { index[stop.name] = coordinate }
         }

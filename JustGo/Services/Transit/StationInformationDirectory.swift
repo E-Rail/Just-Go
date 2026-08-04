@@ -104,6 +104,42 @@ final class StationInformationDirectory: Sendable {
         servedCityIDs.contains(cityID)
     }
 
+    /// How to ask the operator about this station, or nil when none of them covers it.
+    ///
+    /// Lived privately on the station screen while that screen was the only thing that fetched
+    /// official data. The route needs the same answer — the operator names Beijing's exits `A`,
+    /// `B`, `D2`, which is what the signs say, while OpenStreetMap leaves 200 of Beijing's 1,095
+    /// surveyed doors unnamed and calls another 246 things like 东南口. Two copies of this mapping
+    /// would drift, and a station the route resolves differently from its own page is worse than
+    /// one neither can resolve.
+    func officialReference(
+        forStationID stationID: String,
+        name: String,
+        nameEn: String?
+    ) -> OfficialStationInformationReference? {
+        guard let entry = onlineEntry(forStationID: stationID) else { return nil }
+        let expectedNames = ([name, nameEn, entry.name, entry.nameEn].compactMap { $0 }) + entry.aliases
+        switch entry.source {
+        case "beijingSubwayOnline":
+            return .beijing(externalStationID: entry.externalStationID, expectedNames: expectedNames)
+        case "shanghaiMetroOnline":
+            return .shanghai(lineStationIDs: entry.lineStationIDs, expectedNames: expectedNames)
+        case "guangzhouMetroOnline":
+            return .guangzhou(stationShowCode: entry.externalStationID, expectedNames: expectedNames)
+        case "hangzhouMetroOnline":
+            // Hangzhou keys service times per operator station record, and 火车东站 is published
+            // as two, so the reference carries every code rather than the representative alone.
+            return .hangzhou(
+                stationCodes: entry.lineStationIDs.isEmpty
+                    ? [entry.externalStationID]
+                    : entry.lineStationIDs,
+                expectedNames: expectedNames
+            )
+        default:
+            return nil
+        }
+    }
+
     private static func loadJSONObject(named name: String, bundle: Bundle) -> [String: Any]? {
         guard let url = bundle.url(
             forResource: name,

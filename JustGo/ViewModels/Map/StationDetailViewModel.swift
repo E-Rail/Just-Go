@@ -188,8 +188,11 @@ final class StationDetailViewModel {
 
     func loadOnlineStationInformation() async {
         guard let station,
-              let entry = stationInformationDirectory.onlineEntry(forStationID: station.id),
-              let reference = Self.reference(for: entry, station: station) else { return }
+              let reference = stationInformationDirectory.officialReference(
+                  forStationID: station.id,
+                  name: station.name,
+                  nameEn: station.nameEn
+              ) else { return }
 
         let stationID = station.id
         let generation = officialInformationGeneration
@@ -267,33 +270,6 @@ final class StationDetailViewModel {
 
     /// Builds the source-specific reference from a bundled directory entry. The directory says
     /// which source and key; this maps that to the provider's typed request.
-    private static func reference(
-        for entry: StationDirectoryEntry,
-        station: Station
-    ) -> OfficialStationInformationReference? {
-        let expectedNames = ([station.name, station.nameEn, entry.name, entry.nameEn]
-            .compactMap { $0 } + entry.aliases)
-        switch entry.source {
-        case "beijingSubwayOnline":
-            return .beijing(externalStationID: entry.externalStationID, expectedNames: expectedNames)
-        case "shanghaiMetroOnline":
-            return .shanghai(lineStationIDs: entry.lineStationIDs, expectedNames: expectedNames)
-        case "guangzhouMetroOnline":
-            return .guangzhou(stationShowCode: entry.externalStationID, expectedNames: expectedNames)
-        case "hangzhouMetroOnline":
-            // Hangzhou keys service times per operator station record, and 火车东站 is published
-            // as two, so the reference carries every code rather than the representative alone.
-            return .hangzhou(
-                stationCodes: entry.lineStationIDs.isEmpty
-                    ? [entry.externalStationID]
-                    : entry.lineStationIDs,
-                expectedNames: expectedNames
-            )
-        default:
-            return nil
-        }
-    }
-
     var usesCategorizedStationInformation: Bool {
         guard let station else { return false }
         if station.cityID == "8100" {

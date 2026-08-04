@@ -298,10 +298,18 @@ app_entry = read.call("JustGo/App/JustGoApp.swift")
 errors << "data-rights epoch cleanup must sweep the station-information cache" unless
   app_entry.include?("StationInformationCacheLocation")
 
-# Online station information is a display surface only: route feasibility, planning, and
-# confidence must keep deriving accessibility truth from bundled reviewed data.
+# Scoring must not reach for the operator's page itself. `RoutePlanningService` may — it assembles
+# the route, and the operator is the better authority on its own station than a volunteer survey
+# is: OpenStreetMap leaves 200 of Beijing's 1,095 surveyed doors unnamed and calls another 246
+# things like 东南口, where the operator publishes the exit the sign actually carries. Feasibility
+# and confidence stay barred: they read `RouteDataCoverage`, which planning has already upgraded,
+# so letting them fetch as well would mean two surfaces asking the operator the same question and
+# potentially disagreeing.
+#
+# This changes nothing about rights. The content is still fetched on the rider's own device, still
+# cached device-only, still committed nowhere and redistributed to nobody — the checks above and
+# below this one are what enforce that, and they are untouched.
 %w[
-  JustGo/Services/Transit/RoutePlanningService.swift
   JustGo/Services/Transit/RouteFeasibilityService.swift
   JustGo/Services/Transit/RouteConfidenceService.swift
 ].each do |routing_path|

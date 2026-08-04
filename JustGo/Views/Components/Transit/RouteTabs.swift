@@ -15,21 +15,29 @@ struct RouteTabs: View {
                     Button {
                         selection = route.id
                     } label: {
-                        VStack(spacing: 7) {
-                            Text(AppLocalization.text(
-                                english: "Route \(index + 1) · \(route.formattedDuration)",
-                                chinese: "路线 \(index + 1) · \(route.formattedDuration)"
-                            ))
-                            .font(.subheadline)
-                            .fontWeight(selection == route.id ? .semibold : .regular)
-                            .lineLimit(1)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(route.formattedDuration)
+                                .font(floating ? .title3 : .subheadline)
+                                .fontWeight(selection == route.id ? .semibold : .regular)
+                                .lineLimit(1)
 
                             routeColorBar(route)
                                 .frame(height: 3)
                                 .clipShape(Capsule())
+
+                            // Only on the floating card, which is the one a rider compares
+                            // alternatives on. The inline row sits under a list that already
+                            // says this.
+                            if floating {
+                                Text(route.formattedTransfers)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
                         }
+                        .frame(minWidth: floating ? 104 : 0, alignment: .leading)
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
+                        .padding(.vertical, floating ? 11 : 9)
                         .background {
                             let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
                             if floating {

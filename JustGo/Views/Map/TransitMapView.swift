@@ -138,6 +138,7 @@ struct TransitMapView: UIViewRepresentable {
             for network in parent.metroNetworks {
                 addNetwork(network)
             }
+            addInterchanges(across: parent.metroNetworks)
             if !networkOverlays.isEmpty {
                 mapView.addOverlays(networkOverlays, level: .aboveRoads)
             }
@@ -213,23 +214,29 @@ struct TransitMapView: UIViewRepresentable {
                     )
                 }
             }
-            addInterchanges(network)
         }
 
         /// The links between two stations riders treat as one interchange.
         ///
         /// Drawn on the network, not only inside a planned route: the rider needs to see that
         /// 广安门内 and 牛街 are connected *before* deciding to plan through them. Solid when the
-        /// walk stays inside the paid area, dashed when it crosses the street and a second fare —
-        /// the same distinction the data draws, made visible rather than described.
-        private func addInterchanges(_ network: MetroNetwork) {
-            guard !network.interchanges.isEmpty else { return }
-            let coordinatesByID = Dictionary(
-                network.stations.map { ($0.id, $0.coordinate) },
-                uniquingKeysWith: { first, _ in first }
-            )
-            for link in network.interchanges {
-                guard let from = coordinatesByID[link.fromStationID],
+        /// walk stays inside the building, dashed when it goes out to the street.
+        ///
+        /// Resolved across every loaded network rather than within each one, because a link's two
+        /// halves can live in different packs — Shenzhen's 罗湖 and Hong Kong's 羅湖 are one
+        /// crossing in two networks, and neither pack can draw it alone.
+        private func addInterchanges(across networks: [MetroNetwork]) {
+            var coordinatesByID: [String: CLLocationCoordinate2D] = [:]
+            for network in networks {
+                for station in network.stations where coordinatesByID[station.id] == nil {
+                    coordinatesByID[station.id] = station.coordinate
+                }
+            }
+            // A cross-pack link is written into both of its packs, so it arrives twice.
+            var drawn = Set<String>()
+            for link in networks.flatMap(\.interchanges) {
+                guard drawn.insert("\(link.fromStationID)|\(link.toStationID)").inserted,
+                      let from = coordinatesByID[link.fromStationID],
                       let to = coordinatesByID[link.toStationID] else { continue }
                 addPolyline(
                     [from, to],

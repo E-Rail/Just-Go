@@ -615,13 +615,14 @@ struct RouteDetailView: View {
             onStationSelected: { _ in }
         )
         .ignoresSafeArea(edges: .bottom)
-        // Floating over the map's bottom edge rather than sitting in the scroll content: which
-        // alternative is being shown is a property of the whole screen, and scrolling the journey
-        // used to carry the answer off the top of it.
-        .overlay(alignment: .bottom) {
+        // Floating at the map's TOP edge. These cards were at the bottom, which on this screen is
+        // behind the trip sheet — the sheet opens at `.medium` and covers the lower half, so the
+        // one control for switching alternative was invisible on every route the app has ever
+        // shown. The top strip is the part of the map that is never covered.
+        .overlay(alignment: .top) {
             if alternatives.count > 1 {
                 RouteTabs(routes: alternatives, selection: $selectedRouteID, floating: true)
-                    .padding(.bottom, 10)
+                    .padding(.top, 8)
             }
         }
     }

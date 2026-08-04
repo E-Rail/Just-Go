@@ -55,6 +55,23 @@ MAX_INTERCHANGE_METERS = {
 # intercity halves share a concourse and still need two separate tickets.
 INTERCHANGE_FARES = ["continuous"].freeze
 
+# Interchanges whose two halves live in *different* packs.
+#
+# The Shenzhen/Hong Kong border crossings are the case that forced this: 罗湖 is in Shenzhen's
+# network and 羅湖 is in Hong Kong's, 574m apart across an immigration hall, and a rider crossing
+# there is making one interchange between two systems the app shipped as unconnected graphs. A
+# per-pack `interchanges` list cannot express it, because neither pack contains both stations.
+#
+# Applied as a post-pass once every network is built, so both endpoints' real coordinates are in
+# hand and the link can be written into *both* packs — either one alone is enough for the app to
+# find the edge, but a pack that mentions a crossing it does not carry would be a lie about its
+# own contents. A partial import that names one side and not the other fails loudly rather than
+# writing half of one.
+CROSS_NETWORK_INTERCHANGES = [
+  { cities: %w[4403 8100], from: "罗湖", to: "羅湖", kind: "outOfStation" },
+  { cities: %w[4403 8100], from: "福田口岸", to: "落馬洲", kind: "outOfStation" }
+].freeze
+
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
@@ -81,19 +98,22 @@ CITIES = {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
     networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
     own_unknown_lines: [],
-    # Metro station first, the intercity station it shares a concourse with second. Two stations
-    # inside one paid area, not one station with two names — they were fused into a single node
-    # at the mean of both halves, which put the marker in the gap between two platforms and made
-    # the city's station count 7 short. See `build_interchanges` for why this is a list and not
-    # a distance rule.
+    # Metro station first, the intercity station it interchanges with second. Two stations, not
+    # one station with two names — they were fused into a single node at the mean of both halves,
+    # which put the marker in the gap between two platforms and made the city's station count 7
+    # short. See `build_interchanges` for why this is a list and not a distance rule.
+    #
+    # `outOfStation`, all seven: 城际铁路 is a separate railway with its own gates, its own
+    # ticketing and its own security screening. Sharing a forecourt with a metro station does not
+    # make it one paid area, and calling these `inStation` told riders they could walk through.
     interchanges: [
-      { from: "机场北", to: "白云机场北", kind: "inStation" },
-      { from: "机场南", to: "白云机场南", kind: "inStation" },
-      { from: "广州白云站", to: "广州白云", kind: "inStation" },
-      { from: "广州北站", to: "花都", kind: "inStation" },
-      { from: "大石", to: "大石东", kind: "inStation" },
-      { from: "东平", to: "顺德北", kind: "inStation" },
-      { from: "汉溪长隆", to: "广州长隆", kind: "inStation" }
+      { from: "机场北", to: "白云机场北", kind: "outOfStation" },
+      { from: "机场南", to: "白云机场南", kind: "outOfStation" },
+      { from: "广州白云站", to: "广州白云", kind: "outOfStation" },
+      { from: "广州北站", to: "花都", kind: "outOfStation" },
+      { from: "大石", to: "大石东", kind: "outOfStation" },
+      { from: "东平", to: "顺德北", kind: "outOfStation" },
+      { from: "汉溪长隆", to: "广州长隆", kind: "outOfStation" }
     ]
   },
   "4403" => {
@@ -680,6 +700,48 @@ def build_interchanges(city, city_id, station_groups)
     record["fare"] = fare if fare
     record
   end.sort_by { |link| [link["fromStationID"], link["toStationID"]] }
+end
+
+# Writes each declared cross-pack interchange into both of its networks, now that every station's
+# final coordinate exists. See CROSS_NETWORK_INTERCHANGES.
+def apply_cross_network_interchanges!(networks_by_city, built_city_ids)
+  CROSS_NETWORK_INTERCHANGES.each do |link|
+    from_city, to_city = link.fetch(:cities)
+    touched = link[:cities] & built_city_ids
+    next if touched.empty?
+    unless (link[:cities] - built_city_ids).empty?
+      fail_with(
+        "cross-network interchange #{link[:from]}/#{link[:to]} needs both #{from_city} and " \
+        "#{to_city} in the same run"
+      )
+    end
+    from_network = networks_by_city.fetch(from_city)
+    to_network = networks_by_city.fetch(to_city)
+    from = from_network["stations"].find { |station| station["name"] == link.fetch(:from) }
+    to = to_network["stations"].find { |station| station["name"] == link.fetch(:to) }
+    fail_with("cross-network interchange names an absent station: #{link[:from]}") if from.nil?
+    fail_with("cross-network interchange names an absent station: #{link[:to]}") if to.nil?
+    separation = meters_between(
+      [from["latitude"], from["longitude"]],
+      [to["latitude"], to["longitude"]]
+    )
+    limit = MAX_INTERCHANGE_METERS.fetch(link.fetch(:kind))
+    if separation > limit
+      fail_with("cross-network interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
+    end
+    record = {
+      "fromStationID" => from["id"],
+      "toStationID" => to["id"],
+      "kind" => link.fetch(:kind),
+      "walkingDistanceMeters" => separation.round
+    }
+    record["fare"] = link[:fare] if link[:fare]
+    [from_network, to_network].uniq.each do |network|
+      network["interchanges"] = (network["interchanges"] + [record])
+        .uniq
+        .sort_by { |entry| [entry["fromStationID"], entry["toStationID"]] }
+    end
+  end
 end
 
 def meters_between(a, b)
@@ -1483,15 +1545,22 @@ fail_with("unknown city IDs: #{unknown.join(", ")}") unless unknown.empty?
 FileUtils.mkdir_p(OUTPUT_DIR)
 FileUtils.mkdir_p(REPORT_DIR)
 reports = []
+networks_by_city = {}
 city_ids.each do |city_id|
   city = CITIES.fetch(city_id)
   source = fetch_source(city_id, city, refresh: !!refresh)
   network, report = build_network(city_id, city, source)
   reports << report
+  networks_by_city[city_id] = network
+end
+# After every network is built, because a cross-pack interchange needs both halves' coordinates.
+apply_cross_network_interchanges!(networks_by_city, city_ids)
+city_ids.each do |city_id|
+  network = networks_by_city.fetch(city_id)
   output = File.join(OUTPUT_DIR, "#{city_id}.json")
   File.write(output, "#{JSON.generate(network)}\n")
   points = network["lines"].sum { |line| line["paths"].sum(&:length) }
-  puts "#{city[:name]}: lines=#{network["lines"].length} stations=#{network["stations"].length} points=#{points} -> #{output}"
+  puts "#{CITIES.fetch(city_id)[:name]}: lines=#{network["lines"].length} stations=#{network["stations"].length} points=#{points} -> #{output}"
 end
 report_output = File.join(REPORT_DIR, "canonicalization_report.json")
 File.write(report_output, "#{JSON.pretty_generate({ "cities" => reports })}\n")

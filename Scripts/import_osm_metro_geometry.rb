@@ -47,6 +47,14 @@ MAX_INTERCHANGE_METERS = {
   "outOfStation" => 1_000
 }.freeze
 
+# How the fare treats a declared interchange. Only `continuous` — "the two halves bill as one
+# trip" — is expressible, and only where it has been checked; anything undeclared says nothing
+# rather than guessing. Whether walking between two stations costs a second fare is operator
+# policy, and it does not follow from how far apart they are or whether the walk is indoors:
+# Beijing bills 广安门内 -> 牛街 as one trip across 496m of street, while Guangzhou's metro and
+# intercity halves share a concourse and still need two separate tickets.
+INTERCHANGE_FARES = ["continuous"].freeze
+
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
@@ -55,9 +63,13 @@ CITIES = {
     # Beijing's two street interchanges (出站换乘): the rider leaves the paid area, walks a block
     # and re-enters. Riders make both every day and the app could not plan either, because two
     # named stations with no shared line are two unconnected nodes in the graph.
+    # Both are 虚拟换乘: the rider taps out, walks, taps back in, and the two halves bill as one
+    # trip. That is a fare rule, not something the geometry implies — an out-of-station walk
+    # charges again in plenty of networks — so it is declared per pair and stays unsaid where
+    # it is not known.
     interchanges: [
-      { from: "广安门内", to: "牛街", kind: "outOfStation" },
-      { from: "太平桥", to: "复兴门", kind: "outOfStation" }
+      { from: "广安门内", to: "牛街", kind: "outOfStation", fare: "continuous" },
+      { from: "太平桥", to: "复兴门", kind: "outOfStation", fare: "continuous" }
     ]
   },
   "3100" => {
@@ -619,11 +631,11 @@ end
 
 # Two named stations riders treat as one interchange.
 #
-# Two cases, one mechanism, differing only in `kind`. `inStation` is two stations inside one paid
-# area — Guangzhou's metro/intercity concourses, where the rider never passes a gate. `outOfStation`
-# is a street walk between two separately-gated stations, as at Beijing's 广安门内/牛街. The app
-# draws the first solid and the second dashed, and charges the second a fare it does not charge
-# the first.
+# Two cases, one mechanism, differing only in `kind`, which describes the *walk* and nothing else.
+# `inStation` means the two are connected inside the building, as at Guangzhou's metro/intercity
+# concourses; `outOfStation` means the rider goes out to the street, as at Beijing's 广安门内/牛街.
+# The app draws the first solid and the second dashed. What the fare does is a separate, declared
+# fact — see `INTERCHANGE_FARES`.
 #
 # Declared per pair rather than inferred from distance, because distance cannot separate an
 # interchange from two nearby stations that are not one. Measured over Guangzhou's 414 stations,
@@ -655,12 +667,18 @@ def build_interchanges(city, city_id, station_groups)
     if separation > limit
       fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
     end
-    {
+    fare = link[:fare]
+    if fare && !INTERCHANGE_FARES.include?(fare)
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown fare #{fare}")
+    end
+    record = {
       "fromStationID" => station_id(city_id, from_key),
       "toStationID" => station_id(city_id, to_key),
       "kind" => link.fetch(:kind),
       "walkingDistanceMeters" => separation.round
     }
+    record["fare"] = fare if fare
+    record
   end.sort_by { |link| [link["fromStationID"], link["toStationID"]] }
 end
 

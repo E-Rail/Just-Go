@@ -256,7 +256,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                     toStationID: to.id,
                     lineID: metroInterchangeLineID,
                     distance: link.walkingDistanceMeters,
-                    interchange: link.kind
+                    interchange: link
                 )
                 guard seenEdges.insert(edge.key).inserted else { continue }
                 seenEdges.insert(edge.reversed.key)

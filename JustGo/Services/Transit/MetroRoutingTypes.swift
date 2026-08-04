@@ -40,9 +40,9 @@ struct MetroGraphEdge {
     let toStationID: String
     let lineID: String
     let distance: Double
-    /// nil for a ride between two stops. Set on the link between two stations riders treat as one
-    /// interchange, which is walked rather than ridden and belongs to no line.
-    var interchange: MetroInterchange.Kind? = nil
+    /// nil for a ride between two stops. Set to the declared link between two stations riders
+    /// treat as one interchange, which is walked rather than ridden and belongs to no line.
+    var interchange: MetroInterchange? = nil
 
     var reversed: MetroGraphEdge {
         MetroGraphEdge(

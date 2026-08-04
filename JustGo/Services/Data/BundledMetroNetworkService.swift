@@ -51,18 +51,29 @@ struct MetroLine: Codable, Equatable, Identifiable {
 /// Declared per pair in the importer, never inferred from distance: 南礼士路 and 复兴门 are 372 m
 /// apart and are *not* an interchange, while 太平桥 and 复兴门 at 625 m are.
 struct MetroInterchange: Codable, Equatable {
-    /// `inStation` — two stations inside one paid area (Guangzhou's metro/intercity concourses).
-    /// `outOfStation` — a street walk between two separately gated stations, which costs a
-    /// second fare. Drawn solid and dashed respectively.
+    /// What the walk is, and nothing more. `inStation` — connected inside the building, as at
+    /// Guangzhou's metro/intercity concourses. `outOfStation` — out to the street, as at Beijing's
+    /// 广安门内/牛街. Drawn solid and dashed respectively.
     enum Kind: String, Codable {
         case inStation
         case outOfStation
+    }
+
+    /// What the fare does, where it has been checked. Deliberately separate from `kind` and
+    /// deliberately optional: this does not follow from the walk. Beijing bills 广安门内 → 牛街 as
+    /// one trip across 496 m of street (虚拟换乘), while Guangzhou's metro and intercity halves
+    /// share a concourse and still need two separate tickets. nil means unknown, and unknown is
+    /// said as unknown rather than guessed from the geometry.
+    enum Fare: String, Codable {
+        /// Tap out, walk, tap in — the two halves bill as a single trip.
+        case continuous
     }
 
     let fromStationID: String
     let toStationID: String
     let kind: Kind
     let walkingDistanceMeters: Double
+    let fare: Fare?
 }
 
 struct MetroStation: Codable, Equatable, Identifiable {

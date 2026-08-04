@@ -79,8 +79,10 @@ extension BundledMetroRouteProvider {
         // other stay two legs rather than being folded into one by their shared synthetic line.
         let groups = edges.chunked { $0.lineID == $1.lineID && $0.interchange == $1.interchange }
         for (index, group) in groups.enumerated() {
-            if let first = group.first, let kind = first.interchange {
-                segments.append(contentsOf: group.compactMap { interchangeSegment($0, kind: kind, graph: graph) })
+            if group.first?.interchange != nil {
+                segments.append(contentsOf: group.compactMap { edge in
+                    edge.interchange.flatMap { interchangeSegment(edge, link: $0, graph: graph) }
+                })
                 continue
             }
             guard let first = group.first,
@@ -176,27 +178,42 @@ extension BundledMetroRouteProvider {
     }
 
     /// The leg where the rider walks from one station to the other one riders treat as the same
-    /// interchange. A `.transfer` either way — it is a change of train, not a journey — but an
-    /// `outOfStation` link says so, because leaving the paid area costs a second fare and the
-    /// rider needs to know before they tap out.
+    /// interchange. A `.transfer` either way — it is a change of train, not a journey.
+    ///
+    /// The notes say what the walk is and, separately, what the fare does *only where that has
+    /// been checked*. Both used to be read off `kind`, which was wrong in both directions: an
+    /// out-of-station walk was announced as costing a second fare, when Beijing's two are 虚拟换乘
+    /// and bill as one trip, and a shared concourse was announced as needing no tap-out, when
+    /// Guangzhou's halves are metro and intercity rail on separate tickets.
     private func interchangeSegment(
         _ edge: MetroGraphEdge,
-        kind: MetroInterchange.Kind,
+        link: MetroInterchange,
         graph: MetroRoutingGraph
     ) -> RouteSegment? {
         guard let from = graph.stationsByID[edge.fromStationID],
               let to = graph.stationsByID[edge.toStationID] else { return nil }
-        let note = kind == .outOfStation
-            ? AppLocalization.text(
-                english: "Leaves the paid area — a second fare applies",
-                simplified: "需出站换乘，将重新计费",
-                traditional: "需出站換乘，將重新計費"
-            )
-            : AppLocalization.text(
-                english: "Inside the paid area — no need to tap out",
-                simplified: "站内换乘，无需出闸",
-                traditional: "站內換乘，無需出閘"
-            )
+        var notes = [
+            link.kind == .outOfStation
+                ? AppLocalization.text(
+                    english: "Leave the station and walk to \(to.name)",
+                    simplified: "需出站步行至\(to.name)",
+                    traditional: "需出站步行至\(to.name)"
+                )
+                : AppLocalization.text(
+                    english: "Connected inside the station",
+                    simplified: "站内通道直接连通",
+                    traditional: "站內通道直接連通"
+                )
+        ]
+        // Silence where it is unknown. Saying nothing about the fare is the honest answer; the
+        // rider can read the gates. Saying the wrong thing sends them through the wrong one.
+        if link.fare == .continuous {
+            notes.append(AppLocalization.text(
+                english: "Counts as one trip — no second fare",
+                simplified: "虚拟换乘，计为一次行程，不重复计费",
+                traditional: "虛擬換乘，計為一次行程，不重複計費"
+            ))
+        }
         return RouteSegment(
             id: UUID(),
             type: .transfer,
@@ -213,7 +230,7 @@ extension BundledMetroRouteProvider {
             stationStops: [],
             polylineCoordinates: graph.edgeGeometries[edge.key] ?? [],
             walkingDirections: nil,
-            accessibilityNotes: [note]
+            accessibilityNotes: notes
         )
     }
 

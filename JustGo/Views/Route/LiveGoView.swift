@@ -441,13 +441,8 @@ struct LiveGoView: View {
     private var routeOverlays: [RouteOverlay] {
         let currentSegmentIndex = viewModel.currentStep?.segmentIndex
         return viewModel.route.segments.enumerated().compactMap { index, segment in
-            var coordinates = segment.polylineCoordinates.map {
+            let coordinates = segment.drawableCoordinates.map {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-            }
-            if coordinates.count < 2 {
-                coordinates = segment.stationStops.compactMap(\.coordinate).map {
-                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                }
             }
             guard coordinates.count >= 2 else { return nil }
             let isWalking = segment.type == .walking

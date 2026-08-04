@@ -205,7 +205,10 @@ final class RoutePlanningService {
                     name: stop.name,
                     latitude: coordinate.latitude,
                     longitude: coordinate.longitude,
-                    cityID: routeCityID
+                    // The stop's own pack, not the trip's. On a Dongguan → Guangzhou trip the two
+                    // ends are in different packs, and every lookup keyed to the origin's city
+                    // came back empty for the far half of the journey.
+                    cityID: stop.packCityID ?? routeCityID
                 )
             }
         )
@@ -799,10 +802,10 @@ final class RoutePlanningService {
 }
 
 extension Route {
+    /// The pack the trip *starts* in, and nothing more. A trip spans packs now, so anything about
+    /// one particular station has to ask that station — see `RouteStationStop.packCityID`.
     var networkCityID: String? {
-        let prefix = "network-"
-        guard originStationID.hasPrefix(prefix) else { return nil }
-        return originStationID.dropFirst(prefix.count).split(separator: "-", maxSplits: 1).first.map(String.init)
+        MetroStationIdentifier.cityID(of: originStationID)
     }
 }
 

@@ -379,13 +379,13 @@ struct RouteDetailView: View {
                     TransferStationSheet(
                         transferSegment: segment,
                         nextTransitSegment: nextTransitSegment(after: segment),
-                        cityID: route.networkCityID ?? "",
+                        cityID: segment.packCityID ?? route.networkCityID ?? "",
                         accessibilityFilter: accessibilityFilter
                     )
                 case .station(let stop):
                     RouteStationGuideSheet(
                         stop: stop,
-                        cityID: route.networkCityID ?? ""
+                        cityID: stop.packCityID ?? route.networkCityID ?? ""
                     )
                 case .confidence:
                     let feasibility = currentFeasibility()
@@ -594,7 +594,7 @@ struct RouteDetailView: View {
                 name: stop.name,
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude,
-                cityID: route.networkCityID ?? "",
+                cityID: stop.packCityID ?? route.networkCityID ?? "",
                 // Carried through so interchanges get the larger symbol and win label collisions
                 // against the ordinary stops between them — on a route map they are the stations
                 // the rider has to act at.
@@ -619,11 +619,21 @@ struct RouteDetailView: View {
         // behind the trip sheet — the sheet opens at `.medium` and covers the lower half, so the
         // one control for switching alternative was invisible on every route the app has ever
         // shown. The top strip is the part of the map that is never covered.
-        .overlay(alignment: .top) {
-            if alternatives.count > 1 {
-                RouteTabs(routes: alternatives, selection: $selectedRouteID, floating: true)
-                    .padding(.top, 8)
+        .overlay(alignment: .topLeading) {
+            VStack(alignment: .leading, spacing: 8) {
+                if alternatives.count > 1 {
+                    RouteTabs(routes: alternatives, selection: $selectedRouteID, floating: true)
+                }
+                // The trip's track is the same bundled OSM geometry the browse map draws, so it
+                // carries the same attribution. It was shown on only one of the two screens that
+                // draw it, which under ODbL is not a style difference. Kept up here with the
+                // alternatives rather than at the map's foot, which the trip card covers.
+                if route.segments.contains(where: { $0.type.isTransit }) {
+                    MetroGeometryAttributionView()
+                        .padding(.leading, 12)
+                }
             }
+            .padding(.top, 8)
         }
     }
 

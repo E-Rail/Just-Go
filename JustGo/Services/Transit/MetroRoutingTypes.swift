@@ -23,14 +23,23 @@ struct MetroRoutingGraph {
     /// ID is `network-<city>-<station>` — so the city is a property of the station now, not of the
     /// search.
     let cityIDByStationID: [String: String]
+    /// Duplicate copies of one line, mapped onto the copy that survived. A station's own `lineIDs`
+    /// name its pack's copies, so anything counting a station's lines has to come through here or
+    /// it undercounts: an interchange onto a shared intercity corridor would read as one line.
+    let canonicalLineIDs: [String: String]
 
     func cityID(for stationID: String) -> String {
         cityIDByStationID[stationID] ?? ""
     }
 
+    /// How many of the graph's lines call at this station — the test for "this is an interchange".
+    func lineCount(for station: MetroStation) -> Int {
+        Set(station.lineIDs.map { canonicalLineIDs[$0] ?? $0 }.filter { linesByID[$0] != nil }).count
+    }
+
     /// The `network-<city>-<station>` identifier the rest of the app indexes stations by.
     func qualifiedID(for stationID: String) -> String {
-        "network-\(cityID(for: stationID))-\(stationID)"
+        MetroStationIdentifier.qualified(cityID: cityID(for: stationID), stationID: stationID)
     }
 }
 
@@ -149,6 +158,167 @@ struct MetroMinHeap {
             index = smallest
         }
         return result
+    }
+}
+
+/// Where the ride between two adjacent stations is drawn.
+///
+/// One resolver, used wherever track is drawn, because the alternative is what shipped: the route
+/// map sliced OSM ways per edge while the browse map drew the raw way, so the same corridor could
+/// be continuous on one screen and broken on the other.
+enum MetroTrackGeometry {
+    /// The track between two adjacent stations — **always** at least the two stations themselves.
+    ///
+    /// Returning nothing was the old answer whenever the way could not be sliced sensibly, and it
+    /// left a hole rather than a straight line: a leg's polyline is the concatenation of its edges,
+    /// so one empty edge in the middle stops the drawn line dead. 深井 → 琶洲 did exactly that, and
+    /// the Guangzhou intercity leg ended 5.5 km short of the station it claimed to reach while the
+    /// leg as a whole still had 44 points, so no "this segment has no shape" fallback could fire.
+    /// A straight chord says "these two are connected, the shape is unknown"; a gap says nothing.
+    ///
+    /// The result also starts at `from` and ends at `to` exactly, never at their projections onto
+    /// the way. Projected ends left consecutive legs 583 m apart at 东莞西 — a transfer drawn as
+    /// two lines that miss each other.
+    static func edge(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        separation: Double,
+        line: MetroLine
+    ) -> [CodableCoordinate] {
+        let chord = [from, to]
+        // Project each station onto the polyline itself, never snap to vertices: OSM ways
+        // can run kilometres between vertices (Beijing Line 2's whole ring is 48 points),
+        // so the nearest VERTEX can sit 1km+ past the station and the drawn ride overshoots
+        // or stops short by that much.
+        let matches = line.paths.compactMap { path -> (path: [MetroCoordinate], cumulative: [Double], from: PathProjection, to: PathProjection)? in
+            guard path.count >= 2 else { return nil }
+            let points = path.map(\.coordinate)
+            var cumulative: [Double] = [0]
+            cumulative.reserveCapacity(points.count)
+            for index in 1..<points.count {
+                cumulative.append(cumulative[index - 1] + points[index - 1].distance(to: points[index]))
+            }
+            guard let fromProjection = projection(of: from, onto: points, cumulative: cumulative),
+                  let toProjection = projection(of: to, onto: points, cumulative: cumulative) else {
+                return nil
+            }
+            return (path, cumulative, fromProjection, toProjection)
+        }
+        guard let match = matches.min(by: { ($0.from.distance + $0.to.distance) < ($1.from.distance + $1.to.distance) }),
+              match.from.distance + match.to.distance < 2_000 else {
+            return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+        }
+
+        let points = match.path.map(\.coordinate)
+        let total = match.cumulative[match.cumulative.count - 1]
+        let isRing = points.count >= 3 && points[0].distance(to: points[points.count - 1]) < 5
+        let lowOffset = min(match.from.pathOffset, match.to.pathOffset)
+        let highOffset = max(match.from.pathOffset, match.to.pathOffset)
+        let reversed = match.from.pathOffset > match.to.pathOffset
+        let lowPoint = reversed ? match.to.point : match.from.point
+        let highPoint = reversed ? match.from.point : match.to.point
+
+        var slice: [CLLocationCoordinate2D]
+        if !isRing || highOffset - lowOffset <= total - (highOffset - lowOffset) {
+            // Direct arc: projected endpoint, the vertices strictly between the two
+            // offsets, projected endpoint.
+            slice = [lowPoint]
+            for index in points.indices where match.cumulative[index] > lowOffset && match.cumulative[index] < highOffset {
+                slice.append(points[index])
+            }
+            slice.append(highPoint)
+        } else {
+            // Closed ring where the seam-crossing arc is shorter: walk from the higher
+            // offset forward off the end of the array and back in at the start. The ring's
+            // duplicated closing vertex meets the first vertex at the seam — dedup it.
+            slice = [highPoint]
+            for index in points.indices where match.cumulative[index] > highOffset {
+                slice.append(points[index])
+            }
+            for index in points.indices where match.cumulative[index] < lowOffset {
+                if let last = slice.last, last.distance(to: points[index]) < 1 { continue }
+                slice.append(points[index])
+            }
+            slice.append(lowPoint)
+            slice.reverse()
+        }
+        if reversed {
+            slice.reverse()
+        }
+
+        // A slice grossly longer than the stations' straight-line separation is a bad match (wrong
+        // path variant, self-approaching geometry). 广州东环-琶莲-佛莞城际 ships as one 187.5 km way
+        // whose point order does not follow the service order, which puts 琶洲 and 深井 59.3 km
+        // apart along a hop that is 5.5 km across.
+        guard slice.count >= 2, arcLength(slice) <= max(2.5 * separation, separation + 1_500) else {
+            return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+        }
+        // The stations themselves, then the track between them. Prepended rather than substituted
+        // so a station that genuinely sits off its way keeps both facts — where the platform is and
+        // where the track runs — instead of the shape being bent to reach it.
+        var joined = [from]
+        for point in slice where joined[joined.count - 1].distance(to: point) >= 5 {
+            joined.append(point)
+        }
+        if joined[joined.count - 1].distance(to: to) >= 5 { joined.append(to) }
+        guard joined.count >= 2 else { return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) } }
+        return joined.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+
+    /// A station's closest point ON a path's polyline (not its closest vertex): the point,
+    /// how far the station sits from the track, and the point's arc-length offset from the
+    /// path start — which is what the slicer walks by.
+    private struct PathProjection {
+        let point: CLLocationCoordinate2D
+        let distance: Double
+        let pathOffset: Double
+    }
+
+    /// Nearest point on the polyline to `coordinate`, via point-to-segment projection in a
+    /// small local planar frame (metres-per-degree at the segment; exact enough at station
+    /// scale, and far cheaper than geodesic projection).
+    private static func projection(
+        of coordinate: CLLocationCoordinate2D,
+        onto points: [CLLocationCoordinate2D],
+        cumulative: [Double]
+    ) -> PathProjection? {
+        guard points.count >= 2 else { return nil }
+        var best: PathProjection?
+        for index in 0..<(points.count - 1) {
+            let a = points[index]
+            let b = points[index + 1]
+            let metersPerDegreeLongitude = 111_320.0 * cos(a.latitude * .pi / 180)
+            let metersPerDegreeLatitude = 110_540.0
+            let ax = a.longitude * metersPerDegreeLongitude, ay = a.latitude * metersPerDegreeLatitude
+            let bx = b.longitude * metersPerDegreeLongitude, by = b.latitude * metersPerDegreeLatitude
+            let px = coordinate.longitude * metersPerDegreeLongitude, py = coordinate.latitude * metersPerDegreeLatitude
+            let dx = bx - ax, dy = by - ay
+            let lengthSquared = dx * dx + dy * dy
+            let t = lengthSquared == 0 ? 0 : min(1, max(0, ((px - ax) * dx + (py - ay) * dy) / lengthSquared))
+            let projected = CLLocationCoordinate2D(
+                latitude: (ay + t * dy) / metersPerDegreeLatitude,
+                longitude: (ax + t * dx) / metersPerDegreeLongitude
+            )
+            let distance = coordinate.distance(to: projected)
+            if best == nil || distance < best!.distance {
+                let segmentLength = cumulative[index + 1] - cumulative[index]
+                best = PathProjection(
+                    point: projected,
+                    distance: distance,
+                    pathOffset: cumulative[index] + t * segmentLength
+                )
+            }
+        }
+        return best
+    }
+
+    private static func arcLength(_ coordinates: [CLLocationCoordinate2D]) -> Double {
+        guard coordinates.count >= 2 else { return 0 }
+        var total: Double = 0
+        for index in 1..<coordinates.count {
+            total += coordinates[index - 1].distance(to: coordinates[index])
+        }
+        return total
     }
 }
 

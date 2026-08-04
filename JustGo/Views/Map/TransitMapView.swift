@@ -135,9 +135,7 @@ struct TransitMapView: UIViewRepresentable {
             clearOverlayMetadata(networkOverlays)
             networkOverlays = []
 
-            for network in parent.metroNetworks {
-                addNetwork(network)
-            }
+            addNetworks(parent.metroNetworks)
             addInterchanges(across: parent.metroNetworks)
             if !networkOverlays.isEmpty {
                 mapView.addOverlays(networkOverlays, level: .aboveRoads)
@@ -202,16 +200,34 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        private func addNetwork(_ network: MetroNetwork) {
-            for line in network.lines {
-                for path in line.paths where path.count >= 2 {
-                    addPolyline(
-                        path.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) },
-                        colorHex: line.colorHex,
-                        lineWidth: 4,
-                        simplify: false,
-                        collection: &networkOverlays
-                    )
+        /// Every loaded pack's lines, with each stretch of track drawn once.
+        ///
+        /// Adjacent cities each ship the intercity corridors they share, byte for byte — 234 paths
+        /// across the Guangzhou / Foshan / Dongguan packs, 130 of them distinct. Drawn per pack,
+        /// the shared corridors were laid down two and three times over. Identity is the path's own
+        /// points, so this can only ever collapse a way onto a copy of itself; it is the drawing
+        /// half of the same rule `canonicalStationIDs` and `canonicalLineIDs` apply to the graph.
+        private func addNetworks(_ networks: [MetroNetwork]) {
+            var drawn = Set<Int>()
+            for network in networks {
+                for line in network.lines {
+                    for path in line.paths where path.count >= 2 {
+                        var hasher = Hasher()
+                        hasher.combine(line.colorHex)
+                        hasher.combine(path.count)
+                        for point in path {
+                            hasher.combine(point.latitude)
+                            hasher.combine(point.longitude)
+                        }
+                        guard drawn.insert(hasher.finalize()).inserted else { continue }
+                        addPolyline(
+                            path.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) },
+                            colorHex: line.colorHex,
+                            lineWidth: 4,
+                            simplify: false,
+                            collection: &networkOverlays
+                        )
+                    }
                 }
             }
         }
@@ -242,32 +258,42 @@ struct TransitMapView: UIViewRepresentable {
                     [from, to],
                     colorHex: "#8E8E93",
                     lineWidth: 5,
-                    dashPattern: link.kind == .outOfStation ? [2, 6] : nil,
+                    dashPattern: Self.dashPattern(forInterchange: link.kind),
                     simplify: false,
                     collection: &networkOverlays
                 )
             }
         }
 
+        /// The mark that means "this walk leaves the paid area", defined once. The browse map draws
+        /// an out-of-station link between two stations dashed; the same link inside a planned trip
+        /// has to read the same way, or the dash means one thing on one screen and nothing on the
+        /// next.
+        static func dashPattern(forInterchange kind: MetroInterchange.Kind?) -> [NSNumber]? {
+            kind == .outOfStation ? [2, 6] : nil
+        }
+
         private func addRoute(_ route: Route) {
             for segment in route.segments {
-                let polylineCoordinates = segment.polylineCoordinates.map {
+                let coordinates = segment.drawableCoordinates.map {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                 }
-                let coordinates = polylineCoordinates.count >= 2
-                    ? polylineCoordinates
-                    : segment.stationStops.compactMap(\.coordinate).map {
-                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                    }
                 guard coordinates.count >= 2 else { continue }
                 let isWalking = segment.type == .walking
+                // Round dots, the convention every map app uses for a leg on foot, and the thing
+                // that makes a walk legible at all: solid grey at this width is the same mark the
+                // basemap draws roads with, so a walking-only route read as no route.
+                let dashPattern = isWalking
+                    ? [0.1, 11] as [NSNumber]
+                    : Self.dashPattern(forInterchange: segment.interchangeKind)
                 // A casing under every ride, because a line's colour is data and some of it is
                 // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
                 // importer's fallback gives them #8E8E93 — the same grey the basemap draws roads
                 // with, which made a real leg of a real route look like nothing was drawn at all.
                 // Widening and darkening what sits underneath fixes it for every line at once,
-                // rather than inventing a colour for the ones that don't state theirs.
-                if !isWalking {
+                // rather than inventing a colour for the ones that don't state theirs. Solid legs
+                // only: a casing behind a dashed one fills the gaps back in.
+                if dashPattern == nil {
                     addPolyline(
                         coordinates,
                         colorHex: "#0B0B0F",
@@ -281,10 +307,7 @@ struct TransitMapView: UIViewRepresentable {
                     coordinates,
                     colorHex: routeColorHex(for: segment),
                     lineWidth: isWalking ? 7 : 6,
-                    // Round dots, the convention every map app uses for a leg on foot, and the
-                    // thing that makes a walk legible at all: solid grey at this width is the same
-                    // mark the basemap draws roads with, so a walking-only route read as no route.
-                    dashPattern: isWalking ? [0.1, 11] : nil,
+                    dashPattern: dashPattern,
                     simplify: true,
                     collection: &routeOverlays
                 )

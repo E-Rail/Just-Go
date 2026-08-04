@@ -135,7 +135,7 @@ private func makeDisplayStation(
 ) -> Station {
     let displayLines = item.lineIDs.compactMap { linesByID[$0] }
     let station = Station(
-        stationID: "network-\(cityID)-\(item.id)",
+        stationID: MetroStationIdentifier.qualified(cityID: cityID, stationID: item.id),
         name: item.name,
         nameEn: item.nameEn,
         latitude: item.latitude,

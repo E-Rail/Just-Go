@@ -21,6 +21,7 @@ xcrun swiftc \
     -strict-concurrency=complete \
     -warnings-as-errors \
     -module-cache-path "$BUILD_DIR/ModuleCache" \
+    "$REPO_ROOT/JustGo/Models/Transit/MetroStationIdentifier.swift" \
     "$REPO_ROOT/JustGo/Models/User/PersonalStationMedia.swift" \
     "$REPO_ROOT/JustGo/Services/Data/PersonalStationMediaService.swift" \
     "$SCRIPT_DIR/test_personal_station_media.swift" \

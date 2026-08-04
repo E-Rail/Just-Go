@@ -16,10 +16,9 @@ struct PersonalStationMediaKey: Codable, Hashable, Sendable {
     init?(cityID: String, stationID: String) {
         let normalizedCityID = Self.normalized(cityID)
         let normalizedStationID = Self.normalized(stationID)
-        let networkPrefix = "network-\(normalizedCityID)-"
-
-        guard !normalizedCityID.isEmpty, normalizedStationID.hasPrefix(networkPrefix) else { return nil }
-        let canonical = String(normalizedStationID.dropFirst(networkPrefix.count))
+        guard !normalizedCityID.isEmpty,
+              MetroStationIdentifier.cityID(of: normalizedStationID) == normalizedCityID else { return nil }
+        let canonical = MetroStationIdentifier.canonical(normalizedStationID)
         guard !canonical.isEmpty else { return nil }
         self.cityID = normalizedCityID
         self.canonicalStationID = canonical

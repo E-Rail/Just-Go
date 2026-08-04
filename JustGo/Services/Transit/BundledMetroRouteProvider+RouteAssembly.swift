@@ -142,7 +142,7 @@ extension BundledMetroRouteProvider {
             let stationIDs = [first.fromStationID] + group.map(\.toStationID)
             let stops = stationIDs.compactMap { id -> RouteStationStop? in
                 guard let station = graph.stationsByID[id] else { return nil }
-                let lineCount = Set(station.lineIDs.filter { graph.linesByID[$0] != nil }).count
+                let lineCount = graph.lineCount(for: station)
                 return RouteStationStop(
                     stationID: graph.qualifiedID(for: station.id),
                     name: station.name,
@@ -230,7 +230,8 @@ extension BundledMetroRouteProvider {
             stationStops: [],
             polylineCoordinates: graph.edgeGeometries[edge.key] ?? [],
             walkingDirections: nil,
-            accessibilityNotes: notes
+            accessibilityNotes: notes,
+            interchangeKind: link.kind
         )
     }
 

@@ -595,12 +595,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     /// Map-search results carry a synthesised `network-<cityID>-<stationID>` identifier; packs are
     /// keyed by the bare canonical station ID. Anything else is already canonical.
     private func networkStationID(_ value: String) -> String {
-        let prefix = "network-"
-        guard value.hasPrefix(prefix),
-              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
-            return value
-        }
-        return String(value[value.index(after: citySeparator)...])
+        MetroStationIdentifier.canonical(value)
     }
 
     func licensedMedia(for station: Station) async -> [LicensedStationMedia] {

@@ -158,6 +158,61 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// Keyed on identical normalized name **and** colocation — never distance alone. 体育西路 and
     /// 天河南 are 281 m apart and are different stations; requiring the name to match as well is
     /// what separates "the same station shipped twice" from "two stations that are close".
+    /// Which duplicate copies of a *line* collapse onto which surviving one — the missing half of
+    /// the rule above.
+    ///
+    /// Stations were deduplicated across packs and lines were not, so the shared intercity
+    /// corridors existed two or three times over as separate lines joining the *same* canonical
+    /// stations. Dijkstra then had several identical-cost ways to make the same journey, differing
+    /// only in which pack's copy of the line they rode, and the three preferences picked different
+    /// copies: the results page listed 130分钟 · 3次换乘 twice, as two "different" plans that were
+    /// the same trip.
+    ///
+    /// Identity is **identical name and an identical canonical station set** — both, never the name
+    /// alone. Guangzhou's 1号线 and Dongguan's 1号线 share a name and not one station; the three
+    /// copies of 广州东环-琶莲-佛莞城际 share all 18. There is nothing to tune between those cases.
+    private func canonicalLineIDs(
+        across networks: [MetroNetwork],
+        canonicalStationIDs canonical: [String: String]
+    ) -> [String: String] {
+        guard networks.count > 1 else { return [:] }
+
+        struct LineIdentity {
+            let id: String
+            let stationIDs: Set<String>
+        }
+        var byName: [String: [LineIdentity]] = [:]
+        for network in networks {
+            for line in network.lines {
+                let stationIDs = Set(line.servicePatterns.flatMap { $0 }.map { canonical[$0] ?? $0 })
+                guard !stationIDs.isEmpty else { continue }
+                byName[line.name, default: []].append(LineIdentity(id: line.id, stationIDs: stationIDs))
+            }
+        }
+
+        var canonicalLines: [String: String] = [:]
+        for (_, group) in byName where group.count > 1 {
+            var clusters: [[LineIdentity]] = []
+            for line in group {
+                let index = clusters.firstIndex { $0[0].stationIDs == line.stationIDs }
+                if let index {
+                    clusters[index].append(line)
+                } else {
+                    clusters.append([line])
+                }
+            }
+            for cluster in clusters where cluster.count > 1 {
+                // Lowest id wins. The copies serve the same stations by construction, so there is
+                // nothing to prefer between them — this only keeps the choice stable between runs.
+                let winner = cluster.map(\.id).min()!
+                for line in cluster where line.id != winner {
+                    canonicalLines[line.id] = winner
+                }
+            }
+        }
+        return canonicalLines
+    }
+
     private func canonicalStationIDs(across networks: [MetroNetwork]) -> [String: String] {
         guard networks.count > 1 else { return [:] }
 
@@ -206,6 +261,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
 
         let canonical = canonicalStationIDs(across: networks)
         func resolve(_ stationID: String) -> String { canonical[stationID] ?? stationID }
+        let canonicalLine = canonicalLineIDs(across: networks, canonicalStationIDs: canonical)
 
         // Tolerate duplicated ids in a data pack (keep the first) instead of trapping —
         // a single malformed pack entry must not crash route search.
@@ -218,7 +274,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 stationsByID[station.id] = station
                 cityIDByStationID[station.id] = network.cityID
             }
-            for line in network.lines where linesByID[line.id] == nil {
+            for line in network.lines where canonicalLine[line.id] == nil && linesByID[line.id] == nil {
                 linesByID[line.id] = line
             }
         }
@@ -227,7 +283,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         var edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]] = [:]
         var seenEdges = Set<MetroGraphEdgeKey>()
         for network in networks {
-            for line in network.lines {
+            for line in network.lines where canonicalLine[line.id] == nil {
                 for pattern in line.servicePatterns {
                     for pair in pattern.adjacentPairs {
                         guard let from = stationsByID[resolve(pair.0)],
@@ -282,7 +338,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             linesByID: linesByID,
             adjacency: adjacency,
             edgeGeometries: edgeGeometries,
-            cityIDByStationID: cityIDByStationID
+            cityIDByStationID: cityIDByStationID,
+            canonicalLineIDs: canonicalLine
         )
         graphs[key] = graph
         return graph
@@ -413,132 +470,13 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         max(60, distance / 9.7 + 30)
     }
 
-    /// A station's closest point ON a path's polyline (not its closest vertex): the point,
-    /// how far the station sits from the track, and the point's arc-length offset from the
-    /// path start — which is what the slicer walks by.
-    private struct PathProjection {
-        let point: CLLocationCoordinate2D
-        let distance: Double
-        let pathOffset: Double
-    }
-
     private func edgeGeometry(_ edge: MetroGraphEdge, stations: [String: MetroStation], line: MetroLine) -> [CodableCoordinate] {
         guard let from = stations[edge.fromStationID], let to = stations[edge.toStationID] else { return [] }
-        let fromCoordinate = from.coordinate
-        let toCoordinate = to.coordinate
-        // Project each station onto the polyline itself, never snap to vertices: OSM ways
-        // can run kilometres between vertices (Beijing Line 2's whole ring is 48 points),
-        // so the nearest VERTEX can sit 1km+ past the station and the drawn ride overshoots
-        // or stops short by that much.
-        let matches = line.paths.compactMap { path -> (path: [MetroCoordinate], cumulative: [Double], from: PathProjection, to: PathProjection)? in
-            guard path.count >= 2 else { return nil }
-            let points = path.map(\.coordinate)
-            var cumulative: [Double] = [0]
-            cumulative.reserveCapacity(points.count)
-            for index in 1..<points.count {
-                cumulative.append(cumulative[index - 1] + points[index - 1].distance(to: points[index]))
-            }
-            guard let fromProjection = projection(of: fromCoordinate, onto: points, cumulative: cumulative),
-                  let toProjection = projection(of: toCoordinate, onto: points, cumulative: cumulative) else {
-                return nil
-            }
-            return (path, cumulative, fromProjection, toProjection)
-        }
-        guard let match = matches.min(by: { ($0.from.distance + $0.to.distance) < ($1.from.distance + $1.to.distance) }),
-              match.from.distance + match.to.distance < 2_000 else {
-            return []
-        }
-
-        let points = match.path.map(\.coordinate)
-        let total = match.cumulative[match.cumulative.count - 1]
-        let isRing = points.count >= 3 && points[0].distance(to: points[points.count - 1]) < 5
-        let lowOffset = min(match.from.pathOffset, match.to.pathOffset)
-        let highOffset = max(match.from.pathOffset, match.to.pathOffset)
-        let reversed = match.from.pathOffset > match.to.pathOffset
-        let lowPoint = reversed ? match.to.point : match.from.point
-        let highPoint = reversed ? match.from.point : match.to.point
-
-        var slice: [CLLocationCoordinate2D]
-        if !isRing || highOffset - lowOffset <= total - (highOffset - lowOffset) {
-            // Direct arc: projected endpoint, the vertices strictly between the two
-            // offsets, projected endpoint.
-            slice = [lowPoint]
-            for index in points.indices where match.cumulative[index] > lowOffset && match.cumulative[index] < highOffset {
-                slice.append(points[index])
-            }
-            slice.append(highPoint)
-        } else {
-            // Closed ring where the seam-crossing arc is shorter: walk from the higher
-            // offset forward off the end of the array and back in at the start. The ring's
-            // duplicated closing vertex meets the first vertex at the seam — dedup it.
-            slice = [highPoint]
-            for index in points.indices where match.cumulative[index] > highOffset {
-                slice.append(points[index])
-            }
-            for index in points.indices where match.cumulative[index] < lowOffset {
-                if let last = slice.last, last.distance(to: points[index]) < 1 { continue }
-                slice.append(points[index])
-            }
-            slice.append(lowPoint)
-            slice.reverse()
-        }
-        if reversed {
-            slice.reverse()
-        }
-
-        // A slice grossly longer than the stations' straight-line separation is a bad
-        // match (wrong path variant, self-approaching geometry) — better to return
-        // nothing and let the renderer draw its station-to-station straight fallback.
-        guard slice.count >= 2, arcLength(slice) <= max(2.5 * edge.distance, edge.distance + 1_500) else {
-            return []
-        }
-        return slice.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
-    }
-
-    /// Nearest point on the polyline to `coordinate`, via point-to-segment projection in a
-    /// small local planar frame (metres-per-degree at the segment; exact enough at station
-    /// scale, and far cheaper than geodesic projection).
-    private func projection(
-        of coordinate: CLLocationCoordinate2D,
-        onto points: [CLLocationCoordinate2D],
-        cumulative: [Double]
-    ) -> PathProjection? {
-        guard points.count >= 2 else { return nil }
-        var best: PathProjection?
-        for index in 0..<(points.count - 1) {
-            let a = points[index]
-            let b = points[index + 1]
-            let metersPerDegreeLongitude = 111_320.0 * cos(a.latitude * .pi / 180)
-            let metersPerDegreeLatitude = 110_540.0
-            let ax = a.longitude * metersPerDegreeLongitude, ay = a.latitude * metersPerDegreeLatitude
-            let bx = b.longitude * metersPerDegreeLongitude, by = b.latitude * metersPerDegreeLatitude
-            let px = coordinate.longitude * metersPerDegreeLongitude, py = coordinate.latitude * metersPerDegreeLatitude
-            let dx = bx - ax, dy = by - ay
-            let lengthSquared = dx * dx + dy * dy
-            let t = lengthSquared == 0 ? 0 : min(1, max(0, ((px - ax) * dx + (py - ay) * dy) / lengthSquared))
-            let projected = CLLocationCoordinate2D(
-                latitude: (ay + t * dy) / metersPerDegreeLatitude,
-                longitude: (ax + t * dx) / metersPerDegreeLongitude
-            )
-            let distance = coordinate.distance(to: projected)
-            if best == nil || distance < best!.distance {
-                let segmentLength = cumulative[index + 1] - cumulative[index]
-                best = PathProjection(
-                    point: projected,
-                    distance: distance,
-                    pathOffset: cumulative[index] + t * segmentLength
-                )
-            }
-        }
-        return best
-    }
-
-    private func arcLength(_ coordinates: [CLLocationCoordinate2D]) -> Double {
-        guard coordinates.count >= 2 else { return 0 }
-        var total: Double = 0
-        for index in 1..<coordinates.count {
-            total += coordinates[index - 1].distance(to: coordinates[index])
-        }
-        return total
+        return MetroTrackGeometry.edge(
+            from: from.coordinate,
+            to: to.coordinate,
+            separation: edge.distance,
+            line: line
+        )
     }
 }

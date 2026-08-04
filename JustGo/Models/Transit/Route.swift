@@ -85,12 +85,7 @@ struct Route: Identifiable, Codable {
     }
 
     var previewRegion: MapVisibleRegion? {
-        let coordinates = segments.flatMap { segment -> [CodableCoordinate] in
-            if !segment.polylineCoordinates.isEmpty {
-                return segment.polylineCoordinates
-            }
-            return segment.stationStops.compactMap(\.coordinate)
-        }
+        let coordinates = segments.flatMap(\.drawableCoordinates)
 
         guard !coordinates.isEmpty else { return nil }
 
@@ -295,10 +290,30 @@ struct RouteSegment: Identifiable, Codable {
     /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
     var incomingLineName: String? = nil
     var incomingLineColorHex: String? = nil
+    /// Set only on the `.transfer` leg that walks between two stations riders treat as one
+    /// interchange. Carried so the trip map can draw that walk with the same mark the browse map
+    /// gives the same link — a dashed line means "out to the street" on both, or it means nothing.
+    /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
+    var interchangeKind: MetroInterchange.Kind? = nil
 
     var formattedDuration: String {
         let minutes = Int(duration / 60)
         return AppLocalization.minutes(minutes)
+    }
+
+    /// Which pack this leg starts in — the same rule as `RouteStationStop.packCityID`, for the
+    /// transfer sheet, which is handed a segment rather than a stop.
+    var packCityID: String? {
+        fromStationID.flatMap(MetroStationIdentifier.cityID(of:))
+    }
+
+    /// What this leg draws on a map, from the one rule every map uses.
+    ///
+    /// Three screens each carried their own copy of it — the trip map, the live-guidance map and
+    /// `previewRegion` — which is how the trip map and the region it framed could disagree about
+    /// where a route went. An in-station change has no shape and correctly draws nothing.
+    var drawableCoordinates: [CodableCoordinate] {
+        polylineCoordinates.count >= 2 ? polylineCoordinates : stationStops.compactMap(\.coordinate)
     }
 }
 
@@ -410,6 +425,16 @@ struct RouteStationStop: Identifiable, Codable {
 
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"
+    }
+
+    /// Which pack this stop belongs to, read off its own identifier.
+    ///
+    /// A trip spans packs now, so `Route.networkCityID` is the *origin's* city and nothing more.
+    /// Handing it to every stop meant a Dongguan station was asked of Guangzhou's pack, which does
+    /// not fail — it finds nothing and reports "unavailable", the one wrong answer this app is
+    /// built not to give.
+    var packCityID: String? {
+        MetroStationIdentifier.cityID(of: stationID)
     }
 }
 

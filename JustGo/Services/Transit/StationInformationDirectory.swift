@@ -96,12 +96,7 @@ final class StationInformationDirectory: Sendable {
     /// first/last surface silently fell back to the "official page available" placeholder.
     /// Anything else is already canonical.
     private static func canonicalStationID(_ value: String) -> String {
-        let prefix = "network-"
-        guard value.hasPrefix(prefix),
-              let citySeparator = value.dropFirst(prefix.count).firstIndex(of: "-") else {
-            return value
-        }
-        return String(value[value.index(after: citySeparator)...])
+        MetroStationIdentifier.canonical(value)
     }
 
     /// Whether a city has any station-information source, matching how `sources.json` declares it.

@@ -8,6 +8,10 @@ struct MetroRouteContext {
     let networks: [MetroNetwork]
     let originStations: [MetroStationCandidate]
     let destinationStations: [MetroStationCandidate]
+    /// How far apart the two ends are in a straight line. The search compares its own walking
+    /// against this: a ride whose access walks already cost more than going straight there has
+    /// not helped, whatever it did in between.
+    let directDistance: Double
 }
 
 struct MetroRoutingGraph {

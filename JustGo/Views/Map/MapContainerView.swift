@@ -653,6 +653,17 @@ struct MapContainerView: View {
                 )
             }
         }
+        // A named trip, planned through the real planner and landed on its detail page. The
+        // station-derived seeding below cannot reach a specific route, and this environment has no
+        // way to type two endpoints into a form.
+        if let trip = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_ROUTE"] {
+            let parts = trip.split(separator: ",").compactMap { Double($0) }
+            if parts.count >= 4 {
+                didCenterOnUser = true
+                Task { await seedDebugTrip(parts) }
+                return
+            }
+        }
         guard let screen = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] else { return }
         switch screen {
         case "search":
@@ -684,6 +695,20 @@ struct MapContainerView: View {
         default:
             path = [.results, .detail(first.id)]
         }
+    }
+
+    private func seedDebugTrip(_ parts: [Double]) async {
+        let plannerViewModel = planner
+        plannerViewModel.selectPlace(
+            TransitPlace(name: "A", coordinate: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]), source: .localStationData),
+            for: .origin
+        )
+        plannerViewModel.selectPlace(
+            TransitPlace(name: "B", coordinate: CLLocationCoordinate2D(latitude: parts[2], longitude: parts[3]), source: .localStationData),
+            for: .destination
+        )
+        guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
+        path = [.results, .detail(first.id)]
     }
 
     private func debugPlace(for station: Station) -> TransitPlace {

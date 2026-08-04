@@ -261,6 +261,22 @@ struct TransitMapView: UIViewRepresentable {
                     }
                 guard coordinates.count >= 2 else { continue }
                 let isWalking = segment.type == .walking
+                // A casing under every ride, because a line's colour is data and some of it is
+                // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
+                // importer's fallback gives them #8E8E93 — the same grey the basemap draws roads
+                // with, which made a real leg of a real route look like nothing was drawn at all.
+                // Widening and darkening what sits underneath fixes it for every line at once,
+                // rather than inventing a colour for the ones that don't state theirs.
+                if !isWalking {
+                    addPolyline(
+                        coordinates,
+                        colorHex: "#0B0B0F",
+                        lineWidth: 10,
+                        alpha: 0.55,
+                        simplify: true,
+                        collection: &routeOverlays
+                    )
+                }
                 addPolyline(
                     coordinates,
                     colorHex: routeColorHex(for: segment),
@@ -296,12 +312,13 @@ struct TransitMapView: UIViewRepresentable {
             colorHex: String,
             lineWidth: CGFloat,
             dashPattern: [NSNumber]? = nil,
+            alpha: CGFloat = 1,
             simplify: Bool,
             collection: inout [MKOverlay]
         ) {
             let displayCoordinates = simplify ? simplifiedCoordinates(coordinates) : coordinates
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
-            overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex))
+            overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex)).withAlphaComponent(alpha)
             overlayWidths[ObjectIdentifier(polyline)] = lineWidth
             overlayDashes[ObjectIdentifier(polyline)] = dashPattern
             collection.append(polyline)

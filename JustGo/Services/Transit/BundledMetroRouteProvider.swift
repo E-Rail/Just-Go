@@ -108,7 +108,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         return MetroRouteContext(
             networks: networks,
             originStations: originStations,
-            destinationStations: destinationStations
+            destinationStations: destinationStations,
+            directDistance: origin.distance(to: destination)
         )
     }
 
@@ -314,7 +315,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             // route's job (see RoutePlanningService), and accepting it here would let the graph
             // answer "walk between these two stations" as though it were a journey.
             let hasRidden = item.state.lineID != nil && item.state.lineID != metroInterchangeLineID
-            if hasRidden, let destination = destinationsByID[item.state.stationID] {
+            if hasRidden, let destination = destinationsByID[item.state.stationID],
+               !movesAwayFromDestination(destination, in: context) {
                 let total = item.cost + walkingCost(destination.distance, preference: preference)
                 if total < (best?.cost ?? .infinity),
                    !revisitsAStation(endingAt: item.state, previous: previous) {
@@ -357,6 +359,26 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             return nil
         }
         return MetroPath(origin: originCandidate, destination: best.destination, edges: edges)
+    }
+
+    /// Whether alighting here leaves the rider no better off than never boarding.
+    ///
+    /// `revisitsAStation` catches a ride that returns to a station it has already called at. It
+    /// cannot catch this: asking for a route from 岗顶 to 岗顶 produced a ride one stop down Line 3
+    /// to 石牌桥 followed by an 827 m walk back, and that path calls at each of its two stations
+    /// exactly once. The graph must return *some* ride — a destination is only accepted after at
+    /// least one — so with nowhere useful to go it went somewhere useless.
+    ///
+    /// The test is in metres, not in stations: the walking this trip still requires, plus the
+    /// walking it already required to reach a platform, against simply walking the whole way. When
+    /// the ride cannot beat that it is not a shortcut, and rejecting it here lets the search settle
+    /// on a genuine alternative instead of collapsing the query.
+    private func movesAwayFromDestination(
+        _ destination: MetroStationCandidate,
+        in context: MetroRouteContext
+    ) -> Bool {
+        let nearestOriginWalk = context.originStations.first?.distance ?? 0
+        return nearestOriginWalk + destination.distance >= context.directDistance
     }
 
     /// Whether the path ending here already called at one of its own stations.

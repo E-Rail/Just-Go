@@ -692,7 +692,7 @@ struct LiveGoView: View {
     private func stepSummary(_ step: TripStep) -> some View {
         VStack(spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: icon(for: step.kind))
+                Image(systemName: icon(for: step))
                     .font(.title)
                     .foregroundStyle(color(for: step))
                     .frame(width: 40)
@@ -883,7 +883,7 @@ struct LiveGoView: View {
 
     private func announcementBanner(_ step: TripStep) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: icon(for: step.kind))
+            Image(systemName: icon(for: step))
             Text(step.title)
                 .fontWeight(.semibold)
                 .lineLimit(2)
@@ -916,9 +916,11 @@ struct LiveGoView: View {
         .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }
 
-    private func icon(for kind: LiveStepKind) -> String {
-        switch kind {
-        case .walkToStation, .walkToDestination: return "figure.walk"
+    /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving,
+    /// so the kind alone cannot tell a 9 km drive from a walk and drew a walking figure over both.
+    private func icon(for step: TripStep) -> String {
+        switch step.kind {
+        case .walkToStation, .walkToDestination: return step.accessMode.symbolName
         case .ride: return "tram.fill"
         case .transfer: return "arrow.triangle.2.circlepath"
         case .arrive: return "flag.checkered"

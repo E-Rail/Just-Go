@@ -777,6 +777,24 @@ enum SegmentType: String, Codable {
     var isOnFoot: Bool {
         self == .walking
     }
+
+    /// The symbol for this leg, in one place.
+    ///
+    /// There were two copies of this and they disagreed: the journey chain drew `figure.walk` for
+    /// everything that was not a ride, so a 9 km drive and a 6 km cycle both showed a walking
+    /// figure. A leg's icon is the only thing distinguishing the three access modes at a glance —
+    /// getting it wrong there undoes the whole point of choosing between them.
+    ///
+    /// `.subway` is drawn as a `LineBadge` wherever a line is known; this is its fallback.
+    var symbolName: String {
+        switch self {
+        case .walking: return "figure.walk"
+        case .cycling: return "bicycle"
+        case .driving: return "car.fill"
+        case .transfer: return "arrow.triangle.swap"
+        case .subway: return "tram.fill"
+        }
+    }
 }
 
 /// How a rider covers the first or last mile, chosen by how far it is.
@@ -789,6 +807,15 @@ enum AccessLegMode {
     case walking
     case cycling
     case driving
+
+    /// The icon for this mode, from the same table the segments use — one place, always.
+    var symbolName: String {
+        switch self {
+        case .walking: return SegmentType.walking.symbolName
+        case .cycling: return SegmentType.cycling.symbolName
+        case .driving: return SegmentType.driving.symbolName
+        }
+    }
 
     /// Beyond a walk, a bike; beyond a bike, a car.
     ///

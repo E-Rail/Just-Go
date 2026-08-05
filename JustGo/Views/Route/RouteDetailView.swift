@@ -981,22 +981,11 @@ struct RouteDetailView: View {
                 size: Self.markerSize
             )
         case .transfer, .walking, .cycling, .driving:
-            Image(systemName: Self.legSymbol(for: segment.type))
+            Image(systemName: segment.type.symbolName)
                 .font(.system(size: Self.markerSize * 0.45, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: Self.markerSize, height: Self.markerSize)
                 .background(journeyColor(segment), in: Circle())
-        }
-    }
-
-    /// One icon rule for the leg markers. `figure.walk` for a walk, and SF Symbols that exist on
-    /// iOS 18 for the other two — checked against the running OS rather than assumed.
-    static func legSymbol(for type: SegmentType) -> String {
-        switch type {
-        case .transfer: return "arrow.triangle.swap"
-        case .cycling: return "bicycle"
-        case .driving: return "car.fill"
-        case .walking, .subway: return "figure.walk"
         }
     }
 

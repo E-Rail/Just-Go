@@ -98,6 +98,11 @@ private extension StringProtocol {
 /// A whole journey compressed to one line of badges — walk, line, line, walk — so two routes can be
 /// told apart at a glance by their shape rather than by reading three lines of grey text each.
 ///
+/// Each access leg carries its own icon and its own minutes, because those are the two things that
+/// separate otherwise identical-looking routes: "🚶 21" and "🚲 7" describe very different trips
+/// and used to render as the same grey walking square. A ride's badge stays the line number — its
+/// duration is implied by the stops, and a number beside a line number reads as a second line.
+///
 /// Transfer legs are left out on purpose: two adjacent line badges already say a transfer happens,
 /// and drawing it a third time crowded the chain past the width of a phone.
 struct JourneyBadgeChain: View {
@@ -115,15 +120,31 @@ struct JourneyBadgeChain: View {
                 if segment.type == .subway {
                     LineBadge(name: segment.lineName ?? "", colorHex: segment.lineColorHex, size: size)
                 } else {
-                    Image(systemName: "figure.walk")
-                        .font(.system(size: size * 0.52, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: size, height: size)
-                        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: size * 0.3, style: .continuous))
+                    accessBadge(segment)
                 }
             }
         }
         .accessibilityHidden(true)
+    }
+
+    private func accessBadge(_ segment: RouteSegment) -> some View {
+        HStack(spacing: size * 0.14) {
+            Image(systemName: segment.type.symbolName)
+                .font(.system(size: size * 0.52, weight: .semibold))
+            Text("\(Self.minutes(segment.duration))")
+                .font(.system(size: size * 0.46, weight: .semibold))
+                .monospacedDigit()
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, size * 0.26)
+        .frame(height: size)
+        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: size * 0.3, style: .continuous))
+    }
+
+    /// Rounded, and never zero: a 40-second walk is still a leg of the trip, and a badge reading
+    /// "0" says the app could not work it out rather than "this is quick".
+    private static func minutes(_ duration: TimeInterval) -> Int {
+        max(1, Int((duration / 60).rounded()))
     }
 
     private var shown: [RouteSegment] { segments.filter { $0.type != .transfer } }

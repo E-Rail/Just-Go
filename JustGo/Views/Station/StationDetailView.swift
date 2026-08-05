@@ -122,7 +122,6 @@ struct StationDetailView: View {
                         stationEssentialsSection
                     }
                     stationMapSection
-                    riderPhotosSection
                     beforeYouGoSection
                 }
             }

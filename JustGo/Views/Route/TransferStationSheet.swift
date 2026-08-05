@@ -40,7 +40,6 @@ struct TransferStationSheet: View {
                 rideSection
                 stationMapSection
                 stationExitsSection
-                riderPhotosSection
                 accessibilitySection
                 lookAroundSection
             }
@@ -142,23 +141,6 @@ struct TransferStationSheet: View {
 
     /// The in-station walkthrough riders (especially less sign-savvy ones) ask for: which
     /// exits/entrances exist, the transfer corridor, and boarding car/door hints — each
-    /// shown when the pack has it, and honestly marked pending when it doesn't.
-    /// The same photo grid the station screen shows, on the screen where the gap is worst.
-    ///
-    /// Interchange corridors are exactly what no open dataset covers, and the rider reading this
-    /// is standing in one. Deliberately the shared component rather than a copy: the two screens
-    /// drifted once already and shipped blank rows.
-    @ViewBuilder
-    private var riderPhotosSection: some View {
-        if let station = enrichedStation,
-           let key = PersonalStationMediaKey(cityID: station.cityID, stationID: station.stationID) {
-            PersonalStationMediaSection(
-                stationKey: key,
-                stationName: stationName
-            ) { _ in }
-        }
-    }
-
     /// The station's exits. What used to sit here was a "Transfer Guide" — a heading, a
     /// confidence chip that read `unknown` on every route in the app, a sentence apologising for
     /// having no exit data, and rows for corridor and platform hints. Not one of the 58 bundled

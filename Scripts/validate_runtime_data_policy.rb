@@ -39,16 +39,17 @@ end
 %w[NSLocationWhenInUseUsageDescription].each do |key|
   errors << "JustGo-Info.plist is missing #{key}" unless info_plist.include?("<key>#{key}</key>")
 end
-# The camera used to be banned outright: it was only ever reached through the indoor checkpoint
-# scanner, and once that was removed a purpose string would have promised App Review a capability
-# no user could exercise. That premise changed when riders gained the ability to photograph a
-# station. The rule keeps its intent — never declare a capability nothing uses — but now checks it
-# in the positive direction, so the string and the code that reaches the camera must appear
-# together or not at all.
-camera_capture_path = "JustGo/Views/Station/PersonalStationMediaSection.swift"
+# Never declare a capability nothing uses: the purpose string and the code that reaches the camera
+# must appear together or not at all. Twice now a feature that reached the camera has been removed
+# while its Info.plist string stayed behind, which promises App Review something no user can
+# exercise — first the indoor checkpoint scanner, then the rider photo grid (removed before the
+# first TestFlight, since nothing was ever uploaded and the permission bought the rider nothing).
+# Checked across the whole source tree rather than one named file, so the rule survives the next
+# feature that owns it.
 declares_camera = info_plist.include?("NSCameraUsageDescription")
-reaches_camera = File.file?(File.join(ROOT, camera_capture_path)) &&
-                 read.call(camera_capture_path).include?("sourceType = .camera")
+reaches_camera = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift")).any? do |path|
+  File.read(path, encoding: "UTF-8").include?("sourceType = .camera")
+end
 if declares_camera && !reaches_camera
   errors << "JustGo must not declare camera access it never uses"
 end

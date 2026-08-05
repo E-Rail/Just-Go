@@ -15,19 +15,23 @@ people's data comes after the one that proves the shape without them.
 
 ## What already exists
 
-More than I expected. The client half of photos is largely modelled:
+**Update, 2026-08-05:** the photo half was **removed** before the first TestFlight build. It stored
+photos on the device and uploaded nothing, so the `NSCameraUsageDescription` it required promised
+App Review — and the rider — a capability neither got anything from. Deleting it was the honest
+call for a first build; the design below is unchanged, and the code is one `git revert` away.
+
+Removed: `PersonalStationMedia.swift` (identity, the `transferCorridor` / `exitSign` / `platform` /
+`stationMap` subject taxonomy, and the `local → queued → submitted → published / rejected` share
+lifecycle), `PersonalStationMediaService.swift`, `PersonalStationMediaSection.swift`, and their
+test suite. Worth reading back out of git when Stage 2 starts rather than redesigning: the subject
+taxonomy and the share states were the considered parts.
+
+What survives and still matters:
 
 | Piece | Where | State |
 |---|---|---|
-| Photo identity | `PersonalStationMediaKey` (cityID + canonical station ID, validated, length-capped) | done |
-| "What does this answer" | `PersonalStationMediaSubject`: `transferCorridor`, `exitSign`, `platform`, `stationMap` | done |
-| Share lifecycle | `PersonalStationMediaShareState`: `local` → `queued` → `submitted` → `published` / `rejected` | schema done, only `.local` ever written |
-| Capture + storage | `PersonalStationMediaSection.swift`, image picker, on-device index | done |
-| Trust labels | `DataConfidence.communityVerified` and `.personal`, with labels and colours | done, unused |
+| Trust labels | `DataConfidence.communityVerified` and `.personal`, with labels and colours | present, unused |
 | Trip history | `TripMemoryService.tripRecords`, `recordPlannedTrip`, `markTripComplete` | done, wired |
-
-The share states were written forward-compatibly on purpose — the file's own comment says turning
-upload on should be a migration of *state*, not of schema. That holds up.
 
 What does **not** exist: any server, any upload, any moderation, any aggregation. All four
 `CityPack*URL` Info.plist keys are empty, so there is not even a static host today.
@@ -49,8 +53,10 @@ are drawn from the trip's own unknowns, so they are never generic:
 - The destination exit was chosen by straight-line distance → *"Did Exit C come out on the right
   side?"* (`yes` / `no, I'd use another`)
 
-Stored on the device, keyed by `PersonalStationMediaKey`'s identity scheme. Two things use them
-immediately, both entirely local:
+Stored on the device, keyed by city ID plus canonical station ID — the scheme the removed
+`PersonalStationMediaKey` used, which is worth lifting back out of git rather than reinventing: it
+rejected the provider fallback IDs, and a key built from one of those files data under an identity
+that changes between launches. Two things use the answers immediately, both entirely local:
 
 1. **The rider's own future trips.** A transfer they reported as slow is costed higher for them.
    `DataConfidence.personal` already exists to label it.
@@ -67,9 +73,13 @@ don't matter.
 
 ## Stage 2 — photos, still local, with the subject question
 
-Already 70% built. What's missing is that the four subjects exist but the capture flow doesn't
-insist on one, and a photo whose subject is unknown is the "unlabelled corridor snapshot" the model
-comment warns about.
+Was built once and removed (see above); rebuild it from that commit rather than from scratch. The
+one thing it got wrong: the four subjects existed but the capture flow did not insist on one, and a
+photo whose subject is unknown is the "unlabelled corridor snapshot" the model comment warns about.
+
+Note that this stage is what re-introduces `NSCameraUsageDescription`. It should not land until the
+photos are worth the permission — `validate_runtime_data_policy.rb` enforces the pairing in both
+directions, so the string cannot come back on its own.
 
 Ship: subject required at capture, photos surfaced on the station page, `.personal` confidence
 label, and an explicit "on this device only" statement. Still no server.

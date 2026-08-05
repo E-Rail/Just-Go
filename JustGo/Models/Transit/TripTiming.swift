@@ -62,6 +62,19 @@ enum RouteServiceStatus: Equatable {
         case .running, .unknown: return nil
         }
     }
+
+    /// How bad this is for the rider, so a trip made of several rides can report its worst leg.
+    /// `running` and `unknown` share the floor deliberately — neither is a problem to report, and
+    /// which of the two a whole trip deserves is a question about certainty, not severity, decided
+    /// by the caller.
+    var severity: Int {
+        switch self {
+        case .running, .unknown: return 0
+        case .lastTrainSoon: return 1
+        case .notYetStarted: return 2
+        case .serviceEndedToday: return 3
+        }
+    }
 }
 
 extension RouteServiceStatus: Codable {

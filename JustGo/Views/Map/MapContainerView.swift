@@ -88,6 +88,16 @@ struct MapContainerView: View {
             guard let pending else { return }
             beginPlan(to: pending)
         }
+        // The planner's `basePreference` had no writer, so everything set in Accessibility
+        // Settings — step-free requirement, lift preference, avoid-stairs, and the walking-distance
+        // limit the long-walk warning is measured against — stopped at the settings screen and
+        // never reached a plan. Seeded here on appear, and re-seeded on change so a preference
+        // switched mid-session drops results planned under the old one.
+        .task(id: appState.accessibilityPreference) {
+            if planner.syncAccessibilityPreference(appState.accessibilityPreference) {
+                path.removeAll()
+            }
+        }
     }
 
     /// Opens the map where the rider left it. Nothing is loaded from this — the viewport decides

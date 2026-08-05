@@ -216,6 +216,122 @@ final class RoutePlanningService {
         )
     }
 
+    /// Whether the subway is running for this trip — resolved for **every** ride it makes, at the
+    /// moment each one departs, rather than only for the first.
+    ///
+    /// Two holes met here. `serviceWindows` reads the city pack and no pack carries a timetable:
+    /// operator schedule content must not be committed, so `schedules` is empty for all 2,849
+    /// bundled stations and this resolved to `.unknown` for every route in every city while the
+    /// machinery below it — the banner, the confidence reason, the feasibility level — looked
+    /// finished. The operator's own page does publish first and last train, and
+    /// `officialStationSnapshots` has already fetched it; reading it here redistributes nothing
+    /// that the accessibility upgrade above does not already read the same way, on the rider's
+    /// device and cached device-only.
+    ///
+    /// And only the boarding leg was ever checked. The train a rider actually misses is rarely the
+    /// first one — it is the connection, which departs later in the evening and stops earlier. A
+    /// definite failure on any leg beats "fine" on the others; a leg nobody can answer for keeps
+    /// the whole trip `.unknown` rather than letting a verified leg speak for it.
+    private func serviceStatus(
+        for route: Route,
+        cityID: String,
+        snapshots: [String: OfficialStationInformationSnapshot],
+        tripAnchor: TripTimeAnchor
+    ) async -> (status: RouteServiceStatus, warning: RouteWarning?) {
+        let departure = TripTimeContext(
+            anchor: tripAnchor,
+            totalDuration: route.totalDuration
+        ).departureDate
+
+        var elapsed: TimeInterval = 0
+        var worst: (status: RouteServiceStatus, segment: RouteSegment)?
+        var sawUnknown = false
+        var sawAnswer = false
+
+        for segment in route.segments {
+            defer { elapsed += segment.duration }
+            guard segment.type.isTransit, let stationName = segment.fromStationName else { continue }
+
+            // The operator first: it is the authority on its own timetable and the only source that
+            // answers at all today. The pack remains the fallback so a city that later ships
+            // redistributable times keeps working with no change here.
+            let official = Self.serviceWindows(from: snapshots[stationName])
+            let windows = official.isEmpty
+                ? await officialStationData.serviceWindows(
+                    cityID: segment.packCityID ?? cityID,
+                    stationName: stationName
+                )
+                : official
+
+            let status = serviceHoursResolver.status(
+                boardingLineName: segment.lineName,
+                windows: windows,
+                at: departure.addingTimeInterval(elapsed)
+            )
+            if status == .unknown {
+                sawUnknown = true
+                continue
+            }
+            sawAnswer = true
+            if status.severity > (worst?.status.severity ?? 0) {
+                worst = (status, segment)
+            }
+        }
+
+        guard let worst else {
+            // Nothing to report: either every leg is inside its service hours, or nobody could
+            // answer for one of them and saying "running" would be borrowing another leg's answer.
+            return (sawAnswer && !sawUnknown ? .running : .unknown, nil)
+        }
+
+        // Name the leg. On a one-ride trip the station adds nothing the rider does not already
+        // know; on a trip with a change it is the whole point — the ride that fails is usually not
+        // the one they are standing at the entrance of.
+        let banner = worst.status.bannerText
+        let message: String? = {
+            guard let banner else { return nil }
+            guard route.transferCount > 0, let station = worst.segment.fromStationName else { return banner }
+            return AppLocalization.text(
+                english: "\(station): \(banner)",
+                simplified: "\(station)：\(banner)",
+                traditional: "\(station)：\(banner)"
+            )
+        }()
+
+        return (
+            worst.status,
+            worst.status.warningType.flatMap { type in
+                message.map {
+                    RouteWarning(
+                        type: type,
+                        message: $0,
+                        affectedStationID: worst.segment.fromStationID
+                    )
+                }
+            }
+        )
+    }
+
+    /// The operator's published first/last train, in the shape the resolver reads. Rows with
+    /// neither time are dropped rather than passed through as blanks — the resolver treats an
+    /// empty pool as "no answer", which is what a row with no times actually is.
+    private static func serviceWindows(
+        from snapshot: OfficialStationInformationSnapshot?
+    ) -> [StationServiceWindow] {
+        guard let snapshot else { return [] }
+        return snapshot.lines.flatMap { line in
+            line.services.compactMap { service in
+                guard service.firstTrain != nil || service.lastTrain != nil else { return nil }
+                return StationServiceWindow(
+                    lineName: line.lineName,
+                    direction: service.direction,
+                    firstTime: service.firstTrain,
+                    lastTime: service.lastTrain
+                )
+            }
+        }
+    }
+
     /// A lift, by the words the operators actually use. Escalators are deliberately absent: an
     /// escalator is not step-free access, and counting one as though it were is the difference
     /// between a wheelchair user reaching the platform and being stranded at the concourse.
@@ -410,18 +526,15 @@ final class RoutePlanningService {
             ))
         }
 
-        if let boarding = route.boardingTransitSegment, let boardingName = boarding.fromStationName {
-            let windows = await officialStationData.serviceWindows(cityID: routeCityID, stationName: boardingName)
-            let boardingMoment = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).departureDate
-            let status = serviceHoursResolver.status(
-                boardingLineName: boarding.lineName,
-                windows: windows,
-                at: boardingMoment
-            )
-            route.serviceStatus = status
-            if let warningType = status.warningType, let banner = status.bannerText {
-                route.warnings.append(RouteWarning(type: warningType, message: banner, affectedStationID: nil))
-            }
+        let service = await serviceStatus(
+            for: route,
+            cityID: routeCityID,
+            snapshots: officialSnapshots,
+            tripAnchor: tripAnchor
+        )
+        route.serviceStatus = service.status
+        if let warning = service.warning {
+            route.warnings.append(warning)
         }
 
         // Being in the routable network does not make a station one a rider can use. The reviewed

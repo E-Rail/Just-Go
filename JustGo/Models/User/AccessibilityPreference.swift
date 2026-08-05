@@ -1,6 +1,8 @@
 import Foundation
 
-struct AccessibilityPreference: Codable {
+/// `Equatable` so a view can key work on "the rider changed a preference" — `MapContainerView`
+/// re-seeds the planner from this, which is the only path by which these settings reach a plan.
+struct AccessibilityPreference: Codable, Equatable {
     var primaryCategory: DisabilityCategory
 
     // Mobility

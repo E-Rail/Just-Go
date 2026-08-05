@@ -167,7 +167,8 @@ struct MetroMinHeap {
 /// map sliced OSM ways per edge while the browse map drew the raw way, so the same corridor could
 /// be continuous on one screen and broken on the other.
 enum MetroTrackGeometry {
-    /// The track between two adjacent stations — **always** at least the two stations themselves.
+    /// The track between two adjacent stations — the line's own geometry, clipped to this hop, and
+    /// **never** empty.
     ///
     /// Returning nothing was the old answer whenever the way could not be sliced sensibly, and it
     /// left a hole rather than a straight line: a leg's polyline is the concatenation of its edges,
@@ -176,9 +177,10 @@ enum MetroTrackGeometry {
     /// leg as a whole still had 44 points, so no "this segment has no shape" fallback could fire.
     /// A straight chord says "these two are connected, the shape is unknown"; a gap says nothing.
     ///
-    /// The result also starts at `from` and ends at `to` exactly, never at their projections onto
-    /// the way. Projected ends left consecutive legs 583 m apart at 东莞西 — a transfer drawn as
-    /// two lines that miss each other.
+    /// The ends are the stations' **projections onto the track**, not the stations themselves —
+    /// this is where the train runs, and a station node can sit a few hundred metres off it. What
+    /// closes that gap is a grey connector drawn by `TransitMapView`, not a detour bolted onto the
+    /// coloured line; see `addStationConnectors`.
     static func edge(
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
@@ -276,34 +278,6 @@ enum MetroTrackGeometry {
         }
         guard joined.count >= 2 else { return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) } }
         return joined.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
-    }
-
-    /// Where a line's track actually passes a station — the point a ride along `line` starts or
-    /// ends at, which is not the station's own coordinate whenever the node sits off the rail.
-    ///
-    /// Exists so a change between two lines can be drawn as the link it is. Both rides stop at
-    /// their own line's track, and those two points can be a few hundred metres apart at a station
-    /// like 顺义; without something spanning them the route reads as two disconnected pieces.
-    /// Returns nil when the line has no usable geometry, which is the caller's cue to draw nothing
-    /// rather than invent a link.
-    static func trackPoint(
-        near coordinate: CLLocationCoordinate2D,
-        on line: MetroLine
-    ) -> CLLocationCoordinate2D? {
-        var best: PathProjection?
-        for path in line.paths where path.count >= 2 {
-            let points = path.map(\.coordinate)
-            var cumulative: [Double] = [0]
-            for index in 1..<points.count {
-                cumulative.append(cumulative[index - 1] + points[index - 1].distance(to: points[index]))
-            }
-            guard let candidate = projection(of: coordinate, onto: points, cumulative: cumulative) else { continue }
-            if best == nil || candidate.distance < best!.distance { best = candidate }
-        }
-        // Far enough away and it is not this station's track at all — a parallel line, or a branch
-        // the service does not use. Nothing is drawn rather than a link to somewhere else's rail.
-        guard let best, best.distance <= 1_000 else { return nil }
-        return best.point
     }
 
     /// A station's closest point ON a path's polyline (not its closest vertex): the point,

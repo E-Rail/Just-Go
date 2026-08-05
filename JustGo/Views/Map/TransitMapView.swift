@@ -316,10 +316,16 @@ struct TransitMapView: UIViewRepresentable {
                 // route, and it earns its own colour below rather than a grey the basemap owns.
                 let dashPattern: [NSNumber]?
                 switch segment.type {
-                case .walking: dashPattern = [0.1, 11]
+                case .walking: dashPattern = Self.selfPoweredDashPattern
+                // A change is grey either way, but an out-of-station one keeps its longer dash:
+                // that mark means "you leave through the gates" on the browse map too, and the
+                // whole point of it is that both maps say it the same way.
+                case .transfer:
+                    dashPattern = Self.dashPattern(forInterchange: segment.interchangeKind)
+                        ?? Self.selfPoweredDashPattern
                 case .cycling: dashPattern = [7, 6]
                 case .driving: dashPattern = nil
-                case .subway, .transfer: dashPattern = Self.dashPattern(forInterchange: segment.interchangeKind)
+                case .subway: dashPattern = nil
                 }
                 // A casing under every ride, because a line's colour is data and some of it is
                 // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
@@ -346,13 +352,58 @@ struct TransitMapView: UIViewRepresentable {
                     simplify: true,
                     collection: &routeOverlays
                 )
+                addStationConnectors(for: segment, drawn: coordinates)
             }
         }
+
+        /// Joins a ride's drawn track back to the stations it calls at — in grey dots, never in
+        /// the line's colour.
+        ///
+        /// A station node can sit a few hundred metres from the rail that serves it (顺义 is 272 m
+        /// from 15号线's track and 366 m from 市郊铁路通密线's; 339 of 8,108 station-on-line pairs
+        /// across the bundled networks are more than 60 m off). The ride itself draws the track and
+        /// only the track, because that is where the train goes — bending the coloured line out to
+        /// the platform and back drew a right-angled spike per station, which is what made a trip
+        /// through 顺义 look like a rectangle bolted to the route.
+        ///
+        /// But leaving the gap open read as a broken route. So the gap is drawn as what it
+        /// actually is: the bit the rider covers themselves, getting between the entrance and the
+        /// platform. Same grey, same round dots as a walk, because it is the same kind of thing —
+        /// colour on this map means "the train runs here", and this is not track.
+        private func addStationConnectors(for segment: RouteSegment, drawn: [CLLocationCoordinate2D]) {
+            guard segment.type.isTransit,
+                  let first = segment.stationStops.first?.coordinate,
+                  let last = segment.stationStops.last?.coordinate,
+                  let trackStart = drawn.first,
+                  let trackEnd = drawn.last else { return }
+            let boarding = CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
+            let alighting = CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
+            for (station, track) in [(boarding, trackStart), (alighting, trackEnd)] {
+                // Below this the two are the same place at any zoom the rider can reach, and a
+                // two-point overlay per station per leg is not free.
+                guard station.distance(to: track) >= 15 else { continue }
+                addPolyline(
+                    [station, track],
+                    colorHex: Self.selfPoweredColorHex,
+                    lineWidth: 7,
+                    dashPattern: Self.selfPoweredDashPattern,
+                    simplify: false,
+                    collection: &routeOverlays
+                )
+            }
+        }
+
+        /// Grey round dots: every part of a trip the rider covers under their own power — the walk
+        /// at each end, the change between platforms, and the hop between a station and the track
+        /// that serves it. One colour and one pattern for all of them, so the map has exactly two
+        /// vocabularies: coloured means a train carries you, grey means you move yourself.
+        static let selfPoweredColorHex = "#8E8E93"
+        static let selfPoweredDashPattern: [NSNumber] = [0.1, 11]
 
         private func routeColorHex(for segment: RouteSegment) -> String {
             switch segment.type {
             case .walking:
-                return "#8E8E93"
+                return Self.selfPoweredColorHex
             case .cycling:
                 return "#34C759"
             // Not grey. A drive is drawn solid, and solid grey at this width is indistinguishable
@@ -361,8 +412,12 @@ struct TransitMapView: UIViewRepresentable {
                 return "#5856D6"
             case .subway:
                 return segment.lineColorHex ?? "#007AFF"
+            // Grey, not the orange it used to be. A change is the rider walking between two
+            // platforms — the same thing as the walk at either end of the trip and the hop from a
+            // platform to its track, so it gets the same mark. Orange read as a third mode of
+            // travel on a map whose colours otherwise mean "which line".
             case .transfer:
-                return "#FF9500"
+                return Self.selfPoweredColorHex
             }
         }
 

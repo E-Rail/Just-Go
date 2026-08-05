@@ -128,20 +128,6 @@ extension BundledMetroRouteProvider {
                 let incomingContext = previousLine.map {
                     transitLegContext(group: previousGroup, line: $0, graph: graph)
                 }
-                // The change, drawn: from where the incoming line's track passes this station to
-                // where the outgoing line's does. Rides now stop at their own track rather than
-                // spiking out to the station node, so at a station whose node sits off the rail
-                // those two points differ — 顺义's two lines pass 272 m and 366 m from it — and
-                // without this the route would read as two disconnected pieces. Both ends come
-                // from the same projection the ride geometry used, so it joins exactly.
-                // Empty when either line has no usable geometry, or when the two tracks meet at
-                // the same spot and there is nothing to span.
-                let link = [previousLine, line].compactMap { candidate in
-                    candidate.flatMap { MetroTrackGeometry.trackPoint(near: from.coordinate, on: $0) }
-                }
-                let linkCoordinates = link.count == 2 && link[0].distance(to: link[1]) >= 5
-                    ? link.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
-                    : []
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .transfer,
@@ -155,7 +141,12 @@ extension BundledMetroRouteProvider {
                     distance: 0,
                     stops: 0,
                     stationStops: [],
-                    polylineCoordinates: linkCoordinates,
+                    // An in-station change draws nothing of its own. The map already joins the two
+                    // rides through this station: each ride's track is tied back to the station
+                    // node by a grey connector, so the path reads platform -> concourse -> platform
+                    // — which is the way a rider actually makes the change. A direct line between
+                    // the two tracks would cut a corner nobody walks.
+                    polylineCoordinates: [],
                     walkingDirections: nil,
                     accessibilityNotes: [],
                     transferContext: incomingContext.map {

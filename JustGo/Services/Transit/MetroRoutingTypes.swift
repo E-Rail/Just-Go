@@ -253,16 +253,57 @@ enum MetroTrackGeometry {
         guard slice.count >= 2, arcLength(slice) <= max(2.5 * separation, separation + 1_500) else {
             return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
         }
-        // The stations themselves, then the track between them. Prepended rather than substituted
-        // so a station that genuinely sits off its way keeps both facts — where the platform is and
-        // where the track runs — instead of the shape being bent to reach it.
-        var joined = [from]
-        for point in slice where joined[joined.count - 1].distance(to: point) >= 5 {
+        // The track and nothing else — the line's own geometry, clipped to this hop.
+        //
+        // This used to prepend `from` and append `to`, so that a station sitting off its way kept
+        // "both facts". Drawn, that is a spike from the platform out to the rail and back, and at
+        // a station far enough off it reads as a rectangle bolted to the route: 顺义 sits 272 m
+        // from 15号线's track and 366 m from 市郊铁路通密线's, and both lines drew the detour, at
+        // right angles, over each other. 339 of 8,108 station-on-line pairs are more than 60 m off
+        // their own track, so this is not one bad node.
+        //
+        // The train does not go to the station building; it goes along the track. Drawing the
+        // track is the true statement, and it makes the ride identical to what the browse map
+        // draws for the same stretch, which is the point — two maps, one geometry.
+        //
+        // Joints still land: consecutive hops on one leg share a station projected onto the *same*
+        // path, so they meet exactly. Where two legs meet at a change, the transfer segment now
+        // carries the platform-to-platform link that covers the offset (see `interchangeSegment`
+        // and the in-station transfer in `transitSegments`).
+        var joined: [CLLocationCoordinate2D] = []
+        for point in slice where (joined.last.map { $0.distance(to: point) >= 1 } ?? true) {
             joined.append(point)
         }
-        if joined[joined.count - 1].distance(to: to) >= 5 { joined.append(to) }
         guard joined.count >= 2 else { return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) } }
         return joined.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+
+    /// Where a line's track actually passes a station — the point a ride along `line` starts or
+    /// ends at, which is not the station's own coordinate whenever the node sits off the rail.
+    ///
+    /// Exists so a change between two lines can be drawn as the link it is. Both rides stop at
+    /// their own line's track, and those two points can be a few hundred metres apart at a station
+    /// like 顺义; without something spanning them the route reads as two disconnected pieces.
+    /// Returns nil when the line has no usable geometry, which is the caller's cue to draw nothing
+    /// rather than invent a link.
+    static func trackPoint(
+        near coordinate: CLLocationCoordinate2D,
+        on line: MetroLine
+    ) -> CLLocationCoordinate2D? {
+        var best: PathProjection?
+        for path in line.paths where path.count >= 2 {
+            let points = path.map(\.coordinate)
+            var cumulative: [Double] = [0]
+            for index in 1..<points.count {
+                cumulative.append(cumulative[index - 1] + points[index - 1].distance(to: points[index]))
+            }
+            guard let candidate = projection(of: coordinate, onto: points, cumulative: cumulative) else { continue }
+            if best == nil || candidate.distance < best!.distance { best = candidate }
+        }
+        // Far enough away and it is not this station's track at all — a parallel line, or a branch
+        // the service does not use. Nothing is drawn rather than a link to somewhere else's rail.
+        guard let best, best.distance <= 1_000 else { return nil }
+        return best.point
     }
 
     /// A station's closest point ON a path's polyline (not its closest vertex): the point,

@@ -21,7 +21,11 @@ struct LaunchStageView: View {
     var body: some View {
         VStack(spacing: 22) {
             Text(wordmark)
-                .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 52 : 44, design: .serif))
+                // San Francisco, at the weight the system uses for a large title. The wordmark was
+                // set in New York (`design: .serif`), which is also an Apple face but reads as a
+                // reading typeface — the first thing the app shows should look like the platform
+                // it is part of, and every other screen is already SF.
+                .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 52 : 44, weight: .semibold))
                 .foregroundStyle(themeColor)
                 .accessibilityHidden(true)
 

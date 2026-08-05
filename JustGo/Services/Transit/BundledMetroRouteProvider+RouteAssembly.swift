@@ -8,21 +8,36 @@ extension BundledMetroRouteProvider {
         graph: MetroRoutingGraph,
         origin: TransitPlace,
         destination: TransitPlace,
-        preference: MetroSearchPreference
+        preference: MetroSearchPreference,
+        accessibilityFilter: AccessibilityFilter
     ) async -> Route {
         let originStation = path.origin.station
         let destinationStation = path.destination.station
-        async let originWalk = walkingSegment(
+        // How the rider covers each end is decided by how far that end is, once, here — and the
+        // straight line is what decides it rather than the routed distance, because the mode has
+        // to be chosen before there is a route to measure.
+        let limit = accessibilityFilter.maxWalkingDistance
+        let originMode = AccessLegMode.forDistance(
+            origin.routeCoordinate.distance(to: originStation.coordinate),
+            walkingLimit: limit
+        )
+        let destinationMode = AccessLegMode.forDistance(
+            destinationStation.coordinate.distance(to: destination.routeCoordinate),
+            walkingLimit: limit
+        )
+        async let originWalk = accessSegment(
             from: origin.routeCoordinate,
             to: originStation.coordinate,
             fromName: origin.name,
-            toName: originStation.name
+            toName: originStation.name,
+            mode: originMode
         )
-        async let destinationWalk = walkingSegment(
+        async let destinationWalk = accessSegment(
             from: destinationStation.coordinate,
             to: destination.routeCoordinate,
             fromName: destinationStation.name,
-            toName: destination.name
+            toName: destination.name,
+            mode: destinationMode
         )
 
         var segments: [RouteSegment] = []
@@ -63,8 +78,11 @@ extension BundledMetroRouteProvider {
             stepFreeAssessment: hasStairs ? .barrierDetected : .unknown,
             warnings: warnings,
             accessGuidance: [
-                accessGuide(kind: .origin, place: origin, station: originStation, walk: segments.first?.type == .walking ? segments.first : nil),
-                accessGuide(kind: .destination, place: destination, station: destinationStation, walk: segments.last?.type == .walking ? segments.last : nil)
+                // `isAccessLeg`, not `== .walking`: a first mile long enough to be cycled or
+                // driven is exactly the one where naming the right door matters most, and testing
+                // for walking alone silently dropped the guide on those routes.
+                accessGuide(kind: .origin, place: origin, station: originStation, walk: segments.first?.type.isAccessLeg == true ? segments.first : nil),
+                accessGuide(kind: .destination, place: destination, station: destinationStation, walk: segments.last?.type.isAccessLeg == true ? segments.last : nil)
             ],
             dataCoverage: .unknown
         )
@@ -284,6 +302,22 @@ extension BundledMetroRouteProvider {
         toName: String
     ) async -> RouteSegment? {
         await walkingRoutes.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+    }
+
+    func accessSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String,
+        mode: AccessLegMode
+    ) async -> RouteSegment? {
+        await walkingRoutes.accessSegment(
+            from: from,
+            to: to,
+            fromName: fromName,
+            toName: toName,
+            mode: mode
+        )
     }
 
     private func accessGuide(kind: RouteAccessKind, place: TransitPlace, station: MetroStation, walk: RouteSegment?) -> RouteAccessGuide {

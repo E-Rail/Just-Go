@@ -835,7 +835,7 @@ struct RouteDetailView: View {
     private static let markerInset: CGFloat = 13
 
     private func legRow(_ segment: RouteSegment, index: Int) -> some View {
-        let isWalk = segment.type == .walking
+        let isWalk = segment.type.isAccessLeg
         let isExpanded = expandedLegs.contains(segment.id)
         return HStack(alignment: .top, spacing: 0) {
             ZStack(alignment: .top) {
@@ -980,8 +980,8 @@ struct RouteDetailView: View {
                 colorHex: segment.lineColorHex,
                 size: Self.markerSize
             )
-        case .transfer, .walking:
-            Image(systemName: segment.type == .transfer ? "arrow.triangle.swap" : "figure.walk")
+        case .transfer, .walking, .cycling, .driving:
+            Image(systemName: Self.legSymbol(for: segment.type))
                 .font(.system(size: Self.markerSize * 0.45, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: Self.markerSize, height: Self.markerSize)
@@ -989,11 +989,24 @@ struct RouteDetailView: View {
         }
     }
 
+    /// One icon rule for the leg markers. `figure.walk` for a walk, and SF Symbols that exist on
+    /// iOS 18 for the other two — checked against the running OS rather than assumed.
+    static func legSymbol(for type: SegmentType) -> String {
+        switch type {
+        case .transfer: return "arrow.triangle.swap"
+        case .cycling: return "bicycle"
+        case .driving: return "car.fill"
+        case .walking, .subway: return "figure.walk"
+        }
+    }
+
     private func journeyColor(_ segment: RouteSegment?) -> Color {
         switch segment?.type {
         case .subway: return Color(hex: segment?.lineColorHex ?? "#007AFF")
         case .transfer: return .orange
-        case .walking, nil: return .gray
+        // The first and last mile share one colour on purpose: they are the same kind of thing to
+        // a rider reading the strip, and the icon already says which of the three it is.
+        case .walking, .cycling, .driving, nil: return .gray
         }
     }
 
@@ -1003,15 +1016,30 @@ struct RouteDetailView: View {
             return segment.lineName ?? AppLocalization.localized("Transit")
         case .transfer:
             return AppLocalization.text(english: "Transfer", simplified: "换乘", traditional: "換乘")
-        case .walking:
-            // The door is the point of a walking leg, and the walk is now actually measured to it
+        case .walking, .cycling, .driving:
+            // The door is the point of an access leg, and the leg is now actually measured to it
             // — so name it here rather than in a separate card the rider has to go looking for.
             guard let exit = exitName(for: index) else { return segment.summaryLabel }
-            return AppLocalization.text(
-                english: index == 0 ? "Walk to \(exit)" : "Walk from \(exit)",
-                simplified: index == 0 ? "步行至 \(exit)" : "从 \(exit) 步行",
-                traditional: index == 0 ? "步行至 \(exit)" : "從 \(exit) 步行"
-            )
+            switch segment.type {
+            case .cycling:
+                return AppLocalization.text(
+                    english: index == 0 ? "Cycle to \(exit)" : "Cycle from \(exit)",
+                    simplified: index == 0 ? "骑行至 \(exit)" : "从 \(exit) 骑行",
+                    traditional: index == 0 ? "騎行至 \(exit)" : "從 \(exit) 騎行"
+                )
+            case .driving:
+                return AppLocalization.text(
+                    english: index == 0 ? "Drive to \(exit)" : "Drive from \(exit)",
+                    simplified: index == 0 ? "驾车至 \(exit)" : "从 \(exit) 驾车",
+                    traditional: index == 0 ? "駕車至 \(exit)" : "從 \(exit) 駕車"
+                )
+            default:
+                return AppLocalization.text(
+                    english: index == 0 ? "Walk to \(exit)" : "Walk from \(exit)",
+                    simplified: index == 0 ? "步行至 \(exit)" : "从 \(exit) 步行",
+                    traditional: index == 0 ? "步行至 \(exit)" : "從 \(exit) 步行"
+                )
+            }
         }
     }
 
@@ -1022,7 +1050,7 @@ struct RouteDetailView: View {
             return "\(from) → \(to) · \(AppLocalization.stops(segment.stops))"
         case .transfer:
             return segment.fromStationName
-        case .walking:
+        case .walking, .cycling, .driving:
             return AppLocalization.distance(segment.distance)
         }
     }

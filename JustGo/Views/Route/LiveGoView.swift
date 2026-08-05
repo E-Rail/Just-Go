@@ -445,7 +445,7 @@ struct LiveGoView: View {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
             }
             guard coordinates.count >= 2 else { return nil }
-            let isWalking = segment.type == .walking
+            let isWalking = segment.type.isAccessLeg
             return RouteOverlay(
                 id: index,
                 coordinates: coordinates,

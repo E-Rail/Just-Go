@@ -229,6 +229,18 @@ extension RouteSegment {
                 english: "Walk \(AppLocalization.distance(distance))",
                 chinese: "步行 \(AppLocalization.distance(distance))"
             )
+        case .cycling:
+            return AppLocalization.text(
+                english: "Cycle \(AppLocalization.distance(distance))",
+                simplified: "骑行 \(AppLocalization.distance(distance))",
+                traditional: "騎行 \(AppLocalization.distance(distance))"
+            )
+        case .driving:
+            return AppLocalization.text(
+                english: "Drive \(AppLocalization.distance(distance))",
+                simplified: "驾车 \(AppLocalization.distance(distance))",
+                traditional: "駕車 \(AppLocalization.distance(distance))"
+            )
         case .subway:
             return "\(lineName ?? AppLocalization.localized("Transit")) • \(AppLocalization.stops(stops))"
         case .transfer:

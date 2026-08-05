@@ -20,17 +20,26 @@ private actor WalkingLegMemo {
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
         fromName: String,
-        toName: String
+        toName: String,
+        mode: AccessLegMode
     ) async -> RouteSegment? {
         // ~1 m precision: finer than the coordinates differ by, coarser than float noise.
+        // The mode is part of the key: the same two points cycled and driven are different legs.
         let key = String(
-            format: "%.5f,%.5f>%.5f,%.5f",
-            from.latitude, from.longitude, to.latitude, to.longitude
+            format: "%.5f,%.5f>%.5f,%.5f|%@",
+            from.latitude, from.longitude, to.latitude, to.longitude,
+            String(describing: mode)
         )
         if let existing = inFlight[key] { return await existing.value }
         let provider = provider
         let task = Task {
-            await provider.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+            await provider.accessSegment(
+                from: from,
+                to: to,
+                fromName: fromName,
+                toName: toName,
+                mode: mode
+            )
         }
         inFlight[key] = task
         return await task.value
@@ -559,8 +568,11 @@ final class RoutePlanningService {
         // Choose each end's door ONCE, by measured walking distance, and let every surface read
         // that one answer. When the timeline picked its own exit and the guide card picked another,
         // the same trip named two different doors on two screens.
-        let originIndex = route.segments.first?.type == .walking ? 0 : nil
-        let destinationIndex = route.segments.count > 1 && route.segments.last?.type == .walking
+        // Any access leg, not just a walked one — the door-measuring below is what turns a
+        // straight-line exit guess into a measured one, and a cycled or driven first mile needs it
+        // just as much.
+        let originIndex = route.segments.first?.type.isAccessLeg == true ? 0 : nil
+        let destinationIndex = route.segments.count > 1 && route.segments.last?.type.isAccessLeg == true
             ? route.segments.count - 1
             : nil
         // Read what the two lookups need before starting them: an `async let` body may not capture
@@ -670,6 +682,7 @@ final class RoutePlanningService {
         // Nothing to replace, or no station centre to judge against: keep the straight-line pick and
         // spend no calls on a difference that cannot be established.
         guard let existing, let centre = stationPositions[guide.stationName] else { return fallback }
+        let mode = existing.accessLegMode
 
         let measurable = ranked.points.filter { point in
             guard let coordinate = point.coordinate else { return false }
@@ -693,7 +706,11 @@ final class RoutePlanningService {
                         from: isArrival ? doorCoordinate : riderCoordinate,
                         to: isArrival ? riderCoordinate : doorCoordinate,
                         fromName: fromName,
-                        toName: toName
+                        toName: toName,
+                        // The assembler already decided how this end is covered. Re-measuring it
+                        // against a specific door must not silently turn a 6 km drive back into
+                        // a walk — the door moves, the mode does not.
+                        mode: mode
                     )
                     return (point, leg)
                 }

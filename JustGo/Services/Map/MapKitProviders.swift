@@ -117,6 +117,16 @@ protocol WalkingRouteProviding {
         fromName: String,
         toName: String
     ) async -> RouteSegment?
+
+    /// The same leg by whichever mode its length calls for. Walking is unchanged; the other two
+    /// are described on the implementation, which is where their honesty caveats belong.
+    func accessSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String,
+        mode: AccessLegMode
+    ) async -> RouteSegment?
 }
 
 final class MapKitWalkingRouteProvider: WalkingRouteProviding {
@@ -186,6 +196,120 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             accessibilityNotes: mapRoute == nil ? [AppLocalization.localized("Walking distance is estimated")] : []
         )
     }
+
+    func accessSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String,
+        mode: AccessLegMode
+    ) async -> RouteSegment? {
+        switch mode {
+        case .walking:
+            return await walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        case .cycling:
+            return await cyclingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        case .driving:
+            return await drivingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        }
+    }
+
+    /// A bike ride along the **walking** route, re-timed.
+    ///
+    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any` — there is
+    /// no cycling type, and `.transit` refuses to calculate at all (measured: `MKErrorDomain` 5).
+    /// So there is no cycling routing available to this app, and the honest thing to do with that
+    /// is say it rather than draw a line that pretends otherwise: the shape is the pedestrian
+    /// route, and the leg says so.
+    ///
+    /// The failure this guards against is a walking route that no bike can follow. Apple's own
+    /// steps name stairs, and a step-mentioning leg keeps the pedestrian duration and carries the
+    /// warning instead of quietly promising a 14 km/h average over a staircase.
+    private func cyclingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        guard let walk = await walkingSegment(from: from, to: to, fromName: fromName, toName: toName) else {
+            return nil
+        }
+        let steps = walk.walkingDirections ?? []
+        let hasStairs = steps.contains(where: \.hasStairs)
+        var notes = walk.accessibilityNotes
+        notes.append(AppLocalization.text(
+            english: "Follows the walking route — no cycling directions are published",
+            simplified: "沿步行路线绘制 — 没有可用的骑行导航数据",
+            traditional: "沿步行路線繪製 — 沒有可用的騎行導航資料"
+        ))
+        if hasStairs {
+            notes.append(AppLocalization.text(
+                english: "This route includes stairs — you may have to walk the bike",
+                simplified: "此路线含台阶 — 可能需要推行",
+                traditional: "此路線含階梯 — 可能需要推行"
+            ))
+        }
+        // 14 km/h: a shared bike in city traffic, and slow enough that a rider who beats it is
+        // early rather than late. Not applied where stairs were named — see above.
+        let duration = hasStairs ? walk.duration : walk.distance / Self.cyclingMetresPerSecond
+        return walk.retyped(as: .cycling, duration: duration, accessibilityNotes: notes)
+    }
+
+    /// A real driving route from MapKit — `.automobile` is a transport type `MKDirections` will
+    /// actually calculate, unlike `.transit`, so unlike the bike this one is measured rather than
+    /// derived. Falls back to the walking leg when MapKit declines, because a leg that exists is
+    /// worth more than a mode that is missing.
+    private func drivingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to))
+        request.transportType = .automobile
+        let mapRoute: MKRoute?
+        do {
+            mapRoute = try await withMapKitTimeout {
+                try await MKDirections(request: request).calculate().routes.first
+            }
+        } catch {
+            AppLog.routing.info("Driving directions unavailable, falling back to the walking leg: \(error)")
+            mapRoute = nil
+        }
+        guard let mapRoute else {
+            return await walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        }
+        return RouteSegment(
+            id: UUID(),
+            type: .driving,
+            lineName: nil,
+            lineColorHex: nil,
+            fromStationName: fromName,
+            toStationName: toName,
+            fromStationID: nil,
+            toStationID: nil,
+            duration: mapRoute.expectedTravelTime,
+            distance: mapRoute.distance,
+            stops: 0,
+            stationStops: [],
+            polylineCoordinates: mapRoute.polyline.routeCoordinates.map {
+                CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude)
+            },
+            // Deliberately nil rather than the driving steps: `walkingDirections` is what the
+            // stairs and step-free checks read, and a car's turn list has nothing to say to them.
+            walkingDirections: nil,
+            accessibilityNotes: [AppLocalization.text(
+                english: "Driving time excludes parking",
+                simplified: "驾车时间不含停车",
+                traditional: "駕車時間不含停車"
+            )]
+        )
+    }
+
+    /// 14 km/h. A guess, and labelled as one wherever the leg is shown.
+    private static let cyclingMetresPerSecond: Double = 14_000.0 / 3_600.0
 }
 
 @MainActor

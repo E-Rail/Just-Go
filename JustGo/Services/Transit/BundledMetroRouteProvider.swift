@@ -75,7 +75,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                         graph: graph,
                         origin: origin,
                         destination: destination,
-                        preference: entry.preference
+                        preference: entry.preference,
+                        accessibilityFilter: accessibilityFilter
                     )
                     return (entry.order, route)
                 }

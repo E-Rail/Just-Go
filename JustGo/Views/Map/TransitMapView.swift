@@ -307,13 +307,20 @@ struct TransitMapView: UIViewRepresentable {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                 }
                 guard coordinates.count >= 2 else { continue }
-                let isWalking = segment.type == .walking
+                let isAccessLeg = segment.type.isAccessLeg
                 // Round dots, the convention every map app uses for a leg on foot, and the thing
                 // that makes a walk legible at all: solid grey at this width is the same mark the
-                // basemap draws roads with, so a walking-only route read as no route.
-                let dashPattern = isWalking
-                    ? [0.1, 11] as [NSNumber]
-                    : Self.dashPattern(forInterchange: segment.interchangeKind)
+                // basemap draws roads with, so a walking-only route read as no route. A bike leg
+                // gets a longer dash — near enough to read as the same family of "you cover this
+                // yourself", far enough apart to tell at a glance. A drive is solid: it is a road
+                // route, and it earns its own colour below rather than a grey the basemap owns.
+                let dashPattern: [NSNumber]?
+                switch segment.type {
+                case .walking: dashPattern = [0.1, 11]
+                case .cycling: dashPattern = [7, 6]
+                case .driving: dashPattern = nil
+                case .subway, .transfer: dashPattern = Self.dashPattern(forInterchange: segment.interchangeKind)
+                }
                 // A casing under every ride, because a line's colour is data and some of it is
                 // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
                 // importer's fallback gives them #8E8E93 — the same grey the basemap draws roads
@@ -334,7 +341,7 @@ struct TransitMapView: UIViewRepresentable {
                 addPolyline(
                     coordinates,
                     colorHex: routeColorHex(for: segment),
-                    lineWidth: isWalking ? 7 : 6,
+                    lineWidth: isAccessLeg ? 7 : 6,
                     dashPattern: dashPattern,
                     simplify: true,
                     collection: &routeOverlays
@@ -346,6 +353,12 @@ struct TransitMapView: UIViewRepresentable {
             switch segment.type {
             case .walking:
                 return "#8E8E93"
+            case .cycling:
+                return "#34C759"
+            // Not grey. A drive is drawn solid, and solid grey at this width is indistinguishable
+            // from the roads underneath it — the same trap the walking dots exist to avoid.
+            case .driving:
+                return "#5856D6"
             case .subway:
                 return segment.lineColorHex ?? "#007AFF"
             case .transfer:

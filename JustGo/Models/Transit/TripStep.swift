@@ -37,6 +37,12 @@ struct TripStep: Identifiable, Equatable {
     /// `.arrive` step) — lets the live map frame the step's real geometry.
     var segmentIndex: Int? = nil
     var transferContext: TransferContext? = nil
+    /// How the rider covers this access leg. The step *kind* stays `.walkToStation` /
+    /// `.walkToDestination` because everything structural about the step is the same — it is the
+    /// first or last mile, it has a drawn path, it frames the same way. Only the verb changes,
+    /// and telling someone to "walk" a 9 km drive is exactly the kind of confident wrong sentence
+    /// this app exists not to produce.
+    var accessMode: AccessLegMode = .walking
 
     var transferCLCoordinate: CLLocationCoordinate2D? {
         transferCoordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
@@ -54,11 +60,26 @@ struct TripStep: Identifiable, Equatable {
             let target = exitHint
                 ?? toStationName
                 ?? AppLocalization.text(english: "the station", simplified: "车站", traditional: "車站")
-            return AppLocalization.text(
-                english: "Walk to \(target)",
-                simplified: "步行至\(target)",
-                traditional: "步行至\(target)"
-            )
+            switch accessMode {
+            case .walking:
+                return AppLocalization.text(
+                    english: "Walk to \(target)",
+                    simplified: "步行至\(target)",
+                    traditional: "步行至\(target)"
+                )
+            case .cycling:
+                return AppLocalization.text(
+                    english: "Cycle to \(target)",
+                    simplified: "骑行至\(target)",
+                    traditional: "騎行至\(target)"
+                )
+            case .driving:
+                return AppLocalization.text(
+                    english: "Drive to \(target)",
+                    simplified: "驾车至\(target)",
+                    traditional: "駕車至\(target)"
+                )
+            }
         case .ride:
             let line = lineName ?? AppLocalization.text(english: "the train", simplified: "列车", traditional: "列車")
             return AppLocalization.text(english: "Board \(line)", simplified: "乘坐\(line)", traditional: "乘坐\(line)")
@@ -67,7 +88,14 @@ struct TripStep: Identifiable, Equatable {
             return AppLocalization.text(english: "Transfer to \(line)", simplified: "换乘\(line)", traditional: "換乘\(line)")
         case .walkToDestination:
             let place = toStationName ?? AppLocalization.text(english: "your destination", simplified: "目的地", traditional: "目的地")
-            return AppLocalization.text(english: "Walk to \(place)", simplified: "步行至\(place)", traditional: "步行至\(place)")
+            switch accessMode {
+            case .walking:
+                return AppLocalization.text(english: "Walk to \(place)", simplified: "步行至\(place)", traditional: "步行至\(place)")
+            case .cycling:
+                return AppLocalization.text(english: "Cycle to \(place)", simplified: "骑行至\(place)", traditional: "騎行至\(place)")
+            case .driving:
+                return AppLocalization.text(english: "Drive to \(place)", simplified: "驾车至\(place)", traditional: "駕車至\(place)")
+            }
         case .arrive:
             return AppLocalization.text(english: "You have arrived", simplified: "您已到达", traditional: "您已抵達")
         }

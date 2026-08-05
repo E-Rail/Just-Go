@@ -85,7 +85,8 @@ final class RoutePlannerViewModel {
         AccessibilityFilter(
             requiresWheelchairAccess: requiresWheelchairAccess,
             requiresElevator: requiresElevator,
-            avoidStairs: avoidStairs
+            avoidStairs: avoidStairs,
+            maxWalkingDistance: basePreference.maxWalkingDistance
         )
     }
 

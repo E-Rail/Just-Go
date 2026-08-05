@@ -91,7 +91,7 @@ struct LiveGoTripBuilder {
         var steps: [TripStep] = []
         for (index, segment) in route.segments.enumerated() {
             switch segment.type {
-            case .walking:
+            case .walking, .cycling, .driving:
                 let isOrigin = index == 0
                 // The same door the plan routed to, so the screen the rider actually follows on
                 // foot names the entrance the detail screen promised instead of just the station.
@@ -108,7 +108,8 @@ struct LiveGoTripBuilder {
                     duration: segment.duration,
                     exitHint: guide?.accessPoint?.namedDoor,
                     walkingPathCoordinates: segment.polylineCoordinates,
-                    segmentIndex: index
+                    segmentIndex: index,
+                    accessMode: segment.accessLegMode
                 ))
             case .transfer:
                 // The transfer segment's own stationStops is always empty by construction —

@@ -5,6 +5,10 @@ struct AccessibilityFilter {
     var requiresWheelchairAccess: Bool
     var requiresElevator: Bool
     var avoidStairs: Bool
+    /// How far the rider is willing to walk to reach a station, from Accessibility Settings.
+    /// Carried on the filter because the route assembler needs it and only ever receives this —
+    /// it is what decides whether the first mile is walked, cycled or driven.
+    var maxWalkingDistance: Double = 500
 
     static let none = AccessibilityFilter(
         requiresWheelchairAccess: false,
@@ -302,6 +306,49 @@ struct RouteSegment: Identifiable, Codable {
     /// where a route went. An in-station change has no shape and correctly draws nothing.
     var drawableCoordinates: [CodableCoordinate] {
         polylineCoordinates.count >= 2 ? polylineCoordinates : stationStops.compactMap(\.coordinate)
+    }
+
+    /// Which access mode this leg is, for callers that must rebuild it without changing it.
+    /// A transit or transfer leg is not an access leg at all; walking is the honest default for
+    /// them because it is what a rebuilt leg between two points on foot would be.
+    var accessLegMode: AccessLegMode {
+        switch type {
+        case .cycling: return .cycling
+        case .driving: return .driving
+        case .walking, .subway, .transfer: return .walking
+        }
+    }
+
+    /// The same leg, re-labelled for a different mode. Used only where a mode borrows another's
+    /// geometry — cycling has no routing source of its own, so it rides the walking shape and
+    /// keeps the walking steps, which is exactly what lets the stairs check still see them.
+    func retyped(
+        as type: SegmentType,
+        duration: TimeInterval,
+        accessibilityNotes: [String]
+    ) -> RouteSegment {
+        RouteSegment(
+            id: id,
+            type: type,
+            lineName: lineName,
+            lineColorHex: lineColorHex,
+            fromStationName: fromStationName,
+            toStationName: toStationName,
+            fromStationID: fromStationID,
+            toStationID: toStationID,
+            duration: duration,
+            distance: distance,
+            stops: stops,
+            stationStops: stationStops,
+            polylineCoordinates: polylineCoordinates,
+            walkingDirections: walkingDirections,
+            accessibilityNotes: accessibilityNotes,
+            transitContext: transitContext,
+            transferContext: transferContext,
+            incomingLineName: incomingLineName,
+            incomingLineColorHex: incomingLineColorHex,
+            interchangeKind: interchangeKind
+        )
     }
 }
 
@@ -715,12 +762,59 @@ enum TransitPlaceSource: String, Codable {
 
 enum SegmentType: String, Codable {
     case walking
+    case cycling
+    case driving
     case subway
     case transfer
 
     /// True for the segments a rider actually rides, as opposed to walking to/between them.
     var isTransit: Bool {
         self == .subway
+    }
+
+    /// The first and last mile — how the rider gets between their own doorstep and a station.
+    /// A transfer is between two stations, so it is not one of these.
+    var isAccessLeg: Bool {
+        self == .walking || self == .cycling || self == .driving
+    }
+
+    /// Only walking counts as walking. A route summary that folded a 6 km drive into
+    /// "walking distance" would be lying in the one number riders check hardest.
+    var isOnFoot: Bool {
+        self == .walking
+    }
+}
+
+/// How a rider covers the first or last mile, chosen by how far it is.
+///
+/// One rule in one place, because the choice has to be identical wherever a leg is built or
+/// rebuilt — the route assembler makes these legs and the exit chooser remakes them against a
+/// specific door, and two copies of a distance ladder would disagree about which mode a leg is
+/// the moment either was edited.
+enum AccessLegMode {
+    case walking
+    case cycling
+    case driving
+
+    /// Beyond a walk, a bike; beyond a bike, a car.
+    ///
+    /// The lower bound is the rider's own limit from Accessibility Settings rather than a constant
+    /// — someone who has said they will not walk more than 300 m has already answered this
+    /// question, and asking them to walk 900 m to a station ignores the only thing they told us.
+    /// The upper bound is fixed at 8 km: past that a bike stops being plausible as a leg of a
+    /// metro trip, whatever the rider's walking limit is.
+    static func forDistance(_ metres: Double, walkingLimit: Double) -> AccessLegMode {
+        if metres <= max(walkingLimit, 0) { return .walking }
+        if metres <= 8_000 { return .cycling }
+        return .driving
+    }
+
+    var segmentType: SegmentType {
+        switch self {
+        case .walking: return .walking
+        case .cycling: return .cycling
+        case .driving: return .driving
+        }
     }
 }
 

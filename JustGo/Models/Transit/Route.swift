@@ -282,11 +282,6 @@ struct RouteSegment: Identifiable, Codable {
     /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
     var incomingLineName: String? = nil
     var incomingLineColorHex: String? = nil
-    /// Set only on the `.transfer` leg that walks between two stations riders treat as one
-    /// interchange. Carried so the trip map can draw that walk with the same mark the browse map
-    /// gives the same link — a dashed line means "out to the street" on both, or it means nothing.
-    /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
-    var interchangeKind: MetroInterchange.Kind? = nil
 
     var formattedDuration: String {
         let minutes = Int(duration / 60)
@@ -346,8 +341,7 @@ struct RouteSegment: Identifiable, Codable {
             transitContext: transitContext,
             transferContext: transferContext,
             incomingLineName: incomingLineName,
-            incomingLineColorHex: incomingLineColorHex,
-            interchangeKind: interchangeKind
+            incomingLineColorHex: incomingLineColorHex
         )
     }
 }
@@ -809,13 +803,6 @@ enum AccessLegMode {
         return .driving
     }
 
-    var segmentType: SegmentType {
-        switch self {
-        case .walking: return .walking
-        case .cycling: return .cycling
-        case .driving: return .driving
-        }
-    }
 }
 
 struct WalkingStep: Codable {

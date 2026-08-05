@@ -286,20 +286,21 @@ struct TransitMapView: UIViewRepresentable {
                     [from, to],
                     colorHex: "#8E8E93",
                     lineWidth: 5,
-                    dashPattern: Self.dashPattern(forInterchange: link.kind),
+                    dashPattern: Self.transferDashPattern,
                     simplify: false,
                     collection: &interchangeOverlays
                 )
             }
         }
 
-        /// The mark that means "this walk leaves the paid area", defined once. The browse map draws
-        /// an out-of-station link between two stations dashed; the same link inside a planned trip
-        /// has to read the same way, or the dash means one thing on one screen and nothing on the
-        /// next.
-        static func dashPattern(forInterchange kind: MetroInterchange.Kind?) -> [NSNumber]? {
-            kind == .outOfStation ? [2, 6] : nil
-        }
+        /// A dash means "you change here", everywhere, on both maps.
+        ///
+        /// This used to be dashed only for a change that leaves the paid area and solid for one
+        /// inside the station. Two marks for one idea is a legend the rider has to learn, and the
+        /// difference between them is already stated in words on the leg — "leave the station and
+        /// walk to X" versus "connected inside the station" — where it cannot be misread. One mark
+        /// for every change, and the words carry the distinction.
+        static let transferDashPattern: [NSNumber] = [2, 6]
 
         private func addRoute(_ route: Route) {
             for segment in route.segments {
@@ -317,12 +318,7 @@ struct TransitMapView: UIViewRepresentable {
                 let dashPattern: [NSNumber]?
                 switch segment.type {
                 case .walking: dashPattern = Self.selfPoweredDashPattern
-                // A change is grey either way, but an out-of-station one keeps its longer dash:
-                // that mark means "you leave through the gates" on the browse map too, and the
-                // whole point of it is that both maps say it the same way.
-                case .transfer:
-                    dashPattern = Self.dashPattern(forInterchange: segment.interchangeKind)
-                        ?? Self.selfPoweredDashPattern
+                case .transfer: dashPattern = Self.transferDashPattern
                 case .cycling: dashPattern = [7, 6]
                 case .driving: dashPattern = nil
                 case .subway: dashPattern = nil
@@ -386,7 +382,10 @@ struct TransitMapView: UIViewRepresentable {
                     [station, track],
                     colorHex: Self.selfPoweredColorHex,
                     lineWidth: 7,
-                    dashPattern: Self.selfPoweredDashPattern,
+                    // Dashed, like every other change: this stub is the rider getting between the
+                    // station and the platform the train actually stops at, which is part of the
+                    // same movement, not a street walk.
+                    dashPattern: Self.transferDashPattern,
                     simplify: false,
                     collection: &routeOverlays
                 )

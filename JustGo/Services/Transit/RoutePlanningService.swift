@@ -774,7 +774,7 @@ final class RoutePlanningService {
 
         // `longWalk` was judged against the centroid walk in the assembler; a door can be several
         // hundred metres from a station's centre, so the verdict can genuinely flip either way.
-        let walkingDistance = updatedSegments.filter { $0.type == .walking }.reduce(0) { $0 + $1.distance }
+        let walkingDistance = updatedSegments.filter { $0.type.isOnFoot }.reduce(0) { $0 + $1.distance }
         route.walkingDistance = walkingDistance
         route.warnings.removeAll { $0.type == .longWalk }
         if walkingDistance >= 800 {

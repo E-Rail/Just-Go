@@ -48,7 +48,7 @@ extension BundledMetroRouteProvider {
         ))
         if let walk = await destinationWalk { segments.append(walk) }
 
-        let walkingDistance = segments.filter { $0.type == .walking }.reduce(0) { $0 + $1.distance }
+        let walkingDistance = segments.filter { $0.type.isOnFoot }.reduce(0) { $0 + $1.distance }
         var warnings: [RouteWarning] = []
         if walkingDistance >= 800 {
             warnings.append(RouteWarning(type: .longWalk, message: AppLocalization.localized("Long walking segment"), affectedStationID: nil))
@@ -253,8 +253,7 @@ extension BundledMetroRouteProvider {
             stationStops: [],
             polylineCoordinates: graph.edgeGeometries[edge.key] ?? [],
             walkingDirections: nil,
-            accessibilityNotes: notes,
-            interchangeKind: link.kind
+            accessibilityNotes: notes
         )
     }
 

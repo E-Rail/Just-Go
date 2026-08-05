@@ -71,7 +71,6 @@
 "Station accessibility data is missing" = "缺少车站无障碍数据";
 "Station accessibility data is verified" = "车站无障碍数据已验证";
 "Some facilities are not verified" = "部分设施未验证";
-"station entrance" = "车站入口";
 "Step-by-Step Guidance" = "分步指引";
 "Tactile Path" = "盲道";
 "Terms of Service" = "服务条款";
@@ -165,13 +164,10 @@
 "Apple Maps walking directions mention an elevator." = "Apple 地图步行指引提到电梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地图步行指引提到扶梯。";
 "Apple Maps walking directions mention stairs." = "Apple 地图步行指引提到楼梯。";
-"Checking station details..." = "正在检查车站详情…";
 "Complete Trip" = "完成行程";
 "First" = "首班";
 "My Trips" = "我的行程";
 "No Quick Tags yet" = "暂无快捷标签";
-"No saved trips yet" = "暂无已保存行程";
-"No stations match these filters" = "没有车站符合这些筛选条件";
 "No trip history yet" = "暂无行程历史";
 "Official accessibility data is not available for this station yet." = "本站暂未提供官方无障碍数据。";
 "Official city data" = "官方城市数据";
@@ -179,9 +175,7 @@
 "Pending" = "待确认";
 "Personal" = "个人";
 "Quick Tags" = "快捷标签";
-"Try clearing filters or loading official city data." = "请尝试清除筛选条件，或加载官方城市数据。";
 "Save" = "保存";
-"Saved Trips" = "已保存行程";
 "Saved locally on this device." = "已保存在本设备。";
 "Specific entrance or exit is unavailable" = "暂无具体出入口信息";
 "Stairs detected" = "检测到楼梯";

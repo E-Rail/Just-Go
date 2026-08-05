@@ -372,11 +372,6 @@ struct RouteResultsView: View {
         return AppLocalization.text(english: "Balanced", simplified: "均衡", traditional: "均衡")
     }
 
-    private var selectedRoute: Route? {
-        guard let selectedRouteID else { return viewModel.routes.first }
-        return viewModel.routes.first { $0.id == selectedRouteID } ?? viewModel.routes.first
-    }
-
     private var routeSelectionSignature: String {
         viewModel.routes.map(\.id.uuidString).joined(separator: "|")
     }

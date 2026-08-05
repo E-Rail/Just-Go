@@ -1,19 +1,5 @@
 import SwiftUI
 
-extension RouteDetailView {
-    /// Maps an access-point source to a confidence label for the access guidance card.
-    /// Returns nil for the generic placeholder so the chip is hidden when no specific exit exists.
-    func accessConfidence(for guide: RouteAccessGuide) -> DataConfidence? {
-        guard let source = guide.accessPoint?.source else { return nil }
-        switch source {
-        case .specificEntrance, .localStationData: return .official
-        case .inferred, .mapKit: return .estimated
-        case .stationPOI, .routeBoundary: return nil
-        }
-    }
-
-}
-
 extension RouteFeasibilityLevel {
     var color: Color {
         switch self {

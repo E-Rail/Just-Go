@@ -76,14 +76,6 @@ struct Route: Identifiable, Codable {
         accessGuidance.first { $0.kind == .destination }
     }
 
-    var boardingGuidance: RouteStationGuidance? {
-        stationGuidance.first { $0.role == .boarding }
-    }
-
-    var arrivalGuidance: RouteStationGuidance? {
-        stationGuidance.first { $0.role == .arrival }
-    }
-
     var previewRegion: MapVisibleRegion? {
         let coordinates = segments.flatMap(\.drawableCoordinates)
 
@@ -338,30 +330,6 @@ struct RouteAccessGuide: Identifiable, Codable {
         }
     }
 
-    var primaryInstruction: String {
-        let accessName = accessPoint?.name ?? AppLocalization.localized("station entrance")
-        switch kind {
-        case .origin:
-            return AppLocalization.text(
-                english: "Walk from \(placeName) to \(accessName) at \(stationName)",
-                simplified: "从\(placeName)步行至\(stationName) \(accessName)",
-                traditional: "從\(placeName)步行至\(stationName) \(accessName)"
-            )
-        case .destination:
-            return AppLocalization.text(
-                english: "Leave \(stationName) through \(accessName), then walk to \(placeName)",
-                simplified: "从\(stationName) \(accessName)出站后步行至\(placeName)",
-                traditional: "從\(stationName) \(accessName)出站後步行至\(placeName)"
-            )
-        }
-    }
-
-    var formattedWalk: String {
-        guard walkingDuration >= 60 else {
-            return AppLocalization.distance(walkingDistance)
-        }
-        return "\(AppLocalization.distance(walkingDistance)) • \(AppLocalization.minutes(Int(walkingDuration / 60)))"
-    }
 }
 
 enum RouteAccessKind: String, Codable {
@@ -406,7 +374,6 @@ enum RouteAccessPointSource: String, Codable {
     case inferred
     case specificEntrance
     case stationPOI
-    case routeBoundary
 }
 
 struct RouteStationStop: Identifiable, Codable {
@@ -676,15 +643,6 @@ struct StationAccessGuidance {
     /// id. Exits at a large interchange sit several hundred metres and one busy road apart, so the
     /// arbitrary first exit routinely sent people out of the wrong side of the station. Deleted
     /// rather than deprecated — leaving it in place is an invitation to reintroduce the bug.
-    func recommendedAccessPoint(
-        near target: CodableCoordinate?,
-        requiresStepFree: Bool
-    ) -> StationExitRecommendation? {
-        let ranked = rankedAccessPoints(near: target, requiresStepFree: requiresStepFree, limit: 1)
-        guard let point = ranked.points.first else { return nil }
-        return StationExitRecommendation(point: point, stepFreeUnavailable: ranked.stepFreeUnavailable)
-    }
-
     /// The `limit` most promising entrances, nearest-in-a-straight-line first, plus whether the
     /// rider's step-free requirement went unmet.
     ///
@@ -720,14 +678,6 @@ struct StationAccessGuidance {
             .map(\.point)
         return (Array((ordered.isEmpty ? preferred : ordered).prefix(limit)), unavailable)
     }
-}
-
-/// A chosen entrance plus whether it satisfied the rider's step-free requirement.
-struct StationExitRecommendation {
-    let point: StationAccessPoint
-    /// The rider asked for step-free access and no entrance at this station is recorded as
-    /// step-free — the point is still the nearest one, but nothing here claims it is accessible.
-    let stepFreeUnavailable: Bool
 }
 
 struct CodableCoordinate: Codable, Equatable {
@@ -816,11 +766,12 @@ struct RouteWarning: Identifiable, Codable {
         "\(type.rawValue)-\(affectedStationID ?? "route")-\(message)"
     }
 
+    /// Every case here has a producer. `elevatorOutage`, `escalatorOutage`, `serviceDisruption`
+    /// and `crowding` were removed because none did: nothing in the app has ever constructed them,
+    /// and no source exists to. Live outage and crowding feeds are not available to this app, so
+    /// keeping the cases meant carrying a UI branch that could only ever render a claim we had no
+    /// data for. Add a case back when — and only when — something can produce it.
     enum WarningType: String, Codable {
-        case elevatorOutage
-        case escalatorOutage
-        case serviceDisruption
-        case crowding
         case stepFreeAccessUnconfirmed
         case stairsDetected
         case longWalk

@@ -60,9 +60,6 @@ final class RouteFeasibilityService {
             case .lastTrainSoon:
                 level = max(level, .caution)
                 reasons.append(warning.message)
-            case .elevatorOutage, .escalatorOutage, .serviceDisruption, .crowding:
-                level = max(level, .caution)
-                reasons.append(warning.message)
             }
         }
 

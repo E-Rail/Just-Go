@@ -71,7 +71,6 @@
 "Station accessibility data is missing" = "Station accessibility data is missing";
 "Station accessibility data is verified" = "Station accessibility data is verified";
 "Some facilities are not verified" = "Some facilities are not verified";
-"station entrance" = "station entrance";
 "Step-by-Step Guidance" = "Step-by-Step Guidance";
 "Tactile Path" = "Tactile Path";
 "Terms of Service" = "Terms of Service";
@@ -165,13 +164,10 @@
 "Apple Maps walking directions mention an elevator." = "Apple Maps walking directions mention an elevator.";
 "Apple Maps walking directions mention an escalator." = "Apple Maps walking directions mention an escalator.";
 "Apple Maps walking directions mention stairs." = "Apple Maps walking directions mention stairs.";
-"Checking station details..." = "Checking station details...";
 "Complete Trip" = "Complete Trip";
 "First" = "First";
 "My Trips" = "My Trips";
 "No Quick Tags yet" = "No Quick Tags yet";
-"No saved trips yet" = "No saved trips yet";
-"No stations match these filters" = "No stations match these filters";
 "No trip history yet" = "No trip history yet";
 "Official accessibility data is not available for this station yet." = "Official accessibility data is not available for this station yet.";
 "Official city data" = "Official city data";
@@ -179,9 +175,7 @@
 "Pending" = "Pending";
 "Personal" = "Personal";
 "Quick Tags" = "Quick Tags";
-"Try clearing filters or loading official city data." = "Try clearing filters or loading official city data.";
 "Save" = "Save";
-"Saved Trips" = "Saved Trips";
 "Saved locally on this device." = "Saved locally on this device.";
 "Specific entrance or exit is unavailable" = "Specific entrance or exit is unavailable";
 "Stairs detected" = "Stairs detected";

@@ -15,8 +15,17 @@ struct TransitDataView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
 
+    /// Only the cities whose pack actually holds station data — 14 of the 53, not all 53.
+    ///
+    /// Routing is untouched: every city keeps its bundled OSM network and stays searchable and
+    /// plannable. This page is about the *station* layer, and listing a city with an empty pack
+    /// put a download control in front of nothing — there are no remote packs at all, since none
+    /// of the `CityPack*URL` Info.plist keys is set. Advertising 39 packs that cannot arrive is
+    /// the same failure as claiming a transfer nobody surveyed.
     private var cities: [City] {
-        container.cityService.getAllCities()
+        container.cityService.getAllCities().filter { city in
+            (state.coverage[city.id] ?? city.dataCapabilities.coverage).hasStationData
+        }
     }
 
     var body: some View {
@@ -195,9 +204,9 @@ struct TransitDataView: View {
                         ))
                     } footer: {
                         Text(AppLocalization.text(
-                            english: "Deleting a downloaded update restores the included version.",
-                            simplified: "删除下载的更新后会恢复内置版本。",
-                            traditional: "刪除下載的更新後會恢復內置版本。"
+                            english: "Only cities with station data are listed. Every other city still routes from its bundled metro network. Deleting a downloaded update restores the included version.",
+                            simplified: "仅列出拥有车站数据的城市。其他城市仍可使用内置线网规划路线。删除下载的更新后会恢复内置版本。",
+                            traditional: "僅列出擁有車站資料的城市。其他城市仍可使用內置線網規劃路線。刪除下載的更新後會恢復內置版本。"
                         ))
                     }
                 }

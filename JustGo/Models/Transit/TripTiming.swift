@@ -1,7 +1,7 @@
 import Foundation
 
-/// When the rider intends to travel. The single shared timeline that the
-/// time-aware-confidence, crowding and departure-planner features all key off.
+/// When the rider intends to travel. The single shared timeline that the time-aware-confidence
+/// and departure-planner features both key off.
 enum TripTimeAnchor: Codable, Equatable {
     case now
     case departBy(Date)

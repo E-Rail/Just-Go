@@ -411,29 +411,6 @@ struct SearchPageView: View {
         .scrollContentBackground(.hidden)
     }
 
-    private var filterLoadingRow: some View {
-        HStack(spacing: 12) {
-            Spacer()
-            ProgressView()
-            Text(AppLocalization.localized("Checking station details..."))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-        }
-        .padding(.vertical, 28)
-    }
-
-    private var activeFilterEmptyState: some View {
-        ContentUnavailableView {
-            Label(
-                AppLocalization.localized("No stations match these filters"),
-                systemImage: "line.3.horizontal.decrease.circle"
-            )
-        } description: {
-            Text(AppLocalization.localized("Try clearing filters or loading official city data."))
-        }
-    }
-
     private var recentSearchesSection: some View {
         Section(AppLocalization.localized("Recent Searches")) {
             ForEach(viewModel?.recentSearches ?? []) { search in

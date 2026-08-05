@@ -89,11 +89,6 @@ final class RoutePlannerViewModel {
         )
     }
 
-    var canSearch: Bool {
-        !originName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !destinationName.trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
     /// Where to bias a place lookup: the other end of the trip when it is already resolved, else
     /// the rider's own position, else nowhere.
     ///
@@ -361,52 +356,6 @@ final class RoutePlannerViewModel {
         swap(&originPlace, &destinationPlace)
     }
 
-    func useRecentRoute(_ recentRoute: RecentRoute) {
-        invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
-        originName = recentRoute.originStationName
-        destinationName = recentRoute.destinationStationName
-        originPlace = nil
-        destinationPlace = nil
-        clearSuggestions()
-    }
-
-    func useSavedTrip(_ savedTrip: SavedTrip) {
-        invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
-        originName = savedTrip.origin.name
-        destinationName = savedTrip.destination.name
-        originPlace = savedTrip.origin.hasUsableRouteCoordinate ? savedTrip.origin.transitPlace : nil
-        destinationPlace = savedTrip.destination.hasUsableRouteCoordinate ? savedTrip.destination.transitPlace : nil
-        requiresWheelchairAccess = savedTrip.accessibilityFilter.requiresWheelchairAccess
-        requiresElevator = savedTrip.accessibilityFilter.requiresElevator
-        avoidStairs = savedTrip.accessibilityFilter.avoidStairs
-        if let preferredPreference = savedTrip.preferredRoutePreference {
-            sortStrategy = preferredPreference
-        } else if let preferredStrategy = savedTrip.preferredStrategy {
-            sortStrategy = RoutePreference(routeStrategy: preferredStrategy)
-        }
-        clearSuggestions()
-    }
-
-    func originSnapshot() -> TransitPlaceSnapshot? {
-        if let originPlace {
-            return TransitPlaceSnapshot(place: originPlace)
-        }
-        let trimmed = originName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : TransitPlaceSnapshot(name: trimmed)
-    }
-
-    func destinationSnapshot() -> TransitPlaceSnapshot? {
-        if let destinationPlace {
-            return TransitPlaceSnapshot(place: destinationPlace)
-        }
-        let trimmed = destinationName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : TransitPlaceSnapshot(name: trimmed)
-    }
-
     private var accessibilityPreferences: AccessibilityPreference {
         var preferences = basePreference
         preferences.requiresWheelchairAccess = requiresWheelchairAccess
@@ -576,13 +525,6 @@ struct RecentRoute: Identifiable, Codable {
     let plannedDuration: TimeInterval?
     /// City the route was planned in; nil on rows saved before this field existed.
     let cityID: String?
-
-    /// Localized at display time from the raw duration so it follows a language switch;
-    /// falls back to the legacy stored string for records saved before plannedDuration existed.
-    var displayDuration: String {
-        if let plannedDuration { return AppLocalization.minutes(Int(plannedDuration / 60)) }
-        return duration
-    }
 
     /// The stored city, or one recovered from the station ID for legacy rows — every route
     /// producer builds IDs as "network-<cityID>-<station>", so the middle component is the

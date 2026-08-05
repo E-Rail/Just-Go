@@ -62,20 +62,6 @@ enum ChinaClock {
         calendar.component(.weekday, from: date)
     }
 
-    /// Monday–Friday in China time.
-    static func isWeekday(_ date: Date) -> Bool {
-        (2...6).contains(weekday(of: date))
-    }
-
-    /// Half-open membership test `[start, end)` in minutes-of-day. When `end <= start`
-    /// the window is treated as crossing midnight (e.g. 23:00–00:30).
-    static func isWithin(minute: Int, start: Int, end: Int) -> Bool {
-        guard start != end else { return false }
-        if start < end {
-            return minute >= start && minute < end
-        }
-        return minute >= start || minute < end
-    }
 
     /// "HH:mm" display string for a `Date` in China time.
     static func clockText(_ date: Date) -> String {

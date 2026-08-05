@@ -1922,14 +1922,6 @@ private struct CityPackDiskStore {
         try fileManager.removeItem(at: rootURL)
     }
 
-    private func validatedData(
-        at url: URL,
-        validator: (Data) -> Bool
-    ) -> Data? {
-        guard let data = try? Data(contentsOf: url), validator(data) else { return nil }
-        return data
-    }
-
     private func store(_ data: Data, at url: URL) throws {
         try fileManager.createDirectory(
             at: url.deletingLastPathComponent(),

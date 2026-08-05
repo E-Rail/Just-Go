@@ -162,43 +162,6 @@ final class StationSearchViewModel {
         errorMessage = nil
     }
 
-    func toggleAccessibleFilter() {
-        filter.accessibleOnly.toggle()
-        applyFilters()
-        enrichForActiveFacilityFiltersIfNeeded()
-    }
-
-    func toggleElevatorFilter() {
-        filter.elevatorOnly.toggle()
-        applyFilters()
-        enrichForActiveFacilityFiltersIfNeeded()
-    }
-
-    func toggleTransferFilter() {
-        filter.transferOnly.toggle()
-        applyFilters()
-    }
-
-    func clearFilters() {
-        facilityEnrichmentTask?.cancel()
-        isEnrichingForFacility = false
-        filter = StationFilter()
-        applyFilters()
-    }
-
-    func setFacilityFilter(_ type: StationFacilityType?) {
-        filter.facilityType = type
-        applyFilters()
-        enrichForActiveFacilityFiltersIfNeeded()
-        if !activeFiltersNeedOfficialData {
-            facilityEnrichmentTask?.cancel()
-            isEnrichingForFacility = false
-            if unfilteredResults.isEmpty == false {
-                errorMessage = nil
-            }
-        }
-    }
-
     func distanceText(for station: Station) -> String? {
         // The distance this row was ordered by, not a fresh measurement. See `applyFilters`.
         guard let meters = distanceByStationID[station.stationID] else { return nil }

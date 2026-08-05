@@ -12,10 +12,6 @@ struct TripMemoryView: View {
         }
     }
 
-    private var mostUsedTrip: SavedTrip? {
-        tripMemoryService.savedTrips.max(by: { $0.useCount < $1.useCount })
-    }
-
     private func avgMonthlyDuration(for records: [TripRecord]) -> Int? {
         let durations = records.map(\.plannedDuration)
         guard !durations.isEmpty else { return nil }
@@ -65,21 +61,6 @@ struct TripMemoryView: View {
                             }
                         }
                     }
-                    if let top = mostUsedTrip, top.useCount > 0 {
-                        Divider()
-                        HStack(spacing: 6) {
-                            Image(systemName: "arrow.trianglehead.clockwise")
-                                .font(.caption)
-                                .foregroundStyle(Color.accentColor)
-                            Text(AppLocalization.text(
-                                english: "Most used: \(top.name) (\(top.useCount)×)",
-                                simplified: "最常用：\(top.name)（\(top.useCount)次）",
-                                traditional: "最常用：\(top.name)（\(top.useCount)次）"
-                            ))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    }
                 }
                 .padding(.vertical, 4)
             } header: {
@@ -93,46 +74,6 @@ struct TripMemoryView: View {
             List {
                 Group {
                     statisticsCard
-                    Section {
-                        if tripMemoryService.savedTrips.isEmpty {
-                            Text(AppLocalization.localized("No saved trips yet"))
-                                .foregroundStyle(.secondary)
-                        } else {
-                            ForEach(tripMemoryService.savedTrips) { trip in
-                                HStack(alignment: .top, spacing: 12) {
-                                    Image(systemName: "bookmark.fill")
-                                        .foregroundStyle(Color.accentColor)
-                                        .frame(width: 24)
-
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        Text(trip.name)
-                                            .font(.headline)
-                                        Text(trip.routeTitle)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.secondary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                        Text(AppLocalization.text(
-                                            english: "Used \(trip.useCount) times",
-                                            chinese: "已使用\(trip.useCount)次"
-                                        ))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                                .swipeActions {
-                                    Button(role: .destructive) {
-                                        tripMemoryService.deleteSavedTrip(id: trip.id)
-                                    } label: {
-                                        Label(AppLocalization.localized("Delete"), systemImage: "trash")
-                                    }
-                                }
-                            }
-                        }
-                    } header: {
-                        Text(AppLocalization.localized("Saved Trips"))
-                    }
-
                     Section {
                         if tripMemoryService.tripRecords.isEmpty {
                             Text(AppLocalization.localized("No trip history yet"))

@@ -841,9 +841,6 @@ final class RoutePlanningService {
             if !route.stepFreeAssessment.supportsStepFreeTravel {
                 score -= 0.5
             }
-            for warning in route.warnings where warning.type == .elevatorOutage {
-                score -= 0.3
-            }
         }
 
         if preferences.avoidStairs {

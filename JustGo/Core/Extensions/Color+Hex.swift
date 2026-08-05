@@ -20,8 +20,6 @@ extension Color {
 
     static let appSurface = Color(UIColor.secondarySystemGroupedBackground)
 
-    static let appSurfaceSecondary = Color(UIColor.tertiarySystemGroupedBackground)
-
     init(hex: String) {
         let (r, g, b) = Color.rgbComponents(hex: hex)
         self.init(red: Double(r), green: Double(g), blue: Double(b))

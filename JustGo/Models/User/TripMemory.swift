@@ -31,36 +31,6 @@ extension TransitPlaceSnapshot {
             source: .quickPlace
         )
     }
-
-    var hasUsableRouteCoordinate: Bool {
-        abs(latitude) > 0.000001 || abs(longitude) > 0.000001
-    }
-}
-
-struct SavedTrip: Identifiable, Codable, Equatable {
-    let id: String
-    var name: String
-    var origin: TransitPlaceSnapshot
-    var destination: TransitPlaceSnapshot
-    var cityID: String
-    var cityName: String
-    var preferredStrategy: RouteStrategy?
-    var preferredRoutePreference: RoutePreference?
-    var accessibilityFilter: SavedTripAccessibilityFilter
-    var createdAt: Date
-    var lastUsedAt: Date?
-    var useCount: Int
-    var notes: String?
-
-    var routeTitle: String {
-        "\(origin.name) -> \(destination.name)"
-    }
-
-    var hasAccessibilityOverrides: Bool {
-        accessibilityFilter.requiresWheelchairAccess ||
-            accessibilityFilter.requiresElevator ||
-            accessibilityFilter.avoidStairs
-    }
 }
 
 struct SavedTripAccessibilityFilter: Codable, Equatable {

@@ -4,20 +4,16 @@ import Foundation
 @Observable
 final class TripMemoryService {
     private let userDefaults: UserDefaults
-    private let savedTripsKey = "savedTrips"
     private let tripRecordsKey = "tripRecords"
     private let stationQuickTagsKey = "stationQuickTags"
     private let obsoleteFavoriteStationsKey = "favoriteStations"
-    private let maxSavedTrips = 50
     private let maxTripRecords = 300
 
-    private(set) var savedTrips: [SavedTrip]
     private(set) var tripRecords: [TripRecord]
     private(set) var stationQuickTags: [StationQuickTag]
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        savedTrips = userDefaults.codableValue(forKey: savedTripsKey, as: [SavedTrip].self, default: [])
         tripRecords = userDefaults.codableValue(forKey: tripRecordsKey, as: [TripRecord].self, default: [])
         let storedQuickTags = userDefaults.codableValue(
             forKey: stationQuickTagsKey,
@@ -29,59 +25,6 @@ final class TripMemoryService {
         if stationQuickTags != storedQuickTags {
             userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
         }
-    }
-
-    func createSavedTrip(
-        name: String,
-        origin: TransitPlaceSnapshot,
-        destination: TransitPlaceSnapshot,
-        city: City,
-        preferredStrategy: RouteStrategy?,
-        preferredRoutePreference: RoutePreference? = nil,
-        accessibilityFilter: AccessibilityFilter,
-        notes: String? = nil
-    ) {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let fallbackName = "\(origin.name) -> \(destination.name)"
-        let savedTrip = SavedTrip(
-            id: UUID().uuidString,
-            name: trimmedName.isEmpty ? fallbackName : trimmedName,
-            origin: origin,
-            destination: destination,
-            cityID: city.id,
-            cityName: city.localizedName,
-            preferredStrategy: preferredStrategy,
-            preferredRoutePreference: preferredRoutePreference,
-            accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
-            createdAt: .now,
-            lastUsedAt: nil,
-            useCount: 0,
-            notes: notes
-        )
-
-        savedTrips.removeAll { existing in
-            existing.origin.name == savedTrip.origin.name &&
-                existing.destination.name == savedTrip.destination.name &&
-                existing.cityID == savedTrip.cityID
-        }
-        savedTrips.insert(savedTrip, at: 0)
-        savedTrips = Array(savedTrips.prefix(maxSavedTrips))
-        persistSavedTrips()
-    }
-
-    func deleteSavedTrip(id: String) {
-        savedTrips.removeAll { $0.id == id }
-        persistSavedTrips()
-    }
-
-    func markSavedTripUsed(id: String) -> SavedTrip? {
-        guard let index = savedTrips.firstIndex(where: { $0.id == id }) else { return nil }
-        savedTrips[index].useCount += 1
-        savedTrips[index].lastUsedAt = .now
-        let trip = savedTrips.remove(at: index)
-        savedTrips.insert(trip, at: 0)
-        persistSavedTrips()
-        return trip
     }
 
     func recordPlannedTrip(route: Route, cityID: String, accessibilityFilter: AccessibilityFilter, savedTripID: String? = nil) -> TripRecord {
@@ -134,10 +77,6 @@ final class TripMemoryService {
     func deleteTripRecord(id: String) {
         tripRecords.removeAll { $0.id == id }
         persistTripRecords()
-    }
-
-    private func persistSavedTrips() {
-        userDefaults.setCodable(savedTrips, forKey: savedTripsKey)
     }
 
     private func persistTripRecords() {

@@ -17,8 +17,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A6000001"
                BuildableName = "Just-Go.app"
-               BlueprintName = "JustGo"
-               ReferencedContainer = "container:JustGo.xcodeproj">
+               BlueprintName = "Just-Go"
+               ReferencedContainer = "container:Just-Go.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,8 +47,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A6000001"
             BuildableName = "Just-Go.app"
-            BlueprintName = "JustGo"
-            ReferencedContainer = "container:JustGo.xcodeproj">
+            BlueprintName = "Just-Go"
+            ReferencedContainer = "container:Just-Go.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,8 +64,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A6000001"
             BuildableName = "Just-Go.app"
-            BlueprintName = "JustGo"
-            ReferencedContainer = "container:JustGo.xcodeproj">
+            BlueprintName = "Just-Go"
+            ReferencedContainer = "container:Just-Go.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

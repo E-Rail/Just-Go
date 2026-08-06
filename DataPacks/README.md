@@ -2,7 +2,7 @@
 
 `DataPacks/manifest.json` is the schema-v2 catalog for app-bundled city packs. It is not a
 download catalog: every `downloadURL` is `null`, and the only available packs point to
-`JustGo/Resources/BundledCityPacks/1100.json` and `8100.json` through `bundledResource`.
+`Just-Go/Resources/BundledCityPacks/1100.json` and `8100.json` through `bundledResource`.
 The other 56 catalog cities are intentionally `source_pending`.
 The separate official-resource catalog exposes reviewed user-initiated resources without changing
 a city's pack status or copying an operator dataset.

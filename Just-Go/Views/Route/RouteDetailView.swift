@@ -123,13 +123,13 @@ struct RouteDetailView: View {
                 isGuiding = true
             }
             #if DEBUG
-            if ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] == "guiding" {
+            if ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SCREEN"] == "guiding" {
                 ActiveTripStore.save(route)
                 isGuiding = true
             }
             // The map divider is a drag, and drags cannot be injected in this environment, so its
             // range is verified by driving it to each end and screenshotting instead.
-            switch ProcessInfo.processInfo.environment["JUSTGO_DEBUG_MAP_FRACTION"] {
+            switch ProcessInfo.processInfo.environment["JUST_GO_DEBUG_MAP_FRACTION"] {
             case "low": tripCardDetent = .fraction(0.3)
             case "medium": tripCardDetent = .medium
             case "top": tripCardDetent = .fraction(0.92)

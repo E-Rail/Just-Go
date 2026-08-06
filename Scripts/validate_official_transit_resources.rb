@@ -16,7 +16,7 @@ BEIJING_SOURCE_PATH = File.join(
   "official-resources",
   "beijing_station_information.json"
 )
-SERVICE_PATH = File.join(ROOT, "JustGo", "Services", "Data", "OfficialCityPackService.swift")
+SERVICE_PATH = File.join(ROOT, "Just-Go", "Services", "Data", "OfficialCityPackService.swift")
 DIRECT_EXTENSIONS = %w[.pdf .jpg .jpeg .png .webp .gif .svg].freeze
 REDIRECT_QUERY_KEYS = OfficialTransitResourceCatalogBuilder::REDIRECT_QUERY_KEYS
 
@@ -241,7 +241,7 @@ end
 fail_validation("Beijing must expose the reviewed official directory fallback") unless
   beijing_directory&.fetch("targetURL") == beijing_source.fetch("sourceDirectoryURL")
 
-runtime_swift = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift"))
+runtime_swift = Dir.glob(File.join(ROOT, "Just-Go", "**", "*.swift"))
   .map { |path| File.read(path, encoding: "UTF-8") }
   .join("\n")
 %w[
@@ -294,7 +294,7 @@ fail_validation("city resources do not use the bundled catalog") unless city_met
 # by pinning `officialStationMapCount: 0` is now made by there being nothing to count. It was a
 # criterion no city could ever satisfy — the browser links are catalog coverage, never route
 # evidence — so every route in every city lost the same points for it, permanently.
-route_model_source = File.read(File.join(ROOT, "JustGo", "Models", "Transit", "Route.swift"))
+route_model_source = File.read(File.join(ROOT, "Just-Go", "Models", "Transit", "Route.swift"))
 fail_validation("route coverage must not carry a station-map count at all") if
   service_source.include?("officialStationMapCount") || route_model_source.include?("let officialStationMapCount")
 

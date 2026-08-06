@@ -11,7 +11,7 @@ REQUIRED_INFO_KEYS = %w[
 ENTRY_PATTERN = /^\s*"((?:\\.|[^"])*)"\s*=\s*"((?:\\.|[^"])*)";\s*$/
 PLACEHOLDER_PATTERN = /%(?:\d+\$)?[@dfius]/
 LITERAL_LOCALIZATION_PATTERN = /AppLocalization\.localized\(\s*"((?:\\.|[^"])*)"\s*\)/m
-SWIFT_DIR = File.join(ROOT, "JustGo")
+SWIFT_DIR = File.join(ROOT, "Just-Go")
 VISIBLE_LITERAL_PATTERN = /
   \b(?:Text|Label|Button|Section|Picker|Toggle|ContentUnavailableView)\s*\(\s*"([^"]*[A-Za-z][^"]*)" |
   \.(?:navigationTitle|accessibilityLabel|accessibilityHint)\s*\(\s*"([^"]*[A-Za-z][^"]*)"
@@ -41,7 +41,7 @@ def parse_strings(path)
 end
 
 localizations = LOCALES.to_h do |locale|
-  path = File.join(ROOT, "JustGo", "Resources", "#{locale}.lproj", "Localizable.strings")
+  path = File.join(ROOT, "Just-Go", "Resources", "#{locale}.lproj", "Localizable.strings")
   [locale, parse_strings(path)]
 end
 
@@ -71,7 +71,7 @@ LOCALES.drop(1).each do |locale|
 end
 
 LOCALES.each do |locale|
-  path = File.join(ROOT, "JustGo", "Resources", "#{locale}.lproj", "InfoPlist.strings")
+  path = File.join(ROOT, "Just-Go", "Resources", "#{locale}.lproj", "InfoPlist.strings")
   entries = parse_strings(path)
   missing = REQUIRED_INFO_KEYS - entries.keys
   fail_with("#{locale} InfoPlist.strings is missing #{missing.inspect}") unless missing.empty?

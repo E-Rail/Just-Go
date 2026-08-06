@@ -93,8 +93,8 @@ and corridor/platform hints where an operator does.
 ## Setup
 
 1. Clone the repository.
-2. Open `JustGo.xcodeproj` in Xcode.
-3. Build the `JustGo` scheme.
+2. Open `Just-Go.xcodeproj` in Xcode.
+3. Build the `Just-Go` scheme.
 
 Release builds use the included baseline unless a first-party city-pack origin is configured
 through the build settings. Release does not fall back to GitHub, jsDelivr, or Wikimedia.

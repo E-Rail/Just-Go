@@ -45,7 +45,7 @@ catalog_by_city.keys.sort.each do |city_id|
   manifest_entry = manifest_by_city.fetch(city_id)
   catalog_city = catalog_by_city.fetch(city_id)
 
-  network_relative = "JustGo/Resources/MetroNetworks/#{city_id}.json"
+  network_relative = "Just-Go/Resources/MetroNetworks/#{city_id}.json"
   network = File.file?(File.join(ROOT, network_relative)) ? load_json(network_relative) : nil
   network_document =
     if network
@@ -77,7 +77,7 @@ catalog_by_city.keys.sort.each do |city_id|
     end
 
   bundled_resource = manifest_entry["bundledResource"]
-  pack_relative = bundled_resource ? "JustGo/Resources/#{bundled_resource}" : nil
+  pack_relative = bundled_resource ? "Just-Go/Resources/#{bundled_resource}" : nil
   pack = pack_relative && File.file?(File.join(ROOT, pack_relative)) ? load_json(pack_relative) : nil
 
   document = {

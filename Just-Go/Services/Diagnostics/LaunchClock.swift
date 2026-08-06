@@ -30,7 +30,7 @@ enum LaunchClock {
     /// Logs `label` with milliseconds elapsed since the kernel started the process.
     static func mark(_ label: String) {
         let elapsed = Date().timeIntervalSince(processStart) * 1000
-        log.error("JUSTGOLAUNCH \(label, privacy: .public) +\(Int(elapsed))ms")
+        log.error("JUST_GO_LAUNCH \(label, privacy: .public) +\(Int(elapsed))ms")
     }
 }
 #endif

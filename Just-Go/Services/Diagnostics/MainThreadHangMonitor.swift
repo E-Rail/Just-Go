@@ -31,7 +31,7 @@ enum MainThreadHangMonitor {
                 if stale > 0.2 {
                     worstStale = max(worstStale, stale)
                 } else if worstStale > 0 {
-                    log.error("JUSTGOHANG \(Int(worstStale * 1000))ms")
+                    log.error("JUST_GO_HANG \(Int(worstStale * 1000))ms")
                     worstStale = 0
                 }
             }
@@ -46,7 +46,7 @@ enum MainThreadHangMonitor {
         defer {
             let elapsed = (CFAbsoluteTimeGetCurrent() - start) * 1000
             if elapsed > 8 {
-                log.error("JUSTGOSTAGE \(label, privacy: .public) \(Int(elapsed))ms")
+                log.error("JUST_GO_STAGE \(label, privacy: .public) \(Int(elapsed))ms")
             }
         }
         return try work()

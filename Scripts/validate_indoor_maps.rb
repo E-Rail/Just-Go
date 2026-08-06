@@ -5,7 +5,7 @@ require "json"
 require_relative "lib/oss_data_validators"
 
 ROOT = File.expand_path("..", __dir__)
-PACK_PATTERN = File.join(ROOT, "JustGo", "Resources", "BundledCityPacks", "*.json")
+PACK_PATTERN = File.join(ROOT, "Just-Go", "Resources", "BundledCityPacks", "*.json")
 FORBIDDEN_STATION_FIELDS = %w[
   indoorMap indoorMaps platformCheckpoints lineCoverageGaps transferPaths
   boardingZoneHints doorGuidance verifiedTransferContexts
@@ -17,13 +17,13 @@ def fail_with(message)
 end
 
 forbidden_files = Dir.glob(File.join(ROOT, "DataPacks", "**", "indoor_maps.json"))
-forbidden_files.concat(Dir.glob(File.join(ROOT, "JustGo", "Resources", "**", "indoor_maps.json")))
+forbidden_files.concat(Dir.glob(File.join(ROOT, "Just-Go", "Resources", "**", "indoor_maps.json")))
 forbidden_files.concat(Dir.glob(File.join(ROOT, "DataPacks", "**", "indoor", "**", "*")))
 forbidden_files.concat(Dir.glob(File.join(ROOT, "DataPacks", "**", "station_maps", "**", "*")))
 forbidden_files.select! { |path| File.file?(path) }
 fail_with("stale traced indoor data remains: #{forbidden_files.join(", ")}") unless forbidden_files.empty?
 
-project = File.read(File.join(ROOT, "JustGo.xcodeproj", "project.pbxproj"), encoding: "UTF-8")
+project = File.read(File.join(ROOT, "Just-Go.xcodeproj", "project.pbxproj"), encoding: "UTF-8")
 fail_with("Xcode still references indoor_maps.json") if project.include?("indoor_maps.json")
 
 pack_paths = Dir.glob(PACK_PATTERN).sort

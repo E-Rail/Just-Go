@@ -22,7 +22,7 @@ builds. `.github/workflows/ci.yml` is the source of truth; keep them in sync.
 export DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer
 
 # Builds — Debug and Release both, warnings-as-errors is stricter than CI and worth keeping
-xcodebuild build -project JustGo.xcodeproj -scheme JustGo \
+xcodebuild build -project Just-Go.xcodeproj -scheme Just-Go \
   -destination 'generic/platform=iOS Simulator' -configuration Debug \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
   SWIFT_TREAT_WARNINGS_AS_ERRORS=YES GCC_TREAT_WARNINGS_AS_ERRORS=YES
@@ -36,13 +36,13 @@ bash Scripts/check_no_legacy_map_provider.sh
 git diff --check
 ```
 
-**`xcodebuild` rewrites `JustGo.xcodeproj/project.pbxproj`.** Snapshot it before any build and
+**`xcodebuild` rewrites `Just-Go.xcodeproj/project.pbxproj`.** Snapshot it before any build and
 restore it after, or unrelated churn lands in your commit:
 
 ```bash
-cp JustGo.xcodeproj/project.pbxproj /tmp/pbxproj.bak
+cp Just-Go.xcodeproj/project.pbxproj /tmp/pbxproj.bak
 # ... build ...
-cp /tmp/pbxproj.bak JustGo.xcodeproj/project.pbxproj
+cp /tmp/pbxproj.bak Just-Go.xcodeproj/project.pbxproj
 ```
 
 ### Regenerating data
@@ -86,13 +86,13 @@ ruby Scripts/generate_station_info_api.rb
 This environment has **no tap or scroll injection**. Two workable approaches:
 
 1. `ImageRenderer` for a view that needs no async loading.
-2. A temporary DEBUG probe: gate `JustGoApp.body` on a `JUSTGO_DEBUG_PROBE` env var, render or query
+2. A temporary DEBUG probe: gate `JustGoApp.body` on a `JUST_GO_DEBUG_PROBE` env var, render or query
    the real view/service, **write results to `Documents/probe.txt`** (`simctl launch --console` is
    unreliable), then read them back:
 
 ```bash
 xcrun simctl install <UDID> path/to/Just-Go.app
-SIMCTL_CHILD_JUSTGO_DEBUG_PROBE=1 xcrun simctl launch <UDID> com.e-rail.just-go
+SIMCTL_CHILD_JUST_GO_DEBUG_PROBE=1 xcrun simctl launch <UDID> com.e-rail.just-go
 cat "$(xcrun simctl get_app_container <UDID> com.e-rail.just-go data)/Documents/probe.txt"
 ```
 
@@ -106,7 +106,7 @@ reasoning-only perf fixes were all wrong. Use the DEBUG `MainThreadHangMonitor` 
 ## Layout
 
 ```
-JustGo/
+Just-Go/
   App/          JustGoApp (staged launch), ContentView (tab root)
   Core/         DI container, localization, extensions
   Models/       Transit, City, Station, User domain types

@@ -13,7 +13,7 @@ require_relative "lib/line_names"
 
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-metro")
-OUTPUT_DIR = File.join(ROOT, "JustGo", "Resources", "MetroNetworks")
+OUTPUT_DIR = File.join(ROOT, "Just-Go", "Resources", "MetroNetworks")
 REPORT_DIR = CACHE_DIR
 OVERPASS_URLS = [
   URI("https://overpass-api.de/api/interpreter"),

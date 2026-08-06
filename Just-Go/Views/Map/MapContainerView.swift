@@ -651,9 +651,9 @@ struct MapContainerView: View {
     /// screen above the map root is unreachable and therefore unverifiable.
     private func seedDebugScreen() {
         // Puts the camera somewhere specific without a pan gesture — the sibling of
-        // JUSTGO_DEBUG_SCREEN, and the only way to screenshot a named station in this
+        // JUST_GO_DEBUG_SCREEN, and the only way to screenshot a named station in this
         // environment, which has no gesture injection at all.
-        if let camera = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_CAMERA"] {
+        if let camera = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_CAMERA"] {
             let parts = camera.split(separator: ",").compactMap { Double($0) }
             if parts.count >= 3 {
                 didCenterOnUser = true
@@ -666,7 +666,7 @@ struct MapContainerView: View {
         // A named trip, planned through the real planner and landed on its detail page. The
         // station-derived seeding below cannot reach a specific route, and this environment has no
         // way to type two endpoints into a form.
-        if let trip = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_ROUTE"] {
+        if let trip = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ROUTE"] {
             let parts = trip.split(separator: ",").compactMap { Double($0) }
             if parts.count >= 4 {
                 didCenterOnUser = true
@@ -674,7 +674,7 @@ struct MapContainerView: View {
                 return
             }
         }
-        guard let screen = ProcessInfo.processInfo.environment["JUSTGO_DEBUG_SCREEN"] else { return }
+        guard let screen = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SCREEN"] else { return }
         switch screen {
         case "search":
             path = [.search]

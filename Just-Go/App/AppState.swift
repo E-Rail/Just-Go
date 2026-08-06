@@ -82,7 +82,7 @@ final class AppState {
     // Lets a headless diagnostic launch open straight onto a given tab, since this environment has
     // no way to inject a tap — confirmed, not assumed: this Xcode install ships no Simulator.app,
     // so the device is booted headlessly and there is no GUI to click.
-    var selectedTab: Tab = ProcessInfo.processInfo.environment["JUSTGO_START_TAB"] == "profile"
+    var selectedTab: Tab = ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] == "profile"
         ? .profile
         : .map
     #else

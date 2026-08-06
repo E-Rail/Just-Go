@@ -22,7 +22,7 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 iOSInjectionProject/
-JustGo/Config/Secrets.xcconfig
+Just-Go/Config/Secrets.xcconfig
 
 # Local xcodebuild output
 build/

@@ -74,7 +74,7 @@ index_by_city.each do |city_id, index_entry|
   errors << "#{city_id}: capabilities drifted from the manifest" unless document["capabilities"] == manifest_entry["capabilities"]
   errors << "#{city_id}: coverage drifted from the manifest" unless document["coverage"] == manifest_entry["coverage"]
 
-  network_path = File.join(ROOT, "JustGo/Resources/MetroNetworks/#{city_id}.json")
+  network_path = File.join(ROOT, "Just-Go/Resources/MetroNetworks/#{city_id}.json")
   if File.file?(network_path)
     network = JSON.parse(File.read(network_path, encoding: "UTF-8"))
     universal_network = document["network"]
@@ -111,7 +111,7 @@ index_by_city.each do |city_id, index_entry|
   end
 
   bundled_resource = manifest_entry["bundledResource"]
-  pack_path = bundled_resource ? File.join(ROOT, "JustGo/Resources", bundled_resource) : nil
+  pack_path = bundled_resource ? File.join(ROOT, "Just-Go/Resources", bundled_resource) : nil
   if pack_path && File.file?(pack_path)
     pack = JSON.parse(File.read(pack_path, encoding: "UTF-8"))
     station_detail_total += document.fetch("stationDetails").length

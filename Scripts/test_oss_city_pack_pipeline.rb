@@ -15,15 +15,15 @@ class OSSCityPackPipelineTest < Minitest::Test
     "DataPacks/sources/8100/metadata.json",
     "DataPacks/sources/7101/metadata.json",
     "THIRD_PARTY_NOTICES.md",
-    "JustGo/Resources/BundledCityPacks/1100.json",
-    "JustGo/Resources/BundledCityPacks/8100.json",
-    "JustGo/Resources/BundledCityPacks/7101.json"
+    "Just-Go/Resources/BundledCityPacks/1100.json",
+    "Just-Go/Resources/BundledCityPacks/8100.json",
+    "Just-Go/Resources/BundledCityPacks/7101.json"
   ].freeze
 
   def test_exact_schema_and_generated_counts
     manifest = json("DataPacks/manifest.json")
-    beijing = json("JustGo/Resources/BundledCityPacks/1100.json")
-    hong_kong = json("JustGo/Resources/BundledCityPacks/8100.json")
+    beijing = json("Just-Go/Resources/BundledCityPacks/1100.json")
+    hong_kong = json("Just-Go/Resources/BundledCityPacks/8100.json")
     sources = json("DataPacks/sources/8100/metadata.json")
     rights = json("DataPacks/rights_inventory.json")
 
@@ -84,8 +84,8 @@ class OSSCityPackPipelineTest < Minitest::Test
   # parses and still validates structurally, so the regression is pinned by distance: converted,
   # exits sit tens of metres from their station; unconverted, none is closer than ~330 m.
   def test_taipei_exits_are_converted_to_the_app_coordinate_frame
-    pack = json("JustGo/Resources/BundledCityPacks/7101.json")
-    network = json("JustGo/Resources/MetroNetworks/7101.json")
+    pack = json("Just-Go/Resources/BundledCityPacks/7101.json")
+    network = json("Just-Go/Resources/MetroNetworks/7101.json")
     positions = network.fetch("stations").to_h { |station| [station.fetch("id"), station] }
 
     points = pack.fetch("stations").flat_map do |station|
@@ -105,7 +105,7 @@ class OSSCityPackPipelineTest < Minitest::Test
   end
 
   def test_taipei_pack_only_claims_what_the_open_data_states
-    pack = json("JustGo/Resources/BundledCityPacks/7101.json")
+    pack = json("Just-Go/Resources/BundledCityPacks/7101.json")
 
     assert_equal %w[osm-metro-networks taipei-open-data], pack.fetch("rightsIDs")
     assert_equal "partial_static", pack.fetch("capabilities").fetch("accessibility")
@@ -134,7 +134,7 @@ class OSSCityPackPipelineTest < Minitest::Test
   end
 
   def test_racecourse_reference_and_hoi_wong_road_rename_are_explicit
-    pack = json("JustGo/Resources/BundledCityPacks/8100.json")
+    pack = json("Just-Go/Resources/BundledCityPacks/8100.json")
     racecourse = pack.fetch("stations").find { |station| station["stationNameEn"] == "Racecourse" }
     refute_nil racecourse
     assert_equal OSSCityPackPipeline::RACECOURSE_REFERENCE.fetch("canonicalStationID"), racecourse.fetch("stationID")
@@ -158,7 +158,7 @@ class OSSCityPackPipelineTest < Minitest::Test
   # unlabeled entrances left it — and 133 other stations — showing no entrance map at all, which is
   # the regression this pins: a station is not allowed to lose its whole survey for want of a label.
   def test_entrances_with_no_sign_letter_still_ship
-    beijing = json("JustGo/Resources/BundledCityPacks/1100.json")
+    beijing = json("Just-Go/Resources/BundledCityPacks/1100.json")
     yuquanlu = beijing.fetch("stations").find { |station| station.fetch("stationName") == "玉泉路" }
     points = yuquanlu.fetch("stationAccessPoints")
 
@@ -172,7 +172,7 @@ class OSSCityPackPipelineTest < Minitest::Test
   # step-free but never named belongs in none of them — an empty string there is a blank row.
   def test_no_pack_lists_a_nameless_accessible_entrance
     OSSDataValidators::BUNDLED_CITY_IDS.each do |city_id|
-      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+      json("Just-Go/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
         entrances = station.dig("accessibility", "accessibleEntrances")
         next if entrances.nil?
 
@@ -184,7 +184,7 @@ class OSSCityPackPipelineTest < Minitest::Test
 
   def test_no_pack_ships_licensed_media
     %w[1100 7101 8100].each do |city_id|
-      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+      json("Just-Go/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
         assert_empty station.fetch("licensedMedia"), "#{city_id} unexpectedly ships licensed media"
       end
     end

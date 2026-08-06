@@ -84,22 +84,22 @@ module OSSCityPackPipeline
 
   SOURCE_FILES = {
     "mtr_lines_and_stations.csv" => {
-      snapshot: "justgo-mtr-lines.csv",
+      snapshot: "just-go-mtr-lines.csv",
       source_url: "https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "light_rail_routes_and_stops.csv" => {
-      snapshot: "justgo-lrt-routes.csv",
+      snapshot: "just-go-lrt-routes.csv",
       source_url: "https://opendata.mtr.com.hk/data/light_rail_routes_and_stops.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "barrier_free_facilities.csv" => {
-      snapshot: "justgo-barrier.csv",
+      snapshot: "just-go-barrier.csv",
       source_url: "https://opendata.mtr.com.hk/data/barrier_free_facilities.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "barrier_free_facility_category.csv" => {
-      snapshot: "justgo-barrier-categories.csv",
+      snapshot: "just-go-barrier-categories.csv",
       source_url: "https://opendata.mtr.com.hk/data/barrier_free_facility_category.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     }
@@ -817,11 +817,11 @@ module OSSCityPackPipeline
     end
 
     def pack_path(city_id)
-      File.join(root, "JustGo", "Resources", "BundledCityPacks", "#{city_id}.json")
+      File.join(root, "Just-Go", "Resources", "BundledCityPacks", "#{city_id}.json")
     end
 
     def network_path(city_id)
-      File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json")
+      File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json")
     end
 
     def load_network(city_id)
@@ -903,7 +903,7 @@ module OSSCityPackPipeline
           "rightsIDs" => %w[just-go-generated-catalog taipei-open-data].sort
         },
         {
-          "path" => "JustGo/Resources/BundledCityPacks/7101.json",
+          "path" => "Just-Go/Resources/BundledCityPacks/7101.json",
           "rightsIDs" => %w[just-go-generated-catalog osm-metro-networks taipei-open-data].sort
         },
         *OSM_ENTRANCE_CITY_IDS.map do |city_id|
@@ -916,7 +916,7 @@ module OSSCityPackPipeline
         # entrance city ships a pack whose only third-party content is OSM.
         *(OSM_ENTRANCE_CITY_IDS - %w[1100]).map do |city_id|
           {
-            "path" => "JustGo/Resources/BundledCityPacks/#{city_id}.json",
+            "path" => "Just-Go/Resources/BundledCityPacks/#{city_id}.json",
             "rightsIDs" => %w[just-go-generated-catalog osm-metro-networks].sort
           }
         end,
@@ -925,13 +925,13 @@ module OSSCityPackPipeline
           "rightsIDs" => ["just-go-generated-catalog"]
         },
         {
-          "path" => "JustGo/Resources/BundledCityPacks/1100.json",
+          "path" => "Just-Go/Resources/BundledCityPacks/1100.json",
           "rightsIDs" => %w[
             just-go-generated-catalog osm-metro-networks beijing-official-landing-links
           ].sort
         },
         {
-          "path" => "JustGo/Resources/BundledCityPacks/8100.json",
+          "path" => "Just-Go/Resources/BundledCityPacks/8100.json",
           "rightsIDs" => %w[
             just-go-generated-catalog osm-metro-networks data-gov-hk-mtr
           ].sort
@@ -949,7 +949,7 @@ module OSSCityPackPipeline
           "rightsIDs" => ["taipei-open-data"]
         }
       end
-      Dir.glob(File.join(root, "JustGo", "Resources", "MetroNetworks", "*.json")).sort.each do |path|
+      Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort.each do |path|
         files << {
           "path" => path.delete_prefix("#{root}/"),
           "rightsIDs" => ["osm-metro-networks"]

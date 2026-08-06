@@ -288,7 +288,7 @@ module OSSDataValidators
     end
 
     def licensed_media_declarations
-      Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "*.json")).sort.flat_map do |path|
+      Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "*.json")).sort.flat_map do |path|
         load_json(path).fetch("stations", []).flat_map { |station| Array(station["licensedMedia"]) }
       end
     end
@@ -332,9 +332,9 @@ module OSSDataValidators
     def scoped_asset_paths
       paths = []
       paths.concat(Dir.glob(File.join(root, "DataPacks", "**", "*.{json,csv}")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "**", "*.json")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "MetroNetworks", "**", "*.json")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "LicensedMedia", "**", "*")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "**", "*.json")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "**", "*.json")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "LicensedMedia", "**", "*")))
       paths << File.join(root, "THIRD_PARTY_NOTICES.md")
       paths.select { |path| File.file?(path) }.map { |path| relative(path) }.uniq.sort
     end
@@ -349,13 +349,13 @@ module OSSDataValidators
         fail_validation("undeclared binary in #{relative(path)}") if sample.include?("\x00")
       end
 
-      media_dir = File.join(root, "JustGo", "Resources", "LicensedMedia")
+      media_dir = File.join(root, "Just-Go", "Resources", "LicensedMedia")
       media_files = Dir.glob(File.join(media_dir, "**", "*"), File::FNM_DOTMATCH)
         .select { |path| File.file?(path) }
       media_files.each do |path|
         next if File.extname(path).downcase == ".json"
 
-        relative_path = path.delete_prefix("#{File.join(root, "JustGo", "Resources")}/")
+        relative_path = path.delete_prefix("#{File.join(root, "Just-Go", "Resources")}/")
         declaration = declarations.find { |media| media["relativePath"] == relative_path }
         fail_validation("undeclared binary in #{relative(path)}") unless declaration
         right = rights.find { |item| item["scope"] == relative_path }
@@ -385,7 +385,7 @@ module OSSDataValidators
     end
 
     def validate_pack_rights!(known_ids)
-      Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "*.json")).sort.each do |path|
+      Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "*.json")).sort.each do |path|
         pack = load_json(path)
         unknown = Array(pack["rightsIDs"]) - known_ids
         fail_validation("#{relative(path)} has unknown rights IDs: #{unknown.join(", ")}") unless unknown.empty?
@@ -406,13 +406,13 @@ module OSSDataValidators
     end
 
     def expected_rights_for(path)
-      return ["osm-metro-networks"] if path.match?(%r{\AJustGo/Resources/MetroNetworks/[^/]+\.json\z})
+      return ["osm-metro-networks"] if path.match?(%r{\AJust-Go/Resources/MetroNetworks/[^/]+\.json\z})
       # Vendored OSM entrances, and the packs built purely from them. Beijing's pack also carries
       # its landing-link grant, so it stays in the explicit table below.
       if path.match?(%r{\ADataPacks/sources/osm-entrances/[^/]+\.json\z})
         return %w[just-go-generated-catalog osm-metro-networks].sort
       end
-      if path.match?(%r{\AJustGo/Resources/BundledCityPacks/(?!1100|7101|8100)[^/]+\.json\z})
+      if path.match?(%r{\AJust-Go/Resources/BundledCityPacks/(?!1100|7101|8100)[^/]+\.json\z})
         return %w[just-go-generated-catalog osm-metro-networks].sort
       end
       return ["data-gov-hk-mtr"] if path.match?(%r{\ADataPacks/sources/8100/[^/]+\.csv\z})
@@ -461,15 +461,15 @@ module OSSDataValidators
         ].sort,
         "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr just-go-generated-catalog].sort,
         "DataPacks/sources/7101/metadata.json" => %w[just-go-generated-catalog taipei-open-data].sort,
-        "JustGo/Resources/BundledCityPacks/7101.json" => %w[
+        "Just-Go/Resources/BundledCityPacks/7101.json" => %w[
           just-go-generated-catalog osm-metro-networks taipei-open-data
         ].sort,
         "THIRD_PARTY_NOTICES.md" => ["just-go-generated-catalog"],
-        "JustGo/Resources/BundledCityPacks/1100.json" => %w[
+        "Just-Go/Resources/BundledCityPacks/1100.json" => %w[
           beijing-official-landing-links just-go-generated-catalog
           osm-metro-networks
         ].sort,
-        "JustGo/Resources/BundledCityPacks/8100.json" => %w[
+        "Just-Go/Resources/BundledCityPacks/8100.json" => %w[
           data-gov-hk-mtr just-go-generated-catalog osm-metro-networks
         ].sort
       }[path]
@@ -548,7 +548,7 @@ module OSSDataValidators
       fail_validation("#{city_id} bundled resources must be station-scoped") unless city["externalResources"] == []
       resource = city.fetch("bundledResource")
       fail_validation("#{city_id} bundledResource is unsafe") unless safe_relative_path?(resource)
-      pack_path = File.join(root, "JustGo", "Resources", resource)
+      pack_path = File.join(root, "Just-Go", "Resources", resource)
       fail_validation("missing bundled pack #{resource}") unless File.file?(pack_path)
       bytes = File.binread(pack_path)
       fail_validation("#{city_id} sizeBytes must be positive") unless city["sizeBytes"].is_a?(Integer) && city["sizeBytes"].positive?
@@ -763,7 +763,7 @@ module OSSDataValidators
       license_uri = https_uri(media["licenseURL"], "licensed media licenseURL")
       fail_validation("licensed media licenseURL host is not allowed") unless license_uri.host == "creativecommons.org"
 
-      asset_path = File.join(root, "JustGo", "Resources", relative_path)
+      asset_path = File.join(root, "Just-Go", "Resources", relative_path)
       fail_validation("licensed media file is missing") unless File.file?(asset_path)
       fail_validation("licensed media size mismatch") unless media["sizeBytes"] == File.size(asset_path)
       fail_validation("licensed media checksum mismatch") unless media["sha256"] == Digest::SHA256.file(asset_path).hexdigest
@@ -944,12 +944,12 @@ module OSSDataValidators
     end
 
     def network_station_count(city_id)
-      path = File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json")
+      path = File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json")
       File.file?(path) ? load_json(path).fetch("stations").length : 0
     end
 
     def load_network(city_id)
-      load_json(File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json"))
+      load_json(File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json"))
     end
 
     def deep_copy(value)

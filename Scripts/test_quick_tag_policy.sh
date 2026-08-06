@@ -23,7 +23,7 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-quick-tag-policy" \
-    "$ROOT/JustGo/Models/User/StationQuickTag.swift" \
+    "$ROOT/Just-Go/Models/User/StationQuickTag.swift" \
     "$ROOT/Scripts/test_quick_tag_policy.swift"
 
 "$BUILD_DIR/test-quick-tag-policy"

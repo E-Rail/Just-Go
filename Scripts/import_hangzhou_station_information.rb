@@ -13,7 +13,7 @@ OUTPUT = File.join(
   "official-resources",
   "hangzhou_station_information.json"
 )
-NETWORK = File.join(ROOT, "JustGo", "Resources", "MetroNetworks", "3301.json")
+NETWORK = File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "3301.json")
 
 unless ARGV == ["--refresh"]
   warn "usage: ruby Scripts/import_hangzhou_station_information.rb --refresh"

@@ -5,7 +5,7 @@ require "json"
 require_relative "lib/oss_data_validators"
 
 ROOT = File.expand_path("..", __dir__)
-PACK_PATTERN = File.join(ROOT, "JustGo", "Resources", "BundledCityPacks", "*.json")
+PACK_PATTERN = File.join(ROOT, "Just-Go", "Resources", "BundledCityPacks", "*.json")
 EXPECTED_PACK_IDS = OSSDataValidators::BUNDLED_CITY_IDS
 
 def fail_with(message)

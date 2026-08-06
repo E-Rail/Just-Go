@@ -153,7 +153,7 @@
 		A200002F /* User/SearchHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/SearchHistory.swift; sourceTree = "<group>"; };
 		A2000033 /* Extensions/Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Color+Hex.swift"; sourceTree = "<group>"; };
 		A200003C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A200003D /* JustGo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "JustGo-Info.plist"; sourceTree = "<group>"; };
+		A200003D /* Just-Go-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Just-Go-Info.plist"; sourceTree = "<group>"; };
 		A200003E /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		A2000312 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		A200003F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -225,7 +225,7 @@
 		A2000310 /* Profile/QuickTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagsView.swift; sourceTree = "<group>"; };
 		A2000605 /* Profile/QuickTagAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagAddView.swift; sourceTree = "<group>"; };
 		A2000311 /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = manifest.json; path = DataPacks/manifest.json; sourceTree = SOURCE_ROOT; };
-		A3000001 /* JustGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JustGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3000001 /* Just-Go.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Just-Go.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,12 +242,12 @@
 		A5000001 = {
 			isa = PBXGroup;
 			children = (
-				A5000002 /* JustGo */,
+				A5000002 /* Just-Go */,
 				A5000010 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A5000002 /* JustGo */ = {
+		A5000002 /* Just-Go */ = {
 			isa = PBXGroup;
 			children = (
 				A5000003 /* App */,
@@ -258,9 +258,9 @@
 				A5000008 /* Views */,
 				A5000014 /* Config */,
 				A500000C /* Resources */,
-				A200003D /* JustGo-Info.plist */,
+				A200003D /* Just-Go-Info.plist */,
 			);
-			path = JustGo;
+			path = "Just-Go";
 			sourceTree = "<group>";
 		};
 		A5000003 /* App */ = {
@@ -419,7 +419,7 @@
 		A5000010 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A3000001 /* JustGo.app */,
+				A3000001 /* Just-Go.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -436,9 +436,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A6000001 /* JustGo */ = {
+		A6000001 /* Just-Go */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A8000001 /* Build configuration list for PBXNativeTarget "JustGo" */;
+			buildConfigurationList = A8000001 /* Build configuration list for PBXNativeTarget "Just-Go" */;
 			buildPhases = (
 				A7000001 /* Sources */,
 				A4000001 /* Frameworks */,
@@ -448,9 +448,9 @@
 			);
 			dependencies = (
 			);
-			name = JustGo;
-			productName = JustGo;
-			productReference = A3000001 /* JustGo.app */;
+			name = "Just-Go";
+			productName = "Just-Go";
+			productReference = A3000001 /* Just-Go.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -468,7 +468,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A8000003 /* Build configuration list for PBXProject "JustGo" */;
+			buildConfigurationList = A8000003 /* Build configuration list for PBXProject "Just-Go" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -483,7 +483,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A6000001 /* JustGo */,
+				A6000001 /* Just-Go */,
 			);
 		};
 /* End PBXProject section */
@@ -749,12 +749,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 376LB43J9M;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "JustGo/JustGo-Info.plist";
+				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -783,12 +783,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 376LB43J9M;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "JustGo/JustGo-Info.plist";
+				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -814,7 +814,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A8000001 /* Build configuration list for PBXNativeTarget "JustGo" */ = {
+		A8000001 /* Build configuration list for PBXNativeTarget "Just-Go" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB000001 /* Debug */,
@@ -823,7 +823,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A8000003 /* Build configuration list for PBXProject "JustGo" */ = {
+		A8000003 /* Build configuration list for PBXProject "Just-Go" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA000001 /* Debug */,

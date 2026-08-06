@@ -21,7 +21,7 @@ require_relative "lib/osm_station_entrance_importer"
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-entrances")
 OUTPUT_DIR = File.join(ROOT, "DataPacks", "sources", "osm-entrances")
-NETWORK_DIR = File.join(ROOT, "JustGo", "Resources", "MetroNetworks")
+NETWORK_DIR = File.join(ROOT, "Just-Go", "Resources", "MetroNetworks")
 
 # The twelve largest networks. Bounding boxes are copied from import_osm_metro_geometry.rb so the
 # entrance query covers exactly the area the stations were imported from.

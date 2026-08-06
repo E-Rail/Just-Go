@@ -6,9 +6,9 @@ require "set"
 
 ROOT = File.expand_path("..", __dir__)
 EARTH_RADIUS = 6_371_000.0
-paths = Dir.glob(File.join(ROOT, "JustGo", "Resources", "MetroNetworks", "*.json")).sort
+paths = Dir.glob(File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort
 abort "metro network validation failed: no assets" if paths.empty?
-city_service_source = File.read(File.join(ROOT, "JustGo", "Services", "Data", "CityService.swift"))
+city_service_source = File.read(File.join(ROOT, "Just-Go", "Services", "Data", "CityService.swift"))
 route_picker_city_ids = city_service_source.scan(/City\(id: "(\d+)"/).flatten
 network_city_ids = paths.map { |path| File.basename(path, ".json") }
 abort "metro network validation failed: route picker must contain exactly 53 unique cities" unless route_picker_city_ids.length == 53 && route_picker_city_ids.uniq.length == 53

@@ -178,7 +178,7 @@ class OSSDataValidatorsTest < Minitest::Test
   # Blanks the name of an entrance that *had* one, so neither test above can pass by mutating an
   # entrance that was already unnamed.
   def blank_a_named_access_point(city_id)
-    relative = "JustGo/Resources/BundledCityPacks/#{city_id}.json"
+    relative = "Just-Go/Resources/BundledCityPacks/#{city_id}.json"
     pack = JSON.parse(File.read(File.join(@root, relative)))
     point = pack.fetch("stations")
       .flat_map { |station| Array(station["stationAccessPoints"]) }
@@ -195,10 +195,10 @@ class OSSDataValidatorsTest < Minitest::Test
 
   def copy_fixture
     FileUtils.cp_r(File.join(SOURCE_ROOT, "DataPacks"), @root)
-    resources = File.join(@root, "JustGo", "Resources")
+    resources = File.join(@root, "Just-Go", "Resources")
     FileUtils.mkdir_p(resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "BundledCityPacks"), resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "MetroNetworks"), resources)
+    FileUtils.cp_r(File.join(SOURCE_ROOT, "Just-Go", "Resources", "BundledCityPacks"), resources)
+    FileUtils.cp_r(File.join(SOURCE_ROOT, "Just-Go", "Resources", "MetroNetworks"), resources)
     FileUtils.cp(File.join(SOURCE_ROOT, "THIRD_PARTY_NOTICES.md"), @root)
   end
 
@@ -230,7 +230,7 @@ class OSSDataValidatorsTest < Minitest::Test
   end
 
   def mutate_pack(city_id, sync_coverage: false)
-    relative_path = "JustGo/Resources/BundledCityPacks/#{city_id}.json"
+    relative_path = "Just-Go/Resources/BundledCityPacks/#{city_id}.json"
     pack = read_json(relative_path)
     yield pack
     write_json(relative_path, pack)

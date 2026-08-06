@@ -79,8 +79,8 @@ Just-Go 不提供站内导航。站内图引擎、逐步规划、检查点扫描
 ## 设置
 
 1. 克隆仓库。
-2. 在 Xcode 中打开 `JustGo.xcodeproj`。
-3. 构建 `JustGo` scheme。
+2. 在 Xcode 中打开 `Just-Go.xcodeproj`。
+3. 构建 `Just-Go` scheme。
 
 Release 构建默认只使用内置基础数据；只有配置第一方城市数据源后才会启用远程更新。
 Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用明确配置的开发源；

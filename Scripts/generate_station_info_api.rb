@@ -25,7 +25,7 @@ module StationInfoAPIGenerator
   # registry (which cities are served, and how). Both are written from the same source of truth
   # here so they cannot drift; CI diff-checks the mirror.
   AUTHORED_SOURCES = File.join(ROOT, "StationInfoAPI", "sources", "sources.json")
-  BUNDLE_DIR = File.join(ROOT, "JustGo", "Resources", "StationInfo")
+  BUNDLE_DIR = File.join(ROOT, "Just-Go", "Resources", "StationInfo")
   BUNDLED_DIRECTORY = File.join(BUNDLE_DIR, "directory.json")
   BUNDLED_SOURCES = File.join(BUNDLE_DIR, "sources.json")
 

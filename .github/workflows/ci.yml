@@ -67,13 +67,13 @@ jobs:
           ruby Scripts/generate_universal_city_data.rb
           ruby Scripts/generate_station_info_api.rb
           ruby Scripts/generate_station_info_api.rb
-          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal JustGo/Resources/BundledCityPacks StationInfoAPI/directory/directory.json JustGo/Resources/StationInfo
+          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal Just-Go/Resources/BundledCityPacks StationInfoAPI/directory/directory.json Just-Go/Resources/StationInfo
 
       - name: Build for iOS Simulator
         run: |
           xcodebuild clean build \
-            -project JustGo.xcodeproj \
-            -scheme JustGo \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
@@ -83,8 +83,8 @@ jobs:
       - name: Build Release policy configuration
         run: |
           xcodebuild build \
-            -project JustGo.xcodeproj \
-            -scheme JustGo \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
             -configuration Release \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData-Release" \

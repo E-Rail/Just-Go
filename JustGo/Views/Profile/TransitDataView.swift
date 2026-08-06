@@ -73,9 +73,9 @@ struct TransitDataView: View {
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(AppLocalization.text(
-                                            english: "Maps, travel information, accessibility, and help for 58 reviewed cities",
-                                            simplified: "58 个已审核城市的地图、出行信息、无障碍服务与帮助",
-                                            traditional: "58 個已審核城市的地圖、出行資訊、無障礙服務與協助"
+                                            english: "Official links for 58 reviewed cities — 43 have at least one; maps and accessibility pages are rarer",
+                                            simplified: "58 个已审核城市的官方链接——其中 43 个至少有一条；地图与无障碍页面较少",
+                                            traditional: "58 個已審核城市的官方連結——其中 43 個至少有一條；地圖與無障礙頁面較少"
                                         ))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
@@ -108,19 +108,14 @@ struct TransitDataView: View {
                         dataCapabilityRow(
                             icon: "clock.fill",
                             title: AppLocalization.localized("Train times"),
-                            detail: AppLocalization.localized("Official first/last schedules; live countdown only when an official provider exists")
-                        )
-                        dataCapabilityRow(
-                            icon: "photo.fill",
-                            title: AppLocalization.text(
-                                english: "Station layouts and media",
-                                simplified: "车站布局与媒体",
-                                traditional: "車站佈局與媒體"
-                            ),
+                            // No bundled pack carries a timetable — operator schedule content must
+                            // not be committed, so `schedules` is empty for all 2,849 stations.
+                            // First and last trains exist only as a device-side fetch, in the
+                            // cities that publish one.
                             detail: AppLocalization.text(
-                                english: "In-app official resources and licensed media are kept separate",
-                                simplified: "应用内官方资源与许可媒体分别管理",
-                                traditional: "App 內官方資源與授權媒體分別管理"
+                                english: "First and last trains fetched from the operator, in cities that publish them",
+                                simplified: "在公布数据的城市，首末班车信息从运营方获取",
+                                traditional: "在公布資料的城市，首末班車資訊從營運方取得"
                             )
                         )
                     } header: {

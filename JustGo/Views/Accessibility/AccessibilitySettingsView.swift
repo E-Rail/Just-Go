@@ -142,15 +142,18 @@ struct AccessibilitySettingsView: View {
 
     private var cognitiveSection: some View {
         Section {
-            Toggle(AppLocalization.localized("Simplified UI"), isOn: preferenceBinding(\.simplifiedUI))
+            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI` — no
+            // view hid anything — so a rider with a cognitive-accessibility need flipped a switch
+            // that did nothing, on the one screen that exists to serve them. A control that lies
+            // is worse than a control that is absent.
             Toggle(AppLocalization.localized("Step-by-Step Guidance"), isOn: preferenceBinding(\.stepByStepGuidance))
         } header: {
             Text(AppLocalization.localized("Cognitive"))
         } footer: {
             Text(AppLocalization.text(
-                english: "Simplified UI hides non-essential route planner sections. Step-by-Step Guidance opens the guided navigator directly when you view a route.",
-                simplified: "简化界面会隐藏路线规划页中的非必要板块；分步指引会在查看路线时直接进入分步导航。",
-                traditional: "簡化介面會隱藏路線規劃頁中的非必要區塊；分步指引會在查看路線時直接進入分步導航。"
+                english: "Step-by-Step Guidance opens the guided navigator directly when you view a route.",
+                simplified: "分步指引会在查看路线时直接进入分步导航。",
+                traditional: "分步指引會在查看路線時直接進入分步導航。"
             ))
         }
     }

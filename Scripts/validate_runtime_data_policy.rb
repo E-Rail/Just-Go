@@ -46,7 +46,14 @@ end
 # first TestFlight, since nothing was ever uploaded and the permission bought the rider nothing).
 # Checked across the whole source tree rather than one named file, so the rule survives the next
 # feature that owns it.
-declares_camera = info_plist.include?("NSCameraUsageDescription")
+# Every place the key can live, not just the plist. Three localized `InfoPlist.strings` copies
+# outlived the plist entry itself — each still describing the indoor-checkpoint scanner that was
+# removed two features ago — precisely because this check only ever read `JustGo-Info.plist`.
+camera_string_files = [File.join(ROOT, "JustGo", "JustGo-Info.plist")] +
+                      Dir.glob(File.join(ROOT, "JustGo", "**", "*.lproj", "InfoPlist.strings"))
+declares_camera = camera_string_files.any? do |path|
+  File.file?(path) && File.read(path, encoding: "UTF-8").include?("NSCameraUsageDescription")
+end
 reaches_camera = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift")).any? do |path|
   File.read(path, encoding: "UTF-8").include?("sourceType = .camera")
 end

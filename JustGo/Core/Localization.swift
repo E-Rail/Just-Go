@@ -199,7 +199,11 @@ extension Station {
             label += AppLocalization.text(english: ", has elevator", chinese: "，有电梯")
         }
         if accessibility?.isFullyAccessible == true {
-            label += AppLocalization.text(english: ", fully accessible", chinese: "，完全无障碍")
+            label += AppLocalization.text(
+                english: ", lift and step-free entrance listed",
+                simplified: "，已列出电梯与无障碍入口",
+                traditional: "，已列出電梯與無障礙入口"
+            )
         }
         return label
     }

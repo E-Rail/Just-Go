@@ -134,7 +134,14 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         Section {
-            LabeledContent(AppLocalization.localized("Route and Search Provider"), value: AppLocalization.localized("Apple Maps"))
+            LabeledContent(
+                AppLocalization.text(english: "Metro routing", simplified: "地铁规划", traditional: "地鐵規劃"),
+                value: AppLocalization.text(english: "Included with the app", simplified: "随应用内置", traditional: "隨應用內建")
+            )
+            LabeledContent(
+                AppLocalization.text(english: "Places and walking", simplified: "地点与步行", traditional: "地點與步行"),
+                value: AppLocalization.localized("Apple Maps")
+            )
             LabeledContent(AppLocalization.localized("Official Station Details"), value: AppLocalization.localized("City Packs"))
             Button(role: .destructive) {
                 showClearCacheConfirmation = true
@@ -151,9 +158,9 @@ struct SettingsView: View {
                 Button(AppLocalization.localized("Cancel"), role: .cancel) {}
             } message: {
                 Text(AppLocalization.text(
-                    english: "Downloaded city packs, saved official station information, and temporary web data will be deleted and must be downloaded again. Your tags, trips, records, photos, and settings are not affected.",
-                    simplified: "已下载的城市数据包、已保存的官方车站信息和临时网页数据将被删除，需要重新下载。您的标签、行程、记录、照片和设置不受影响。",
-                    traditional: "已下載的城市資料包、已儲存的官方車站資訊和暫存網頁資料將被刪除，需要重新下載。您的標籤、行程、記錄、照片和設定不受影響。"
+                    english: "Saved official station information and temporary web data will be deleted, and fetched again when needed. Your tags, trips, records and settings are not affected.",
+                    simplified: "已保存的官方车站信息和临时网页数据将被删除，需要时会重新获取。您的标签、行程、记录和设置不受影响。",
+                    traditional: "已儲存的官方車站資訊和暫存網頁資料將被刪除，需要時會重新取得。您的標籤、行程、記錄和設定不受影響。"
                 ))
             }
         } header: {

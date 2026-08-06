@@ -284,7 +284,18 @@ struct StationDetailView: View {
                     HStack {
                         Image(systemName: "figure.roll")
                             .foregroundStyle(.green)
-                        Text(AppLocalization.localized("Fully Accessible Station"))
+                        // Not "Fully Accessible Station". Nothing publishes that; it was inferred
+                        // from a lift and a ramp both being listed somewhere at this station,
+                        // which is not the same as a step-free way from the street to the
+                        // platform — the exact inference `validate_indoor_maps.rb` exists to
+                        // prevent elsewhere. The two facts are worth showing; the conclusion is
+                        // not ours to draw, least of all for the riders who cannot absorb it
+                        // being wrong.
+                        Text(AppLocalization.text(
+                            english: "Lift and step-free entrance listed",
+                            simplified: "已列出电梯与无障碍入口",
+                            traditional: "已列出電梯與無障礙入口"
+                        ))
                             .font(.subheadline)
                             .foregroundStyle(.green)
                     }

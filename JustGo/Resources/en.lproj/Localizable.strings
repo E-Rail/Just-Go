@@ -23,7 +23,6 @@
 "Finding routes..." = "Finding routes...";
 "Flash Alerts" = "Flash Alerts";
 "Fully Accessible" = "Fully Accessible";
-"Fully Accessible Station" = "Fully Accessible Station";
 "Hearing" = "Hearing";
 "Hearing Impairment" = "Hearing Impairment";
 "High Contrast Mode" = "High Contrast Mode";
@@ -66,7 +65,6 @@
 "Search" = "Search";
 "Settings" = "Settings";
 "Show Accessibility Badges" = "Show Accessibility Badges";
-"Simplified UI" = "Simplified UI";
 "Station not found. Try another station name." = "Station not found. Try another station name.";
 "Station accessibility data is missing" = "Station accessibility data is missing";
 "Station accessibility data is verified" = "Station accessibility data is verified";
@@ -81,8 +79,6 @@
 "Map, station search, and routes" = "Map, station search, and routes";
 "Accessibility and station facilities" = "Accessibility and station facilities";
 "Official city packs when public sources exist" = "Official city packs when public sources exist";
-"Official first/last schedules; live countdown only when an official provider exists" = "Official first/last schedules; live countdown only when an official provider exists";
-"Route and Search Provider" = "Route and Search Provider";
 "Official Station Details" = "Official Station Details";
 "City Packs" = "City Packs";
 "Transfer" = "Transfer";

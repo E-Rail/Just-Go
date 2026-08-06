@@ -22,7 +22,6 @@ struct AccessibilityPreference: Codable, Equatable {
     var vibrationAlerts: Bool
 
     // Cognitive
-    var simplifiedUI: Bool
     var stepByStepGuidance: Bool
 
     static var `default`: AccessibilityPreference {
@@ -35,7 +34,6 @@ struct AccessibilityPreference: Codable, Equatable {
             audioNavigation: false,
             visualAnnouncements: false,
             vibrationAlerts: false,
-            simplifiedUI: false,
             stepByStepGuidance: false
         )
     }

@@ -22,7 +22,6 @@
 "Finding routes..." = "正在查找路線…";
 "Flash Alerts" = "閃光提醒";
 "Fully Accessible" = "完全無障礙";
-"Fully Accessible Station" = "完全無障礙車站";
 "Hearing" = "聽力";
 "Hearing Impairment" = "聽力障礙";
 "High Contrast Mode" = "高對比模式";
@@ -66,7 +65,6 @@
 "Search" = "搜尋";
 "Settings" = "設定";
 "Show Accessibility Badges" = "顯示無障礙標記";
-"Simplified UI" = "簡化介面";
 "Station not found. Try another station name." = "未找到車站。請嘗試其他車站名稱。";
 "Station accessibility data is missing" = "缺少車站無障礙資料";
 "Station accessibility data is verified" = "車站無障礙資料已驗證";
@@ -81,8 +79,6 @@
 "Map, station search, and routes" = "地圖、車站搜尋和路線";
 "Accessibility and station facilities" = "無障礙與車站設施";
 "Official city packs when public sources exist" = "有公開官方來源時使用官方城市資料包";
-"Official first/last schedules; live countdown only when an official provider exists" = "官方首末班時刻；只有接入官方來源時才顯示即時倒數";
-"Route and Search Provider" = "路線與搜尋提供方";
 "Official Station Details" = "官方車站詳情";
 "City Packs" = "城市資料包";
 "Transfer" = "轉乘";

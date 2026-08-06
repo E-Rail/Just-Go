@@ -7,7 +7,6 @@ ROOT = File.expand_path("..", __dir__)
 LOCALES = %w[en zh-Hans zh-Hant].freeze
 REQUIRED_INFO_KEYS = %w[
   NSLocationWhenInUseUsageDescription
-  NSCameraUsageDescription
 ].freeze
 ENTRY_PATTERN = /^\s*"((?:\\.|[^"])*)"\s*=\s*"((?:\\.|[^"])*)";\s*$/
 PLACEHOLDER_PATTERN = /%(?:\d+\$)?[@dfius]/

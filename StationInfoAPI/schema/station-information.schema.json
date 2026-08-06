@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/e-rail/justgo/StationInfoAPI/schema/station-information.schema.json",
+  "$id": "https://github.com/E-Rail/Just-Go/StationInfoAPI/schema/station-information.schema.json",
   "title": "Station Information Snapshot",
   "description": "The normalized shape every source is mapped into, whatever its raw upstream form. This is the machine-readable twin of DataPacks/STATION_INFORMATION_SCHEMA.md (schema version 2). A producer outputs a `snapshot`; the on-device cache wraps it in an `envelope` (see $defs.envelope).",
   "$comment": "schemaVersion 2. The `source` field is an open string on purpose: adding a city (e.g. shanghaiMetroOnline) is additive and does not bump this schema. The authoritative list of valid source identifiers lives in ../sources/sources.json.",

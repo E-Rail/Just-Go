@@ -42,7 +42,7 @@ struct RouteDetailView: View {
     // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
     // foreground use) isn't used as a fill under white text.
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     // Once per detail instance, NOT reset on disappear: leaving the auto-entered navigator
     // re-fires onAppear, and a reset would immediately re-enter it.
     @State private var didAutoPresentLiveGo = false

@@ -18,7 +18,7 @@ struct RouteResultsView: View {
     // Raw theme hex for the solid-fill chip below — see RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
     // isn't used as a fill under white text.
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
     var body: some View {
         List {

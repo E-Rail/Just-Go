@@ -73,7 +73,7 @@ struct LiveGoView: View {
     // Read directly rather than via Color.accentColor: this view is presented in a
     // .fullScreenCover, whose first rendered frame doesn't yet have the root .tint(...)
     // environment value propagated and would otherwise flash system blue.
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @Environment(AppState.self) private var appState
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?

@@ -8,7 +8,7 @@ struct LaunchStageView: View {
     let progress: Double
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
     // Not a `Text("…")` literal on purpose: the app name is a wordmark, never translated, and
     // Scripts/validate_localizations.rb rejects bare English literals in `Text(...)`.

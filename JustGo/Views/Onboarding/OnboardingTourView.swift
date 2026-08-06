@@ -9,7 +9,7 @@ struct OnboardingTourView: View {
     // Raw theme hex for the Continue/Get Started button's solid fill — see
     // RouteEntryView's identical declaration for why `Color.accentColor`
     // (dark-mode-lightened for foreground use) isn't used as a fill under white text.
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
     private struct TourPage {
         let icon: String

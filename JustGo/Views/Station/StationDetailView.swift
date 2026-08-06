@@ -417,7 +417,7 @@ struct PlanRouteButtons: View {
     var onSelected: () -> Void = {}
 
     @Environment(AppState.self) private var appState
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
     var body: some View {
         Button {

@@ -7,7 +7,7 @@ struct SettingsView: View {
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @State private var showTour = false
     @State private var showQuickTags = false
     @State private var showClearCacheConfirmation = false

@@ -100,7 +100,7 @@ final class KeyboardDismissGesture: NSObject, UIGestureRecognizerDelegate {
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.forestGreen.rawValue
+    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     // Same key the old one-shot welcome card used, so existing users never see the tour
     // uninvited; it stays replayable from Settings → App Tour.
     @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false

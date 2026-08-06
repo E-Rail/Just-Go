@@ -69,14 +69,48 @@ extension Color {
 }
 
 private extension UIColor {
-    /// Blends the color toward white just enough to reach `targetLuminance`, leaving
-    /// already-light colors unchanged. Perceptual luma keeps the lift even across hues.
+    /// Brightens the color to `targetLuminance` for use on a dark background, keeping its hue
+    /// **and its saturation**. Already-light colors are returned unchanged.
+    ///
+    /// This used to blend toward white, which reaches the target but drains the colour on the way:
+    /// the brand orange arrived as #C9955C, a bronze at 0.54 saturation, and forest green arrived
+    /// as a grey-green at 0.23. Raising brightness in HSB instead keeps the hue *and* the
+    /// saturation, and measured across all seven themes it is better on both counts every time —
+    /// brand orange #C9955C -> #F68C18 (sat 0.54 -> 0.90, contrast 6.43 -> 7.01 on #1C1C1E),
+    /// teal 0.40 -> 0.90, forest 0.23 -> 0.60. No theme lost contrast.
+    ///
+    /// Brightness alone cannot always get there — a saturated blue tops out darker than the target
+    /// — so the white blend stays as the fallback for that case rather than being deleted.
     func legibleOnDarkBackground(targetLuminance: CGFloat = 0.62) -> UIColor {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         guard getRed(&r, green: &g, blue: &b, alpha: &a) else { return self }
-        let luma = 0.299 * r + 0.587 * g + 0.114 * b
-        guard luma < targetLuminance else { return self }
-        let t = (targetLuminance - luma) / (1 - luma) // blend factor toward white, 0...1
+        func luma(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat) -> CGFloat {
+            0.299 * red + 0.587 * green + 0.114 * blue
+        }
+        guard luma(r, g, b) < targetLuminance else { return self }
+
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0
+        if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &a) {
+            // Binary search the brightness that lands on the target: luma is monotonic in
+            // brightness at fixed hue/saturation, but not linear in it.
+            var low = brightness, high: CGFloat = 1
+            for _ in 0..<24 {
+                let mid = (low + high) / 2
+                let candidate = UIColor(hue: hue, saturation: saturation, brightness: mid, alpha: a)
+                var cr: CGFloat = 0, cg: CGFloat = 0, cb: CGFloat = 0, ca: CGFloat = 0
+                candidate.getRed(&cr, green: &cg, blue: &cb, alpha: &ca)
+                if luma(cr, cg, cb) < targetLuminance { low = mid } else { high = mid }
+            }
+            let lifted = UIColor(hue: hue, saturation: saturation, brightness: high, alpha: a)
+            var lr: CGFloat = 0, lg: CGFloat = 0, lb: CGFloat = 0, la: CGFloat = 0
+            lifted.getRed(&lr, green: &lg, blue: &lb, alpha: &la)
+            if luma(lr, lg, lb) >= targetLuminance - 0.005 { return lifted }
+            r = lr; g = lg; b = lb
+        }
+
+        // Full brightness still too dark for the target — finish toward white.
+        let shortfall = luma(r, g, b)
+        let t = (targetLuminance - shortfall) / (1 - shortfall)
         return UIColor(
             red: r + (1 - r) * t,
             green: g + (1 - g) * t,

@@ -68,7 +68,7 @@ module OSMStationEntranceImporter
           ) do |http|
             request = Net::HTTP::Post.new(url.request_uri)
             request["Content-Type"] = "application/x-www-form-urlencoded"
-            request["User-Agent"] = "JustGo-DataImport/1.0"
+            request["User-Agent"] = "Just-Go-DataImport/1.0"
             request.body = body
             http.request(request)
           end

@@ -58,13 +58,13 @@ reaches_camera = Dir.glob(File.join(ROOT, "JustGo", "**", "*.swift")).any? do |p
   File.read(path, encoding: "UTF-8").include?("sourceType = .camera")
 end
 if declares_camera && !reaches_camera
-  errors << "JustGo must not declare camera access it never uses"
+  errors << "Just-Go must not declare camera access it never uses"
 end
 if reaches_camera && !declares_camera
   errors << "camera capture exists but JustGo-Info.plist declares no NSCameraUsageDescription"
 end
 if info_plist.include?("NSLocationAlwaysAndWhenInUseUsageDescription")
-  errors << "JustGo must not declare always-on location access"
+  errors << "Just-Go must not declare always-on location access"
 end
 
 retired_paths = %w[

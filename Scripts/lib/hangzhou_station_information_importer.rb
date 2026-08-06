@@ -66,7 +66,7 @@ module HangzhouStationInformationImporter
       request["Accept"] = "application/json"
       request["Origin"] = OPERATOR_URL.chomp("/")
       request["Referer"] = SITE_INQUIRY_URL
-      request["User-Agent"] = "JustGo-DataImport/1.0"
+      request["User-Agent"] = "Just-Go-DataImport/1.0"
       request.body = ""
       http.request(request)
     end

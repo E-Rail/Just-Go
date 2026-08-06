@@ -61,7 +61,7 @@ module GuangzhouStationInformationImporter
       request = Net::HTTP::Post.new(uri.request_uri)
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"
-      request["User-Agent"] = "JustGo-DataImport/1.0"
+      request["User-Agent"] = "Just-Go-DataImport/1.0"
       request.body = "{}"
       http.request(request)
     end

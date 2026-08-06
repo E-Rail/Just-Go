@@ -290,7 +290,7 @@ struct RouteDetailView: View {
     }
 
     /// Stops, transfers and which door to go in by — the line Amap spends on "13站 · ¥5 · 玉泉路
-    /// (C2东南口) 进站". There is no fare here and there will not be one: JustGo holds no fare data
+    /// (C2东南口) 进站". There is no fare here and there will not be one: Just-Go holds no fare data
     /// for any city, and a fare inferred from a stop count is exactly the guess this app refuses
     /// to make. The entrance is real — it is the door the plan actually routed the rider to.
     private var heroSummary: String {
@@ -450,7 +450,7 @@ struct RouteDetailView: View {
 
     /// What the operator says about riding this route today.
     ///
-    /// Amap fills this space with live advisory text scraped from the operator. JustGo has no
+    /// Amap fills this space with live advisory text scraped from the operator. Just-Go has no
     /// advisory feed, so it shows the two things it can actually stand behind and says where each
     /// came from: the service warnings it derives from official first/last-train data, and a link
     /// to the operator's own service-status page carrying the provider's name and the date that

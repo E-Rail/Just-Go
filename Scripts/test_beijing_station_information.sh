@@ -12,7 +12,7 @@ if [ ! -x "$SWIFTC" ]; then
     exit 1
 fi
 
-BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/justgo-beijing-station-information.XXXXXX")
+BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/just-go-beijing-station-information.XXXXXX")
 trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
 
 "$SWIFTC" \

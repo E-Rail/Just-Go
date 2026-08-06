@@ -6,7 +6,7 @@ CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
 CITY_PACK_FALLBACK_BASE_URL =
 
 // Xcode 16 defaults Debug app targets to the "debug dylib" layout for SwiftUI Previews: the
-// executable becomes a 40 KB stub and all ~23 MB of app code moves into JustGo.debug.dylib,
+// executable becomes a 40 KB stub and all ~23 MB of app code moves into Just-Go.debug.dylib,
 // which dyld must map and bind before main — outside the shared cache, unoptimised. On device
 // that dominated launch (the app was reaching the ~20s launch watchdog and getting SIGKILLed
 // in dyld, before any of our code ran).

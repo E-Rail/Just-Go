@@ -23,7 +23,7 @@ workers = Array.new(8) do
       value = queue.pop(true)
       uri = URI(value)
       request = Net::HTTP::Head.new(uri)
-      request["User-Agent"] = "JustGo scheduled official-link audit"
+      request["User-Agent"] = "Just-Go scheduled official-link audit"
       response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 8, read_timeout: 12) do |http|
         http.request(request)
       end

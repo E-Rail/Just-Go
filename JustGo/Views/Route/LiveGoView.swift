@@ -298,9 +298,9 @@ struct LiveGoView: View {
                 }
                 if guidance.externalResources.contains(where: { $0.kind.isTransferRelevant }) {
                     Text(AppLocalization.text(
-                        english: "Official links are reference material only. JustGo infers nothing from them.",
-                        simplified: "官方链接仅供参考；JustGo 不会据此作任何推断。",
-                        traditional: "官方連結僅供參考；JustGo 不會據此作任何推斷。"
+                        english: "Official links are reference material only. Just-Go infers nothing from them.",
+                        simplified: "官方链接仅供参考；Just-Go 不会据此作任何推断。",
+                        traditional: "官方連結僅供參考；Just-Go 不會據此作任何推斷。"
                     ))
                         .rowMeta()
                         .multilineTextAlignment(.center)

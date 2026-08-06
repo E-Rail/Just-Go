@@ -35,9 +35,9 @@ struct OfficialTransitResourceButton: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(AppLocalization.text(
-                english: "\(displayTitle), \(resource.format.badgeTitle), opens inside JustGo from \(resource.provider)",
-                simplified: "\(displayTitle)，\(resource.format.badgeTitle)，在 JustGo 内打开 \(resource.provider)",
-                traditional: "\(displayTitle)，\(resource.format.badgeTitle)，在 JustGo 內開啟 \(resource.provider)"
+                english: "\(displayTitle), \(resource.format.badgeTitle), opens inside Just-Go from \(resource.provider)",
+                simplified: "\(displayTitle)，\(resource.format.badgeTitle)，在 Just-Go 内打开 \(resource.provider)",
+                traditional: "\(displayTitle)，\(resource.format.badgeTitle)，在 Just-Go 內開啟 \(resource.provider)"
             ))
             .fullScreenCover(isPresented: $isPresentingViewer) {
                 OfficialTransitResourceViewer(resource: resource)
@@ -508,9 +508,9 @@ private enum OfficialTransitBinaryLoadError: LocalizedError {
             )
         case .insecureRedirect:
             return AppLocalization.text(
-                english: "JustGo blocked a redirect to a non-secure address.",
-                simplified: "JustGo 已阻止重定向至非安全地址。",
-                traditional: "JustGo 已封鎖重新導向至非安全位址。"
+                english: "Just-Go blocked a redirect to a non-secure address.",
+                simplified: "Just-Go 已阻止重定向至非安全地址。",
+                traditional: "Just-Go 已封鎖重新導向至非安全位址。"
             )
         case .tooLarge:
             return AppLocalization.text(
@@ -754,7 +754,7 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
       if (!viewport.parentNode) document.head.appendChild(viewport);
 
       const style = document.createElement('style');
-      style.id = 'justgo-station-reader';
+      style.id = 'just-go-station-reader';
       style.textContent = `
         :root { color-scheme: light; }
         html, body {
@@ -1018,9 +1018,9 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
                     state.failed(
                         webView,
                         message: AppLocalization.text(
-                            english: "JustGo blocked a non-secure link from this page.",
-                            simplified: "JustGo 已阻止此页面中的非安全链接。",
-                            traditional: "JustGo 已封鎖此頁面中的非安全連結。"
+                            english: "Just-Go blocked a non-secure link from this page.",
+                            simplified: "Just-Go 已阻止此页面中的非安全链接。",
+                            traditional: "Just-Go 已封鎖此頁面中的非安全連結。"
                         )
                     )
                 }
@@ -1058,9 +1058,9 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
                 state.failed(
                     webView,
                     message: AppLocalization.text(
-                        english: "This operator file cannot be displayed inside JustGo.",
-                        simplified: "此运营方文件无法在 JustGo 内显示。",
-                        traditional: "此營運方檔案無法在 JustGo 內顯示。"
+                        english: "This operator file cannot be displayed inside Just-Go.",
+                        simplified: "此运营方文件无法在 Just-Go 内显示。",
+                        traditional: "此營運方檔案無法在 Just-Go 內顯示。"
                     )
                 )
                 decisionHandler(.cancel)

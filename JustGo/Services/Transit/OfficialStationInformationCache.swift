@@ -5,7 +5,7 @@ enum StationInformationCacheLocation {
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? fileManager.temporaryDirectory
         return base
-            .appendingPathComponent("JustGo", isDirectory: true)
+            .appendingPathComponent("Just-Go", isDirectory: true)
             .appendingPathComponent("StationInformationCache", isDirectory: true)
     }
 }

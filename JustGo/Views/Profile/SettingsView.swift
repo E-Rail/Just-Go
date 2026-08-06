@@ -83,7 +83,7 @@ struct SettingsView: View {
             Text(AppLocalization.localized("Language"))
         } footer: {
             if languagePreference != AppLocalization.launchPreference.rawValue {
-                Text(AppLocalization.localized("Language changes take effect after restarting JustGo."))
+                Text(AppLocalization.localized("Language changes take effect after restarting Just-Go."))
             }
         }
     }

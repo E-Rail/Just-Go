@@ -12,7 +12,7 @@ struct LaunchStageView: View {
 
     // Not a `Text("…")` literal on purpose: the app name is a wordmark, never translated, and
     // Scripts/validate_localizations.rb rejects bare English literals in `Text(...)`.
-    private let wordmark = "JustGo"
+    private let wordmark = "Just-Go"
 
     private var themeColor: Color {
         Color.adaptive(hex: selectedThemeHex)

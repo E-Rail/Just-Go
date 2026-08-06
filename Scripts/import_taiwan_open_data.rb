@@ -55,7 +55,7 @@ def download(url)
   5.times do
     request = Net::HTTP::Get.new(uri)
     # data.taipei answers non-browser agents with an error page rather than the file.
-    request["User-Agent"] = "Mozilla/5.0 (compatible; JustGo open-data importer)"
+    request["User-Agent"] = "Mozilla/5.0 (compatible; Just-Go open-data importer)"
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
                                open_timeout: 30, read_timeout: 120) { |http| http.request(request) }
     return response.body if response.is_a?(Net::HTTPSuccess)

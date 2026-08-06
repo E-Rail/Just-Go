@@ -210,9 +210,9 @@ struct SearchPageView: View {
 
     private var currentLocationUnavailableReason: String {
         AppLocalization.text(
-            english: "Location access is off for JustGo",
-            simplified: "JustGo 没有定位权限",
-            traditional: "JustGo 沒有定位權限"
+            english: "Location access is off for Just-Go",
+            simplified: "Just-Go 没有定位权限",
+            traditional: "Just-Go 沒有定位權限"
         )
     }
 

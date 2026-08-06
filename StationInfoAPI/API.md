@@ -1,12 +1,12 @@
 # Station Information API — call guide
 
-This is a **client contract**, not a hosted service. There is no JustGo server to call. You read
+This is a **client contract**, not a hosted service. There is no Just-Go server to call. You read
 three static files, then fetch each operator **yourself, on your end-user's device**, and reshape
 the response into one uniform schema.
 
 That indirection is the whole design. For Beijing, Shanghai and Guangzhou the grant is
 `LicenseRef-External-Link-Only`: the operator's page content — first/last trains, exits, facilities
-— may be linked and indexed but **not copied and re-served**. So neither JustGo nor you may stand up
+— may be linked and indexed but **not copied and re-served**. So neither Just-Go nor you may stand up
 an endpoint that proxies it. Each app fetches it live, on its own users' devices, and redistributes
 nothing. Hong Kong is different (`LicenseRef-DATA-GOV-HK-1.2`, redistributable) and its static data
 ships in a pack; see [Hong Kong](#hong-kong) below.

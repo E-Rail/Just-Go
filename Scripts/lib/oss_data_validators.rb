@@ -410,10 +410,10 @@ module OSSDataValidators
       # Vendored OSM entrances, and the packs built purely from them. Beijing's pack also carries
       # its landing-link grant, so it stays in the explicit table below.
       if path.match?(%r{\ADataPacks/sources/osm-entrances/[^/]+\.json\z})
-        return %w[justgo-generated-catalog osm-metro-networks].sort
+        return %w[just-go-generated-catalog osm-metro-networks].sort
       end
       if path.match?(%r{\AJustGo/Resources/BundledCityPacks/(?!1100|7101|8100)[^/]+\.json\z})
-        return %w[justgo-generated-catalog osm-metro-networks].sort
+        return %w[just-go-generated-catalog osm-metro-networks].sort
       end
       return ["data-gov-hk-mtr"] if path.match?(%r{\ADataPacks/sources/8100/[^/]+\.csv\z})
       return ["taipei-open-data"] if path.match?(%r{\ADataPacks/sources/7101/[^/]+\.csv\z})
@@ -421,7 +421,7 @@ module OSSDataValidators
       # rights union; the per-city subset lives inside the document itself.
       if path.match?(%r{\ADataPacks/universal/[^/]+\.json\z})
         return %w[
-          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
           macau-official-landing-link
           official-transit-resource-links osm-metro-networks taipei-open-data
         ].sort
@@ -429,48 +429,48 @@ module OSSDataValidators
 
       {
         "DataPacks/manifest.json" => %w[
-          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
           macau-official-landing-link
           osm-metro-networks taipei-open-data
         ].sort,
-        "DataPacks/rights_inventory.json" => ["justgo-generated-catalog"],
+        "DataPacks/rights_inventory.json" => ["just-go-generated-catalog"],
         "DataPacks/official_transit_resources.json" => %w[
-          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
           official-transit-resource-links osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/shanghai_station_information.json" => %w[
-          justgo-generated-catalog official-transit-resource-links osm-metro-networks
+          just-go-generated-catalog official-transit-resource-links osm-metro-networks
           shanghai-official-landing-links
         ].sort,
         "DataPacks/sources/official-resources/guangzhou_station_information.json" => %w[
-          guangzhou-official-station-references justgo-generated-catalog osm-metro-networks
+          guangzhou-official-station-references just-go-generated-catalog osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hangzhou_station_information.json" => %w[
-          hangzhou-official-station-references justgo-generated-catalog osm-metro-networks
+          hangzhou-official-station-references just-go-generated-catalog osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/beijing_station_information.json" => %w[
-          beijing-official-landing-links justgo-generated-catalog
+          beijing-official-landing-links just-go-generated-catalog
           official-transit-resource-links osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hong_kong_index.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+          data-gov-hk-mtr just-go-generated-catalog official-transit-resource-links
           osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hong_kong_station_bindings.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog osm-metro-networks
+          data-gov-hk-mtr just-go-generated-catalog osm-metro-networks
         ].sort,
-        "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr justgo-generated-catalog].sort,
-        "DataPacks/sources/7101/metadata.json" => %w[justgo-generated-catalog taipei-open-data].sort,
+        "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr just-go-generated-catalog].sort,
+        "DataPacks/sources/7101/metadata.json" => %w[just-go-generated-catalog taipei-open-data].sort,
         "JustGo/Resources/BundledCityPacks/7101.json" => %w[
-          justgo-generated-catalog osm-metro-networks taipei-open-data
+          just-go-generated-catalog osm-metro-networks taipei-open-data
         ].sort,
-        "THIRD_PARTY_NOTICES.md" => ["justgo-generated-catalog"],
+        "THIRD_PARTY_NOTICES.md" => ["just-go-generated-catalog"],
         "JustGo/Resources/BundledCityPacks/1100.json" => %w[
-          beijing-official-landing-links justgo-generated-catalog
+          beijing-official-landing-links just-go-generated-catalog
           osm-metro-networks
         ].sort,
         "JustGo/Resources/BundledCityPacks/8100.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog osm-metro-networks
+          data-gov-hk-mtr just-go-generated-catalog osm-metro-networks
         ].sort
       }[path]
     end

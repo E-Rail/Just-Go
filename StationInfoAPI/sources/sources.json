@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "The source registry: for each supported source, its licence, how to fetch it, and how to map its raw response into ../schema/station-information.schema.json. This is JustGo's own authored normalization knowledge (MIT); the endpoint URLs are links, in the same category as the sourcePageURL values in the directory. It carries no operator content.",
+  "description": "The source registry: for each supported source, its licence, how to fetch it, and how to map its raw response into ../schema/station-information.schema.json. This is Just-Go's own authored normalization knowledge (MIT); the endpoint URLs are links, in the same category as the sourcePageURL values in the directory. It carries no operator content.",
   "wireSchema": "../schema/station-information.schema.json",
   "conventions": {
     "status": {

@@ -619,7 +619,7 @@ def fetch_source(city_id, city, refresh:)
 
   response = OVERPASS_URLS.lazy.map do |url|
     request = Net::HTTP::Post.new(url)
-    request["User-Agent"] = "JustGo metro geometry importer"
+    request["User-Agent"] = "Just-Go metro geometry importer"
     request.set_form_data("data" => overpass_query(city[:bbox]))
     Net::HTTP.start(
       url.host,

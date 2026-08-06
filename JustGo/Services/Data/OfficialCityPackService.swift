@@ -129,7 +129,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private static let maximumManifestBytes = 2_000_000
     private static let maximumPackBytes = 50_000_000
     private static let approvedRightsIDs: Set<String> = [
-        "justgo-generated-catalog",
+        "just-go-generated-catalog",
         "osm-metro-networks",
         "data-gov-hk-mtr",
         "beijing-official-landing-links",
@@ -1857,7 +1857,7 @@ enum CityPackStorageLocation {
             in: .userDomainMask
         ).first ?? fileManager.temporaryDirectory
         return applicationSupport
-            .appendingPathComponent("JustGo", isDirectory: true)
+            .appendingPathComponent("Just-Go", isDirectory: true)
             .appendingPathComponent("CityPacks", isDirectory: true)
     }
 }

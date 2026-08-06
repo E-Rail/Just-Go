@@ -25,7 +25,7 @@ struct OnboardingTourView: View {
         [
             TourPage(
                 icon: "map.fill",
-                title: AppLocalization.text(english: "Welcome to JustGo", simplified: "欢迎使用 JustGo", traditional: "歡迎使用 JustGo"),
+                title: AppLocalization.text(english: "Welcome to Just-Go", simplified: "欢迎使用 Just-Go", traditional: "歡迎使用 Just-Go"),
                 points: [
                     ("map", AppLocalization.text(
                         english: "Metro routing for 53 Chinese cities. The map is the app — pan it, or search for anywhere.",

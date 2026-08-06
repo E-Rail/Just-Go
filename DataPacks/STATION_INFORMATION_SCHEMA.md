@@ -1,20 +1,20 @@
 # Station Information Schema (v2)
 
-The interchange format JustGo uses for live, operator-published station information: first/last
+The interchange format Just-Go uses for live, operator-published station information: first/last
 trains, exits, and facilities. It is the shape of every entry in the device-only station
 information cache, and it is documented here so other applications can implement against the same
 contract.
 
 ## What this document is, and is not
 
-**This is a schema, not a dataset.** JustGo bundles no operator station content and this repository
+**This is a schema, not a dataset.** Just-Go bundles no operator station content and this repository
 ships none. Beijing's first/last trains, exits, and facilities are covered by
 `beijing-official-landing-links` in `rights_inventory.json`, whose grant is
 `LicenseRef-External-Link-Only`:
 
 > no operator page text, schedules, facilities, exits, coordinates, images, or media are copied
 
-so JustGo requests them from `www.bjsubway.com` on the rider's own device, keeps a last-good copy
+so Just-Go requests them from `www.bjsubway.com` on the rider's own device, keeps a last-good copy
 under Application Support (backup-excluded, wiped by Settings → Clear Cache), and redistributes
 nothing. What *is* bundled is `sources/official-resources/beijing_station_information.json`, which
 holds only station IDs, names, aliases, and page URLs — the permitted scope.

@@ -67,15 +67,15 @@ links.
 
 Linked resources render only after a user taps them. Pages use an ephemeral WebKit data store; PDFs and
 images use memory-only native renderers with a 50 MB response limit. Their state is discarded with
-the presentation. JustGo does not prefetch, persist, or redistribute operator content, and external
+the presentation. Just-Go does not prefetch, persist, or redistribute operator content, and external
 maps do not count as offline coverage or evidence of an indoor path or door position. The operator
 receives the user-initiated network request and applies its own privacy terms. Unsupported resources
 offer an explicit browser fallback. Linking and user-initiated rendering are conservative
 engineering controls, not a legal guarantee.
 
 Beijing source and context pages may load provider-selected third-party web services after the
-rider taps. The native station-information request contacts only `www.bjsubway.com`; JustGo does
-not send the response to a JustGo server or retain it beyond the in-memory cache and the rider's
+rider taps. The native station-information request contacts only `www.bjsubway.com`; Just-Go does
+not send the response to a Just-Go server or retain it beyond the in-memory cache and the rider's
 own device-local, user-clearable snapshot described above. The source-page reader remains
 non-persistent and does not relicense provider text.
 

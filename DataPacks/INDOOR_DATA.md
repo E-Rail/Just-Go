@@ -1,6 +1,6 @@
 # Indoor And Transfer Data
 
-JustGo ships no indoor diagrams, transfer paths, or station map files, and **has no runtime that
+Just-Go ships no indoor diagrams, transfer paths, or station map files, and **has no runtime that
 could consume them**. `verifiedTransferContexts.covered` is zero for every catalog city and the
 metric is retained only so a pack that claimed otherwise would fail validation.
 

@@ -53,7 +53,7 @@ module ShanghaiStationInformationImporter
       uri.host, uri.port, use_ssl: uri.scheme == "https",
       open_timeout: 15, read_timeout: 30
     ) do |http|
-      http.get(uri.request_uri, "User-Agent" => "JustGo-DataImport/1.0", "Accept" => "application/json")
+      http.get(uri.request_uri, "User-Agent" => "Just-Go-DataImport/1.0", "Accept" => "application/json")
     end
     unless response.code == "200"
       raise ImportError, "Shanghai station index returned HTTP #{response.code}"

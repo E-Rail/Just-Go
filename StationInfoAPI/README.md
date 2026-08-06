@@ -19,7 +19,7 @@ copy and re-serve their content. See [`API.md`](API.md) for the reasoning and th
 | [`API.md`](API.md) | the call guide | MIT (authored) | by hand |
 
 None of these files carry operator content — only station IDs, names, aliases, page URLs, and
-JustGo's own authored schema and mapping recipes. The prose companion to the schema is
+Just-Go's own authored schema and mapping recipes. The prose companion to the schema is
 [`../DataPacks/STATION_INFORMATION_SCHEMA.md`](../DataPacks/STATION_INFORMATION_SCHEMA.md).
 
 ## How the three layers fit together

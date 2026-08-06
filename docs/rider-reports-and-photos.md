@@ -2,7 +2,7 @@
 
 Status: **plan, nothing built.** Written 2026-08-05. Supersedes nothing.
 
-This is the first thing JustGo has proposed that cannot be done on the device alone. Everything
+This is the first thing Just-Go has proposed that cannot be done on the device alone. Everything
 until now — routing, packs, the operator fetch — is either bundled or read directly by the rider's
 phone and cached for nobody else. Structured reports and shared photos are different in kind: they
 are *other people's* data arriving on *this* rider's screen, and that needs a server, a moderation

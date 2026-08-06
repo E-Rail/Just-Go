@@ -7,7 +7,7 @@ import os
 /// servicing its runloop == the UI is frozen, which is exactly what we need to measure (and
 /// what wall-clock timing around individual functions cannot tell us on its own).
 enum MainThreadHangMonitor {
-    private static let log = Logger(subsystem: "com.justgo.diag", category: "hang")
+    private static let log = Logger(subsystem: "com.e-rail.just-go.diag", category: "hang")
     nonisolated(unsafe) private static var lastBeat = CFAbsoluteTimeGetCurrent()
     private static let lock = NSLock()
 
@@ -20,7 +20,7 @@ enum MainThreadHangMonitor {
         RunLoop.main.add(timer, forMode: .common)
 
         Thread.detachNewThread {
-            Thread.current.name = "justgo-hang-monitor"
+            Thread.current.name = "just-go-hang-monitor"
             var worstStale: Double = 0
             while true {
                 Thread.sleep(forTimeInterval: 0.02)

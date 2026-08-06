@@ -12,7 +12,7 @@ class OSSDataValidatorsTest < Minitest::Test
   SOURCE_ROOT = File.expand_path("..", __dir__)
 
   def setup
-    @root = Dir.mktmpdir("justgo-oss-validator")
+    @root = Dir.mktmpdir("just-go-oss-validator")
     copy_fixture
   end
 
@@ -150,7 +150,7 @@ class OSSDataValidatorsTest < Minitest::Test
     entry = inventory.fetch("files").find do |item|
       item["path"] == "DataPacks/sources/8100/mtr_lines_and_stations.csv"
     end
-    entry["rightsIDs"] = ["justgo-generated-catalog"]
+    entry["rightsIDs"] = ["just-go-generated-catalog"]
     write_json("DataPacks/rights_inventory.json", inventory)
 
     error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
@@ -209,7 +209,7 @@ class OSSDataValidatorsTest < Minitest::Test
   def initialize_fixture_repository
     git("init")
     git("config", "user.email", "tests@example.com")
-    git("config", "user.name", "JustGo Tests")
+    git("config", "user.name", "Just-Go Tests")
     # `git commit` forks background maintenance once the fixture's loose objects pass gc.auto, and
     # it keeps writing into .git after commit returns — teardown's remove_entry then races it and
     # dies with ENOTEMPTY. How close the fixture sits to that threshold depends on how many

@@ -27,10 +27,9 @@ final class StationSearchService {
     func search(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return await nearestStations(to: coordinate, limit: nearbyStationLimit) }
+        let needle = query.lowercased()
         let bundledMatches = rankedByDistance(
-            await metroNetworkProvider.allStations().filter {
-                stationSearchText($0).localizedCaseInsensitiveContains(query)
-            },
+            await metroNetworkProvider.allStations().filter { $0.searchKey.contains(needle) },
             from: coordinate
         )
         let region = coordinate.map {
@@ -175,12 +174,6 @@ final class StationSearchService {
             return matches
         }
     }
-}
-
-private func stationSearchText(_ station: Station) -> String {
-    [station.name, station.nameEn, station.namePinyin]
-        .compactMap { $0 }
-        .joined(separator: " ")
 }
 
 struct StationFilter {

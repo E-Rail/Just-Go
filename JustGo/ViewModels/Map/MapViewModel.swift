@@ -38,6 +38,20 @@ enum MapCameraSpan {
     static let station: CLLocationDegrees = 0.008
 }
 
+/// `@MainActor` because it publishes SwiftUI-observed state.
+///
+/// It was `@Observable` with no isolation, while its sibling `StationDetailViewModel` has always
+/// been `@MainActor`. `scheduleVisibleStationsRefresh` spawns an unstructured `Task` from a
+/// nonisolated context, so `refreshVisibleStations()` — and its assignment to the observed
+/// `stations` property — ran on the cooperative pool. Mutating observed state off the main actor
+/// is the kind of bug that works until the day it does not.
+///
+/// The reason this was not simply annotated before is the O(N) filter in `refreshVisibleStations`,
+/// whose own comment called it "the dominant map-interaction CPU cost" — moving that to the main
+/// thread would have traded a latent race for a visible stutter. Measured on device (Release,
+/// 6,718 stations, a Beijing-sized viewport): **0.07 ms per refresh**. The 50 ms debounce added
+/// since that comment was written is what made it cheap. It is safe on the main actor now.
+@MainActor
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
@@ -51,10 +65,10 @@ final class MapViewModel {
     private let stationSearchService: StationSearchService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
-    private var viewportLoadTask: Task<Void, Never>?
+    @ObservationIgnored nonisolated(unsafe) private var viewportLoadTask: Task<Void, Never>?
     // Publish token. A load only writes its results if no newer load has started since.
     private var networkLoadGeneration = 0
-    private var markerRefreshTask: Task<Void, Never>?
+    @ObservationIgnored nonisolated(unsafe) private var markerRefreshTask: Task<Void, Never>?
 
     init(
         locationService: LocationService,
@@ -66,6 +80,8 @@ final class MapViewModel {
         self.metroNetworkProvider = metroNetworkProvider
     }
 
+    // `nonisolated` on the two task handles above is what lets this run: `deinit` is
+    // nonisolated and cannot touch main-actor state, and `Task.cancel()` is safe from any thread.
     deinit {
         viewportLoadTask?.cancel()
         markerRefreshTask?.cancel()

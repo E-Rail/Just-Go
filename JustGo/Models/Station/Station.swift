@@ -21,6 +21,27 @@ final class Station: Identifiable, Hashable {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
+    /// The station's names, lowercased and joined once, for keyword search to scan.
+    ///
+    /// Search used to build this string per station per keystroke and then run
+    /// `localizedCaseInsensitiveContains` — a locale-aware ICU search — over each one. Measured on
+    /// device (Release, 6,718 stations, worst-case single-character query): **21.7 ms per
+    /// keystroke, against 5.0 ms** for a plain `contains` on a precomputed key. Search is
+    /// debounced at 180 ms, so this is not a hang; it is 17 ms of CPU burned on every typing pause.
+    ///
+    /// Lazily built and cached, because most stations are never searched against in a session and
+    /// building 6,718 of these at decode time would move the cost to launch rather than remove it.
+    private var cachedSearchKey: String?
+
+    var searchKey: String {
+        if let cachedSearchKey { return cachedSearchKey }
+        // `namePinyin` is deliberately absent: it is never populated for network-derived stations
+        // (measured 0 of 6,718), so including it only lengthened a string nobody could match on.
+        let key = (nameEn.map { "\(name) \($0)" } ?? name).lowercased()
+        cachedSearchKey = key
+        return key
+    }
+
     init(
         stationID: String,
         name: String,

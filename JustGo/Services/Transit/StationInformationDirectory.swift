@@ -23,15 +23,50 @@ struct StationDirectoryEntry: Sendable, Equatable {
 }
 
 final class StationInformationDirectory: Sendable {
-    /// Sources whose data is fetched live on the rider's device. `bundledDataset` sources (Hong
-    /// Kong) are served from the city pack and are intentionally excluded from the online path.
-    private let onDeviceFetchSources: Set<String>
-    /// City IDs a `stable` source covers — used to answer "does this city have station info" the
-    /// same way the API's `sources.json` declares it, rather than hard-coding city IDs.
-    private let servedCityIDs: Set<String>
-    private let entriesByStationID: [String: StationDirectoryEntry]
+    private struct Contents: Sendable {
+        /// Sources whose data is fetched live on the rider's device. `bundledDataset` sources (Hong
+        /// Kong) are served from the city pack and are intentionally excluded from the online path.
+        let onDeviceFetchSources: Set<String>
+        /// City IDs a `stable` source covers — used to answer "does this city have station info"
+        /// the same way the API's `sources.json` declares it, rather than hard-coding city IDs.
+        let servedCityIDs: Set<String>
+        let entriesByStationID: [String: StationDirectoryEntry]
+    }
+
+    /// Parsed on first use, not on construction.
+    ///
+    /// `directory.json` is **453 KB / 1,598 entries**, and this type was built inside
+    /// `DIContainer.configure()`, which runs in `JustGoApp.init()` — so the whole file was read,
+    /// deserialised and walked on the main thread before the app had drawn anything. The comment
+    /// on the very next line of `configure()` explains that the bundled catalog was handed a lazy
+    /// loader for exactly this reason; the directory beside it was missed.
+    ///
+    /// Nothing on the launch path asks a station-information question — the first caller is a
+    /// route plan or a station sheet, both already off the main actor — so the work simply moves
+    /// to where it is needed. The lock is uncontended in practice and makes the type honestly
+    /// `Sendable` rather than relying on the callers happening to be serialised.
+    private let bundle: Bundle
+    private let lock = NSLock()
+    nonisolated(unsafe) private var loaded: Contents?
+
+    private var contents: Contents {
+        lock.lock()
+        defer { lock.unlock() }
+        if let loaded { return loaded }
+        let parsed = Self.parse(bundle: bundle)
+        loaded = parsed
+        return parsed
+    }
+
+    private var onDeviceFetchSources: Set<String> { contents.onDeviceFetchSources }
+    private var servedCityIDs: Set<String> { contents.servedCityIDs }
+    private var entriesByStationID: [String: StationDirectoryEntry] { contents.entriesByStationID }
 
     init(bundle: Bundle = .main) {
+        self.bundle = bundle
+    }
+
+    private static func parse(bundle: Bundle) -> Contents {
         let directory = Self.loadJSONObject(named: "directory", bundle: bundle)
         let sources = Self.loadJSONObject(named: "sources", bundle: bundle)
 
@@ -49,8 +84,6 @@ final class StationInformationDirectory: Sendable {
                 }
             }
         }
-        onDeviceFetchSources = onDeviceFetch
-        servedCityIDs = servedCities
 
         var entries: [String: StationDirectoryEntry] = [:]
         if let stations = directory?["stations"] as? [String: Any] {
@@ -78,7 +111,11 @@ final class StationInformationDirectory: Sendable {
                 )
             }
         }
-        entriesByStationID = entries
+        return Contents(
+            onDeviceFetchSources: onDeviceFetch,
+            servedCityIDs: servedCities,
+            entriesByStationID: entries
+        )
     }
 
     /// The routing entry for a canonical station, if any source covers it live.

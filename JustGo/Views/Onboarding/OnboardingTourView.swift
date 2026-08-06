@@ -6,6 +6,7 @@ import SwiftUI
 struct OnboardingTourView: View {
     let onFinish: () -> Void
     @State private var pageIndex = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     // Raw theme hex for the Continue/Get Started button's solid fill — see
     // RouteEntryView's identical declaration for why `Color.accentColor`
     // (dark-mode-lightened for foreground use) isn't used as a fill under white text.
@@ -15,28 +16,31 @@ struct OnboardingTourView: View {
         let icon: String
         let title: String
         let points: [(icon: String, text: String)]
+        /// The last page offers the colour choice. Once, here, at the moment it means something —
+        /// the alternative is a preference the rider only discovers by going looking in Settings.
+        var showsThemePicker = false
     }
 
     private var pages: [TourPage] {
         [
             TourPage(
-                icon: "tram.circle.fill",
+                icon: "map.fill",
                 title: AppLocalization.text(english: "Welcome to JustGo", simplified: "欢迎使用 JustGo", traditional: "歡迎使用 JustGo"),
                 points: [
-                    ("building.2", AppLocalization.text(
-                        english: "Metro route planning for 46+ Chinese cities — pick your city at the top of the Route tab.",
-                        simplified: "支持中国46+城市的地铁路线规划——在“路线”页顶部选择城市。",
-                        traditional: "支援中國46+城市的地鐵路線規劃——在「路線」頁頂部選擇城市。"
+                    ("map", AppLocalization.text(
+                        english: "Metro routing for 53 Chinese cities. The map is the app — pan it, or search for anywhere.",
+                        simplified: "覆盖中国 53 个城市的地铁规划。地图就是主界面——直接拖动，或搜索任意地点。",
+                        traditional: "涵蓋中國 53 個城市的地鐵規劃。地圖就是主畫面——直接拖曳，或搜尋任何地點。"
+                    )),
+                    ("wifi.slash", AppLocalization.text(
+                        english: "Routes are planned on your phone, so they work underground and with no signal.",
+                        simplified: "路线在手机本地规划，地下无信号也能用。",
+                        traditional: "路線在手機本機規劃，地下無訊號也能用。"
                     )),
                     ("magnifyingglass", AppLocalization.text(
-                        english: "Type where you start and where you're going — stations, places, or addresses all work.",
-                        simplified: "输入出发地和目的地——车站、地点或地址都可以。",
-                        traditional: "輸入出發地和目的地——車站、地點或地址都可以。"
-                    )),
-                    ("location.fill", AppLocalization.text(
-                        english: "The chips under the fields fill them in one tap: your current location, Home, Work.",
-                        simplified: "输入框下方的快捷标签一点即填：当前位置、家、公司。",
-                        traditional: "輸入框下方的快捷標籤一點即填：目前位置、家、公司。"
+                        english: "Tap a start or destination field to search stations, places and addresses.",
+                        simplified: "点按起点或终点输入框，可搜索车站、地点和地址。",
+                        traditional: "點按起點或終點輸入框，可搜尋車站、地點和地址。"
                     ))
                 ]
             ),
@@ -45,19 +49,19 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Compare and go", simplified: "比较路线，出发", traditional: "比較路線，出發"),
                 points: [
                     ("list.bullet", AppLocalization.text(
-                        english: "Every search shows alternatives — fastest, fewest transfers, least walking — with what each is best for.",
-                        simplified: "每次搜索都给出多条备选：最快、换乘最少、步行最少，并标明各自适合谁。",
-                        traditional: "每次搜尋都給出多條備選:最快、換乘最少、步行最少，並標明各自適合誰。"
+                        english: "Every search offers alternatives — fastest, fewest transfers, least walking.",
+                        simplified: "每次搜索都提供多条备选：最快、换乘最少、步行最少。",
+                        traditional: "每次搜尋都提供多條備選：最快、換乘最少、步行最少。"
                     )),
-                    ("figure.walk.circle.fill", AppLocalization.text(
-                        english: "\"Navigate step-by-step\" walks you through the trip one step at a time, with a reminder before your stop.",
-                        simplified: "“分步导航”一步一步带您走完全程，到站前还会提醒。",
-                        traditional: "「分步導航」一步一步帶您走完全程，到站前還會提醒。"
+                    ("figure.walk", AppLocalization.text(
+                        english: "Long first or last miles switch from walking to cycling or driving, and say which.",
+                        simplified: "首末段较长时会自动改为骑行或驾车，并注明所用方式。",
+                        traditional: "首末段較長時會自動改為騎行或駕車，並註明所用方式。"
                     )),
-                    ("arrow.triangle.2.circlepath", AppLocalization.text(
-                        english: "Tap a transfer step for official station links and verified indoor guidance when available. Missing paths and doors are clearly marked.",
-                        simplified: "点按换乘步骤可查看官方车站链接及可用的已核实站内指引。缺少通道或车门数据时会明确说明。",
-                        traditional: "點按換乘步驟可查看官方車站連結及可用的已核實站內指引。缺少通道或車門資料時會明確說明。"
+                    ("play.circle.fill", AppLocalization.text(
+                        english: "Navigate walks you through one step at a time, with an alert before your stop.",
+                        simplified: "“导航”一步一步带您走完全程，到站前提醒。",
+                        traditional: "「導航」一步一步帶您走完全程，到站前提醒。"
                     ))
                 ]
             ),
@@ -66,42 +70,38 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Honest information", simplified: "诚实的信息", traditional: "誠實的資訊"),
                 points: [
                     ("checkmark.seal", AppLocalization.text(
-                        english: "Green \"official\" labels mean verified city data; orange means estimated. Missing data says so — never guessed.",
-                        simplified: "绿色“官方”标签代表已核实的城市数据；橙色代表估算。缺失的数据会如实说明，绝不编造。",
-                        traditional: "綠色「官方」標籤代表已核實的城市資料；橙色代表估算。缺失的資料會如實說明，絕不編造。"
+                        english: "Green means the operator published it. Orange means estimated. Missing data says so.",
+                        simplified: "绿色表示运营方公布的数据，橙色表示估算。没有的数据会如实说明。",
+                        traditional: "綠色表示營運方公布的資料，橙色表示估算。沒有的資料會如實說明。"
                     )),
-                    ("accessibility", AppLocalization.text(
-                        english: "Elevators, ramps and step-free exits are shown per station where cities publish them.",
-                        simplified: "在城市公开数据的车站，会显示电梯、坡道和无障碍出入口。",
-                        traditional: "在城市公開資料的車站，會顯示電梯、坡道和無障礙出入口。"
+                    ("figure.stairs", AppLocalization.text(
+                        english: "Lifts and step-free exits are shown per station where the city publishes them.",
+                        simplified: "在城市公开数据的车站，会显示电梯与无障碍出入口。",
+                        traditional: "在城市公開資料的車站，會顯示電梯與無障礙出入口。"
                     )),
                     ("clock", AppLocalization.text(
-                        english: "Live arrivals appear only where an official provider exists. Otherwise the app shows a licensed static schedule or an honest unavailable state.",
-                        simplified: "仅在官方提供实时数据时显示到站信息；否则显示许可的静态时刻表或明确的不可用状态。",
-                        traditional: "僅在官方提供即時資料時顯示到站資訊；否則顯示授權的靜態時刻表或明確的不可用狀態。"
+                        english: "Where the operator publishes first and last trains, every leg is checked against them.",
+                        simplified: "运营方公布首末班车时，每一段行程都会据此核对。",
+                        traditional: "營運方公布首末班車時，每一段行程都會據此核對。"
                     ))
                 ]
             ),
             TourPage(
-                icon: "person.fill",
+                icon: "paintpalette.fill",
                 title: AppLocalization.text(english: "Make it yours", simplified: "打造您的专属", traditional: "打造您的專屬"),
                 points: [
                     ("tag.fill", AppLocalization.text(
-                        english: "Save Home, Work, and unlimited custom tags, then fill them with one tap in the planner.",
-                        simplified: "保存家、公司以及任意数量的自定义标签，即可在路线规划中一键填入。",
-                        traditional: "儲存家、公司以及任意數量的自訂標籤，即可在路線規劃中一鍵填入。"
+                        english: "Save Home, Work and your own tags, then fill a field with one tap.",
+                        simplified: "保存家、公司和自定义标签，之后一点即可填入。",
+                        traditional: "儲存家、公司和自訂標籤，之後一點即可填入。"
                     )),
-                    ("bookmark.fill", AppLocalization.text(
-                        english: "Save trips you repeat — they come back as one-tap cards, morning and evening.",
-                        simplified: "保存常用行程——早晚高峰时一键直达。",
-                        traditional: "儲存常用行程——早晚高峰時一鍵直達。"
-                    )),
-                    ("gearshape.fill", AppLocalization.text(
-                        english: "Set accessibility needs once in Profile → Accessibility Settings; every route search respects them. Replay this tour anytime from Settings.",
-                        simplified: "在“个人 → 无障碍设置”中设置一次出行需求，之后每次搜索都会遵循。本导览可随时在设置中重看。",
-                        traditional: "在「個人 → 無障礙設定」中設定一次出行需求，之後每次搜尋都會遵循。本導覽可隨時在設定中重看。"
+                    ("figure.roll", AppLocalization.text(
+                        english: "Set step-free needs once in Profile → Accessibility; route search follows them.",
+                        simplified: "在“个人 → 无障碍”中设置一次无障碍需求，路线搜索会据此规划。",
+                        traditional: "在「個人 → 無障礙」中設定一次無障礙需求，路線搜尋會據此規劃。"
                     ))
-                ]
+                ],
+                showsThemePicker: true
             )
         ]
     }
@@ -124,8 +124,21 @@ struct OnboardingTourView: View {
                         .tag(index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            // Dots off, drawn below instead. As an overlay they float *over* the page's content,
+            // so at accessibility text sizes a line of copy scrolled underneath them and the dots
+            // sat on top of the words. Content and chrome do not share space here.
+            .tabViewStyle(.page(indexDisplayMode: .never))
+
+            HStack(spacing: 7) {
+                ForEach(pages.indices, id: \.self) { index in
+                    Circle()
+                        .fill(index == pageIndex ? Color.accentColor : Color.secondary.opacity(0.3))
+                        .frame(width: 7, height: 7)
+                }
+            }
+            .padding(.top, 4)
+            .padding(.bottom, 10)
+            .accessibilityHidden(true)
 
             Button {
                 if pageIndex < pages.count - 1 {
@@ -149,33 +162,52 @@ struct OnboardingTourView: View {
         .background(Color.appBackground)
     }
 
+    /// Scrolls, because it has to.
+    ///
+    /// This page had no `ScrollView` and no Dynamic Type handling at all, with bullets over 150
+    /// characters — so at accessibility text sizes the first screen a new rider ever sees simply
+    /// clipped, and the people most likely to be running those sizes are the ones this app is for.
+    /// `LaunchStageView`, in this same folder, has adapted to `dynamicTypeSize` all along.
+    ///
+    /// Only the content scrolls: the page dots and the Continue button live outside this view, so
+    /// the way forward can never be the thing that scrolled off the bottom.
     private func tourPageView(_ page: TourPage) -> some View {
-        VStack(alignment: .leading, spacing: 24) {
-            VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: page.icon)
-                    .font(.system(size: 44))
-                    .foregroundStyle(Color.accentColor)
-                Text(page.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-            }
-
-            ForEach(Array(page.points.enumerated()), id: \.offset) { _, point in
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: point.icon)
-                        .font(.title3)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Image(systemName: page.icon)
+                        .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 34 : 44))
                         .foregroundStyle(Color.accentColor)
-                        .frame(width: 30)
-                    Text(point.text)
-                        .font(.subheadline)
+                    Text(page.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-            }
 
-            Spacer()
+                ForEach(Array(page.points.enumerated()), id: \.offset) { _, point in
+                    HStack(alignment: .top, spacing: 14) {
+                        Image(systemName: point.icon)
+                            .font(.title3)
+                            .foregroundStyle(Color.accentColor)
+                            // Fixed at accessibility sizes: a symbol column that grows with the
+                            // text leaves no room for the text it is labelling.
+                            .frame(width: dynamicTypeSize.isAccessibilitySize ? 26 : 30)
+                        Text(point.text)
+                            .font(.subheadline)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                if page.showsThemePicker {
+                    ThemePickerRow()
+                        .padding(.top, 4)
+                }
+            }
+            .padding(.horizontal, 28)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.horizontal, 28)
-        .padding(.top, 8)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .scrollBounceBehavior(.basedOnSize)
     }
 }

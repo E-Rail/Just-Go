@@ -7,7 +7,6 @@ struct SettingsView: View {
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
-    @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @State private var showTour = false
     @State private var showQuickTags = false
     @State private var showClearCacheConfirmation = false
@@ -63,51 +62,13 @@ struct SettingsView: View {
 
     private var themeSection: some View {
         Section {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 14) {
-                    ForEach(AppTheme.allCases) { theme in
-                        themeCircle(for: theme)
-                    }
-                }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 4)
-            }
-            .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
+            ThemePickerRow()
+                .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
         } header: {
             Text(AppLocalization.text(english: "App Theme", simplified: "主题颜色", traditional: "主題顏色"))
         }
     }
 
-    @ViewBuilder
-    private func themeCircle(for theme: AppTheme) -> some View {
-        let isSelected = selectedThemeHex == theme.rawValue
-        Button {
-            selectedThemeHex = theme.rawValue
-        } label: {
-            VStack(spacing: 6) {
-                ZStack {
-                    Circle()
-                        .fill(theme.accent)
-                        .frame(width: 44, height: 44)
-                    if isSelected {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                }
-                .overlay(
-                    Circle()
-                        .stroke(isSelected ? theme.accent : Color.clear, lineWidth: 2.5)
-                        .padding(-3)
-                )
-                Text(theme.name)
-                    .font(.caption2)
-                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                    .fontWeight(isSelected ? .semibold : .regular)
-            }
-        }
-        .buttonStyle(.plain)
-    }
 
     // MARK: - Language
 

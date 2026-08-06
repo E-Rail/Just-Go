@@ -78,6 +78,7 @@
 		A1000067 /* Route/RouteDetailSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000067 /* Route/RouteDetailSupportViews.swift */; };
 		A100006A /* Components/Transit/RouteTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006A /* Components/Transit/RouteTabs.swift */; };
 		A1000073 /* Components/Transit/StationAccessPointRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000073 /* Components/Transit/StationAccessPointRow.swift */; };
+		A1000411 /* Components/ThemePickerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000411 /* Components/ThemePickerRow.swift */; };
 		A1000074 /* Components/Transit/StepControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000074 /* Components/Transit/StepControls.swift */; };
 		A100006C /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200006C /* Logging.swift */; };
 		A1000313 /* Map/MapItemDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000313 /* Map/MapItemDetailSheet.swift */; };
@@ -191,6 +192,7 @@
 		A2000067 /* Route/RouteDetailSupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RouteDetailSupportViews.swift; sourceTree = "<group>"; };
 		A200006A /* Components/Transit/RouteTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/RouteTabs.swift; sourceTree = "<group>"; };
 		A2000073 /* Components/Transit/StationAccessPointRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StationAccessPointRow.swift; sourceTree = "<group>"; };
+		A2000411 /* Components/ThemePickerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/ThemePickerRow.swift; sourceTree = "<group>"; };
 		A2000074 /* Components/Transit/StepControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StepControls.swift; sourceTree = "<group>"; };
 		A200006C /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		A2000313 /* Map/MapItemDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapItemDetailSheet.swift; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 				A2000019 /* Components/Transit/LineColorIndicator.swift */,
 				A200006A /* Components/Transit/RouteTabs.swift */,
 				A2000073 /* Components/Transit/StationAccessPointRow.swift */,
+				A2000411 /* Components/ThemePickerRow.swift */,
 				A2000074 /* Components/Transit/StepControls.swift */,
 				A2000602 /* Components/Web/OfficialTransitResourceViewer.swift */,
 				A2000604 /* Components/QuickTagEditorSheet.swift */,
@@ -549,6 +552,7 @@
 				A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */,
 				A100006A /* Components/Transit/RouteTabs.swift in Sources */,
 				A1000073 /* Components/Transit/StationAccessPointRow.swift in Sources */,
+				A1000411 /* Components/ThemePickerRow.swift in Sources */,
 				A1000074 /* Components/Transit/StepControls.swift in Sources */,
 				A100001B /* Map/MapKitProviders.swift in Sources */,
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,
@@ -744,6 +748,7 @@
 			baseConfigurationReference = A2000048 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -777,6 +782,7 @@
 			baseConfigurationReference = A2000049 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = JustGo/JustGo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

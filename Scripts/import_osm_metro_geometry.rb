@@ -8,10 +8,12 @@ require "json"
 require "net/http"
 require "set"
 require "uri"
+require_relative "lib/gcj02"
+require_relative "lib/line_names"
 
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-metro")
-OUTPUT_DIR = File.join(ROOT, "JustGo", "Resources", "MetroNetworks")
+OUTPUT_DIR = File.join(ROOT, "Just-Go", "Resources", "MetroNetworks")
 REPORT_DIR = CACHE_DIR
 OVERPASS_URLS = [
   URI("https://overpass-api.de/api/interpreter"),
@@ -30,11 +32,62 @@ SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 # belong to the city — every other route relation in the bbox is dropped. `own_unknown_lines`
 # whitelists the handful of the city's own lines that carry no network/operator tag in OSM
 # (so they would otherwise be indistinguishable from foreign untagged lines).
+# The Pearl River Delta intercity railway (城际铁路) is a scheduled, metro-style service riders
+# use to move between the delta's cities, and it interchanges with the metro at shared stations.
+# It is named here as its own allowlist entry rather than opening `route=train` generally, so
+# mainline/high-speed railway inside the same bounding boxes (国铁/高铁) stays out.
+GUANGDONG_INTERCITY_NETWORKS = ["珠三角城际", "粤港澳大湾区城际铁路"].freeze
+
+# Sanity bounds on a declared `interchanges` pair, per kind. Far enough to cover the real thing
+# — Guangzhou's widest shared concourse is 350m, Beijing's longest street interchange is 太平桥/
+# 复兴门 at 625m — and tight enough that a typo naming the wrong station fails the import instead
+# of inventing a transfer across the city.
+MAX_INTERCHANGE_METERS = {
+  "inStation" => 500,
+  "outOfStation" => 1_000
+}.freeze
+
+# How the fare treats a declared interchange. Only `continuous` — "the two halves bill as one
+# trip" — is expressible, and only where it has been checked; anything undeclared says nothing
+# rather than guessing. Whether walking between two stations costs a second fare is operator
+# policy, and it does not follow from how far apart they are or whether the walk is indoors:
+# Beijing bills 广安门内 -> 牛街 as one trip across 496m of street, while Guangzhou's metro and
+# intercity halves share a concourse and still need two separate tickets.
+INTERCHANGE_FARES = ["continuous"].freeze
+
+# Interchanges whose two halves live in *different* packs.
+#
+# The Shenzhen/Hong Kong border crossings are the case that forced this: 罗湖 is in Shenzhen's
+# network and 羅湖 is in Hong Kong's, 574m apart across an immigration hall, and a rider crossing
+# there is making one interchange between two systems the app shipped as unconnected graphs. A
+# per-pack `interchanges` list cannot express it, because neither pack contains both stations.
+#
+# Applied as a post-pass once every network is built, so both endpoints' real coordinates are in
+# hand and the link can be written into *both* packs — either one alone is enough for the app to
+# find the edge, but a pack that mentions a crossing it does not carry would be a lie about its
+# own contents. A partial import that names one side and not the other fails loudly rather than
+# writing half of one.
+CROSS_NETWORK_INTERCHANGES = [
+  { cities: %w[4403 8100], from: "罗湖", to: "羅湖", kind: "outOfStation" },
+  { cities: %w[4403 8100], from: "福田口岸", to: "落馬洲", kind: "outOfStation" }
+].freeze
+
 CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
     networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
-    own_unknown_lines: ["前门大街有轨电车"]
+    own_unknown_lines: ["前门大街有轨电车"],
+    # Beijing's two street interchanges (出站换乘): the rider leaves the paid area, walks a block
+    # and re-enters. Riders make both every day and the app could not plan either, because two
+    # named stations with no shared line are two unconnected nodes in the graph.
+    # Both are 虚拟换乘: the rider taps out, walks, taps back in, and the two halves bill as one
+    # trip. That is a fare rule, not something the geometry implies — an out-of-station walk
+    # charges again in plenty of networks — so it is declared per pair and stays unsaid where
+    # it is not known.
+    interchanges: [
+      { from: "广安门内", to: "牛街", kind: "outOfStation", fare: "continuous" },
+      { from: "太平桥", to: "复兴门", kind: "outOfStation", fare: "continuous" }
+    ]
   },
   "3100" => {
     name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20],
@@ -43,8 +96,25 @@ CITIES = {
   },
   "4401" => {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
-    networks: ["广州地铁"],
-    own_unknown_lines: []
+    networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
+    own_unknown_lines: [],
+    # Metro station first, the intercity station it interchanges with second. Two stations, not
+    # one station with two names — they were fused into a single node at the mean of both halves,
+    # which put the marker in the gap between two platforms and made the city's station count 7
+    # short. See `build_interchanges` for why this is a list and not a distance rule.
+    #
+    # `outOfStation`, all seven: 城际铁路 is a separate railway with its own gates, its own
+    # ticketing and its own security screening. Sharing a forecourt with a metro station does not
+    # make it one paid area, and calling these `inStation` told riders they could walk through.
+    interchanges: [
+      { from: "机场北", to: "白云机场北", kind: "outOfStation" },
+      { from: "机场南", to: "白云机场南", kind: "outOfStation" },
+      { from: "广州白云站", to: "广州白云", kind: "outOfStation" },
+      { from: "广州北站", to: "花都", kind: "outOfStation" },
+      { from: "大石", to: "大石东", kind: "outOfStation" },
+      { from: "东平", to: "顺德北", kind: "outOfStation" },
+      { from: "汉溪长隆", to: "广州长隆", kind: "outOfStation" }
+    ]
   },
   "4403" => {
     name: "Shenzhen", bbox: [22.35, 113.65, 22.95, 114.75],
@@ -88,8 +158,16 @@ CITIES = {
   "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true, own_unknown_lines: [] },
   "1501" => { name: "Hohhot", bbox: [40.70, 111.50, 41.00, 112.00], networks: ["呼和浩特地铁", "呼和浩特轨道交通"], own_unknown_lines: [] },
   "1401" => { name: "Taiyuan", bbox: [37.65, 112.40, 38.05, 112.70], networks: ["太原轨道交通", "太原地铁"], own_unknown_lines: [] },
-  "4419" => { name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00], networks: ["东莞轨道交通", "东莞地铁"], own_unknown_lines: [] },
-  "4406" => { name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35], networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车"], own_unknown_lines: [] },
+  "4419" => {
+    name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00],
+    networks: ["东莞轨道交通", "东莞地铁", *GUANGDONG_INTERCITY_NETWORKS],
+    own_unknown_lines: []
+  },
+  "4406" => {
+    name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35],
+    networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车", *GUANGDONG_INTERCITY_NETWORKS],
+    own_unknown_lines: []
+  },
   "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"], own_unknown_lines: [] },
   "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"], own_unknown_lines: [] },
   "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: [] },
@@ -100,13 +178,38 @@ CITIES = {
   "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
   "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"], own_unknown_lines: [] },
   "8100" => { name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [] },
-  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] }
+  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] },
+  # Taipei's three busiest lines (板南, 文湖, 淡水信義) carry no network/operator tag in OSM and
+  # exist *only* as untagged relations — without naming them here the city would import with its
+  # core network missing. They are listed rather than `allow_unknown` because the same bbox also
+  # holds the untagged 貓空纜車 gondola, which is not rail. 新北捷運/淡海輕軌 are the New Taipei
+  # half of the same metro system; 桃園捷運 is excluded here and imported as Taoyuan (7106).
+  "7101" => {
+    name: "Taipei", bbox: [24.90, 121.30, 25.30, 121.80],
+    networks: ["臺北捷運", "台北捷運", "新北捷運", "淡海輕軌"],
+    own_unknown_lines: [
+      "臺北捷運 南港-板橋-土城線",
+      "捷運文湖線",
+      "淡水信義線",
+      "臺北捷運 淡水線-信義線"
+    ]
+  },
+  "7102" => { name: "Kaohsiung", bbox: [22.45, 120.15, 22.85, 120.50], networks: ["高雄捷運", "環狀輕軌"], own_unknown_lines: [] },
+  "7104" => { name: "Taichung", bbox: [24.05, 120.55, 24.35, 120.80], networks: ["臺中捷運", "台中捷運"], own_unknown_lines: [] },
+  # The bbox reaches Taipei Main Station because the Airport MRT terminates there; the
+  # allowlist keeps Taipei's own lines out.
+  "7106" => { name: "Taoyuan", bbox: [24.90, 121.15, 25.12, 121.55], networks: ["桃園捷運"], own_unknown_lines: [] },
+  # The only route relations in this bbox are the city's own 金义东线, so untagged ones are safe.
+  "3307" => { name: "Jinhua", bbox: [28.85, 119.50, 29.45, 120.45], networks: ["浙中都市圈城际轨道交通", "金华轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  # 宁滁线 is Chuzhou-operated and tagged as such; the rest of this bbox is Nanjing Metro, so
+  # untagged relations are *not* allowed through here.
+  "3411" => { name: "Chuzhou", bbox: [31.95, 118.15, 32.45, 118.70], networks: ["滁州轨道交通"], own_unknown_lines: [] },
+  # 郑许线 carries no network tag and is the only rail in the bbox.
+  "4110" => { name: "Xuchang", bbox: [33.95, 113.60, 34.45, 114.05], networks: ["许昌轨道交通", "郑许线"], allow_unknown: true, own_unknown_lines: [] }
 }.freeze
 
 EARTH_RADIUS = 6_371_000.0
 PI = Math::PI
-GCJ_A = 6_378_245.0
-GCJ_EE = 0.006693421622965943
 
 def fail_with(message)
   warn "OSM metro import failed: #{message}"
@@ -138,10 +241,14 @@ def source_color(value)
 end
 
 def passenger_line_name(tags)
-  value = tags["name:zh"] || tags["name"] || tags["ref"] || "Metro"
-  value = value.split(/[:：]/, 2).first
-  value = value.gsub(/\s*[\(（][^()（）]*(?:→|=>|->)[^()（）]*[\)）]\s*\z/, "")
-  value.split(/(?:→|=>|->)/, 2).first.strip.gsub(/\A地铁\s*/, "")
+  reference = tags["ref"].to_s.strip
+  value = LineNames.clean(tags["name:zh"]) || LineNames.clean(tags["name"])
+  # Guiyang's relations name the run ("1 窦官 - 小孟工业园") and carry the line only as `ref`, so
+  # the reduction leaves a bare number. Every other mainland city in the catalog displays
+  # "<n>号线"; rendering it here keeps the map legend consistent instead of showing a lone digit.
+  return "#{reference}号线" if !reference.empty? && value == reference && reference.match?(/\A\d+\z/)
+
+  value || (reference.empty? ? "Metro" : reference)
 end
 
 def line_name_tokens(value)
@@ -156,7 +263,13 @@ def inferred_route_reference(tags, name)
   explicit = normalized(tags["ref"])
   return explicit unless explicit.empty?
 
-  name.to_s[/\d+[a-z]?/i].to_s.downcase
+  # A line reference is a designation plus a number ("S3", "T1"), not the first digits in the
+  # string. This value keys `structured_service?`, so losing the designation does not merely
+  # mislabel a line — it fuses two of them: 成都市域铁路S3资阳线 carries no `ref` tag, reduced to
+  # "3", matched 成都地铁3号线's ref, and unioned into it, dragging 资阳's stations 60km onto
+  # Line 3. Prefer a letter-prefixed form; fall back to bare digits so "Metro Line 10" and
+  # "Light Rail 614P" (no letter against the number) keep reading as before.
+  (name.to_s[/(?<![a-z])[a-z]{1,2}\d+[a-z]?/i] || name.to_s[/\d+[a-z]?/i]).to_s.downcase
 end
 
 def service_identity(tags)
@@ -168,13 +281,16 @@ end
 # is matched against the city's normalized allowlist. Lines with no network/operator are kept
 # only if explicitly whitelisted by name (the city's own untagged lines); anything else —
 # a neighbouring city's metro, an intercity service, Hong Kong MTR, etc. — is rejected.
-def city_owns_line?(city, network_identity, name)
+def city_owns_line?(city, network_identity, name, mode: nil)
   allowed = (city[:networks] || []).map { |value| normalized(value) }
   return true if allowed.include?(network_identity)
   if network_identity == "unknown"
     # Isolated systems whose OSM relations carry no network/operator tag: there is no
     # neighbouring metro inside the bbox to confuse them with, so keep their untagged lines.
-    return true if city[:allow_unknown]
+    # `allow_unknown` covers urban modes only. Unidentified heavy rail inside a city bbox is
+    # national or cross-border rail, not that city's metro — Urumqi's bbox holds the
+    # "13/14 乌鲁木齐<=>Алматы" sleeper to Almaty, tagged route=train network=unknown.
+    return true if city[:allow_unknown] && mode != "train"
     return (city[:own_unknown_lines] || []).include?(name)
   end
 
@@ -184,7 +300,7 @@ end
 def relation_owned_by_city?(city, relation)
   tags = relation.fetch("tags", {})
   identity = network_identity(tags)
-  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags))
+  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags), mode: tags["route"])
 end
 
 def supported_route_relation?(relation)
@@ -268,6 +384,33 @@ def same_named_service?(left, right, evidence)
   evidence[:stationContainment] >= 0.8 || evidence[:trackContainment] >= 0.5
 end
 
+# The express service on a line the local service also runs: 广惠城际快车 is 广惠城际 skipping
+# stops, not a second railway. OSM publishes them as separate relations, so the intercity corridors
+# imported as two lines each — and a station on both then claimed two interchanges where a rider
+# sees one line with two kinds of train.
+#
+# `servicePatterns` is exactly the field for this, and until now it went unused for the case it
+# was built for. The suffix is the whole rule: 快车/大站快车 appended to a name the city already
+# has. Not inferred from station containment, which would also fuse 广清城际 into 广惠城际 (they
+# share the whole Guangzhou trunk); the express variant has to *say* it is one.
+def express_variant_service?(left, right, evidence)
+  base, express = if express_of(right[:name_key]) == left[:name_key]
+                    [left, right]
+                  elsif express_of(left[:name_key]) == right[:name_key]
+                    [right, left]
+                  end
+  return false if base.nil?
+  return false unless network_compatible?(base, express)
+
+  # An express calls at a subset of the local's stops, so it is the express that must be contained.
+  evidence[:sharedStations] >= 2 && evidence[:trackContainment] >= 0.5
+end
+
+def express_of(name_key)
+  stripped = name_key.sub(/大?站?快车\z/, "")
+  stripped == name_key ? nil : stripped
+end
+
 def combined_service?(combined, component, evidence)
   return false if combined[:name_tokens].length < 2
   return false unless combined[:name_tokens].include?(component[:name_key])
@@ -275,6 +418,19 @@ def combined_service?(combined, component, evidence)
   return false if evidence[:sharedStations] < [2, component[:stations].length].min
 
   evidence[:stationContainment] >= 0.9 || evidence[:trackContainment] >= 0.5
+end
+
+# A through-running service split into two logical lines with no shared name at all (e.g.
+# Shenzhen 2号线/8号线): neither `same_named_service?` nor `combined_service?` can fire because
+# there is no textual overlap to key on. The identical station set plus identical published
+# line colour is what a rider actually uses to recognise "this is one line" — and unlike name
+# matching, an exact station-set match is definitionally the same physical corridor, so this
+# rule is safe to apply generally rather than special-casing any one city.
+def same_corridor_service?(left, right)
+  return false if left[:stations].empty? || left[:stations] != right[:stations]
+  return false if left[:color].nil? || left[:color] != right[:color]
+
+  network_compatible?(left, right)
 end
 
 def profile_summary(profile)
@@ -308,6 +464,7 @@ def canonicalize_relations(relations, elements_by_key, ways)
   end
   accepted = []
   rejected = []
+  same_corridor_indices = Set.new
 
   profiles.each_index.to_a.combination(2) do |left_index, right_index|
     left = profiles[left_index]
@@ -317,11 +474,16 @@ def canonicalize_relations(relations, elements_by_key, ways)
                "structuredIdentity"
              elsif same_named_service?(left, right, evidence)
                "sameName"
+             elsif express_variant_service?(left, right, evidence)
+               "expressVariant"
              elsif combined_service?(left, right, evidence) || combined_service?(right, left, evidence)
                "combinedService"
+             elsif same_corridor_service?(left, right)
+               "sameCorridor"
              end
     if reason
       union.call(left_index, right_index)
+      same_corridor_indices.merge([left_index, right_index]) if reason == "sameCorridor"
       accepted << {
         "left" => profile_summary(left),
         "right" => profile_summary(right),
@@ -344,9 +506,14 @@ def canonicalize_relations(relations, elements_by_key, ways)
     end
   end
 
-  groups = profiles.each_index.group_by { |index| find.call(index) }.values.map do |indices|
-    indices.map { |index| profiles[index] }
-  end
+  index_groups = profiles.each_index.group_by { |index| find.call(index) }.values
+  groups = index_groups.map { |indices| indices.map { |index| profiles[index] } }
+  # Whether this group's *only* connection to a same-name-covering profile is the sameCorridor
+  # rule — used to gate `display_line_name` synthesis so an ordinary two-direction line (whose
+  # direction relations already merge via `structuredIdentity`/`sameName` and happen to share a
+  # station set too) keeps its single representative name instead of getting every direction's
+  # raw OSM name concatenated together.
+  same_corridor_groups = index_groups.map { |indices| indices.any? { |index| same_corridor_indices.include?(index) } }
   structured_groups = {}
   groups.each_with_index do |group, group_index|
     group.each do |profile|
@@ -359,7 +526,7 @@ def canonicalize_relations(relations, elements_by_key, ways)
   end
   ambiguous = rejected.select { |candidate| candidate["ambiguous"] }
   fail_with("ambiguous logical-line candidates: #{ambiguous.map { |candidate| "#{candidate.dig("left", "relationID")}/#{candidate.dig("right", "relationID")}" }.join(", ")}") unless ambiguous.empty?
-  [groups, { "acceptedMerges" => accepted, "rejectedCandidates" => rejected }]
+  [groups, same_corridor_groups, { "acceptedMerges" => accepted, "rejectedCandidates" => rejected }]
 end
 
 def canonical_profile(profiles)
@@ -396,8 +563,37 @@ def canonical_route_reference(profiles, canonical)
   counts.max_by { |reference, count| [count, reference.length, reference] }&.first.to_s
 end
 
+# Existing merges (`sameName`, `structuredIdentity`, `combinedService`) always leave a single
+# profile whose own name already covers every merged profile — either they all share one name,
+# or (for `combinedService`) one relation is tagged with the slash-joined name already, and
+# `canonical_profile` prefers it for having the most name tokens. `sameCorridor` is the one
+# merge kind where no profile's name covers the others (Shenzhen's 2号线 and 8号线 relations
+# each carry only their own single-token name), so the display name has to be synthesised.
+def display_line_name(profiles, canonical, same_corridor)
+  return canonical[:name] if canonical[:name_tokens].length > 1
+  # Only synthesise a combined name for a group that merged *because of* the sameCorridor rule
+  # (two logical lines with no textual overlap, unioned solely on identical stations + colour,
+  # e.g. Shenzhen 2号线/8号线). An ordinary two-direction line's relations already merge via
+  # `structuredIdentity`/`sameName` and also happen to share a station set — synthesising there
+  # would concatenate every direction's raw OSM name (seen on Taiyuan/Changzhou/Hefei/Luoyang
+  # etc., whose direction relations are tagged with distinct from/to-suffixed names).
+  return canonical[:name] unless same_corridor
+
+  by_key = profiles.each_with_object({}) { |profile, names| names[profile[:name_key]] ||= profile[:name] }
+  return canonical[:name] if by_key.length <= 1
+
+  by_key.values.sort_by { |name| [name.length, name] }.join("/")
+end
+
 def line_id(city_id, key)
   Digest::SHA256.hexdigest("#{city_id}|#{key}")[0, 16]
+end
+
+# A station's ID is the hash of its *normalized* name, which is also how service patterns
+# reference it. Both were computed inline; sharing one definition is what lets the interchange
+# merge below rewrite a station ID and its pattern references without them drifting apart.
+def station_id(city_id, name_key)
+  Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16]
 end
 
 def overpass_query(bbox)
@@ -423,7 +619,7 @@ def fetch_source(city_id, city, refresh:)
 
   response = OVERPASS_URLS.lazy.map do |url|
     request = Net::HTTP::Post.new(url)
-    request["User-Agent"] = "JustGo metro geometry importer"
+    request["User-Agent"] = "Just-Go metro geometry importer"
     request.set_form_data("data" => overpass_query(city[:bbox]))
     Net::HTTP.start(
       url.host,
@@ -441,39 +637,111 @@ def fetch_source(city_id, city, refresh:)
   JSON.parse(response.body)
 end
 
-def outside_china?(latitude, longitude)
-  longitude < 72.004 || longitude > 137.8347 || latitude < 0.8293 || latitude > 55.8271
-end
-
-def transform_latitude(x, y)
-  -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(x.abs) +
-    (20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2 / 3 +
-    (20 * Math.sin(y * PI) + 40 * Math.sin(y / 3 * PI)) * 2 / 3 +
-    (160 * Math.sin(y / 12 * PI) + 320 * Math.sin(y * PI / 30)) * 2 / 3
-end
-
-def transform_longitude(x, y)
-  300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(x.abs) +
-    (20 * Math.sin(6 * x * PI) + 20 * Math.sin(2 * x * PI)) * 2 / 3 +
-    (20 * Math.sin(x * PI) + 40 * Math.sin(x / 3 * PI)) * 2 / 3 +
-    (150 * Math.sin(x / 12 * PI) + 300 * Math.sin(x / 30 * PI)) * 2 / 3
-end
-
 def wgs84_to_gcj02(latitude, longitude)
-  return [latitude, longitude] if outside_china?(latitude, longitude)
-
-  delta_latitude = transform_latitude(longitude - 105, latitude - 35)
-  delta_longitude = transform_longitude(longitude - 105, latitude - 35)
-  radians = latitude / 180 * PI
-  magic = 1 - GCJ_EE * Math.sin(radians)**2
-  sqrt_magic = Math.sqrt(magic)
-  delta_latitude = delta_latitude * 180 / ((GCJ_A * (1 - GCJ_EE)) / (magic * sqrt_magic) * PI)
-  delta_longitude = delta_longitude * 180 / (GCJ_A / sqrt_magic * Math.cos(radians) * PI)
-  [latitude + delta_latitude, longitude + delta_longitude]
+  GCJ02.from_wgs84(latitude, longitude)
 end
 
-def output_coordinate(city_id, latitude, longitude)
-  city_id == "8100" ? [latitude, longitude] : wgs84_to_gcj02(latitude, longitude)
+def average_coordinate(station)
+  coordinates = station["coordinates"]
+  [
+    coordinates.sum { |coordinate| coordinate[0] } / coordinates.length,
+    coordinates.sum { |coordinate| coordinate[1] } / coordinates.length
+  ]
+end
+
+# Two named stations riders treat as one interchange.
+#
+# Two cases, one mechanism, differing only in `kind`, which describes the *walk* and nothing else.
+# `inStation` means the two are connected inside the building, as at Guangzhou's metro/intercity
+# concourses; `outOfStation` means the rider goes out to the street, as at Beijing's 广安门内/牛街.
+# The app draws the first solid and the second dashed. What the fare does is a separate, declared
+# fact — see `INTERCHANGE_FARES`.
+#
+# Declared per pair rather than inferred from distance, because distance cannot separate an
+# interchange from two nearby stations that are not one. Measured over Guangzhou's 414 stations,
+# the real concourse pairs run out to 350m (汉溪长隆/广州长隆) while 体育西路 and 天河南 — different
+# stations, no interchange — are 281m apart. In Beijing 南礼士路 and 复兴门 are 372m apart and are
+# *not* an interchange, while 太平桥 and 复兴门 at 625m are. No threshold separates those, so a
+# threshold would invent transfers between the busiest stations in both cities. A wrong transfer
+# is worse than a missing one.
+#
+# These used to be merges: the two nodes were fused into one at the mean of their coordinates.
+# That put the marker in the gap between two platforms, undercounted the city's stations by one
+# per pair, and could only ever express the in-station case.
+def build_interchanges(city, city_id, station_groups)
+  (city[:interchanges] || []).map do |link|
+    from_key = normalized_station_name(link.fetch(:from))
+    to_key = normalized_station_name(link.fetch(:to))
+    from = station_groups[from_key]
+    to = station_groups[to_key]
+    # Loud, not skipped: a typo or a renamed station would otherwise silently drop the link and
+    # the interchange would quietly stop being plannable again.
+    fail_with("#{city[:name]} interchange names an absent station: #{link[:from]}") if from.nil?
+    fail_with("#{city[:name]} interchange names an absent station: #{link[:to]}") if to.nil?
+    unless (from["lineIDs"] & to["lineIDs"]).empty?
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} already share a line")
+    end
+    limit = MAX_INTERCHANGE_METERS[link.fetch(:kind)]
+    fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown kind #{link[:kind]}") if limit.nil?
+    separation = meters_between(average_coordinate(from), average_coordinate(to))
+    if separation > limit
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
+    end
+    fare = link[:fare]
+    if fare && !INTERCHANGE_FARES.include?(fare)
+      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown fare #{fare}")
+    end
+    record = {
+      "fromStationID" => station_id(city_id, from_key),
+      "toStationID" => station_id(city_id, to_key),
+      "kind" => link.fetch(:kind),
+      "walkingDistanceMeters" => separation.round
+    }
+    record["fare"] = fare if fare
+    record
+  end.sort_by { |link| [link["fromStationID"], link["toStationID"]] }
+end
+
+# Writes each declared cross-pack interchange into both of its networks, now that every station's
+# final coordinate exists. See CROSS_NETWORK_INTERCHANGES.
+def apply_cross_network_interchanges!(networks_by_city, built_city_ids)
+  CROSS_NETWORK_INTERCHANGES.each do |link|
+    from_city, to_city = link.fetch(:cities)
+    touched = link[:cities] & built_city_ids
+    next if touched.empty?
+    unless (link[:cities] - built_city_ids).empty?
+      fail_with(
+        "cross-network interchange #{link[:from]}/#{link[:to]} needs both #{from_city} and " \
+        "#{to_city} in the same run"
+      )
+    end
+    from_network = networks_by_city.fetch(from_city)
+    to_network = networks_by_city.fetch(to_city)
+    from = from_network["stations"].find { |station| station["name"] == link.fetch(:from) }
+    to = to_network["stations"].find { |station| station["name"] == link.fetch(:to) }
+    fail_with("cross-network interchange names an absent station: #{link[:from]}") if from.nil?
+    fail_with("cross-network interchange names an absent station: #{link[:to]}") if to.nil?
+    separation = meters_between(
+      [from["latitude"], from["longitude"]],
+      [to["latitude"], to["longitude"]]
+    )
+    limit = MAX_INTERCHANGE_METERS.fetch(link.fetch(:kind))
+    if separation > limit
+      fail_with("cross-network interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
+    end
+    record = {
+      "fromStationID" => from["id"],
+      "toStationID" => to["id"],
+      "kind" => link.fetch(:kind),
+      "walkingDistanceMeters" => separation.round
+    }
+    record["fare"] = link[:fare] if link[:fare]
+    [from_network, to_network].uniq.each do |network|
+      network["interchanges"] = (network["interchanges"] + [record])
+        .uniq
+        .sort_by { |entry| [entry["fromStationID"], entry["toStationID"]] }
+    end
+  end
 end
 
 def meters_between(a, b)
@@ -734,6 +1002,7 @@ def select_service_relations(relations, elements_by_key, ways)
   patterns = passenger_service_patterns(relations, elements_by_key)
   selected_nodes = Set.new
   decisions = []
+  extra_geometry_ways = []
   selections = patterns.map do |pattern|
     candidates = pattern[:candidates]
     selected = candidates.max_by do |relation|
@@ -756,10 +1025,27 @@ def select_service_relations(relations, elements_by_key, ways)
       "uniqueTrackNodes" => (nodes - selected_nodes).length
     }
     selected_nodes.merge(nodes)
+
+    # Rendering-only recovery: every candidate in this group that is not the selected one
+    # contributes its track back to the drawn path, never to the routing graph.
+    #
+    # A real line is two physical tracks, and OSM models each direction as its own relation.
+    # Keeping only the selected direction drew a single-track line down a double-track corridor,
+    # which is what riders see on the ground and on operator maps. Both directions are therefore
+    # unioned in — the plain reverse-direction duplicate (same stops, parallel track) as well as
+    # the divergent case folded in by `passenger_service_patterns`'s subset/terminal merge, where
+    # a direction skips or adds a stop and its track physically separates (an airport line's
+    # one-way loop through a second terminal). `geometry_ways` dedupes by way ID, so a corridor
+    # whose directions genuinely share one way is still drawn once.
+    candidates.each do |candidate|
+      next if candidate.equal?(selected)
+
+      extra_geometry_ways.concat(relation_track_ways(candidate, ways))
+    end
     selected
   end
   validate_selected_corridors!(selections, elements_by_key, ways)
-  [selections, patterns.length, decisions]
+  [selections, patterns.length, decisions, extra_geometry_ways.uniq { |way| way["id"] }.sort_by { |way| way["id"] }]
 end
 
 def canonical_path_key(path)
@@ -768,7 +1054,19 @@ def canonical_path_key(path)
   forward < reverse ? forward : reverse
 end
 
+# The OSM base timestamp of the Overpass response the city was built from. Cities are refreshed
+# individually, so their snapshots genuinely differ (Beijing's cache predates Taipei's by five
+# weeks); stamping `Date.today` instead would have every file claim a provenance date it does not
+# have. Overpass always returns this, so a response without it is a truncated read, not an old one.
+def source_snapshot(city, source)
+  timestamp = source.dig("osm3s", "timestamp_osm_base").to_s
+  fail_with("#{city[:name]} source has no osm3s.timestamp_osm_base; refetch it") unless
+    timestamp =~ /\A(\d{4})-(\d{2})-(\d{2})T/
+  "#{Regexp.last_match(1)}-#{Regexp.last_match(2)}-#{Regexp.last_match(3)}"
+end
+
 def build_network(city_id, city, source)
+  snapshot = source_snapshot(city, source)
   elements = source.fetch("elements")
   nodes = elements.select { |item| item["type"] == "node" }.to_h do |node|
     [node["id"], [node["lat"], node["lon"]]]
@@ -781,22 +1079,27 @@ def build_network(city_id, city, source)
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
   end
-  groups, canonicalization_report = canonicalize_relations(passenger_relations, elements_by_key, ways)
+  groups, same_corridor_groups, canonicalization_report = canonicalize_relations(passenger_relations, elements_by_key, ways)
   service_pattern_decisions = []
 
   station_groups = {}
-  lines = groups.map do |profiles|
+  lines = groups.zip(same_corridor_groups).map do |profiles, same_corridor|
     canonical = canonical_profile(profiles)
     direction_relations = profiles.map { |profile| profile[:relation] }
     canonical_network = canonical[:network].empty? ? "unknown" : canonical[:network]
     # Drop lines that belong to another city's system (pulled in via the bbox / a cross-border
     # transfer station). Skipping the group here means its line and its not-shared stations are
     # never emitted, and a shared transfer station keeps only this city's line IDs.
-    next unless city_owns_line?(city, canonical_network, canonical[:name])
+    next unless city_owns_line?(
+      city,
+      canonical_network,
+      canonical[:name],
+      mode: canonical[:relation].dig("tags", "route")
+    )
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
-    selected_relations, service_pattern_count, pattern_decisions =
+    selected_relations, service_pattern_count, pattern_decisions, extra_geometry_ways =
       select_service_relations(direction_relations, elements_by_key, ways)
     service_pattern_decisions.concat(pattern_decisions.map { |decision| decision.merge("logicalLineID" => id) })
     member_ways = selected_relations.flat_map { |relation| relation_track_ways(relation, ways) }
@@ -804,9 +1107,19 @@ def build_network(city_id, city, source)
     seen_paths = Set.new
     node_paths = join_way_paths(member_ways).select { |path| seen_paths.add?(canonical_path_key(path)) }
     track_station_patterns = physical_station_patterns(node_paths, pattern_station_nodes)
-    coordinate_paths = node_paths.map do |path|
+    # Rendering geometry only: `extra_geometry_ways` is the track belonging to a direction
+    # relation that select_service_relations folded away because it shares a group with the
+    # selected relation, but which physically diverges from it (see the comment there) — e.g.
+    # 首都机场线's one-way loop through T2 that the selected direction never visits. Union it in
+    # here so the drawn line is complete. `track_station_patterns` above (and hence the routing
+    # graph) is computed from `selected_relations` alone and is untouched by this.
+    geometry_ways = (member_ways + extra_geometry_ways).uniq { |way| way["id"] }.sort_by { |way| way["id"] }
+    geometry_seen_paths = Set.new
+    geometry_node_paths = join_way_paths(geometry_ways)
+      .select { |path| geometry_seen_paths.add?(canonical_path_key(path)) }
+    coordinate_paths = geometry_node_paths.map do |path|
       coordinates = path.map { |node_id| nodes[node_id] }.compact.map do |coordinate|
-        output_coordinate(city_id, *coordinate)
+        wgs84_to_gcj02(*coordinate)
       end
       next if coordinates.length < 2
       simplify(coordinates).map { |latitude, longitude| { "latitude" => latitude.round(6), "longitude" => longitude.round(6) } }
@@ -849,12 +1162,12 @@ def build_network(city_id, city, source)
       "logicalLineID" => id,
       "networkIdentity" => canonical_network,
       "routeReference" => route_reference,
-      "name" => canonical[:name],
-      "nameEn" => canonical[:relation].dig("tags", "name:en")&.split(/[:→]/, 2)&.first&.strip,
+      "name" => display_line_name(profiles, canonical, same_corridor),
+      "nameEn" => LineNames.clean(canonical[:relation].dig("tags", "name:en")),
       "colorHex" => canonical_color(profiles, canonical),
       "stationIDs" => [],
       "servicePatterns" => service_patterns.map do |pattern|
-        pattern.map { |name| Digest::SHA256.hexdigest("#{city_id}|#{name}")[0, 16] }
+        pattern.map { |name| station_id(city_id, name) }
       end,
       "paths" => coordinate_paths,
       "sourceRelationIDs" => direction_relations.map { |relation| relation["id"].to_s }.sort,
@@ -877,13 +1190,15 @@ def build_network(city_id, city, source)
     base
   end
 
+  interchanges = build_interchanges(city, city_id, station_groups)
+
   stations = station_groups.map do |name_key, station|
     next if station["lineIDs"].empty?
     latitude = station["coordinates"].sum { |coordinate| coordinate[0] } / station["coordinates"].length
     longitude = station["coordinates"].sum { |coordinate| coordinate[1] } / station["coordinates"].length
-    latitude, longitude = output_coordinate(city_id, latitude, longitude)
+    latitude, longitude = wgs84_to_gcj02(latitude, longitude)
     {
-      "id" => Digest::SHA256.hexdigest("#{city_id}|#{name_key}")[0, 16],
+      "id" => station_id(city_id, name_key),
       "name" => station["name"],
       "nameEn" => station["nameEn"],
       "latitude" => latitude.round(6),
@@ -916,7 +1231,7 @@ def build_network(city_id, city, source)
   fail_with("#{city[:name]} produced no physical paths") if all_coordinates.empty?
   network = {
     "cityID" => city_id,
-    "version" => "osm-#{Date.today.strftime("%Y%m%d")}",
+    "version" => "osm-#{snapshot.delete("-")}",
     "bounds" => {
       "minLatitude" => all_coordinates.map { |point| point["latitude"] }.min,
       "minLongitude" => all_coordinates.map { |point| point["longitude"] }.min,
@@ -927,15 +1242,16 @@ def build_network(city_id, city, source)
     "geometryKind" => "physicalTrack",
     "attribution" => ATTRIBUTION,
     "licenseURL" => LICENSE_URL,
-    "sourceSnapshot" => Date.today.iso8601,
-    "coordinateSystem" => city_id == "8100" ? "wgs84" : "gcj02",
+    "sourceSnapshot" => snapshot,
+    "coordinateSystem" => "gcj02",
     "sourceURLs" => [SOURCE_URL, *OVERPASS_URLS.map(&:to_s)],
     "lines" => lines.sort_by { |line| line["name"] },
-    "stations" => stations.sort_by { |station| station["name"] }
+    "stations" => stations.sort_by { |station| station["name"] },
+    "interchanges" => interchanges
   }
   report = canonicalization_report.merge(
     "cityID" => city_id,
-    "sourceSnapshot" => Date.today.iso8601,
+    "sourceSnapshot" => snapshot,
     "canonicalLines" => lines.map do |line|
       {
         "logicalLineID" => line["logicalLineID"],
@@ -971,12 +1287,59 @@ def self_test
   fail_with("Hong Kong MTR line must not enter Shenzhen") if city_owns_line?(CITIES.fetch("4403"), normalized("港鐵 MTR"), "港鐵東鐵綫")
   fail_with("Suzhou line must not enter Shanghai") if city_owns_line?(CITIES.fetch("3100"), normalized("苏州轨道交通"), "11号线")
   fail_with("Shenzhen line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("深圳地铁"), "深圳地铁13号线")
-  fail_with("intercity line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际")
+  fail_with("Guangdong intercity should be kept") unless city_owns_line?(
+    CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际"
+  )
+  fail_with("Greater Bay intercity should be kept") unless city_owns_line?(
+    CITIES.fetch("4406"), normalized("粤港澳大湾区城际铁路"), "广清城际"
+  )
+  # Intercity is admitted by name, not by opening `route=train`: mainline and high-speed
+  # railway sharing the same bounding box must still be rejected.
+  fail_with("national rail must not enter Guangzhou") if city_owns_line?(
+    CITIES.fetch("4401"), normalized("中国铁路"), "广深铁路", mode: "train"
+  )
+  fail_with("high-speed rail must not enter Guangzhou") if city_owns_line?(
+    CITIES.fetch("4401"), normalized("台灣高鐵"), "高鐵", mode: "train"
+  )
   fail_with("own untagged line should be kept") unless city_owns_line?(CITIES.fetch("3100"), "unknown", "磁浮线")
   fail_with("foreign untagged line must be dropped") if city_owns_line?(CITIES.fetch("4401"), "unknown", "华为松山湖有轨电车1号线")
+  fail_with("untagged urban line should be kept under allow_unknown") unless city_owns_line?(
+    CITIES.fetch("6501"), "unknown", "1号线", mode: "subway"
+  )
+  fail_with("untagged heavy rail must not enter a city") if city_owns_line?(
+    CITIES.fetch("6501"), "unknown", "13/14", mode: "train"
+  )
   fail_with("direction suffix line-name test failed") unless passenger_line_name(
     "name" => "Light Rail 505 (A → B)"
   ) == "Light Rail 505"
+  # The English label used to get a weaker reduction of its own, which is how names such as
+  # "Light Rail 614P (Tuen Mun Ferry Pier" — cut mid-bracket by an arrow split — reached the app.
+  fail_with("English line-name reduction test failed") unless
+    LineNames.clean("Light Rail 614P (Tuen Mun Ferry Pier → Siu Hong)") == "Light Rail 614P"
+  fail_with("nested-bracket run annotation test failed") unless
+    LineNames.clean("呼和浩特地铁1号线（坝堰（机场）→伊利健康谷）") == "呼和浩特地铁1号线"
+  fail_with("hyphenated line name must survive") unless
+    LineNames.clean("臺北捷運 南港-板橋-土城線") == "臺北捷運 南港-板橋-土城線"
+  fail_with("terminus pair test failed") unless LineNames.clean("常州地铁2号线 五一路-青枫公园") == "常州地铁2号线"
+  fail_with("bare-ref line name test failed") unless
+    passenger_line_name("name" => "1 窦官 - 小孟工业园", "ref" => "1") == "1号线"
+  # An explicit `ref` always wins; the cases below all exercise the name fallback, which is what
+  # keys line merging. Dropping a designation letter here fuses two different lines.
+  fail_with("designation must survive ref inference") unless
+    inferred_route_reference({}, "成都市域铁路S3资阳线") == "s3"
+  fail_with("designation must not collide with a plain number") unless
+    inferred_route_reference({}, "成都地铁3号线") == "3"
+  fail_with("S-line designation test failed") unless
+    inferred_route_reference({}, "南京地铁S1号线") == "s1"
+  fail_with("tram designation test failed") unless
+    inferred_route_reference({}, "有轨电车 亦庄T1线") == "t1"
+  # No ASCII letter sits against the number, so these keep reducing to bare digits as before.
+  fail_with("English line-number inference test failed") unless
+    inferred_route_reference({}, "Metro Line 10") == "10"
+  fail_with("numeric-suffix inference test failed") unless
+    inferred_route_reference({}, "Light Rail 614P") == "614p"
+  fail_with("explicit ref must win over the name") unless
+    inferred_route_reference({ "ref" => "S3" }, "成都地铁3号线") == normalized("S3")
   joined = join_way_paths([
     { "id" => 1, "nodes" => [1, 2, 3] },
     { "id" => 2, "nodes" => [5, 4, 3] },
@@ -986,8 +1349,12 @@ def self_test
   fail_with("disconnected path test failed") unless joined.any? { |path| path == [8, 9] }
   xidan = wgs84_to_gcj02(39.9057386, 116.3682035)
   fail_with("WGS84 to GCJ-02 test failed") unless meters_between(xidan, [39.9071187, 116.3744198]) < 1
+  # Apple's basemap is GCJ-02 across the whole of Greater China — the mainland, Hong Kong, Macau
+  # and Taiwan alike — so no city is exempt. Hong Kong was previously left in WGS-84 on the
+  # assumption that the SARs are surveyed unshifted; measured against MapKit that placed all 162
+  # Hong Kong stations about 600 m off the basemap they are drawn on.
   hong_kong = [22.397643, 114.207797]
-  fail_with("Hong Kong must remain WGS84") unless output_coordinate("8100", *hong_kong) == hong_kong
+  fail_with("Hong Kong must convert to GCJ-02") if wgs84_to_gcj02(*hong_kong) == hong_kong
   fixture_elements = {
     "node:10" => { "tags" => { "name" => "A" } },
     "node:11" => { "tags" => { "name" => "B" } },
@@ -1178,15 +1545,22 @@ fail_with("unknown city IDs: #{unknown.join(", ")}") unless unknown.empty?
 FileUtils.mkdir_p(OUTPUT_DIR)
 FileUtils.mkdir_p(REPORT_DIR)
 reports = []
+networks_by_city = {}
 city_ids.each do |city_id|
   city = CITIES.fetch(city_id)
   source = fetch_source(city_id, city, refresh: !!refresh)
   network, report = build_network(city_id, city, source)
   reports << report
+  networks_by_city[city_id] = network
+end
+# After every network is built, because a cross-pack interchange needs both halves' coordinates.
+apply_cross_network_interchanges!(networks_by_city, city_ids)
+city_ids.each do |city_id|
+  network = networks_by_city.fetch(city_id)
   output = File.join(OUTPUT_DIR, "#{city_id}.json")
   File.write(output, "#{JSON.generate(network)}\n")
   points = network["lines"].sum { |line| line["paths"].sum(&:length) }
-  puts "#{city[:name]}: lines=#{network["lines"].length} stations=#{network["stations"].length} points=#{points} -> #{output}"
+  puts "#{CITIES.fetch(city_id)[:name]}: lines=#{network["lines"].length} stations=#{network["stations"].length} points=#{points} -> #{output}"
 end
 report_output = File.join(REPORT_DIR, "canonicalization_report.json")
 File.write(report_output, "#{JSON.pretty_generate({ "cities" => reports })}\n")

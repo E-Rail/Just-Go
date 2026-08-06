@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -38,9 +38,10 @@ jobs:
           ruby Scripts/test_oss_data_validators.rb
           ruby Scripts/test_official_transit_resource_importer.rb
           ruby Scripts/test_beijing_station_information_importer.rb
+          ruby Scripts/test_shanghai_station_information_importer.rb
+          ruby Scripts/test_guangzhou_station_information_importer.rb
           ruby Scripts/test_official_transit_resource_catalog.rb
           ruby Scripts/import_osm_metro_geometry.rb --self-test
-          ruby Scripts/import_licensed_station_media.rb
           ruby Scripts/validate_data_rights.rb --history
           ruby Scripts/validate_runtime_data_policy.rb
           ruby Scripts/validate_official_transit_resources.rb
@@ -49,11 +50,12 @@ jobs:
           ruby Scripts/validate_localizations.rb
           ruby Scripts/validate_metro_networks.rb
           ruby Scripts/validate_indoor_maps.rb
+          ruby Scripts/validate_universal_city_data.rb
+          ruby Scripts/validate_station_info_api.rb
           bash Scripts/check_no_legacy_map_provider.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
           DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_quick_tag_policy.sh
-          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_personal_station_media.sh
 
       - name: Verify deterministic generated data
         run: |
@@ -61,13 +63,17 @@ jobs:
           ruby Scripts/generate_city_pack_manifest.rb
           ruby Scripts/generate_official_transit_resources.rb
           ruby Scripts/generate_official_transit_resources.rb
-          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json JustGo/Resources/BundledCityPacks
+          ruby Scripts/generate_universal_city_data.rb
+          ruby Scripts/generate_universal_city_data.rb
+          ruby Scripts/generate_station_info_api.rb
+          ruby Scripts/generate_station_info_api.rb
+          git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal Just-Go/Resources/BundledCityPacks StationInfoAPI/directory/directory.json Just-Go/Resources/StationInfo
 
       - name: Build for iOS Simulator
         run: |
           xcodebuild clean build \
-            -project JustGo.xcodeproj \
-            -scheme JustGo \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
@@ -77,8 +83,8 @@ jobs:
       - name: Build Release policy configuration
         run: |
           xcodebuild build \
-            -project JustGo.xcodeproj \
-            -scheme JustGo \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
             -configuration Release \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData-Release" \

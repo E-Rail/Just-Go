@@ -1,4 +1,4 @@
-# JustGo
+# Just-Go
 
 [![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
@@ -7,7 +7,7 @@
 
 [English](README.md) | 中文
 
-JustGo 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路线规划、车站信息和透明的
+Just-Go 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路线规划、车站信息和透明的
 数据可信度说明。应用结合内置地铁路线、Apple 地图地点搜索与步行路段、带有明确署名的
 地铁网络几何，以及范围严格受控
 的官方城市数据。缺失的时刻表、车站布局、换乘通道和车门位置会明确显示为不可用，不会推测。
@@ -25,16 +25,14 @@ JustGo 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路�
   车站则提供实时列车、出入口、设施三类信息。
 - 面向全部 58 个目录城市的内置官方资源目录，包含 770 个已审核的乘客地图、出行、
   无障碍和帮助链接。
-- 两张内置试点照片：Ian Holton 的建国门照片采用 CC BY 2.0，Qqhhss 的香港中环照片采用
-  CC0 1.0。
 - 从照片或文件导入的私人车站图片，经标准化后仅保存在设备上。
 
 当前内置覆盖如下：
 
 | 城市 | 网络车站 | 已匹配 | 无障碍 | 实时到站 | 外部地图 | 媒体 | 已核实换乘 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 北京 | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
-| 香港 | 162 | 162 | 98 | 162 | 0 | 1 | 0 |
+| 北京 | 444 | 444 | 0 | 0 | 0 | 0 | 0 |
+| 香港 | 162 | 162 | 98 | 162 | 0 | 0 | 0 |
 
 其余 56 个城市数据包处于来源待接入状态，其中 44 个城市保留带署名的网络基础数据，12 个仅有目录信息。
 轨道路线由内置地铁网络计算，不依赖可选城市数据包；Apple 地图用于地点搜索和步行路段。
@@ -64,21 +62,25 @@ JustGo 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路�
 
 香港全部 162 个车站使用相同的三类别结构，但第一项显示“实时列车”，而非北京的“首末车”。
 列车信息来自政府官方实时 API；出入口和设施在可用时来自内置的 DATA.GOV.HK 无障碍快照，
-并保留已核实的“不可用”状态。其他已审核网页、PDF 和图片仍只会在乘客点按后于 JustGo 内
-打开：网页使用不持久化的 WebKit 会话，文件使用上限为 50 MB 的纯内存原生查看器。JustGo
+并保留已核实的“不可用”状态。其他已审核网页、PDF 和图片仍只会在乘客点按后于 Just-Go 内
+打开：网页使用不持久化的 WebKit 会话，文件使用上限为 50 MB 的纯内存原生查看器。Just-Go
 不会持久化或再分发运营方内容；无法显示的非车站资源仍保留明确的浏览器后备入口。
 
 ## 站内指引
 
-应用保留了站内图引擎、检查点扫描、持久化和 Live Go 接入，以便未来承载经核实的数据。
-当前版本包含 0 个经核实的换乘上下文，也不宣称提供通用 3D 地图、站内路线、上车车厢、
-车门位置或换乘通道。没有经核实指引时，Live Go 会保留普通换乘步骤并明确说明不可用。
+Just-Go 不提供站内导航。站内图引擎、逐步规划、检查点扫描及其 Live Go 接入已整体移除，
+而非继续保留：始终没有经核实的数据来源，所有入口都无法触达，相机权限也只是向审核承诺
+一个用户打不开的扫描功能。Just-Go 不宣称提供 3D 地图、站内路线、上车车厢、车门位置或
+换乘通道。换乘时，Live Go 会显示车站、可用的官方链接，并提示以站内标识为准。
+
+实际展示的内容来自官方开放数据：城市公布出入口时显示出入口，运营方公布通道／站台提示时
+显示提示。
 
 ## 设置
 
 1. 克隆仓库。
-2. 在 Xcode 中打开 `JustGo.xcodeproj`。
-3. 构建 `JustGo` scheme。
+2. 在 Xcode 中打开 `Just-Go.xcodeproj`。
+3. 构建 `Just-Go` scheme。
 
 Release 构建默认只使用内置基础数据；只有配置第一方城市数据源后才会启用远程更新。
 Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用明确配置的开发源；
@@ -90,10 +92,16 @@ Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用�
 ruby Scripts/generate_city_pack_manifest.rb
 ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
+ruby Scripts/generate_universal_city_data.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
 ruby Scripts/validate_official_transit_resources.rb
+ruby Scripts/validate_universal_city_data.rb
 ```
+
+面向开发者的统一城市数据格式见 [`DataPacks/universal/`](DataPacks/universal/)——58 个城市
+以同一套带版本号和完整性索引的 JSON 结构发布，格式说明见
+[DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md)。
 
 数据结构、来源、校验和和授权说明见 [DataPacks/README.md](DataPacks/README.md)、
 [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md) 和
@@ -103,12 +111,13 @@ ruby Scripts/validate_official_transit_resources.rb
 
 - 私人车站媒体保存在 Application Support 中并排除备份，不会用于推断路线、无障碍、
   站内通道或车门位置。
-- 外部运营方资源只会在用户主动操作后通过不持久化的应用内网页或文件查看器显示。JustGo
+- 外部运营方资源只会在用户主动操作后通过不持久化的应用内网页或文件查看器显示。Just-Go
   不会预取、持久化或再分发这些内容，也不会把它们计入离线内容。运营方会收到该网络请求；不支持
   的下载仍由乘客明确选择是否改用浏览器。
 - 打开 416 个支持原生信息的北京车站详情之一时，会把已审核的不透明车站 ID 发送给
-  `www.bjsubway.com`。JustGo 只在内存中显示选定响应文字，不发送到 JustGo 服务器，也不
-  持久化。打开精确来源页面时还可能联系运营方选择的第三方网页服务。
+  `www.bjsubway.com`。Just-Go 显示选定响应文字，不发送到 Just-Go 服务器；仅在本机保留最近
+  一次成功获取的快照（不参与备份），供离线时以"已缓存"标注展示，并可随时通过"设置 →
+  清除缓存"删除。打开精确来源页面时还可能联系运营方选择的第三方网页服务。
 - 香港实时到站请求使用官方线路和车站标识访问 `rt.data.gov.hk`，不会包含私人媒体或
   乘客位置。
 - 应用链接到已发布的[隐私政策](https://e-rail.github.io/justgo/docs/privacy/)和
@@ -116,5 +125,5 @@ ruby Scripts/validate_official_transit_resources.rb
 
 ## 许可证
 
-JustGo 原创软件源代码采用 MIT 许可证。第三方数据和媒体不包含在 MIT 授权中，其条款记录在
+Just-Go 原创软件源代码采用 MIT 许可证。第三方数据和媒体不包含在 MIT 授权中，其条款记录在
 `DataPacks/rights_inventory.json` 和 `THIRD_PARTY_NOTICES.md`。

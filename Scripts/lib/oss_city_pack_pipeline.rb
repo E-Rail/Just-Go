@@ -5,6 +5,7 @@ require "csv"
 require "digest"
 require "fileutils"
 require "json"
+require_relative "gcj02"
 
 module OSSCityPackPipeline
   GENERATED_AT = "2026-07-15T00:00:00Z"
@@ -83,22 +84,22 @@ module OSSCityPackPipeline
 
   SOURCE_FILES = {
     "mtr_lines_and_stations.csv" => {
-      snapshot: "justgo-mtr-lines.csv",
+      snapshot: "just-go-mtr-lines.csv",
       source_url: "https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "light_rail_routes_and_stops.csv" => {
-      snapshot: "justgo-lrt-routes.csv",
+      snapshot: "just-go-lrt-routes.csv",
       source_url: "https://opendata.mtr.com.hk/data/light_rail_routes_and_stops.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "barrier_free_facilities.csv" => {
-      snapshot: "justgo-barrier.csv",
+      snapshot: "just-go-barrier.csv",
       source_url: "https://opendata.mtr.com.hk/data/barrier_free_facilities.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     },
     "barrier_free_facility_category.csv" => {
-      snapshot: "justgo-barrier-categories.csv",
+      snapshot: "just-go-barrier-categories.csv",
       source_url: "https://opendata.mtr.com.hk/data/barrier_free_facility_category.csv",
       resource_url: "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities"
     }
@@ -109,7 +110,7 @@ module OSSCityPackPipeline
     "schedules" => "source_pending",
     "liveArrivals" => "source_pending",
     "stationMaps" => "external_only",
-    "licensedMedia" => "metadata_only",
+    "licensedMedia" => "source_pending",
     "verifiedTransferContexts" => "source_pending"
   }.freeze
 
@@ -118,9 +119,38 @@ module OSSCityPackPipeline
     "schedules" => "source_pending",
     "liveArrivals" => "official_live",
     "stationMaps" => "external_only",
-    "licensedMedia" => "metadata_only",
+    "licensedMedia" => "source_pending",
     "verifiedTransferContexts" => "source_pending"
   }.freeze
+
+  # data.taipei publishes exits for the Taipei Metro proper but not for the New Taipei light-rail
+  # and branch lines that share the same rider-facing network, so accessibility coverage is
+  # partial by construction rather than pending.
+  TAIPEI_CAPABILITIES = {
+    "accessibility" => "partial_static",
+    "schedules" => "source_pending",
+    "liveArrivals" => "source_pending",
+    "stationMaps" => "source_pending",
+    "licensedMedia" => "source_pending",
+    "verifiedTransferContexts" => "source_pending"
+  }.freeze
+
+  TAIPEI_SOURCE_FILES = %w[station_exits.csv stations.csv].freeze
+
+  # Cities whose exits come from OpenStreetMap rather than an operator. OSM is ODbL, so unlike
+  # every operator feed here these ship inside the app and work with no network at all — which is
+  # the only way most of these cities get an exit list or an exit map on the station screen.
+  # Beijing is in the list too, but merges into its existing landing-link pack rather than
+  # producing a second one.
+  # Listing a city here without its DataPacks/sources/osm-entrances file is a hard error, not a
+  # silent skip, so the list and the vendored set cannot drift apart unnoticed.
+  OSM_ENTRANCE_CITY_IDS = %w[
+    1100 1200 3100 3201 3205 3301 4201 4401 4403 5000 5101 6101
+  ].freeze
+
+  # "頂埔站出口1" → 頂埔 / 1. Taipei Main Station's exits are lettered without the 站出口 form.
+  TAIPEI_EXIT_PATTERN = /\A(?<station>.+?)站(?:出入口|出口)(?<label>.*)\z/
+  TAIPEI_MAIN_STATION = "台北車站"
 
   PENDING_CAPABILITIES = {
     "accessibility" => "source_pending",
@@ -139,37 +169,6 @@ module OSSCityPackPipeline
       "provider" => "Macao Light Rapid Transit Corporation, Limited"
     }
   ].freeze
-
-  MEDIA = {
-    "jianguomen" => {
-      "kind" => "stationPhoto",
-      "title" => "Beijing Subway Jianguomen Station",
-      "relativePath" => "LicensedMedia/beijing-jianguomen.jpg",
-      "mimeType" => "image/jpeg",
-      "sizeBytes" => 470_435,
-      "sha256" => "54f8ab6ecab018924e43fb244b5d2d940a100a4680caa799e8e807a721adf750",
-      "sourcePageURL" => "https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg",
-      "creator" => "Ian Holton",
-      "licenseSPDX" => "CC-BY-2.0",
-      "licenseURL" => "https://creativecommons.org/licenses/by/2.0/",
-      "attribution" => "Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.",
-      "modifications" => "Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits."
-    },
-    "central" => {
-      "kind" => "stationPhoto",
-      "title" => "Central station in Hong Kong",
-      "relativePath" => "LicensedMedia/hong-kong-central.jpg",
-      "mimeType" => "image/jpeg",
-      "sizeBytes" => 955_201,
-      "sha256" => "7ef38511d29cee0872787d5ab154bafce6a0089af3bc48508999244ff0840370",
-      "sourcePageURL" => "https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg",
-      "creator" => "Qqhhss",
-      "licenseSPDX" => "CC0-1.0",
-      "licenseURL" => "https://creativecommons.org/publicdomain/zero/1.0/",
-      "attribution" => "Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.",
-      "modifications" => "Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits."
-    }
-  }.freeze
 
   class BuildError < StandardError; end
 
@@ -190,8 +189,16 @@ module OSSCityPackPipeline
 
       packs = {
         "1100" => build_beijing_pack,
-        "8100" => build_hong_kong_pack
+        "8100" => build_hong_kong_pack,
+        "7101" => build_taipei_pack
       }
+      # Beijing already appears above and merges its entrances into that pack; the rest get a
+      # pack whose only content is OSM exits, which is what makes their station screens work
+      # offline at all.
+      (OSM_ENTRANCE_CITY_IDS - packs.keys).each do |city_id|
+        packs[city_id] = build_osm_entrance_pack(city_id)
+      end
+      packs = packs.sort.to_h
       packs.each { |city_id, pack| write_json(pack_path(city_id), pack) }
       write_json(manifest_path, build_manifest(packs))
 
@@ -206,9 +213,11 @@ module OSSCityPackPipeline
 
     def build_beijing_pack
       network = load_network("1100")
+      # Beijing already ships a pack for its official landing links, so its OSM entrances merge
+      # into that one rather than producing a competing second pack for the same city.
+      access_points = osm_access_points("1100")
       stations = network.fetch("stations").sort_by { |station| station.fetch("id") }.map do |station|
-        media = station["nameEn"] == "Jianguomen" ? [deep_copy(MEDIA.fetch("jianguomen"))] : []
-        base_station(station).merge(
+        record = base_station(station).merge(
           "externalResources" => [
             external_resource(
               "operatorInformation",
@@ -222,9 +231,13 @@ module OSSCityPackPipeline
               "https://www.bjsubway.com/station/xltcx/",
               "Beijing Subway"
             )
-          ],
-          "licensedMedia" => media
+          ]
         )
+        if (points = access_points[station.fetch("id")])
+          record["stationAccessPoints"] = points
+          apply_entrance_accessibility!(record)
+        end
+        normalize_station_arrays!(record)
       end
 
       coverage = coverage_for(network.fetch("stations").length, stations)
@@ -233,11 +246,138 @@ module OSSCityPackPipeline
         "cityID" => "1100",
         "version" => VERSION,
         "generatedAt" => GENERATED_AT,
-        "rightsIDs" => %w[osm-metro-networks beijing-official-landing-links media-jianguomen-ian-holton].sort,
-        "capabilities" => deep_copy(BEIJING_CAPABILITIES),
+        "rightsIDs" => %w[osm-metro-networks beijing-official-landing-links].sort,
+        "capabilities" => deep_copy(BEIJING_CAPABILITIES).merge(
+          "accessibility" => osm_entrance_capabilities(stations).fetch("accessibility")
+        ),
         "coverage" => coverage,
         "stations" => stations
       }
+    end
+
+    # Reads the vendored OSM entrance binding for a city. Returns station ID -> access-point
+    # records, already in GCJ-02 and already bound to canonical stations by the importer, so the
+    # pack build stays offline and deterministic.
+    def osm_access_points(city_id)
+      path = File.join(root, "DataPacks", "sources", "osm-entrances", "#{city_id}.json")
+      return {} unless File.file?(path)
+
+      document = JSON.parse(File.read(path))
+      unless document["cityID"] == city_id && document["stations"].is_a?(Hash)
+        raise BuildError, "OSM entrance document for #{city_id} is invalid"
+      end
+
+      # Entrances with neither a name nor an exit letter are kept. They were dropped at first, on
+      # the reasoning that a pin nobody can match to a sign is useless — but that reasoning only
+      # holds for a *list*. A door you walk to needs a position, not a letter, and dropping them
+      # blanked the map at 134 stations that OSM surveys perfectly well: 玉泉路 has eight entrances
+      # within 90 m and shipped none of them. They travel with an empty name; the app labels them
+      # by their compass bearing from the station, which is derived from the surveyed coordinate
+      # rather than invented, and localizes properly instead of baking one language into the pack.
+      document.fetch("stations").each_with_object({}) do |(station_id, entrances), index|
+        points = entrances
+          .map { |entrance| osm_access_point(entrance) }
+          .uniq { |point| point.fetch("id") }
+          .sort_by { |point| point.fetch("id") }
+        index[station_id] = points unless points.empty?
+      end
+    end
+
+    # `ref` is the exit letter riders actually look for ("A", "B2"); it is the identity here, with
+    # the OSM node ID only as a fallback so an untagged entrance still gets a stable, unique id.
+    # The name is left empty when the survey records neither, which the app renders as a bearing.
+    def osm_access_point(entrance)
+      node_id = entrance.fetch("osmNodeID")
+      label = entrance["ref"].to_s.strip
+      name = entrance["name"].to_s.strip
+      {
+        "id" => "osm-#{node_id}",
+        "name" => name.empty? ? label : name,
+        "kind" => "exit",
+        "latitude" => entrance.fetch("latitude").round(6),
+        "longitude" => entrance.fetch("longitude").round(6),
+        # OSM's wheelchair values are yes/no/limited/designated. Only an unqualified yes is
+        # reported as step-free; "limited" is precisely the case a rider must not be told is fine,
+        # and an untagged entrance — most of them — is simply not a step-free claim. The UI shows
+        # the green wheelchair only for true, so false reads as "not asserted" rather than as
+        # "surveyed and inaccessible".
+        "isAccessible" => accessible_wheelchair_value?(entrance["wheelchair"]) == true,
+        "source" => "specificEntrance"
+      }
+    end
+
+    def accessible_wheelchair_value?(value)
+      case value.to_s.strip.downcase
+      when "yes", "designated" then true
+      when "no", "limited" then false
+      end
+    end
+
+    def build_osm_entrance_pack(city_id)
+      network = load_network(city_id)
+      access_points = osm_access_points(city_id)
+      raise BuildError, "no OSM entrances vendored for #{city_id}" if access_points.empty?
+
+      stations = network.fetch("stations")
+        .select { |station| access_points.key?(station.fetch("id")) }
+        .sort_by { |station| station.fetch("id") }
+        .map do |station|
+          record = base_station(station)
+          record["stationAccessPoints"] = access_points.fetch(station.fetch("id"))
+          apply_entrance_accessibility!(record)
+          normalize_station_arrays!(record)
+        end
+
+      {
+        "schemaVersion" => 2,
+        "cityID" => city_id,
+        "version" => VERSION,
+        "generatedAt" => GENERATED_AT,
+        "rightsIDs" => %w[osm-metro-networks],
+        "capabilities" => osm_entrance_capabilities(stations),
+        "coverage" => coverage_for(network.fetch("stations").length, stations),
+        "stations" => stations
+      }
+    end
+
+    # Only claim static accessibility where OSM actually carries wheelchair tags; most cities have
+    # entrance geometry with no accessibility tagging at all, and saying otherwise would present an
+    # untagged station as one with no step-free entrance rather than one nobody has surveyed.
+    def osm_entrance_capabilities(stations)
+      # Only cities where OSM actually records step-free entrances claim static accessibility.
+      # `accessibility` is set on a station exactly when at least one of its entrances is tagged
+      # wheelchair=yes, so it is the honest signal here. Beijing's pack carries every station,
+      # most with no entrances at all.
+      tagged = stations.any? { |station| !station["accessibility"].nil? }
+      deep_copy(PENDING_CAPABILITIES).merge(
+        "accessibility" => tagged ? "partial_static" : "source_pending"
+      )
+    end
+
+    # `accessibleEntrances` is a list of names riders read, so an entrance OSM tagged step-free but
+    # never named contributes nothing to it. Where a station's only step-free entrances are unnamed
+    # the block is skipped entirely rather than written empty: an empty block would still count
+    # towards the pack's accessibility coverage while displaying nothing. Step-free *routing* is
+    # unaffected either way — it reads `isAccessible` off the access point, not this list.
+    def apply_entrance_accessibility!(record)
+      accessible = record.fetch("stationAccessPoints")
+        .select { |point| point.fetch("isAccessible") == true }
+        .map { |point| point.fetch("name") }
+        .reject { |name| name.strip.empty? }
+      return record if accessible.empty?
+
+      record["accessibility"] = {
+        "source" => "openstreetmap/subway-entrances",
+        "hasElevator" => nil,
+        "hasEscalator" => nil,
+        "hasWheelchairRamp" => nil,
+        "hasTactilePath" => nil,
+        "hasAccessibleRestroom" => nil,
+        "elevatorLocations" => [],
+        "accessibleEntrances" => accessible,
+        "facilityNotes" => []
+      }
+      record
     end
 
     def build_hong_kong_pack
@@ -325,10 +465,6 @@ module OSSCityPackPipeline
         )
       end
 
-      central = records.values.find { |record| record["stationNameEn"] == "Central" }
-      raise BuildError, "Central did not match the canonical network" unless central
-
-      central["licensedMedia"] << deep_copy(MEDIA.fetch("central"))
       stations = records.values.each { |record| normalize_station_arrays!(record) }
         .sort_by { |record| record.fetch("stationID") }
       if stations.length != 162
@@ -348,12 +484,100 @@ module OSSCityPackPipeline
         "cityID" => "8100",
         "version" => VERSION,
         "generatedAt" => GENERATED_AT,
-        "rightsIDs" => %w[osm-metro-networks data-gov-hk-mtr media-central-qqhhss].sort,
+        "rightsIDs" => %w[osm-metro-networks data-gov-hk-mtr].sort,
         "capabilities" => deep_copy(HONG_KONG_CAPABILITIES),
         "coverage" => coverage,
         "destinationNames" => destination_names,
         "stations" => stations
       }
+    end
+
+    # Taipei's pack carries station exits: name, position and whether the exit is the barrier-free
+    # one. The app already renders these (StationDetailView, TransferStationSheet) and had no
+    # source for any city until now. Only facts present in the open data are emitted — in
+    # particular an accessible exit is recorded as an accessible entrance and nothing is inferred
+    # about lifts or ramps, which the dataset does not state.
+    def build_taipei_pack
+      network = load_network("7101")
+      canonical_index = canonical_station_index(network.fetch("stations"))
+      records = {}
+
+      taipei_exit_rows.each do |row|
+        source_name = row.fetch("出入口名稱").to_s.strip
+        station_name, label = split_taipei_exit_name(source_name)
+        candidates = canonical_index[normalize_name(station_name)]
+        if candidates.length != 1
+          raise BuildError,
+            "Taipei exit #{source_name.inspect} matched #{candidates.length} canonical stations"
+        end
+        canonical = candidates.first
+        record = records[canonical.fetch("id")] ||= base_station(canonical).merge(
+          "stationAccessPoints" => []
+        )
+
+        latitude = Float(row.fetch("緯度"))
+        longitude = Float(row.fetch("經度"))
+        # The open data is WGS-84; everything the app draws is GCJ-02 (see Scripts/lib/gcj02.rb).
+        latitude, longitude = GCJ02.from_wgs84(latitude, longitude)
+        accessible = row.fetch("是否為無障礙用").to_s.strip == "是"
+        record.fetch("stationAccessPoints") << {
+          "id" => "#{canonical.fetch("id")}-#{label.empty? ? "exit" : label}",
+          "name" => source_name,
+          "kind" => "exit",
+          "latitude" => latitude.round(6),
+          "longitude" => longitude.round(6),
+          "isAccessible" => accessible,
+          "source" => "specificEntrance"
+        }
+      end
+
+      stations = records.values.map do |record|
+        record["stationAccessPoints"] = record.fetch("stationAccessPoints")
+          .uniq { |point| point.fetch("id") }
+          .sort_by { |point| point.fetch("id") }
+        accessible_entrances = record.fetch("stationAccessPoints")
+          .select { |point| point.fetch("isAccessible") }
+          .map { |point| point.fetch("name") }
+        unless accessible_entrances.empty?
+          record["accessibility"] = {
+            "source" => "data.taipei/taipei-metro-station-exits",
+            "hasElevator" => nil,
+            "hasEscalator" => nil,
+            "hasWheelchairRamp" => nil,
+            "hasTactilePath" => nil,
+            "hasAccessibleRestroom" => nil,
+            "elevatorLocations" => [],
+            "accessibleEntrances" => accessible_entrances,
+            "facilityNotes" => []
+          }
+        end
+        normalize_station_arrays!(record)
+      end.sort_by { |record| record.fetch("stationID") }
+
+      {
+        "schemaVersion" => 2,
+        "cityID" => "7101",
+        "version" => VERSION,
+        "generatedAt" => GENERATED_AT,
+        "rightsIDs" => %w[osm-metro-networks taipei-open-data].sort,
+        "capabilities" => deep_copy(TAIPEI_CAPABILITIES),
+        "coverage" => coverage_for(network.fetch("stations").length, stations),
+        "stations" => stations
+      }
+    end
+
+    def split_taipei_exit_name(value)
+      return [TAIPEI_MAIN_STATION, value.delete_prefix(TAIPEI_MAIN_STATION)] if
+        value.start_with?(TAIPEI_MAIN_STATION)
+
+      match = TAIPEI_EXIT_PATTERN.match(value)
+      raise BuildError, "unparsable Taipei exit name #{value.inspect}" unless match
+
+      [match[:station], match[:label].to_s.strip]
+    end
+
+    def taipei_exit_rows
+      @taipei_exit_rows ||= read_csv(File.join(root, "DataPacks", "sources", "7101", "station_exits.csv"))
     end
 
     def build_manifest(packs)
@@ -454,25 +678,26 @@ module OSSCityPackPipeline
           "MIT",
           "ODbL-1.0",
           "LicenseRef-DATA-GOV-HK-1.2",
+          "LicenseRef-OGDL-TW-1.0",
           "LicenseRef-External-Link-Only",
           "CC-BY-2.0",
           "CC0-1.0"
         ],
         "rights" => [
           {
-            "id" => "justgo-generated-catalog",
+            "id" => "just-go-generated-catalog",
             "kind" => "authoredMetadata",
             "scope" => "Generated catalog, rights inventory, and deterministic pack structure",
             "licenseSPDX" => "MIT",
             "licenseURL" => "https://opensource.org/license/mit",
             "sourceURL" => "https://github.com/e-rail/justgo",
-            "attribution" => "JustGo contributors",
+            "attribution" => "Just-Go contributors",
             "redistribution" => "Covered by the repository MIT license; third-party fields retain their separately declared terms."
           },
           {
             "id" => "osm-metro-networks",
             "kind" => "database",
-            "scope" => "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry",
+            "scope" => "MetroNetworks station identifiers, names, lines, coordinates, and physical-track geometry, and the station entrances (railway=subway_entrance) bundled as station access points",
             "licenseSPDX" => "ODbL-1.0",
             "licenseURL" => "https://opendatacommons.org/licenses/odbl/1-0/",
             "sourceURL" => "https://www.openstreetmap.org/",
@@ -490,6 +715,16 @@ module OSSCityPackPipeline
             "redistribution" => "Custom DATA.GOV.HK Terms of Use v1.2 apply; attribution and source identification are required."
           },
           {
+            "id" => "taipei-open-data",
+            "kind" => "dataset",
+            "scope" => "DataPacks/sources/7101 Taipei Metro station and station-exit datasets, and the exit names, positions and barrier-free flags derived from them",
+            "licenseSPDX" => "LicenseRef-OGDL-TW-1.0",
+            "licenseURL" => "https://data.gov.tw/license",
+            "sourceURL" => "https://data.gov.tw/dataset/128428",
+            "attribution" => "臺北大眾捷運股份有限公司 / 臺北市資料大平臺 (data.taipei)",
+            "redistribution" => "Open Government Data License, Taiwan, version 1.0 permits redistribution, commercial use and derivative works. Attribution is mandatory: omitting it voids the licence grant retroactively."
+          },
+          {
             "id" => "beijing-official-landing-links",
             "kind" => "linkMetadata",
             "scope" => "Reviewed coverage states and official page/context URLs for all canonical Beijing app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
@@ -498,6 +733,36 @@ module OSSCityPackPipeline
             "sourceURL" => "https://www.bjsubway.com/station/",
             "attribution" => "Beijing Subway, Beijing MTR, China Railway 12306, and the identified Beijing municipal authorities",
             "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only after a user tap."
+          },
+          {
+            "id" => "shanghai-official-landing-links",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed coverage states, official station identifiers, and official page URLs for canonical Shanghai app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://service.shmetro.com/czxx/index.htm",
+            "sourceURL" => "https://service.shmetro.com/czxx/index.htm",
+            "attribution" => "Shanghai Shentong Metro Group (Shanghai Metro)",
+            "redistribution" => "Only factual station IDs, exact URLs, aliases, verification dates, and typed review outcomes are bundled. Provider-controlled page content remains external and is requested only on the rider device after a user tap."
+          },
+          {
+            "id" => "guangzhou-official-station-references",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed official station identifiers (stationShowCode) and aliases for canonical Guangzhou app stations; no operator page text, schedules, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://www.gzmtr.com/",
+            "sourceURL" => "https://www.gzmtr.com/",
+            "attribution" => "Guangzhou Metro Group",
+            "redistribution" => "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
+          },
+          {
+            "id" => "hangzhou-official-station-references",
+            "kind" => "linkMetadata",
+            "scope" => "Reviewed official station identifiers (stationCode) and aliases for canonical Hangzhou app stations; no operator page text, schedules, station descriptions, facilities, exits, coordinates, images, or media are copied",
+            "licenseSPDX" => "LicenseRef-External-Link-Only",
+            "licenseURL" => "https://www.hzmetro.com/",
+            "sourceURL" => "https://www.hzmetro.com/",
+            "attribution" => "Hangzhou Metro Group Co., Ltd.",
+            "redistribution" => "Only factual station identifiers, aliases, and verification dates are bundled. First/last train times are fetched on the rider device from the operator and are never copied, persisted, or redistributed."
           },
           {
             "id" => "macau-official-landing-link",
@@ -518,36 +783,6 @@ module OSSCityPackPipeline
             "sourceURL" => "https://www.mtr.com.hk/en/customer/services/system_map.html",
             "attribution" => "Official transit operators and government transport authorities identified per catalog record",
             "redistribution" => "Only factual link metadata is bundled. Linked pages and files remain with their providers and are opened only after user action."
-          },
-          {
-            "id" => "media-jianguomen-ian-holton",
-            "kind" => "mediaMetadata",
-            "scope" => MEDIA.fetch("jianguomen").fetch("relativePath"),
-            "licenseSPDX" => "CC-BY-2.0",
-            "licenseURL" => MEDIA.fetch("jianguomen").fetch("licenseURL"),
-            "sourceURL" => MEDIA.fetch("jianguomen").fetch("sourcePageURL"),
-            "creator" => "Ian Holton",
-            "attribution" => MEDIA.fetch("jianguomen").fetch("attribution"),
-            "sourceSizeBytes" => 3_011_512,
-            "sourceSHA1" => "682c2dd88704d654c79557a7a5f6d6f518d7f4b8",
-            "bundledSizeBytes" => MEDIA.fetch("jianguomen").fetch("sizeBytes"),
-            "bundledSHA256" => MEDIA.fetch("jianguomen").fetch("sha256"),
-            "bundled" => true
-          },
-          {
-            "id" => "media-central-qqhhss",
-            "kind" => "mediaMetadata",
-            "scope" => MEDIA.fetch("central").fetch("relativePath"),
-            "licenseSPDX" => "CC0-1.0",
-            "licenseURL" => MEDIA.fetch("central").fetch("licenseURL"),
-            "sourceURL" => MEDIA.fetch("central").fetch("sourcePageURL"),
-            "creator" => "Qqhhss",
-            "attribution" => MEDIA.fetch("central").fetch("attribution"),
-            "sourceSizeBytes" => 4_463_295,
-            "sourceSHA1" => "23ad1d16a17cc4837b960e3606a3e91ee2cdf490",
-            "bundledSizeBytes" => MEDIA.fetch("central").fetch("sizeBytes"),
-            "bundledSHA256" => MEDIA.fetch("central").fetch("sha256"),
-            "bundled" => true
           }
         ],
         "dataLicenses" => [DATA_GOV_HK_LICENSE.to_h],
@@ -582,11 +817,11 @@ module OSSCityPackPipeline
     end
 
     def pack_path(city_id)
-      File.join(root, "JustGo", "Resources", "BundledCityPacks", "#{city_id}.json")
+      File.join(root, "Just-Go", "Resources", "BundledCityPacks", "#{city_id}.json")
     end
 
     def network_path(city_id)
-      File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json")
+      File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json")
     end
 
     def load_network(city_id)
@@ -604,68 +839,102 @@ module OSSCityPackPipeline
         {
           "path" => "DataPacks/manifest.json",
           "rightsIDs" => %w[
-            justgo-generated-catalog osm-metro-networks data-gov-hk-mtr
+            just-go-generated-catalog osm-metro-networks data-gov-hk-mtr
             beijing-official-landing-links macau-official-landing-link
-            media-jianguomen-ian-holton media-central-qqhhss
+            taipei-open-data
           ].sort
         },
         {
           "path" => "DataPacks/rights_inventory.json",
-          "rightsIDs" => ["justgo-generated-catalog"]
+          "rightsIDs" => ["just-go-generated-catalog"]
         },
         {
           "path" => "DataPacks/official_transit_resources.json",
           "rightsIDs" => %w[
-            beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+            beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
             official-transit-resource-links osm-metro-networks
           ].sort
         },
         {
           "path" => "DataPacks/sources/official-resources/hong_kong_index.json",
           "rightsIDs" => %w[
-            data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+            data-gov-hk-mtr just-go-generated-catalog official-transit-resource-links
             osm-metro-networks
           ].sort
         },
         {
           "path" => "DataPacks/sources/official-resources/hong_kong_station_bindings.json",
-          "rightsIDs" => %w[data-gov-hk-mtr justgo-generated-catalog osm-metro-networks].sort
+          "rightsIDs" => %w[data-gov-hk-mtr just-go-generated-catalog osm-metro-networks].sort
         },
         {
           "path" => "DataPacks/sources/official-resources/beijing_station_information.json",
           "rightsIDs" => %w[
-            beijing-official-landing-links justgo-generated-catalog
+            beijing-official-landing-links just-go-generated-catalog
             official-transit-resource-links osm-metro-networks
           ].sort
         },
         {
-          "path" => "DataPacks/sources/8100/metadata.json",
-          "rightsIDs" => %w[justgo-generated-catalog data-gov-hk-mtr].sort
+          "path" => "DataPacks/sources/official-resources/shanghai_station_information.json",
+          "rightsIDs" => %w[
+            just-go-generated-catalog official-transit-resource-links
+            osm-metro-networks shanghai-official-landing-links
+          ].sort
         },
+        {
+          "path" => "DataPacks/sources/official-resources/guangzhou_station_information.json",
+          "rightsIDs" => %w[
+            guangzhou-official-station-references just-go-generated-catalog
+            osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/official-resources/hangzhou_station_information.json",
+          "rightsIDs" => %w[
+            hangzhou-official-station-references just-go-generated-catalog
+            osm-metro-networks
+          ].sort
+        },
+        {
+          "path" => "DataPacks/sources/8100/metadata.json",
+          "rightsIDs" => %w[just-go-generated-catalog data-gov-hk-mtr].sort
+        },
+        {
+          "path" => "DataPacks/sources/7101/metadata.json",
+          "rightsIDs" => %w[just-go-generated-catalog taipei-open-data].sort
+        },
+        {
+          "path" => "Just-Go/Resources/BundledCityPacks/7101.json",
+          "rightsIDs" => %w[just-go-generated-catalog osm-metro-networks taipei-open-data].sort
+        },
+        *OSM_ENTRANCE_CITY_IDS.map do |city_id|
+          {
+            "path" => "DataPacks/sources/osm-entrances/#{city_id}.json",
+            "rightsIDs" => %w[just-go-generated-catalog osm-metro-networks].sort
+          }
+        end,
+        # Beijing's pack is declared with its landing-link grant further down; every other
+        # entrance city ships a pack whose only third-party content is OSM.
+        *(OSM_ENTRANCE_CITY_IDS - %w[1100]).map do |city_id|
+          {
+            "path" => "Just-Go/Resources/BundledCityPacks/#{city_id}.json",
+            "rightsIDs" => %w[just-go-generated-catalog osm-metro-networks].sort
+          }
+        end,
         {
           "path" => "THIRD_PARTY_NOTICES.md",
-          "rightsIDs" => ["justgo-generated-catalog"]
+          "rightsIDs" => ["just-go-generated-catalog"]
         },
         {
-          "path" => "JustGo/Resources/BundledCityPacks/1100.json",
+          "path" => "Just-Go/Resources/BundledCityPacks/1100.json",
           "rightsIDs" => %w[
-            justgo-generated-catalog osm-metro-networks beijing-official-landing-links
-            media-jianguomen-ian-holton
+            just-go-generated-catalog osm-metro-networks beijing-official-landing-links
           ].sort
         },
         {
-          "path" => "JustGo/Resources/BundledCityPacks/8100.json",
+          "path" => "Just-Go/Resources/BundledCityPacks/8100.json",
           "rightsIDs" => %w[
-            justgo-generated-catalog osm-metro-networks data-gov-hk-mtr media-central-qqhhss
+            just-go-generated-catalog osm-metro-networks data-gov-hk-mtr
           ].sort
-        },
-        {
-          "path" => "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg",
-          "rightsIDs" => ["media-jianguomen-ian-holton"]
-        },
-        {
-          "path" => "JustGo/Resources/LicensedMedia/hong-kong-central.jpg",
-          "rightsIDs" => ["media-central-qqhhss"]
         }
       ]
       SOURCE_FILES.each_key do |file_name|
@@ -674,18 +943,42 @@ module OSSCityPackPipeline
           "rightsIDs" => ["data-gov-hk-mtr"]
         }
       end
-      Dir.glob(File.join(root, "JustGo", "Resources", "MetroNetworks", "*.json")).sort.each do |path|
+      TAIPEI_SOURCE_FILES.each do |file_name|
+        files << {
+          "path" => "DataPacks/sources/7101/#{file_name}",
+          "rightsIDs" => ["taipei-open-data"]
+        }
+      end
+      Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort.each do |path|
         files << {
           "path" => path.delete_prefix("#{root}/"),
           "rightsIDs" => ["osm-metro-networks"]
+        }
+      end
+      # DataPacks/universal/ republishes the catalog, networks, packs, and rights data as
+      # one developer-facing document per city (Scripts/generate_universal_city_data.rb),
+      # so every file carries the union of the aggregated sources' rights. The per-city
+      # subset is embedded in each document and cross-checked by
+      # Scripts/validate_universal_city_data.rb.
+      universal_rights = %w[
+        beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
+        macau-official-landing-link
+        official-transit-resource-links osm-metro-networks taipei-open-data
+      ].sort
+      files << {
+        "path" => "DataPacks/universal/index.json",
+        "rightsIDs" => universal_rights
+      }
+      CATALOG_CITY_IDS.each do |city_id|
+        files << {
+          "path" => "DataPacks/universal/#{city_id}.json",
+          "rightsIDs" => universal_rights
         }
       end
       files.sort_by { |entry| entry.fetch("path") }
     end
 
     def third_party_notices
-      jianguomen = MEDIA.fetch("jianguomen")
-      central = MEDIA.fetch("central")
       <<~MARKDOWN
         # Third-Party Notices
 
@@ -708,11 +1001,21 @@ module OSSCityPackPipeline
         by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
         https://data.gov.hk/en/terms-and-conditions
 
+        ## Taipei Metro Open Data Via data.taipei
+
+        The Taipei city pack is derived from the vendored 臺北捷運車站出入口座標 and 臺北捷運車站資料
+        snapshots: station entrance names, positions, and whether an entrance is the barrier-free one.
+
+        Data provider: 臺北大眾捷運股份有限公司 (Taipei Rapid Transit Corporation). Distribution portal:
+        臺北市資料大平臺 (data.taipei). Reuse is governed by the Open Government Data License, Taiwan,
+        version 1.0, which requires this attribution to be retained:
+        https://data.gov.tw/license
+
         ## Official Transit Resource Links
 
         The bundled official-resource catalog contains reviewed factual link metadata for transit
         operators and government transport authorities. Linked pages, PDFs, and images remain with
-        their providers. After user action, JustGo renders reviewed pages in a non-persistent WebKit
+        their providers. After user action, Just-Go renders reviewed pages in a non-persistent WebKit
         session and reviewed PDFs or images in memory-only native viewers. It does not copy,
         prefetch, persist, or redistribute their content.
 
@@ -734,21 +1037,15 @@ module OSSCityPackPipeline
         https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
         https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
 
-        ## Jianguomen Station Photo
-
-        #{jianguomen.fetch("attribution")}
-
-        Source description page: #{jianguomen.fetch("sourcePageURL")}
-
-        Modification record: #{jianguomen.fetch("modifications")}
-
-        ## Central Station Photo
-
-        #{central.fetch("attribution")}
-
-        Source description page: #{central.fetch("sourcePageURL")}
-
-        Modification record: #{central.fetch("modifications")}
+        Guangzhou, Shanghai and Hangzhou station references are reviewed operator station
+        identifiers for canonical app stations. The bundle contains identifier and alias metadata,
+        not operator page text, schedules, station descriptions, facilities, exits, coordinates,
+        images, or layouts. For those reviewed identifiers, Station Detail may request first/last
+        train times from the operator for temporary, non-persistent native display; the response
+        remains subject to the operator's terms:
+        https://www.gzmtr.com/
+        https://service.shmetro.com/czxx/index.htm
+        https://www.hzmetro.com/
       MARKDOWN
     end
 
@@ -840,7 +1137,13 @@ module OSSCityPackPipeline
       {
         "stationID" => station.fetch("id"),
         "stationName" => station.fetch("name"),
-        "stationNameEn" => station["nameEn"].to_s,
+        # Never emit an empty English name. OfficialCityPackService treats a present-but-empty
+        # stationNameEn as malformed and rejects the station — which fails the *whole* pack, so a
+        # single station OSM has no English name for silently discarded every exit in the city.
+        # Beijing had 22 such stations and had therefore been dropping its bundled pack unnoticed.
+        # Absent English falls back to the station's own name, which is what the app displays for
+        # these stations anyway.
+        "stationNameEn" => station["nameEn"].to_s.strip.empty? ? station.fetch("name") : station.fetch("nameEn"),
         "aliases" => [],
         "accessibility" => nil,
         "schedules" => [],

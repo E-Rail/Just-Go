@@ -1,4 +1,4 @@
-# JustGo
+# Just-Go
 
 [![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
@@ -7,7 +7,7 @@
 
 English | [中文](README-zh.md)
 
-JustGo is an iPhone and iPad transit companion for route planning, station context, and honest
+Just-Go is an iPhone and iPad transit companion for route planning, station context, and honest
 data confidence. It combines bundled metro routing, Apple Maps place search and walking legs,
 attributed metro geometry, and narrowly
 scoped official city data. Missing schedules, layouts, transfer paths, and door positions are
@@ -28,16 +28,14 @@ shown as unavailable rather than inferred.
   (Live Trains, Exits, Facilities).
 - A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
   rider-facing maps, travel information, accessibility resources, and help pages.
-- Two bundled pilot photos: Jianguomen by Ian Holton under CC BY 2.0, and Hong Kong Central by
-  Qqhhss under CC0 1.0.
 - Private station images imported from Photos or Files, normalized and stored only on-device.
 
 The current bundled coverage is:
 
 | City | Network | Matched | Accessibility | Live arrivals | External maps | Media | Verified transfers |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Beijing | 444 | 444 | 0 | 0 | 0 | 1 | 0 |
-| Hong Kong | 162 | 162 | 98 | 162 | 0 | 1 | 0 |
+| Beijing | 444 | 444 | 0 | 0 | 0 | 0 | 0 |
+| Hong Kong | 162 | 162 | 98 | 162 | 0 | 0 | 0 |
 
 The other 56 city packs are source-pending. Of those cities, 44 retain an attributed network
 baseline and 12 are catalog-only. Included metro topology powers rail routing independently of
@@ -75,23 +73,28 @@ reuse license was found, so production distribution still requires operator or l
 Hong Kong uses the same three-category structure for all 162 stations, with Live Trains replacing
 Beijing's First / Last label. Live train rows come from the official government transport API;
 exits and facilities use the included DATA.GOV.HK barrier-free snapshot where available, including
-verified unavailable states. Other reviewed pages, PDFs, and images open inside JustGo only after a
+verified unavailable states. Other reviewed pages, PDFs, and images open inside Just-Go only after a
 rider taps them: pages use a non-persistent WebKit session, while documents use memory-only native
-viewers with a 50 MB limit. JustGo does not persist or redistribute operator content. Unsupported
+viewers with a 50 MB limit. Just-Go does not persist or redistribute operator content. Unsupported
 non-station resources retain an explicit browser fallback.
 
 ## Indoor Guidance
 
-The indoor graph, checkpoint scanner, persistence, and Live Go integration remain in the app
-for future verified data. This release contains zero verified transfer contexts. It does not
-claim universal 3D maps, indoor routes, boarding cars, door positions, or transfer corridors.
-When verified guidance is unavailable, Live Go keeps the normal transfer step and says so.
+Just-Go does not do indoor navigation. The indoor graph, step planner, checkpoint scanner and
+their Live Go integration were removed rather than kept dormant: no verified source ever
+materialised, so every entry point was unreachable and the camera permission promised a scanner
+no rider could open. Just-Go claims no 3D maps, indoor routes, boarding cars, door positions, or
+transfer corridors. On a transfer, Live Go shows the station, any official operator links, and
+tells the rider to follow station signs.
+
+What it does show comes from official open data: exits and entrances where a city publishes them,
+and corridor/platform hints where an operator does.
 
 ## Setup
 
 1. Clone the repository.
-2. Open `JustGo.xcodeproj` in Xcode.
-3. Build the `JustGo` scheme.
+2. Open `Just-Go.xcodeproj` in Xcode.
+3. Build the `Just-Go` scheme.
 
 Release builds use the included baseline unless a first-party city-pack origin is configured
 through the build settings. Release does not fall back to GitHub, jsDelivr, or Wikimedia.
@@ -104,10 +107,17 @@ Regenerate and validate data from the vendored, reviewed inputs:
 ruby Scripts/generate_city_pack_manifest.rb
 ruby Scripts/import_beijing_station_information.rb --refresh
 ruby Scripts/generate_official_transit_resources.rb
+ruby Scripts/generate_universal_city_data.rb
 ruby Scripts/validate_data_rights.rb
 ruby Scripts/validate_city_packs.rb
 ruby Scripts/validate_official_transit_resources.rb
+ruby Scripts/validate_universal_city_data.rb
 ```
+
+Developers consuming Just-Go's data can use the Universal City Data Format —
+[`DataPacks/universal/`](DataPacks/universal/) publishes all 58 cities in one versioned,
+integrity-indexed JSON schema documented in
+[DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md).
 
 See [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md), and
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for schema, provenance, checksums, and exact
@@ -118,13 +128,14 @@ license treatment.
 - Personal station media stays in Application Support, is excluded from backup, and is never
   used to infer routing, accessibility, indoor paths, or doors.
 - External operator resources render inside non-persistent in-app page and document viewers only
-  after a user action. JustGo does not prefetch, persist, redistribute, or count them as offline
+  after a user action. Just-Go does not prefetch, persist, redistribute, or count them as offline
   content. The operator receives the request; unsupported downloads remain an explicit browser
   fallback controlled by the rider.
 - Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
-  station ID to `www.bjsubway.com`. JustGo displays selected response text in memory, does not send
-  it to a JustGo server, and does not persist it. Opening the exact source page may also contact
-  provider-selected third-party web services.
+  station ID to `www.bjsubway.com`. Just-Go displays selected response text, does not send it to a
+  Just-Go server, and keeps only a device-local, backup-excluded copy of the last good snapshot for
+  offline access — served clearly labeled as cached and deletable via Settings → Clear Cache.
+  Opening the exact source page may also contact provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)
@@ -132,6 +143,6 @@ license treatment.
 
 ## License
 
-JustGo's original software source is MIT licensed. Third-party data and media are not granted
+Just-Go's original software source is MIT licensed. Third-party data and media are not granted
 under MIT; their terms are recorded in `DataPacks/rights_inventory.json` and
 `THIRD_PARTY_NOTICES.md`.

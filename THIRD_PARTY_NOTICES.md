@@ -19,11 +19,21 @@ Data provider: MTR Corporation Limited. Distribution portal: DATA.GOV.HK. Reuse 
 by the DATA.GOV.HK Terms and Conditions of Use version 1.2:
 https://data.gov.hk/en/terms-and-conditions
 
+## Taipei Metro Open Data Via data.taipei
+
+The Taipei city pack is derived from the vendored 臺北捷運車站出入口座標 and 臺北捷運車站資料
+snapshots: station entrance names, positions, and whether an entrance is the barrier-free one.
+
+Data provider: 臺北大眾捷運股份有限公司 (Taipei Rapid Transit Corporation). Distribution portal:
+臺北市資料大平臺 (data.taipei). Reuse is governed by the Open Government Data License, Taiwan,
+version 1.0, which requires this attribution to be retained:
+https://data.gov.tw/license
+
 ## Official Transit Resource Links
 
 The bundled official-resource catalog contains reviewed factual link metadata for transit
 operators and government transport authorities. Linked pages, PDFs, and images remain with
-their providers. After user action, JustGo renders reviewed pages in a non-persistent WebKit
+their providers. After user action, Just-Go renders reviewed pages in a non-persistent WebKit
 session and reviewed PDFs or images in memory-only native viewers. It does not copy,
 prefetch, persist, or redistribute their content.
 
@@ -45,18 +55,12 @@ https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm
 https://www.beijing.gov.cn/hudong/yonghu/static/zdb/xinxiang/detail.html?searchCode=zdb16223326024872299813
 https://ggzyfw.beijing.gov.cn/jyxxggjtbyqs/20240516/4526775.html
 
-## Jianguomen Station Photo
-
-Beijing Subway Jianguomen Station 01.jpg by Ian Holton, licensed CC BY 2.0.
-
-Source description page: https://commons.wikimedia.org/wiki/File:Beijing_Subway_Jianguomen_Station_01.jpg
-
-Modification record: Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits.
-
-## Central Station Photo
-
-Central station in Hong Kong.jpg by Qqhhss, dedicated under CC0 1.0.
-
-Source description page: https://commons.wikimedia.org/wiki/File:Central_station_in_Hong_Kong.jpg
-
-Modification record: Auto-oriented, resized to a 2400-pixel maximum edge, converted to sRGB, re-encoded as JPEG, and stripped of metadata; no visual content edits.
+Guangzhou, Shanghai and Hangzhou station references are reviewed operator station
+identifiers for canonical app stations. The bundle contains identifier and alias metadata,
+not operator page text, schedules, station descriptions, facilities, exits, coordinates,
+images, or layouts. For those reviewed identifiers, Station Detail may request first/last
+train times from the operator for temporary, non-persistent native display; the response
+remains subject to the operator's terms:
+https://www.gzmtr.com/
+https://service.shmetro.com/czxx/index.htm
+https://www.hzmetro.com/

@@ -12,7 +12,7 @@ if [ ! -x "$SWIFTC" ]; then
     exit 1
 fi
 
-BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/justgo-beijing-station-information.XXXXXX")
+BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/just-go-beijing-station-information.XXXXXX")
 trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
 
 "$SWIFTC" \
@@ -23,7 +23,7 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-beijing-station-information" \
-    "$ROOT/JustGo/Services/Transit/OfficialStationInformationProvider.swift" \
+    "$ROOT/Just-Go/Services/Transit/OfficialStationInformationProvider.swift" \
     "$ROOT/Scripts/test_beijing_station_information.swift"
 
 "$BUILD_DIR/test-beijing-station-information"

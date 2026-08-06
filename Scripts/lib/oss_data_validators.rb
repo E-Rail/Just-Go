@@ -14,6 +14,7 @@ module OSSDataValidators
     MIT
     ODbL-1.0
     LicenseRef-DATA-GOV-HK-1.2
+    LicenseRef-OGDL-TW-1.0
     LicenseRef-External-Link-Only
     CC-BY-2.0
     CC0-1.0
@@ -27,6 +28,14 @@ module OSSDataValidators
     stationID stationName stationNameEn aliases accessibility schedules stationFacilities
     externalResources licensedMedia liveArrivalReferences
   ].freeze
+  # Optional in the pack schema and in `OfficialCityPackService`; present where a city has an
+  # open-data source for its entrances, absent everywhere else.
+  OPTIONAL_STATION_KEYS = %w[stationAccessPoints].freeze
+  REQUIRED_ACCESS_POINT_KEYS = %w[
+    id name kind latitude longitude isAccessible source
+  ].freeze
+  ACCESS_POINT_KINDS = %w[entrance exit elevator escalator unknown].freeze
+  ACCESS_POINT_SOURCES = %w[specificEntrance localStationData].freeze
   REQUIRED_MEDIA_KEYS = %w[
     kind title relativePath mimeType sizeBytes sha256 sourcePageURL creator licenseSPDX
     licenseURL attribution modifications
@@ -38,7 +47,13 @@ module OSSDataValidators
     rightsID datasetName termsURL attribution snapshotDate
     redistributionEvidenceURL redistributionEvidence
   ].freeze
-  BUNDLED_CITY_IDS = %w[1100 8100].freeze
+  # Every city that ships a pack inside the app. The three original entries are operator-sourced;
+  # the rest carry OpenStreetMap station entrances, which are ODbL and so may be redistributed in
+  # the bundle rather than fetched on the rider's device. Kept as an explicit list because a pack
+  # appearing here without review is exactly what these validators exist to catch.
+  BUNDLED_CITY_IDS = %w[
+    1100 1200 3100 3201 3205 3301 4201 4401 4403 5000 5101 6101 7101 8100
+  ].freeze
   EXTERNAL_LANDING_PAGES = {
     "1100" => %w[
       https://www.bjsubway.com/station/xltcx/
@@ -53,10 +68,14 @@ module OSSDataValidators
     creativecommons.org
     commons.wikimedia.org
     data.gov.hk
+    data.gov.tw
     github.com
     opensource.org
     opendatacommons.org
+    service.shmetro.com
     www.bjsubway.com
+    www.gzmtr.com
+    www.hzmetro.com
     www.mlm.com.mo
     www.mtr.com.hk
     www.openstreetmap.org
@@ -269,7 +288,7 @@ module OSSDataValidators
     end
 
     def licensed_media_declarations
-      Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "*.json")).sort.flat_map do |path|
+      Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "*.json")).sort.flat_map do |path|
         load_json(path).fetch("stations", []).flat_map { |station| Array(station["licensedMedia"]) }
       end
     end
@@ -313,9 +332,9 @@ module OSSDataValidators
     def scoped_asset_paths
       paths = []
       paths.concat(Dir.glob(File.join(root, "DataPacks", "**", "*.{json,csv}")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "**", "*.json")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "MetroNetworks", "**", "*.json")))
-      paths.concat(Dir.glob(File.join(root, "JustGo", "Resources", "LicensedMedia", "**", "*")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "**", "*.json")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "**", "*.json")))
+      paths.concat(Dir.glob(File.join(root, "Just-Go", "Resources", "LicensedMedia", "**", "*")))
       paths << File.join(root, "THIRD_PARTY_NOTICES.md")
       paths.select { |path| File.file?(path) }.map { |path| relative(path) }.uniq.sort
     end
@@ -330,13 +349,13 @@ module OSSDataValidators
         fail_validation("undeclared binary in #{relative(path)}") if sample.include?("\x00")
       end
 
-      media_dir = File.join(root, "JustGo", "Resources", "LicensedMedia")
+      media_dir = File.join(root, "Just-Go", "Resources", "LicensedMedia")
       media_files = Dir.glob(File.join(media_dir, "**", "*"), File::FNM_DOTMATCH)
         .select { |path| File.file?(path) }
       media_files.each do |path|
         next if File.extname(path).downcase == ".json"
 
-        relative_path = path.delete_prefix("#{File.join(root, "JustGo", "Resources")}/")
+        relative_path = path.delete_prefix("#{File.join(root, "Just-Go", "Resources")}/")
         declaration = declarations.find { |media| media["relativePath"] == relative_path }
         fail_validation("undeclared binary in #{relative(path)}") unless declaration
         right = rights.find { |item| item["scope"] == relative_path }
@@ -366,7 +385,7 @@ module OSSDataValidators
     end
 
     def validate_pack_rights!(known_ids)
-      Dir.glob(File.join(root, "JustGo", "Resources", "BundledCityPacks", "*.json")).sort.each do |path|
+      Dir.glob(File.join(root, "Just-Go", "Resources", "BundledCityPacks", "*.json")).sort.each do |path|
         pack = load_json(path)
         unknown = Array(pack["rightsIDs"]) - known_ids
         fail_validation("#{relative(path)} has unknown rights IDs: #{unknown.join(", ")}") unless unknown.empty?
@@ -387,42 +406,72 @@ module OSSDataValidators
     end
 
     def expected_rights_for(path)
-      return ["osm-metro-networks"] if path.match?(%r{\AJustGo/Resources/MetroNetworks/[^/]+\.json\z})
+      return ["osm-metro-networks"] if path.match?(%r{\AJust-Go/Resources/MetroNetworks/[^/]+\.json\z})
+      # Vendored OSM entrances, and the packs built purely from them. Beijing's pack also carries
+      # its landing-link grant, so it stays in the explicit table below.
+      if path.match?(%r{\ADataPacks/sources/osm-entrances/[^/]+\.json\z})
+        return %w[just-go-generated-catalog osm-metro-networks].sort
+      end
+      if path.match?(%r{\AJust-Go/Resources/BundledCityPacks/(?!1100|7101|8100)[^/]+\.json\z})
+        return %w[just-go-generated-catalog osm-metro-networks].sort
+      end
       return ["data-gov-hk-mtr"] if path.match?(%r{\ADataPacks/sources/8100/[^/]+\.csv\z})
+      return ["taipei-open-data"] if path.match?(%r{\ADataPacks/sources/7101/[^/]+\.csv\z})
+      # Universal city documents aggregate every reviewed source, so each carries the full
+      # rights union; the per-city subset lives inside the document itself.
+      if path.match?(%r{\ADataPacks/universal/[^/]+\.json\z})
+        return %w[
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
+          macau-official-landing-link
+          official-transit-resource-links osm-metro-networks taipei-open-data
+        ].sort
+      end
 
       {
         "DataPacks/manifest.json" => %w[
-          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
-          macau-official-landing-link media-central-qqhhss media-jianguomen-ian-holton
-          osm-metro-networks
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
+          macau-official-landing-link
+          osm-metro-networks taipei-open-data
         ].sort,
-        "DataPacks/rights_inventory.json" => ["justgo-generated-catalog"],
+        "DataPacks/rights_inventory.json" => ["just-go-generated-catalog"],
         "DataPacks/official_transit_resources.json" => %w[
-          beijing-official-landing-links data-gov-hk-mtr justgo-generated-catalog
+          beijing-official-landing-links data-gov-hk-mtr just-go-generated-catalog
           official-transit-resource-links osm-metro-networks
         ].sort,
+        "DataPacks/sources/official-resources/shanghai_station_information.json" => %w[
+          just-go-generated-catalog official-transit-resource-links osm-metro-networks
+          shanghai-official-landing-links
+        ].sort,
+        "DataPacks/sources/official-resources/guangzhou_station_information.json" => %w[
+          guangzhou-official-station-references just-go-generated-catalog osm-metro-networks
+        ].sort,
+        "DataPacks/sources/official-resources/hangzhou_station_information.json" => %w[
+          hangzhou-official-station-references just-go-generated-catalog osm-metro-networks
+        ].sort,
         "DataPacks/sources/official-resources/beijing_station_information.json" => %w[
-          beijing-official-landing-links justgo-generated-catalog
+          beijing-official-landing-links just-go-generated-catalog
           official-transit-resource-links osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hong_kong_index.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog official-transit-resource-links
+          data-gov-hk-mtr just-go-generated-catalog official-transit-resource-links
           osm-metro-networks
         ].sort,
         "DataPacks/sources/official-resources/hong_kong_station_bindings.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog osm-metro-networks
+          data-gov-hk-mtr just-go-generated-catalog osm-metro-networks
         ].sort,
-        "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr justgo-generated-catalog].sort,
-        "THIRD_PARTY_NOTICES.md" => ["justgo-generated-catalog"],
-        "JustGo/Resources/BundledCityPacks/1100.json" => %w[
-          beijing-official-landing-links justgo-generated-catalog
-          media-jianguomen-ian-holton osm-metro-networks
+        "DataPacks/sources/8100/metadata.json" => %w[data-gov-hk-mtr just-go-generated-catalog].sort,
+        "DataPacks/sources/7101/metadata.json" => %w[just-go-generated-catalog taipei-open-data].sort,
+        "Just-Go/Resources/BundledCityPacks/7101.json" => %w[
+          just-go-generated-catalog osm-metro-networks taipei-open-data
         ].sort,
-        "JustGo/Resources/BundledCityPacks/8100.json" => %w[
-          data-gov-hk-mtr justgo-generated-catalog media-central-qqhhss osm-metro-networks
+        "THIRD_PARTY_NOTICES.md" => ["just-go-generated-catalog"],
+        "Just-Go/Resources/BundledCityPacks/1100.json" => %w[
+          beijing-official-landing-links just-go-generated-catalog
+          osm-metro-networks
         ].sort,
-        "JustGo/Resources/LicensedMedia/beijing-jianguomen.jpg" => ["media-jianguomen-ian-holton"],
-        "JustGo/Resources/LicensedMedia/hong-kong-central.jpg" => ["media-central-qqhhss"]
+        "Just-Go/Resources/BundledCityPacks/8100.json" => %w[
+          data-gov-hk-mtr just-go-generated-catalog osm-metro-networks
+        ].sort
       }[path]
     end
   end
@@ -460,7 +509,9 @@ module OSSDataValidators
       end
 
       bundled = cities.select { |city| !city["bundledResource"].nil? }
-      fail_validation("only 1100 and 8100 may be bundled") unless bundled.map { |city| city["cityID"] } == BUNDLED_CITY_IDS
+      unless bundled.map { |city| city["cityID"] }.sort == BUNDLED_CITY_IDS
+        fail_validation("only #{BUNDLED_CITY_IDS.join(", ")} may be bundled")
+      end
       (cities - bundled).each { |city| validate_pending_city!(city) }
       bundled.each { |city| validate_bundled_city!(city) }
       RightsValidator.new(root: root).validate!
@@ -497,7 +548,7 @@ module OSSDataValidators
       fail_validation("#{city_id} bundled resources must be station-scoped") unless city["externalResources"] == []
       resource = city.fetch("bundledResource")
       fail_validation("#{city_id} bundledResource is unsafe") unless safe_relative_path?(resource)
-      pack_path = File.join(root, "JustGo", "Resources", resource)
+      pack_path = File.join(root, "Just-Go", "Resources", resource)
       fail_validation("missing bundled pack #{resource}") unless File.file?(pack_path)
       bytes = File.binread(pack_path)
       fail_validation("#{city_id} sizeBytes must be positive") unless city["sizeBytes"].is_a?(Integer) && city["sizeBytes"].positive?
@@ -516,6 +567,7 @@ module OSSDataValidators
       unknown_ids = station_ids - canonical_ids
       fail_validation("#{city_id} has non-canonical stationIDs: #{unknown_ids.join(", ")}") unless unknown_ids.empty?
       pack.fetch("stations").each { |station| validate_station!(city_id, station, pack_path, network) }
+      validate_access_point_frame!(city_id, pack, network)
 
       computed = coverage_for(canonical_ids.length, pack.fetch("stations"))
       fail_validation("#{city_id} pack coverage is inconsistent") unless pack["coverage"] == computed
@@ -549,10 +601,14 @@ module OSSDataValidators
     end
 
     def validate_station!(city_id, station, pack_path, network)
-      exact_keys!(station, REQUIRED_STATION_KEYS, "#{city_id} station")
+      exact_keys!(station, REQUIRED_STATION_KEYS, "#{city_id} station", optional: OPTIONAL_STATION_KEYS)
       fail_validation("#{city_id} stationID is missing") if station["stationID"].to_s.empty?
       fail_validation("#{city_id} stationName is missing") if station["stationName"].to_s.empty?
-      fail_validation("#{city_id} stationNameEn must be a string") unless station["stationNameEn"].is_a?(String)
+      # Non-empty, not merely a string: the app rejects a present-but-empty English name and
+      # discards the entire pack for it, so an empty one here is a silent city-wide outage.
+      unless station["stationNameEn"].is_a?(String) && !station["stationNameEn"].strip.empty?
+        fail_validation("#{city_id} stationNameEn must be a non-empty string")
+      end
       fail_validation("#{city_id} aliases must be stable and unique") unless station["aliases"].is_a?(Array) && station["aliases"] == station["aliases"].uniq.sort
       fail_validation("#{city_id} schedules must be empty") unless station["schedules"] == []
       fail_validation("#{city_id} stationFacilities must be an array") unless station["stationFacilities"].is_a?(Array)
@@ -564,6 +620,7 @@ module OSSDataValidators
       station["liveArrivalReferences"].each { |reference| validate_live_reference!(reference) }
       canonical = network.fetch("stations").find { |item| item["id"] == station["stationID"] }
       fail_validation("#{city_id} station is not canonical") unless canonical
+      validate_access_points!(city_id, station, canonical)
       line_index = network.fetch("lines").to_h { |line| [line.fetch("id"), line] }
       station["liveArrivalReferences"].each do |reference|
         line = line_index[reference["lineID"]]
@@ -575,6 +632,95 @@ module OSSDataValidators
           fail_validation("live arrival line code does not match its canonical line")
         end
       end
+    end
+
+    # An entrance is only useful if it is near the station it belongs to and in the same
+    # coordinate frame as the network. A pack built from unconverted WGS-84 source data would
+    # put every entrance several hundred metres away, so the distance is asserted, not assumed.
+    ACCESS_POINT_MAX_METRES = 800
+
+    # A pack whose entrances were never converted from WGS-84 to GCJ-02 still passes every
+    # per-entrance check, because the whole city is displaced together and each entrance stays
+    # within the per-point bound. The uniform displacement is the tell: with the right frame some
+    # entrance is essentially on top of its station, and with the wrong one none is close at all.
+    ACCESS_POINT_MIN_NEAREST_METRES = 60
+
+    def validate_access_point_frame!(city_id, pack, network)
+      positions = network.fetch("stations").to_h { |station| [station.fetch("id"), station] }
+      distances = pack.fetch("stations").flat_map do |station|
+        canonical = positions[station["stationID"]]
+        Array(station["stationAccessPoints"]).map do |point|
+          metres_between(
+            point["latitude"], point["longitude"],
+            canonical.fetch("latitude"), canonical.fetch("longitude")
+          )
+        end
+      end
+      return if distances.empty?
+
+      nearest = distances.min
+      return if nearest <= ACCESS_POINT_MIN_NEAREST_METRES
+
+      fail_validation(
+        "#{city_id} nearest station entrance is #{nearest.round}m from its station — the pack " \
+        "looks like it kept its source WGS-84 coordinates instead of converting to GCJ-02"
+      )
+    end
+
+    # An OSM node id is the one case where an empty name is the truth rather than a bug: the survey
+    # records the door's position but no sign letter, and the app labels it by compass bearing at
+    # render time so the label localizes. Every other source names its entrances, so for those an
+    # empty name still means something upstream dropped it.
+    OSM_ACCESS_POINT_ID = /\Aosm-\d+\z/.freeze
+
+    def validate_access_point_name!(city_id, point)
+      return if point["name"].is_a?(String) && !point["name"].strip.empty?
+
+      unless point["name"].is_a?(String)
+        fail_validation("#{city_id} access point name must be a string")
+      end
+      unless point["id"].to_s.match?(OSM_ACCESS_POINT_ID)
+        fail_validation("#{city_id} access point #{point["id"].inspect} is missing its name")
+      end
+    end
+
+    def validate_access_points!(city_id, station, canonical)
+      points = station["stationAccessPoints"]
+      return if points.nil?
+
+      fail_validation("#{city_id} stationAccessPoints must be an array") unless points.is_a?(Array)
+      ids = points.map { |point| point["id"] }
+      fail_validation("#{city_id} stationAccessPoints must have stable unique ids") unless
+        ids == ids.uniq && ids == ids.sort
+      points.each do |point|
+        exact_keys!(point, REQUIRED_ACCESS_POINT_KEYS, "#{city_id} station access point")
+        validate_access_point_name!(city_id, point)
+        fail_validation("#{city_id} access point kind is unsupported") unless
+          ACCESS_POINT_KINDS.include?(point["kind"])
+        fail_validation("#{city_id} access point source is unsupported") unless
+          ACCESS_POINT_SOURCES.include?(point["source"])
+        fail_validation("#{city_id} access point isAccessible must be boolean") unless
+          [true, false].include?(point["isAccessible"])
+        latitude = point["latitude"]
+        longitude = point["longitude"]
+        unless latitude.is_a?(Numeric) && longitude.is_a?(Numeric)
+          fail_validation("#{city_id} access point coordinate must be numeric")
+        end
+        distance = metres_between(latitude, longitude, canonical.fetch("latitude"), canonical.fetch("longitude"))
+        if distance > ACCESS_POINT_MAX_METRES
+          fail_validation(
+            "#{city_id} access point #{point["id"]} is #{distance.round}m from its station " \
+            "(check the coordinate frame)"
+          )
+        end
+      end
+    end
+
+    def metres_between(latitude_a, longitude_a, latitude_b, longitude_b)
+      mean_latitude = (latitude_a + latitude_b) / 2 * Math::PI / 180
+      delta_y = (latitude_a - latitude_b) * Math::PI / 180 * 6_371_000.0
+      delta_x = (longitude_a - longitude_b) * Math::PI / 180 * 6_371_000.0 * Math.cos(mean_latitude)
+      Math.sqrt(delta_x * delta_x + delta_y * delta_y)
     end
 
     def validate_external_resource!(city_id, resource)
@@ -617,7 +763,7 @@ module OSSDataValidators
       license_uri = https_uri(media["licenseURL"], "licensed media licenseURL")
       fail_validation("licensed media licenseURL host is not allowed") unless license_uri.host == "creativecommons.org"
 
-      asset_path = File.join(root, "JustGo", "Resources", relative_path)
+      asset_path = File.join(root, "Just-Go", "Resources", relative_path)
       fail_validation("licensed media file is missing") unless File.file?(asset_path)
       fail_validation("licensed media size mismatch") unless media["sizeBytes"] == File.size(asset_path)
       fail_validation("licensed media checksum mismatch") unless media["sha256"] == Digest::SHA256.file(asset_path).hexdigest
@@ -652,18 +798,89 @@ module OSSDataValidators
       end
     end
 
+    # Cities whose pack is nothing but OpenStreetMap station entrances. Beijing also carries them
+    # but is pinned with the operator cities above, since its pack predates this source.
+    OSM_ENTRANCE_PACK_EXPECTATIONS = {
+      "1200" => { stations: 108, exits: 344, accessibility: 5, network: 239 },
+      "3100" => { stations: 369, exits: 1430, accessibility: 56, network: 471 },
+      "3201" => { stations: 100, exits: 376, accessibility: 11, network: 210 },
+      "3205" => { stations: 53, exits: 230, accessibility: 2, network: 235 },
+      "3301" => { stations: 262, exits: 1333, accessibility: 10, network: 270 },
+      "4201" => { stations: 89, exits: 319, accessibility: 7, network: 293 },
+      # Seven metro/intercity concourse pairs stopped being merged into one node and became
+      # declared in-station interchanges instead (see `build_interchanges`), so the network is
+      # back to its true 414. Entrances follow: 326 -> 329 stations carry exits and 1259 -> 1262
+      # bind, because each half is matched against its own platform rather than against a node
+      # sitting in the gap between them. The two now-ambiguous exits are at 广州白云, in range of
+      # both halves — reported and dropped rather than guessed at.
+      "4401" => { stations: 329, exits: 1262, accessibility: 37, network: 414 },
+      "4403" => { stations: 321, exits: 1504, accessibility: 19, network: 372 },
+      "5000" => { stations: 83, exits: 299, accessibility: 3, network: 273 },
+      "5101" => { stations: 184, exits: 771, accessibility: 9, network: 396 },
+      "6101" => { stations: 227, exits: 920, accessibility: 164, network: 247 }
+    }.freeze
+
     def validate_city_expectations!(city_id, pack, network)
       stations = pack.fetch("stations")
-      expected = if city_id == "1100"
+      expected = case city_id
+      when "1100"
+        # Beijing's pack also carries OSM entrances, so its accessibility count is the number of
+        # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
+        # means the entrance import silently stopped matching.
         {
           "networkStations" => 444,
           "matchedStations" => { "covered" => 444, "total" => 444 },
-          "accessibility" => { "covered" => 0, "total" => 444 },
+          "accessibility" => { "covered" => 43, "total" => 444 },
           "staticSchedules" => { "covered" => 0, "total" => 444 },
           "liveArrivals" => { "covered" => 0, "total" => 444 },
           "externalLayouts" => { "covered" => 0, "total" => 444 },
-          "licensedMedia" => { "covered" => 1, "total" => 444 },
+          "licensedMedia" => { "covered" => 0, "total" => 444 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 444 }
+        }
+      when "7101"
+        # data.taipei covers the Taipei Metro proper; the New Taipei light-rail and branch lines
+        # in the same canonical network have no published exit data, so coverage is partial and
+        # the exact split is pinned here to catch a silent regression in either direction.
+        exits = stations.sum { |station| Array(station["stationAccessPoints"]).length }
+        fail_validation("Taipei pack lost station exits (#{exits})") unless exits == 388
+        unless stations.all? { |station| !Array(station["stationAccessPoints"]).empty? }
+          fail_validation("Taipei pack has a station with no exits")
+        end
+        {
+          "networkStations" => 151,
+          "matchedStations" => { "covered" => 118, "total" => 151 },
+          "accessibility" => { "covered" => 118, "total" => 151 },
+          "staticSchedules" => { "covered" => 0, "total" => 151 },
+          "liveArrivals" => { "covered" => 0, "total" => 151 },
+          "externalLayouts" => { "covered" => 0, "total" => 151 },
+          "licensedMedia" => { "covered" => 0, "total" => 151 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 151 }
+        }
+      when *OSM_ENTRANCE_PACK_EXPECTATIONS.keys
+        # Packs built purely from OpenStreetMap entrances. Station and exit counts are pinned per
+        # city because the failure mode here is quiet: a coordinate-frame or bbox regression drops
+        # the match rate without erroring, and the pack still looks structurally valid.
+        pinned = OSM_ENTRANCE_PACK_EXPECTATIONS.fetch(city_id)
+        exits = stations.sum { |station| Array(station["stationAccessPoints"]).length }
+        unless stations.length == pinned.fetch(:stations) && exits == pinned.fetch(:exits)
+          fail_validation(
+            "#{city_id} OSM entrance pack drifted: #{stations.length} stations / #{exits} exits, " \
+            "expected #{pinned.fetch(:stations)} / #{pinned.fetch(:exits)}"
+          )
+        end
+        if stations.any? { |station| Array(station["stationAccessPoints"]).empty? }
+          fail_validation("#{city_id} OSM entrance pack has a station with no exits")
+        end
+        total = pinned.fetch(:network)
+        {
+          "networkStations" => total,
+          "matchedStations" => { "covered" => pinned.fetch(:stations), "total" => total },
+          "accessibility" => { "covered" => pinned.fetch(:accessibility), "total" => total },
+          "staticSchedules" => { "covered" => 0, "total" => total },
+          "liveArrivals" => { "covered" => 0, "total" => total },
+          "externalLayouts" => { "covered" => 0, "total" => total },
+          "licensedMedia" => { "covered" => 0, "total" => total },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => total }
         }
       else
         missing = network.fetch("stations").reject do |canonical|
@@ -691,7 +908,7 @@ module OSSDataValidators
           "staticSchedules" => { "covered" => 0, "total" => 162 },
           "liveArrivals" => { "covered" => 162, "total" => 162 },
           "externalLayouts" => { "covered" => 0, "total" => 162 },
-          "licensedMedia" => { "covered" => 1, "total" => 162 },
+          "licensedMedia" => { "covered" => 0, "total" => 162 },
           "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
         }
       end
@@ -727,12 +944,12 @@ module OSSDataValidators
     end
 
     def network_station_count(city_id)
-      path = File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json")
+      path = File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json")
       File.file?(path) ? load_json(path).fetch("stations").length : 0
     end
 
     def load_network(city_id)
-      load_json(File.join(root, "JustGo", "Resources", "MetroNetworks", "#{city_id}.json"))
+      load_json(File.join(root, "Just-Go", "Resources", "MetroNetworks", "#{city_id}.json"))
     end
 
     def deep_copy(value)

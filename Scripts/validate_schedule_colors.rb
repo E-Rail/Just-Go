@@ -2,10 +2,11 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "lib/oss_data_validators"
 
 ROOT = File.expand_path("..", __dir__)
-PACK_PATTERN = File.join(ROOT, "JustGo", "Resources", "BundledCityPacks", "*.json")
-EXPECTED_PACK_IDS = %w[1100 8100].freeze
+PACK_PATTERN = File.join(ROOT, "Just-Go", "Resources", "BundledCityPacks", "*.json")
+EXPECTED_PACK_IDS = OSSDataValidators::BUNDLED_CITY_IDS
 
 def fail_with(message)
   warn "schedule-color validation failed: #{message}"
@@ -28,7 +29,9 @@ pack_paths.each do |pack_path|
   schedule_count += schedules.length
 end
 
-fail_with("expected exactly the reviewed 1100 and 8100 baselines") unless pack_ids.sort == EXPECTED_PACK_IDS.sort
+unless pack_ids.sort == EXPECTED_PACK_IDS.sort
+  fail_with("expected exactly the reviewed #{EXPECTED_PACK_IDS.join(", ")} baselines")
+end
 unless schedule_count.zero?
   fail_with("static schedules require a separately reviewed reusable source; found #{schedule_count} rows")
 end

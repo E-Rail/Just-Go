@@ -13,15 +13,17 @@ class OSSCityPackPipelineTest < Minitest::Test
     "DataPacks/manifest.json",
     "DataPacks/rights_inventory.json",
     "DataPacks/sources/8100/metadata.json",
+    "DataPacks/sources/7101/metadata.json",
     "THIRD_PARTY_NOTICES.md",
-    "JustGo/Resources/BundledCityPacks/1100.json",
-    "JustGo/Resources/BundledCityPacks/8100.json"
+    "Just-Go/Resources/BundledCityPacks/1100.json",
+    "Just-Go/Resources/BundledCityPacks/8100.json",
+    "Just-Go/Resources/BundledCityPacks/7101.json"
   ].freeze
 
   def test_exact_schema_and_generated_counts
     manifest = json("DataPacks/manifest.json")
-    beijing = json("JustGo/Resources/BundledCityPacks/1100.json")
-    hong_kong = json("JustGo/Resources/BundledCityPacks/8100.json")
+    beijing = json("Just-Go/Resources/BundledCityPacks/1100.json")
+    hong_kong = json("Just-Go/Resources/BundledCityPacks/8100.json")
     sources = json("DataPacks/sources/8100/metadata.json")
     rights = json("DataPacks/rights_inventory.json")
 
@@ -36,10 +38,11 @@ class OSSCityPackPipelineTest < Minitest::Test
     bundled_city_ids = manifest.fetch("cities").map do |city|
       city["cityID"] if city["bundledResource"]
     end.compact
-    assert_equal %w[1100 8100], bundled_city_ids
+    # Manifest order follows the catalog, not the pack build order.
+    assert_equal OSSDataValidators::BUNDLED_CITY_IDS, bundled_city_ids.sort
     assert manifest.fetch("cities").all? { |city| city["downloadURL"].nil? }
-    assert_equal 46, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
-    assert_equal 12, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
+    assert_equal 53, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
+    assert_equal 5, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
 
     macau = manifest.fetch("cities").find { |city| city.fetch("cityID") == "8200" }
     assert_equal "source-pending", macau.fetch("version")
@@ -70,15 +73,68 @@ class OSSCityPackPipelineTest < Minitest::Test
         "staticSchedules" => { "covered" => 0, "total" => 162 },
         "liveArrivals" => { "covered" => 162, "total" => 162 },
         "externalLayouts" => { "covered" => 0, "total" => 162 },
-        "licensedMedia" => { "covered" => 1, "total" => 162 },
+        "licensedMedia" => { "covered" => 0, "total" => 162 },
         "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
       },
       hong_kong.fetch("coverage")
     )
   end
 
+  # The exits arrive as WGS-84 and everything the app draws is GCJ-02. An unconverted pack still
+  # parses and still validates structurally, so the regression is pinned by distance: converted,
+  # exits sit tens of metres from their station; unconverted, none is closer than ~330 m.
+  def test_taipei_exits_are_converted_to_the_app_coordinate_frame
+    pack = json("Just-Go/Resources/BundledCityPacks/7101.json")
+    network = json("Just-Go/Resources/MetroNetworks/7101.json")
+    positions = network.fetch("stations").to_h { |station| [station.fetch("id"), station] }
+
+    points = pack.fetch("stations").flat_map do |station|
+      canonical = positions.fetch(station.fetch("stationID"))
+      station.fetch("stationAccessPoints").map do |point|
+        metres_between(
+          point.fetch("latitude"), point.fetch("longitude"),
+          canonical.fetch("latitude"), canonical.fetch("longitude")
+        )
+      end
+    end
+
+    assert_equal 388, points.length
+    assert_operator points.min, :<, 40, "no exit is close to its station; coordinates look unconverted"
+    assert_operator points.sort[points.length / 2], :<, 150, "median exit distance is too large"
+    assert_operator points.max, :<, 800, "an exit is implausibly far from its station"
+  end
+
+  def test_taipei_pack_only_claims_what_the_open_data_states
+    pack = json("Just-Go/Resources/BundledCityPacks/7101.json")
+
+    assert_equal %w[osm-metro-networks taipei-open-data], pack.fetch("rightsIDs")
+    assert_equal "partial_static", pack.fetch("capabilities").fetch("accessibility")
+    assert_equal 118, pack.fetch("stations").length
+
+    pack.fetch("stations").each do |station|
+      assert_empty station.fetch("schedules"), "the exit dataset carries no timetable"
+      assert_empty station.fetch("licensedMedia")
+      accessibility = station.fetch("accessibility")
+      next if accessibility.nil?
+
+      # The dataset states only whether an exit is the barrier-free one; lifts, ramps and
+      # accessible toilets are not stated and must stay unknown rather than be inferred.
+      assert_nil accessibility.fetch("hasElevator")
+      assert_nil accessibility.fetch("hasWheelchairRamp")
+      assert_nil accessibility.fetch("hasAccessibleRestroom")
+      refute_empty accessibility.fetch("accessibleEntrances")
+    end
+  end
+
+  def metres_between(latitude_a, longitude_a, latitude_b, longitude_b)
+    mean_latitude = (latitude_a + latitude_b) / 2 * Math::PI / 180
+    delta_y = (latitude_a - latitude_b) * Math::PI / 180 * 6_371_000.0
+    delta_x = (longitude_a - longitude_b) * Math::PI / 180 * 6_371_000.0 * Math.cos(mean_latitude)
+    Math.sqrt(delta_x * delta_x + delta_y * delta_y)
+  end
+
   def test_racecourse_reference_and_hoi_wong_road_rename_are_explicit
-    pack = json("JustGo/Resources/BundledCityPacks/8100.json")
+    pack = json("Just-Go/Resources/BundledCityPacks/8100.json")
     racecourse = pack.fetch("stations").find { |station| station["stationNameEn"] == "Racecourse" }
     refute_nil racecourse
     assert_equal OSSCityPackPipeline::RACECOURSE_REFERENCE.fetch("canonicalStationID"), racecourse.fetch("stationID")
@@ -98,16 +154,39 @@ class OSSCityPackPipelineTest < Minitest::Test
     refute_includes renamed.fetch("aliases"), "海皇路"
   end
 
-  def test_media_metadata_matches_shared_normalized_files
-    declarations = %w[1100 8100].flat_map do |city_id|
-      json("JustGo/Resources/BundledCityPacks/#{city_id}.json").fetch("stations")
-        .flat_map { |station| station.fetch("licensedMedia") }
+  # 玉泉路 has eight entrances surveyed within 90 m and a sign letter on none of them. Dropping
+  # unlabeled entrances left it — and 133 other stations — showing no entrance map at all, which is
+  # the regression this pins: a station is not allowed to lose its whole survey for want of a label.
+  def test_entrances_with_no_sign_letter_still_ship
+    beijing = json("Just-Go/Resources/BundledCityPacks/1100.json")
+    yuquanlu = beijing.fetch("stations").find { |station| station.fetch("stationName") == "玉泉路" }
+    points = yuquanlu.fetch("stationAccessPoints")
+
+    assert_equal 8, points.length
+    assert points.all? { |point| point.fetch("name").empty? }, "these entrances carry no label"
+    assert points.all? { |point| point.fetch("id").start_with?("osm-") }
+    assert points.all? { |point| point["latitude"].is_a?(Float) && point["longitude"].is_a?(Float) }
+  end
+
+  # `accessibleEntrances` is a list of names a rider reads off the screen, so an entrance OSM tagged
+  # step-free but never named belongs in none of them — an empty string there is a blank row.
+  def test_no_pack_lists_a_nameless_accessible_entrance
+    OSSDataValidators::BUNDLED_CITY_IDS.each do |city_id|
+      json("Just-Go/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+        entrances = station.dig("accessibility", "accessibleEntrances")
+        next if entrances.nil?
+
+        assert entrances.none? { |name| name.to_s.strip.empty? },
+               "#{city_id} #{station.fetch("stationName")} lists an unnamed accessible entrance"
+      end
     end
-    assert_equal 2, declarations.length
-    declarations.each do |media|
-      path = File.join(ROOT, "JustGo", "Resources", media.fetch("relativePath"))
-      assert_equal File.size(path), media.fetch("sizeBytes")
-      assert_equal Digest::SHA256.file(path).hexdigest, media.fetch("sha256")
+  end
+
+  def test_no_pack_ships_licensed_media
+    %w[1100 7101 8100].each do |city_id|
+      json("Just-Go/Resources/BundledCityPacks/#{city_id}.json").fetch("stations").each do |station|
+        assert_empty station.fetch("licensedMedia"), "#{city_id} unexpectedly ships licensed media"
+      end
     end
   end
 

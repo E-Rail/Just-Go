@@ -229,8 +229,9 @@ private func testParsingAndRequestContract() async throws {
     try requireEqual(OfficialStationInformationCategory.allCases.count, 3, "category count")
     try requireEqual(snapshot.stationName, "建国门", "station name")
     try requireEqual(snapshot.source, .beijingSubwayOnline, "source")
-    try requireEqual(snapshot.trains.count, 2, "first/last train rows")
-    try requireEqual(snapshot.trains.first?.lineColorHex, "#BE3631", "line color")
+    try requireEqual(snapshot.lines.count, 2, "first/last train lines")
+    try requireEqual(snapshot.lines.first?.services.count, 1, "services on the first line")
+    try requireEqual(snapshot.lines.first?.lineColorHex, "#BE3631", "line color")
     try requireEqual(snapshot.exits.first?.details.count, 2, "exit nearby text")
     try requireEqual(snapshot.facilityGroups.first?.items.first?.location, "C口、B口、A口", "facility location")
     try requireEqual(snapshot.facilityGroups.first?.items.count, 2, "facility status rows")
@@ -384,6 +385,117 @@ private func testTransportAndResponseLimits() async throws {
     contentSession.invalidateAndCancel()
 }
 
+private actor FakeStationInformationCache: OfficialStationInformationCaching {
+    static let storedDate = Date(timeIntervalSince1970: 1_752_000_000)
+    private var stored: [String: OfficialStationInformationSnapshot] = [:]
+
+    func storedSnapshot(
+        cityID: String,
+        stationID: String,
+        externalStationID: String
+    ) -> (snapshot: OfficialStationInformationSnapshot, fetchedAt: Date)? {
+        guard let snapshot = stored[externalStationID], snapshot.stationID == stationID else {
+            return nil
+        }
+        return (snapshot, Self.storedDate)
+    }
+
+    func store(_ snapshot: OfficialStationInformationSnapshot, cityID: String, externalStationID: String) {
+        stored[externalStationID] = snapshot
+    }
+
+    func clearAll() {
+        stored.removeAll()
+    }
+}
+
+private func waitForStore(
+    in cache: FakeStationInformationCache
+) async throws {
+    // The provider's disk store is fire-and-forget; poll briefly for it to land.
+    for _ in 0..<100 {
+        if await cache.storedSnapshot(
+            cityID: "1100",
+            stationID: "network-1100-jianguomen",
+            externalStationID: "150995220"
+        ) != nil {
+            return
+        }
+        try await Task.sleep(for: .milliseconds(10))
+    }
+    throw HarnessFailure(description: "successful fetch never reached the injected cache")
+}
+
+private func testStoredSnapshotFallback() async throws {
+    let body = try fixture()
+    MockTransport.install { _, invocation in
+        switch invocation {
+        case 1: return .http(statusCode: 200, body: body)
+        case 2: return .urlError(.notConnectedToInternet)
+        default: return .http(
+            statusCode: 429,
+            headers: ["Content-Type": "application/json", "Retry-After": "60"],
+            body: Data()
+        )
+        }
+    }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let cache = FakeStationInformationCache()
+    let provider = BeijingStationInformationProvider(session: session, diskCache: cache)
+
+    let live = try await provider.information(for: request())
+    try requireEqual(live.freshness, .live, "network snapshots must be live")
+    try await waitForStore(in: cache)
+
+    await provider.releaseMemory()
+    let offline = try await provider.information(for: request())
+    try requireEqual(
+        offline.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "offline must serve the stored snapshot labeled as cached"
+    )
+    try requireEqual(offline.withFreshness(.live), live, "cached payload must match the stored snapshot")
+
+    await provider.releaseMemory()
+    let rateLimited = try await provider.information(for: request())
+    try requireEqual(
+        rateLimited.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "a 429 must serve the stored snapshot instead of erroring"
+    )
+    let duringCooldown = try await provider.information(for: request())
+    try requireEqual(
+        duringCooldown.freshness,
+        .cached(fetchedAt: FakeStationInformationCache.storedDate),
+        "the cooldown window must serve the stored snapshot"
+    )
+    try requireEqual(MockTransport.requestCount, 3, "the cooldown fallback must not hit the network")
+}
+
+private func testContractViolationNeverServesCache() async throws {
+    let good = try fixture()
+    let wrongName = try fixture(stationName: "苹果园")
+    MockTransport.install { _, invocation in
+        .http(statusCode: 200, body: invocation == 1 ? good : wrongName)
+    }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let cache = FakeStationInformationCache()
+    let provider = BeijingStationInformationProvider(session: session, diskCache: cache)
+
+    _ = try await provider.information(for: request())
+    try await waitForStore(in: cache)
+    await provider.releaseMemory()
+
+    let error = try await providerError {
+        _ = try await provider.information(for: request())
+    }
+    guard case .contractViolation = error else {
+        throw HarnessFailure(description: "a station-identity mismatch must never fall back to the cache")
+    }
+}
+
 private func testInvalidReviewedReference() async throws {
     let provider = BeijingStationInformationProvider(session: makeSession())
     let invalidID = try await providerError {
@@ -400,12 +512,91 @@ private func testInvalidReviewedReference() async throws {
     }
 }
 
+/// Regression test for the duplicate first/last rows users saw on Beijing station pages.
+///
+/// The payload here is the real shape captured from the live endpoint for 宋家庄 (line 10) and
+/// 西直门 (line 2): `terminalStationName` is a *direction* marker, not a terminus, so one
+/// direction served by several short-turn services returns several records that share a line
+/// name, direction and first-train time and differ only in the last-train digits. Those rendered
+/// as visually identical duplicate rows.
+private func testDirectionGroupingCollapsesDuplicateRows() async throws {
+    let payload = try JSONSerialization.data(withJSONObject: [
+        "status": 200,
+        "message": "成功",
+        "data": [
+            "lines": [
+                // 宋家庄 line 10: three services in the 石榴庄 direction.
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "21:44", "terminalStationName": "石榴庄", "destStationName": "车道沟"],
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "22:05", "terminalStationName": "石榴庄", "destStationName": "成寿寺"],
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:07",
+                 "lastTime": "23:28", "terminalStationName": "石榴庄", "destStationName": "巴沟"],
+                // Opposite direction must survive as its own row.
+                ["lineName": "10号线", "lineColor": "009BC0", "firstTime": "5:36",
+                 "lastTime": "23:22", "terminalStationName": "成寿寺", "destStationName": "车道沟"],
+                // Past-midnight last train must win over a 23:xx one, not be treated as earliest.
+                ["lineName": "1号线八通线", "lineColor": "BE3631", "firstTime": "5:37",
+                 "lastTime": "23:39", "terminalStationName": "四惠东", "destStationName": "四惠东"],
+                ["lineName": "1号线八通线", "lineColor": "BE3631", "firstTime": "5:37",
+                 "lastTime": "0:21", "terminalStationName": "四惠东", "destStationName": "四惠东"]
+            ],
+            "station": [
+                "stationName": "建国门",
+                "stationDeviceLocation": 150_995_220,
+                "exits": [["name": "A", "nearby": ["建国门内大街北侧"]]]
+            ]
+        ]
+    ], options: [.sortedKeys])
+
+    MockTransport.install { _, _ in .http(statusCode: 200, body: payload) }
+    let session = makeSession()
+    defer { session.invalidateAndCancel() }
+    let provider = BeijingStationInformationProvider(session: session)
+    let snapshot = try await provider.information(for: request())
+
+    // Flatten the line/service tree back into the direction rows this regression is about.
+    let rows = snapshot.lines.flatMap { line in
+        line.services.map { (lineName: line.lineName, service: $0) }
+    }
+    let identities = rows.map { "\($0.lineName)|\($0.service.direction)" }
+    guard Set(identities).count == identities.count else {
+        throw HarnessFailure(description: "Duplicate line/direction rows survived: \(identities)")
+    }
+    guard rows.count == 3 else {
+        throw HarnessFailure(
+            description: "Expected 3 grouped rows, got \(rows.count): \(identities)"
+        )
+    }
+
+    guard let shiliuzhuang = rows.first(where: { $0.service.direction == "石榴庄" })?.service else {
+        throw HarnessFailure(description: "石榴庄 direction row missing")
+    }
+    guard shiliuzhuang.firstTrain == "5:07", shiliuzhuang.lastTrain == "23:28" else {
+        throw HarnessFailure(
+            description: "石榴庄 window should span 5:07–23:28, got "
+                + "\(shiliuzhuang.firstTrain ?? "nil")–\(shiliuzhuang.lastTrain ?? "nil")"
+        )
+    }
+
+    guard let sihuidong = rows.first(where: { $0.service.direction == "四惠东" })?.service else {
+        throw HarnessFailure(description: "四惠东 direction row missing")
+    }
+    guard sihuidong.lastTrain == "0:21" else {
+        throw HarnessFailure(
+            description: "Past-midnight last train should win, got \(sihuidong.lastTrain ?? "nil")"
+        )
+    }
+}
+
 @main
 private enum BeijingStationInformationHarness {
     static func main() async {
         do {
             try await testParsingAndRequestContract()
             print("PASS: native categories and request contract")
+            try await testDirectionGroupingCollapsesDuplicateRows()
+            print("PASS: direction grouping collapses duplicate first/last rows")
             try await testCacheCoalescingAndRelease()
             print("PASS: cache, coalescing, and memory release")
             try await testIdentityAndServiceValidation()
@@ -414,7 +605,11 @@ private enum BeijingStationInformationHarness {
             print("PASS: timeout, rate limit, MIME, and response cap")
             try await testInvalidReviewedReference()
             print("PASS: reviewed reference validation")
-            print("BeijingStationInformationProvider: 5 test groups passed")
+            try await testStoredSnapshotFallback()
+            print("PASS: stored-snapshot fallback for availability failures")
+            try await testContractViolationNeverServesCache()
+            print("PASS: contract violations never serve the cache")
+            print("BeijingStationInformationProvider: 8 test groups passed")
         } catch {
             FileHandle.standardError.write(
                 Data("Beijing station information test failed: \(error)\n".utf8)

@@ -12,7 +12,7 @@ if [ ! -x "$SWIFTC" ]; then
     exit 1
 fi
 
-BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/justgo-hk-realtime.XXXXXX")
+BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/just-go-hk-realtime.XXXXXX")
 trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
 
 "$SWIFTC" \
@@ -23,9 +23,10 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-hong-kong-realtime" \
-    "$ROOT/JustGo/Core/Logging.swift" \
-    "$ROOT/JustGo/Models/Transit/RealTimeArrival.swift" \
-    "$ROOT/JustGo/Services/Transit/HongKongRealtimeArrivalProvider.swift" \
+    "$ROOT/Just-Go/Core/Logging.swift" \
+    "$ROOT/Just-Go/Core/Concurrency/Deadline.swift" \
+    "$ROOT/Just-Go/Models/Transit/RealTimeArrival.swift" \
+    "$ROOT/Just-Go/Services/Transit/HongKongRealtimeArrivalProvider.swift" \
     "$ROOT/Scripts/test_hong_kong_realtime.swift"
 
 "$BUILD_DIR/test-hong-kong-realtime"

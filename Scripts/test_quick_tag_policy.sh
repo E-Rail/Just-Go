@@ -12,7 +12,7 @@ if [ ! -x "$SWIFTC" ]; then
     exit 1
 fi
 
-BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/justgo-quick-tag-policy.XXXXXX")
+BUILD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/just-go-quick-tag-policy.XXXXXX")
 trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
 
 "$SWIFTC" \
@@ -23,7 +23,7 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-quick-tag-policy" \
-    "$ROOT/JustGo/Models/User/StationQuickTag.swift" \
+    "$ROOT/Just-Go/Models/User/StationQuickTag.swift" \
     "$ROOT/Scripts/test_quick_tag_policy.swift"
 
 "$BUILD_DIR/test-quick-tag-policy"

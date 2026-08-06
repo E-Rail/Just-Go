@@ -17,7 +17,7 @@ module OfficialTransitResourceImporter
   def fetch(url)
     uri = URI(url)
     request = Net::HTTP::Get.new(uri)
-    request["User-Agent"] = "JustGo official-resource catalog importer"
+    request["User-Agent"] = "Just-Go official-resource catalog importer"
     response = Net::HTTP.start(
       uri.host,
       uri.port,

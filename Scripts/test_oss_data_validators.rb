@@ -12,7 +12,7 @@ class OSSDataValidatorsTest < Minitest::Test
   SOURCE_ROOT = File.expand_path("..", __dir__)
 
   def setup
-    @root = Dir.mktmpdir("justgo-oss-validator")
+    @root = Dir.mktmpdir("just-go-oss-validator")
     copy_fixture
   end
 
@@ -21,7 +21,7 @@ class OSSDataValidatorsTest < Minitest::Test
   end
 
   def test_rejects_undeclared_binary
-    path = File.join(@root, "JustGo", "Resources", "LicensedMedia", "undeclared.jpg")
+    path = File.join(@root, "DataPacks", "sources", "8100", "undeclared.jpg")
     File.binwrite(path, "not declared")
 
     error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
@@ -150,39 +150,55 @@ class OSSDataValidatorsTest < Minitest::Test
     entry = inventory.fetch("files").find do |item|
       item["path"] == "DataPacks/sources/8100/mtr_lines_and_stations.csv"
     end
-    entry["rightsIDs"] = ["justgo-generated-catalog"]
+    entry["rightsIDs"] = ["just-go-generated-catalog"]
     write_json("DataPacks/rights_inventory.json", inventory)
 
     error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
     assert_match(/incorrect rights assignment/, error.message)
   end
 
-  def test_rejects_media_rights_evidence_mismatch
-    inventory = read_json("DataPacks/rights_inventory.json")
-    right = inventory.fetch("rights").find { |item| item["id"] == "media-central-qqhhss" }
-    right["bundledSHA256"] = "0" * 64
-    write_json("DataPacks/rights_inventory.json", inventory)
-
-    error = assert_raises(OSSDataValidators::ValidationError) { rights_validator.validate! }
-    assert_match(/rights evidence checksum mismatch/, error.message)
-  end
-
-  def test_rejects_missing_declared_media
-    FileUtils.rm(File.join(@root, "JustGo", "Resources", "LicensedMedia", "hong-kong-central.jpg"))
-
-    error = assert_raises(OSSDataValidators::ValidationError) { city_validator.validate! }
-    assert_match(/licensed media file is missing|structured\/bundled files missing rights declarations/, error.message)
-  end
-
   private
+
+  # An OpenStreetMap node is the one entrance a pack may ship unnamed: the survey has its position
+  # but no sign letter, and the app names it by compass bearing at render time. Every other source
+  # names its entrances, so a blank name there means something upstream dropped it.
+  def test_accepts_a_nameless_openstreetmap_entrance
+    blank_a_named_access_point("1100") { |point| assert point["id"].start_with?("osm-") }
+
+    assert city_pack_validator.validate!
+  end
+
+  def test_rejects_a_nameless_entrance_from_a_named_source
+    blank_a_named_access_point("1100") { |point| point["id"] = "beijing-exit-1" }
+
+    error = assert_raises(OSSDataValidators::ValidationError) { city_pack_validator.validate! }
+    assert_match(/is missing its name/, error.message)
+  end
+
+  # Blanks the name of an entrance that *had* one, so neither test above can pass by mutating an
+  # entrance that was already unnamed.
+  def blank_a_named_access_point(city_id)
+    relative = "Just-Go/Resources/BundledCityPacks/#{city_id}.json"
+    pack = JSON.parse(File.read(File.join(@root, relative)))
+    point = pack.fetch("stations")
+      .flat_map { |station| Array(station["stationAccessPoints"]) }
+      .find { |candidate| !candidate.fetch("name").strip.empty? }
+    refute_nil point, "#{city_id} has no named entrance to blank"
+    yield point
+    point["name"] = ""
+    write_json(relative, pack)
+  end
+
+  def city_pack_validator
+    OSSDataValidators::CityPackValidator.new(root: @root)
+  end
 
   def copy_fixture
     FileUtils.cp_r(File.join(SOURCE_ROOT, "DataPacks"), @root)
-    resources = File.join(@root, "JustGo", "Resources")
+    resources = File.join(@root, "Just-Go", "Resources")
     FileUtils.mkdir_p(resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "BundledCityPacks"), resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "LicensedMedia"), resources)
-    FileUtils.cp_r(File.join(SOURCE_ROOT, "JustGo", "Resources", "MetroNetworks"), resources)
+    FileUtils.cp_r(File.join(SOURCE_ROOT, "Just-Go", "Resources", "BundledCityPacks"), resources)
+    FileUtils.cp_r(File.join(SOURCE_ROOT, "Just-Go", "Resources", "MetroNetworks"), resources)
     FileUtils.cp(File.join(SOURCE_ROOT, "THIRD_PARTY_NOTICES.md"), @root)
   end
 
@@ -193,7 +209,14 @@ class OSSDataValidatorsTest < Minitest::Test
   def initialize_fixture_repository
     git("init")
     git("config", "user.email", "tests@example.com")
-    git("config", "user.name", "JustGo Tests")
+    git("config", "user.name", "Just-Go Tests")
+    # `git commit` forks background maintenance once the fixture's loose objects pass gc.auto, and
+    # it keeps writing into .git after commit returns — teardown's remove_entry then races it and
+    # dies with ENOTEMPTY. How close the fixture sits to that threshold depends on how many
+    # distinct blobs the bundled data happens to have, so leaving it on makes an unrelated data
+    # change able to turn this suite red.
+    git("config", "gc.auto", "0")
+    git("config", "maintenance.auto", "false")
     git("add", ".")
     git("commit", "-m", "fixture")
   end
@@ -207,7 +230,7 @@ class OSSDataValidatorsTest < Minitest::Test
   end
 
   def mutate_pack(city_id, sync_coverage: false)
-    relative_path = "JustGo/Resources/BundledCityPacks/#{city_id}.json"
+    relative_path = "Just-Go/Resources/BundledCityPacks/#{city_id}.json"
     pack = read_json(relative_path)
     yield pack
     write_json(relative_path, pack)

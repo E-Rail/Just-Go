@@ -10,7 +10,7 @@ options = {
 }
 OptionParser.new do |parser|
   parser.banner = "Usage: generate_city_pack_manifest.rb [options]"
-  parser.on("--snapshot-dir DIR", "Directory containing the four justgo-*.csv snapshots") do |value|
+  parser.on("--snapshot-dir DIR", "Directory containing the four just-go-*.csv snapshots") do |value|
     options[:snapshot_dir] = value
   end
   parser.on("--refresh-sources", "Replace vendored CSVs from --snapshot-dir") do

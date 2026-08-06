@@ -6,14 +6,33 @@ require "set"
 
 ROOT = File.expand_path("..", __dir__)
 EARTH_RADIUS = 6_371_000.0
-paths = Dir.glob(File.join(ROOT, "JustGo", "Resources", "MetroNetworks", "*.json")).sort
+paths = Dir.glob(File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort
 abort "metro network validation failed: no assets" if paths.empty?
-city_service_source = File.read(File.join(ROOT, "JustGo", "Services", "Data", "CityService.swift"))
+city_service_source = File.read(File.join(ROOT, "Just-Go", "Services", "Data", "CityService.swift"))
 route_picker_city_ids = city_service_source.scan(/City\(id: "(\d+)"/).flatten
 network_city_ids = paths.map { |path| File.basename(path, ".json") }
-abort "metro network validation failed: route picker must contain exactly 46 unique cities" unless route_picker_city_ids.length == 46 && route_picker_city_ids.uniq.length == 46
+abort "metro network validation failed: route picker must contain exactly 53 unique cities" unless route_picker_city_ids.length == 53 && route_picker_city_ids.uniq.length == 53
 unless route_picker_city_ids.to_set == network_city_ids.to_set
   abort "metro network validation failed: route-picker and metro-network city sets differ"
+end
+
+# `City.stationCount`/`lineCount` are hand-written literals that the city list and the transit-data
+# screen print verbatim, so they silently drift from the geometry they claim to describe: Urumqi
+# advertised 44 stations and 3 lines while shipping 23 and 1, and Shenzhen advertised one line more
+# than the map draws. Pin them to the asset rather than trusting them to be re-typed.
+counts = city_service_source.scan(
+  /City\(id: "(\d+)".*?stationCount: (\d+), lineCount: (\d+)\)/
+).to_h { |city_id, stations, lines| [city_id, [stations.to_i, lines.to_i]] }
+paths.each do |path|
+  network = JSON.parse(File.read(path))
+  city_id = network.fetch("cityID")
+  declared = counts[city_id]
+  actual = [network.fetch("stations").length, network.fetch("lines").length]
+  abort "metro network validation failed: #{city_id} has no declared counts" if declared.nil?
+  next if declared == actual
+
+  abort "metro network validation failed: #{city_id} declares #{declared[0]} stations/#{declared[1]} " \
+        "lines but ships #{actual[0]}/#{actual[1]}"
 end
 
 def point_segment_distance(point, start_point, end_point)
@@ -45,10 +64,7 @@ paths.each do |path|
   abort "#{city}: attribution missing" unless network["attribution"].to_s.include?("OpenStreetMap")
   abort "#{city}: license missing" if network["licenseURL"].to_s.empty?
   abort "#{city}: snapshot missing" if network["sourceSnapshot"].to_s.empty?
-  expected_coordinate_system = city == "8100" ? "wgs84" : "gcj02"
-  unless network["coordinateSystem"] == expected_coordinate_system
-    abort "#{city}: coordinate system must be #{expected_coordinate_system}"
-  end
+  abort "#{city}: coordinate system must be gcj02" unless network["coordinateSystem"] == "gcj02"
 
   stations = network.fetch("stations")
   station_ids = stations.map { |station| station.fetch("id") }.to_set

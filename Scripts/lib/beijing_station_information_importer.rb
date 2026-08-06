@@ -86,7 +86,7 @@ module BeijingStationInformationImporter
     uri = URI(INDEX_URL)
     request = Net::HTTP::Get.new(uri)
     request["Accept"] = "application/json"
-    request["User-Agent"] = "JustGo Beijing station-information importer"
+    request["User-Agent"] = "Just-Go Beijing station-information importer"
     response = Net::HTTP.start(
       uri.host,
       uri.port,

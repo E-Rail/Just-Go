@@ -6,7 +6,8 @@ require_relative "lib/oss_data_validators"
 begin
   OSSDataValidators::CityPackValidator.new.validate!
   manifest = JSON.parse(File.read(File.expand_path("../DataPacks/manifest.json", __dir__)))
-  puts "city-pack validation ok: schema=2 cities=#{manifest.fetch("cities").length} bundled=2"
+  bundled = manifest.fetch("cities").count { |city| !city["bundledResource"].nil? }
+  puts "city-pack validation ok: schema=2 cities=#{manifest.fetch("cities").length} bundled=#{bundled}"
 rescue OSSDataValidators::ValidationError => error
   warn "city-pack validation failed: #{error.message}"
   exit 1

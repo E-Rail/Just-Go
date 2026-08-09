@@ -1,7 +1,7 @@
 # Just-Go
 
-[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
+[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjust--go-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/just-go)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/just-go)
 [![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
 [![License: MIT](https://img.shields.io/badge/software-MIT-green.svg)](LICENSE)
 
@@ -120,8 +120,8 @@ ruby Scripts/validate_universal_city_data.rb
   清除缓存"删除。打开精确来源页面时还可能联系运营方选择的第三方网页服务。
 - 香港实时到站请求使用官方线路和车站标识访问 `rt.data.gov.hk`，不会包含私人媒体或
   乘客位置。
-- 应用链接到已发布的[隐私政策](https://e-rail.github.io/justgo/docs/privacy/)和
-  [服务条款](https://e-rail.github.io/justgo/docs/terms/)。
+- 应用链接到已发布的[隐私政策](https://e-rail.github.io/just-go/docs/privacy/)和
+  [服务条款](https://e-rail.github.io/just-go/docs/terms/)。
 
 ## 许可证
 

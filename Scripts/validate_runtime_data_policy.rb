@@ -89,8 +89,8 @@ swift_sources = swift_files.to_h { |path| [path, File.read(path, encoding: "UTF-
 
 expected_web_literals = Set.new([
   ["Just-Go/Views/Map/TransitMapView.swift", "https://www.openstreetmap.org/copyright"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/privacy/"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/terms/"],
+  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
+  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],

@@ -244,6 +244,16 @@ struct SearchPageView: View {
         viewModel?.searchText.isEmpty ?? true
     }
 
+    /// Whether the page as a whole has an answer, from either half.
+    ///
+    /// The two halves answer at different speeds: stations are in memory and land on the
+    /// keystroke, places come back from Apple ~350 ms later. So a place search still in flight
+    /// counts as "possibly something" — resolving it to "nothing" would flash the empty state
+    /// on every keystroke in the gap before Apple replies.
+    private var hasAnyResult: Bool {
+        !(viewModel?.searchResults.isEmpty ?? true) || !placeResults.isEmpty || isSearchingPlaces
+    }
+
     private var searchField: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -375,7 +385,12 @@ struct SearchPageView: View {
                     } description: {
                         Text(message)
                     }
-                } else {
+                } else if !hasAnyResult {
+                    // "No results" means the whole page found nothing — not just the station half.
+                    // It used to render whenever the station index missed, so a search like
+                    // "北京 xinchi" showed a full-width empty state sitting directly on top of four
+                    // perfectly good places from Apple. Saying "nothing here" above a list of
+                    // somethings is the loudest possible way to be wrong.
                     ContentUnavailableView {
                         Label(AppLocalization.localized("No Results"), systemImage: "magnifyingglass")
                     } description: {

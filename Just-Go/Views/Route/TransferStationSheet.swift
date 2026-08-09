@@ -191,9 +191,9 @@ struct TransferStationSheet: View {
                         OfficialTransitResourceButton(resource: resource, compact: true)
                     }
                     Text(AppLocalization.text(
-                        english: "These official resources are displayed inside Just-Go. Just-Go does not verify or interpret what they show.",
-                        simplified: "这些官方资源会在 Just-Go 内显示；Just-Go 不对其内容作核实或解读。",
-                        traditional: "這些官方資源會在 Just-Go 內顯示；Just-Go 不對其內容作核實或解讀。"
+                        english: "Straight from the operator, opened here for you to read.",
+                        simplified: "由运营方提供，可在此直接查看。",
+                        traditional: "由營運方提供，可在此直接查看。"
                     ))
                         .rowMeta()
                 }

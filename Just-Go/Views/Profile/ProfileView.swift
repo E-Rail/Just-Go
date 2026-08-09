@@ -1,8 +1,8 @@
 import SwiftUI
 
 enum AppWebLinks {
-    static let privacyPolicy = URL(string: "https://e-rail.github.io/justgo/docs/privacy/")!
-    static let termsOfService = URL(string: "https://e-rail.github.io/justgo/docs/terms/")!
+    static let privacyPolicy = URL(string: "https://e-rail.github.io/just-go/docs/privacy/")!
+    static let termsOfService = URL(string: "https://e-rail.github.io/just-go/docs/terms/")!
 }
 
 /// The five screens Profile can open. One `sheet(item:)` rather than five `sheet(isPresented:)`

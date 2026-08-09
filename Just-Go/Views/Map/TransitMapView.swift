@@ -78,6 +78,9 @@ struct TransitMapView: UIViewRepresentable {
         private var stationSignature = ""
         private var routeSignature = ""
         private var markerVisibilityBand = -1
+        /// Drives `strokeScale`. Seeded wide so the first stroke of a freshly-built map is sized
+        /// for the zoom it is actually at, rather than for a street-level view it may never show.
+        private var currentMaxDelta: CLLocationDegrees = 0.05
         private var annotationStations: [ObjectIdentifier: Station] = [:]
         private var stationAnnotationsByID: [String: StationAnnotation] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
@@ -536,13 +539,60 @@ struct TransitMapView: UIViewRepresentable {
             // Marker size/visibility only changes when maxDelta crosses one of the style or
             // visibility thresholds; within a band every annotation reconfigures identically, so
             // skip the O(N) sweep while panning at a fixed zoom.
-            let band = markerBand(for: max(region.span.latitudeDelta, region.span.longitudeDelta))
+            let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
+            let band = markerBand(for: maxDelta)
             if band != markerVisibilityBand {
                 markerVisibilityBand = band
+                currentMaxDelta = maxDelta
                 refreshMarkerVisibility(on: mapView)
                 syncInterchangeVisibility(on: mapView)
+                // Safe to hang off the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) are a
+                // superset of strokeScale's (0.055, 0.18, 0.8), so no stroke change can happen
+                // without a band change. Keep that true if either set moves.
+                refreshOverlayWidths(on: mapView)
             }
             parent.onRegionChanged?(visibleRegion)
+        }
+
+        /// How much to shrink every stroke at the current zoom, and why there has to be a factor
+        /// at all.
+        ///
+        /// `MKPolylineRenderer.lineWidth` is in screen points, so it does not change as the map
+        /// zooms — a 7pt line is 7pt whether it spans a street or a province. Zoom out to fit a
+        /// whole trip and the route collapses toward a point while its stroke stays put, so the
+        /// round dots of a walk stop reading as a dotted line and merge into one fat grey blob.
+        /// The dash pattern is scaled by the same factor so the dot-to-gap rhythm is preserved
+        /// rather than turning into sparse specks.
+        private func strokeScale(for maxDelta: CLLocationDegrees) -> CGFloat {
+            switch maxDelta {
+            case ..<0.055: return 1
+            case ..<0.18: return 0.85
+            case ..<0.8: return 0.62
+            default: return 0.45
+            }
+        }
+
+        private func applyStrokeWidth(to renderer: MKPolylineRenderer, polyline: MKPolyline) {
+            let key = ObjectIdentifier(polyline)
+            let scale = strokeScale(for: currentMaxDelta)
+            // Floored so a hairline never disappears entirely at the widest zooms.
+            renderer.lineWidth = max(1.5, (overlayWidths[key] ?? 5) * scale)
+            renderer.lineDashPattern = overlayDashes[key]?.map {
+                NSNumber(value: max(0.1, $0.doubleValue * Double(scale)))
+            }
+        }
+
+        /// Re-strokes the overlays already on screen. Cheap: MapKit hands back the renderer it
+        /// already made, so this touches two numbers per overlay and asks for a redraw.
+        private func refreshOverlayWidths(on mapView: MKMapView) {
+            for overlay in mapView.overlays {
+                guard let polyline = overlay as? MKPolyline,
+                      let renderer = mapView.renderer(for: overlay) as? MKPolylineRenderer else {
+                    continue
+                }
+                applyStrokeWidth(to: renderer, polyline: polyline)
+                renderer.setNeedsDisplay()
+            }
         }
 
         private func markerBand(for maxDelta: CLLocationDegrees) -> Int {
@@ -633,8 +683,7 @@ struct TransitMapView: UIViewRepresentable {
 
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
-            renderer.lineWidth = overlayWidths[ObjectIdentifier(polyline)] ?? 5
-            renderer.lineDashPattern = overlayDashes[ObjectIdentifier(polyline)] ?? nil
+            applyStrokeWidth(to: renderer, polyline: polyline)
             renderer.lineCap = .round
             renderer.lineJoin = .round
             return renderer

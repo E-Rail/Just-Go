@@ -1,7 +1,7 @@
 # Just-Go
 
-[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
+[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjust--go-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/just-go)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/just-go)
 [![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
 [![License: MIT](https://img.shields.io/badge/software-MIT-green.svg)](LICENSE)
 
@@ -138,8 +138,8 @@ license treatment.
   Opening the exact source page may also contact provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
-- The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)
-  and [Terms of Service](https://e-rail.github.io/justgo/docs/terms/).
+- The app links to the published [Privacy Policy](https://e-rail.github.io/just-go/docs/privacy/)
+  and [Terms of Service](https://e-rail.github.io/just-go/docs/terms/).
 
 ## License
 

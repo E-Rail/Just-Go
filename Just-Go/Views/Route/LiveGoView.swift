@@ -126,11 +126,18 @@ struct LiveGoView: View {
                 if isActiveTransferStep {
                     transferStepSurface
                 } else {
-                    ZStack(alignment: .bottom) {
-                        liveMap
-                            .ignoresSafeArea(edges: .bottom)
-                        instructionPanel
-                    }
+                    // The panel is a safe-area inset rather than a ZStack overlay so MapKit knows
+                    // the space is taken. Stacked, the map believed it owned the whole screen and
+                    // laid its own POI labels and pin glyphs out underneath our opaque card —
+                    // Apple's icons peeking out from behind our text, which is what it looked
+                    // like. Insetting keeps the map drawing full-bleed (the panel still floats
+                    // over live map) while moving MapKit's own labelling, controls and legal
+                    // attribution into the part of the screen the rider can actually see.
+                    liveMap
+                        .ignoresSafeArea(edges: .bottom)
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            instructionPanel
+                        }
                 }
             }
             .overlay(alignment: .top) {
@@ -298,9 +305,9 @@ struct LiveGoView: View {
                 }
                 if guidance.externalResources.contains(where: { $0.kind.isTransferRelevant }) {
                     Text(AppLocalization.text(
-                        english: "Official links are reference material only. Just-Go infers nothing from them.",
-                        simplified: "官方链接仅供参考；Just-Go 不会据此作任何推断。",
-                        traditional: "官方連結僅供參考；Just-Go 不會據此作任何推斷。"
+                        english: "Straight from the operator, for reference.",
+                        simplified: "由运营方提供，仅供参考。",
+                        traditional: "由營運方提供，僅供參考。"
                     ))
                         .rowMeta()
                         .multilineTextAlignment(.center)

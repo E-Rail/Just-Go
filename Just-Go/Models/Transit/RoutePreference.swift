@@ -60,7 +60,12 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    static let primary: [RoutePreference] = [.fastest, .leastWalking, .fewestTransfers, .leastConfusing]
+    /// The chips shown above the results. Two, because these are the only two a rider actually
+    /// decides between at the moment they are choosing a route — everything else is a standing
+    /// preference, not a per-trip one. The rest stay reachable under "More" rather than being
+    /// deleted: "Least Walking" in particular is a real need, it just belongs to whoever set
+    /// step-free needs in Profile rather than to a row everyone has to read past.
+    static let primary: [RoutePreference] = [.fastest, .fewestTransfers]
 
     var isPrimary: Bool {
         Self.primary.contains(self)

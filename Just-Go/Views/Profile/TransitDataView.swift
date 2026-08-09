@@ -536,9 +536,9 @@ private struct OfficialResourceCityView: View {
 
             Section {
                 Text(AppLocalization.text(
-                    english: "Reviewed \(city.verifiedAt). External maps remain operator content and do not establish a verified indoor path or door position in Just-Go.",
-                    simplified: "审核日期：\(city.verifiedAt)。外部地图仍属于运营方内容，并不代表 Just-Go 已核实站内路径或车门位置。",
-                    traditional: "審核日期：\(city.verifiedAt)。外部地圖仍屬於營運方內容，並不代表 Just-Go 已核實站內路徑或車門位置。"
+                    english: "Checked \(city.verifiedAt). These are the operator's own maps — we don't add station layouts or door positions.",
+                    simplified: "核对于 \(city.verifiedAt)。这些是运营方自己的地图，我们不会另行标注站内路线或车门位置。",
+                    traditional: "核對於 \(city.verifiedAt)。這些是營運方自己的地圖，我們不會另行標註站內路線或車門位置。"
                 ))
                     .font(.caption)
                     .foregroundStyle(.secondary)

@@ -212,8 +212,9 @@ struct RouteResultsView: View {
         }
     }
 
-    /// The three headline strategies, preceded by whatever is actually sorting the list when that
-    /// is something else.
+    /// The headline strategies, preceded by whatever is actually sorting the list when that is
+    /// something else — so a sort picked from "More" still shows as the selected chip rather than
+    /// leaving the row looking like nothing is chosen.
     private var sortChipStrategies: [RoutePreference] {
         let primary = RoutePreference.primary
         guard !primary.contains(viewModel.sortStrategy) else { return primary }

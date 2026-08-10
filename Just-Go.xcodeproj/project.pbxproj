@@ -108,6 +108,9 @@
 		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
 		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
 		A1000309 /* User/StationQuickTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/StationQuickTag.swift */; };
+		A1000903 /* Route/TransferPacePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000903 /* Route/TransferPacePrompt.swift */; };
+		A1000902 /* Data/TransferInsightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000902 /* Data/TransferInsightService.swift */; };
+		A1000901 /* Transit/TransferPace.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000901 /* Transit/TransferPace.swift */; };
 		A1000310 /* Profile/QuickTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/QuickTagsView.swift */; };
 		A1000605 /* Profile/QuickTagAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000605 /* Profile/QuickTagAddView.swift */; };
 		A1000311 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000311 /* manifest.json */; };
@@ -222,6 +225,9 @@
 		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
 		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
 		A2000309 /* User/StationQuickTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/StationQuickTag.swift; sourceTree = "<group>"; };
+		A2000903 /* Route/TransferPacePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferPacePrompt.swift; sourceTree = "<group>"; };
+		A2000902 /* Data/TransferInsightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TransferInsightService.swift; sourceTree = "<group>"; };
+		A2000901 /* Transit/TransferPace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransferPace.swift; sourceTree = "<group>"; };
 		A2000310 /* Profile/QuickTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagsView.swift; sourceTree = "<group>"; };
 		A2000605 /* Profile/QuickTagAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagAddView.swift; sourceTree = "<group>"; };
 		A2000311 /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = manifest.json; path = DataPacks/manifest.json; sourceTree = SOURCE_ROOT; };
@@ -309,6 +315,7 @@
 				A200002F /* User/SearchHistory.swift */,
 				A2000051 /* User/TripMemory.swift */,
 				A2000309 /* User/StationQuickTag.swift */,
+				A2000901 /* Transit/TransferPace.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -342,6 +349,7 @@
 				A2000020 /* Location/LocationService.swift */,
 				A2000023 /* Data/CityService.swift */,
 				A2000054 /* Data/TripMemoryService.swift */,
+				A2000902 /* Data/TransferInsightService.swift */,
 				A2000314 /* Data/ActiveTripStore.swift */,
 			);
 			path = Services;
@@ -372,6 +380,7 @@
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
 				A2000064 /* Station/FullScreenStationImageView.swift */,
 				A200000B /* Route/RouteResultsView.swift */,
+				A2000903 /* Route/TransferPacePrompt.swift */,
 				A200000C /* Route/RouteDetailView.swift */,
 				A2000065 /* Route/RouteDetailView+Segments.swift */,
 				A2000066 /* Route/RouteDetailView+Sheets.swift */,
@@ -593,6 +602,9 @@
 				A100002F /* User/SearchHistory.swift in Sources */,
 				A1000051 /* User/TripMemory.swift in Sources */,
 				A1000309 /* User/StationQuickTag.swift in Sources */,
+				A1000903 /* Route/TransferPacePrompt.swift in Sources */,
+				A1000902 /* Data/TransferInsightService.swift in Sources */,
+				A1000901 /* Transit/TransferPace.swift in Sources */,
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000310 /* Profile/QuickTagsView.swift in Sources */,
 				A1000605 /* Profile/QuickTagAddView.swift in Sources */,

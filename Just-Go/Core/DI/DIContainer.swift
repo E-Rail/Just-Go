@@ -27,6 +27,7 @@ final class DIContainer {
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
+    let transferInsightService: TransferInsightService
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
@@ -48,6 +49,7 @@ final class DIContainer {
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
+        transferInsightService: TransferInsightService,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         tripReminderService: TripReminderService,
@@ -67,6 +69,7 @@ final class DIContainer {
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
+        self.transferInsightService = transferInsightService
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.tripReminderService = tripReminderService
@@ -213,6 +216,7 @@ final class DIContainer {
             stationInformationDirectory: stationInformationDirectory
         )
         let tripMemoryService = TripMemoryService()
+        let transferInsightService = TransferInsightService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
@@ -228,6 +232,7 @@ final class DIContainer {
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,
+            transferInsightService: transferInsightService,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             tripReminderService: tripReminderService,

@@ -251,6 +251,24 @@ struct LiveGoView: View {
             ?? AppLocalization.localized("Transfer station")
     }
 
+    /// Which change the rider is making, as something answerable about.
+    ///
+    /// Built from names rather than identifiers because `TripStep` carries names — and that is
+    /// fine while every answer stays on the device that produced it. **Before answers are ever
+    /// pooled between riders this has to move to stable IDs**: `localizedName` differs by
+    /// language, so a Chinese and an English rider standing in the same corridor would key the
+    /// same change two different ways. `TransferKey` is the one type that has to change.
+    private var activeTransferKey: TransferKey? {
+        guard let step = viewModel.currentStep,
+              step.kind == .transfer,
+              let station = step.fromStationName,
+              let toLine = step.lineName else { return nil }
+        let fromLine = viewModel.plan.steps[..<viewModel.currentIndex]
+            .last { $0.kind == .ride }?.lineName
+        guard let fromLine, fromLine != toLine else { return nil }
+        return TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
+    }
+
     private var activeTransferGuidance: LiveTransferGuidance? {
         guard let step = viewModel.currentStep,
               step.kind == .transfer,
@@ -266,6 +284,23 @@ struct LiveGoView: View {
             instructionPanel
         }
         .background(Color.appBackground)
+    }
+
+    /// The one moment the rider knows how long the change took is while they are making it, so
+    /// the question lives here and nowhere else. Shown under both the guidance and the
+    /// "no information" state — the app having nothing to say about a transfer is exactly when
+    /// hearing from the rider is worth most.
+    @ViewBuilder
+    private var transferPaceSection: some View {
+        if let key = activeTransferKey {
+            TransferPacePrompt(
+                key: key,
+                insight: container.transferInsightService.insight(for: key)
+            ) { pace in
+                container.transferInsightService.record(pace, for: key)
+            }
+            .padding(.horizontal, 24)
+        }
     }
 
     @ViewBuilder
@@ -312,27 +347,32 @@ struct LiveGoView: View {
                         .rowMeta()
                         .multilineTextAlignment(.center)
                 }
+                transferPaceSection
+                    .padding(.horizontal, -24)
             }
             .padding(24)
             .accessibilityElement(children: .contain)
         } else {
-            ContentUnavailableView {
-                Label(
-                    AppLocalization.text(
-                        english: "Transfer information unavailable",
-                        simplified: "暂无换乘信息",
-                        traditional: "暫無轉乘資訊"
-                    ),
-                    systemImage: "signpost.right"
-                )
-            } description: {
-                Text(AppLocalization.text(
-                    english: "Follow station signs for this transfer.",
-                    simplified: "本次换乘请以站内标识为准。",
-                    traditional: "本次轉乘請以站內標識為準。"
-                ))
+            VStack(spacing: 18) {
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(
+                            english: "Transfer information unavailable",
+                            simplified: "暂无换乘信息",
+                            traditional: "暫無轉乘資訊"
+                        ),
+                        systemImage: "signpost.right"
+                    )
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Follow station signs for this transfer.",
+                        simplified: "本次换乘请以站内标识为准。",
+                        traditional: "本次轉乘請以站內標識為準。"
+                    ))
+                }
+                transferPaceSection
             }
-            .padding(24)
+            .padding(.vertical, 24)
         }
     }
 

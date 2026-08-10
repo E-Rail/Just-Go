@@ -55,6 +55,7 @@ final class RoutePlanningService {
     /// a route is still a route without it — and because most cities have no such source.
     private let officialStationInformation: (any OfficialStationInformationProviding)?
     private let stationInformationDirectory: StationInformationDirectory?
+    private let transferGeometry: (any TransferGeometryProviding)?
     private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
@@ -63,7 +64,8 @@ final class RoutePlanningService {
         officialStationData: OfficialStationDataProviding,
         walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider(),
         officialStationInformation: (any OfficialStationInformationProviding)? = nil,
-        stationInformationDirectory: StationInformationDirectory? = nil
+        stationInformationDirectory: StationInformationDirectory? = nil,
+        transferGeometry: (any TransferGeometryProviding)? = nil
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
@@ -71,6 +73,7 @@ final class RoutePlanningService {
         self.walkingRoutes = walkingRoutes
         self.officialStationInformation = officialStationInformation
         self.stationInformationDirectory = stationInformationDirectory
+        self.transferGeometry = transferGeometry
     }
 
     func planRoute(
@@ -146,7 +149,66 @@ final class RoutePlanningService {
             for await result in group {
                 collected.append(result)
             }
-            return collected.sorted { $0.0 < $1.0 }.map(\.1)
+            let ordered = collected.sorted { $0.0 < $1.0 }.map(\.1)
+            return await self.applyingMeasuredTransfers(
+                to: ordered,
+                from: origin.routeCoordinate,
+                to: destination.routeCoordinate
+            )
+        }
+    }
+
+    /// Re-costs every change the app has a measured corridor length for.
+    ///
+    /// This is what makes a transfer's real cost visible to ranking rather than only to the eye:
+    /// until now every change cost the same modelled penalty, so a route through a 231 m
+    /// interchange and one through a 689 m interchange were priced identically and the shorter walk
+    /// won nothing. Correcting the segment durations feeds `totalDuration`, which the strategy
+    /// sorters already order by — no separate ranking rule, and none of the callers change.
+    ///
+    /// Bounded and entirely optional, for the same reason the official-station lookup above is: this
+    /// is an *upgrade* to an answer the app already has offline. No key, no network or a slow
+    /// network all mean the modelled cost stands, never a failed or delayed plan.
+    private func applyingMeasuredTransfers(
+        to routes: [Route],
+        from origin: CLLocationCoordinate2D,
+        to destination: CLLocationCoordinate2D
+    ) async -> [Route] {
+        guard let transferGeometry,
+              routes.contains(where: { $0.transferCount > 0 }) else { return routes }
+
+        let geometries = await withTaskGroup(of: [TransferGeometry].self) { group in
+            group.addTask { await transferGeometry.geometries(from: origin, to: destination) }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(3))
+                return []
+            }
+            let first = await group.next() ?? []
+            group.cancelAll()
+            return first
+        }
+        guard !geometries.isEmpty else { return routes }
+
+        return routes.map { route in
+            var didMeasure = false
+            var segments = route.segments
+            for index in segments.indices {
+                let segment = segments[index]
+                guard segment.type == .transfer,
+                      let station = segment.fromStationName,
+                      let toLine = segment.lineName,
+                      let fromLine = segment.incomingLineName else { continue }
+                let key = TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
+                guard let match = geometries.first(where: { $0.matches(key) }) else { continue }
+                segments[index] = segment.measuringTransfer(distance: Double(match.distanceMetres))
+                didMeasure = true
+            }
+            guard didMeasure else { return route }
+
+            let corrected = route.totalDuration
+                - route.segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
+                + segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
+            return route.replacingSegments(segments, totalDuration: max(60, corrected))
         }
     }
 

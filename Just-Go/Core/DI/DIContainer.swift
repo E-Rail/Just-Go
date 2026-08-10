@@ -229,7 +229,8 @@ final class DIContainer {
             officialStationData: officialStationData,
             walkingRoutes: walkingRouteProvider,
             officialStationInformation: stationInformationRouter,
-            stationInformationDirectory: stationInformationDirectory
+            stationInformationDirectory: stationInformationDirectory,
+            transferGeometry: transferGeometryProvider
         )
         let tripMemoryService = TripMemoryService()
         let transferInsightService = TransferInsightService()

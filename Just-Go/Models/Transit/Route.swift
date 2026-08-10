@@ -51,6 +51,31 @@ struct Route: Identifiable, Codable {
         segments.first { $0.type.isTransit }
     }
 
+    /// `totalDuration` is `let` and stays that way — a route's headline number should not be
+    /// quietly mutable — so re-costing rebuilds the value instead.
+    func replacingSegments(_ newSegments: [RouteSegment], totalDuration newTotal: TimeInterval) -> Route {
+        Route(
+            id: id,
+            origin: origin,
+            destination: destination,
+            originStationID: originStationID,
+            destinationStationID: destinationStationID,
+            strategy: strategy,
+            segments: newSegments,
+            totalDuration: newTotal,
+            walkingDistance: walkingDistance,
+            totalStops: totalStops,
+            transferCount: transferCount,
+            isFullyAccessible: isFullyAccessible,
+            stepFreeAssessment: stepFreeAssessment,
+            warnings: warnings,
+            accessGuidance: accessGuidance,
+            dataCoverage: dataCoverage,
+            serviceStatus: serviceStatus,
+            stationGuidance: stationGuidance
+        )
+    }
+
     var formattedDuration: String {
         let minutes = Int(totalDuration / 60)
         return AppLocalization.minutes(minutes)
@@ -333,6 +358,36 @@ struct RouteSegment: Identifiable, Codable {
             toStationID: toStationID,
             duration: duration,
             distance: distance,
+            stops: stops,
+            stationStops: stationStops,
+            polylineCoordinates: polylineCoordinates,
+            walkingDirections: walkingDirections,
+            accessibilityNotes: accessibilityNotes,
+            transitContext: transitContext,
+            transferContext: transferContext,
+            incomingLineName: incomingLineName,
+            incomingLineColorHex: incomingLineColorHex
+        )
+    }
+
+    /// A transfer leg re-costed from a measured corridor length.
+    ///
+    /// Separate from `retyped` because the meaning is different: this does not change what the leg
+    /// *is*, it replaces a modelled guess with an observed distance. The duration is derived here
+    /// at the app's own 1.25 m/s rather than taken from whoever supplied the metres — see
+    /// `TransferPace.init(distanceMetres:)` for why a provider's seconds are not a second source.
+    func measuringTransfer(distance measuredDistance: Double) -> RouteSegment {
+        RouteSegment(
+            id: id,
+            type: type,
+            lineName: lineName,
+            lineColorHex: lineColorHex,
+            fromStationName: fromStationName,
+            toStationName: toStationName,
+            fromStationID: fromStationID,
+            toStationID: toStationID,
+            duration: measuredDistance / 1.25,
+            distance: measuredDistance,
             stops: stops,
             stationStops: stationStops,
             polylineCoordinates: polylineCoordinates,

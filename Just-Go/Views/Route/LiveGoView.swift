@@ -93,6 +93,9 @@ struct LiveGoView: View {
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
+    /// Measured corridor lengths for this trip's interchanges, fetched once and held for the
+    /// screen's lifetime only — nothing about them is written to disk.
+    @State private var transferGeometries: [TransferGeometry] = []
     /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
     /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
     /// The Accessibility toggle below is a stronger promise than this one — see `onAppear`.
@@ -295,12 +298,51 @@ struct LiveGoView: View {
         if let key = activeTransferKey {
             TransferPacePrompt(
                 key: key,
-                insight: container.transferInsightService.insight(for: key)
+                insight: insight(for: key)
             ) { pace in
                 container.transferInsightService.record(pace, for: key)
             }
             .padding(.horizontal, 24)
+            // Fetched here rather than when the trip starts: a journey with no change never asks,
+            // so a direct ride costs no request at all.
+            .task(id: viewModel.route.id) { await loadTransferGeometries() }
         }
+    }
+
+    /// What the app knows about this change, best source first.
+    ///
+    /// The rider's own answer outranks a measured corridor because they were standing in it — the
+    /// geometry knows the distance but nothing about the stairs, the lift queue or the crowd. When
+    /// neither exists this returns nil and the prompt simply asks, which is the honest state.
+    private func insight(for key: TransferKey) -> TransferInsight? {
+        if let recorded = container.transferInsightService.insight(for: key) { return recorded }
+        guard let geometry = transferGeometries.first(where: { $0.matches(key) }) else { return nil }
+        return TransferInsight(
+            pace: TransferPace(distanceMetres: geometry.distanceMetres),
+            source: .mapProvider,
+            distanceMetres: geometry.distanceMetres
+        )
+    }
+
+    private func loadTransferGeometries() async {
+        guard transferGeometries.isEmpty,
+              let provider = container.transferGeometryProvider,
+              let origin = originCoordinate,
+              let destination = destinationCoordinate else { return }
+        transferGeometries = await provider.geometries(from: origin, to: destination)
+    }
+
+    /// Mirror of `destinationCoordinate` from the other end of the route.
+    private var originCoordinate: CLLocationCoordinate2D? {
+        for segment in viewModel.route.segments {
+            if let first = segment.polylineCoordinates.first {
+                return CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
+            }
+            if let stop = segment.stationStops.first?.coordinate {
+                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
+            }
+        }
+        return nil
     }
 
     @ViewBuilder

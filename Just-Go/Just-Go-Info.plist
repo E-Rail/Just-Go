@@ -27,6 +27,10 @@
 	<string>1</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>BaiduMapsAK</key>
+	<string>$(BAIDU_MAPS_AK)</string>
+	<key>BaiduMapsSK</key>
+	<string>$(BAIDU_MAPS_SK)</string>
 	<key>CityPackBaseURL</key>
 	<string>$(CITY_PACK_BASE_URL)</string>
 	<key>CityPackFallbackBaseURL</key>

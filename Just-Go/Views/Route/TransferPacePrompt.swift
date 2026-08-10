@@ -23,7 +23,14 @@ struct TransferPacePrompt: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if let shown = justAnswered ?? insight?.pace {
-                answeredState(pace: shown, source: justAnswered == nil ? insight?.source : .you)
+                answeredState(
+                    pace: shown,
+                    source: justAnswered == nil ? insight?.source : .you,
+                    // The rider's own answer replaces the estimate outright, metres included:
+                    // once they have told us, a measured corridor length is no longer the best
+                    // thing the app knows about this change.
+                    distanceMetres: justAnswered == nil ? insight?.distanceMetres : nil
+                )
             } else {
                 question
             }
@@ -90,7 +97,11 @@ struct TransferPacePrompt: View {
         .accessibilityLabel(pace.title)
     }
 
-    private func answeredState(pace: TransferPace, source: TransferInsightSource?) -> some View {
+    private func answeredState(
+        pace: TransferPace,
+        source: TransferInsightSource?,
+        distanceMetres: Int?
+    ) -> some View {
         HStack(spacing: 10) {
             Image(systemName: pace.icon)
                 .font(.headline)
@@ -99,9 +110,18 @@ struct TransferPacePrompt: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(headline(for: source))
                     .rowMeta()
-                Text(pace.title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                // A measured corridor leads with its metres, because that is the part that was
+                // actually observed; the bucket beside it is this app's own walking model applied
+                // to that distance, and is never presented as if it had been timed.
+                if let distanceMetres, source == .mapProvider {
+                    Text("\(distanceMetres) m · \(pace.title)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                } else {
+                    Text(pace.title)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
             }
             Spacer(minLength: 0)
         }
@@ -117,6 +137,15 @@ struct TransferPacePrompt: View {
                 english: "\(count) riders said",
                 simplified: "\(count) 位乘客的用时",
                 traditional: "\(count) 位乘客的用時"
+            )
+        case .mapProvider:
+            // "Walking distance", not "transfer time". The metres were measured; the seconds were
+            // not, and naming this after time would be the app inventing the precision it exists
+            // to refuse.
+            return AppLocalization.text(
+                english: "Walking distance between platforms",
+                simplified: "站台之间的步行距离",
+                traditional: "月台之間的步行距離"
             )
         case .you, .none:
             return AppLocalization.text(

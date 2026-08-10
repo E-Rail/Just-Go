@@ -8,15 +8,28 @@ import Observation
 /// them — would be a lie told by the copy rather than by the data. The UI switches on this, so
 /// when a shared answer set does arrive nothing has to be remembered.
 enum TransferInsightSource: Equatable, Sendable {
-    /// Answered by this rider, on this device. The only case produced today.
+    /// Answered by this rider, on this device.
     case you
     /// Pooled from other riders. Nothing produces this yet — see `RemoteTransferInsightSource`.
     case riders(count: Int)
+    /// Derived from a routing provider's measured corridor length. Ranks below both of the above:
+    /// it is a real distance, but it knows nothing about stairs, lifts, crowds or waiting, so a
+    /// rider who was actually there outranks it.
+    case mapProvider
 }
 
 struct TransferInsight: Equatable, Sendable {
     let pace: TransferPace
     let source: TransferInsightSource
+    /// Present only when the figure came from measured geometry. The screen shows the metres
+    /// rather than a time in that case — the distance is what was actually observed.
+    let distanceMetres: Int?
+
+    init(pace: TransferPace, source: TransferInsightSource, distanceMetres: Int? = nil) {
+        self.pace = pace
+        self.source = source
+        self.distanceMetres = distanceMetres
+    }
 }
 
 /// The seam a shared answer set arrives through.

@@ -89,6 +89,10 @@ swift_sources = swift_files.to_h { |path| [path, File.read(path, encoding: "UTF-
 
 expected_web_literals = Set.new([
   ["Just-Go/Views/Map/TransitMapView.swift", "https://www.openstreetmap.org/copyright"],
+  # Baidu is fetch-only. Its terms forbid storing or caching what the service releases, so nothing
+  # it returns may be persisted or committed — the check below enforces that no response payload
+  # ever lands in the repo.
+  ["Just-Go/Services/Map/BaiduMapsClient.swift", "https://api.map.baidu.com"],
   ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
   ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
@@ -156,6 +160,41 @@ swift_sources.each do |absolute_path, source|
 
   %w[jsdelivr.net wikimedia.org wikipedia.org githubusercontent.com].each do |host|
     errors << "runtime source references forbidden media/data host #{host}: #{absolute_path.delete_prefix("#{ROOT}/")}" if source.include?(host)
+  end
+end
+
+# --- Baidu is fetch-only, and must stay that way -----------------------------------------------
+#
+# Baidu's terms forbid storing or caching what the service releases (clause 3.3.2), so the app may
+# read a response and must not keep it. Three things are asserted, because "we remembered not to"
+# is not a guarantee: the client cannot cache, the consumer cannot persist, and no response payload
+# has been committed. The last one is the trap the LicenseRef-External-Link-Only cities already
+# taught us — the leak is a generated file landing in the repo, not a line of Swift.
+baidu_client_path = File.join(ROOT, "Just-Go/Services/Map/BaiduMapsClient.swift")
+if File.file?(baidu_client_path)
+  baidu_client_source = File.read(baidu_client_path, encoding: "UTF-8")
+  ["URLSessionConfiguration.ephemeral", "urlCache = nil", "reloadIgnoringLocalCacheData"].each do |marker|
+    errors << "Baidu client must not cache responses (missing #{marker})" unless
+      baidu_client_source.include?(marker)
+  end
+
+  geometry_path = File.join(ROOT, "Just-Go/Services/Transit/BaiduTransferGeometryService.swift")
+  if File.file?(geometry_path)
+    geometry_source = File.read(geometry_path, encoding: "UTF-8")
+    %w[UserDefaults FileManager setCodable NSKeyedArchiver].each do |marker|
+      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduTransferGeometryService)" if
+        geometry_source.include?(marker)
+    end
+  end
+
+  # No committed byte may have come from Baidu.
+  committed_data = Dir.glob(File.join(ROOT, "{DataPacks,StationInfoAPI}/**/*.json")) +
+                   Dir.glob(File.join(ROOT, "Just-Go/Resources/**/*.json"))
+  committed_data.each do |path|
+    contents = File.read(path, encoding: "UTF-8")
+    next unless contents.include?("baidu") || contents.include?("百度")
+
+    errors << "Baidu-derived content is committed: #{path.delete_prefix("#{ROOT}/")}"
   end
 end
 

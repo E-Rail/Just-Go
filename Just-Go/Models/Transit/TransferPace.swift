@@ -33,6 +33,22 @@ enum TransferPace: String, Codable, CaseIterable, Identifiable, Sendable {
         case .long: return "tortoise"
         }
     }
+
+    /// The bucket a measured corridor length falls into, using **this app's** walking model
+    /// (1.25 m/s, the same constant `BundledMetroRouteProvider` costs walking legs with).
+    ///
+    /// Deliberately not the provider's own seconds. Baidu returns a duration alongside the
+    /// distance, but it is `distance ÷ 1.19 m/s` in every sample taken — a restatement of the
+    /// metres, not a second observation of them. Deriving the bucket here keeps one walking model
+    /// in the app instead of importing a second one that only looks like new information.
+    init(distanceMetres: Int) {
+        let seconds = Double(distanceMetres) / 1.25
+        switch seconds {
+        case ..<120: self = .quick
+        case ..<300: self = .steady
+        default: self = .long
+        }
+    }
 }
 
 /// Identifies one change: this station, from this line to that one.

@@ -326,10 +326,10 @@ struct LiveGoView: View {
 
     private func loadTransferGeometries() async {
         guard transferGeometries.isEmpty,
-              let provider = container.transferGeometryProvider,
+              let provider = container.tripObservationProvider,
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return }
-        transferGeometries = await provider.geometries(from: origin, to: destination)
+        transferGeometries = await provider.observations(from: origin, to: destination).transfers
     }
 
     /// Mirror of `destinationCoordinate` from the other end of the route.

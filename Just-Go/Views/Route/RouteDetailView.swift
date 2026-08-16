@@ -289,17 +289,27 @@ struct RouteDetailView: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
-    /// Stops, transfers and which door to go in by — the line Amap spends on "13站 · ¥5 · 玉泉路
-    /// (C2东南口) 进站". There is no fare here and there will not be one: Just-Go holds no fare data
-    /// for any city, and a fare inferred from a stop count is exactly the guess this app refuses
-    /// to make. The entrance is real — it is the door the plan actually routed the rider to.
+    /// Stops, fare, transfers and which door to go in by. This is the line Amap spends on
+    /// "13站 · ¥5 · 玉泉路 (C2东南口) 进站".
+    ///
+    /// The fare was absent here for a long time, under a rule that still stands: a fare inferred
+    /// from a stop count is exactly the guess this app refuses to make. What changed is the
+    /// evidence, not the standard. The amount is now read from a provider that priced the same two
+    /// gates, and `RoutePlanningService.pricing` throws it away unless the boarding and alighting
+    /// stations match this route's, so an unpriced trip still prints nothing at all.
+    ///
+    /// The entrance is real. It is the door the plan actually routed the rider to.
     private var heroSummary: String {
         let stops = AppLocalization.text(
             english: "\(route.totalStops) stops",
             simplified: "\(route.totalStops) 站",
             traditional: "\(route.totalStops) 站"
         )
-        var parts = [stops, route.formattedTransfers]
+        var parts = [stops]
+        if let fare = route.fare {
+            parts.append(fare.formatted)
+        }
+        parts.append(route.formattedTransfers)
         if let entrance = route.originAccessGuide?.accessPoint?.namedDoor {
             parts.append(AppLocalization.text(
                 english: "Enter at \(entrance)",

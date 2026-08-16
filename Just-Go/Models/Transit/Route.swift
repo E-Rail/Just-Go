@@ -46,6 +46,10 @@ struct Route: Identifiable, Codable {
     var dataCoverage: RouteDataCoverage = .unknown
     var serviceStatus: RouteServiceStatus = .unknown
     var stationGuidance: [RouteStationGuidance] = []
+    /// What this journey costs, when a fare was observed for the same pair of gates. `nil` means
+    /// nobody priced it and the screens say nothing, which is the answer for every city outside
+    /// Baidu's coverage and for every route whose boarding and alighting stations went unmatched.
+    var fare: RouteFare?
 
     var boardingTransitSegment: RouteSegment? {
         segments.first { $0.type.isTransit }
@@ -72,7 +76,8 @@ struct Route: Identifiable, Codable {
             accessGuidance: accessGuidance,
             dataCoverage: dataCoverage,
             serviceStatus: serviceStatus,
-            stationGuidance: stationGuidance
+            stationGuidance: stationGuidance,
+            fare: fare
         )
     }
 
@@ -129,6 +134,40 @@ struct Route: Identifiable, Codable {
             latitudeDelta: latitudeDelta,
             longitudeDelta: longitudeDelta
         )
+    }
+}
+
+/// What a journey costs to ride, in yuan.
+///
+/// `RouteDetailView` used to carry a comment stating that a fare would never appear here, because
+/// the only way to produce one would have been to infer it from a stop count. That reasoning still
+/// holds and this is not that: the amount is read from a routing provider that priced the same two
+/// gates, and it is discarded outright unless the boarding and alighting stations match the ones
+/// this route uses. The standard did not move, the available evidence did.
+struct RouteFare: Codable, Equatable {
+    /// A bus journey between the same two points, costing less than the fare above.
+    ///
+    /// Just-Go plans rail and only rail. But a ¥2 flat bus fare against a ¥6 metro fare is a real
+    /// choice for a rider counting money, and a route screen that knew about it and stayed quiet
+    /// would be keeping a secret rather than keeping scope.
+    struct BusAlternative: Codable, Equatable {
+        let yuan: Double
+        let duration: TimeInterval
+    }
+
+    let yuan: Double
+    let cheaperBus: BusAlternative?
+
+    var formatted: String { Self.formatted(yuan) }
+
+    /// Whole yuan wherever the fare is whole, which is every mainland tariff checked. The decimal
+    /// branch exists so a city that charges half-yuan is rendered rather than rounded into a
+    /// number nobody is charged.
+    static func formatted(_ yuan: Double) -> String {
+        let rounded = (yuan * 10).rounded() / 10
+        return rounded == rounded.rounded()
+            ? "¥\(Int(rounded))"
+            : "¥\(String(format: "%.1f", rounded))"
     }
 }
 

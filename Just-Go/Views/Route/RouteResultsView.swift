@@ -288,7 +288,27 @@ struct RouteResultsView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
+                        // Absent for every unpriced route, which is every city outside the
+                        // provider's coverage. A blank is the honest rendering of "nobody told us".
+                        if let fare = route.fare {
+                            Text(fare.formatted)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .monospacedDigit()
+                                .foregroundStyle(Color.accentColor)
+                        }
                     }
+                }
+
+                // The app does not plan bus routes and is not about to start. Naming the cheaper
+                // one is what an honest app does with a fact it happens to hold.
+                if let bus = route.fare?.cheaperBus {
+                    Label(
+                        cheaperBusLine(bus, against: route),
+                        systemImage: "bus"
+                    )
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 }
 
                 // Full width, below everything: sharing a line with the duration column squeezed
@@ -346,6 +366,35 @@ struct RouteResultsView: View {
         )
     }
 
+    /// One line naming a cheaper bus, and saying plainly that this app will not plan it.
+    ///
+    /// The time difference is stated in whichever direction it actually runs. A bus that is both
+    /// cheaper and faster is unusual and not impossible, and printing "slower" over it would be a
+    /// small lie in service of a tidier sentence.
+    private func cheaperBusLine(_ bus: RouteFare.BusAlternative, against route: Route) -> String {
+        let fare = RouteFare.formatted(bus.yuan)
+        let deltaMinutes = Int((bus.duration - route.totalDuration) / 60)
+        guard abs(deltaMinutes) >= 1 else {
+            return AppLocalization.text(
+                english: "A bus does this for \(fare). Just-Go plans rail only.",
+                simplified: "公交 \(fare) 可达。Just-Go 只规划轨道交通。",
+                traditional: "公車 \(fare) 可達。Just-Go 只規劃軌道交通。"
+            )
+        }
+        let minutes = abs(deltaMinutes)
+        return deltaMinutes > 0
+            ? AppLocalization.text(
+                english: "A bus does this for \(fare), about \(minutes) min slower. Just-Go plans rail only.",
+                simplified: "公交 \(fare) 可达，约慢 \(minutes) 分钟。Just-Go 只规划轨道交通。",
+                traditional: "公車 \(fare) 可達，約慢 \(minutes) 分鐘。Just-Go 只規劃軌道交通。"
+            )
+            : AppLocalization.text(
+                english: "A bus does this for \(fare), about \(minutes) min faster. Just-Go plans rail only.",
+                simplified: "公交 \(fare) 可达，约快 \(minutes) 分钟。Just-Go 只规划轨道交通。",
+                traditional: "公車 \(fare) 可達，約快 \(minutes) 分鐘。Just-Go 只規劃軌道交通。"
+            )
+    }
+
     private func transferEffort(for route: Route) -> String {
         if route.transferCount == 0 {
             return AppLocalization.text(english: "Direct", simplified: "直达", traditional: "直達")
@@ -360,6 +409,12 @@ struct RouteResultsView: View {
         }
         if route.totalDuration == routes.map(\.totalDuration).min() {
             return AppLocalization.localized("Fastest")
+        }
+        // Only claimable when something else was priced to compare against. One priced route among
+        // four unpriced ones is not the cheapest of anything.
+        let fares = routes.compactMap(\.fare?.yuan)
+        if fares.count > 1, let fare = route.fare?.yuan, fare == fares.min() {
+            return AppLocalization.text(english: "Cheapest", simplified: "最便宜", traditional: "最便宜")
         }
         if route.transferCount == routes.map(\.transferCount).min() {
             return AppLocalization.text(english: "Fewest transfers", simplified: "换乘最少", traditional: "換乘最少")

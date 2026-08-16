@@ -30,7 +30,7 @@ final class DIContainer {
     let transferInsightService: TransferInsightService
     /// Measured transfer corridor lengths, when a provider can supply them. Optional because the
     /// app must build, launch and route with no Baidu key at all.
-    let transferGeometryProvider: TransferGeometryProviding?
+    let tripObservationProvider: TripObservationProviding?
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
@@ -53,7 +53,7 @@ final class DIContainer {
         cityService: CityService,
         tripMemoryService: TripMemoryService,
         transferInsightService: TransferInsightService,
-        transferGeometryProvider: TransferGeometryProviding? = nil,
+        tripObservationProvider: TripObservationProviding? = nil,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         tripReminderService: TripReminderService,
@@ -74,7 +74,7 @@ final class DIContainer {
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
         self.transferInsightService = transferInsightService
-        self.transferGeometryProvider = transferGeometryProvider
+        self.tripObservationProvider = tripObservationProvider
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.tripReminderService = tripReminderService
@@ -184,7 +184,7 @@ final class DIContainer {
         let placeSearchProvider = CompositePlaceSearchProvider(
             baidu: baiduClient.map { BaiduPlaceSearchProvider(client: $0) }
         )
-        let transferGeometryProvider = baiduClient.map { BaiduTransferGeometryService(client: $0) }
+        let tripObservationProvider = baiduClient.map { BaiduTripObservationService(client: $0) }
         let metroNetworkProvider = BundledMetroNetworkService()
         // Dedicated ephemeral sessions (no cookies, no shared cache) instead of `URLSession.shared`
         // — a stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
@@ -230,7 +230,7 @@ final class DIContainer {
             walkingRoutes: walkingRouteProvider,
             officialStationInformation: stationInformationRouter,
             stationInformationDirectory: stationInformationDirectory,
-            transferGeometry: transferGeometryProvider
+            tripObservations: tripObservationProvider
         )
         let tripMemoryService = TripMemoryService()
         let transferInsightService = TransferInsightService()
@@ -250,7 +250,7 @@ final class DIContainer {
             cityService: cityService,
             tripMemoryService: tripMemoryService,
             transferInsightService: transferInsightService,
-            transferGeometryProvider: transferGeometryProvider,
+            tripObservationProvider: tripObservationProvider,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             tripReminderService: tripReminderService,

@@ -55,7 +55,7 @@ final class RoutePlanningService {
     /// a route is still a route without it — and because most cities have no such source.
     private let officialStationInformation: (any OfficialStationInformationProviding)?
     private let stationInformationDirectory: StationInformationDirectory?
-    private let transferGeometry: (any TransferGeometryProviding)?
+    private let tripObservations: (any TripObservationProviding)?
     private let serviceHoursResolver = ServiceHoursResolver()
 
     init(
@@ -65,7 +65,7 @@ final class RoutePlanningService {
         walkingRoutes: WalkingRouteProviding = MapKitWalkingRouteProvider(),
         officialStationInformation: (any OfficialStationInformationProviding)? = nil,
         stationInformationDirectory: StationInformationDirectory? = nil,
-        transferGeometry: (any TransferGeometryProviding)? = nil
+        tripObservations: (any TripObservationProviding)? = nil
     ) {
         self.placeSearchProvider = placeSearchProvider
         self.routeProvider = routeProvider
@@ -73,7 +73,7 @@ final class RoutePlanningService {
         self.walkingRoutes = walkingRoutes
         self.officialStationInformation = officialStationInformation
         self.stationInformationDirectory = stationInformationDirectory
-        self.transferGeometry = transferGeometry
+        self.tripObservations = tripObservations
     }
 
     func planRoute(
@@ -150,7 +150,7 @@ final class RoutePlanningService {
                 collected.append(result)
             }
             let ordered = collected.sorted { $0.0 < $1.0 }.map(\.1)
-            return await self.applyingMeasuredTransfers(
+            return await self.applyingTripObservations(
                 to: ordered,
                 from: origin.routeCoordinate,
                 to: destination.routeCoordinate
@@ -158,58 +158,100 @@ final class RoutePlanningService {
         }
     }
 
-    /// Re-costs every change the app has a measured corridor length for.
+    /// Applies everything one trip-observation call answers: measured corridor lengths, and the
+    /// fare for the gate-to-gate journey.
     ///
-    /// This is what makes a transfer's real cost visible to ranking rather than only to the eye:
-    /// until now every change cost the same modelled penalty, so a route through a 231 m
-    /// interchange and one through a 689 m interchange were priced identically and the shorter walk
-    /// won nothing. Correcting the segment durations feeds `totalDuration`, which the strategy
-    /// sorters already order by — no separate ranking rule, and none of the callers change.
+    /// Re-costing the changes is what makes a transfer's real cost visible to ranking rather than
+    /// only to the eye. Until `1421763` every change cost the same modelled penalty, so a route
+    /// through a 231 m interchange and one through a 689 m interchange were priced identically and
+    /// the shorter walk won nothing. Correcting the segment durations feeds `totalDuration`, which
+    /// the strategy sorters already order by, so there is no separate ranking rule and no caller
+    /// changes.
     ///
-    /// Bounded and entirely optional, for the same reason the official-station lookup above is: this
-    /// is an *upgrade* to an answer the app already has offline. No key, no network or a slow
-    /// network all mean the modelled cost stands, never a failed or delayed plan.
-    private func applyingMeasuredTransfers(
+    /// Bounded and entirely optional, for the same reason the official-station lookup above is.
+    /// This is an *upgrade* to an answer the app already has offline. No key, no network or a slow
+    /// network all mean the modelled cost stands and no fare is shown, never a failed or delayed
+    /// plan.
+    private func applyingTripObservations(
         to routes: [Route],
         from origin: CLLocationCoordinate2D,
         to destination: CLLocationCoordinate2D
     ) async -> [Route] {
-        guard let transferGeometry,
-              routes.contains(where: { $0.transferCount > 0 }) else { return routes }
+        // A direct ride has no change to measure but still has a fare, so this no longer skips on
+        // transfer count alone.
+        guard let tripObservations, !routes.isEmpty else { return routes }
 
-        let geometries = await withTaskGroup(of: [TransferGeometry].self) { group in
-            group.addTask { await transferGeometry.geometries(from: origin, to: destination) }
+        let observed = await withTaskGroup(of: TripObservations.self) { group in
+            group.addTask { await tripObservations.observations(from: origin, to: destination) }
             group.addTask {
                 try? await Task.sleep(for: .seconds(3))
-                return []
+                return .none
             }
-            let first = await group.next() ?? []
+            let first = await group.next() ?? .none
             group.cancelAll()
             return first
         }
-        guard !geometries.isEmpty else { return routes }
+        guard !observed.isEmpty else { return routes }
 
+        // Transfers first, fare second. Re-costing rebuilds the route through
+        // `replacingSegments`, which copies field by field, so pricing last keeps the fare out of
+        // reach of anything that could drop it on the way past.
         return routes.map { route in
-            var didMeasure = false
-            var segments = route.segments
-            for index in segments.indices {
-                let segment = segments[index]
-                guard segment.type == .transfer,
-                      let station = segment.fromStationName,
-                      let toLine = segment.lineName,
-                      let fromLine = segment.incomingLineName else { continue }
-                let key = TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
-                guard let match = geometries.first(where: { $0.matches(key) }) else { continue }
-                segments[index] = segment.measuringTransfer(distance: Double(match.distanceMetres))
-                didMeasure = true
-            }
-            guard didMeasure else { return route }
-
-            let corrected = route.totalDuration
-                - route.segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
-                + segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
-            return route.replacingSegments(segments, totalDuration: max(60, corrected))
+            let measured = measuringTransfers(in: route, with: observed.transfers)
+            return pricing(measured, with: observed)
         }
+    }
+
+    /// Re-costs the changes this route makes, where a corridor was measured for one.
+    private func measuringTransfers(in route: Route, with geometries: [TransferGeometry]) -> Route {
+        guard !geometries.isEmpty else { return route }
+
+        var didMeasure = false
+        var segments = route.segments
+        for index in segments.indices {
+            let segment = segments[index]
+            guard segment.type == .transfer,
+                  let station = segment.fromStationName,
+                  let toLine = segment.lineName,
+                  let fromLine = segment.incomingLineName else { continue }
+            let key = TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
+            guard let match = geometries.first(where: { $0.matches(key) }) else { continue }
+            segments[index] = segment.measuringTransfer(distance: Double(match.distanceMetres))
+            didMeasure = true
+        }
+        guard didMeasure else { return route }
+
+        let corrected = route.totalDuration
+            - route.segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
+            + segments.reduce(0) { $0 + ($1.type == .transfer ? $1.duration : 0) }
+        return route.replacingSegments(segments, totalDuration: max(60, corrected))
+    }
+
+    /// Attaches a fare, but only to a route that boards and alights where the priced journey did.
+    ///
+    /// The station pair is the whole justification. A Chinese metro tariff is charged on the entry
+    /// and exit gates rather than the path between them, which is why a fare observed on someone
+    /// else's route is still this route's fare when the gates agree, and is a different number the
+    /// moment they do not. No match leaves `fare` nil and the screens print nothing, which is the
+    /// same rule the exit names and corridor lengths already follow.
+    private func pricing(_ route: Route, with observed: TripObservations) -> Route {
+        let rides = route.segments.filter { $0.type.isTransit }
+        guard let boarding = rides.first?.fromStationName,
+              let alighting = rides.last?.toStationName,
+              let fare = observed.railFares.first(where: {
+                  $0.matches(boarding: boarding, alighting: alighting)
+              }) else { return route }
+
+        var priced = route
+        priced.fare = RouteFare(
+            yuan: fare.yuan,
+            // Only worth naming when it actually undercuts the fare the rider would otherwise pay.
+            cheaperBus: observed.cheaperBus.flatMap { bus in
+                guard bus.yuan < fare.yuan else { return nil }
+                return RouteFare.BusAlternative(yuan: bus.yuan, duration: bus.duration)
+            }
+        )
+        return priced
     }
 
     // MARK: - Official station information
@@ -1098,6 +1140,22 @@ final class RoutePlanningService {
                     return $0.strategy == .fastest
                 }
                 return $0.totalDuration < $1.totalDuration
+            }
+        case .cheapest:
+            // Unpriced routes sink rather than sort as free. A route nobody priced is not a cheap
+            // route, and floating it to the top of a cost sort would be the app asserting the one
+            // thing it does not know.
+            return routes.sorted {
+                switch ($0.fare?.yuan, $1.fare?.yuan) {
+                case let (lhs?, rhs?):
+                    return lhs == rhs ? $0.totalDuration < $1.totalDuration : lhs < rhs
+                case (.some, nil):
+                    return true
+                case (nil, .some):
+                    return false
+                case (nil, nil):
+                    return $0.totalDuration < $1.totalDuration
+                }
             }
         case .leastWalking:
             return routes.sorted {

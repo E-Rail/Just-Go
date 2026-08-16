@@ -178,23 +178,39 @@ if File.file?(baidu_client_path)
       baidu_client_source.include?(marker)
   end
 
-  geometry_path = File.join(ROOT, "Just-Go/Services/Transit/BaiduTransferGeometryService.swift")
-  if File.file?(geometry_path)
-    geometry_source = File.read(geometry_path, encoding: "UTF-8")
+  # Named, and required to exist. This used to skip silently when the file was absent, which meant
+  # renaming the consumer would have turned the persistence check off without failing anything.
+  observation_path = File.join(ROOT, "Just-Go/Services/Transit/BaiduTripObservationService.swift")
+  if File.file?(observation_path)
+    observation_source = File.read(observation_path, encoding: "UTF-8")
     %w[UserDefaults FileManager setCodable NSKeyedArchiver].each do |marker|
-      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduTransferGeometryService)" if
-        geometry_source.include?(marker)
+      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduTripObservationService)" if
+        observation_source.include?(marker)
     end
+  else
+    errors << "BaiduTripObservationService.swift is missing; the no-persistence check cannot run"
   end
 
-  # No committed byte may have come from Baidu.
+  # No committed byte may have come from Baidu. Fare and taxi amounts are operator data under the
+  # same rule as the LicenseRef-External-Link-Only cities: read on the device, kept nowhere. A
+  # generated file carrying a price is the shape this leak would actually take.
+  #
+  # Timetables are deliberately not listed here. `oss_data_validators.rb` already fails a pack whose
+  # `schedules` is non-empty, and matching on `first_time`/`last_time` flags the source-rule files
+  # that legitimately map an operator's key names onto model fields ("firstTrain": "first_time").
+  fare_markers = %w[price_detail ticket_price taxi_fee 票价 票價]
   committed_data = Dir.glob(File.join(ROOT, "{DataPacks,StationInfoAPI}/**/*.json")) +
                    Dir.glob(File.join(ROOT, "Just-Go/Resources/**/*.json"))
   committed_data.each do |path|
     contents = File.read(path, encoding: "UTF-8")
-    next unless contents.include?("baidu") || contents.include?("百度")
+    relative = path.delete_prefix("#{ROOT}/")
 
-    errors << "Baidu-derived content is committed: #{path.delete_prefix("#{ROOT}/")}"
+    errors << "Baidu-derived content is committed: #{relative}" if
+      contents.include?("baidu") || contents.include?("百度")
+
+    leaked = fare_markers.select { |marker| contents.include?(marker) }
+    errors << "Operator fare/timetable content is committed in #{relative}: #{leaked.join(", ")}" unless
+      leaked.empty?
   end
 end
 

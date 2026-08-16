@@ -278,6 +278,33 @@ class SourceRulesTest < Minitest::Test
     assert_includes PLANNING_SOURCE, "case (nil, .some):"
   end
 
+  def test_provider_hours_never_override_the_operator
+    # The operator is the authority on its own timetable. This fallback exists for the cities where
+    # nothing answers at all, which is most of them: no bundled pack carries a schedule, because
+    # operator schedule content must not be committed.
+    assert_includes PLANNING_SOURCE, "if route.serviceStatus == .unknown, !observed.lineHours.isEmpty",
+                    "service hours may only be filled in where no other source replied"
+  end
+
+  def test_one_leg_walk_is_shared_between_both_hour_sources
+    # Two copies of "which failing ride does this trip get judged by" would eventually disagree.
+    assert_includes PLANNING_SOURCE, "private func serviceVerdict("
+    assert_equal 2, PLANNING_SOURCE.scan("serviceVerdict(for: route, departure:").size,
+                 "both the operator path and the fallback must reduce through the same walk"
+  end
+
+  def test_taxi_is_quoted_only_against_the_clock
+    # Beside a trip running normally it is noise; beside one nobody could time it is a guess.
+    assert_includes PLANNING_SOURCE, "case .lastTrainSoon, .serviceEndedToday:"
+    assert_includes PLANNING_SOURCE, "case .running, .notYetStarted, .unknown:"
+  end
+
+  def test_taxi_hour_is_read_in_china_time
+    # The tariff windows are the city's own local hours. A rider planning from another timezone
+    # still pays the Chinese night rate.
+    assert_includes PLANNING_SOURCE, "ChinaClock.minutesOfDay(of: departure) / 60"
+  end
+
   def test_nothing_baidu_derived_is_persisted
     %w[UserDefaults FileManager setCodable NSKeyedArchiver].each do |marker|
       refute_includes SOURCE, marker,

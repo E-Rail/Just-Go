@@ -50,6 +50,12 @@ struct Route: Identifiable, Codable {
     /// nobody priced it and the screens say nothing, which is the answer for every city outside
     /// Baidu's coverage and for every route whose boarding and alighting stations went unmatched.
     var fare: RouteFare?
+    /// What a taxi over the same ground costs at the hour this trip departs.
+    ///
+    /// Carried only when the trip is against the clock, meaning the last train is close or already
+    /// gone. The app already knew that much and said nothing about what it would cost to be wrong,
+    /// which for a rider on a late shift is the part that decides whether they run for the train.
+    var missedTrainTaxiYuan: Double?
 
     var boardingTransitSegment: RouteSegment? {
         segments.first { $0.type.isTransit }
@@ -77,7 +83,8 @@ struct Route: Identifiable, Codable {
             dataCoverage: dataCoverage,
             serviceStatus: serviceStatus,
             stationGuidance: stationGuidance,
-            fare: fare
+            fare: fare,
+            missedTrainTaxiYuan: missedTrainTaxiYuan
         )
     }
 

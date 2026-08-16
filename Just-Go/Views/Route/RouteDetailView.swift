@@ -472,7 +472,10 @@ struct RouteDetailView: View {
         if notice != nil || officialResource != nil || !serviceNotices.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 if notice != nil {
-                    ServiceStatusBanner(status: route.serviceStatus)
+                    ServiceStatusBanner(
+                        status: route.serviceStatus,
+                        missedTrainTaxiYuan: route.missedTrainTaxiYuan
+                    )
                         .padding(.horizontal, 4)
                         .padding(.top, 4)
                 }

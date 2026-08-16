@@ -153,7 +153,8 @@ final class RoutePlanningService {
             return await self.applyingTripObservations(
                 to: ordered,
                 from: origin.routeCoordinate,
-                to: destination.routeCoordinate
+                to: destination.routeCoordinate,
+                tripAnchor: tripAnchor
             )
         }
     }
@@ -175,7 +176,8 @@ final class RoutePlanningService {
     private func applyingTripObservations(
         to routes: [Route],
         from origin: CLLocationCoordinate2D,
-        to destination: CLLocationCoordinate2D
+        to destination: CLLocationCoordinate2D,
+        tripAnchor: TripTimeAnchor
     ) async -> [Route] {
         // A direct ride has no change to measure but still has a fare, so this no longer skips on
         // transfer count alone.
@@ -193,13 +195,73 @@ final class RoutePlanningService {
         }
         guard !observed.isEmpty else { return routes }
 
-        // Transfers first, fare second. Re-costing rebuilds the route through
-        // `replacingSegments`, which copies field by field, so pricing last keeps the fare out of
-        // reach of anything that could drop it on the way past.
+        // Transfers first, then everything that only annotates. Re-costing rebuilds the route
+        // through `replacingSegments`, which copies field by field, so the annotations go last and
+        // stay out of reach of anything that could drop them on the way past.
         return routes.map { route in
             let measured = measuringTransfers(in: route, with: observed.transfers)
-            return pricing(measured, with: observed)
+            let timed = upgradingServiceHours(of: measured, with: observed, tripAnchor: tripAnchor)
+            return pricing(timed, with: observed)
         }
+    }
+
+    /// Answers "can I still get home?" for the cities no operator answers for, and prices the
+    /// consequence of the answer being no.
+    ///
+    /// Only routes still reading `.unknown` are touched, so an operator that published its own
+    /// timetable keeps the last word on it. That leaves this as the source for the cities where
+    /// nothing else replies at all, which is most of them: no bundled pack carries a timetable,
+    /// because operator schedule content must not be committed.
+    ///
+    /// The taxi price rides along because it is the same question. The app has warned about the
+    /// last train for a long time without saying what missing it costs, and the two facts arrive
+    /// in the same response.
+    private func upgradingServiceHours(
+        of route: Route,
+        with observed: TripObservations,
+        tripAnchor: TripTimeAnchor
+    ) -> Route {
+        let departure = TripTimeContext(
+            anchor: tripAnchor,
+            totalDuration: route.totalDuration
+        ).departureDate
+
+        var upgraded = route
+        if route.serviceStatus == .unknown, !observed.lineHours.isEmpty {
+            let verdict = serviceVerdict(for: route, departure: departure) { segment in
+                guard let station = segment.fromStationName, let line = segment.lineName else { return [] }
+                return observed.lineHours
+                    .filter { $0.matches(lineName: line, boardingStation: station) }
+                    .map {
+                        StationServiceWindow(
+                            lineName: $0.lineName,
+                            // Baidu reports the hours of the direction it routed the rider in, so
+                            // there is no separate direction to carry and nothing to match on.
+                            direction: nil,
+                            firstTime: $0.firstTrain,
+                            lastTime: $0.lastTrain
+                        )
+                    }
+            }
+            if verdict.status != .unknown {
+                upgraded.serviceStatus = verdict.status
+                if let warning = verdict.warning { upgraded.warnings.append(warning) }
+            }
+        }
+
+        // Only where the rider is actually against the clock. Quoting a taxi beside a trip that is
+        // running normally would be noise, and beside one nobody could time it would be a guess.
+        switch upgraded.serviceStatus {
+        case .lastTrainSoon, .serviceEndedToday:
+            // China Standard Time, because the tariff windows are the city's own local hours and a
+            // rider planning this trip from another timezone still pays the Chinese night rate.
+            upgraded.missedTrainTaxiYuan = observed.taxi?.yuan(
+                atHour: ChinaClock.minutesOfDay(of: departure) / 60
+            )
+        case .running, .notYetStarted, .unknown:
+            break
+        }
+        return upgraded
     }
 
     /// Re-costs the changes this route makes, where a corridor was measured for one.
@@ -356,6 +418,40 @@ final class RoutePlanningService {
             totalDuration: route.totalDuration
         ).departureDate
 
+        // Gathered first so the verdict below is a pure reduction, shared with the fallback path
+        // that has no operator to await. Without that split the leg walk existed twice and the two
+        // copies could disagree about which failing ride a trip should be judged by.
+        var windowsBySegment: [UUID: [StationServiceWindow]] = [:]
+        for segment in route.segments {
+            guard segment.type.isTransit, let stationName = segment.fromStationName else { continue }
+
+            // The operator first: it is the authority on its own timetable and the only source that
+            // answers at all today. The pack remains the fallback so a city that later ships
+            // redistributable times keeps working with no change here.
+            let official = Self.serviceWindows(from: snapshots[stationName])
+            windowsBySegment[segment.id] = official.isEmpty
+                ? await officialStationData.serviceWindows(
+                    cityID: segment.packCityID ?? cityID,
+                    stationName: stationName
+                )
+                : official
+        }
+
+        return serviceVerdict(for: route, departure: departure) { windowsBySegment[$0.id] ?? [] }
+    }
+
+    /// Reduces a route's rides to the one service verdict the whole trip deserves.
+    ///
+    /// Every ride is checked at the moment it departs rather than only the first. The train a rider
+    /// actually misses is rarely the first one, it is the connection, which departs later in the
+    /// evening and stops earlier. A definite failure on any leg beats "fine" on the others, and a
+    /// leg nobody can answer for keeps the whole trip `.unknown` rather than letting a verified leg
+    /// speak for it.
+    private func serviceVerdict(
+        for route: Route,
+        departure: Date,
+        windows: (RouteSegment) -> [StationServiceWindow]
+    ) -> (status: RouteServiceStatus, warning: RouteWarning?) {
         var elapsed: TimeInterval = 0
         var worst: (status: RouteServiceStatus, segment: RouteSegment)?
         var sawUnknown = false
@@ -363,22 +459,11 @@ final class RoutePlanningService {
 
         for segment in route.segments {
             defer { elapsed += segment.duration }
-            guard segment.type.isTransit, let stationName = segment.fromStationName else { continue }
-
-            // The operator first: it is the authority on its own timetable and the only source that
-            // answers at all today. The pack remains the fallback so a city that later ships
-            // redistributable times keeps working with no change here.
-            let official = Self.serviceWindows(from: snapshots[stationName])
-            let windows = official.isEmpty
-                ? await officialStationData.serviceWindows(
-                    cityID: segment.packCityID ?? cityID,
-                    stationName: stationName
-                )
-                : official
+            guard segment.type.isTransit, segment.fromStationName != nil else { continue }
 
             let status = serviceHoursResolver.status(
                 boardingLineName: segment.lineName,
-                windows: windows,
+                windows: windows(segment),
                 at: departure.addingTimeInterval(elapsed)
             )
             if status == .unknown {

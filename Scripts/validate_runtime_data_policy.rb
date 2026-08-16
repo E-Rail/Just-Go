@@ -191,6 +191,20 @@ if File.file?(baidu_client_path)
     errors << "BaiduTripObservationService.swift is missing; the no-persistence check cannot run"
   end
 
+  # The cycling provider gets the same treatment, with one marker relaxed: it reads a rider's own
+  # "I ride an electric bike" preference out of UserDefaults, which is the rider's setting rather
+  # than anything the provider released. Writing is still forbidden.
+  riding_path = File.join(ROOT, "Just-Go/Services/Map/BaiduRidingRouteProvider.swift")
+  if File.file?(riding_path)
+    riding_source = File.read(riding_path, encoding: "UTF-8")
+    ["UserDefaults.standard.set", "FileManager", "setCodable", "NSKeyedArchiver"].each do |marker|
+      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduRidingRouteProvider)" if
+        riding_source.include?(marker)
+    end
+  else
+    errors << "BaiduRidingRouteProvider.swift is missing; the no-persistence check cannot run"
+  end
+
   # No committed byte may have come from Baidu. Fare and taxi amounts are operator data under the
   # same rule as the LicenseRef-External-Link-Only cities: read on the device, kept nowhere. A
   # generated file carrying a price is the shape this leak would actually take.

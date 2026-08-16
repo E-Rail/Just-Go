@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("showAccessibilityBadges") private var showBadges = true
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
+    @AppStorage(AccessBicycle.storageKey) private var usesElectricBike = false
     @State private var showTour = false
     @State private var showQuickTags = false
     @State private var showClearCacheConfirmation = false
@@ -20,6 +21,7 @@ struct SettingsView: View {
                 themeSection
                 languageSection
                 notificationsSection
+                travelSection
                 tagsSection
                 dataSection
                 accessibilitySection
@@ -190,4 +192,27 @@ struct SettingsView: View {
         }
     }
 
+    /// How the rider covers a first or last mile too long to walk. The distance ladder that picks
+    /// walking, cycling or driving is unchanged; this only says which kind of bike the cycling
+    /// answer means, and it changes both the route drawn and the time quoted.
+    private var travelSection: some View {
+        Section {
+            Toggle(
+                AppLocalization.text(
+                    english: "I ride an electric bike",
+                    simplified: "我骑电动车",
+                    traditional: "我騎電動車"
+                ),
+                isOn: $usesElectricBike
+            )
+        } header: {
+            Text(AppLocalization.text(english: "Getting around", simplified: "出行方式", traditional: "出行方式"))
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Used for the ride to and from the station.",
+                simplified: "用于往返车站的接驳路段。",
+                traditional: "用於往返車站的接駁路段。"
+            ))
+        }
+    }
 }

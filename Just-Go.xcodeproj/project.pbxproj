@@ -111,6 +111,7 @@
 		A1000903 /* Route/TransferPacePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000903 /* Route/TransferPacePrompt.swift */; };
 		A1000902 /* Data/TransferInsightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000902 /* Data/TransferInsightService.swift */; };
 		A1000904 /* Map/BaiduMapsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000904 /* Map/BaiduMapsClient.swift */; };
+		A1000907 /* Map/BaiduRidingRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000907 /* Map/BaiduRidingRouteProvider.swift */; };
 		A1000905 /* Map/BaiduPlaceSearchProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000905 /* Map/BaiduPlaceSearchProvider.swift */; };
 		A1000906 /* Transit/BaiduTripObservationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000906 /* Transit/BaiduTripObservationService.swift */; };
 		A1000901 /* Transit/TransferPace.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000901 /* Transit/TransferPace.swift */; };
@@ -231,6 +232,7 @@
 		A2000903 /* Route/TransferPacePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferPacePrompt.swift; sourceTree = "<group>"; };
 		A2000902 /* Data/TransferInsightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TransferInsightService.swift; sourceTree = "<group>"; };
 		A2000904 /* Map/BaiduMapsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduMapsClient.swift; sourceTree = "<group>"; };
+		A2000907 /* Map/BaiduRidingRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduRidingRouteProvider.swift; sourceTree = "<group>"; };
 		A2000905 /* Map/BaiduPlaceSearchProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduPlaceSearchProvider.swift; sourceTree = "<group>"; };
 		A2000906 /* Transit/BaiduTripObservationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BaiduTripObservationService.swift; sourceTree = "<group>"; };
 		A2000901 /* Transit/TransferPace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransferPace.swift; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 				A2000306 /* Notifications/TripReminderService.swift */,
 				A200001B /* Map/MapKitProviders.swift */,
 				A2000904 /* Map/BaiduMapsClient.swift */,
+				A2000907 /* Map/BaiduRidingRouteProvider.swift */,
 				A2000905 /* Map/BaiduPlaceSearchProvider.swift */,
 				A2000906 /* Transit/BaiduTripObservationService.swift */,
 				A2000701 /* Diagnostics/MainThreadHangMonitor.swift */,
@@ -574,6 +577,7 @@
 				A1000074 /* Components/Transit/StepControls.swift in Sources */,
 				A100001B /* Map/MapKitProviders.swift in Sources */,
 				A1000904 /* Map/BaiduMapsClient.swift in Sources */,
+				A1000907 /* Map/BaiduRidingRouteProvider.swift in Sources */,
 				A1000905 /* Map/BaiduPlaceSearchProvider.swift in Sources */,
 				A1000906 /* Transit/BaiduTripObservationService.swift in Sources */,
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,

@@ -209,10 +209,16 @@ final class DIContainer {
             realtimeArrivals: realtimeArrivalProvider,
             officialResourceCatalogLoader: { try .bundled() }
         )
-        // One walking-leg builder for both callers: the graph walks to the station, enrichment
+        // One access-leg builder for both callers: the graph walks to the station, enrichment
         // re-walks to the door it picks. Two instances would be harmless but two implementations
         // would not, so the shared one is passed explicitly rather than defaulted twice.
-        let walkingRouteProvider = MapKitWalkingRouteProvider()
+        //
+        // Walking and driving stay with MapKit. Cycling goes to Baidu, which has a cycling router
+        // where MapKit has no cycling transport type at all; with no key the composite is pure
+        // MapKit and the bike leg is the re-timed walking shape it has always been.
+        let walkingRouteProvider = CompositeAccessRouteProvider(
+            riding: baiduClient.map { BaiduRidingRouteProvider(client: $0) }
+        )
         let transitRouteProvider = BundledMetroRouteProvider(
             metroNetworks: metroNetworkProvider,
             walkingRoutes: walkingRouteProvider

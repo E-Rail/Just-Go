@@ -124,9 +124,9 @@ extension RouteServiceStatus {
             return nil
         case .lastTrainSoon(let minutes):
             return AppLocalization.text(
-                english: "Last train in about \(minutes) min — leave soon",
-                simplified: "末班车约\(minutes)分钟后 — 请尽快出发",
-                traditional: "末班車約\(minutes)分鐘後 — 請盡快出發"
+                english: "Last train in about \(minutes) min. Leave soon.",
+                simplified: "末班车约\(minutes)分钟后，请尽快出发。",
+                traditional: "末班車約\(minutes)分鐘後，請盡快出發。"
             )
         case .serviceEndedToday:
             return AppLocalization.text(
@@ -211,9 +211,9 @@ struct DeparturePlan: Equatable {
             )
         }
         return AppLocalization.text(
-            english: "Leave by \(clock) — in \(minutes) min",
-            simplified: "请于 \(clock) 前出发 — 还有 \(minutes) 分钟",
-            traditional: "請於 \(clock) 前出發 — 還有 \(minutes) 分鐘"
+            english: "Leave by \(clock), in \(minutes) min",
+            simplified: "请于 \(clock) 前出发，还有 \(minutes) 分钟",
+            traditional: "請於 \(clock) 前出發，還有 \(minutes) 分鐘"
         )
     }
 

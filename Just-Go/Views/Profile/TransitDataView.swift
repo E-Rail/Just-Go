@@ -73,9 +73,9 @@ struct TransitDataView: View {
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(AppLocalization.text(
-                                            english: "Official links for 58 reviewed cities — 43 have at least one; maps and accessibility pages are rarer",
-                                            simplified: "58 个已审核城市的官方链接——其中 43 个至少有一条；地图与无障碍页面较少",
-                                            traditional: "58 個已審核城市的官方連結——其中 43 個至少有一條；地圖與無障礙頁面較少"
+                                            english: "Official links for 58 reviewed cities. 43 have at least one. Maps and accessibility pages are rarer.",
+                                            simplified: "58 个已审核城市的官方链接，其中 43 个至少有一条。地图与无障碍页面较少。",
+                                            traditional: "58 個已審核城市的官方連結，其中 43 個至少有一條。地圖與無障礙頁面較少。"
                                         ))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
@@ -536,7 +536,7 @@ private struct OfficialResourceCityView: View {
 
             Section {
                 Text(AppLocalization.text(
-                    english: "Checked \(city.verifiedAt). These are the operator's own maps — we don't add station layouts or door positions.",
+                    english: "Checked \(city.verifiedAt). These are the operator's own maps. Just-Go adds no station layouts or door positions.",
                     simplified: "核对于 \(city.verifiedAt)。这些是运营方自己的地图，我们不会另行标注站内路线或车门位置。",
                     traditional: "核對於 \(city.verifiedAt)。這些是營運方自己的地圖，我們不會另行標註站內路線或車門位置。"
                 ))

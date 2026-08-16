@@ -1062,7 +1062,7 @@ final class RoutePlanningService {
                 }
             } else {
                 notes = [AppLocalization.text(
-                    english: "Exit \(point.name) is estimated from station data — confirm on site.",
+                    english: "Exit \(point.name) is estimated from station data. Confirm it on site.",
                     simplified: "出入口 \(point.name) 根据车站数据估算，请到现场确认。",
                     traditional: "出入口 \(point.name) 根據車站資料估算，請到現場確認。"
                 )]
@@ -1072,7 +1072,7 @@ final class RoutePlanningService {
             // most entrances are simply unsurveyed, which is not the same as being accessible.
             if recommendation.stepFreeUnavailable {
                 notes.append(AppLocalization.text(
-                    english: "No step-free entrance is recorded at \(guide.stationName) — this is the nearest one.",
+                    english: "No step-free entrance is recorded at \(guide.stationName). This is the nearest one.",
                     simplified: "\(guide.stationName)暂无无障碍出入口记录，这是最近的一个。",
                     traditional: "\(guide.stationName)暫無無障礙出入口記錄，這是最近的一個。"
                 ))

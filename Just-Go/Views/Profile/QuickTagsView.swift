@@ -152,9 +152,9 @@ struct QuickTagsView: View {
                 }
             } message: { _ in
                 Text(AppLocalization.text(
-                    english: "Quick Tags appear as one-tap chips in the route planner.",
-                    simplified: "快捷标签会显示在路线规划的一键填入按钮中。",
-                    traditional: "快捷標籤會顯示在路線規劃的一鍵填入按鈕中。"
+                    english: "Quick tags fill a start or destination field in one tap.",
+                    simplified: "快捷标签可一键填入起点或终点。",
+                    traditional: "快捷標籤可一鍵填入起點或終點。"
                 ))
             }
             .alert(

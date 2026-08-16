@@ -238,15 +238,15 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
         let hasStairs = steps.contains(where: \.hasStairs)
         var notes = walk.accessibilityNotes
         notes.append(AppLocalization.text(
-            english: "Follows the walking route — no cycling directions are published",
-            simplified: "沿步行路线绘制 — 没有可用的骑行导航数据",
-            traditional: "沿步行路線繪製 — 沒有可用的騎行導航資料"
+            english: "Follows the walking route. No cycling directions are published.",
+            simplified: "沿步行路线绘制，没有可用的骑行导航数据。",
+            traditional: "沿步行路線繪製，沒有可用的騎行導航資料。"
         ))
         if hasStairs {
             notes.append(AppLocalization.text(
-                english: "This route includes stairs — you may have to walk the bike",
-                simplified: "此路线含台阶 — 可能需要推行",
-                traditional: "此路線含階梯 — 可能需要推行"
+                english: "This route includes stairs. You may have to walk the bike.",
+                simplified: "此路线含台阶，可能需要推行。",
+                traditional: "此路線含階梯，可能需要推行。"
             ))
         }
         // 14 km/h: a shared bike in city traffic, and slow enough that a rider who beats it is

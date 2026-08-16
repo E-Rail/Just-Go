@@ -68,13 +68,13 @@ final class TripReminderService {
         content.title = AppLocalization.text(english: "Get ready to get off", simplified: "准备下车", traditional: "準備下車")
         if let exitHint, !exitHint.isEmpty {
             content.body = AppLocalization.text(
-                english: "Approaching \(stationName) — get off and head to \(exitHint). (estimated from route time)",
+                english: "Approaching \(stationName). Get off and head to \(exitHint). (estimated from route time)",
                 simplified: "即将到达\(stationName)，请下车前往\(exitHint)。（根据线路时间估算）",
                 traditional: "即將抵達\(stationName)，請下車前往\(exitHint)。（根據路線時間估算）"
             )
         } else {
             content.body = AppLocalization.text(
-                english: "Approaching \(stationName) — get ready to get off. (estimated from route time)",
+                english: "Approaching \(stationName). Get ready to get off. (estimated from route time)",
                 simplified: "即将到达\(stationName)，请准备下车。（根据线路时间估算）",
                 traditional: "即將抵達\(stationName)，請準備下車。（根據路線時間估算）"
             )

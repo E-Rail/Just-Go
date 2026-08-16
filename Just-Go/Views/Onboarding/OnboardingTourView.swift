@@ -28,12 +28,12 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Welcome to Just-Go", simplified: "欢迎使用 Just-Go", traditional: "歡迎使用 Just-Go"),
                 points: [
                     ("map", AppLocalization.text(
-                        english: "Metro routing for 53 Chinese cities. The map is the app — pan it, or search for anywhere.",
-                        simplified: "覆盖中国 53 个城市的地铁规划。地图就是主界面——直接拖动，或搜索任意地点。",
-                        traditional: "涵蓋中國 53 個城市的地鐵規劃。地圖就是主畫面——直接拖曳，或搜尋任何地點。"
+                        english: "Metro routing for 53 Chinese cities. Pan the map, or search for a place.",
+                        simplified: "覆盖中国 53 个城市的地铁规划。可以拖动地图，也可以搜索地点。",
+                        traditional: "涵蓋中國 53 個城市的地鐵規劃。可以拖曳地圖，也可以搜尋地點。"
                     )),
                     ("wifi.slash", AppLocalization.text(
-                        english: "Routes are planned on your phone, so they work underground and with no signal.",
+                        english: "Routes are planned on your phone. They work underground, and with no signal.",
                         simplified: "路线在手机本地规划，地下无信号也能用。",
                         traditional: "路線在手機本機規劃，地下無訊號也能用。"
                     )),
@@ -49,25 +49,25 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Compare and go", simplified: "比较路线，出发", traditional: "比較路線，出發"),
                 points: [
                     ("list.bullet", AppLocalization.text(
-                        english: "Every search offers alternatives — fastest, fewest transfers, least walking.",
-                        simplified: "每次搜索都提供多条备选：最快、换乘最少、步行最少。",
-                        traditional: "每次搜尋都提供多條備選：最快、換乘最少、步行最少。"
+                        english: "A search returns several routes. Sort them by time, by fare, or by fewest changes.",
+                        simplified: "一次搜索会给出多条路线，可按时间、票价或换乘次数排序。",
+                        traditional: "一次搜尋會給出多條路線，可按時間、票價或轉乘次數排序。"
                     )),
                     ("figure.walk", AppLocalization.text(
-                        english: "Long first or last miles switch from walking to cycling or driving, and say which.",
-                        simplified: "首末段较长时会自动改为骑行或驾车，并注明所用方式。",
-                        traditional: "首末段較長時會自動改為騎行或駕車，並註明所用方式。"
+                        english: "A long first or last stretch switches to cycling or driving. The route says which.",
+                        simplified: "首末段较长时会改为骑行或驾车，路线上会注明。",
+                        traditional: "首末段較長時會改為騎行或駕車，路線上會註明。"
                     )),
                     ("play.circle.fill", AppLocalization.text(
-                        english: "Navigate walks you through one step at a time, with an alert before your stop.",
-                        simplified: "“导航”一步一步带您走完全程，到站前提醒。",
-                        traditional: "「導航」一步一步帶您走完全程，到站前提醒。"
+                        english: "Navigate gives one step at a time, and alerts before your stop.",
+                        simplified: "“导航”每次只给一步，到站前会提醒。",
+                        traditional: "「導航」每次只給一步，到站前會提醒。"
                     ))
                 ]
             ),
             TourPage(
                 icon: "checkmark.seal.fill",
-                title: AppLocalization.text(english: "Honest information", simplified: "诚实的信息", traditional: "誠實的資訊"),
+                title: AppLocalization.text(english: "Where the data comes from", simplified: "数据来自哪里", traditional: "資料來自哪裡"),
                 points: [
                     ("checkmark.seal", AppLocalization.text(
                         english: "Green means the operator published it. Orange means estimated. Missing data says so.",
@@ -80,23 +80,23 @@ struct OnboardingTourView: View {
                         traditional: "在城市公開資料的車站，會顯示電梯與無障礙出入口。"
                     )),
                     ("clock", AppLocalization.text(
-                        english: "Where the operator publishes first and last trains, every leg is checked against them.",
-                        simplified: "运营方公布首末班车时，每一段行程都会据此核对。",
-                        traditional: "營運方公布首末班車時，每一段行程都會據此核對。"
+                        english: "Each leg is checked against first and last train times where those are published.",
+                        simplified: "有首末班车数据时，每一段行程都会据此核对。",
+                        traditional: "有首末班車資料時，每一段行程都會據此核對。"
                     ))
                 ]
             ),
             TourPage(
                 icon: "paintpalette.fill",
-                title: AppLocalization.text(english: "Make it yours", simplified: "打造您的专属", traditional: "打造您的專屬"),
+                title: AppLocalization.text(english: "Set it up", simplified: "个性化设置", traditional: "個人化設定"),
                 points: [
                     ("tag.fill", AppLocalization.text(
-                        english: "Save Home, Work and your own tags, then fill a field with one tap.",
-                        simplified: "保存家、公司和自定义标签，之后一点即可填入。",
-                        traditional: "儲存家、公司和自訂標籤，之後一點即可填入。"
+                        english: "Save Home, Work and your own tags, then fill a field by tapping one.",
+                        simplified: "保存家、公司和自定义标签，之后点一下就能填入。",
+                        traditional: "儲存家、公司和自訂標籤，之後點一下就能填入。"
                     )),
                     ("figure.roll", AppLocalization.text(
-                        english: "Set step-free needs once in Profile → Accessibility; route search follows them.",
+                        english: "Set step-free needs once in Profile → Accessibility. Route search follows them.",
                         simplified: "在“个人 → 无障碍”中设置一次无障碍需求，路线搜索会据此规划。",
                         traditional: "在「個人 → 無障礙」中設定一次無障礙需求，路線搜尋會據此規劃。"
                     ))

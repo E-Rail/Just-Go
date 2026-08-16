@@ -81,7 +81,7 @@ struct AccessibilitySettingsView: View {
                     ? AppLocalization.text(english: "On", simplified: "已开启", traditional: "已開啟")
                     : AppLocalization.text(english: "Off", simplified: "未开启", traditional: "未開啟"),
                 path: AppLocalization.text(
-                    english: "Turn on in Settings > Accessibility > VoiceOver — or ask Siri, or triple-click the side button.",
+                    english: "Turn on in Settings > Accessibility > VoiceOver. You can also ask Siri, or triple-click the side button.",
                     simplified: "请在 设置 > 辅助功能 > 旁白 中开启，也可通过 Siri 或连按三下侧边按钮。",
                     traditional: "請在 設定 > 輔助使用 > 旁白 中開啟，也可透過 Siri 或連按三下側邊按鈕。"
                 )

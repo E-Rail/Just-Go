@@ -232,7 +232,7 @@ extension BundledMetroRouteProvider {
         // rider can read the gates. Saying the wrong thing sends them through the wrong one.
         if link.fare == .continuous {
             notes.append(AppLocalization.text(
-                english: "Counts as one trip — no second fare",
+                english: "Counts as one trip, with no second fare",
                 simplified: "虚拟换乘，计为一次行程，不重复计费",
                 traditional: "虛擬換乘，計為一次行程，不重複計費"
             ))

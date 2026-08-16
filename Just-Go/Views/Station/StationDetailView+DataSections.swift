@@ -689,7 +689,7 @@ extension StationDetailView {
             )
         case .officialContextOnly:
             return AppLocalization.text(
-                english: "Official line/operator context only — no dedicated station page.",
+                english: "Official line and operator context only. There is no dedicated station page.",
                 simplified: "仅有官方线路或运营背景资料，没有本站专属页面。",
                 traditional: "僅有官方路線或營運背景資料，沒有本站專屬頁面。"
             )

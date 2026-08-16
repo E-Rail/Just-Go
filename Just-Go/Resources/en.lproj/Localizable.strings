@@ -20,7 +20,7 @@
 "Elevator" = "Elevator";
 "Escalator" = "Escalator";
 "Fastest" = "Fastest";
-"Finding routes..." = "Finding routes...";
+"Finding routes..." = "Finding routes…";
 "Flash Alerts" = "Flash Alerts";
 "Fully Accessible" = "Fully Accessible";
 "Hearing" = "Hearing";
@@ -208,6 +208,6 @@
 "Add Quick Tag" = "Add Quick Tag";
 "Edit Quick Tag" = "Edit Quick Tag";
 "Delete Quick Tag" = "Delete Quick Tag";
-"Quick Tags appear as one-tap chips in Route Planner." = "Quick Tags appear as one-tap chips in Route Planner.";
+"Quick Tags appear as one-tap chips in Route Planner." = "Quick tags fill a start or destination field in one tap.";
 "Last" = "Last";
 "Center map on my location" = "Center map on my location";

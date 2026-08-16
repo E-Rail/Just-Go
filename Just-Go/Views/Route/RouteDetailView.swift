@@ -1118,7 +1118,7 @@ struct RouteDetailView: View {
                 Button(AppLocalization.localized("OK"), role: .cancel) {}
             } message: {
                 Text(AppLocalization.text(
-                    english: "The leave time is already here — no reminder was set.",
+                    english: "The leave time is already here, so no reminder was set.",
                     simplified: "出发时间已到，未设置提醒。",
                     traditional: "出發時間已到，未設定提醒。"
                 ))

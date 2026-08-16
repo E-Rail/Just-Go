@@ -716,7 +716,7 @@ struct LiveGoView: View {
             ))
         } catch {
             showRerouteNotice(AppLocalization.text(
-                english: "Couldn't reroute — following the original route",
+                english: "Couldn't reroute, so the original route stands",
                 simplified: "重新规划失败，继续按原路线导航",
                 traditional: "重新規劃失敗，繼續按原路線導航"
             ))

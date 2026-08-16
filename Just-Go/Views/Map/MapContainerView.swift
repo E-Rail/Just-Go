@@ -326,8 +326,8 @@ struct MapContainerView: View {
                 .buttonStyle(.plain)
             }
             .padding(12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
+            .elevated(.floating)
             .accessibilityElement(children: .contain)
 
             if isLoadingStationDetail {

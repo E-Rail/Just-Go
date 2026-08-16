@@ -37,7 +37,7 @@ struct TransferPacePrompt: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
         .animation(.easeInOut(duration: 0.2), value: justAnswered)
     }
 

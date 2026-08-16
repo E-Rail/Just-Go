@@ -466,7 +466,7 @@ extension StationDetailView {
             }
         }
         .frame(height: StationDetailView.entranceMapHeight)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
         .accessibilityLabel(AppLocalization.text(
             english: "Map of station entrances",
             simplified: "车站出入口地图",
@@ -932,8 +932,8 @@ extension StationDetailView {
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 160)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                             .font(.caption)
@@ -944,7 +944,7 @@ extension StationDetailView {
                             .padding(8)
                     }
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: Radius.small, style: .continuous)
                             .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
                     }
                 }

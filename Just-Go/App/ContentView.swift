@@ -113,18 +113,16 @@ struct ContentView: View {
         // looking at a place had to leave it, switch tabs, and type its name back in. Both now
         // live on the map's own navigation stack (see `MapRoute`).
         TabView(selection: $appState.selectedTab) {
-            MapContainerView()
-                .tabItem {
-                    Label(AppLocalization.localized("Map"), systemImage: "map.fill")
-                }
-                .tag(AppState.Tab.map)
-
-            ProfileView()
-                .tabItem {
-                    Label(AppLocalization.localized("Profile"), systemImage: "person.fill")
-                }
-                .tag(AppState.Tab.profile)
+            Tab(AppLocalization.localized("Map"), systemImage: "map.fill", value: AppState.Tab.map) {
+                MapContainerView()
+            }
+            Tab(AppLocalization.localized("Profile"), systemImage: "person.fill", value: AppState.Tab.profile) {
+                ProfileView()
+            }
         }
+        // On a phone this is the tab bar it has always been. On an iPad it becomes a sidebar, which
+        // is the one line that stops the app rendering as a phone screen stretched to 1024 points.
+        .tabViewStyle(.sidebarAdaptable)
         .tint(Color.adaptive(hex: selectedThemeHex))
         .onAppear {
             if !hasSeenWelcome { showTour = true }

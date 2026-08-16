@@ -111,7 +111,7 @@ struct SearchPageView: View {
                 Image(systemName: "chevron.left")
                     .font(.headline)
                     .foregroundStyle(Color.primary)
-                    .frame(width: 34, height: 34)
+                    .tappable()
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -296,7 +296,7 @@ struct SearchPageView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
     }
 
     /// Apple's places, under the stations. Choosing one hands straight back to the map rather than

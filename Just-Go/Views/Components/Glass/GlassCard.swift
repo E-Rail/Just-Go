@@ -185,30 +185,36 @@ struct JourneyRail: View {
     }
 }
 
-/// The one card treatment in the app.
+/// The card, and at last the glass its file is named after.
 ///
-/// Cards were previously drawn five different ways depending on which file you were in —
-/// `systemGray6` at radius 10, `.ultraThinMaterial` at 14, `.regularMaterial` at 10, `appSurface` at
-/// 12, `GlassCard` at 18 — often two of them stacked on one screen. No single one of those looks
-/// wrong; seeing three at once is what makes a screen look assembled rather than designed, because
+/// Cards were previously drawn five different ways depending on which file you were in:
+/// `systemGray6` at radius 10, `.ultraThinMaterial` at 14, `.regularMaterial` at 10, `appSurface`
+/// at 12, `GlassCard` at 18, often two of them stacked on one screen. No single one of those looks
+/// wrong. Seeing three at once is what makes a screen look assembled rather than designed, because
 /// the eye reads differing radii as a differing *kind* of thing and goes looking for the meaning.
-extension View {
-    func cardSurface(_ cornerRadius: CGFloat = 18) -> some View {
-        background(Color.appSurface, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-    }
-}
-
+///
+/// The treatment itself now lives in `Core/DesignSystem.swift` as `.cardSurface(radius:elevation:)`,
+/// alongside the spacing and elevation tokens, so a card, a chip and a floating panel are all
+/// measured from one place.
 struct GlassCard<Content: View>: View {
     let content: Content
+    /// Set on cards drawn over the map, where glass has something to refract and a shadow is the
+    /// only thing separating the card from what it covers.
+    var overContent = false
 
-    init(@ViewBuilder content: () -> Content) {
+    init(overContent: Bool = false, @ViewBuilder content: () -> Content) {
+        self.overContent = overContent
         self.content = content()
     }
 
     var body: some View {
         content
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .cardSurface()
+            .padding(Metrics.l)
+            .cardSurface(
+                radius: Radius.large,
+                elevation: overContent ? .floating : .resting,
+                overContent: overContent
+            )
     }
 }

@@ -14,6 +14,7 @@ struct RouteResultsView: View {
     let onSwap: () -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var selectedRouteID: UUID?
     // Raw theme hex for the solid-fill chip below — see RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
@@ -88,35 +89,52 @@ struct RouteResultsView: View {
     /// From and To, always visible, both editable in place. This is the whole reason the entry
     /// page is no longer in the way: everything it existed to collect is here, on the screen that
     /// shows the consequence of changing it.
+    ///
+    /// Two one-line fields sit stacked on a phone because that is all the width there is. Given
+    /// more, they sit side by side with the swap control between them, which is both what they
+    /// mean and what the control does.
     private var endpointHeader: some View {
-        HStack(spacing: 12) {
-            VStack(spacing: 0) {
+        HStack(spacing: Metrics.m) {
+            if isWide {
                 endpointRow(.origin)
-                Divider().padding(.leading, 26)
+                swapButton
                 endpointRow(.destination)
+            } else {
+                VStack(spacing: 0) {
+                    endpointRow(.origin)
+                    Divider().padding(.leading, 26)
+                    endpointRow(.destination)
+                }
+                swapButton
             }
-
-            Button(action: onSwap) {
-                Image(systemName: "arrow.up.arrow.down")
-                    .font(.headline)
-                    .foregroundStyle(Color.accentColor)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(AppLocalization.text(
-                english: "Swap start and destination",
-                simplified: "交换起点和终点",
-                traditional: "交換起點和終點"
-            ))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .padding(.horizontal, Metrics.l)
+        .padding(.vertical, Metrics.s)
+        .readableColumn()
         .background(.regularMaterial)
         .overlay(alignment: .bottom) {
             Divider()
         }
     }
+
+    private var swapButton: some View {
+        Button(action: onSwap) {
+            Image(systemName: isWide ? "arrow.left.arrow.right" : "arrow.up.arrow.down")
+                .font(.headline)
+                .foregroundStyle(Color.accentColor)
+                .tappable()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(AppLocalization.text(
+            english: "Swap start and destination",
+            simplified: "交换起点和终点",
+            traditional: "交換起點和終點"
+        ))
+    }
+
+    /// Wide enough to stop being one tall column. Read from the size class rather than a raw width
+    /// so a split-screen iPad window, which is genuinely narrow, keeps the phone layout.
+    private var isWide: Bool { horizontalSizeClass == .regular }
 
     private func endpointRow(_ field: RouteInputField) -> some View {
         let name = viewModel.name(for: field).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -146,8 +164,7 @@ struct RouteResultsView: View {
                     Image(systemName: "location.circle.fill")
                         .font(.title3)
                         .foregroundStyle(Color.accentColor)
-                        .frame(width: 34, height: 34)
-                        .contentShape(Rectangle())
+                        .tappable()
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(AppLocalization.text(
@@ -225,6 +242,13 @@ struct RouteResultsView: View {
         Section {
             ForEach(viewModel.routes) { route in
                 comparisonRow(route)
+                    // Cards settle in as they enter rather than appearing fully formed at the
+                    // edge. Subtle on purpose: this is a list a rider scans, not one they admire.
+                    .scrollTransition(.interactive) { content, phase in
+                        content
+                            .opacity(phase.isIdentity ? 1 : 0.6)
+                            .scaleEffect(phase.isIdentity ? 1 : 0.97)
+                    }
             }
         } header: {
             Text(viewModel.routes.count == 1
@@ -279,15 +303,20 @@ struct RouteResultsView: View {
 
                     Spacer(minLength: 4)
 
-                    VStack(alignment: .trailing, spacing: 2) {
+                    VStack(alignment: .trailing, spacing: Metrics.hairline) {
+                        // Re-sorting the list swaps these numbers in place. Animating the digits
+                        // rather than cross-fading whole labels is the difference between the row
+                        // visibly updating and the row appearing to have always said that.
                         Text(metrics.durationText)
                             .font(.title2)
                             .fontWeight(.bold)
                             .monospacedDigit()
+                            .contentTransition(.numericText())
                         Text(metrics.arrivalText)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
+                            .contentTransition(.numericText())
                         // Absent for every unpriced route, which is every city outside the
                         // provider's coverage. A blank is the honest rendering of "nobody told us".
                         if let fare = route.fare {
@@ -296,6 +325,7 @@ struct RouteResultsView: View {
                                 .fontWeight(.semibold)
                                 .monospacedDigit()
                                 .foregroundStyle(Color.accentColor)
+                                .contentTransition(.numericText())
                         }
                     }
                 }
@@ -322,11 +352,14 @@ struct RouteResultsView: View {
                         .foregroundStyle(concern.tint)
                 }
             }
-            .padding(14)
+            .padding(Metrics.l)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .cardSurface()
         }
         .buttonStyle(.plain)
+        // A route card stretched across a 1366-point iPad is a phone layout that got wider, not a
+        // design. Capped and centred; on a phone the cap is larger than the screen and does nothing.
+        .readableColumn()
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
     }

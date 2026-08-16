@@ -46,6 +46,7 @@
 		A100002F /* User/SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002F /* User/SearchHistory.swift */; };
 		A1000033 /* Extensions/Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* Extensions/Color+Hex.swift */; };
 		A1000312 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000312 /* AppTheme.swift */; };
+		A1000950 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000950 /* DesignSystem.swift */; };
 		A100003C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200003C /* Assets.xcassets */; };
 		A100003D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000012 /* Localizable.strings */; };
 		A100003E /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200003E /* Localization.swift */; };
@@ -163,6 +164,7 @@
 		A200003D /* Just-Go-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Just-Go-Info.plist"; sourceTree = "<group>"; };
 		A200003E /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		A2000312 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		A2000950 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		A200003F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		A2000040 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		A2000041 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 				A200003E /* Localization.swift */,
 				A200006C /* Logging.swift */,
 				A2000312 /* AppTheme.swift */,
+				A2000950 /* DesignSystem.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -631,6 +634,7 @@
 				A100003E /* Localization.swift in Sources */,
 				A100006C /* Logging.swift in Sources */,
 				A1000312 /* AppTheme.swift in Sources */,
+				A1000950 /* DesignSystem.swift in Sources */,
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,

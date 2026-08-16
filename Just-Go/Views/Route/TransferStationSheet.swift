@@ -276,7 +276,7 @@ struct TransferStationSheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 LookAroundPreview(initialScene: lookAroundScene)
                     .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
                 Text(AppLocalization.text(
                     english: "Station entrance (street view)",
                     simplified: "车站入口（街景）",

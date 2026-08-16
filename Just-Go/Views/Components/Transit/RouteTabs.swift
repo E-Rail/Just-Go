@@ -39,7 +39,7 @@ struct RouteTabs: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, floating ? 11 : 9)
                         .background {
-                            let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            let shape = RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
                             if floating {
                                 shape.fill(.regularMaterial)
                                     .overlay(shape.fill(
@@ -47,7 +47,7 @@ struct RouteTabs: View {
                                             ? Color.accentColor.opacity(0.22)
                                             : Color.clear
                                     ))
-                                    .shadow(color: .black.opacity(0.22), radius: 6, y: 3)
+                                    .elevated(.floating)
                             } else {
                                 shape.fill(
                                     selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface
@@ -55,7 +55,7 @@ struct RouteTabs: View {
                             }
                         }
                         .overlay {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
                                 .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
                         }
                     }

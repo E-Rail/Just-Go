@@ -32,7 +32,7 @@ struct StepSecondaryButtonLabel: View {
         Label(title, systemImage: systemImage)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 }
 
@@ -49,7 +49,7 @@ struct StepPrimaryButtonLabel: View {
         Label(title, systemImage: systemImage)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(Color(hex: fillHex), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(Color(hex: fillHex), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
             .foregroundStyle(.white)
     }
 }

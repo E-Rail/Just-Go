@@ -90,7 +90,7 @@ struct OfficialTransitResourceButton: View {
         .padding(.horizontal, 10)
         .frame(minHeight: 36)
         .background(Color.secondary.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
         .contentShape(Rectangle())
     }
 
@@ -101,7 +101,7 @@ struct OfficialTransitResourceButton: View {
             .padding(.horizontal, 4)
             .padding(.vertical, 1)
             .background(Color.secondary.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 
     private var iconName: String {
@@ -141,7 +141,7 @@ struct OfficialTransitResourceViewer: View {
                             .controlSize(.large)
                             .padding(20)
                             .background(.regularMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                             .accessibilityLabel(AppLocalization.text(
                                 english: "Loading official resource",
                                 simplified: "正在加载官方资源",
@@ -228,7 +228,7 @@ struct OfficialTransitResourceViewer: View {
                 .padding(.horizontal, 6)
                 .padding(.vertical, 3)
                 .background(Color.secondary.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
         }
         .padding(.horizontal)
         .frame(minHeight: 50)

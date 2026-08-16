@@ -254,7 +254,7 @@ struct StationDetailView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 7)
-        .background(confidence.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(confidence.color.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 
     private var stationHeader: some View {
@@ -301,7 +301,7 @@ struct StationDetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
-                    .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                 }
             }
         }
@@ -399,7 +399,7 @@ struct StationDetailView: View {
                             }
                             .padding(.horizontal, 9)
                             .padding(.vertical, 7)
-                            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                         }
                     }
                 }

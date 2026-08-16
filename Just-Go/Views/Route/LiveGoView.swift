@@ -773,8 +773,8 @@ struct LiveGoView: View {
         // `.ultraThinMaterial` let the map through: walking past a park turned the panel green,
         // walking past water turned it blue, and the instruction the rider is following changed
         // contrast with the scenery. This is the one surface on screen that has to stay readable.
-        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: .black.opacity(0.2), radius: 12, y: 4)
+        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
+        .elevated(.floating)
         .padding([.horizontal, .bottom], 12)
     }
 
@@ -784,6 +784,9 @@ struct LiveGoView: View {
                 Image(systemName: icon(for: step))
                     .font(.title)
                     .foregroundStyle(color(for: step))
+                    // The glyph is the one thing on this panel that says what the rider is doing
+                    // right now, so it animates when it changes rather than swapping silently.
+                    .contentTransition(.symbolEffect(.replace))
                     .frame(width: 40)
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -880,7 +883,7 @@ struct LiveGoView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .padding(.horizontal, 14)
-                        .frame(height: 36)
+                        .frame(minHeight: Metrics.minimumTapTarget)
                         .background(Color.secondary.opacity(0.16), in: Capsule())
                         .foregroundStyle(.primary)
                 }
@@ -901,7 +904,7 @@ struct LiveGoView: View {
         Button(action: action) {
             Image(systemName: isOn ? onImage : offImage)
                 .font(.subheadline)
-                .frame(width: 36, height: 36)
+                .tappable()
                 .background(isOn ? themeColor.opacity(0.18) : Color.secondary.opacity(0.16), in: Circle())
                 .foregroundStyle(isOn ? themeColor : Color.secondary)
         }
@@ -981,7 +984,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
     }
 
     private func noticeBanner(text: String, icon: String, showsSpinner: Bool = false) -> some View {
@@ -1001,8 +1004,8 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
+        .elevated(.floating)
     }
 
     /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving,
@@ -1041,9 +1044,9 @@ struct LiveGoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
         .foregroundStyle(.white)
-        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
+        .elevated(.floating)
     }
 
     /// (Re)arms the estimated "get off" alert for the current step. Cancels any prior alert first,

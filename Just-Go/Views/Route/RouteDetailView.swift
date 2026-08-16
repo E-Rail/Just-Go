@@ -241,6 +241,9 @@ struct RouteDetailView: View {
                 Text(route.formattedDuration)
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .monospacedDigit()
+                    // Switching between alternatives changes this number in place; animating the
+                    // digits makes it read as the same number changing rather than a new label.
+                    .contentTransition(.numericText())
                     // Three numbers on one line, and "1 hr 52 min" in a large rounded face is wide.
                     // Shrinking beats wrapping: a duration broken across two lines stops reading as
                     // one number at all.
@@ -286,7 +289,7 @@ struct RouteDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
     }
 
     /// Stops, fare, transfers and which door to go in by. This is the line Amap spends on
@@ -515,7 +518,7 @@ struct RouteDetailView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
         }
     }
 
@@ -557,7 +560,7 @@ struct RouteDetailView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.orange)
                 .frame(width: 28, height: 28)
-                .background(Color.orange.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(Color.orange.opacity(0.14), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.title)
                     .font(.subheadline)
@@ -759,7 +762,7 @@ struct RouteDetailView: View {
                 DataConfidenceChip(confidence: decisionDataConfidence, compact: true)
             }
         }
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
     }
 
     /// Inset to clear the icon well, so the dividers separate the *text* column and the icons read
@@ -779,7 +782,7 @@ struct RouteDetailView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(tint)
                 .frame(width: 28, height: 28)
-                .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
             Text(title)
                 .font(.body)
                 .foregroundStyle(.primary)
@@ -838,7 +841,7 @@ struct RouteDetailView: View {
             arrivalRow
         }
         .padding(.vertical, 2)
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
     }
 
     private static let railWidth: CGFloat = 44

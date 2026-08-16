@@ -85,6 +85,9 @@ enum BaiduMapsError: Error, Equatable {
     /// Baidu answered, and said no. `status` is its own code — 302/210 are quota and permission.
     case service(status: Int, message: String)
     case malformedResponse
+    /// This launch has already made as many calls to that endpoint as it is allowed. Local, so it
+    /// costs no round trip, and indistinguishable to every caller from having no key at all.
+    case budgetExhausted(path: String)
 }
 
 /// Every Baidu Web Service response carries this envelope, and a non-zero `status` means the
@@ -100,8 +103,29 @@ protocol BaiduResponseEnvelope: Decodable, Sendable {
 /// signature must be computed over the parameters *in the order they are sent*; a dictionary's
 /// arbitrary order would produce a valid-looking signature that Baidu rejects.
 actor BaiduMapsClient {
+    /// How many calls one launch may make to each endpoint family.
+    ///
+    /// The published free allowance is per *account* per day, not per device: 100 place searches,
+    /// 300 reverse geocodes, 5,000 route plans, shared across every rider using the app. No number
+    /// held on a phone can enforce that, and this does not pretend to. What it does is stop a
+    /// single device spending the whole day's allowance in one sitting, and turn the aftermath into
+    /// an immediate local refusal instead of a round trip to be told 302 每日配额超限.
+    ///
+    /// The ceilings are deliberately lopsided in the same proportion as the allowance itself. Route
+    /// planning is where the headroom is and where every fact this app reads now comes from; place
+    /// search is the starved one.
+    enum RequestBudget {
+        static let ceilings: [String: Int] = [
+            "/place/v2/search": 25,
+            "/reverse_geocoding/v3/": 20,
+            "/direction/v2/transit": 200,
+            "/direction/v2/riding": 200
+        ]
+    }
+
     let configuration: BaiduMapsConfiguration
     private let session: URLSession
+    private var spent: [String: Int] = [:]
 
     init(configuration: BaiduMapsConfiguration, session: URLSession? = nil) {
         self.configuration = configuration
@@ -127,6 +151,15 @@ actor BaiduMapsClient {
         parameters: [(name: String, value: String)]
     ) async throws -> Response {
         guard configuration.isConfigured else { throw BaiduMapsError.notConfigured }
+
+        // Checked before the request is built, so an exhausted budget costs nothing at all. Every
+        // caller already treats a throw as "no answer" and falls back, so this needs no new
+        // handling anywhere: it degrades the app to what it is with no key.
+        if let ceiling = RequestBudget.ceilings[path] {
+            let used = spent[path, default: 0]
+            guard used < ceiling else { throw BaiduMapsError.budgetExhausted(path: path) }
+            spent[path] = used + 1
+        }
 
         var ordered = parameters
         ordered.append((name: "output", value: "json"))

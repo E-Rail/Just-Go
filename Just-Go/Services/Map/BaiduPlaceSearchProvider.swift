@@ -103,7 +103,7 @@ final class CompositePlaceSearchProvider: PlaceSearchProviding {
     }
 
     func searchPlaces(keyword: String, region: MKCoordinateRegion?, limit: Int) async throws -> [TransitPlace] {
-        if let baidu, Self.prefersBaidu(for: region) {
+        if let baidu, Self.prefersBaidu(for: region), Self.containsCJK(keyword) {
             do {
                 let results = try await baidu.searchPlaces(keyword: keyword, region: region, limit: limit)
                 if !results.isEmpty { return results }
@@ -114,15 +114,38 @@ final class CompositePlaceSearchProvider: PlaceSearchProviding {
         return try await appleMaps.searchPlaces(keyword: keyword, region: region, limit: limit)
     }
 
+    /// Apple first, and Baidu only if Apple has nothing.
+    ///
+    /// The opposite of `searchPlaces`, on purpose. Baidu was brought in because Apple's mainland
+    /// results for a *Chinese place name* are thin, which is a statement about POI search and not
+    /// about turning a coordinate into a street address, where Apple is perfectly good. Reverse
+    /// geocoding is also the call the app makes most casually, on launch and on every "start from
+    /// my location", and it draws on an allowance of 300 a day shared by every rider.
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace {
-        if let baidu, Self.prefersBaidu(for: nil, coordinate: location) {
-            do {
-                return try await baidu.reverseGeocode(location: location, name: name)
-            } catch {
-                AppLog.data.info("Baidu reverse geocode unavailable, falling back to Apple: \(error)")
-            }
+        do {
+            let place = try await appleMaps.reverseGeocode(location: location, name: name)
+            if place.address?.isEmpty == false { return place }
+        } catch {
+            AppLog.data.info("Apple reverse geocode unavailable, trying Baidu: \(error)")
         }
-        return try await appleMaps.reverseGeocode(location: location, name: name)
+        guard let baidu, Self.prefersBaidu(for: nil, coordinate: location) else {
+            return try await appleMaps.reverseGeocode(location: location, name: name)
+        }
+        return try await baidu.reverseGeocode(location: location, name: name)
+    }
+
+    /// Whether the query is one Apple is known to answer badly.
+    ///
+    /// Baidu earns its allowance on Chinese place names, which is the bug that brought it in:
+    /// searching a station's Chinese name on Apple returned four unrelated places and no station.
+    /// A Latin-script query has no such problem and does not justify spending one of the day's
+    /// hundred searches, so it goes straight to Apple.
+    static func containsCJK(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            (0x4E00...0x9FFF).contains(scalar.value)       // CJK Unified Ideographs
+                || (0x3400...0x4DBF).contains(scalar.value) // Extension A
+                || (0xF900...0xFAFF).contains(scalar.value) // Compatibility Ideographs
+        }
     }
 
     /// Baidu's coverage is Greater China; outside it Apple is simply better, so the bounds are the

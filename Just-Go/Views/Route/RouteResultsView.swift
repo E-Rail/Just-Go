@@ -15,6 +15,7 @@ struct RouteResultsView: View {
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRouteID: UUID?
     // Raw theme hex for the solid-fill chip below. See RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
@@ -289,7 +290,11 @@ struct RouteResultsView: View {
                         .foregroundStyle(Color.accentColor)
                 }
 
-                HStack(alignment: .top, spacing: 12) {
+                // Two columns need two columns' worth of width. At accessibility text sizes each
+                // side is several words wide and the arrival time rendered as "Arrive…", dropping
+                // the time itself, which is the one thing that line exists to say. Above those
+                // sizes the card stacks instead, the way `StepControlPair` already does.
+                AdaptiveStack(isVertical: dynamicTypeSize.isAccessibilitySize, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
                         // The lines this route rides, in order, in their own colours. A rider
                         // comparing alternatives is choosing between *shapes* of journey, and three
@@ -303,7 +308,8 @@ struct RouteResultsView: View {
 
                     Spacer(minLength: 4)
 
-                    VStack(alignment: .trailing, spacing: Metrics.hairline) {
+                    VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .trailing,
+                           spacing: Metrics.hairline) {
                         // Re-sorting the list swaps these numbers in place. Animating the digits
                         // rather than cross-fading whole labels is the difference between the row
                         // visibly updating and the row appearing to have always said that.

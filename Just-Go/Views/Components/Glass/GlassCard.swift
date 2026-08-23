@@ -108,17 +108,27 @@ private extension StringProtocol {
 struct JourneyBadgeChain: View {
     let segments: [RouteSegment]
     var size: CGFloat = 26
+    /// Every dimension here is a point size rather than a `Font.TextStyle`, so none of it grew
+    /// with the rider's text setting. Rendered at the largest accessibility size the badges came
+    /// out identical to their default size while every label around them tripled, leaving the
+    /// primary visual of a route row as the one microscopic thing on the card.
+    ///
+    /// Capped at 2x. A chain of five badges is laid out horizontally in a fixed-width card, and
+    /// the full 3.1x accessibility scale pushes it off the edge; two is enough to read.
+    @ScaledMetric(relativeTo: .subheadline) private var typeScale: CGFloat = 1
+
+    private var scaled: CGFloat { size * min(typeScale, 2) }
 
     var body: some View {
         HStack(spacing: 5) {
             ForEach(Array(shown.enumerated()), id: \.element.id) { index, segment in
                 if index > 0 {
                     Image(systemName: "chevron.compact.right")
-                        .font(.system(size: size * 0.5, weight: .semibold))
+                        .font(.system(size: scaled * 0.5, weight: .semibold))
                         .foregroundStyle(.tertiary)
                 }
                 if segment.type == .subway {
-                    LineBadge(name: segment.lineName ?? "", colorHex: segment.lineColorHex, size: size)
+                    LineBadge(name: segment.lineName ?? "", colorHex: segment.lineColorHex, size: scaled)
                 } else {
                     accessBadge(segment)
                 }
@@ -128,17 +138,17 @@ struct JourneyBadgeChain: View {
     }
 
     private func accessBadge(_ segment: RouteSegment) -> some View {
-        HStack(spacing: size * 0.14) {
+        HStack(spacing: scaled * 0.14) {
             Image(systemName: segment.type.symbolName)
-                .font(.system(size: size * 0.52, weight: .semibold))
+                .font(.system(size: scaled * 0.52, weight: .semibold))
             Text("\(Self.minutes(segment.duration))")
-                .font(.system(size: size * 0.46, weight: .semibold))
+                .font(.system(size: scaled * 0.46, weight: .semibold))
                 .monospacedDigit()
         }
         .foregroundStyle(.secondary)
-        .padding(.horizontal, size * 0.26)
-        .frame(height: size)
-        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: size * 0.3, style: .continuous))
+        .padding(.horizontal, scaled * 0.26)
+        .frame(height: scaled)
+        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: scaled * 0.3, style: .continuous))
     }
 
     /// Rounded, and never zero: a 40-second walk is still a leg of the trip, and a badge reading

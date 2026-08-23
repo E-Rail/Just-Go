@@ -53,3 +53,22 @@ struct StepPrimaryButtonLabel: View {
             .foregroundStyle(.white)
     }
 }
+
+/// An `HStack` that becomes a `VStack` when the rider's text size makes two columns untenable.
+///
+/// Extracted because a second copy of this decision was about to be written for the route card.
+/// `StepControlPair` below is its first caller and the reason it exists: two buttons squeezed
+/// side by side at accessibility sizes are two buttons nobody can read.
+struct AdaptiveStack<Content: View>: View {
+    let isVertical: Bool
+    var spacing: CGFloat
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if isVertical {
+            VStack(alignment: .leading, spacing: spacing, content: content)
+        } else {
+            HStack(alignment: .top, spacing: spacing, content: content)
+        }
+    }
+}

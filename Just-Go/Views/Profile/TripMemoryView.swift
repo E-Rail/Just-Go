@@ -21,7 +21,7 @@ struct TripMemoryView: View {
     @ViewBuilder
     private var statisticsCard: some View {
         // Computed once and reused below instead of letting thisMonthRecords (a full filter
-        // pass over tripRecords) run twice per render — once for the count, once inside what
+        // pass over tripRecords) run twice per render, once for the count, once inside what
         // was a second computed property re-deriving the average from the same filter.
         let monthRecords = thisMonthRecords
         let monthCount = monthRecords.count

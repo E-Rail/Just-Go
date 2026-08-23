@@ -22,14 +22,14 @@ private final class HangzhouRedirectDelegate: NSObject, URLSessionTaskDelegate, 
 /// in `StationInfoAPI/sources/sources.json` under `hangzhouMetroOnline`.
 ///
 /// The shape differs from the other mainland sources in one way that drives this whole file:
-/// there is no per-station endpoint. `/api/operation/all` returns the entire network — every line,
-/// every station, every direction's first and last train — in a single ~350 KB response. So the
+/// there is no per-station endpoint. `/api/operation/all` returns the entire network. Every line,
+/// every station, every direction's first and last train, in a single ~350 KB response, so the
 /// network payload is fetched once and shared by every station lookup in the session, and the
 /// per-station work is slicing that payload by station code. That makes the first station open
 /// pay for the whole city and every subsequent one free, rather than one request per station.
 actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
     /// Cities whose station accessibility/facility facts come from this official online surface
-    /// rather than the bundled pack. Hangzhou's payload carries neither, so this is false — the
+    /// rather than the bundled pack. Hangzhou's payload carries neither, so this is false. The
     /// coverage UI must keep reporting the bundled state for those categories.
     static func servesStationInformation(forCityID cityID: String) -> Bool {
         false
@@ -153,7 +153,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
     }
 
     /// Availability failures fall back to the last snapshot this device stored, labeled as
-    /// cached. Caller and contract errors never do — a stored copy must not paper over a
+    /// cached. Caller and contract errors never do. A stored copy must not paper over a
     /// station-identity mismatch or a malformed request.
     private func servingStoredSnapshot(
         for request: PreparedRequest,
@@ -223,7 +223,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         }
     }
 
-    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
     /// connection that trickles data indefinitely never triggers it, so the byte-by-byte read
     /// below could hang well past `requestTimeout`. Race the whole fetch against an explicit
     /// deadline so it is always bounded.
@@ -441,7 +441,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         return digits.isEmpty ? nil : Int(digits)
     }
 
-    /// The operator writes "终点站" where a direction terminates at this station and "——" where
+    /// The operator writes "终点站" where a direction terminates at this station and ".. " Where
     /// it publishes nothing. Both mean there is no departure to show, so neither is copied
     /// through as if it were a time.
     private static func serviceTime(_ value: String?) -> String? {
@@ -517,8 +517,8 @@ struct HangzhouNetwork: Decodable, Sendable {
     }
 }
 
-/// Only the identity fields are read. `description` — the operator's own prose about the station —
-/// is deliberately not decoded: it is licensed content this app neither stores nor displays.
+/// Only the identity fields are read. `description`. The operator's own prose about the station.
+/// Is deliberately not decoded: it is licensed content this app neither stores nor displays.
 struct HangzhouListedStation: Decodable, Sendable {
     let stationCode: String
     let stationName: String

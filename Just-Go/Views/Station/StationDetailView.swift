@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The station sheet's top-level sections. Everything used to stack in one column — ten cards, two
-/// of them tall — so reaching the entrance map meant scrolling past the whole page. These group the
+/// The station sheet's top-level sections. Everything used to stack in one column. Ten cards, two
+/// of them tall, so reaching the entrance map meant scrolling past the whole page. These group the
 /// same content by the question a rider arrived with, and only the tabs that have something to show
 /// are offered.
 enum StationDetailTab: String, CaseIterable, Identifiable {
@@ -50,12 +50,12 @@ struct StationDetailView: View {
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
     @State var selectedTab: StationDetailTab = .trains
 
-    /// Tall, because the map is the whole point of the Map tab — but fixed. This shows one
+    /// Tall, because the map is the whole point of the Map tab, but fixed. This shows one
     /// station's doors; there is nothing further to reveal by making it taller, and a resize
     /// handle on a card inside a scroll view is a gesture competing with the scroll for no gain.
     static let entranceMapHeight: Double = 380
 
-    /// Only tabs with something behind them are offered — an empty tab is worse than no tab. The
+    /// Only tabs with something behind them are offered. An empty tab is worse than no tab. The
     /// station tab is always present: lines and the data-confidence chips do not depend on a pack.
     var availableTabs: [StationDetailTab] {
         StationDetailTab.allCases.filter { tab in
@@ -69,7 +69,7 @@ struct StationDetailView: View {
 
     /// The tab to render: the picked one while it still has content, otherwise the first that does.
     /// Content arrives asynchronously, so the selection has to survive a tab appearing or vanishing
-    /// under it — the entrance map in particular only exists once the city pack has loaded.
+    /// under it: the entrance map in particular only exists once the city pack has loaded.
     var effectiveTab: StationDetailTab {
         let tabs = availableTabs
         return tabs.contains(selectedTab) ? selectedTab : (tabs.first ?? .station)
@@ -112,8 +112,8 @@ struct StationDetailView: View {
                     }
                 case .map:
                     // Entrance geometry answers a different question from the operator's exit text
-                    // — the operator says which streets an exit reaches, the bundled OSM entrances
-                    // say where it physically is — so this sits outside the bundled-sections gate.
+                    //. The operator says which streets an exit reaches, the bundled OSM entrances
+                    // say where it physically is, so this sits outside the bundled-sections gate.
                     stationGuideSection
                 case .station:
                     linesSection
@@ -182,7 +182,7 @@ struct StationDetailView: View {
     var usesNativeStationInformationSurface: Bool {
         // Hong Kong ships its station data in the bundle, so it is always native. Every other
         // city is native exactly when the bundled Station Information directory routes the station
-        // to an online source — Beijing, Shanghai, Guangzhou, Hangzhou today, and any city added with
+        // to an online source: Beijing, Shanghai, Guangzhou, Hangzhou today, and any city added with
         // no code change here. The directory is synchronous, so this is stable once the view model
         // exists; before that, ask the directory directly to avoid a first-frame flash.
         if displayedStation.cityID == "8100" {
@@ -195,8 +195,8 @@ struct StationDetailView: View {
     }
 
     /// The bundled sections (schedules, accessibility, essentials, guide) return whenever
-    /// the native online surface has nothing to serve — the fetch failed and no snapshot is
-    /// cached — so a blocked or offline network still gets the offline official data instead
+    /// the native online surface has nothing to serve. The fetch failed and no snapshot is
+    /// cached, so a blocked or offline network still gets the offline official data instead
     /// of only an error card.
     /// Applies to every live-fetch city, not just Beijing: the directory lookup used to miss for
     /// map-opened stations, so Shanghai and Guangzhou always fell into the non-native branch above
@@ -287,7 +287,7 @@ struct StationDetailView: View {
                         // Not "Fully Accessible Station". Nothing publishes that; it was inferred
                         // from a lift and a ramp both being listed somewhere at this station,
                         // which is not the same as a step-free way from the street to the
-                        // platform — the exact inference `validate_indoor_maps.rb` exists to
+                        // platform: the exact inference `validate_indoor_maps.rb` exists to
                         // prevent elsewhere. The two facts are worth showing; the conclusion is
                         // not ours to draw, least of all for the riders who cannot absorb it
                         // being wrong.
@@ -345,7 +345,7 @@ struct StationDetailView: View {
     }
 
     /// A station the network draws but riders cannot yet use. The reviewed operator state already
-    /// existed — it was only spelled out in prose far down the official-information section, so a
+    /// existed: it was only spelled out in prose far down the official-information section, so a
     /// rider planning a trip to 福寿岭 had no way to see it was still a building site. The wording
     /// lives on the status itself, so this header and the route planner's warning can never
     /// disagree about what the same reviewed fact means.
@@ -366,7 +366,7 @@ struct StationDetailView: View {
     }
 
     /// Renders nothing when the station carries no resolved lines, rather than a headed card with
-    /// an empty grid under it — a card that says only "Lines" costs a screenful of scrolling and
+    /// an empty grid under it: a card that says only "Lines" costs a screenful of scrolling and
     /// tells a rider nothing.
     @ViewBuilder
     private var linesSection: some View {
@@ -413,7 +413,7 @@ struct StationDetailView: View {
 /// *destination* and calls `onSelected` so the presenting card can dismiss itself; the map's
 /// navigation stack watches for that record and pushes the entry page.
 ///
-/// This was a pair — "From here" and "To here" — which asked the rider to answer a question they
+/// This was a pair: "From here" and "To here", which asked the rider to answer a question they
 /// had not been asked yet. Standing in front of a place on a map, "route here" is what you mean
 /// essentially always; the entry page then opens with this end filled and the other end defaulted
 /// to where you are, and swapping them is one button away if that guess was wrong.
@@ -446,7 +446,7 @@ struct PlanRouteButtons: View {
             .padding(.vertical, 12)
             // Raw hex, not `themeColor`: this is a solid fill under white text, and
             // `Color.adaptive` lightens toward white in dark mode specifically for
-            // *foreground* legibility — used as a fill it collapses contrast instead.
+            // *foreground* legibility: used as a fill it collapses contrast instead.
             .background(Color(hex: selectedThemeHex), in: Capsule())
             .foregroundStyle(.white)
         }

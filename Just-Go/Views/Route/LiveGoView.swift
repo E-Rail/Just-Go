@@ -59,7 +59,7 @@ struct LiveGoView: View {
     /// Rendered inside another screen rather than over it. The route detail turns *into* the
     /// navigator rather than covering itself with a second one, so this drops the navigation
     /// chrome that only a presented copy needs and hands the exit back to its host. One
-    /// implementation, two containers — a second navigator would drift from this one, and this is
+    /// implementation, two containers: a second navigator would drift from this one, and this is
     /// where the off-route recovery, the arrival alert and the transfer surface all live.
     var embedded = false
     var onExit: (() -> Void)?
@@ -94,11 +94,11 @@ struct LiveGoView: View {
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
     /// Measured corridor lengths for this trip's interchanges, fetched once and held for the
-    /// screen's lifetime only — nothing about them is written to disk.
+    /// screen's lifetime only: nothing about them is written to disk.
     @State private var transferGeometries: [TransferGeometry] = []
     /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
     /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
-    /// The Accessibility toggle below is a stronger promise than this one — see `onAppear`.
+    /// The Accessibility toggle below is a stronger promise than this one. See `onAppear`.
     @AppStorage("guidanceVoiceEnabled") private var voiceEnabled = true
     /// Whether the camera tracks the rider. On while guiding, because "where am I on this route"
     /// is the question guidance exists to answer; stepping through manually turns it off so the
@@ -131,7 +131,7 @@ struct LiveGoView: View {
                 } else {
                     // The panel is a safe-area inset rather than a ZStack overlay so MapKit knows
                     // the space is taken. Stacked, the map believed it owned the whole screen and
-                    // laid its own POI labels and pin glyphs out underneath our opaque card —
+                    // laid its own POI labels and pin glyphs out underneath our opaque card.
                     // Apple's icons peeking out from behind our text, which is what it looked
                     // like. Insetting keeps the map drawing full-bleed (the panel still floats
                     // over live map) while moving MapKit's own labelling, controls and legal
@@ -216,7 +216,7 @@ struct LiveGoView: View {
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
         // Observes the raw fix because that is what changes, but hands on the corrected one: off-route
         // detection, the arrival alert and the reroute origin are all measured against GCJ-02 route
-        // geometry, and a raw WGS-84 fix is ~540 m from it — enough to declare a rider off a route
+        // geometry, and a raw WGS-84 fix is ~540 m from it. Enough to declare a rider off a route
         // they are standing on. See LocationService.mapSpaceCorrection.
         .onChange(of: container.locationService.currentLocation) { _, _ in
             handleLocationUpdate(container.locationService.mapSpaceLocation)
@@ -256,7 +256,7 @@ struct LiveGoView: View {
 
     /// Which change the rider is making, as something answerable about.
     ///
-    /// Built from names rather than identifiers because `TripStep` carries names — and that is
+    /// Built from names rather than identifiers because `TripStep` carries names, and that is
     /// fine while every answer stays on the device that produced it. **Before answers are ever
     /// pooled between riders this has to move to stable IDs**: `localizedName` differs by
     /// language, so a Chinese and an English rider standing in the same corridor would key the
@@ -291,7 +291,7 @@ struct LiveGoView: View {
 
     /// The one moment the rider knows how long the change took is while they are making it, so
     /// the question lives here and nowhere else. Shown under both the guidance and the
-    /// "no information" state — the app having nothing to say about a transfer is exactly when
+    /// "no information" state: the app having nothing to say about a transfer is exactly when
     /// hearing from the rider is worth most.
     @ViewBuilder
     private var transferPaceSection: some View {
@@ -311,7 +311,7 @@ struct LiveGoView: View {
 
     /// What the app knows about this change, best source first.
     ///
-    /// The rider's own answer outranks a measured corridor because they were standing in it — the
+    /// The rider's own answer outranks a measured corridor because they were standing in it. The
     /// geometry knows the distance but nothing about the stairs, the lift queue or the crowd. When
     /// neither exists this returns nil and the prompt simply asks, which is the honest state.
     private func insight(for key: TransferKey) -> TransferInsight? {
@@ -577,8 +577,8 @@ struct LiveGoView: View {
     }
 
     /// Re-frame the camera on the current step's geometry. The rider stays free to pan and
-    /// zoom afterwards (and can follow their own position via the map's location button) —
-    /// only a step change or a reroute moves the camera.
+    /// zoom afterwards (and can follow their own position via the map's location button).
+    /// Only a step change or a reroute moves the camera.
     private func frameCurrentStep(animated: Bool) {
         guard let region = region(for: viewModel.currentStep) else { return }
         if animated {
@@ -642,8 +642,8 @@ struct LiveGoView: View {
     /// constantly replan a trip the rider is following correctly.
     private func handleLocationUpdate(_ location: CLLocation?) {
         // Centre on the rider, zoomed in, for as long as they are following rather than reading
-        // ahead. `MapCameraSpan.station` is the app's existing tightest scale — the same number the
-        // map uses for one station and its exits — so guidance does not introduce a fifth zoom.
+        // ahead. `MapCameraSpan.station` is the app's existing tightest scale. The same number the
+        // map uses for one station and its exits, so guidance does not introduce a fifth zoom.
         if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
             withAnimation(.easeInOut(duration: 0.35)) {
                 camera = .region(MKCoordinateRegion(
@@ -734,7 +734,7 @@ struct LiveGoView: View {
     }
 
     /// Minimum distance from a point to a polyline (point-to-segment projections in a
-    /// small local planar frame — exact enough at street scale).
+    /// small local planar frame: exact enough at street scale).
     private func distance(from coordinate: CLLocationCoordinate2D, toPolyline path: [CLLocationCoordinate2D]) -> Double {
         var best = Double.greatestFiniteMagnitude
         for index in 0..<(path.count - 1) {
@@ -1050,7 +1050,7 @@ struct LiveGoView: View {
     }
 
     /// (Re)arms the estimated "get off" alert for the current step. Cancels any prior alert first,
-    /// then — only for a ride step with the toggle on — schedules a hands-free local notification
+    /// then: only for a ride step with the toggle on. Schedules a hands-free local notification
     /// and an in-app timer that buzzes + shows a banner if the app is still foreground at fire time.
     @MainActor
     private func refreshArrivalAlert() {
@@ -1071,8 +1071,8 @@ struct LiveGoView: View {
             guard await container.tripReminderService.requestAuthorization() else { return }
             // requestAuthorization can take a while (first-run system prompt). If the rider
             // advanced past this step while it was pending, cancelArrivalAlert() already ran
-            // with the OLD scheduledStationKey and found nothing registered yet to cancel —
-            // registering now would leave a stale "get off" alert for an already-passed stop.
+            // with the OLD scheduledStationKey and found nothing registered yet to cancel.
+            // Registering now would leave a stale "get off" alert for an already-passed stop.
             guard !Task.isCancelled, scheduledStationKey == key else { return }
             await container.tripReminderService.scheduleArrivalReminder(
                 stationID: key,

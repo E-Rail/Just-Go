@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 import CoreLocation
 
-// Pre-compiled once instead of recompiling on every exitTokens(in:) call — stationGuidance
+// Pre-compiled once instead of recompiling on every exitTokens(in:) call. StationGuidance
 // calls it per station per route, so this pattern was being rebuilt dozens of times per search.
 private let exitTokenExpression = try! NSRegularExpression(pattern: "([A-Za-z0-9]+(?:[、，,/\\s][A-Za-z0-9]+)*)\\s*[出入]?口")
 
@@ -345,7 +345,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         if let existing = inFlightLoads[cityID] {
             let status = await existing.task.value
             // A delete can invalidate the load we coalesced onto (its cancelled task yields
-            // .failed) — mirror the creator path and report the current truth instead.
+            // .failed): mirror the creator path and report the current truth instead.
             guard loadGenerationMatches(for: cityID, generation: existing.generation) else {
                 return await cityPackStatus(for: cityID)
             }
@@ -429,7 +429,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         for group in groups {
             guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
 
-            // Disk-cache short-circuit first, in priority order across the whole group — cheap,
+            // Disk-cache short-circuit first, in priority order across the whole group. Cheap,
             // local, and exactly as fresh from any candidate sharing this version.
             for candidate in group {
                 let manifestURL = candidate.url
@@ -459,7 +459,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 return loaded.loadStatus
             }
 
-            // No cached hit for this version — race the real downloads, so a stalled or
+            // No cached hit for this version: race the real downloads, so a stalled or
             // black-holed source (an international base URL is a known offender on some
             // mainland networks) can't force a healthy mirror to wait behind it.
             let downloadable: [(manifestURL: URL, entry: OfficialManifestCity, downloadURL: URL, maximumBytes: Int)] =
@@ -481,7 +481,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                         let data = try await download(from: candidate.downloadURL, maximumBytes: candidate.maximumBytes)
                         // No size/SHA guard here: `decodeValidatedPack` checks both before it
                         // parses anything, so the downloaded bytes are still verified ahead of
-                        // the decode — hashing here too meant a second full pass over them.
+                        // the decode: hashing here too meant a second full pass over them.
                         let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry, origin: .downloaded)
                         guard await validatesCanonicalMembership(decoded) else {
                             throw CityPackCandidateFailed()
@@ -549,7 +549,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private func enrichLoadedStation(_ station: Station) -> Station {
         guard let item = stationRecord(for: station) else { return station }
         // Station is a reference type, and callers pass in instances the main thread may
-        // already be rendering — mutating those here (on the actor's executor) races the UI.
+        // already be rendering: mutating those here (on the actor's executor) races the UI.
         // Enrich a copy instead; every caller consumes the returned station.
         let enriched = Station(
             stationID: station.stationID,
@@ -1234,7 +1234,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             // A bundled pack ships inside the app binary, is pinned by the manifest's SHA-256,
             // and is reviewed in-repo, so authored guidance is trusted from it. Rejecting
             // `stationAccessPoints` here regardless of origin silently discarded the *entire*
-            // Taipei pack — every one of its stations carries the operator's official entrance
+            // Taipei pack: every one of its stations carries the operator's official entrance
             // coordinates, so every station failed and the city fell back to notConfigured.
             return station.licensedMedia.allSatisfy(validatesBundledMedia)
         case .downloaded:
@@ -1337,15 +1337,15 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func download(from url: URL, maximumBytes: Int) async throws -> Data {
         // Cap how long a single fetch can sit with no response. URLSession's default is 60s,
-        // and the pack CDNs are black-holed (stall, not refuse) on some mainland networks —
-        // with several fallback URLs tried serially, a cold load could pin the city-pack
+        // and the pack CDNs are black-holed (stall, not refuse) on some mainland networks.
+        // With several fallback URLs tried serially, a cold load could pin the city-pack
         // spinners for minutes before the .failed cooldown ever got a chance to cache.
         // This is an idle timeout, so a slow-but-flowing pack download is not cut off.
         guard maximumBytes > 0,
               maximumBytes <= Self.maximumPackBytes,
               Self.isAllowedRemoteDataURL(url) else { throw RoutePlanningError.networkError }
         let session = self.session
-        // `timeoutInterval` above only fires when no bytes arrive for the interval — a
+        // `timeoutInterval` above only fires when no bytes arrive for the interval. A
         // connection that trickles data indefinitely never trips it, so the byte-by-byte read
         // below could hang well past 15s. Race the whole fetch against an explicit deadline.
         return try await withDeadline(
@@ -1565,7 +1565,7 @@ private struct RemoteManifestEntry {
     let priority: Int
 }
 
-/// Thrown by a single racing candidate in `performDownload` — validation failed or the data
+/// Thrown by a single racing candidate in `performDownload`. Validation failed or the data
 /// didn't match its manifest entry. Never surfaces beyond the task group; siblings keep racing.
 private struct CityPackCandidateFailed: Error {}
 
@@ -1874,7 +1874,7 @@ private struct CityPackDiskStore {
     }
 
     /// Deliberately does not hash. Every caller hands the bytes straight to
-    /// `decodeValidatedPack`, whose first act is the size + SHA-256 check — so the bytes are
+    /// `decodeValidatedPack`, whose first act is the size + SHA-256 check, so the bytes are
     /// still verified before anything parses them, just once instead of twice. Hashing here as
     /// well cost a second full pass over the file (741 KB for Hong Kong, 383 KB for Beijing).
     func packData(for entry: OfficialManifestCity) -> Data? {

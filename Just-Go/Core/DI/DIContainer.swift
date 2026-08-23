@@ -36,7 +36,7 @@ final class DIContainer {
     let tripReminderService: TripReminderService
     let stationInformationDiskCache: OfficialStationInformationDiskCache?
     /// Operator notices, fetched on the device and held in memory only. Not in `init` because it
-    /// has no configuration and no test seam yet — one city publishes a parseable list.
+    /// has no configuration and no test seam yet. One city publishes a parseable list.
     let serviceNoticeProvider = BeijingServiceNoticeProvider()
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
     private var memoryWarningObserver: NSObjectProtocol?
@@ -93,8 +93,8 @@ final class DIContainer {
         }
     }
 
-    /// Settings → Clear Cache. Deletes every downloaded/cached tier — city packs on disk and
-    /// in memory, the device-local station-information snapshots, and URL caches — while
+    /// Settings → Clear Cache. Deletes every downloaded/cached tier. City packs on disk and
+    /// in memory, the device-local station-information snapshots, and URL caches, while
     /// leaving user data (tags, trips, records, personal media, preferences) untouched.
     func clearAllCaches() async {
         await memoryWarningReleaseTargets.officialStationData?.clearAllCaches()
@@ -134,7 +134,7 @@ final class DIContainer {
     /// Held here rather than in a `@State` on the map, because the map's navigation router has to
     /// be able to build any of those three screens *synchronously*, at any moment, with no
     /// dependency on whether some `.task` has run yet. When it was optional state, a push that
-    /// arrived before that task produced `EmptyView` — a pushed screen with no title and no
+    /// arrived before that task produced `EmptyView`. A pushed screen with no title and no
     /// content, which is exactly what a blank page is.
     @MainActor
     func sharedRoutePlannerViewModel() -> RoutePlannerViewModel {
@@ -173,7 +173,7 @@ final class DIContainer {
     @MainActor
     static func configure() -> DIContainer {
         let locationService = LocationService()
-        // Baidu answers Chinese place queries that Apple misses — searching a station name used to
+        // Baidu answers Chinese place queries that Apple misses. Searching a station name used to
         // return unrelated places and no station. The key comes from the git-ignored
         // Secrets.xcconfig; when it is absent the composite is pure MapKit and nothing else in the
         // app can tell the difference.
@@ -187,13 +187,13 @@ final class DIContainer {
         let tripObservationProvider = baiduClient.map { BaiduTripObservationService(client: $0) }
         let metroNetworkProvider = BundledMetroNetworkService()
         // Dedicated ephemeral sessions (no cookies, no shared cache) instead of `URLSession.shared`
-        // — a stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
+        //. A stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
         // traffic, matching the pattern already used for the Beijing station-info provider.
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
         let stationInformationDiskCache = OfficialStationInformationDiskCache()
         // One provider per source, dispatched by a router. The app decides which source a station
         // uses by reading the bundled Station Information API directory, exactly as a third-party
-        // consumer would — no per-city branching at the call sites.
+        // consumer would: no per-city branching at the call sites.
         let stationInformationRouter = OfficialStationInformationRouter(
             beijing: BeijingStationInformationProvider(diskCache: stationInformationDiskCache),
             shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache),

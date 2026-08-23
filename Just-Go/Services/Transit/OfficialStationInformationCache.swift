@@ -13,7 +13,7 @@ enum StationInformationCacheLocation {
 /// Device-only persistence for the last good official station-information snapshot per
 /// station, so riders keep access to exits, facilities, and first/last trains offline.
 ///
-/// Policy (enforced by validate_runtime_data_policy.rb): storage only — no network code in
+/// Policy (enforced by validate_runtime_data_policy.rb): storage only. No network code in
 /// this file; lives under Application Support excluded from iCloud/iTunes backup; never
 /// bundled into the app or exported; wiped by both Settings → Clear Cache and the
 /// data-rights epoch cleanup at launch.

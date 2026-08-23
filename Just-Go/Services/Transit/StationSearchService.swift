@@ -22,7 +22,7 @@ final class StationSearchService {
     ///
     /// There is no city argument because there is no selected city: the rider's own position
     /// orders the answers instead of gating them. Searching 人民广场 from Beijing therefore lists
-    /// Shanghai's — last, but listed, which is what "distance-ranked" means and what a city filter
+    /// Shanghai's: last, but listed, which is what "distance-ranked" means and what a city filter
     /// could never do.
     func search(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -46,12 +46,12 @@ final class StationSearchService {
         //
         // A place that does NOT resolve to a station is dropped. It used to be wrapped in a
         // synthesised `Station` and returned anyway, which is how a noodle shop ended up listed
-        // under "Stations" with line dots and a distance — the app asserting something it had no
+        // under "Stations" with line dots and a distance. The app asserting something it had no
         // basis for. The search page already lists Apple's places in their own section, so
         // nothing is lost by refusing to relabel them.
         let mapKitMatches = await withTaskGroup(of: (Int, Station?).self) { group in
             for (index, place) in places.enumerated() {
-                // Each place carries its own city now — the network whose bounds it falls in.
+                // Each place carries its own city now. The network whose bounds it falls in.
                 // A nationwide search returns places in several, so one shared cityID would have
                 // matched most of them against the wrong pack.
                 let cityID = await cityID(covering: place.coordinate)
@@ -104,7 +104,7 @@ final class StationSearchService {
         await officialStationData.enrichStation(station)
     }
 
-    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps — not just metro stations.
+    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps. Not just metro stations.
     /// Biased to `region` (the visible map area, or the rider) when one is known; unbiased
     /// otherwise, which is honest about having nowhere to bias it to.
     func searchPlaces(keyword: String, region: MKCoordinateRegion?) async throws -> [TransitPlace] {
@@ -113,7 +113,7 @@ final class StationSearchService {
         return try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 12)
     }
 
-    /// The programmed metro station a place corresponds to, if any — matched by name against the
+    /// The programmed metro station a place corresponds to, if any. Matched by name against the
     /// bundled network covering that place, then the official city pack. Returns nil for
     /// non-station places (e.g. a shop), so only true stations resolve to a station.
     ///
@@ -129,7 +129,7 @@ final class StationSearchService {
         return await officialStationData.matchingStation(place: place, cityID: cityID)
     }
 
-    /// The bundled network a coordinate sits in — nearest bounding box within 25 km, the same
+    /// The bundled network a coordinate sits in. Nearest bounding box within 25 km, the same
     /// tolerance the route provider uses to decide which packs a trip can reach.
     private func cityID(covering coordinate: CLLocationCoordinate2D) async -> String? {
         await metroNetworkProvider.networkSummaries()
@@ -139,7 +139,7 @@ final class StationSearchService {
     }
 
     /// Nearest first when the rider's position is known, input order otherwise. Each distance is
-    /// computed once — the comparator runs O(n log n) times and the maths is trig-heavy.
+    /// computed once: the comparator runs O(n log n) times and the maths is trig-heavy.
     private func rankedByDistance(_ stations: [Station], from coordinate: CLLocationCoordinate2D?) -> [Station] {
         guard let coordinate else { return stations }
         return stations

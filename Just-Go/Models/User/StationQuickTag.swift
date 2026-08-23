@@ -55,7 +55,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     let latitude: Double
     let longitude: Double
     let cityID: String
-    // var: repairable via withCityMetadata — rows favorited from another city's context
+    // var: repairable via withCityMetadata. Rows favorited from another city's context
     // were historically stamped with the selected city's name.
     var cityName: String
     var cityNameEn: String?
@@ -74,7 +74,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     init(station: Station, cityName: String, cityNameEn: String? = nil, kind: StationQuickTagKind) {
         self.id = "\(station.cityID)|\(station.stationID)"
         self.stationID = station.stationID
-        // Store the raw, stable source names — these are the keys the city-pack enrichment
+        // Store the raw, stable source names. These are the keys the city-pack enrichment
         // looks up. Display is localized on the fly via `displayName` / `displayLineNames`.
         self.name = station.name
         self.nameEn = station.nameEn
@@ -184,7 +184,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     }
 }
 
-/// Home and Work are single-slot (`isExclusive`) — saving a new one silently takes over the
+/// Home and Work are single-slot (`isExclusive`). Saving a new one silently takes over the
 /// slot, the way "set as Home" behaves elsewhere on iOS. Custom tags are unlimited.
 enum StationQuickTagPolicy {
     static func inserting(

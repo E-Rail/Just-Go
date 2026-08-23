@@ -1,6 +1,6 @@
 import Foundation
 
-/// `Equatable` so a view can key work on "the rider changed a preference" — `MapContainerView`
+/// `Equatable` so a view can key work on "the rider changed a preference". `MapContainerView`
 /// re-seeds the planner from this, which is the only path by which these settings reach a plan.
 struct AccessibilityPreference: Codable, Equatable {
     var primaryCategory: DisabilityCategory
@@ -12,7 +12,7 @@ struct AccessibilityPreference: Codable, Equatable {
     var avoidStairs: Bool
 
     // Vision. VoiceOver / high contrast / large text are SYSTEM features an app can't
-    // toggle — the settings sheet points to the right iOS Settings paths instead of
+    // toggle: the settings sheet points to the right iOS Settings paths instead of
     // carrying dead switches for them.
     var audioNavigation: Bool
 
@@ -46,7 +46,7 @@ struct RouteAffectingAccessibilitySignature: Equatable {
     let avoidStairs: Bool
     let maxWalkingDistance: Double
 
-    /// The mobility trio only — a maxWalkingDistance change alone must not reseed the
+    /// The mobility trio only: a maxWalkingDistance change alone must not reseed the
     /// planner's per-trip chips.
     func mobilityMatches(_ other: RouteAffectingAccessibilitySignature) -> Bool {
         requiresWheelchairAccess == other.requiresWheelchairAccess &&

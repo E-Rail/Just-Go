@@ -27,18 +27,18 @@ struct TripStep: Identifiable, Equatable {
     var exitHint: String? = nil
     /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
     /// separately verified indoor guidance.
-    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working —
-    /// matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
+    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working.
+    /// Matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
     var transferCoordinate: CodableCoordinate? = nil
     /// Apple's real, already-computed walking-route polyline for `.walkToStation`/
     /// `.walkToDestination` steps (the same data already stored on `RouteSegment.polylineCoordinates`).
     var walkingPathCoordinates: [CodableCoordinate] = []
     /// Index of the `Route.segments` entry this step came from (nil for the synthetic
-    /// `.arrive` step) — lets the live map frame the step's real geometry.
+    /// `.arrive` step): lets the live map frame the step's real geometry.
     var segmentIndex: Int? = nil
     var transferContext: TransferContext? = nil
     /// How the rider covers this access leg. The step *kind* stays `.walkToStation` /
-    /// `.walkToDestination` because everything structural about the step is the same — it is the
+    /// `.walkToDestination` because everything structural about the step is the same. It is the
     /// first or last mile, it has a drawn path, it frames the same way. Only the verb changes,
     /// and telling someone to "walk" a 9 km drive is exactly the kind of confident wrong sentence
     /// this app exists not to produce.
@@ -55,7 +55,7 @@ struct TripStep: Identifiable, Equatable {
     var title: String {
         switch kind {
         case .walkToStation:
-            // The entrance when the plan resolved one — this is a rider standing on the street
+            // The entrance when the plan resolved one. This is a rider standing on the street
             // looking for a way in, and "walk to 北京站" points at a building with eight of them.
             let target = exitHint
                 ?? toStationName

@@ -5,7 +5,7 @@ import MapKit
 ///
 /// Stations come first and instantly, because they are in memory and are what this app is for;
 /// places arrive behind them from a debounced network search. Choosing either hands back to the
-/// map, which is what owns navigation — a station pushes its detail, a place opens its card with
+/// map, which is what owns navigation. A station pushes its detail, a place opens its card with
 /// the same "Route here" button a tapped pin gets. That sameness is the point: the rider should
 /// not be able to tell how they found the place.
 struct SearchPageView: View {
@@ -20,7 +20,7 @@ struct SearchPageView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
     // Tracked so a newer recent tap (or a direct station selection) supersedes an older
-    // replay still loading its city — the loser must not overwrite the winner's push.
+    // replay still loading its city: the loser must not overwrite the winner's push.
     @State private var recentReplayTask: Task<Void, Never>?
     @State private var placeResults: [TransitPlace] = []
     @State private var placeSearchTask: Task<Void, Never>?
@@ -80,7 +80,7 @@ struct SearchPageView: View {
         placeSearchTask = Task {
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled else { return }
-            // Biased to the rider, not to a city centroid — the same position the station list
+            // Biased to the rider, not to a city centroid. The same position the station list
             // is ranked by, so both halves of this page answer "near me" the same way.
             let region = container.locationService.mapSpaceLocation.map {
                 MKCoordinateRegion(
@@ -124,8 +124,8 @@ struct SearchPageView: View {
         .padding(.bottom, 4)
     }
 
-    /// Every place the rider has already told the app matters, one tap from the top of the page —
-    /// starting with the one it can work out for itself.
+    /// Every place the rider has already told the app matters, one tap from the top of the page.
+    /// Starting with the one it can work out for itself.
     private var quickTagBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -166,7 +166,7 @@ struct SearchPageView: View {
     ///
     /// This is the only control in the app that offers the device's own position. The route entry
     /// page that used to have the button was removed, which left the automatic fill in `beginPlan`
-    /// as the sole caller — so whenever that fill did not land (GPS timeout, permission, or a start
+    /// as the sole caller, so whenever that fill did not land (GPS timeout, permission, or a start
     /// dropped as belonging to another city) the rider had a start field they could open but not
     /// answer.
     private var currentLocationChip: some View {
@@ -238,7 +238,7 @@ struct SearchPageView: View {
         tripMemoryService.stationQuickTags
     }
 
-    /// Nothing typed — the state where the page offers what the rider has already told it
+    /// Nothing typed: the state where the page offers what the rider has already told it
     /// matters, rather than a list of whatever happens to be nearby.
     private var isIdle: Bool {
         viewModel?.searchText.isEmpty ?? true
@@ -248,7 +248,7 @@ struct SearchPageView: View {
     ///
     /// The two halves answer at different speeds: stations are in memory and land on the
     /// keystroke, places come back from Apple ~350 ms later. So a place search still in flight
-    /// counts as "possibly something" — resolving it to "nothing" would flash the empty state
+    /// counts as "possibly something": resolving it to "nothing" would flash the empty state
     /// on every keystroke in the gap before Apple replies.
     private var hasAnyResult: Bool {
         !(viewModel?.searchResults.isEmpty ?? true) || !placeResults.isEmpty || isSearchingPlaces
@@ -386,7 +386,7 @@ struct SearchPageView: View {
                         Text(message)
                     }
                 } else if !hasAnyResult {
-                    // "No results" means the whole page found nothing — not just the station half.
+                    // "No results" means the whole page found nothing. Not just the station half.
                     // It used to render whenever the station index missed, so a search like
                     // "北京 xinchi" showed a full-width empty state sitting directly on top of four
                     // perfectly good places from Apple. Saying "nothing here" above a list of
@@ -433,7 +433,7 @@ struct SearchPageView: View {
                     isSearchFocused = false
                     recentReplayTask?.cancel()
                     recentReplayTask = Task {
-                        // A recent replays in ITS city — same-named stations exist across
+                        // A recent replays in ITS city: same-named stations exist across
                         // cities, so re-resolving by name can open the wrong station
                         // entirely. The stored cityID is what makes that exact; nothing
                         // about the app's state has to change to honour it any more.
@@ -446,7 +446,7 @@ struct SearchPageView: View {
                             onSelectStation(station)
                             if dismissesOnSelection { dismiss() }
                         } else {
-                            // Station no longer in the pack — fall back to a name search.
+                            // Station no longer in the pack: fall back to a name search.
                             // scheduleSearch (not search) so it goes through the single
                             // debounced slot the field itself uses.
                             viewModel?.searchText = search.stationName

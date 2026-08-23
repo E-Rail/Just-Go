@@ -198,7 +198,7 @@ final class StationDetailViewModel {
         let generation = officialInformationGeneration
         isLoadingOfficialStationInformation = true
         // Keep any snapshot already on screen: `loadStation` clears it on a station change,
-        // so anything still here is this station's own data — blanking it during a refresh
+        // so anything still here is this station's own data. Blanking it during a refresh
         // just swaps real content for a spinner.
         officialStationInformationError = nil
         defer {
@@ -236,7 +236,7 @@ final class StationDetailViewModel {
 
     /// The first station opened after launch fails intermittently: the cold DNS/TLS handshake to
     /// the official service, racing the app's own launch work, times out or resets while the
-    /// endpoint is reachable — leaving a blank "unavailable" card that loads on a manual retry.
+    /// endpoint is reachable: leaving a blank "unavailable" card that loads on a manual retry.
     /// Retry transient failures a couple of times (short, growing backoff) before surfacing the
     /// error, so the first load succeeds on its own. Non-transient failures throw immediately, and
     /// a superseded load bails as cancelled rather than overwriting a newer station's data.
@@ -388,8 +388,8 @@ final class StationDetailViewModel {
                 items: facilityItems
             ))
         }
-        // Both service times are nil here, so a row's identity collapses to direction|arrival —
-        // two trains on the same line and destination showing the same countdown produce
+        // Both service times are nil here, so a row's identity collapses to direction|arrival.
+        // Two trains on the same line and destination showing the same countdown produce
         // duplicate ForEach ids, which is undefined behavior in SwiftUI. Uniquing happens within
         // a line, since the line name is no longer part of the row's identity.
         var lineOrder: [String] = []
@@ -533,7 +533,7 @@ final class StationDetailViewModel {
             return .official
         }
         // Accessibility facts for the live-fetch cities come from the official online surface,
-        // not the bundled pack — Beijing publishes them as facility groups, Shanghai and
+        // not the bundled pack: Beijing publishes them as facility groups, Shanghai and
         // Guangzhou as per-exit accessibility flags. While that surface is showing either (live
         // or cached), the "Before You Go" chip must agree with it instead of claiming nothing
         // exists.
@@ -555,7 +555,7 @@ final class StationDetailViewModel {
     /// Whether live arrivals are a thing this station could have at all. Hong Kong publishes them;
     /// no mainland operator here does, so the chip was a permanent "Not available" telling the
     /// rider nothing about the station they are standing in. A row of dead chips is not honesty,
-    /// it is furniture — the ones that remain are the ones that can change.
+    /// it is furniture: the ones that remain are the ones that can change.
     var showsLiveArrivalConfidence: Bool {
         realtimeAvailability != .notConfigured
     }

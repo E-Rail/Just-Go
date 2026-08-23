@@ -55,7 +55,7 @@ struct ServiceHoursResolver {
         // Non-wrap [first, last]: ended once past last.
         // Wrap window (last < first, last train past midnight): the off-service gap is
         // (last, first). Split at the gap midpoint so the early half is "ended" and the
-        // late half is "not yet started" — otherwise notYetStarted is unreachable for all
+        // late half is "not yet started": otherwise notYetStarted is unreachable for all
         // midnight-wrap services (e.g. at 4:55 AM before a 5:00 first train).
         let ended = firstMin <= lastMin
             ? nowMin > lastMin
@@ -112,8 +112,8 @@ struct LiveGoTripBuilder {
                     accessMode: segment.accessLegMode
                 ))
             case .transfer:
-                // The transfer segment's own stationStops is always empty by construction —
-                // the transfer station's coordinate instead lives on stationStops.first of the
+                // The transfer segment's own stationStops is always empty by construction.
+                // The transfer station's coordinate instead lives on stationStops.first of the
                 // ride segment that immediately follows it (same station, since a transfer and
                 // the ride after it always share the same starting station).
                 let nextRide = route.segments.indices.contains(index + 1) ? route.segments[index + 1] : nil

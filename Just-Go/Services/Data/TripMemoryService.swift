@@ -154,8 +154,8 @@ final class TripMemoryService {
 
     /// Re-syncs each tag's frozen station snapshot (station ID, coordinates, line
     /// names/colors, English names) against the current bundled network data. Tags capture
-    /// this data at save time, and data refreshes regenerate the content-hash station IDs —
-    /// without this pass, tags saved before a refresh drift out of sync with what the rest
+    /// this data at save time, and data refreshes regenerate the content-hash station IDs.
+    /// Without this pass, tags saved before a refresh drift out of sync with what the rest
     /// of the app shows for the same station.
     func repairQuickTagStationData(stationLookup: @MainActor (StationQuickTag) async -> Station?) async {
         let original = stationQuickTags
@@ -175,7 +175,7 @@ final class TripMemoryService {
                 didRepair = true
             }
         }
-        // A user mutation while a lookup was in flight wins — drop this pass instead of
+        // A user mutation while a lookup was in flight wins. Drop this pass instead of
         // clobbering it; the next launch repairs whatever is still stale.
         guard didRepair, stationQuickTags == original else { return }
         stationQuickTags = StationQuickTagPolicy.normalized(repaired)

@@ -6,7 +6,7 @@ struct MapKitTimeoutError: Error {}
 /// Races `operation` against a deadline so a stalled MapKit call (MKLocalSearch, MKDirections)
 /// can't hang a user-facing spinner indefinitely. MapKit calls are known elsewhere in this
 /// codebase to ignore Swift task cancellation, so the abandoned call may keep running in the
-/// background after this throws — but the caller (and its loading UI) is unblocked either way.
+/// background after this throws, but the caller (and its loading UI) is unblocked either way.
 func withMapKitTimeout<T: Sendable>(
     seconds: TimeInterval = 12,
     operation: @escaping @Sendable () async throws -> T
@@ -32,8 +32,8 @@ protocol PlaceSearchProviding {
 
 /// "Where I am", as somewhere a trip can start from.
 ///
-/// The ladder below has four ways to go wrong — a cached fix that is fresh enough, a live request,
-/// a coarser last-known fallback, and a reverse-geocode that may fail on its own — and it used to
+/// The ladder below has four ways to go wrong. A cached fix that is fresh enough, a live request,
+/// a coarser last-known fallback, and a reverse-geocode that may fail on its own, and it used to
 /// live inside `RoutePlannerViewModel.useCurrentLocation` because the deleted route-entry page was
 /// the only thing that ever asked. Two screens ask now, and a second copy of a four-branch fallback
 /// is exactly the drift `CLAUDE.md` warns about.
@@ -50,7 +50,7 @@ struct CurrentPlaceResolver {
            recent.horizontalAccuracy <= 100,
            abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
             // A recent, sufficiently accurate fix (e.g. from pre-warming) is good enough for a
-            // route origin — use it instead of waiting on a fresh one that can stall indoors, on
+            // route origin: use it instead of waiting on a fresh one that can stall indoors, on
             // weak GPS, or in the simulator. The ≤120 s window is looser than
             // requestCurrentLocation's 30 s so a just-prewarmed fix answers instantly; the
             // accuracy gate is what keeps it safe.
@@ -76,7 +76,7 @@ struct CurrentPlaceResolver {
         }
     }
 
-    /// Names the coordinate. A failed reverse-geocode is not a failed locate — the rider still
+    /// Names the coordinate. A failed reverse-geocode is not a failed locate. The rider still
     /// gets a start they can route from, just labelled generically.
     func place(at coordinate: CLLocationCoordinate2D) async -> TransitPlace {
         do {
@@ -109,7 +109,7 @@ protocol TransitRouteProviding {
 /// Builds one walking leg. Extracted from `BundledMetroRouteProvider` because enrichment needs it
 /// too: the graph walks the rider to the station, then `RoutePlanningService` picks which door they
 /// should actually use, and the leg has to be recomputed against that door. Two callers, one
-/// implementation — a second copy would drift on exactly the numbers riders read.
+/// implementation: a second copy would drift on exactly the numbers riders read.
 protocol WalkingRouteProviding {
     func walkingSegment(
         from: CLLocationCoordinate2D,
@@ -216,7 +216,7 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
 
     /// A bike ride along the **walking** route, re-timed.
     ///
-    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any` — there is
+    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any`. There is
     /// no cycling type, and `.transit` refuses to calculate at all (measured: `MKErrorDomain` 5).
     /// So there is no cycling routing available to this app, and the honest thing to do with that
     /// is say it rather than draw a line that pretends otherwise: the shape is the pedestrian
@@ -250,12 +250,12 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             ))
         }
         // 14 km/h: a shared bike in city traffic, and slow enough that a rider who beats it is
-        // early rather than late. Not applied where stairs were named — see above.
+        // early rather than late. Not applied where stairs were named. See above.
         let duration = hasStairs ? walk.duration : walk.distance / Self.cyclingMetresPerSecond
         return walk.retyped(as: .cycling, duration: duration, accessibilityNotes: notes)
     }
 
-    /// A real driving route from MapKit — `.automobile` is a transport type `MKDirections` will
+    /// A real driving route from MapKit. `.Automobile` is a transport type `MKDirections` will
     /// actually calculate, unlike `.transit`, so unlike the bike this one is measured rather than
     /// derived. Falls back to the walking leg when MapKit declines, because a leg that exists is
     /// worth more than a mode that is missing.

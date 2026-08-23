@@ -397,7 +397,7 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
 
             do {
                 // `timeoutIntervalForRequest`/`timeoutIntervalForResource` only fire when no
-                // bytes arrive for the interval — a connection that trickles data indefinitely
+                // bytes arrive for the interval: a connection that trickles data indefinitely
                 // never trips them, so a buffered `session.data(for:)` can hang well past the
                 // declared 30s and leave the viewer looking frozen. Race it against an explicit
                 // deadline, mirroring the fix in OfficialStationInformationProvider.swift.
@@ -622,7 +622,7 @@ private final class OfficialTransitResourceWebState: ObservableObject {
     private var loadWatchdog: Task<Void, Never>?
 
     /// Nothing else here has a time limit. WebKit reports a failed load through its delegate, but
-    /// a DNS lookup that never answers produces no delegate call at all — the operator hosts this
+    /// a DNS lookup that never answers produces no delegate call at all. The operator hosts this
     /// app links to are exactly the ones that do that on a restricted network, and the result was
     /// a screen showing a spinner and nothing else, forever. Every load now ends one way or the
     /// other within this window.

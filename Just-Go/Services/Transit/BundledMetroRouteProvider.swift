@@ -19,14 +19,14 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         to destination: TransitPlace,
         accessibilityFilter: AccessibilityFilter
     ) async throws -> [Route] {
-        // Bounds-only pass first — decoding and permanently caching all ~46 supported cities'
+        // Bounds-only pass first: decoding and permanently caching all ~46 supported cities'
         // full station/line/polyline data on every search (via networks()) just to compare
         // bounding boxes was the dominant cost of a cold route search. Only the (typically 0-2)
         // cities that actually pass the bounds check get their full network loaded below.
         let summaries = await metroNetworks.networkSummaries()
         // Near either end, not near both. Requiring both is what made Suzhou → Shanghai return
         // nothing at all: Suzhou's pack is 34.9 km from a central Shanghai destination and
-        // Shanghai's is 32.7 km from a central Suzhou origin, so the `&&` dropped *both* — even
+        // Shanghai's is 32.7 km from a central Suzhou origin, so the `&&` dropped *both*. Even
         // though 花桥 sits in both packs, 60 m apart, and is exactly where the two 11号线s meet.
         // A pack that reaches only one end is precisely the pack that carries the corridor out.
         let candidateCityIDs = summaries.filter {
@@ -63,7 +63,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         }
         guard !uniquePaths.isEmpty else { throw RoutePlanningError.noRouteFound }
 
-        // Each makeRoute call fetches its own walking directions over the network — running
+        // Each makeRoute call fetches its own walking directions over the network. Running
         // the (up to 3) candidates one after another multiplied route-search latency by the
         // number of alternatives. They're independent, so fetch them concurrently instead.
         let results: [Route] = await withTaskGroup(of: (Int, Route).self) { group in
@@ -148,7 +148,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// Which duplicate copies of a station collapse onto which surviving one.
     ///
     /// Adjacent cities' packs each carry the intercity corridor they share, so a station on that
-    /// corridor is shipped two or three times — 174 such pairs across the bundled data, 170 of them
+    /// corridor is shipped two or three times. 174 Such pairs across the bundled data, 170 of them
     /// in the Guangzhou/Foshan/Dongguan cluster. Left alone the merged graph would hold two
     /// disconnected copies of 科韵路 and a rider could not change trains there.
     ///
@@ -156,10 +156,10 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// something wrong with it. Each pack stays independently valid, independently licensed, and
     /// usable on its own.
     ///
-    /// Keyed on identical normalized name **and** colocation — never distance alone. 体育西路 and
+    /// Keyed on identical normalized name **and** colocation. Never distance alone. 体育西路 and
     /// 天河南 are 281 m apart and are different stations; requiring the name to match as well is
     /// what separates "the same station shipped twice" from "two stations that are close".
-    /// Which duplicate copies of a *line* collapse onto which surviving one — the missing half of
+    /// Which duplicate copies of a *line* collapse onto which surviving one. The missing half of
     /// the rule above.
     ///
     /// Stations were deduplicated across packs and lines were not, so the shared intercity
@@ -169,7 +169,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// copies: the results page listed 130分钟 · 3次换乘 twice, as two "different" plans that were
     /// the same trip.
     ///
-    /// Identity is **identical name and an identical canonical station set** — both, never the name
+    /// Identity is **identical name and an identical canonical station set**. Both, never the name
     /// alone. Guangzhou's 1号线 and Dongguan's 1号线 share a name and not one station; the three
     /// copies of 广州东环-琶莲-佛莞城际 share all 18. There is nothing to tune between those cases.
     private func canonicalLineIDs(
@@ -204,7 +204,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             }
             for cluster in clusters where cluster.count > 1 {
                 // Lowest id wins. The copies serve the same stations by construction, so there is
-                // nothing to prefer between them — this only keeps the choice stable between runs.
+                // nothing to prefer between them: this only keeps the choice stable between runs.
                 let winner = cluster.map(\.id).min()!
                 for line in cluster where line.id != winner {
                     canonicalLines[line.id] = winner
@@ -238,7 +238,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 }
             }
             for cluster in clusters where cluster.count > 1 {
-                // The copy that knows the most lines survives — that is the one the importer merged
+                // The copy that knows the most lines survives, that is the one the importer merged
                 // the metro service into, so it sits on the platform rather than beside it. The id
                 // tie-break only exists to keep the choice stable between runs.
                 let winner = cluster.sorted {
@@ -264,8 +264,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         func resolve(_ stationID: String) -> String { canonical[stationID] ?? stationID }
         let canonicalLine = canonicalLineIDs(across: networks, canonicalStationIDs: canonical)
 
-        // Tolerate duplicated ids in a data pack (keep the first) instead of trapping —
-        // a single malformed pack entry must not crash route search.
+        // Tolerate duplicated ids in a data pack (keep the first) instead of trapping.
+        // A single malformed pack entry must not crash route search.
         var stationsByID: [String: MetroStation] = [:]
         var linesByID: [String: MetroLine] = [:]
         var cityIDByStationID: [String: String] = [:]
@@ -308,7 +308,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         // Interchange links, both kinds. An `outOfStation` pair is two separately gated stations
         // and a street walk; an `inStation` pair is two stations inside one paid area. Either way
         // the graph needs an edge, or the two are unreachable from each other however close they
-        // sit — which is why Beijing's 广安门内 ↔ 牛街 could not be planned at all.
+        // sit, which is why Beijing's 广安门内 ↔ 牛街 could not be planned at all.
         for network in networks {
             for link in network.interchanges {
                 let fromID = resolve(link.fromStationID)
@@ -385,7 +385,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
 
             for edge in graph.adjacency[item.state.stationID, default: []] {
                 // An interchange link is the transfer, so it pays the penalty and the boarding on
-                // the far side of it does not — charging both would price one change as two.
+                // the far side of it does not: charging both would price one change as two.
                 let arrivedByInterchange = item.state.lineID == metroInterchangeLineID
                 let transfer = !arrivedByInterchange &&
                     item.state.lineID != nil &&
@@ -424,8 +424,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// `revisitsAStation` catches a ride that returns to a station it has already called at. It
     /// cannot catch this: asking for a route from 岗顶 to 岗顶 produced a ride one stop down Line 3
     /// to 石牌桥 followed by an 827 m walk back, and that path calls at each of its two stations
-    /// exactly once. The graph must return *some* ride — a destination is only accepted after at
-    /// least one — so with nowhere useful to go it went somewhere useless.
+    /// exactly once. The graph must return *some* ride. A destination is only accepted after at
+    /// least one, so with nowhere useful to go it went somewhere useless.
     ///
     /// The test is in metres, not in stations: the walking this trip still requires, plus the
     /// walking it already required to reach a platform, against simply walking the whole way. When
@@ -442,8 +442,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     /// Whether the path ending here already called at one of its own stations.
     ///
     /// A ride that comes back to a station it has passed through is never the answer, and the
-    /// search will otherwise choose one. A destination is only accepted with `lineID != nil` —
-    /// i.e. having ridden at least one edge — so when the rider's destination *is* the station
+    /// search will otherwise choose one. A destination is only accepted with `lineID != nil`.
+    /// I.e. having ridden at least one edge, so when the rider's destination *is* the station
     /// they are stood next to, the cheapest **legal** path is out one stop and back. That is what
     /// "route me to my nearest station" returned: one south, then north to where it started.
     ///

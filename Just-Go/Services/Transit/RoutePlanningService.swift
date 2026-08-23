@@ -5,7 +5,7 @@ import MapKit
 /// Memoises walking legs for the span of one plan.
 ///
 /// Alternatives are enriched concurrently and mostly share their endpoints, so without this the
-/// same door-to-destination walk is requested once per alternative per candidate door — enough
+/// same door-to-destination walk is requested once per alternative per candidate door. Enough
 /// duplicate `MKDirections` traffic to get throttled. In-flight calls are shared, not just
 /// finished ones, because the concurrent callers arrive together.
 private actor WalkingLegMemo {
@@ -52,7 +52,7 @@ final class RoutePlanningService {
     private let officialStationData: OfficialStationDataProviding
     private let walkingRoutes: WalkingRouteProviding
     /// The operator's own answer about a station, fetched on the rider's device. Optional because
-    /// a route is still a route without it — and because most cities have no such source.
+    /// a route is still a route without it, and because most cities have no such source.
     private let officialStationInformation: (any OfficialStationInformationProviding)?
     private let stationInformationDirectory: StationInformationDirectory?
     private let tripObservations: (any TripObservationProviding)?
@@ -85,7 +85,7 @@ final class RoutePlanningService {
         // Walking is a real answer, and until now it was one the app could not give: every result
         // had to contain a train. Asking for a route to your nearest station therefore produced a
         // ride one stop out and back, because that was the cheapest thing the graph was allowed to
-        // return. Built alongside the search rather than after it — it costs one MKDirections call
+        // return. Built alongside the search rather than after it. It costs one MKDirections call
         // and the two are independent.
         async let directWalk = directWalkingRoute(from: origin, to: destination)
 
@@ -120,7 +120,7 @@ final class RoutePlanningService {
         let legs = WalkingLegMemo(provider: walkingRoutes)
 
         // Each route's enrichment below is a handful of officialStationData lookups that don't
-        // touch any shared mutable state — running them one route after another multiplied
+        // touch any shared mutable state: running them one route after another multiplied
         // enrichment latency by the number of alternatives. They're independent, so enrich
         // concurrently instead (same fix already applied to the analogous per-alternative
         // fetch in BundledMetroRouteProvider.routes).
@@ -129,7 +129,7 @@ final class RoutePlanningService {
                 group.addTask {
                     let enriched = await self.enrichedRoute(
                         route,
-                        // A POI's own entrance beats its centroid when MapKit knows one — it is
+                        // A POI's own entrance beats its centroid when MapKit knows one. It is
                         // the door the rider actually walks to, so it is the right thing to
                         // measure the station's exits against.
                         originTarget: CodableCoordinate(
@@ -322,7 +322,7 @@ final class RoutePlanningService {
     ///
     /// Best effort in every direction: no source for the city, no directory entry, a timeout or a
     /// refusal all mean "no official answer", never a failed plan. Bounded at four seconds because
-    /// this is an *upgrade* to an answer that already exists — a rider waiting on a route must not
+    /// this is an *upgrade* to an answer that already exists. A rider waiting on a route must not
     /// wait on an operator's website.
     private func officialStationSnapshots(
         for stops: [RouteStationStop]
@@ -361,7 +361,7 @@ final class RoutePlanningService {
     /// Counts a stop as having official accessibility when the operator publishes a lift for it.
     ///
     /// The pack's count comes from OpenStreetMap `wheelchair` tags, which cover 20% of the bundled
-    /// network — so a Beijing trip reported "accessibility source pending" for stations whose
+    /// network, so a Beijing trip reported "accessibility source pending" for stations whose
     /// operator page lists a 直梯 and where it is. Taken as the larger of the two rather than a
     /// replacement: the pack still speaks for cities with no official source.
     private func coverage(
@@ -376,7 +376,7 @@ final class RoutePlanningService {
                 }
         }.count
         // Same argument for the timetable: the operator publishes first and last train per line
-        // per direction, and the app was reading only the pack — so a Beijing trip was docked for
+        // per direction, and the app was reading only the pack, so a Beijing trip was docked for
         // an "incomplete official schedule" while bjsubway.com was answering with one.
         let scheduleCount = snapshots.values.filter { snapshot in
             snapshot.lines.contains { line in
@@ -391,20 +391,20 @@ final class RoutePlanningService {
         )
     }
 
-    /// Whether the subway is running for this trip — resolved for **every** ride it makes, at the
+    /// Whether the subway is running for this trip. Resolved for **every** ride it makes, at the
     /// moment each one departs, rather than only for the first.
     ///
     /// Two holes met here. `serviceWindows` reads the city pack and no pack carries a timetable:
     /// operator schedule content must not be committed, so `schedules` is empty for all 2,849
     /// bundled stations and this resolved to `.unknown` for every route in every city while the
-    /// machinery below it — the banner, the confidence reason, the feasibility level — looked
+    /// machinery below it: the banner, the confidence reason, the feasibility level. Looked
     /// finished. The operator's own page does publish first and last train, and
     /// `officialStationSnapshots` has already fetched it; reading it here redistributes nothing
     /// that the accessibility upgrade above does not already read the same way, on the rider's
     /// device and cached device-only.
     ///
     /// And only the boarding leg was ever checked. The train a rider actually misses is rarely the
-    /// first one — it is the connection, which departs later in the evening and stops earlier. A
+    /// first one: it is the connection, which departs later in the evening and stops earlier. A
     /// definite failure on any leg beats "fine" on the others; a leg nobody can answer for keeps
     /// the whole trip `.unknown` rather than letting a verified leg speak for it.
     private func serviceStatus(
@@ -483,7 +483,7 @@ final class RoutePlanningService {
         }
 
         // Name the leg. On a one-ride trip the station adds nothing the rider does not already
-        // know; on a trip with a change it is the whole point — the ride that fails is usually not
+        // know; on a trip with a change it is the whole point. The ride that fails is usually not
         // the one they are standing at the entrance of.
         let banner = worst.status.bannerText
         let message: String? = {
@@ -511,7 +511,7 @@ final class RoutePlanningService {
     }
 
     /// The operator's published first/last train, in the shape the resolver reads. Rows with
-    /// neither time are dropped rather than passed through as blanks — the resolver treats an
+    /// neither time are dropped rather than passed through as blanks. The resolver treats an
     /// empty pool as "no answer", which is what a row with no times actually is.
     private static func serviceWindows(
         from snapshot: OfficialStationInformationSnapshot?
@@ -541,11 +541,11 @@ final class RoutePlanningService {
     /// The operator's exit list laid over the pack's.
     ///
     /// Beijing signs its exits `A`, `B`, `D2`. OpenStreetMap surveyed 1,095 doors for Beijing and
-    /// left 200 of them unnamed, calling another 246 things like 东南口 — so the app sent riders to
+    /// left 200 of them unnamed, calling another 246 things like 东南口, so the app sent riders to
     /// a door whose sign says something else, or to one with no name at all. Where the two agree on
     /// a name the surveyed coordinate is kept and the point is marked official; where the operator
-    /// lists an exit nobody surveyed it is added without a coordinate, which is the honest shape —
-    /// the exit exists and is called `A`, and where exactly it stands is not known.
+    /// lists an exit nobody surveyed it is added without a coordinate, which is the honest shape.
+    /// The exit exists and is called `A`, and where exactly it stands is not known.
     private func merged(
         _ guidance: [String: StationAccessGuidance],
         with snapshots: [String: OfficialStationInformationSnapshot]
@@ -573,7 +573,7 @@ final class RoutePlanningService {
             }
             // One door, one exit: the operator says this station has exactly one exit and exactly
             // one was surveyed, so they are the same door and it is called what the sign says. Any
-            // looser pairing would be a guess — with two surveyed doors and exits A and B there is
+            // looser pairing would be a guess, with two surveyed doors and exits A and B there is
             // nothing in either dataset that says which is which, and a wrong exit letter sends a
             // rider up the wrong staircase with full confidence.
             var bound = upgraded
@@ -626,8 +626,8 @@ final class RoutePlanningService {
     /// The trip on foot, when that is a thing a person would actually do.
     ///
     /// Bounded at 3 km straight-line: past that walking stops being an answer and starts being a
-    /// way to make `MKDirections` slow for nothing. Deliberately carries no station IDs — it calls
-    /// at none — which leaves `networkCityID` nil, the value every reader of it already handles.
+    /// way to make `MKDirections` slow for nothing. Deliberately carries no station IDs. It calls
+    /// at none, which leaves `networkCityID` nil, the value every reader of it already handles.
     /// `strategy` is `.fastest` because when walking wins it *is* the fastest option, so this needs
     /// no new strategy case, no new localized strings, and no change to the sort chips.
     private func directWalkingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
@@ -675,13 +675,13 @@ final class RoutePlanningService {
     ) async -> Route {
         var route = route
         // The pack that actually produced the route. A walking-only plan has none, and every
-        // official-data lookup below then finds nothing and reports unavailable — which is the
+        // official-data lookup below then finds nothing and reports unavailable, which is the
         // truth: no station was involved, so there is nothing to say about one.
         let routeCityID = route.networkCityID ?? ""
         let criticalStops = criticalStops(for: route)
         let criticalStopNames = criticalStops.map(\.name)
 
-        // These three official-data lookups are independent of one another — kick them
+        // These three official-data lookups are independent of one another. Kick them
         // off concurrently and await results in the order their side effects are applied.
         async let dataCoverage = officialStationData.routeCoverage(
             cityID: routeCityID,
@@ -736,8 +736,8 @@ final class RoutePlanningService {
         }
 
         // Being in the routable network does not make a station one a rider can use. The reviewed
-        // catalog marks eight that do not take passengers — 福寿岭 is still a building site, 黄土店
-        // is open track with no passenger stop — and every one of them can be routed to today. The
+        // catalog marks eight that do not take passengers. 福寿岭 is still a building site, 黄土店
+        // is open track with no passenger stop, and every one of them can be routed to today. The
         // status was only ever read by the station's own screen, so a plan could send someone to a
         // door that does not open and say nothing.
         route.warnings.append(contentsOf: await passengerServiceWarnings(
@@ -757,7 +757,7 @@ final class RoutePlanningService {
         // Choose each end's door ONCE, by measured walking distance, and let every surface read
         // that one answer. When the timeline picked its own exit and the guide card picked another,
         // the same trip named two different doors on two screens.
-        // Any access leg, not just a walked one — the door-measuring below is what turns a
+        // Any access leg, not just a walked one. The door-measuring below is what turns a
         // straight-line exit guess into a measured one, and a cycled or driven first mile needs it
         // just as much.
         let originIndex = route.segments.first?.type.isAccessLeg == true ? 0 : nil
@@ -822,11 +822,11 @@ final class RoutePlanningService {
     }
 
     /// Distance below which re-walking the leg to a specific door is not worth an `MKDirections`
-    /// round trip — the door is essentially where the graph already sent the rider.
+    /// round trip: the door is essentially where the graph already sent the rider.
     private static let exitRerouteThresholdMetres: Double = 40
 
     /// How many of the nearest doors get their walk actually measured. Three covers the case this
-    /// exists for — one door on the wrong side of a barrier — without turning every plan into a
+    /// exists for: one door on the wrong side of a barrier, without turning every plan into a
     /// dozen routing calls.
     private static let exitCandidateLimit = 3
 
@@ -842,7 +842,7 @@ final class RoutePlanningService {
     ///
     /// The graph walks the rider to the station's centre, because a centre is all a graph node has,
     /// and enrichment then names a specific door. Left there, the two halves of the screen disagree:
-    /// the text says "Exit D" while the map draws — and the duration counts — a walk to the middle
+    /// the text says "Exit D" while the map draws, and the duration counts. A walk to the middle
     /// of the station. At 西单 that read as a 265 m walk to a door 34 m away.
     ///
     /// Straight-line distance alone is not enough to choose with, either. At 西直门 the nearest door
@@ -898,7 +898,7 @@ final class RoutePlanningService {
                         toName: toName,
                         // The assembler already decided how this end is covered. Re-measuring it
                         // against a specific door must not silently turn a 6 km drive back into
-                        // a walk — the door moves, the mode does not.
+                        // a walk: the door moves, the mode does not.
                         mode: mode
                     )
                     return (point, leg)
@@ -995,7 +995,7 @@ final class RoutePlanningService {
         func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role) {
             guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
             let access = guidance[stop.name] ?? .empty
-            // The boarding and arrival doors were already chosen — by measured walking distance —
+            // The boarding and arrival doors were already chosen, by measured walking distance,
             // so take those rather than re-deciding here. Deciding twice is how the timeline and
             // the guide card came to name two different exits for the same trip.
             //
@@ -1006,7 +1006,7 @@ final class RoutePlanningService {
             case .arrival: chosen = destinationExit
             case .transfer: chosen = nil
             }
-            // Downstream — the trip timeline, the arrival notification — only ever sees this point,
+            // Downstream: the trip timeline, the arrival notification, only ever sees this point,
             // so an unlabeled entrance has its direction resolved here, while the station it is
             // measured from is still in hand.
             let exit = chosen?.labeled(relativeTo: stop.coordinate)
@@ -1068,8 +1068,8 @@ final class RoutePlanningService {
                 )]
             }
             // The rider asked for step-free access and this station has no entrance recorded as
-            // step-free. Say that, rather than let the nearest exit read as an accessible one —
-            // most entrances are simply unsurveyed, which is not the same as being accessible.
+            // step-free. Say that, rather than let the nearest exit read as an accessible one.
+            // Most entrances are simply unsurveyed, which is not the same as being accessible.
             if recommendation.stepFreeUnavailable {
                 notes.append(AppLocalization.text(
                     english: "No step-free entrance is recorded at \(guide.stationName). This is the nearest one.",
@@ -1194,11 +1194,11 @@ final class RoutePlanningService {
     ) -> [Route] {
         let ranked = rankedRoutes(routes, by: strategy, preferences: preferences, tripAnchor: tripAnchor)
         // A hard accessibility requirement demotes routes with a DETECTED barrier under
-        // every strategy, not just the step-free sort — otherwise the toggles have no
+        // every strategy, not just the step-free sort. Otherwise the toggles have no
         // visible effect on the default orderings. Demoted, not removed: hiding every
         // option behind an unmet requirement helps no one, and the route cards carry the
         // barrier warning explaining the ordering. (Path-level avoidance would need
-        // accessibility data inside the routing graph — not available there today.)
+        // accessibility data inside the routing graph. Not available there today.)
         guard preferences.requiresWheelchairAccess || preferences.prefersElevator else { return ranked }
         let clear = ranked.filter { $0.stepFreeAssessment != .barrierDetected }
         let barriers = ranked.filter { $0.stepFreeAssessment == .barrierDetected }
@@ -1316,7 +1316,7 @@ final class RoutePlanningService {
 
 extension Route {
     /// The pack the trip *starts* in, and nothing more. A trip spans packs now, so anything about
-    /// one particular station has to ask that station — see `RouteStationStop.packCityID`.
+    /// one particular station has to ask that station. See `RouteStationStop.packCityID`.
     var networkCityID: String? {
         MetroStationIdentifier.cityID(of: originStationID)
     }

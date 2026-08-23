@@ -42,7 +42,7 @@ struct StepPrimaryButtonLabel: View {
     let systemImage: String
     /// Raw hex, not `themeColor`: this is a solid fill under white text, and
     /// `Color.adaptive` lightens toward white in dark mode specifically for *foreground*
-    /// legibility — used as a fill it collapses contrast instead.
+    /// legibility: used as a fill it collapses contrast instead.
     let fillHex: String
 
     var body: some View {

@@ -71,8 +71,8 @@ final class CityService {
         cities.first { $0.id == id }
     }
 
-    /// The city a coordinate belongs to. Used to *label* things — which pack a quick tag files
-    /// under, which network to warm on launch — never to gate what the app will load, search,
+    /// The city a coordinate belongs to. Used to *label* things, which pack a quick tag files
+    /// under, which network to warm on launch. Never to gate what the app will load, search,
     /// draw or route. That gate is gone: the map is one network you pan.
     func findNearestCity(to location: CLLocation) -> City? {
         cities.min { city1, city2 in

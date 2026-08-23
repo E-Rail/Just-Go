@@ -27,7 +27,7 @@ struct JustGoApp: App {
         #endif
         _container = State(initialValue: container)
         // The sweep walks a directory whose size the app doesn't control, and nothing waits
-        // on its result — keep it off the main thread, which is otherwise blocked here
+        // on its result: keep it off the main thread, which is otherwise blocked here
         // until the first frame. Measured at 8ms on an empty container but 82ms with 4,200
         // temp entries, i.e. bounded only by how much junk has accumulated.
         Task.detached(priority: .utility) {
@@ -67,7 +67,7 @@ struct JustGoApp: App {
     private func runLaunchStages() async {
         guard appState.isLaunching else { return }
 
-        // Stage 1 — services. `DIContainer.configure()` already ran in `init`; the city
+        // Stage 1: services. `DIContainer.configure()` already ran in `init`; the city
         // capabilities manifest is the remaining piece, and it is what the city rows render from.
         appState.advanceLaunch(to: .loadingCities)
         // Starts a fix so the map's opening centre-on-user has something to land on quickly.
@@ -78,11 +78,11 @@ struct JustGoApp: App {
             CityDataCapabilities.prewarm()
         }.value
 
-        // Stage 2 — decode the network the map is about to open on, so its geometry is already
+        // Stage 2: decode the network the map is about to open on, so its geometry is already
         // in memory instead of being paid for on first appearance. Which one that is comes from
         // the camera the rider left behind, not from a city they were made to pick.
         // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
-        // is a warmup — if it overruns, hand off and let it land in the actor's cache behind us.
+        // is a warmup, if it overruns, hand off and let it land in the actor's cache behind us.
         #if DEBUG
         LaunchClock.mark("stage1.capabilities.done")
         #endif
@@ -102,10 +102,10 @@ struct JustGoApp: App {
         #if DEBUG
         LaunchClock.mark("stage2.networkDecode.done")
         #endif
-        // Essentials done — hand off.
+        // Essentials done: hand off.
         appState.advanceLaunch(to: .ready)
 
-        // Stage 3 — runs after the handoff, so it never holds the first screen.
+        // Stage 3: runs after the handoff, so it never holds the first screen.
         //
         // The nationwide station index is 53 packs' worth of decoding and search is the only
         // thing that needs it, several taps away; quick-tag repair touches a network decode and
@@ -122,7 +122,7 @@ struct JustGoApp: App {
     }
 
     /// Builds the nationwide station list behind the live UI, so the first search does not wait
-    /// on it. Idempotent — the provider caches, and the search page calls the same method.
+    /// on it. Idempotent: the provider caches, and the search page calls the same method.
     private func warmStationIndex() async {
         _ = await container.metroNetworkProvider.allStations()
     }

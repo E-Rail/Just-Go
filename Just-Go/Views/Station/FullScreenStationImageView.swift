@@ -7,7 +7,7 @@ private let stationAssetImageCache = NSCache<NSString, UIImage>()
 
 /// Renders only bundled or privately persisted station media. Decodes off the main actor and,
 /// when `targetDimension` is given, downsamples via ImageIO instead of decoding full resolution
-/// — a grid of multi-MB personal photos would otherwise stall scrolling with per-cell,
+///. A grid of multi-MB personal photos would otherwise stall scrolling with per-cell,
 /// main-thread, full-size decodes. Results are cached (bounded by `NSCache`'s own eviction).
 struct StationAssetImage<Content: View, Failure: View>: View {
     let url: URL

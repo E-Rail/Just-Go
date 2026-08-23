@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The launch work the app does before it can show a usable UI, in order. Each case is real
-/// work with a real completion point — the launch screen names the stage it is on, so a slow
+/// work with a real completion point. The launch screen names the stage it is on, so a slow
 /// launch on a real device reports *which* stage is slow instead of just feeling slow.
 enum LaunchStage: Int, CaseIterable, Comparable {
     case preparing
@@ -57,8 +57,8 @@ final class AppState {
 
     /// Where the map was last looking.
     ///
-    /// This is what is left of "the selected city". The app used to hold one city as a mode —
-    /// gating what was loaded, searched, drawn and routed — and every screen had to agree about
+    /// This is what is left of "the selected city". The app used to hold one city as a mode.
+    /// Gating what was loaded, searched, drawn and routed, and every screen had to agree about
     /// it. What a rider actually wants on relaunch is the view they left, so that is the only
     /// thing kept: a camera, not a mode. Nothing is gated on it.
     var lastMapCamera: MapCamera? {
@@ -80,7 +80,7 @@ final class AppState {
 
     #if DEBUG
     // Lets a headless diagnostic launch open straight onto a given tab, since this environment has
-    // no way to inject a tap — confirmed, not assumed: this Xcode install ships no Simulator.app,
+    // no way to inject a tap: confirmed, not assumed: this Xcode install ships no Simulator.app,
     // so the device is booted headlessly and there is no GUI to click.
     var selectedTab: Tab = ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] == "profile"
         ? .profile

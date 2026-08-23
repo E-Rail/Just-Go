@@ -15,11 +15,11 @@ struct TransitDataView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
 
-    /// Only the cities whose pack actually holds station data — 14 of the 53, not all 53.
+    /// Only the cities whose pack actually holds station data. 14 Of the 53, not all 53.
     ///
     /// Routing is untouched: every city keeps its bundled OSM network and stays searchable and
     /// plannable. This page is about the *station* layer, and listing a city with an empty pack
-    /// put a download control in front of nothing — there are no remote packs at all, since none
+    /// put a download control in front of nothing. There are no remote packs at all, since none
     /// of the `CityPack*URL` Info.plist keys is set. Advertising 39 packs that cannot arrive is
     /// the same failure as claiming a transfer nobody surveyed.
     private var cities: [City] {
@@ -108,7 +108,7 @@ struct TransitDataView: View {
                         dataCapabilityRow(
                             icon: "clock.fill",
                             title: AppLocalization.localized("Train times"),
-                            // No bundled pack carries a timetable — operator schedule content must
+                            // No bundled pack carries a timetable. Operator schedule content must
                             // not be committed, so `schedules` is empty for all 2,849 stations.
                             // First and last trains exist only as a device-side fetch, in the
                             // cities that publish one.
@@ -552,12 +552,12 @@ private struct OfficialResourceCityView: View {
 struct CityCapabilityTags: View, Equatable {
     let coverage: CityDataCoverage
     /// True for cities whose accessibility/facility facts are served live from the official
-    /// operator (Beijing) — the bundled coverage metric honestly reads 0 there, but showing
+    /// operator (Beijing): the bundled coverage metric honestly reads 0 there, but showing
     /// "0" would contradict the online facilities every station page renders.
     var hasOfficialOnlineStationInformation: Bool = false
 
     /// Cap held to 3: a city row is a compact summary, not the full coverage table (that
-    /// detail lives on the city's own page) — more than a handful of chips just wraps and
+    /// detail lives on the city's own page). More than a handful of chips just wraps and
     /// crowds every other row in the list.
     private static let maximumTagCount = 3
 

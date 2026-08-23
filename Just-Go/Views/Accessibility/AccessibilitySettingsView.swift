@@ -71,8 +71,8 @@ struct AccessibilitySettingsView: View {
 
     // VoiceOver / high contrast / large text / LED flash are SYSTEM features: an app
     // cannot toggle them (and there is no public deep-link to Settings > Accessibility),
-    // so these rows show the real state where readable and the exact Settings path —
-    // honest guidance instead of switches that silently do nothing.
+    // so these rows show the real state where readable and the exact Settings path.
+    // Honest guidance instead of switches that silently do nothing.
     private var visionSection: some View {
         Section {
             systemFeatureRow(
@@ -142,8 +142,8 @@ struct AccessibilitySettingsView: View {
 
     private var cognitiveSection: some View {
         Section {
-            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI` — no
-            // view hid anything — so a rider with a cognitive-accessibility need flipped a switch
+            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI`. No
+            // view hid anything, so a rider with a cognitive-accessibility need flipped a switch
             // that did nothing, on the one screen that exists to serve them. A control that lies
             // is worse than a control that is absent.
             Toggle(AppLocalization.localized("Step-by-Step Guidance"), isOn: preferenceBinding(\.stepByStepGuidance))

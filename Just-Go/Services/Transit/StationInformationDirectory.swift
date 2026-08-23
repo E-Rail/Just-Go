@@ -3,7 +3,7 @@ import Foundation
 /// The app consumes its own published Station Information API instead of reaching into DataPacks:
 /// it bundles a mirror of `directory.json` (which source covers each station, and with which key)
 /// and `sources.json` (which cities are served, and how), and routes from those. Adding a city is
-/// then a data change — regenerate the directory — with no routing code to touch.
+/// then a data change: regenerate the directory, with no routing code to touch.
 ///
 /// See `StationInfoAPI/API.md`. The bundled copies are written by
 /// `Scripts/generate_station_info_api.rb` and CI diff-checks them against the published contract.
@@ -16,7 +16,7 @@ struct StationDirectoryEntry: Sendable, Equatable {
     let source: String
     /// The source's primary station key. For sources keyed per line this is the first line key.
     let externalStationID: String
-    /// Every key the source uses for this station — one per line it serves. `[externalStationID]`
+    /// Every key the source uses for this station. One per line it serves. `[externalStationID]`
     /// for sources without per-line keys.
     let lineStationIDs: [String]
     let sourcePageURL: String?
@@ -27,7 +27,7 @@ final class StationInformationDirectory: Sendable {
         /// Sources whose data is fetched live on the rider's device. `bundledDataset` sources (Hong
         /// Kong) are served from the city pack and are intentionally excluded from the online path.
         let onDeviceFetchSources: Set<String>
-        /// City IDs a `stable` source covers — used to answer "does this city have station info"
+        /// City IDs a `stable` source covers. Used to answer "does this city have station info"
         /// the same way the API's `sources.json` declares it, rather than hard-coding city IDs.
         let servedCityIDs: Set<String>
         let entriesByStationID: [String: StationDirectoryEntry]
@@ -36,13 +36,13 @@ final class StationInformationDirectory: Sendable {
     /// Parsed on first use, not on construction.
     ///
     /// `directory.json` is **453 KB / 1,598 entries**, and this type was built inside
-    /// `DIContainer.configure()`, which runs in `JustGoApp.init()` — so the whole file was read,
+    /// `DIContainer.configure()`, which runs in `JustGoApp.init()`, so the whole file was read,
     /// deserialised and walked on the main thread before the app had drawn anything. The comment
     /// on the very next line of `configure()` explains that the bundled catalog was handed a lazy
     /// loader for exactly this reason; the directory beside it was missed.
     ///
-    /// Nothing on the launch path asks a station-information question — the first caller is a
-    /// route plan or a station sheet, both already off the main actor — so the work simply moves
+    /// Nothing on the launch path asks a station-information question. The first caller is a
+    /// route plan or a station sheet, both already off the main actor, so the work simply moves
     /// to where it is needed. The lock is uncontended in practice and makes the type honestly
     /// `Sendable` rather than relying on the callers happening to be serialised.
     private let bundle: Bundle
@@ -127,7 +127,7 @@ final class StationInformationDirectory: Sendable {
     }
 
     /// Stations resolved from the bundled metro network carry a synthesised
-    /// `network-<cityID>-<canonicalID>` identifier, while the directory — like the city packs — is
+    /// `network-<cityID>-<canonicalID>` identifier, while the directory, like the city packs. Is
     /// keyed by the bare canonical ID. Every station opened from the map arrives in that
     /// synthesised form, so without this the lookup missed for all of them and the live
     /// first/last surface silently fell back to the "official page available" placeholder.
@@ -144,7 +144,7 @@ final class StationInformationDirectory: Sendable {
     /// How to ask the operator about this station, or nil when none of them covers it.
     ///
     /// Lived privately on the station screen while that screen was the only thing that fetched
-    /// official data. The route needs the same answer — the operator names Beijing's exits `A`,
+    /// official data. The route needs the same answer. The operator names Beijing's exits `A`,
     /// `B`, `D2`, which is what the signs say, while OpenStreetMap leaves 200 of Beijing's 1,095
     /// surveyed doors unnamed and calls another 246 things like 东南口. Two copies of this mapping
     /// would drift, and a station the route resolves differently from its own page is worse than

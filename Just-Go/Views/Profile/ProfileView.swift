@@ -7,7 +7,7 @@ enum AppWebLinks {
 
 /// The five screens Profile can open. One `sheet(item:)` rather than five `sheet(isPresented:)`
 /// on the same node: stacked presentation modifiers are a documented failure class in this app
-/// already — `RouteDetailView` carries the same note about `navigationDestination(item:)` — where
+/// already: `RouteDetailView` carries the same note about `navigationDestination(item:)`. Where
 /// one registration shadows another and the shadowed row simply stops opening. Settings was the
 /// fourth of the five, and the fourth is exactly the one riders reported as dead.
 private enum ProfileDestination: String, Identifiable {

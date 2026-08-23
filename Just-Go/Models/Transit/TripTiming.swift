@@ -64,7 +64,7 @@ enum RouteServiceStatus: Equatable {
     }
 
     /// How bad this is for the rider, so a trip made of several rides can report its worst leg.
-    /// `running` and `unknown` share the floor deliberately — neither is a problem to report, and
+    /// `running` and `unknown` share the floor deliberately, neither is a problem to report, and
     /// which of the two a whole trip deserves is a question about certainty, not severity, decided
     /// by the caller.
     var severity: Int {

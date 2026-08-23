@@ -224,7 +224,7 @@ enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
     /// Whether a rider can board or alight here at all.
     ///
     /// The reviewed catalog marks eight stations that riders cannot use, and every one of them is
-    /// in the routable network — a trip can be planned to 福寿岭 or 黄土店 today. This is the single
+    /// in the routable network: a trip can be planned to 福寿岭 or 黄土店 today. This is the single
     /// definition the station header, the route planner and anything added later all read, so a
     /// station's usability can never again be true on one screen and unmentioned on the next.
     var servesPassengers: Bool {
@@ -237,7 +237,7 @@ enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
     }
 
     /// Short label for a chip or badge: "Not yet open" versus "No passenger service". The two cases
-    /// stay distinct — never opened at all, versus open track with no passenger stop today.
+    /// stay distinct: never opened at all, versus open track with no passenger stop today.
     var serviceStatusLabel: (text: String, icon: String)? {
         switch self {
         case .notOpenForPassengerService:

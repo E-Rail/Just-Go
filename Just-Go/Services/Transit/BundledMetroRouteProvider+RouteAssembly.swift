@@ -13,7 +13,7 @@ extension BundledMetroRouteProvider {
     ) async -> Route {
         let originStation = path.origin.station
         let destinationStation = path.destination.station
-        // How the rider covers each end is decided by how far that end is, once, here — and the
+        // How the rider covers each end is decided by how far that end is, once, here, and the
         // straight line is what decides it rather than the routed distance, because the mode has
         // to be chosen before there is a route to measure.
         let limit = accessibilityFilter.maxWalkingDistance
@@ -71,8 +71,8 @@ extension BundledMetroRouteProvider {
             totalStops: path.edges.count,
             // Count line changes, which is what a transfer is. The interchange link's synthetic
             // line ID is dropped first: it sits between two different real lines by construction
-            // (the importer rejects a pair that shares one), so the change is already counted —
-            // adding the link itself priced one change as two.
+            // (the importer rejects a pair that shares one), so the change is already counted.
+            // Adding the link itself priced one change as two.
             transferCount: max(0, path.edges.map(\.lineID).filter { $0 != metroInterchangeLineID }.consecutiveUnique.count - 1),
             isFullyAccessible: false,
             stepFreeAssessment: hasStairs ? .barrierDetected : .unknown,
@@ -117,11 +117,11 @@ extension BundledMetroRouteProvider {
             )
             // `index > 0`, but not straight after an interchange link: that link *is* the
             // change, and appending a second zero-length transfer on top of it listed the same
-            // change twice — "walk 广安门内 → 牛街" followed by "transfer at 牛街".
+            // change twice: "walk 广安门内 → 牛街" followed by "transfer at 牛街".
             let followsInterchange = index > 0 && groups[index - 1].first?.interchange != nil
             if index > 0, !followsInterchange {
                 // `lineName` below is the outgoing line (correct for "Transfer to X" display
-                // text) — the incoming line, for resolving a real indoor transfer path, is the
+                // text): the incoming line, for resolving a real indoor transfer path, is the
                 // *previous* group's line, only available here, not reconstructable later.
                 let previousGroup = groups[index - 1]
                 let previousLine = previousGroup.last.flatMap { graph.linesByID[$0.lineID] }
@@ -144,7 +144,7 @@ extension BundledMetroRouteProvider {
                     // An in-station change draws nothing of its own. The map already joins the two
                     // rides through this station: each ride's track is tied back to the station
                     // node by a grey connector, so the path reads platform -> concourse -> platform
-                    // — which is the way a rider actually makes the change. A direct line between
+                    //, which is the way a rider actually makes the change. A direct line between
                     // the two tracks would cut a corner nobody walks.
                     polylineCoordinates: [],
                     walkingDirections: nil,
@@ -201,7 +201,7 @@ extension BundledMetroRouteProvider {
     }
 
     /// The leg where the rider walks from one station to the other one riders treat as the same
-    /// interchange. A `.transfer` either way — it is a change of train, not a journey.
+    /// interchange. A `.transfer` either way. It is a change of train, not a journey.
     ///
     /// The notes say what the walk is and, separately, what the fare does *only where that has
     /// been checked*. Both used to be read off `kind`, which was wrong in both directions: an

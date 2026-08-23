@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// The app has no transfer times and cannot get them: 1,153 of the interchanges in the bundled
 /// networks are two lines meeting at a single node, so there is no geometry to measure and any
-/// number would be invented. The alternative — timing the rider's GPS through the change — was
+/// number would be invented. The alternative. Timing the rider's GPS through the change. Was
 /// rejected on purpose. Deriving a dataset from a location stream someone switched on for
 /// guidance is tracking whatever the data is used for, and a fix cannot tell "walked briskly"
 /// from "waited for a lift" anyway. So the app asks, once, and takes no for an answer.
@@ -52,8 +52,8 @@ struct TransferPacePrompt: View {
             .fontWeight(.semibold)
             .fixedSize(horizontal: false, vertical: true)
 
-            // Stacks at accessibility sizes rather than squeezing three labels onto one line —
-            // at XXXL "Under 2 min" alone is wider than a third of the screen.
+            // Stacks at accessibility sizes rather than squeezing three labels onto one line.
+            // At XXXL "Under 2 min" alone is wider than a third of the screen.
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(spacing: 8) {
                     ForEach(TransferPace.allCases) { answerButton($0, fillsWidth: true) }
@@ -128,7 +128,7 @@ struct TransferPacePrompt: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Never "riders say" while the only answer in existence is this rider's own — that would be a
+    /// Never "riders say" while the only answer in existence is this rider's own, that would be a
     /// claim about a crowd made from a sample of one.
     private func headline(for source: TransferInsightSource?) -> String {
         switch source {

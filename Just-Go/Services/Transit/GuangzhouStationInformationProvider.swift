@@ -24,7 +24,7 @@ private final class GuangzhouRedirectDelegate: NSObject, URLSessionTaskDelegate,
 /// Unlike Shanghai, one `serviceTime/list/{stationShowCode}` call returns every line serving the
 /// physical station, so a single representative code is enough. The operator's colours are not on
 /// that response, so the line list (`metroweb/linestation`) is fetched once per session and cached
-/// to colour the lines; a colour fetch that fails is non-fatal — the lines still render.
+/// to colour the lines; a colour fetch that fails is non-fatal. The lines still render.
 actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
     static let cityID = "4401"
     static let host = "apis.gzmtr.com"

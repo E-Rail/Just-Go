@@ -4,7 +4,7 @@ import Foundation
 /// rider does about it.
 ///
 /// Deliberately not a number of minutes. Nobody times their own transfer with a stopwatch, and a
-/// rider who reports "3 minutes" is really reporting "a couple of minutes" — storing 3 would dress
+/// rider who reports "3 minutes" is really reporting "a couple of minutes". Storing 3 would dress
 /// a rough answer up as a precise one. Three buckets is the finest grain a person can answer
 /// honestly from memory, and it is enough: under two minutes means do not hurry, over five means
 /// leave room for it.
@@ -38,7 +38,7 @@ enum TransferPace: String, Codable, CaseIterable, Identifiable, Sendable {
     /// (1.25 m/s, the same constant `BundledMetroRouteProvider` costs walking legs with).
     ///
     /// Deliberately not the provider's own seconds. Baidu returns a duration alongside the
-    /// distance, but it is `distance ÷ 1.19 m/s` in every sample taken — a restatement of the
+    /// distance, but it is `distance ÷ 1.19 m/s` in every sample taken. A restatement of the
     /// metres, not a second observation of them. Deriving the bucket here keeps one walking model
     /// in the app instead of importing a second one that only looks like new information.
     init(distanceMetres: Int) {

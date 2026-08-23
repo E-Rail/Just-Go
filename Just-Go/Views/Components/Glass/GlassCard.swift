@@ -3,11 +3,11 @@ import SwiftUI
 /// The app's type ramp, as three names instead of 180 hand-picked `.font()` calls.
 ///
 /// Better than half the text in this app was `.caption` or smaller, and rows routinely drew the
-/// *label* larger than the value it introduced — "Exit" at `.subheadline` semibold over the exit's
+/// *label* larger than the value it introduced. "Exit" at `.subheadline` semibold over the exit's
 /// actual name at `.caption` secondary. Naming the three roles makes that inversion impossible to
 /// write by accident and makes a later sweep mechanical.
 ///
-/// `.rowTitle` names a thing. `.rowValue` is the thing — never smaller than its title. `.rowMeta`
+/// `.rowTitle` names a thing. `.rowValue` is the thing. Never smaller than its title. `.rowMeta`
 /// is genuine metadata (a count, a source, a timestamp) and is the only one allowed to be small.
 extension View {
     func rowTitle() -> some View {
@@ -26,7 +26,7 @@ extension View {
 /// A metro line's own designation, drawn the way the network draws it: the number in its line
 /// colour.
 ///
-/// Line names were previously plain text — "2号线" in the same weight and colour as everything
+/// Line names were previously plain text. "2号线" In the same weight and colour as everything
 /// around it. Riders do not navigate by reading line names, they navigate by matching colours and
 /// numbers to the signs overhead, so a badge is both the faster read and the one that matches what
 /// they are looking at in the station.
@@ -47,7 +47,7 @@ struct LineBadge: View {
             .frame(minWidth: size, minHeight: size)
             .background(Color(hex: hex), in: RoundedRectangle(cornerRadius: size * 0.3, style: .continuous))
             // Real line branding runs from pale yellow to near-black, so the label colour has to be
-            // measured against the fill rather than fixed — Beijing's 13号线 is a yellow that white
+            // measured against the fill rather than fixed. Beijing's 13号线 is a yellow that white
             // text disappears into.
             .foregroundStyle(Color.legibleText(onHex: hex))
             .accessibilityHidden(true)
@@ -57,7 +57,7 @@ struct LineBadge: View {
     /// "S1线", "TW" from "Tsuen Wan Line".
     ///
     /// A badge has room for two or three characters, so the goal is the shortest unambiguous form,
-    /// not a truncation — "Tsuen…" identifies nothing.
+    /// not a truncation: "Tsuen…" identifies nothing.
     static func shortLabel(for name: String) -> String {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         if let digits = trimmed.range(of: "[0-9]+", options: .regularExpression) {
@@ -66,7 +66,7 @@ struct LineBadge: View {
             let before = trimmed[..<digits.lowerBound]
             let prefix = before.suffix(while: { $0.isLetter && $0.isASCII })
             // The character before the designation disqualifies it only when it is an *ASCII*
-            // letter — i.e. the designation is really the tail of a Latin word. `isLetter` alone
+            // letter: i.e. the designation is really the tail of a Latin word. `isLetter` alone
             // is true for CJK, so every Chinese-prefixed line lost its designation: 成都市域铁路S3
             // 资阳线 badged as "3", colliding with 成都地铁3号线 in the same city, and Nanjing
             // rendered S1/S2/S6/S7/S8/S9 as bare numbers against its own 1–9号线.
@@ -95,12 +95,12 @@ private extension StringProtocol {
     }
 }
 
-/// A whole journey compressed to one line of badges — walk, line, line, walk — so two routes can be
+/// A whole journey compressed to one line of badges. Walk, line, line, walk, so two routes can be
 /// told apart at a glance by their shape rather than by reading three lines of grey text each.
 ///
 /// Each access leg carries its own icon and its own minutes, because those are the two things that
 /// separate otherwise identical-looking routes: "🚶 21" and "🚲 7" describe very different trips
-/// and used to render as the same grey walking square. A ride's badge stays the line number — its
+/// and used to render as the same grey walking square. A ride's badge stays the line number. Its
 /// duration is implied by the stops, and a number beside a line number reads as a second line.
 ///
 /// Transfer legs are left out on purpose: two adjacent line badges already say a transfer happens,
@@ -152,7 +152,7 @@ struct JourneyBadgeChain: View {
 
 /// The continuous vertical line that ties a journey's legs into one path.
 ///
-/// Solid in the leg's own colour while riding, dashed while on foot — the convention every printed
+/// Solid in the leg's own colour while riding, dashed while on foot. The convention every printed
 /// transit map and every well-regarded transit app already uses, so it needs no legend. Drawn as a
 /// single stroked path rather than a stack of capsules so that adjacent legs actually touch: the
 /// spine has to be unbroken or the trip reads as a list of unrelated errands.

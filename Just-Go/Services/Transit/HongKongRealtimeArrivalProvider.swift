@@ -232,7 +232,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         let data: Data
         let response: URLResponse
         do {
-            // `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+            // `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
             // connection that trickles data indefinitely never trips it, so an unguarded fetch
             // could hang well past `requestTimeout`. Race the fetch against an explicit deadline.
             (data, response) = try await withDeadline(

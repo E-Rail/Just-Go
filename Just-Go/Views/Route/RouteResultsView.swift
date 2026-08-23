@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
-    /// Pushing is the map stack's job, not this screen's — it owns the whole plan → results →
+    /// Pushing is the map stack's job, not this screen's. It owns the whole plan → results →
     /// detail chain, so a route chosen here is handed back rather than presented from inside.
     let onSelect: (Route) -> Void
     /// Open the search page to refill one end. Handed back for the same reason as `onSelect`.
@@ -16,7 +16,7 @@ struct RouteResultsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var selectedRouteID: UUID?
-    // Raw theme hex for the solid-fill chip below — see RouteEntryView's identical
+    // Raw theme hex for the solid-fill chip below. See RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
     // isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
@@ -68,7 +68,7 @@ struct RouteResultsView: View {
         }
         .listStyle(.plain)
         // Stock spacing put a third of a screen of nothing between the sort chips and the first
-        // result — the chips sort the list directly below them and belong next to it.
+        // result: the chips sort the list directly below them and belong next to it.
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
@@ -145,7 +145,7 @@ struct RouteResultsView: View {
                 Circle()
                     .fill(field == .origin ? Color.green : Color.red)
                     .frame(width: 9, height: 9)
-                // An unfilled end says what to do about it rather than sitting blank — this
+                // An unfilled end says what to do about it rather than sitting blank. This
                 // header is the only place the trip's ends can be corrected now.
                 Text(name.isEmpty ? placeholder(for: field) : name)
                     .font(.subheadline)
@@ -188,7 +188,7 @@ struct RouteResultsView: View {
                 HStack(spacing: 8) {
                     // The active strategy leads, whether or not it is one of the three that get
                     // their own chip. The default sort is "Transit First", which is *not* primary,
-                    // so it rendered only inside the overflow chip at the far right — off the edge
+                    // so it rendered only inside the overflow chip at the far right. Off the edge
                     // of the screen, leaving a sort row where nothing looked selected.
                     ForEach(sortChipStrategies) { strategy in
                         SortChip(
@@ -230,7 +230,7 @@ struct RouteResultsView: View {
     }
 
     /// The headline strategies, preceded by whatever is actually sorting the list when that is
-    /// something else — so a sort picked from "More" still shows as the selected chip rather than
+    /// something else, so a sort picked from "More" still shows as the selected chip rather than
     /// leaving the row looking like nothing is chosen.
     private var sortChipStrategies: [RoutePreference] {
         let primary = RoutePreference.primary
@@ -261,7 +261,7 @@ struct RouteResultsView: View {
         }
     }
 
-    /// One comparison row per alternative — the lines it rides, how long it takes, when it lands,
+    /// One comparison row per alternative. The lines it rides, how long it takes, when it lands,
     /// and the single thing wrong with it if there is one. Tapping records the planned trip and
     /// opens the detail.
     private func comparisonRow(_ route: Route) -> some View {
@@ -278,7 +278,7 @@ struct RouteResultsView: View {
             onSelect(route)
         } label: {
             VStack(alignment: .leading, spacing: 8) {
-                // Why this route is in the list at all — but only when there is something to
+                // Why this route is in the list at all, but only when there is something to
                 // compare it against. With a single result it said "Recommended", which is a
                 // label for a choice the rider was never offered.
                 if viewModel.routes.count > 1 {
@@ -343,7 +343,7 @@ struct RouteResultsView: View {
 
                 // Full width, below everything: sharing a line with the duration column squeezed
                 // "Walking-heavy route" into a two-line stub. Only what is wrong, and only in
-                // words — this row used to lead with a 50 pt red "38", an unexplained score on a
+                // words: this row used to lead with a 50 pt red "38", an unexplained score on a
                 // scale the rider had never been shown.
                 if let concern = RouteConcern.worst(feasibility: feasibility, confidence: confidence) {
                     Label(concern.title, systemImage: concern.icon)

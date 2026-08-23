@@ -171,7 +171,7 @@ struct QuickTagAddView: View {
             return
         }
         isSearching = true
-        // Both halves are biased to the rider rather than to a selected city — a quick tag is
+        // Both halves are biased to the rider rather than to a selected city. A quick tag is
         // almost always somewhere they have been, and there is no selected city to fall back to.
         let here = container.locationService.mapSpaceLocation?.coordinate
         searchTask = Task {

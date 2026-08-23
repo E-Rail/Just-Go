@@ -10,7 +10,7 @@ import MapKit
 ///
 /// Results arrive in GCJ-02 (`coord_type=2` in, `ret_coordtype=gcj02ll` out), which is the frame
 /// the rest of the app draws in, so nothing is converted on the way through. Getting either
-/// parameter wrong does not fail — it returns BD-09 that looks entirely plausible and sits a few
+/// parameter wrong does not fail: it returns BD-09 that looks entirely plausible and sits a few
 /// hundred metres off, so both were verified against the live API before this was written.
 @MainActor
 final class BaiduPlaceSearchProvider: PlaceSearchProviding {
@@ -76,7 +76,7 @@ final class BaiduPlaceSearchProvider: PlaceSearchProviding {
     }
 
     /// Baidu caps circle search at 50 km. The span is halved because the region describes a full
-    /// width while `radius` describes a radius — passing the span searches four times the area.
+    /// width while `radius` describes a radius. Passing the span searches four times the area.
     private static func searchRadius(for region: MKCoordinateRegion) -> Int {
         let metresPerDegreeLatitude = 111_320.0
         let radius = region.span.latitudeDelta * metresPerDegreeLatitude / 2
@@ -88,7 +88,7 @@ final class BaiduPlaceSearchProvider: PlaceSearchProviding {
 ///
 /// The fallback is not defensive padding: a missing or rate-limited key must degrade the app to
 /// exactly what it was before Baidu existed, never to a blank screen. `isConfigured` being false is
-/// a normal state — the project builds and runs with no key at all.
+/// a normal state: the project builds and runs with no key at all.
 @MainActor
 final class CompositePlaceSearchProvider: PlaceSearchProviding {
     private let baidu: BaiduPlaceSearchProvider?

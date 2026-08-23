@@ -10,7 +10,7 @@ struct OfficialStationExitStreet: Identifiable {
 }
 
 extension StationDetailView {
-    /// The categories the loaded snapshot actually has data for — so a lines-only source
+    /// The categories the loaded snapshot actually has data for, so a lines-only source
     /// (Guangzhou) shows just its trains with no empty Exits/Facilities tabs, and the segmented
     /// control appears only when there is more than one thing to switch between.
     private var officialInformationCategories: [OfficialStationInformationCategory] {
@@ -320,7 +320,7 @@ extension StationDetailView {
     }
 
     /// Exits keyed by the street each one opens onto. Operators publish exits as a number plus
-    /// the roads it reaches ("1 — 西藏南路 复兴东路") and nothing positional, so this inverts that
+    /// the roads it reaches ("1, 西藏南路 复兴东路") and nothing positional, so this inverts that
     /// same text into "which exit do I take for this street" without inventing any geometry. An
     /// exit reaching two streets is listed under both, which is what its own record says.
     private func officialExitsByStreet(
@@ -354,7 +354,7 @@ extension StationDetailView {
             let streets = officialExitsByStreet(exits)
             VStack(alignment: .leading, spacing: 0) {
                 if streets.isEmpty {
-                    // No street text published — fall back to the plain numbered list.
+                    // No street text published: fall back to the plain numbered list.
                     officialExitList(exits)
                 } else {
                     ForEach(Array(streets.enumerated()), id: \.element.id) { index, street in
@@ -405,7 +405,7 @@ extension StationDetailView {
     }
 
     /// Just the part of an entrance name that tells exits apart. Packs name them in full
-    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels — on the map
+    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels, on the map
     /// the station is already the centre pin, so only the number carries information. The full
     /// name stays in the accessibility label and in the list below.
     private func shortAccessPointLabel(_ point: StationAccessPoint) -> String {
@@ -727,7 +727,7 @@ extension StationDetailView {
         viewModel?.isLoadingCityPack == true || !(viewModel?.accessPoints ?? []).isEmpty
     }
 
-    /// "Station Guide" — the specific entrance/exit guidance riders ask for, labeled with a
+    /// "Station Guide": the specific entrance/exit guidance riders ask for, labeled with a
     /// confidence chip.
     @ViewBuilder
     var stationGuideSection: some View {
@@ -757,7 +757,7 @@ extension StationDetailView {
                         }
 
                         // The official online surface lists this station's *named* exits already,
-                        // with the streets each one reaches — richer than a bare name. Repeating
+                        // with the streets each one reaches. Richer than a bare name. Repeating
                         // those would print the same list twice on one screen. It never covers the
                         // unlabeled entrances, so those stay either way.
                         let listed = officialSurfaceListsExits ? exits.filter(\.isUnlabeled) : exits

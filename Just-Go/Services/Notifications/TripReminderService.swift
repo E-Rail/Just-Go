@@ -56,7 +56,7 @@ final class TripReminderService {
     }
 
     /// Schedules an estimated "get off" alert to fire at `fireDate`. Timing is derived from the
-    /// route's segment durations — there is NO live train-position feed, so the copy says so.
+    /// route's segment durations: there is NO live train-position feed, so the copy says so.
     /// Returns false if the fire time is already in the past.
     @discardableResult
     func scheduleArrivalReminder(stationID: String, stationName: String, exitHint: String?, fireDate: Date) async -> Bool {

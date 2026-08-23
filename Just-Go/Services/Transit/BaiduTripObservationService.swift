@@ -44,8 +44,8 @@ struct ObservedBusAlternative: Equatable, Sendable {
 
 /// What a taxi over the same ground costs, by time of day.
 ///
-/// The rider-facing point is not the taxi. It is the price of missing the last train, which is a
-/// number this app can now put next to the warning it already shows.
+/// The rider-facing point is the price of missing the last train, which is a number this app can
+/// now put next to the warning it already shows.
 struct ObservedTaxiFare: Equatable, Sendable {
     /// When the night tariff applies. `nil` means the city quoted one rate for the whole day.
     struct NightWindow: Equatable, Sendable {

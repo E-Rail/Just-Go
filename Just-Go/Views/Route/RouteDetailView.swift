@@ -33,13 +33,13 @@ struct RouteDetailView: View {
     @State private var showsTripCard = false
     /// Where the sheet was resting before a push raised it, so coming back restores it.
     @State private var stopBeforePush: PresentationDetent?
-    /// Guidance replaces this page's content rather than covering it — "but in the same page".
+    /// Guidance replaces this page's content rather than covering it, "but in the same page".
     @State private var isGuiding = false
     @State private var cityResources: [ExternalTransitResource] = []
     @State private var serviceNotices: [OperatorServiceNotice] = []
     @State private var openedNotice: OperatorServiceNotice?
     @State private var officialNoticeResource: ExternalTransitResource?
-    // Raw theme hex for the "Navigate" button's solid fill — see RouteEntryView's
+    // Raw theme hex for the "Navigate" button's solid fill. See RouteEntryView's
     // identical declaration for why `Color.accentColor` (dark-mode-lightened for
     // foreground use) isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
@@ -57,14 +57,14 @@ struct RouteDetailView: View {
         // per body evaluation).
         let feasibility = currentFeasibility()
         let confidence = currentConfidence(feasibility: feasibility)
-        // Map on top, trip underneath, the boundary draggable — the shape every transit app the
+        // Map on top, trip underneath, the boundary draggable. The shape every transit app the
         // rider already uses has. The map used to be a 200pt card buried between the journey and
         // the details, which is a strange place to put the only thing on the screen that shows
         // where the trip actually goes.
         return Group {
             if isGuiding {
                 // The page becomes the navigator rather than presenting a second one over itself.
-                // Same implementation as the full-screen entries below — the off-route recovery,
+                // Same implementation as the full-screen entries below. The off-route recovery,
                 // the arrival alert and the transfer surface all live in there, and a second
                 // navigator built to sit inline would drift from this one.
                 LiveGoView(route: route, embedded: true) {
@@ -85,18 +85,18 @@ struct RouteDetailView: View {
             tripCard(feasibility: feasibility, confidence: confidence)
         }
         // Presented from `.task` rather than inline so the sheet goes up after the push has
-        // settled — a presentation raised during a navigation transition is the one that fails
+        // settled: a presentation raised during a navigation transition is the one that fails
         // with "whose view is not in the window hierarchy".
         .task { showsTripCard = !isGuiding }
         .onChange(of: isGuiding) { _, _ in showsTripCard = !isGuiding }
         // A sheet presented from a *pushed* view is presented on the navigation controller, not on
-        // the view — so popping this screen does not reliably take the sheet with it, and the trip
+        // the view, so popping this screen does not reliably take the sheet with it, and the trip
         // card was left sitting on top of the route list.
         //
         // `onDisappear` is the backstop, but on its own it arrives when the page has already slid
         // away, so the card sat there through the whole transition and then blinked out.
-        // `PageTransitionObserver` reports the pop *starting* — for a tapped back button as well as
-        // a swipe — so the card slides down while the page slides right, which is the one motion
+        // `PageTransitionObserver` reports the pop *starting*, for a tapped back button as well as
+        // a swipe, so the card slides down while the page slides right, which is the one motion
         // this should be.
         .onDisappear { showsTripCard = false }
         .background(
@@ -149,7 +149,7 @@ struct RouteDetailView: View {
         .task(id: routeDataKey) {
             boardingServiceWindows = []
             // Operator content belongs to a trip that actually uses that operator. A walking-only
-            // route rides nothing, and `networkCityID` is nil for it — falling back to the selected
+            // route rides nothing, and `networkCityID` is nil for it. Falling back to the selected
             // city put Beijing Subway service advisories and first/last-train times on a trip that
             // never enters a station. Wrong operator content is worse than none.
             guard route.boardingTransitSegment != nil else { return }
@@ -228,14 +228,14 @@ struct RouteDetailView: View {
     ///
     /// This replaced a header that led with the route string, put the duration second, and then
     /// stacked two status chips that the two cards further down said again in full. One chip
-    /// survives, and only when there is something wrong to say — a green "high confidence" badge
+    /// survives, and only when there is something wrong to say. A green "high confidence" badge
     /// on a route with nothing wrong with it is decoration.
     private func routeHero(
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Duration and walking on the left, arrival on the right — the three numbers a rider
+            // Duration and walking on the left, arrival on the right. The three numbers a rider
             // reads together when deciding whether this is the route they are taking.
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(route.formattedDuration)
@@ -330,7 +330,7 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> (title: String, icon: String, tint: Color)? {
-        // Both of these grade *metro* data — station access, step-free status, service hours,
+        // Both of these grade *metro* data. Station access, step-free status, service hours,
         // network coverage. A walking-only route rides nothing, so there is no such data to be
         // uncertain about, and scoring it anyway told the rider an 832 m walk was 44% trustworthy.
         // Nothing was inferred here: Apple Maps returned a walk, and that is the whole plan.
@@ -378,7 +378,7 @@ struct RouteDetailView: View {
         confidence: RouteConfidence
     ) -> some View {
         // The sheet carries its own navigation stack, so a station or a transfer opens *inside*
-        // it — the way Maps does it. Pushing onto the page's stack instead meant the sheet had to
+        // it: the way Maps does it. Pushing onto the page's stack instead meant the sheet had to
         // be torn down and rebuilt around every push, and the rebuild is what flashed on the way
         // back. Nothing outside the sheet moves now, so there is nothing left to flash.
         NavigationStack {
@@ -411,7 +411,7 @@ struct RouteDetailView: View {
         }
         .presentationDetents(Self.tripCardDetents, selection: $tripCardDetent)
         .presentationDragIndicator(.visible)
-        // The map behind stays live at the two lower stops — the whole point of putting the trip
+        // The map behind stays live at the two lower stops. The whole point of putting the trip
         // on a sheet is that the map does not stop existing while it is up.
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         // There is nowhere for this to be dismissed *to*: the page underneath is the map for this
@@ -524,13 +524,13 @@ struct RouteDetailView: View {
 
     /// The operator's own page for this city, best kind first.
     ///
-    /// Only 3 of 58 cities publish a `serviceStatus` page — Beijing, the largest network here,
-    /// publishes `operatorInformation` instead — so keying strictly on service status would draw
+    /// Only 3 of 58 cities publish a `serviceStatus` page. Beijing, the largest network here,
+    /// publishes `operatorInformation` instead, so keying strictly on service status would draw
     /// nothing almost everywhere. The row is labelled with the resource's own title rather than a
     /// generic "Service status", so an operator-information page is never presented as an
     /// advisory feed it is not.
 
-    /// Wraps a fetched notice so the existing official-resource viewer can open it — same
+    /// Wraps a fetched notice so the existing official-resource viewer can open it. Same
     /// ephemeral web stack, same provenance header, no second browser.
     private static func resource(for item: OperatorServiceNotice) -> ExternalTransitResource {
         ExternalTransitResource(
@@ -600,8 +600,8 @@ struct RouteDetailView: View {
     static let tripCardDetents: Set<PresentationDetent> = [.fraction(0.3), .medium, .fraction(0.92)]
 
     /// The stops this route actually calls at, as map pins. The map used to draw the line and
-    /// nothing else, so a rider could see the shape of the trip but not a single station on it —
-    /// including the one they board at.
+    /// nothing else, so a rider could see the shape of the trip but not a single station on it.
+    /// Including the one they board at.
     private var routeStations: [Station] {
         route.stationTimelineStops.compactMap { stop in
             guard let coordinate = stop.coordinate else { return nil }
@@ -612,7 +612,7 @@ struct RouteDetailView: View {
                 longitude: coordinate.longitude,
                 cityID: stop.packCityID ?? route.networkCityID ?? "",
                 // Carried through so interchanges get the larger symbol and win label collisions
-                // against the ordinary stops between them — on a route map they are the stations
+                // against the ordinary stops between them, on a route map they are the stations
                 // the rider has to act at.
                 isTransferStation: stop.isTransfer
             )
@@ -632,7 +632,7 @@ struct RouteDetailView: View {
         )
         .ignoresSafeArea(edges: .bottom)
         // Floating at the map's TOP edge. These cards were at the bottom, which on this screen is
-        // behind the trip sheet — the sheet opens at `.medium` and covers the lower half, so the
+        // behind the trip sheet: the sheet opens at `.medium` and covers the lower half, so the
         // one control for switching alternative was invisible on every route the app has ever
         // shown. The top strip is the part of the map that is never covered.
         .overlay(alignment: .topLeading) {
@@ -676,9 +676,9 @@ struct RouteDetailView: View {
         }
     }
 
-    /// Everything that is not the journey itself, one row each. These were nine stacked cards —
-    /// confidence, feasibility, trip essentials, access guidance, service hours, reminder, notes —
-    /// most of which the rider reads once, if ever.
+    /// Everything that is not the journey itself, one row each. These were nine stacked cards.
+    /// Confidence, feasibility, trip essentials, access guidance, service hours, reminder, notes.
+    /// Most of which the rider reads once, if ever.
     private func detailsCard(
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
@@ -752,7 +752,7 @@ struct RouteDetailView: View {
 
             rowDivider
             // Provenance needs a subject. On its own the chip said "Not available" under a section
-            // header, naming nothing — a red badge for the rider to worry about with no way to tell
+            // header, naming nothing: a red badge for the rider to worry about with no way to tell
             // what it referred to.
             detailRow(
                 icon: "building.columns.fill",
@@ -798,7 +798,7 @@ struct RouteDetailView: View {
     }
 
     /// Scheduled first/last train times for the boarding line (official city-pack data).
-    /// This is NOT a live countdown — the data sources have no real-time arrival feed.
+    /// This is NOT a live countdown: the data sources have no real-time arrival feed.
     private var boardingServiceHours: (first: String, last: String)? {
         let firsts = boardingServiceWindows.compactMap(\.firstTime).filter { !$0.isEmpty }
         let lasts = boardingServiceWindows.compactMap(\.lastTime).filter { !$0.isEmpty }
@@ -812,7 +812,7 @@ struct RouteDetailView: View {
             return
         }
         let windows = await container.officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
-        // .task(id:) cancelled this load because the rider switched route tabs — without this
+        // .task(id:) cancelled this load because the rider switched route tabs, without this
         // guard a slow (e.g. network-bound) load for the OLD route lands after the new route's
         // cached one and shows the wrong service hours.
         guard !Task.isCancelled else { return }
@@ -830,7 +830,7 @@ struct RouteDetailView: View {
     /// card, solid in each line's colour while riding and dashed while on foot, with the line's own
     /// badge marking where the rider boards.
     ///
-    /// The legs used to be list rows carrying a 34 pt colour chip each — five disconnected bars
+    /// The legs used to be list rows carrying a 34 pt colour chip each. Five disconnected bars
     /// that never said "this is one trip". Transit legs open to reveal the stations they pass,
     /// which is what a separate "Stations" card used to do a whole screen further down.
     private var journeyCard: some View {
@@ -892,7 +892,7 @@ struct RouteDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
-                // What we do not know about this door — that an exit is estimated rather than
+                // What we do not know about this door, that an exit is estimated rather than
                 // surveyed, or that nothing here is recorded as step-free. It rides with the leg
                 // it qualifies, so removing the card it used to live in loses nothing.
                 ForEach(accessNotes(for: index), id: \.self) { note in
@@ -1023,7 +1023,7 @@ struct RouteDetailView: View {
             return AppLocalization.text(english: "Transfer", simplified: "换乘", traditional: "換乘")
         case .walking, .cycling, .driving:
             // The door is the point of an access leg, and the leg is now actually measured to it
-            // — so name it here rather than in a separate card the rider has to go looking for.
+            //, so name it here rather than in a separate card the rider has to go looking for.
             guard let exit = exitName(for: index) else { return segment.summaryLabel }
             switch segment.type {
             case .cycling:
@@ -1163,7 +1163,7 @@ struct RouteDetailView: View {
 
 /// Lightweight wrapper presented when a route's station timeline row is tapped. It resolves the
 /// tapped stop to a full `Station` (loading city-pack data for that one station only) and shows
-/// the standard `StationDetailView` — which lazy-loads exits/facilities/map via its own `.task`.
+/// the standard `StationDetailView`, which lazy-loads exits/facilities/map via its own `.task`.
 private struct RouteStationGuideSheet: View {
     let stop: RouteStationStop
     let cityID: String
@@ -1189,7 +1189,7 @@ private struct RouteStationGuideSheet: View {
             }
         }
         .task {
-            // Only match when the stop carries a real coordinate — matching with a (0,0)
+            // Only match when the stop carries a real coordinate. Matching with a (0,0)
             // placeholder disambiguates same-named stations by distance to Null Island and
             // can pick the wrong one. A coordinate-less stop falls through to the
             // name-based fallback instead.
@@ -1208,7 +1208,7 @@ private struct RouteStationGuideSheet: View {
         }
         // The screen resolves to something within 8 seconds whatever the lookup does. `didResolve`
         // used to depend entirely on `matchingStation` returning, and that call can reach the
-        // network — so a request that never came back left a spinner on screen with no way out.
+        // network, so a request that never came back left a spinner on screen with no way out.
         // The name-based fallback is a real screen; a spinner is not. A lookup that lands late
         // still wins, because it sets `station`, which this branch prefers.
         .task {

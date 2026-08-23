@@ -7,7 +7,7 @@ struct OnboardingTourView: View {
     let onFinish: () -> Void
     @State private var pageIndex = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    // Raw theme hex for the Continue/Get Started button's solid fill — see
+    // Raw theme hex for the Continue/Get Started button's solid fill. See
     // RouteEntryView's identical declaration for why `Color.accentColor`
     // (dark-mode-lightened for foreground use) isn't used as a fill under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
@@ -16,8 +16,8 @@ struct OnboardingTourView: View {
         let icon: String
         let title: String
         let points: [(icon: String, text: String)]
-        /// The last page offers the colour choice. Once, here, at the moment it means something —
-        /// the alternative is a preference the rider only discovers by going looking in Settings.
+        /// The last page offers the colour choice. Once, here, at the moment it means something.
+        /// The alternative is a preference the rider only discovers by going looking in Settings.
         var showsThemePicker = false
     }
 
@@ -165,7 +165,7 @@ struct OnboardingTourView: View {
     /// Scrolls, because it has to.
     ///
     /// This page had no `ScrollView` and no Dynamic Type handling at all, with bullets over 150
-    /// characters — so at accessibility text sizes the first screen a new rider ever sees simply
+    /// characters, so at accessibility text sizes the first screen a new rider ever sees simply
     /// clipped, and the people most likely to be running those sizes are the ones this app is for.
     /// `LaunchStageView`, in this same folder, has adapted to `dynamicTypeSize` all along.
     ///

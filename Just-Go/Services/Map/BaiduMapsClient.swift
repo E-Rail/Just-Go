@@ -3,8 +3,8 @@ import Foundation
 
 /// Credentials and endpoint for Baidu's Web Service API.
 ///
-/// The 服务端 (server) key type is deliberate. The alternative — an iOS-type key with Baidu's
-/// native SDK — would bind the key to the bundle ID, which is better for key safety, but it also
+/// The 服务端 (server) key type is deliberate. The alternative. An iOS-type key with Baidu's
+/// native SDK: would bind the key to the bundle ID, which is better for key safety, but it also
 /// links a closed-source binary that collects device identifiers into an app whose whole promise is
 /// that it does not do that. It also speaks BD-09, a third coordinate frame on top of the two this
 /// codebase already reconciles. HTTP + `ret_coordtype=gcj02` costs one client and stays honest.
@@ -27,7 +27,7 @@ struct BaiduMapsConfiguration: Sendable, Equatable {
     }
 
     /// No key means every Baidu-backed feature reports unavailable rather than guessing. The app
-    /// must build and run without one — a missing key is a normal state, not an error.
+    /// must build and run without one: a missing key is a normal state, not an error.
     var isConfigured: Bool { !accessKey.isEmpty }
 
     /// Signing turns itself on when an SK exists. With the console set to IP 白名单 there is no SK
@@ -50,7 +50,7 @@ struct BaiduMapsConfiguration: Sendable, Equatable {
 /// only Baidu's worked example reveals. `Scripts/test_baidu_sn_signature.rb` pins that example so
 /// this cannot silently regress into a runtime `{"status":211,"message":"APP SN校验失败"}`.
 enum BaiduRequestSigner {
-    /// PHP's `urlencode`, which is what Baidu's reference implementations use — note space becomes
+    /// PHP's `urlencode`, which is what Baidu's reference implementations use. Note space becomes
     /// `+`, not `%20`. Swift's `addingPercentEncoding` does the opposite and produces a signature
     /// that fails for any query containing a space.
     static func urlEncoded(_ value: String) -> String {
@@ -82,7 +82,7 @@ enum BaiduRequestSigner {
 
 enum BaiduMapsError: Error, Equatable {
     case notConfigured
-    /// Baidu answered, and said no. `status` is its own code — 302/210 are quota and permission.
+    /// Baidu answered, and said no. `status` is its own code. 302/210 Are quota and permission.
     case service(status: Int, message: String)
     case malformedResponse
     /// This launch has already made as many calls to that endpoint as it is allowed. Local, so it
@@ -91,7 +91,7 @@ enum BaiduMapsError: Error, Equatable {
 }
 
 /// Every Baidu Web Service response carries this envelope, and a non-zero `status` means the
-/// payload is absent or meaningless — so it is checked before anything is decoded.
+/// payload is absent or meaningless, so it is checked before anything is decoded.
 protocol BaiduResponseEnvelope: Decodable, Sendable {
     var status: Int { get }
     var message: String? { get }
@@ -199,7 +199,7 @@ actor BaiduMapsClient {
 /// A coordinate as Baidu returns it. Requested as GCJ-02 on every endpoint, which is the frame the
 /// rest of this app draws and measures in, so nothing needs converting on arrival.
 ///
-/// Note the parameter that asks for it differs per endpoint — `coord_type=gcj02` on directions,
+/// Note the parameter that asks for it differs per endpoint. `Coord_type=gcj02` on directions,
 /// `coord_type=2` on place search, `coordtype=gcj02ll` on reverse geocoding. They were each
 /// verified against the live API rather than inferred, because a wrong one is not an error: it
 /// returns BD-09 that looks plausible and lands a few hundred metres away.

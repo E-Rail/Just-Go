@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct QuickTagsView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
@@ -122,7 +125,9 @@ struct QuickTagsView: View {
                     .accessibilityLabel(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
             .sheet(isPresented: $showAddTag) {

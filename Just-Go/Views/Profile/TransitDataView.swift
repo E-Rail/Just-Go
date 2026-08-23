@@ -11,6 +11,9 @@ private final class TransitDataState: ObservableObject {
 }
 
 struct TransitDataView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
@@ -214,7 +217,9 @@ struct TransitDataView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
             .task {

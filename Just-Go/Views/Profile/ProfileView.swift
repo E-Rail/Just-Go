@@ -24,35 +24,94 @@ struct ProfileView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var destination: ProfileDestination?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        NavigationStack {
-            List {
-                accessibilitySection
-                riderTrustSection
-                transitDataSection
-                settingsSection
-                aboutSection
-            }
-            .navigationTitle(AppLocalization.localized("Profile"))
-            .navigationBarTitleDisplayMode(.large)
-            .scrollContentBackground(.hidden)
-            .background(Color.appBackground)
-            .sheet(item: $destination) { destination in
-                switch destination {
-                case .accessibility: AccessibilitySettingsView()
-                case .transitData: TransitDataView()
-                case .tripMemory: TripMemoryView()
-                case .settings: SettingsView()
-                case .quickTags: QuickTagsView()
-                }
+        Group {
+            if horizontalSizeClass == .regular {
+                splitLayout
+            } else {
+                stackLayout
             }
         }
+        #if DEBUG
+        // The sibling of the map's seeds. Profile's screens are all behind a tap, and there is no
+        // tap injection here, so without this the split layout could only be reasoned about.
+        .task {
+            if let seed = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_PROFILE"] {
+                appState.selectedTab = .profile
+                destination = ProfileDestination(rawValue: seed)
+            }
+        }
+        #endif
         // Quick Tags → a station → "Route here" switches to the Map tab and pushes the entry page
         // *underneath* this still-open sheet, so the rider's tap appeared to do nothing. Whoever
         // records a pending route is leaving Profile; close what is covering the map.
         .onChange(of: appState.pendingRouteInput) { _, pending in
             if pending != nil { destination = nil }
+        }
+    }
+
+    /// The phone shape, unchanged. Five rows that each raise a sheet.
+    private var stackLayout: some View {
+        NavigationStack {
+            profileList
+                .sheet(item: $destination) { destinationView(for: $0) }
+        }
+    }
+
+    /// The tablet shape: the same five rows as a permanent sidebar, and whatever is selected
+    /// filling the rest of the window.
+    ///
+    /// Five modals on a screen this size was the wrong answer twice over. It buried every one of
+    /// these screens under a card, and it made Quick Tags open a sheet on a sheet on a sheet to
+    /// reach one station. The rows stay the same rows; only where their contents land changes.
+    private var splitLayout: some View {
+        NavigationSplitView {
+            profileList
+        } detail: {
+            if let destination {
+                destinationView(for: destination, showsDoneButton: false)
+            } else {
+                ContentUnavailableView {
+                    Label(AppLocalization.localized("Profile"), systemImage: "person.crop.circle")
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Choose something on the left.",
+                        simplified: "请从左侧选择。",
+                        traditional: "請從左側選擇。"
+                    ))
+                }
+                .background(Color.appBackground)
+            }
+        }
+    }
+
+    private var profileList: some View {
+        List {
+            accessibilitySection
+            riderTrustSection
+            transitDataSection
+            settingsSection
+            aboutSection
+        }
+        .navigationTitle(AppLocalization.localized("Profile"))
+        .navigationBarTitleDisplayMode(.large)
+        .scrollContentBackground(.hidden)
+        .background(Color.appBackground)
+    }
+
+    @ViewBuilder
+    private func destinationView(
+        for destination: ProfileDestination,
+        showsDoneButton: Bool = true
+    ) -> some View {
+        switch destination {
+        case .accessibility: AccessibilitySettingsView(showsDoneButton: showsDoneButton)
+        case .transitData: TransitDataView(showsDoneButton: showsDoneButton)
+        case .tripMemory: TripMemoryView(showsDoneButton: showsDoneButton)
+        case .settings: SettingsView(showsDoneButton: showsDoneButton)
+        case .quickTags: QuickTagsView(showsDoneButton: showsDoneButton)
         }
     }
 

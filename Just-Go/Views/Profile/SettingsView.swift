@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct SettingsView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(\.dismiss) private var dismiss
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -31,7 +34,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
             .fullScreenCover(isPresented: $showTour) {

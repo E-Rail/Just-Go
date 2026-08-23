@@ -2,6 +2,9 @@ import SwiftUI
 import UIKit
 
 struct AccessibilitySettingsView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     @State private var voiceOverOn = UIAccessibility.isVoiceOverRunning
@@ -22,7 +25,9 @@ struct AccessibilitySettingsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
         }

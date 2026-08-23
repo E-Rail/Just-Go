@@ -74,6 +74,87 @@ final class StationSearchService {
         }
     }
 
+    /// A line a rider can open, as search results it.
+    struct LineResult: Identifiable, Hashable {
+        let cityID: String
+        let lineID: String
+        let name: String
+        let nameEn: String?
+        let colorHex: String
+        let stationCount: Int
+        /// The nearest station on this line, which is what orders the results.
+        let distance: CLLocationDistance?
+
+        var id: String { "\(cityID)|\(lineID)" }
+    }
+
+    /// Lines whose name matches, nearest first.
+    ///
+    /// Typing "18号线" used to match nothing at all. `Station.searchKey` is station names only, so
+    /// the query fell through to Apple Maps and landed on "No Results" for a line that ships in the
+    /// app. Lines are now findable, and kept in their own section rather than mixed into the
+    /// stations: a line is not a station, and the last time this app relabelled one thing as
+    /// another a noodle shop appeared under "Stations" with line dots and a distance.
+    ///
+    /// Built from the station list that is already cached rather than by decoding the packs again,
+    /// so a line's stations are the stations that name it, and the count comes free.
+    func searchLines(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [LineResult] {
+        let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard query.count >= 1 else { return [] }
+        let needle = query.lowercased()
+        let queryToken = TransitLineMatching.normalizedLineToken(query)
+
+        var counts: [String: Int] = [:]
+        var nearest: [String: CLLocationDistance] = [:]
+        var lines: [String: SubwayLine] = [:]
+
+        let origin = coordinate.map { CLLocation(latitude: $0.latitude, longitude: $0.longitude) }
+        for station in await metroNetworkProvider.allStations() {
+            let stationDistance = origin.map {
+                CLLocation(latitude: station.latitude, longitude: station.longitude).distance(from: $0)
+            }
+            for line in station.uniqueLogicalLines {
+                let key = "\(line.cityID)|\(line.lineID)"
+                counts[key, default: 0] += 1
+                lines[key] = lines[key] ?? line
+                if let stationDistance {
+                    nearest[key] = min(nearest[key] ?? .greatestFiniteMagnitude, stationDistance)
+                }
+            }
+        }
+
+        let matches = lines.values.filter { line in
+            if line.name.lowercased().contains(needle) { return true }
+            if line.nameEn?.lowercased().contains(needle) == true { return true }
+            // "18" finds 18号线 and 北京地铁18号线 alike. Empty tokens match nothing rather than
+            // everything, which is what a bare "地铁" would otherwise do.
+            return !queryToken.isEmpty && TransitLineMatching.normalizedLineToken(line.name) == queryToken
+        }
+
+        return matches.map { line in
+            let key = "\(line.cityID)|\(line.lineID)"
+            return LineResult(
+                cityID: line.cityID,
+                lineID: line.lineID,
+                name: line.name,
+                nameEn: line.nameEn,
+                colorHex: line.colorHex,
+                stationCount: counts[key] ?? 0,
+                distance: nearest[key]
+            )
+        }
+        .sorted {
+            // Distance first where there is a fix; alphabetical is the fallback rather than
+            // arbitrary dictionary order, which would reshuffle between launches.
+            switch ($0.distance, $1.distance) {
+            case let (left?, right?): return left < right
+            case (nil, _?): return false
+            case (_?, nil): return true
+            default: return $0.name < $1.name
+            }
+        }
+    }
+
     /// The stations closest to the rider, whichever cities they happen to be in. Empty when the
     /// device has no position: there is no centroid left to guess from, and a list of arbitrary
     /// stations claiming to be "nearby" would be a worse answer than none.

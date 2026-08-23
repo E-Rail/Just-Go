@@ -579,7 +579,8 @@ struct MapContainerView: View {
         case .search:
             SearchPageView(
                 onSelectStation: { openStation($0) },
-                onSelectPlace: { selectSearchResult($0) }
+                onSelectPlace: { selectSearchResult($0) },
+                onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) }
             )
         case .editEndpoint(let field):
             SearchPageView(

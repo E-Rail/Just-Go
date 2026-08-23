@@ -11,6 +11,10 @@ import MapKit
 struct SearchPageView: View {
     let onSelectStation: (Station) -> Void
     let onSelectPlace: (TransitPlace) -> Void
+    /// Opening a line, supplied by the host for the same reason `StationDetailView` takes one: this
+    /// page is presented by more than one navigation stack. A host that cannot show a line passes
+    /// nothing and the section stays hidden.
+    var onSelectLine: ((StationSearchService.LineResult) -> Void)?
     /// True when this page exists to return one answer (endpoint editing) rather than to be
     /// browsed. Station rows then close the page like place rows already do.
     var dismissesOnSelection = false
@@ -23,6 +27,8 @@ struct SearchPageView: View {
     // replay still loading its city: the loser must not overwrite the winner's push.
     @State private var recentReplayTask: Task<Void, Never>?
     @State private var placeResults: [TransitPlace] = []
+    @State private var lineResults: [StationSearchService.LineResult] = []
+    @State private var lineSearchTask: Task<Void, Never>?
     @State private var placeSearchTask: Task<Void, Never>?
     @State private var isSearchingPlaces = false
     @State private var currentPlaceTask: Task<Void, Never>?
@@ -58,6 +64,15 @@ struct SearchPageView: View {
             // making them tap a second time on a screen that exists only to be typed into.
             isSearchFocused = true
             await viewModel?.loadInitialStations()
+            #if DEBUG
+            // The one way to look at a populated results list here: this environment can push a
+            // screen but cannot type into it.
+            if let seed = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SEARCH"] {
+                viewModel?.searchText = seed
+                scheduleLineSearch(seed)
+                schedulePlaceSearch(seed)
+            }
+            #endif
         }
         // The map's GCJ-02 correction can land while this page is open, moving the rider ~540 m.
         // Re-order against it rather than leaving a list sorted from where they were not.
@@ -68,6 +83,28 @@ struct SearchPageView: View {
 
     /// Debounced hard, because this is a network search that runs on every keystroke and Apple
     /// rate-limits it. Stations are already on screen by the time this returns.
+    /// Lines are matched entirely in memory against the station list the app already holds, so
+    /// this needs no debounce for the network's sake. It gets a short one anyway so a fast typist
+    /// does not rebuild the index on every keystroke.
+    private func scheduleLineSearch(_ query: String) {
+        lineSearchTask?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            lineResults = []
+            return
+        }
+        lineSearchTask = Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            guard !Task.isCancelled else { return }
+            let results = await container.stationSearchService.searchLines(
+                keyword: trimmed,
+                near: viewModel?.riderCoordinate
+            )
+            guard !Task.isCancelled else { return }
+            lineResults = Array(results.prefix(6))
+        }
+    }
+
     private func schedulePlaceSearch(_ query: String) {
         placeSearchTask?.cancel()
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -250,8 +287,42 @@ struct SearchPageView: View {
     /// keystroke, places come back from Apple ~350 ms later. So a place search still in flight
     /// counts as "possibly something": resolving it to "nothing" would flash the empty state
     /// on every keystroke in the gap before Apple replies.
+    private func lineRow(_ line: StationSearchService.LineResult) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                .fill(Color(hex: line.colorHex))
+                .frame(width: 6, height: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(AppLocalization.isChinese ? AppLocalization.chinese(line.name) : (line.nameEn ?? line.name))
+                    .rowTitle()
+                // The city is the whole point of this line. Searching "18号线" returns five lines
+                // in five cities, and every one of them renders in English as "Line 18": without
+                // the city the rider is choosing between five identical rows.
+                Text(lineSubtitle(line))
+                    .rowMeta()
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .frame(minHeight: Metrics.minimumTapTarget)
+        .contentShape(Rectangle())
+    }
+
+    private func lineSubtitle(_ line: StationSearchService.LineResult) -> String {
+        let stations = AppLocalization.text(
+            english: "\(line.stationCount) stations",
+            simplified: "\(line.stationCount) 座车站",
+            traditional: "\(line.stationCount) 座車站"
+        )
+        guard let city = container.cityService.getCity(byID: line.cityID) else { return stations }
+        return "\(city.localizedName) · \(stations)"
+    }
+
     private var hasAnyResult: Bool {
         !(viewModel?.searchResults.isEmpty ?? true) || !placeResults.isEmpty || isSearchingPlaces
+            || !lineResults.isEmpty
     }
 
     private var searchField: some View {
@@ -269,6 +340,7 @@ struct SearchPageView: View {
                     viewModel?.searchText = newValue
                     viewModel?.scheduleSearch()
                     schedulePlaceSearch(newValue)
+                    scheduleLineSearch(newValue)
                 }
             ))
             .textFieldStyle(.plain)
@@ -351,6 +423,24 @@ struct SearchPageView: View {
             }
 
             Group {
+            // Above the stations, because a rider who typed a line name wants the line, and a
+            // line that ships in this app should not be answered with "No Results".
+            if onSelectLine != nil, !lineResults.isEmpty {
+                Section {
+                    ForEach(lineResults) { line in
+                        Button {
+                            isSearchFocused = false
+                            onSelectLine?(line)
+                            if dismissesOnSelection { dismiss() }
+                        } label: {
+                            lineRow(line)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } header: {
+                    Text(AppLocalization.text(english: "Lines", simplified: "线路", traditional: "線路"))
+                }
+            }
             if viewModel?.isSearching ?? false {
                 HStack {
                     Spacer()

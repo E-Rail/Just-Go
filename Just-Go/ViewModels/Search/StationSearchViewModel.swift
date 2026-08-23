@@ -20,6 +20,11 @@ final class StationSearchViewModel {
 
     private let stationSearchService: StationSearchService
     private let locationService: LocationService
+
+    /// Where the rider is, in the frame everything else here measures in. Exposed so the search
+    /// page can rank lines by distance the same way this ranks stations, rather than reaching for
+    /// `LocationService` itself and picking the wrong one of the two coordinate frames.
+    var riderCoordinate: CLLocationCoordinate2D? { locationService.mapSpaceLocation?.coordinate }
     private let recentSearchesKey = "recentStationSearches"
     private var hasRequestedSearchLocation = false
     private var stationLoadID = UUID()

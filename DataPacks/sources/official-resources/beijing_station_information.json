@@ -6,10 +6,10 @@
   "sourceDirectoryURL": "https://www.bjsubway.com/station/",
   "detailPageURL": "https://www.bjsubway.com/station/siteinfo.html",
   "provider": "Beijing Subway",
-  "canonicalStationCount": 444,
+  "canonicalStationCount": 449,
   "sourceStationCount": 423,
-  "mappedStationCount": 416,
-  "stationPageCount": 417,
+  "mappedStationCount": 421,
+  "stationPageCount": 422,
   "stationPageGapCount": 27,
   "stations": [
     {
@@ -2203,6 +2203,16 @@
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150999331"
     },
     {
+      "stationID": "989832111dd2d195",
+      "stationName": "文华路",
+      "stationNameEn": "Wenhualu",
+      "aliases": [
+
+      ],
+      "externalStationID": "151013643",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013643"
+    },
+    {
       "stationID": "998f8a9dc12ed43f",
       "stationName": "霍营东",
       "stationNameEn": "Huoyingdong",
@@ -2413,6 +2423,16 @@
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151019784"
     },
     {
+      "stationID": "a5cdc4024801a800",
+      "stationName": "回龙观西大街",
+      "stationNameEn": "Huilongguan Xidajie",
+      "aliases": [
+
+      ],
+      "externalStationID": "151013645",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013645"
+    },
+    {
       "stationID": "a5f789b7ee527d31",
       "stationName": "望京南",
       "stationNameEn": "Wangjing South",
@@ -2571,6 +2591,16 @@
       ],
       "externalStationID": "150998555",
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150998555"
+    },
+    {
+      "stationID": "ae55c22a026f3cad",
+      "stationName": "东北旺",
+      "stationNameEn": "Dongbeiwang",
+      "aliases": [
+
+      ],
+      "externalStationID": "151013649",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013649"
     },
     {
       "stationID": "ae77df55e1cf663a",
@@ -3113,6 +3143,16 @@
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151018051"
     },
     {
+      "stationID": "cf9635fc8e1c0bf4",
+      "stationName": "龙泽西",
+      "stationNameEn": "Longzexi",
+      "aliases": [
+
+      ],
+      "externalStationID": "151013647",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013647"
+    },
+    {
       "stationID": "cfd235c2e126af60",
       "stationName": "灵境胡同",
       "stationNameEn": "Lingjing Hutong",
@@ -3171,6 +3211,16 @@
       ],
       "externalStationID": "150996759",
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996759"
+    },
+    {
+      "stationID": "d4f53e110a95ddc6",
+      "stationName": "上地软件园",
+      "stationNameEn": "Shangdi Software Park",
+      "aliases": [
+
+      ],
+      "externalStationID": "151013651",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=151013651"
     },
     {
       "stationID": "d4f701b7d6d29370",
@@ -4621,5 +4671,5 @@
       ]
     }
   ],
-  "sourceOnlyStationCount": 7
+  "sourceOnlyStationCount": 2
 }

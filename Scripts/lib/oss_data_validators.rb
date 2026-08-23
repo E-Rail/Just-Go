@@ -816,7 +816,7 @@ module OSSDataValidators
       "4401" => { stations: 329, exits: 1262, accessibility: 37, network: 414 },
       "4403" => { stations: 321, exits: 1504, accessibility: 19, network: 372 },
       "5000" => { stations: 83, exits: 299, accessibility: 3, network: 273 },
-      "5101" => { stations: 184, exits: 771, accessibility: 9, network: 396 },
+      "5101" => { stations: 184, exits: 771, accessibility: 9, network: 402 },
       "6101" => { stations: 227, exits: 920, accessibility: 164, network: 247 }
     }.freeze
 
@@ -828,14 +828,14 @@ module OSSDataValidators
         # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
         # means the entrance import silently stopped matching.
         {
-          "networkStations" => 444,
-          "matchedStations" => { "covered" => 444, "total" => 444 },
-          "accessibility" => { "covered" => 43, "total" => 444 },
-          "staticSchedules" => { "covered" => 0, "total" => 444 },
-          "liveArrivals" => { "covered" => 0, "total" => 444 },
-          "externalLayouts" => { "covered" => 0, "total" => 444 },
-          "licensedMedia" => { "covered" => 0, "total" => 444 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 444 }
+          "networkStations" => 449,
+          "matchedStations" => { "covered" => 449, "total" => 449 },
+          "accessibility" => { "covered" => 43, "total" => 449 },
+          "staticSchedules" => { "covered" => 0, "total" => 449 },
+          "liveArrivals" => { "covered" => 0, "total" => 449 },
+          "externalLayouts" => { "covered" => 0, "total" => 449 },
+          "licensedMedia" => { "covered" => 0, "total" => 449 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 449 }
         }
       when "7101"
         # data.taipei covers the Taipei Metro proper; the New Taipei light-rail and branch lines

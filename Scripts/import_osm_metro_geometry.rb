@@ -819,17 +819,43 @@ def element_coordinate(element, nodes)
   end
 end
 
-def named_relation_members(relation, elements_by_key, role_prefix)
+# Whether a relation member is claiming to *be* a station, whatever role it was given.
+#
+# PTv2 asks every station in a route relation to be a `stop_position` node with `role=stop`, and
+# most of the world's mapping follows that. Beijing 18号线 does not: relations 20010805/20010820
+# list five of their eleven stations as `public_transport=station` nodes with an **empty** role.
+# Those five never entered the pack, while the track ways still drew the line full length past
+# them — a complete line with a hole in it, no markers, and a single 9.37 km graph edge from
+# 马连洼 to 回龙观东大街 where five boardable stations belong. bjsubway.com published all eleven
+# the whole time; `beijing_station_information_importer.rb` had them pinned as an accepted gap.
+#
+# The role is a convention about how a member was filed. These tags are the member's claim about
+# what it is, and the claim is the thing worth trusting.
+def station_tagged_element?(element)
+  tags = element.is_a?(Hash) ? element.fetch("tags", {}) : {}
+  # A platform is not a station, whatever else it has been tagged with. Hong Kong's MTR platform
+  # ways carry a stray `station=subway` beside `railway=platform`, and trusting that tag alone put
+  # two stations named literally "1" and "2" into 屯馬綫 — platform numbers, promoted to stations.
+  return false if tags["public_transport"] == "platform" || tags["railway"] == "platform"
+  tags["public_transport"] == "station" || tags["railway"] == "station" || tags["station"] == "subway"
+end
+
+# `accept_station_tags` widens the role filter without widening it to everything: a track way
+# carries an empty role too, and is admitted by neither test. Member order is preserved either
+# way, which is what lets the recovered stations land at the right index in the service pattern
+# rather than being appended to the end of the line.
+def named_relation_members(relation, elements_by_key, role_prefix, accept_station_tags: false)
   relation.fetch("members", []).map do |member|
-    next unless member["role"].to_s.start_with?(role_prefix)
     element = elements_by_key["#{member["type"]}:#{member["ref"]}"]
+    matches_role = member["role"].to_s.start_with?(role_prefix)
+    next unless matches_role || (accept_station_tags && station_tagged_element?(element))
     name = element&.dig("tags", "name:zh") || element&.dig("tags", "name")
     [member, element, name] unless name.to_s.empty?
   end.compact
 end
 
 def passenger_station_members(relation, elements_by_key, include_unbuilt: false)
-  stops = named_relation_members(relation, elements_by_key, "stop")
+  stops = named_relation_members(relation, elements_by_key, "stop", accept_station_tags: true)
   usable_stops = stops.reject { |_member, _element, name| unbuilt_station_name?(name) }
   if include_unbuilt
     return stops unless usable_stops.empty?
@@ -1493,6 +1519,41 @@ def self_test
     "tags" => { "route" => "subway", "name" => "Line 20 Direction", "network" => "Metro A", "ref" => "20" }
   )
   fail_with("evidence-only relation classification test failed") unless passenger_station_members(evidence_only, fixture_elements).empty?
+
+  # Beijing 18号线 (relations 20010805/20010820) files five of its eleven stations as
+  # `public_transport=station` nodes with an **empty** role rather than PTv2 `stop_position` nodes
+  # with `role=stop`. All five were dropped while the track ways still drew the line full length
+  # past them: a complete line with a hole in it, no markers, and one 9.37 km graph edge where five
+  # boardable stations belong. Both halves of the fix are pinned here — a station-tagged member is
+  # taken whatever its role and lands at its member-order index, and a platform way carrying a
+  # stray `station=subway` (as Hong Kong's MTR platform ways do) stays out. Trusting that tag alone
+  # promoted two platform numbers into stations named "1" and "2" on 屯馬綫.
+  role_gap_elements = {
+    "node:40" => { "tags" => { "name" => "P", "public_transport" => "stop_position", "subway" => "yes" } },
+    "node:41" => { "tags" => { "name" => "Q", "public_transport" => "station", "railway" => "station", "station" => "subway" } },
+    "node:42" => { "tags" => { "name" => "R", "railway" => "station", "station" => "subway" } },
+    "node:43" => { "tags" => { "name" => "S", "public_transport" => "stop_position", "subway" => "yes" } },
+    "way:44" => { "tags" => { "name" => "1", "public_transport" => "platform", "railway" => "platform", "station" => "subway" } }
+  }
+  role_gap_relation = {
+    "id" => 40,
+    "members" => [
+      { "type" => "node", "ref" => 40, "role" => "stop" },
+      { "type" => "node", "ref" => 41, "role" => "" },
+      { "type" => "node", "ref" => 42, "role" => "" },
+      { "type" => "node", "ref" => 43, "role" => "stop" },
+      { "type" => "way", "ref" => 44, "role" => "" },
+      { "type" => "way", "ref" => 100, "role" => "" }
+    ]
+  }
+  fail_with("mis-tagged platform must not be read as a station") if station_tagged_element?(
+    role_gap_elements.fetch("way:44")
+  )
+  recovered = passenger_station_members(role_gap_relation, role_gap_elements).map { |_member, _element, name| name }
+  fail_with("empty-role station members must be recovered in member order") unless recovered == %w[P Q R S]
+  fail_with("empty-role recovery must reach the service pattern") unless ordered_relation_station_patterns(
+    role_gap_relation, role_gap_elements
+  ) == [%w[p q r s]]
   fail_with("light-rail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "light_rail" })
   fail_with("monorail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "monorail" })
   fail_with("tram eligibility test failed") unless supported_route_relation?("tags" => { "route" => "tram" })

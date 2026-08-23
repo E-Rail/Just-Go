@@ -29,8 +29,13 @@ module BeijingStationInformationImporter
   ].freeze
   NON_CURRENT_PASSENGER_STATIONS = %w[居庸关 三堡 黄土店 张辛 东园].freeze
   UNOPENED_METRO_STATIONS = %w[福寿岭 红庙 陶然桥].freeze
+  # Stations bjsubway.com publishes that the bundled network has no station for. This was seven
+  # names and five of them were 18号线's — the operator had records for them the whole time and the
+  # app had nowhere to attach them, because the OSM importer dropped every relation member filed
+  # with an empty role. Fixing that predicate mapped all five. What is left is the honest remainder:
+  # OSM holds no element at all for either of these two.
   EXPECTED_SOURCE_ONLY_STATIONS = %w[
-    上地软件园 东北旺 回龙观西大街 文华路 朱房北 通运门 龙泽西
+    朱房北 通运门
   ].freeze
   LEGACY_STATION_PAGES = {
     "八角游乐园" => "https://www.bjsubway.com/station/xltcx/line1/2013-08-19/5.html?sk=1"
@@ -74,9 +79,9 @@ module BeijingStationInformationImporter
     }
   }.freeze
 
-  EXPECTED_CANONICAL_COUNT = 444
+  EXPECTED_CANONICAL_COUNT = 449
   EXPECTED_SOURCE_COUNT = 423
-  EXPECTED_MAPPED_COUNT = 416
+  EXPECTED_MAPPED_COUNT = 421
 
   class ImportError < StandardError; end
 

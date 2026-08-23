@@ -708,7 +708,24 @@ struct MapContainerView: View {
     /// this city, through the same `selectPlace` + `searchRoutes` path a rider drives, so what
     /// gets screenshotted is the real screen and not a fixture. Widest separation rather than a
     /// hardcoded pair so this works in any city, and so the route has transfers in it.
+    /// Waits for the viewport loader to actually deliver, rather than reading whatever happened to
+    /// be there when `.task` fired.
+    ///
+    /// Both seeds below plan a real trip, and planning needs a loaded pack. The loader is debounced
+    /// and asynchronous, so on a slower or larger device the seed ran against an empty station list,
+    /// returned silently, and left the harness sitting on the browse map. That reads as "the app is
+    /// broken" or "the harness is flaky" when it is neither.
+    private func waitForNetwork(seconds: Double = 20) async -> Bool {
+        let deadline = Date().addingTimeInterval(seconds)
+        while Date() < deadline {
+            if let stations = viewModel?.stations, stations.count >= 2 { return true }
+            try? await Task.sleep(nanoseconds: 300_000_000)
+        }
+        return false
+    }
+
     private func seedDebugRoute(landingOn screen: String) async {
+        guard await waitForNetwork() else { return }
         guard let stations = viewModel?.stations, stations.count >= 2 else { return }
         let plannerViewModel = planner
         let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
@@ -727,6 +744,7 @@ struct MapContainerView: View {
     }
 
     private func seedDebugTrip(_ parts: [Double]) async {
+        _ = await waitForNetwork()
         let plannerViewModel = planner
         plannerViewModel.selectPlace(
             TransitPlace(name: "A", coordinate: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]), source: .localStationData),

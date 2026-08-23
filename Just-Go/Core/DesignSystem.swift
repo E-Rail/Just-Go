@@ -33,6 +33,11 @@ enum Metrics {
     /// How wide a column of text or cards is allowed to get before it stops being readable. An
     /// iPad in landscape is 1366 points across; a 1366-point-wide list row is not a design, it is
     /// the absence of one.
+    /// The trip column beside a map on regular width. Wide enough for a journey row with a line
+    /// badge, a station pair and a duration without wrapping, and narrow enough to leave the map
+    /// the larger half on every iPad this ships to.
+    static let tripColumnWidth: CGFloat = 420
+
     static let readableColumnWidth: CGFloat = 620
 }
 

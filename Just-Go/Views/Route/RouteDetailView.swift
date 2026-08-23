@@ -12,6 +12,12 @@ enum RouteDetailDestination: Hashable {
     case confidence(UUID)
 }
 
+extension RouteDetailDestination: Identifiable {
+    /// `sheet(item:)` needs one, and `Hashable` already gives a stable answer. Presented as a sheet
+    /// only on regular width; on a phone this is pushed and the id is unused.
+    var id: Self { self }
+}
+
 struct RouteDetailView: View {
     private let initialRoute: Route
     let preference: RoutePreference
@@ -31,6 +37,18 @@ struct RouteDetailView: View {
     /// Which of the three stops the trip sheet is resting at.
     @State private var tripCardDetent: PresentationDetent = .medium
     @State private var showsTripCard = false
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    /// Whether there is room to show the map and the trip at the same time.
+    ///
+    /// Everything below the sheet is a phone invariant. `presentationBackgroundInteraction` exists
+    /// so the map keeps living behind the card, and on an iPad the card is a form sheet floating in
+    /// the middle of a 1024pt-wide map with the route hidden behind it.
+    /// `interactiveDismissDisabled` says "there is nowhere for this to be dismissed to", which is
+    /// true on a phone where the card *is* the screen, and becomes a trap when it is a modal on a
+    /// screen with room to spare. On regular width the trip moves into a real column beside the
+    /// map instead, and nothing about the compact layout changes.
+    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
     /// Where the sheet was resting before a push raised it, so coming back restores it.
     @State private var stopBeforePush: PresentationDetent?
     /// Guidance replaces this page's content rather than covering it, "but in the same page".
@@ -72,6 +90,8 @@ struct RouteDetailView: View {
                     ActiveTripStore.clear()
                 }
                 .safeAreaInset(edge: .bottom) { EmptyView() }
+            } else if isRegularWidth {
+                splitLayout(feasibility: feasibility, confidence: confidence)
             } else {
                 mapHeader()
             }
@@ -87,8 +107,11 @@ struct RouteDetailView: View {
         // Presented from `.task` rather than inline so the sheet goes up after the push has
         // settled: a presentation raised during a navigation transition is the one that fails
         // with "whose view is not in the window hierarchy".
-        .task { showsTripCard = !isGuiding }
-        .onChange(of: isGuiding) { _, _ in showsTripCard = !isGuiding }
+        .task { showsTripCard = !isGuiding && !isRegularWidth }
+        .onChange(of: isGuiding) { _, _ in showsTripCard = !isGuiding && !isRegularWidth }
+        // A rotation or a Split View resize can cross the boundary while this screen is up, and a
+        // sheet left behind on the wide side would sit on top of the column showing the same trip.
+        .onChange(of: isRegularWidth) { _, wide in showsTripCard = !isGuiding && !wide }
         // A sheet presented from a *pushed* view is presented on the navigation controller, not on
         // the view, so popping this screen does not reliably take the sheet with it, and the trip
         // card was left sitting on top of the route list.
@@ -102,7 +125,7 @@ struct RouteDetailView: View {
         .background(
             PageTransitionObserver(
                 onLeaving: { showsTripCard = false },
-                onReturned: { showsTripCard = !isGuiding }
+                onReturned: { showsTripCard = !isGuiding && !isRegularWidth }
             )
             .frame(width: 0, height: 0)
         )
@@ -372,6 +395,57 @@ struct RouteDetailView: View {
         .background(Color.appBackground)
     }
 
+    /// Map and trip side by side, which is what a tablet has the room for.
+    ///
+    /// The column carries no `NavigationStack` of its own. Nesting one inside a pushed destination
+    /// is what broke this the first time: the whole screen failed to appear and the app sat on the
+    /// map root, with no crash and nothing in the log. The sheet path below can carry one because a
+    /// sheet is its own presentation context; a column living inside the page's stack cannot.
+    /// Verified by rendering it both ways rather than reasoned about.
+    private func splitLayout(
+        feasibility: RouteFeasibility,
+        confidence: RouteConfidence
+    ) -> some View {
+        HStack(spacing: 0) {
+            mapHeader()
+                .frame(maxWidth: .infinity)
+            Divider()
+            tripCardContent(feasibility: feasibility, confidence: confidence)
+                .frame(width: Metrics.tripColumnWidth)
+        }
+        // Sub-details are pushed inside the sheet on a phone and presented over the split here, so
+        // the map and the trip both stay on screen behind them.
+        .sheet(item: $detailDestination) { destination in
+            NavigationStack { destinationView(for: destination) }
+        }
+    }
+
+    /// A transfer, a station, or the confidence breakdown. One definition, reached two ways: pushed
+    /// inside the sheet's own stack on a phone, and presented over the split on a tablet.
+    @ViewBuilder
+    private func destinationView(for destination: RouteDetailDestination) -> some View {
+        switch destination {
+        case .transfer(let segment):
+            TransferStationSheet(
+                transferSegment: segment,
+                nextTransitSegment: nextTransitSegment(after: segment),
+                cityID: segment.packCityID ?? route.networkCityID ?? "",
+                accessibilityFilter: accessibilityFilter
+            )
+        case .station(let stop):
+            RouteStationGuideSheet(
+                stop: stop,
+                cityID: stop.packCityID ?? route.networkCityID ?? ""
+            )
+        case .confidence:
+            let feasibility = currentFeasibility()
+            RouteConfidenceDetailView(
+                confidence: currentConfidence(feasibility: feasibility),
+                feasibility: feasibility
+            )
+        }
+    }
+
     /// The trip as something to read, in the sheet over the map.
     private func tripCard(
         feasibility: RouteFeasibility,
@@ -386,31 +460,13 @@ struct RouteDetailView: View {
             // A single destination registration: two navigationDestination(item:) modifiers on
             // the same node is a historically unreliable SwiftUI pattern (one registration can
             // shadow the other), and both pushes share this screen anyway.
-            .navigationDestination(item: $detailDestination) { destination in
-                switch destination {
-                case .transfer(let segment):
-                    TransferStationSheet(
-                        transferSegment: segment,
-                        nextTransitSegment: nextTransitSegment(after: segment),
-                        cityID: segment.packCityID ?? route.networkCityID ?? "",
-                        accessibilityFilter: accessibilityFilter
-                    )
-                case .station(let stop):
-                    RouteStationGuideSheet(
-                        stop: stop,
-                        cityID: stop.packCityID ?? route.networkCityID ?? ""
-                    )
-                case .confidence:
-                    let feasibility = currentFeasibility()
-                    RouteConfidenceDetailView(
-                        confidence: currentConfidence(feasibility: feasibility),
-                        feasibility: feasibility
-                    )
-                }
-            }
+            .navigationDestination(item: $detailDestination) { destinationView(for: $0) }
         }
-        .presentationDetents(Self.tripCardDetents, selection: $tripCardDetent)
-        .presentationDragIndicator(.visible)
+        // Detents, background interaction and the dismiss lock all describe a card sitting over a
+        // map, so they apply only where that is what it is. In a column there is no sheet to give a
+        // detent to and nothing to dismiss.
+        .presentationDetents(isRegularWidth ? [.large] : Self.tripCardDetents, selection: $tripCardDetent)
+        .presentationDragIndicator(isRegularWidth ? .hidden : .visible)
         // The map behind stays live at the two lower stops. The whole point of putting the trip
         // on a sheet is that the map does not stop existing while it is up.
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
@@ -420,6 +476,7 @@ struct RouteDetailView: View {
         // A pushed screen in a 30%-tall sheet is a letterbox. Raising the sheet is what Maps does
         // when it pushes, and it returns to wherever the rider had it once they come back.
         .onChange(of: detailDestination) { previous, current in
+            guard !isRegularWidth else { return }
             if previous == nil, current != nil {
                 stopBeforePush = tripCardDetent
                 withAnimation { tripCardDetent = .fraction(0.92) }

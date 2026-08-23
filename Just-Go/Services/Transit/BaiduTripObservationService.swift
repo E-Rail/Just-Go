@@ -86,6 +86,53 @@ struct ObservedLineHours: Equatable, Sendable {
     let lastTrain: String
 }
 
+/// One stop on a line, where the routing service says it is.
+struct ObservedStop: Equatable, Sendable {
+    let name: String
+    let latitude: Double
+    let longitude: Double
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+}
+
+/// A line as the routing service currently sees it: the stops it calls at, in order, with the
+/// colour it is drawn in and the terminal it runs towards.
+///
+/// This is the same response the app already reads a fare and a last train out of. `stop_info`
+/// carries every intermediate stop with a coordinate, and 马连洼 → 天通苑东 returns all eleven
+/// stations of Beijing 18号线 in one call. The bundled OSM network stays the offline source of
+/// truth; this exists so a rider can ask the question the packs cannot answer, which is whether
+/// what they are looking at is still current.
+struct ObservedLine: Equatable, Sendable {
+    let name: String
+    let colorHex: String?
+    let directionText: String?
+    let firstTrain: String?
+    let lastTrain: String?
+    /// Boarding station, every intermediate stop, then the alighting station.
+    let stops: [ObservedStop]
+}
+
+/// Asking the routing service about one line rather than one trip.
+///
+/// Split from `TripObservationProviding` on purpose. A trip is planned whether the rider asks or
+/// not; a line is looked up only when they open its page and tap for it, and the two deserve
+/// different budgets and different failure stories.
+protocol LineObservationProviding: Sendable {
+    /// The line ridden between two points, when a single line rides the whole way.
+    ///
+    /// Returns `nil` rather than a partial answer when the ride takes more than one line, which is
+    /// what happens on a ring line asked end to end, and when Baidu refuses the trip outright, as
+    /// it does for two adjacent stations 700 m apart.
+    func observedLine(
+        from origin: CLLocationCoordinate2D,
+        to destination: CLLocationCoordinate2D,
+        named expectedName: String
+    ) async -> ObservedLine?
+}
+
 /// Everything one transit routing call answers about a trip.
 ///
 /// The app used to make this call and read a single field out of the response. The other four are
@@ -127,10 +174,13 @@ protocol TripObservationProviding: Sendable {
 /// cost, and the app's own graph stays the offline answer with this as online enrichment on top,
 /// but it is the honest reading of the licence. `validate_runtime_data_policy.rb` enforces that no
 /// Baidu-derived byte is ever committed.
-actor BaiduTripObservationService: TripObservationProviding {
+actor BaiduTripObservationService: TripObservationProviding, LineObservationProviding {
     private let client: BaiduMapsClient
     /// Session-scoped, in memory only. See the note above on why this is not a disk cache.
     private var cache: [String: TripObservations] = [:]
+    /// Line lookups are cached separately and just as briefly: same session-only rule, and a
+    /// negative result is cached too so a ring line does not spend a call every time it is opened.
+    private var lineCache: [String: ObservedLine?] = [:]
 
     init(client: BaiduMapsClient) {
         self.client = client
@@ -170,6 +220,97 @@ actor BaiduTripObservationService: TripObservationProviding {
         let observations = Self.observations(in: response)
         cache[cacheKey] = observations
         return observations
+    }
+
+    // MARK: - One line
+
+    func observedLine(
+        from origin: CLLocationCoordinate2D,
+        to destination: CLLocationCoordinate2D,
+        named expectedName: String
+    ) async -> ObservedLine? {
+        let cacheKey = String(
+            format: "line:%@:%.4f,%.4f>%.4f,%.4f",
+            expectedName, origin.latitude, origin.longitude, destination.latitude, destination.longitude
+        )
+        if let cached = lineCache[cacheKey] { return cached }
+
+        let response: BaiduTransitResponse
+        do {
+            response = try await client.get(
+                BaiduTransitResponse.self,
+                path: "/direction/v2/transit",
+                parameters: [
+                    (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
+                    (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
+                    (name: "coord_type", value: "gcj02"),
+                    (name: "ret_coordtype", value: "gcj02"),
+                    (name: "tactics_incity", value: "5")
+                ]
+            )
+        } catch {
+            AppLog.routing.info("Baidu line observation unavailable: \(error)")
+            return nil
+        }
+
+        let line = Self.observedLine(in: response, named: expectedName)
+        lineCache[cacheKey] = line
+        return line
+    }
+
+    /// The line ridden end to end, when one line rides the whole way and it is the line asked for.
+    ///
+    /// Both conditions matter. Routing two terminals of a ring line returns a fragment rather than
+    /// the ring, and routing across a city returns whatever is fastest, which is frequently a line
+    /// nobody asked about. A branch is the one case where two steps are still one line: Guangzhou
+    /// 3号线 机场北 → 番禺广场 comes back as two steps both named 地铁3号线, because the rider does
+    /// change trains at 体育西路 and stays on the same line doing it. Those concatenate; anything
+    /// else returns nothing at all.
+    static func observedLine(in response: BaiduTransitResponse, named expectedName: String) -> ObservedLine? {
+        for route in response.result?.routes ?? [] {
+            let rides = route.steps.flatMap(\.steps).filter { $0.vehicleInfo?.type != nil && !$0.isWalking }
+            guard !rides.isEmpty, rides.allSatisfy(\.isRail) else { continue }
+
+            let details = rides.compactMap(\.vehicleInfo?.detail)
+            guard details.count == rides.count else { continue }
+            guard details.allSatisfy({ TransitLineMatching.linesMatch($0.name ?? "", expectedName) }) else { continue }
+
+            var stops: [ObservedStop] = []
+            for detail in details {
+                appendStop(detail.onStation, at: nil, to: &stops)
+                for stop in detail.stopInfo ?? [] {
+                    appendStop(stop.stopName, at: stop.stopLocation, to: &stops)
+                }
+                appendStop(detail.offStation, at: nil, to: &stops)
+            }
+            guard stops.count >= 2 else { continue }
+
+            let first = details.first
+            return ObservedLine(
+                name: first?.name ?? expectedName,
+                colorHex: first?.lineColor,
+                directionText: details.last?.directText,
+                firstTrain: first?.firstTime.flatMap { $0.isEmpty ? nil : $0 },
+                lastTrain: first?.lastTime.flatMap { $0.isEmpty ? nil : $0 },
+                stops: stops
+            )
+        }
+        return nil
+    }
+
+    /// Boarding and alighting stations arrive without a coordinate and frequently with an exit
+    /// letter attached ("古城站(D西南口)"), so they are normalised the same way every other station
+    /// name in this file is. A stop repeated at a branch join is dropped rather than drawn twice.
+    private static func appendStop(
+        _ rawName: String?,
+        at location: BaiduCoordinate?,
+        to stops: inout [ObservedStop]
+    ) {
+        let name = TransitLineMatching.normalizedStationName(rawName ?? "")
+        guard !name.isEmpty, stops.last?.name != name else { return }
+        stops.append(
+            ObservedStop(name: name, latitude: location?.lat ?? 0, longitude: location?.lng ?? 0)
+        )
     }
 
     // MARK: - Extraction
@@ -543,6 +684,25 @@ struct BaiduStep: Decodable, Sendable {
             let offStation: String?
             let firstTime: String?
             let lastTime: String?
+            /// The stops between `onStation` and `offStation`, in order, each with a coordinate.
+            /// Requested as GCJ-02 like everything else here, and spot-checked against the same
+            /// station returned by place search: identical to ten decimal places.
+            let stopInfo: [Stop]?
+            let lineColor: String?
+            /// "天通苑东方向" — the terminal this service runs towards, which is how every station
+            /// sign in China names a direction.
+            let directText: String?
+            let stopNum: Int?
+
+            struct Stop: Decodable, Sendable {
+                let stopName: String?
+                let stopLocation: BaiduCoordinate?
+
+                enum CodingKeys: String, CodingKey {
+                    case stopName = "stop_name"
+                    case stopLocation = "stop_location"
+                }
+            }
 
             enum CodingKeys: String, CodingKey {
                 case name, type
@@ -550,6 +710,10 @@ struct BaiduStep: Decodable, Sendable {
                 case offStation = "off_station"
                 case firstTime = "first_time"
                 case lastTime = "last_time"
+                case stopInfo = "stop_info"
+                case lineColor = "line_color"
+                case directText = "direct_text"
+                case stopNum = "stop_num"
             }
         }
     }

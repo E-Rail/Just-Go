@@ -20,6 +20,32 @@ struct MapVisibleRegion {
     }
 }
 
+extension MapVisibleRegion {
+    /// The smallest region that frames every one of these coordinates, with room around them.
+    ///
+    /// Lifted out of `Route.previewRegion`, where it had been the only fit-bounds arithmetic in the
+    /// app and was reachable only from a planned trip. A line has the same need and no route to
+    /// borrow it from. The padding factor and the minimum span are the route map's own numbers,
+    /// kept because they are what has been looked at on a screen.
+    init?(fitting coordinates: [CLLocationCoordinate2D], minimumSpan: CLLocationDegrees = 0.02) {
+        guard !coordinates.isEmpty else { return nil }
+        let latitudes = coordinates.map(\.latitude)
+        let longitudes = coordinates.map(\.longitude)
+        guard let minLatitude = latitudes.min(), let maxLatitude = latitudes.max(),
+              let minLongitude = longitudes.min(), let maxLongitude = longitudes.max() else {
+            return nil
+        }
+        self.init(
+            center: CLLocationCoordinate2D(
+                latitude: (minLatitude + maxLatitude) / 2,
+                longitude: (minLongitude + maxLongitude) / 2
+            ),
+            latitudeDelta: max((maxLatitude - minLatitude) * 1.35, minimumSpan),
+            longitudeDelta: max((maxLongitude - minLongitude) * 1.35, minimumSpan)
+        )
+    }
+}
+
 /// The three scales the map is ever asked to sit at.
 ///
 /// These were four hardcoded literals. 0.22 For a city load, 0.1 for locate-me, 0.02 for a search

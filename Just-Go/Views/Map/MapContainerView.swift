@@ -32,6 +32,9 @@ enum MapRoute: Hashable {
     /// stack cannot resolve renders as a pushed screen with no title and no content, which is what
     /// a blank page is. The object itself is held beside the path in `openedStations`.
     case station(id: String)
+    /// A line, keyed the same way and for the same reason as `.station`: `MetroLine` is a struct
+    /// but is not `Hashable`, and the pair of ids is enough to fetch it from the cached network.
+    case line(cityID: String, lineID: String)
 }
 
 struct MapContainerView: View {
@@ -620,7 +623,11 @@ struct MapContainerView: View {
             if let station = openedStations[stationID] {
                 // The map replaces this screen with the entry page itself. See the
                 // pendingRouteInput handler above.
-                StationDetailView(station: station, dismissesOnRouteSelection: false)
+                StationDetailView(
+                    station: station,
+                    dismissesOnRouteSelection: false,
+                    onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) }
+                )
             } else {
                 // Cannot happen by construction: the station is stored before the push, but a
                 // screen that says something is strictly better than one that says nothing.
@@ -642,6 +649,8 @@ struct MapContainerView: View {
                 }
                 .background(Color.appBackground)
             }
+        case .line(let cityID, let lineID):
+            LineDetailView(cityID: cityID, lineID: lineID)
         }
     }
 
@@ -671,6 +680,16 @@ struct MapContainerView: View {
             if parts.count >= 4 {
                 didCenterOnUser = true
                 Task { await seedDebugTrip(parts) }
+                return
+            }
+        }
+        // A named line, landed on its own page. Same reason as the two above: this environment has
+        // no tap injection, so the only way to look at a pushed screen is to seed the path.
+        if let line = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_LINE"] {
+            let parts = line.split(separator: ",").map(String.init)
+            if parts.count >= 2 {
+                didCenterOnUser = true
+                path = [.line(cityID: parts[0], lineID: parts[1])]
                 return
             }
         }

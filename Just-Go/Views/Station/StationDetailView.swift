@@ -40,6 +40,14 @@ struct StationDetailView: View {
     /// Everywhere else this view is presented in a sheet, where dismissing is the sheet's own
     /// business and touches no navigation path.
     var dismissesOnRouteSelection = true
+    /// How to open one of this station's lines, supplied by whoever is hosting this screen.
+    ///
+    /// Injected rather than pushed from here, because this view is hosted by three different
+    /// navigation stacks (the map's, the route detail's, and the Quick Tags sheet's) and
+    /// registering a destination on each of them is the pattern that shadowed a sheet and cost this
+    /// app its Settings screen. A host that cannot show a line simply passes nothing, and the rows
+    /// stay the plain labels they have always been.
+    var onSelectLine: ((SubwayLine) -> Void)?
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -379,32 +387,50 @@ struct StationDetailView: View {
 
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 8)], alignment: .leading, spacing: 8) {
                         ForEach(station.uniqueLogicalLines) { line in
-                            HStack(spacing: 7) {
-                                Circle()
-                                    .fill(Color(hex: line.colorHex))
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(line.localizedName)
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .lineLimit(1)
-                                    if let alternateName = line.alternateLocalizedName {
-                                        Text(alternateName)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                            .lineLimit(1)
-                                    }
-                                }
-                                Spacer(minLength: 0)
+                            if let onSelectLine {
+                                Button { onSelectLine(line) } label: { lineChip(line, opensLine: true) }
+                                    .buttonStyle(.plain)
+                            } else {
+                                lineChip(line, opensLine: false)
                             }
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 7)
-                            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                         }
                     }
                 }
             }
         }
+    }
+
+    /// One line row. The chevron appears only when tapping it goes somewhere, so the affordance
+    /// never promises a screen the host has not provided.
+    private func lineChip(_ line: SubwayLine, opensLine: Bool) -> some View {
+        HStack(spacing: 7) {
+            Circle()
+                .fill(Color(hex: line.colorHex))
+                .frame(width: 10, height: 10)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(line.localizedName)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                if let alternateName = line.alternateLocalizedName {
+                    Text(alternateName)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer(minLength: 0)
+            if opensLine {
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .frame(minHeight: Metrics.minimumTapTarget)
+        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
+        .contentShape(Rectangle())
     }
 }
 

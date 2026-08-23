@@ -31,6 +31,9 @@ final class DIContainer {
     /// Measured transfer corridor lengths, when a provider can supply them. Optional because the
     /// app must build, launch and route with no Baidu key at all.
     let tripObservationProvider: TripObservationProviding?
+    /// The same service seen through a different port, and optional for the same reason: with no
+    /// key the line page still draws, it simply cannot offer to check itself against the operator.
+    let lineObservationProvider: LineObservationProviding?
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
@@ -54,6 +57,7 @@ final class DIContainer {
         tripMemoryService: TripMemoryService,
         transferInsightService: TransferInsightService,
         tripObservationProvider: TripObservationProviding? = nil,
+        lineObservationProvider: LineObservationProviding? = nil,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         tripReminderService: TripReminderService,
@@ -75,6 +79,7 @@ final class DIContainer {
         self.tripMemoryService = tripMemoryService
         self.transferInsightService = transferInsightService
         self.tripObservationProvider = tripObservationProvider
+        self.lineObservationProvider = lineObservationProvider
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.tripReminderService = tripReminderService
@@ -257,6 +262,7 @@ final class DIContainer {
             tripMemoryService: tripMemoryService,
             transferInsightService: transferInsightService,
             tripObservationProvider: tripObservationProvider,
+            lineObservationProvider: tripObservationProvider,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             tripReminderService: tripReminderService,

@@ -118,28 +118,10 @@ struct Route: Identifiable, Codable {
     }
 
     var previewRegion: MapVisibleRegion? {
-        let coordinates = segments.flatMap(\.drawableCoordinates)
-
-        guard !coordinates.isEmpty else { return nil }
-
-        let latitudes = coordinates.map(\.latitude)
-        let longitudes = coordinates.map(\.longitude)
-        guard let minLatitude = latitudes.min(),
-              let maxLatitude = latitudes.max(),
-              let minLongitude = longitudes.min(),
-              let maxLongitude = longitudes.max() else {
-            return nil
-        }
-
-        let latitudeDelta = max((maxLatitude - minLatitude) * 1.35, 0.02)
-        let longitudeDelta = max((maxLongitude - minLongitude) * 1.35, 0.02)
-        return MapVisibleRegion(
-            center: CLLocationCoordinate2D(
-                latitude: (minLatitude + maxLatitude) / 2,
-                longitude: (minLongitude + maxLongitude) / 2
-            ),
-            latitudeDelta: latitudeDelta,
-            longitudeDelta: longitudeDelta
+        MapVisibleRegion(
+            fitting: segments.flatMap(\.drawableCoordinates).map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
         )
     }
 }

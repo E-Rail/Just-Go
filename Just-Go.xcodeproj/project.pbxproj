@@ -52,6 +52,7 @@
 		A100003E /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200003E /* Localization.swift */; };
 		A100003F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000013 /* InfoPlist.strings */; };
 		A1000040 /* Map/TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* Map/TransitMapView.swift */; };
+		A1000960 /* Map/LineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000960 /* Map/LineDetailView.swift */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
 		A100004B /* Transit/TransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Transit/TransitFormatting.swift */; };
@@ -172,6 +173,7 @@
 		A2000043 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000044 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000045 /* Map/TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/TransitMapView.swift; sourceTree = "<group>"; };
+		A2000960 /* Map/LineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/LineDetailView.swift; sourceTree = "<group>"; };
 		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 				A2000072 /* Route/TransferStationSheet.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
+				A2000960 /* Map/LineDetailView.swift */,
 				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
@@ -554,6 +557,7 @@
 				A1000005 /* Map/MapContainerView.swift in Sources */,
 				A1000006 /* Map/MapViewModel.swift in Sources */,
 				A1000040 /* Map/TransitMapView.swift in Sources */,
+				A1000960 /* Map/LineDetailView.swift in Sources */,
 				A1000008 /* Station/StationDetailView.swift in Sources */,
 				A1000062 /* Station/StationDetailView+Accessibility.swift in Sources */,
 				A1000063 /* Station/StationDetailView+DataSections.swift in Sources */,

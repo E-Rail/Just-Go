@@ -8,12 +8,18 @@ struct AccessibilityFilter {
     /// How far the rider is willing to walk to reach a station, from Accessibility Settings.
     /// Carried on the filter because the route assembler needs it and only ever receives this.
     /// It is what decides whether the first mile is walked, cycled or driven.
-    var maxWalkingDistance: Double = 500
+    ///
+    /// Deliberately has no default. It used to default to 500, and the Live "Go" reroute omitted
+    /// it, so a rider who had set 1000 m was silently re-planned at 500 mid-trip and could be
+    /// handed a different *mode* for the last mile than the one they were planned with. An
+    /// omission this consequential should not compile.
+    var maxWalkingDistance: Double
 
     static let none = AccessibilityFilter(
         requiresWheelchairAccess: false,
         requiresElevator: false,
-        avoidStairs: false
+        avoidStairs: false,
+        maxWalkingDistance: AccessibilityPreference.default.maxWalkingDistance
     )
 
     /// Whether the rider needs the entrance itself to be step-free. All three settings imply it:
@@ -123,6 +129,21 @@ struct Route: Identifiable, Codable {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
             }
         )
+    }
+
+    /// A copy carrying none of the money an observation provider quoted.
+    ///
+    /// `fare` and `missedTrainTaxiYuan` are the only two values on a route that are verbatim
+    /// provider content rather than something the app derived: both are prices Baidu computed and
+    /// returned. Everything else enrichment touches — the service verdict, the warnings it words
+    /// itself, the changes it re-costs at the app's own walking pace — is the app's own reading.
+    ///
+    /// `ActiveTripStore.save` is the reason this exists; see the note there.
+    var withoutObservedPricing: Route {
+        var stripped = self
+        stripped.fare = nil
+        stripped.missedTrainTaxiYuan = nil
+        return stripped
     }
 }
 

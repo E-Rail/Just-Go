@@ -61,6 +61,12 @@ struct MapContainerView: View {
     @State private var pendingResolvedItem: MKMapItem?
     /// Stations that have been pushed, keyed by the id carried in the path.
     @State private var openedStations: [String: Station] = [:]
+    /// A trip that was still running when the app was last killed. `pendingResumableTrip` is the
+    /// one being asked about; `resumableTrip` is the one the rider said yes to. See
+    /// `offerToResumeTrip`.
+    @State private var pendingResumableTrip: Route?
+    @State private var resumableTrip: Route?
+    @State private var isResumingTrip = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -84,6 +90,38 @@ struct MapContainerView: View {
             guard !didCenterOnUser else { return }
             centerOnUser()
         }
+        .task { offerToResumeTrip() }
+        // Full screen rather than a push: a resumed trip is not a place in this stack's history,
+        // and a rider who came back to the app underground wants the navigator, not a map.
+        .fullScreenCover(item: $resumableTrip) { trip in
+            LiveGoView(route: trip) {
+                resumableTrip = nil
+                ActiveTripStore.clear()
+            }
+        }
+        .alert(
+            AppLocalization.text(
+                english: "Resume your trip?",
+                simplified: "继续之前的行程？",
+                traditional: "繼續之前的行程？"
+            ),
+            isPresented: $isResumingTrip,
+            presenting: pendingResumableTrip
+        ) { trip in
+            Button(AppLocalization.text(english: "Resume", simplified: "继续", traditional: "繼續")) {
+                pendingResumableTrip = nil
+                resumableTrip = trip
+            }
+            Button(
+                AppLocalization.text(english: "Discard", simplified: "放弃", traditional: "放棄"),
+                role: .destructive
+            ) {
+                pendingResumableTrip = nil
+                ActiveTripStore.clear()
+            }
+        } message: { trip in
+            Text(verbatim: "\(trip.origin) → \(trip.destination)")
+        }
         // A place card's "Route here" only records the place; the push happens here, so every
         // sender: map POI, search result, station detail. Reaches the entry page the same way
         // and none of them has to know what the navigation stack looks like.
@@ -101,6 +139,22 @@ struct MapContainerView: View {
                 path.removeAll()
             }
         }
+    }
+
+    /// A trip Live "Go" was running when iOS terminated the app, most likely underground, which is
+    /// exactly the case the store was written for.
+    ///
+    /// `ActiveTripStore` had no reader at all: it was saved on every start and cleared on every
+    /// normal exit, so a route only survived when the app was killed mid-trip, and nothing ever
+    /// looked. The rider was asked to plan the journey again, offline, from a platform.
+    ///
+    /// Asked rather than resumed outright. A saved trip can be hours stale, and dropping someone
+    /// into a navigator they did not open is worse than one extra tap.
+    private func offerToResumeTrip() {
+        guard pendingResumableTrip == nil, resumableTrip == nil, path.isEmpty else { return }
+        guard let saved = ActiveTripStore.load() else { return }
+        pendingResumableTrip = saved
+        isResumingTrip = true
     }
 
     /// Opens the map where the rider left it. Nothing is loaded from this. The viewport decides

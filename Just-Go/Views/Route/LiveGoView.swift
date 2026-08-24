@@ -698,7 +698,8 @@ struct LiveGoView: View {
                 accessibilityFilter: AccessibilityFilter(
                     requiresWheelchairAccess: preference.requiresWheelchairAccess,
                     requiresElevator: preference.prefersElevator,
-                    avoidStairs: preference.avoidStairs
+                    avoidStairs: preference.avoidStairs,
+                    maxWalkingDistance: preference.maxWalkingDistance
                 )
             )
             guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }

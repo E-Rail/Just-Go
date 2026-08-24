@@ -191,6 +191,41 @@ if File.file?(baidu_client_path)
     errors << "BaiduTripObservationService.swift is missing; the no-persistence check cannot run"
   end
 
+  # The checks above only watch the two files that *fetch* from Baidu, and a fare does not stay
+  # there: it is attached to a `Route`, and a `Route` is one Codable struct that `ActiveTripStore`
+  # writes to UserDefaults whole so a trip survives the app being killed underground. That is how
+  # the fare and the missed-train taxi price reached disk for months without tripping anything.
+  #
+  # So the consumer end is pinned too. `ActiveTripStore` is the only place a route is persisted;
+  # it must strip the provider's numbers on the way past, and `Route` must keep the helper that
+  # does it. Named explicitly, and required to exist, for the same reason as above: renaming
+  # either one would otherwise turn this check off without failing anything.
+  trip_store_path = File.join(ROOT, "Just-Go/Services/Data/ActiveTripStore.swift")
+  route_path = File.join(ROOT, "Just-Go/Models/Transit/Route.swift")
+  if File.file?(trip_store_path) && File.file?(route_path)
+    trip_store_source = File.read(trip_store_path, encoding: "UTF-8")
+    route_source = File.read(route_path, encoding: "UTF-8")
+    unless trip_store_source.include?("setCodable(route.withoutObservedPricing")
+      errors << "ActiveTripStore must strip provider pricing before persisting a route"
+    end
+    unless route_source.include?("var withoutObservedPricing: Route") &&
+           route_source[/var withoutObservedPricing: Route.*?\n    \}/m].to_s.include?("stripped.fare = nil") &&
+           route_source[/var withoutObservedPricing: Route.*?\n    \}/m].to_s.include?("stripped.missedTrainTaxiYuan = nil")
+      errors << "Route.withoutObservedPricing must clear both fare and missedTrainTaxiYuan"
+    end
+    # Anything else that reaches for the same persistence primitives with a whole route.
+    other_persisting = Dir[File.join(ROOT, "Just-Go/**/*.swift")].select do |candidate|
+      next false if candidate == trip_store_path
+
+      File.read(candidate, encoding: "UTF-8").match?(/setCodable\(\s*route\b/)
+    end
+    unless other_persisting.empty?
+      errors << "a route is persisted outside ActiveTripStore: #{other_persisting.map { |f| f.sub("#{ROOT}/", '') }.join(', ')}"
+    end
+  else
+    errors << "ActiveTripStore.swift or Route.swift is missing; the route-persistence check cannot run"
+  end
+
   # The cycling provider gets the same treatment, with one marker relaxed: it reads a rider's own
   # "I ride an electric bike" preference out of UserDefaults, which is the rider's setting rather
   # than anything the provider released. Writing is still forbidden.

@@ -372,16 +372,11 @@ struct RouteResultsView: View {
 
     private func comparisonMetrics(for route: Route) -> RouteComparisonMetrics {
         let timing = TripTimeContext(anchor: viewModel.tripAnchor, totalDuration: route.totalDuration)
-        let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
         return RouteComparisonMetrics(
             id: route.id,
             durationText: route.formattedDuration,
             bestForReason: bestForReason(for: route, in: viewModel.routes),
-            arrivalText: AppLocalization.text(
-                english: "Arrive \(arrival)",
-                simplified: "\(arrival) 到达",
-                traditional: "\(arrival) 到達"
-            ),
+            arrivalText: timing.arrivalDetail,
             summaryLine: [
                 transferEffort(for: route),
                 AppLocalization.text(

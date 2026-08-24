@@ -741,6 +741,25 @@ struct RouteDetailView: View {
         confidence: RouteConfidence
     ) -> some View {
         VStack(spacing: 0) {
+            // Always present on a trip that rides anything, because it is a property of the
+            // estimator rather than of any city's data: the model has no headway and no
+            // first-train wait to draw on, so every duration here is running time only. Not gated
+            // on a coverage flag for that reason — better data would not make it less true.
+            if route.boardingTransitSegment != nil {
+                detailRow(
+                    icon: "hourglass",
+                    tint: .secondary,
+                    title: AppLocalization.text(
+                        english: "Times exclude waiting for the train",
+                        simplified: "时间不含候车时间",
+                        traditional: "時間不含候車時間"
+                    )
+                ) {
+                    EmptyView()
+                }
+                rowDivider
+            }
+
             if let hours = boardingServiceHours {
                 detailRow(
                     icon: "clock.fill",
@@ -1035,13 +1054,7 @@ struct RouteDetailView: View {
     }
 
     private var arrivalDetail: String {
-        let timing = TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration)
-        let arrival = timing.arrivalDate.formatted(.dateTime.hour().minute())
-        return AppLocalization.text(
-            english: "Arrive \(arrival)",
-            simplified: "\(arrival) 到达",
-            traditional: "\(arrival) 到達"
-        )
+        TripTimeContext(anchor: tripAnchor, totalDuration: route.totalDuration).arrivalDetail
     }
 
     @ViewBuilder

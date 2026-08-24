@@ -42,6 +42,28 @@ struct TripTimeContext: Equatable {
     var arrivalDate: Date {
         departureDate.addingTimeInterval(totalDuration)
     }
+
+    var arrivalDetail: String { approximateArrivalText(arrivalDate) }
+}
+
+/// "Arrive about 14:37" — the only wording an arrival from this app can honestly carry.
+///
+/// Ride time is `distance / 9.7 + 30` per hop (`BundledMetroRouteProvider.trainCost`) and every
+/// change is a flat five minutes. Nothing in the model waits for a train: no headway, no first-train
+/// wait, no variation by time of day, because no bundled pack carries a timetable and inventing one
+/// from station spacing is the inference this project exists to refuse. A total built that way is
+/// honest as a duration and dishonest as a clock time, so the clock time says "about".
+///
+/// One function because two screens each hand-rolled the unhedged version while building the very
+/// `TripTimeContext` that already knew how to word it, and the Chinese strings had carried 约/約 the
+/// whole time — only the English had quietly dropped the hedge.
+func approximateArrivalText(_ date: Date) -> String {
+    let clock = ChinaClock.clockText(date)
+    return AppLocalization.text(
+        english: "Arrive about \(clock)",
+        simplified: "约 \(clock) 到达",
+        traditional: "約 \(clock) 抵達"
+    )
 }
 
 /// Whether the subway is actually running for this route at the planned departure
@@ -217,13 +239,7 @@ struct DeparturePlan: Equatable {
         )
     }
 
-    var arriveByDetail: String {
-        AppLocalization.text(
-            english: "Arrive about \(arriveByText)",
-            simplified: "约 \(arriveByText) 到达",
-            traditional: "約 \(arriveByText) 抵達"
-        )
-    }
+    var arriveByDetail: String { approximateArrivalText(arrivalDate) }
 
     var lastTrainDetail: String? {
         switch lastTrainStatus {

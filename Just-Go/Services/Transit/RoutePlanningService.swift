@@ -1226,22 +1226,6 @@ final class RoutePlanningService {
                 }
                 return $0.totalDuration < $1.totalDuration
             }
-        case .cheapest:
-            // Unpriced routes sink rather than sort as free. A route nobody priced is not a cheap
-            // route, and floating it to the top of a cost sort would be the app asserting the one
-            // thing it does not know.
-            return routes.sorted {
-                switch ($0.fare?.yuan, $1.fare?.yuan) {
-                case let (lhs?, rhs?):
-                    return lhs == rhs ? $0.totalDuration < $1.totalDuration : lhs < rhs
-                case (.some, nil):
-                    return true
-                case (nil, .some):
-                    return false
-                case (nil, nil):
-                    return $0.totalDuration < $1.totalDuration
-                }
-            }
         case .leastWalking:
             return routes.sorted {
                 if $0.strategy != $1.strategy {
@@ -1249,68 +1233,12 @@ final class RoutePlanningService {
                 }
                 return $0.walkingDistance < $1.walkingDistance
             }
-        case .stepFreeSupport:
-            return routes.sorted { accessibilityScore(for: $0, preferences: preferences) > accessibilityScore(for: $1, preferences: preferences) }
         case .fewestTransfers:
             return routes.sorted {
                 ($0.transferCount, $0.totalDuration, $0.walkingDistance) <
                     ($1.transferCount, $1.totalDuration, $1.walkingDistance)
             }
-        case .leastConfusing:
-            return routes.sorted { ranked($0, before: $1, score: routeClarityScore, tripAnchor: tripAnchor) }
-        case .luggageFriendly:
-            return routes.sorted { ranked($0, before: $1, score: luggageScore, tripAnchor: tripAnchor) }
-        case .elderlyFriendly:
-            return routes.sorted { ranked($0, before: $1, score: elderlyScore, tripAnchor: tripAnchor) }
-        case .officialDataOnly:
-            return routes.sorted { ranked($0, before: $1, score: officialDataScore, tripAnchor: tripAnchor) }
         }
-    }
-
-    private func routeClarityScore(_ route: Route) -> Double {
-        officialDataScore(route) - Double(route.transferCount * 20) - route.walkingDistance / 100
-    }
-
-    private func luggageScore(_ route: Route) -> Double {
-        accessibilityScore(for: route, preferences: .default) * 100 +
-            stepFreeScore(route) -
-            Double(route.transferCount * 18) - route.walkingDistance / 80 -
-            Double(route.warnings.count * 12)
-    }
-
-    private func elderlyScore(_ route: Route) -> Double {
-        accessibilityScore(for: route, preferences: .default) * 120 +
-            stepFreeScore(route) -
-            Double(route.transferCount * 22) - route.walkingDistance / 70 -
-            Double(route.warnings.count * 15)
-    }
-
-    private func stepFreeScore(_ route: Route) -> Double {
-        switch route.stepFreeAssessment {
-        case .confirmed: return 20
-        case .likely: return 12
-        case .unknown: return 0
-        case .barrierDetected: return -25
-        }
-    }
-
-    private func officialDataScore(_ route: Route) -> Double {
-        let coverage = route.dataCoverage
-        return Double(
-            coverage.officialAccessibilityCount * 3 +
-            coverage.officialScheduleCount * 2 +
-            coverage.officialFacilityCount
-        )
-    }
-
-    private func ranked(_ lhs: Route, before rhs: Route, score: (Route) -> Double, tripAnchor: TripTimeAnchor) -> Bool {
-        let lhsScore = score(lhs)
-        let rhsScore = score(rhs)
-        if lhsScore != rhsScore { return lhsScore > rhsScore }
-        if lhs.warnings.count != rhs.warnings.count { return lhs.warnings.count < rhs.warnings.count }
-        if lhs.walkingDistance != rhs.walkingDistance { return lhs.walkingDistance < rhs.walkingDistance }
-        if lhs.totalDuration != rhs.totalDuration { return lhs.totalDuration < rhs.totalDuration }
-        return false
     }
 }
 

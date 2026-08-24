@@ -88,14 +88,6 @@ final class RouteConfidenceService {
 
     private func explanation(for route: Route, preference: RoutePreference, level: RouteConfidenceLevel) -> String {
         switch preference {
-        case .luggageFriendly:
-            return AppLocalization.localized("Best for luggage: lower walking and fewer difficult changes.")
-        case .elderlyFriendly:
-            return AppLocalization.localized("Easier option with less walking, fewer transfers, and clearer data.")
-        case .leastConfusing:
-            return AppLocalization.localized("Simpler route with fewer changes and clearer station information.")
-        case .officialDataOnly:
-            return AppLocalization.localized("Prioritized because more official station information is available.")
         case .fewestTransfers:
             return AppLocalization.localized("Prioritized for fewer line changes.")
         default:

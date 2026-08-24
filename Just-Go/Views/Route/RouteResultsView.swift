@@ -272,11 +272,7 @@ struct RouteResultsView: View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    // The active strategy leads, whether or not it is one of the three that get
-                    // their own chip. The default sort is "Transit First", which is *not* primary,
-                    // so it rendered only inside the overflow chip at the far right. Off the edge
-                    // of the screen, leaving a sort row where nothing looked selected.
-                    ForEach(sortChipStrategies) { strategy in
+                    ForEach(RoutePreference.allCases) { strategy in
                         SortChip(
                             title: strategy.title,
                             icon: strategy.icon,
@@ -288,40 +284,10 @@ struct RouteResultsView: View {
                             }
                         }
                     }
-
-                    Menu {
-                        ForEach(RoutePreference.allCases.filter { !$0.isPrimary }) { strategy in
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    viewModel.sortStrategy = strategy
-                                    viewModel.sortRoutes()
-                                }
-                            } label: {
-                                Label(strategy.title, systemImage: strategy.icon)
-                            }
-                        }
-                    } label: {
-                        Label(AppLocalization.localized("More"), systemImage: "ellipsis.circle")
-                            .font(.caption)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 9)
-                            .background(Color.appSurface, in: Capsule())
-                            .foregroundStyle(Color.primary)
-                            .overlay(Capsule().stroke(Color(.separator), lineWidth: 1))
-                    }
                 }
                 .padding(.vertical, 2)
             }
         }
-    }
-
-    /// The headline strategies, preceded by whatever is actually sorting the list when that is
-    /// something else, so a sort picked from "More" still shows as the selected chip rather than
-    /// leaving the row looking like nothing is chosen.
-    private var sortChipStrategies: [RoutePreference] {
-        let primary = RoutePreference.primary
-        guard !primary.contains(viewModel.sortStrategy) else { return primary }
-        return [viewModel.sortStrategy] + primary
     }
 
     private var routesSection: some View {
@@ -526,19 +492,30 @@ struct RouteResultsView: View {
         guard routes.count > 1 else {
             return AppLocalization.text(english: "Recommended", simplified: "推荐", traditional: "推薦")
         }
-        if route.totalDuration == routes.map(\.totalDuration).min() {
+        // Every test below is *strictly* better than every alternative, never equal-best. Two ¥5
+        // routes are not one cheap route and one expensive one, and two routes that both walk 0 m
+        // do not have a winner. Badging either claims a difference the rider will not get, and the
+        // label is the one line on the card that says why this route is here at all. Seen on a
+        // real Beijing pair: identical fares and identical walking, one of them badged for both.
+        func onlyOne(_ isBetter: (Route) -> Bool) -> Bool {
+            routes.allSatisfy { $0.id == route.id || isBetter($0) }
+        }
+
+        if onlyOne({ $0.totalDuration > route.totalDuration }) {
             return AppLocalization.localized("Fastest")
         }
-        // Only claimable when something else was priced to compare against. One priced route among
-        // four unpriced ones is not the cheapest of anything.
-        let fares = routes.compactMap(\.fare?.yuan)
-        if fares.count > 1, let fare = route.fare?.yuan, fare == fares.min() {
+        // Cost needs *every* alternative priced, not merely one other. An unpriced route is not an
+        // expensive route, and treating it as one would let the app claim a saving over a number it
+        // never saw. `?? false` is what makes an unpriced alternative block the claim, and it also
+        // covers the single-priced-route case with no separate count guard.
+        if let fare = route.fare?.yuan,
+           onlyOne({ ($0.fare?.yuan).map { $0 > fare } ?? false }) {
             return AppLocalization.text(english: "Cheapest", simplified: "最便宜", traditional: "最便宜")
         }
-        if route.transferCount == routes.map(\.transferCount).min() {
+        if onlyOne({ $0.transferCount > route.transferCount }) {
             return AppLocalization.text(english: "Fewest transfers", simplified: "换乘最少", traditional: "換乘最少")
         }
-        if route.walkingDistance == routes.map(\.walkingDistance).min() {
+        if onlyOne({ $0.walkingDistance > route.walkingDistance }) {
             return AppLocalization.text(english: "Least walking", simplified: "步行最少", traditional: "步行最少")
         }
         if route.stepFreeAssessment == .confirmed {

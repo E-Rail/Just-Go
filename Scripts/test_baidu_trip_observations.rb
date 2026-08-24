@@ -272,10 +272,16 @@ class SourceRulesTest < Minitest::Test
                     "pricing a plan containing a bus reads a rail fare of 0"
   end
 
-  def test_unpriced_routes_sink_in_the_cheapest_sort
-    # Sorting an unpriced route as free would float the one thing the app does not know to the top.
-    assert_includes PLANNING_SOURCE, "case (.some, nil):"
-    assert_includes PLANNING_SOURCE, "case (nil, .some):"
+  def test_an_unpriced_route_blocks_the_cheapest_claim
+    # There is no cost *sort* any more: it was identical to Fastest whenever no fare was observed,
+    # which is most trips. The principle it protected outlives it, and now lives on the badge — an
+    # unpriced route is not an expensive route, so it must stop a rival calling itself cheapest
+    # rather than be assumed dearer. `?? false` is the whole fix; `?? true` reads as "assume worse".
+    results = File.read(File.join(ROOT, "Just-Go/Views/Route/RouteResultsView.swift"), encoding: "UTF-8")
+    assert_includes results, "onlyOne({ ($0.fare?.yuan).map { $0 > fare } ?? false })",
+                             "an unpriced alternative must block the cheapest badge"
+    refute_includes results, "?? true })",
+                             "assuming an unpriced route is dearer claims a saving nobody measured"
   end
 
   def test_provider_hours_never_override_the_operator

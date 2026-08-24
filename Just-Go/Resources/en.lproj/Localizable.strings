@@ -110,13 +110,7 @@
 "Official city data could not be reached; basic station data still works." = "Official city data could not be reached; basic station data still works.";
 "Tactile path available" = "Tactile path available";
 "Official schedule pending for this city/station" = "Official schedule pending for this city/station";
-"More" = "More";
 "Fewest Transfers" = "Fewest Transfers";
-"Least Confusing" = "Least Confusing";
-"Luggage Friendly" = "Luggage Friendly";
-"Elderly Friendly" = "Elderly Friendly";
-"Official Data Only" = "Official Data Only";
-"Step-Free Support" = "Step-Free Support";
 "Trip Confidence" = "Trip Confidence";
 "High confidence" = "High confidence";
 "Medium confidence" = "Medium confidence";
@@ -139,10 +133,6 @@
 "Official accessibility information available" = "Official accessibility information available";
 "Some station accessibility data is source pending" = "Some station accessibility data is source pending";
 "Fewer transfers than alternatives" = "Fewer transfers than alternatives";
-"Best for luggage: lower walking and fewer difficult changes." = "Best for luggage: lower walking and fewer difficult changes.";
-"Easier option with less walking, fewer transfers, and clearer data." = "Easier option with less walking, fewer transfers, and clearer data.";
-"Simpler route with fewer changes and clearer station information." = "Simpler route with fewer changes and clearer station information.";
-"Prioritized because more official station information is available." = "Prioritized because more official station information is available.";
 "Prioritized for fewer line changes." = "Prioritized for fewer line changes.";
 "This route is likely to be smooth based on available data." = "This route is likely to be smooth based on available data.";
 "This route works, but check the listed uncertainties before going." = "This route works, but check the listed uncertainties before going.";

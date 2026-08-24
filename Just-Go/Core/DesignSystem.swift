@@ -26,10 +26,6 @@ enum Metrics {
     /// controls at 34 and 36.
     static let minimumTapTarget: CGFloat = 44
 
-    /// Width past which a screen should stop being one tall column and start using its width.
-    /// Below this, layouts stay exactly as they are on a phone.
-    static let regularWidthThreshold: CGFloat = 700
-
     /// How wide a column of text or cards is allowed to get before it stops being readable. An
     /// iPad in landscape is 1366 points across; a 1366-point-wide list row is not a design, it is
     /// the absence of one.

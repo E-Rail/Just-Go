@@ -15,6 +15,10 @@ struct SearchPageView: View {
     /// page is presented by more than one navigation stack. A host that cannot show a line passes
     /// nothing and the section stays hidden.
     var onSelectLine: ((StationSearchService.LineResult) -> Void)?
+    /// Replaying a whole journey, both ends at once. Supplied by the host for the same reason as
+    /// `onSelectLine`: filling two endpoints and planning is the map stack's job, not this page's.
+    /// The endpoint-editing presentation passes nothing, because that page exists to return one end.
+    var onSelectRecentTrip: ((RecentRoute) -> Void)?
     /// True when this page exists to return one answer (endpoint editing) rather than to be
     /// browsed. Station rows then close the page like place rows already do.
     var dismissesOnSelection = false
@@ -43,6 +47,7 @@ struct SearchPageView: View {
                 if isIdle {
                     quickTagBar
                 }
+                stationFilterBar
                 resultsList
             }
             .navigationTitle(AppLocalization.localized("Search"))
@@ -71,6 +76,13 @@ struct SearchPageView: View {
                 viewModel?.searchText = seed
                 scheduleLineSearch(seed)
                 schedulePlaceSearch(seed)
+            }
+            // Filter chips are taps, and taps cannot be injected here. Same handler the chip uses.
+            switch ProcessInfo.processInfo.environment["JUST_GO_DEBUG_FILTER"] {
+            case "stepFree": viewModel?.updateFilter { $0.accessibleOnly = true }
+            case "lift": viewModel?.updateFilter { $0.elevatorOnly = true }
+            case "interchange": viewModel?.updateFilter { $0.transferOnly = true }
+            default: break
             }
             #endif
         }
@@ -163,6 +175,79 @@ struct SearchPageView: View {
 
     /// Every place the rider has already told the app matters, one tap from the top of the page.
     /// Starting with the one it can work out for itself.
+    /// Step-free, lift, interchange.
+    ///
+    /// `StationFilter` and the whole filtering path behind it were written and tested, and no view
+    /// ever set `viewModel.filter` — a rider who needs a lift had no way to ask for one. Shown only
+    /// when there are stations to narrow, so it does not sit above an empty screen.
+    ///
+    /// The spinner matters: the first tap on a step-free or lift filter fetches official
+    /// accessibility data for the whole list, which is a network round trip. Without it the list
+    /// appears to have simply lost most of its rows for a second.
+    @ViewBuilder
+    private var stationFilterBar: some View {
+        if let viewModel, !viewModel.searchResults.isEmpty || viewModel.filter.isActive {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    filterChip(
+                        title: AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"),
+                        icon: "figure.roll",
+                        isOn: viewModel.filter.accessibleOnly
+                    ) { $0.accessibleOnly.toggle() }
+
+                    filterChip(
+                        title: AppLocalization.text(english: "Lift", simplified: "有电梯", traditional: "有電梯"),
+                        icon: "arrow.up.arrow.down.square",
+                        isOn: viewModel.filter.elevatorOnly
+                    ) { $0.elevatorOnly.toggle() }
+
+                    filterChip(
+                        title: AppLocalization.text(english: "Interchange", simplified: "换乘站", traditional: "換乘站"),
+                        icon: "arrow.triangle.swap",
+                        isOn: viewModel.filter.transferOnly
+                    ) { $0.transferOnly.toggle() }
+
+                    if viewModel.isEnrichingForFacility {
+                        ProgressView()
+                            .controlSize(.small)
+                            .padding(.leading, 2)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+            }
+        }
+    }
+
+    private func filterChip(
+        title: String,
+        icon: String,
+        isOn: Bool,
+        toggle: @escaping (inout StationFilter) -> Void
+    ) -> some View {
+        Button {
+            isSearchFocused = false
+            viewModel?.updateFilter(toggle)
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.caption)
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .foregroundStyle(isOn ? Color.white : Color.primary)
+            .background(isOn ? Color.accentColor : Color.appSurface, in: Capsule())
+            .overlay(Capsule().stroke(isOn ? Color.clear : Color(.separator), lineWidth: 1))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn ? [.isSelected] : [])
+    }
+
     private var quickTagBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -417,6 +502,11 @@ struct SearchPageView: View {
             // the shortest route to what they are looking up now, and the nearby-station list is
             // still worth having under it. These used to be alternatives, so the recents were
             // only ever visible on a screen with nothing else on it.
+            if isIdle, onSelectRecentTrip != nil, !recentTrips.isEmpty {
+                recentTripsSection
+                    .listRowBackground(Color.clear)
+            }
+
             if isIdle, viewModel?.recentSearches.isEmpty == false {
                 recentSearchesSection
                     .listRowBackground(Color.clear)
@@ -514,6 +604,53 @@ struct SearchPageView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    /// The last few journeys, newest first.
+    ///
+    /// `RoutePlannerViewModel.recentRoutes` has been saved on every search and capped at ten since
+    /// it was written, and had no reader in any view: a rider who makes the same trip twice a day
+    /// re-entered both ends every time. Read from the shared planner instance so this is the same
+    /// array that wrote it.
+    ///
+    /// Three, because this sits above the recent *stations* and the nearby list, and a screen that
+    /// opens on ten of anything is a screen you scroll past.
+    private var recentTrips: [RecentRoute] {
+        Array(container.sharedRoutePlannerViewModel().recentRoutes.prefix(3))
+    }
+
+    private var recentTripsSection: some View {
+        Section(AppLocalization.text(
+            english: "Recent trips",
+            simplified: "最近的行程",
+            traditional: "最近的行程"
+        )) {
+            ForEach(recentTrips) { trip in
+                Button {
+                    isSearchFocused = false
+                    onSelectRecentTrip?(trip)
+                    if dismissesOnSelection { dismiss() }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.triangle.turn.up.right.circle")
+                            .foregroundStyle(Color.accentColor)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(verbatim: "\(trip.originStationName) → \(trip.destinationStationName)")
+                                .lineLimit(1)
+                            Text(trip.duration)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "arrow.up.left")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     private var recentSearchesSection: some View {

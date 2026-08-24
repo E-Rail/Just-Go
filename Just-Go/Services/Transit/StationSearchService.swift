@@ -262,4 +262,10 @@ struct StationFilter {
     var elevatorOnly: Bool = false
     var transferOnly: Bool = false
     var facilityType: StationFacilityType? = nil
+
+    /// Whether anything is being narrowed. Used to keep the filter row on screen when a filter has
+    /// emptied the list, which is exactly the moment the rider needs it back to undo the filter.
+    var isActive: Bool {
+        accessibleOnly || elevatorOnly || transferOnly || facilityType != nil
+    }
 }

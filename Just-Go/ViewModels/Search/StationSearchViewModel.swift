@@ -202,6 +202,17 @@ final class StationSearchViewModel {
 
     /// The rider moved, or the map told us how far Core Location's frame sits from its own.
     /// Re-orders what is listed against the new position rather than reloading it.
+    /// The only way a view should change the filter.
+    ///
+    /// Assigning `filter` on its own does nothing visible: filtering is applied when results are
+    /// replaced, and the accessibility and facility fields the filters read are not loaded at all
+    /// until a filter needs them. Both steps have to follow the change, in this order.
+    func updateFilter(_ transform: (inout StationFilter) -> Void) {
+        transform(&filter)
+        applyFilters()
+        enrichForActiveFacilityFiltersIfNeeded()
+    }
+
     func riderPositionChanged() {
         guard !unfilteredResults.isEmpty else { return }
         applyFilters()

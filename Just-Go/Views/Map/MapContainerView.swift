@@ -144,6 +144,33 @@ struct MapContainerView: View {
         }
     }
 
+    /// Fills both ends of a saved journey and plans it.
+    ///
+    /// Deliberately not routed through `appState.pendingRouteInput`: that channel starts a plan
+    /// from *one* place and seeds the origin from GPS, which would overwrite the origin this row
+    /// just supplied.
+    ///
+    /// If a station no longer resolves — a pack changed, a legacy row has no recoverable city — the
+    /// end that did resolve is still filled and the plan is *not* run. The results header then
+    /// shows which end is missing, which is a truthful half-answer rather than a journey planned
+    /// from a guessed endpoint.
+    private func replayRecentTrip(_ trip: RecentRoute) {
+        let planner = self.planner
+        path = [.results]
+        planTask?.cancel()
+        planTask = Task {
+            guard let cityID = trip.resolvedCityID else { return }
+            let stations = await container.stationSearchService.stations(in: cityID)
+            let origin = stations.first { $0.stationID == trip.originStationID }
+            let destination = stations.first { $0.stationID == trip.destinationStationID }
+            guard !Task.isCancelled else { return }
+            if let origin { planner.selectPlace(origin.asTransitPlace, for: .origin) }
+            if let destination { planner.selectPlace(destination.asTransitPlace, for: .destination) }
+            guard origin != nil, destination != nil else { return }
+            _ = await planner.searchRoutes()
+        }
+    }
+
     /// A pin on bare ground. Reverse geocoding may name it, and until it does — or if it never
     /// does — the coordinate itself is shown. Never a spinner: nothing is loading that could finish.
     private func droppedPinCard(_ place: TappedPlace) -> some View {
@@ -714,7 +741,8 @@ struct MapContainerView: View {
             SearchPageView(
                 onSelectStation: { openStation($0) },
                 onSelectPlace: { selectSearchResult($0) },
-                onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) }
+                onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) },
+                onSelectRecentTrip: { replayRecentTrip($0) }
             )
         case .editEndpoint(let field):
             SearchPageView(

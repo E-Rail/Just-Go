@@ -83,6 +83,12 @@ final class MapViewModel {
     var stations: [Station] = []
     var visibleRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
+    /// The trip the rider has chosen, drawn on the browse map underneath everything else.
+    ///
+    /// The main map passed `route: nil` and always had, so the only place a planned trip appeared
+    /// was the detail screen's header — a non-interactive thumbnail, half-covered by a sheet. A
+    /// rider could not pan or zoom their own journey anywhere in the app.
+    var activeRoute: Route?
     var isLocationAuthorized: Bool {
         locationService.isAuthorized
     }
@@ -189,6 +195,18 @@ final class MapViewModel {
               region.center.distance(to: raw) < 50,
               region.center.distance(to: coordinate) > 50 else { return }
         updateCamera(to: coordinate, spanDelta: region.maxDelta)
+    }
+
+    /// Draws a trip and frames it. Framing is part of showing it: a trip spans more ground than the
+    /// browse camera usually holds, so without this the polyline is drawn mostly off-screen.
+    func showRoute(_ route: Route) {
+        activeRoute = route
+        guard let region = route.previewRegion else { return }
+        withAnimation { visibleRegion = region }
+    }
+
+    func clearRoute() {
+        activeRoute = nil
     }
 
     func updateCamera(to coordinate: CLLocationCoordinate2D, spanDelta: CLLocationDegrees) {

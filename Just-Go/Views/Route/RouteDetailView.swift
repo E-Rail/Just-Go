@@ -37,6 +37,10 @@ struct RouteDetailView: View {
     /// Which of the three stops the trip sheet is resting at.
     @State private var tripCardDetent: PresentationDetent = .medium
     @State private var showsTripCard = false
+    /// Where the header map is looking. Seeded from the trip's own bounds and then left to the
+    /// rider: it used to be `.constant(route.previewRegion)`, which made the one map on this screen
+    /// something to look at rather than something to use.
+    @State private var headerRegion: MapVisibleRegion?
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     /// Whether there is room to show the map and the trip at the same time.
@@ -678,16 +682,19 @@ struct RouteDetailView: View {
 
     private func mapHeader() -> some View {
         TransitMapView(
-            visibleRegion: .constant(route.previewRegion),
+            visibleRegion: $headerRegion,
             stations: routeStations,
             alwaysShowsStations: true,
             metroNetworks: [],
             route: route,
             showsUserLocation: false,
-            onRegionChanged: nil,
+            onRegionChanged: { headerRegion = $0 },
             onStationSelected: { _ in }
         )
         .ignoresSafeArea(edges: .bottom)
+        // Seeded once. Assigning on every pass would fight the rider for the camera, and a nil
+        // binding is a no-op in `syncRegion` rather than a reset, so the map simply stays put.
+        .task(id: route.id) { headerRegion = route.previewRegion }
         // Floating at the map's TOP edge. These cards were at the bottom, which on this screen is
         // behind the trip sheet: the sheet opens at `.medium` and covers the lower half, so the
         // one control for switching alternative was invisible on every route the app has ever

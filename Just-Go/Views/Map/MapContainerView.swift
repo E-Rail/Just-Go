@@ -302,8 +302,13 @@ struct MapContainerView: View {
                 set: { viewModel?.visibleRegion = $0 }
             ),
             stations: viewModel?.stations ?? [],
+            // The browse map hides non-interchange stations above a 0.12° span, and a whole trip is
+            // usually wider than that, so without this the rider's own stops vanish at exactly the
+            // zoom that shows the whole journey. `alwaysShowsStations` exists for this case and
+            // says so; ordinary browsing keeps its thinning.
+            alwaysShowsStations: viewModel?.activeRoute != nil,
             metroNetworks: viewModel?.metroNetworks ?? [],
-            route: nil,
+            route: viewModel?.activeRoute,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
             onUserLocationChanged: { coordinate in
                 container.locationService.observeMapSpaceUserLocation(coordinate)
@@ -554,6 +559,7 @@ struct MapContainerView: View {
         // Consumed here rather than by the pushed screen: this is the only handler, and leaving it
         // set would re-fire the moment anything else observed it.
         appState.pendingRouteInput = nil
+        viewModel?.clearRoute()
         let planner = self.planner
         planner.selectPlace(pending.place, for: pending.role)
 
@@ -610,6 +616,11 @@ struct MapContainerView: View {
     /// Re-runs the current plan. Shared by the endpoint editor and the header's swap button so the
     /// two cannot disagree about what a changed endpoint means.
     private func replan() {
+        // The previously chosen trip stops being the answer the moment a different one is searched
+        // for. Not cleared when the rider merely pops back to the map: leaving it drawn is the
+        // whole point, and clearing on pop would have meant drawing it only on a map that is
+        // covered by the screen doing the drawing.
+        viewModel?.clearRoute()
         planTask?.cancel()
         planTask = Task { _ = await planner.searchRoutes() }
     }
@@ -645,7 +656,10 @@ struct MapContainerView: View {
         case .results:
             RouteResultsView(
                 viewModel: planner,
-                onSelect: { route in path.append(.detail(route.id)) },
+                onSelect: { route in
+                    viewModel?.showRoute(route)
+                    path.append(.detail(route.id))
+                },
                 onEditEndpoint: { path.append(.editEndpoint($0)) },
                 onUseCurrentLocation: {
                     planTask?.cancel()
@@ -753,7 +767,7 @@ struct MapContainerView: View {
         switch screen {
         case "search":
             path = [.search]
-        case "results", "detail", "guiding", "editEndpoint":
+        case "results", "detail", "guiding", "editEndpoint", "mapRoute":
             Task { await seedDebugRoute(landingOn: screen) }
         default:
             break
@@ -803,6 +817,10 @@ struct MapContainerView: View {
         plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
         switch screen {
+        case "mapRoute":
+            // Chosen, then backed out of: the map keeps the trip.
+            viewModel?.showRoute(first)
+            path = []
         case "results":
             path = [.results]
         case "editEndpoint":

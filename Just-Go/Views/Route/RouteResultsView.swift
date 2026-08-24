@@ -1,5 +1,24 @@
 import SwiftUI
 
+/// Now / Depart at / Arrive by. Local to this screen because `TripTimeAnchor` carries a date and a
+/// segmented control needs a case that does not, and because nothing else in the app picks a time.
+private enum TripTimingMode: CaseIterable {
+    case now
+    case departAt
+    case arriveBy
+
+    var title: String {
+        switch self {
+        case .now:
+            return AppLocalization.text(english: "Now", simplified: "现在", traditional: "現在")
+        case .departAt:
+            return AppLocalization.text(english: "Depart at", simplified: "出发时间", traditional: "出發時間")
+        case .arriveBy:
+            return AppLocalization.text(english: "Arrive by", simplified: "到达时间", traditional: "抵達時間")
+        }
+    }
+}
+
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
     /// Pushing is the map stack's job, not this screen's. It owns the whole plan → results →
@@ -12,11 +31,18 @@ struct RouteResultsView: View {
     /// sending it through a search screen to answer a question the phone already knows is silly.
     let onUseCurrentLocation: () -> Void
     let onSwap: () -> Void
+    /// Re-run the plan. Changing the trip's *time* has to re-search, and setting `tripAnchor`
+    /// alone will not: its `didSet` invalidates the in-flight search and clears the spinner but
+    /// deliberately leaves `routes` standing, so without this the screen would re-time the old
+    /// results against a new clock and show a plan nobody made.
+    let onReplan: () -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRouteID: UUID?
+    @State private var timingMode: TripTimingMode = .now
+    @State private var chosenDate = Date()
     // Raw theme hex for the solid-fill chip below. See RouteEntryView's identical
     // declaration for why `Color.accentColor` (dark-mode-lightened for foreground use)
     // isn't used as a fill under white text.
@@ -76,7 +102,12 @@ struct RouteResultsView: View {
         // Pinned, not the first row of the list. Where the trip starts and ends is the thing the
         // rider checks first and changes most; scrolling it away to compare the fourth alternative
         // means scrolling back up to fix a wrong start.
-        .safeAreaInset(edge: .top, spacing: 0) { endpointHeader }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            VStack(spacing: 0) {
+                endpointHeader
+                timingHeader
+            }
+        }
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -116,6 +147,60 @@ struct RouteResultsView: View {
         .overlay(alignment: .bottom) {
             Divider()
         }
+    }
+
+    /// When, alongside where. The third input to a trip, and until now the only one with no
+    /// control: `tripAnchor` had no writer anywhere in the app, so every last-train check ran
+    /// against "now" and the "Leave by …" banner never appeared once.
+    ///
+    /// It belongs here rather than on an entry screen because the entry screen was deliberately
+    /// removed; this header is where the other two inputs already live, and it shows the
+    /// consequence of changing one immediately below.
+    private var timingHeader: some View {
+        VStack(spacing: Metrics.s) {
+            Picker(selection: $timingMode) {
+                ForEach(TripTimingMode.allCases, id: \.self) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            } label: {
+                EmptyView()
+            }
+            .pickerStyle(.segmented)
+
+            if timingMode != .now {
+                DatePicker(
+                    selection: $chosenDate,
+                    displayedComponents: [.date, .hourAndMinute]
+                ) {
+                    Text(timingMode.title)
+                }
+                .datePickerStyle(.compact)
+            }
+        }
+        .padding(.horizontal, Metrics.l)
+        .padding(.bottom, Metrics.s)
+        .readableColumn()
+        .background(.regularMaterial)
+        .overlay(alignment: .bottom) { Divider() }
+        .onChange(of: timingMode) { _, mode in
+            // A stale time is worse than no time: coming back to "Depart at" an hour later must
+            // not silently offer the moment the screen was first opened.
+            if mode == .now { chosenDate = Date() }
+            applyTiming()
+        }
+        .onChange(of: chosenDate) { _, _ in applyTiming() }
+    }
+
+    private func applyTiming() {
+        let anchor: TripTimeAnchor
+        switch timingMode {
+        case .now: anchor = .now
+        case .departAt: anchor = .departBy(chosenDate)
+        case .arriveBy: anchor = .arriveBy(chosenDate)
+        }
+        guard viewModel.tripAnchor != anchor else { return }
+        viewModel.tripAnchor = anchor
+        onReplan()
     }
 
     private var swapButton: some View {

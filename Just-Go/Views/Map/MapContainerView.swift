@@ -658,7 +658,8 @@ struct MapContainerView: View {
                 onSwap: {
                     planner.swapOriginDestination()
                     replan()
-                }
+                },
+                onReplan: replan
             )
         case .detail(let routeID):
             if let route = planner.routes.first(where: { $0.id == routeID }) {
@@ -783,6 +784,19 @@ struct MapContainerView: View {
         guard await waitForNetwork() else { return }
         guard let stations = viewModel?.stations, stations.count >= 2 else { return }
         let plannerViewModel = planner
+        // "departBy+90" / "arriveBy+90": minutes from now. The trip's time has a control now, but
+        // controls need taps and this environment has none, and the "Leave by …" banner it exists
+        // to reveal had never rendered in any build. Seeded here so it can actually be looked at.
+        if let anchor = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ANCHOR"] {
+            let parts = anchor.split(separator: "+")
+            let minutes = parts.count > 1 ? Double(parts[1]) ?? 60 : 60
+            let date = Date().addingTimeInterval(minutes * 60)
+            switch parts.first {
+            case "departBy": plannerViewModel.tripAnchor = .departBy(date)
+            case "arriveBy": plannerViewModel.tripAnchor = .arriveBy(date)
+            default: break
+            }
+        }
         let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
         guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
         plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)

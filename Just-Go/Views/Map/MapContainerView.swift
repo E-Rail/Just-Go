@@ -10,6 +10,9 @@ private struct TappedPlace: Identifiable {
     let name: String
     let coordinate: CLLocationCoordinate2D
     var resolvedItem: MKMapItem?
+    /// A pin the rider dropped on bare ground rather than an Apple POI they tapped. There is no
+    /// `MKMapItem` coming for one of these, so the loading shell below would spin forever.
+    var isDroppedPin = false
 }
 
 /// Everything the map can push. One path enum rather than a `navigationDestination` per screen:
@@ -141,6 +144,64 @@ struct MapContainerView: View {
         }
     }
 
+    /// A pin on bare ground. Reverse geocoding may name it, and until it does — or if it never
+    /// does — the coordinate itself is shown. Never a spinner: nothing is loading that could finish.
+    private func droppedPinCard(_ place: TappedPlace) -> some View {
+        VStack(alignment: .leading, spacing: Metrics.s) {
+            Text(place.name)
+                .font(.title3.weight(.semibold))
+            Text(verbatim: String(
+                format: "%.5f, %.5f",
+                place.coordinate.latitude,
+                place.coordinate.longitude
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .monospacedDigit()
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Metrics.l)
+    }
+
+    /// Drops a pin wherever the rider pressed, so somewhere that is not one of Apple's points of
+    /// interest can still become an endpoint. The state resets copy `handlePlaceTapped` exactly:
+    /// every new interaction has to cancel the last one, or a resolve already in flight lands on
+    /// top of this pin and replaces it with a place the rider is no longer looking at.
+    private func handleMapLongPressed(_ coordinate: CLLocationCoordinate2D) {
+        placeCardDetent = .fraction(0.3)
+        placeMatchTask?.cancel()
+        stationOpenTask?.cancel()
+        isLoadingStationDetail = false
+        pendingResolvedItem = nil
+        tappedPlace = TappedPlace(
+            name: AppLocalization.text(
+                english: "Dropped pin",
+                simplified: "标记的位置",
+                traditional: "標記的位置"
+            ),
+            coordinate: coordinate,
+            isDroppedPin: true
+        )
+        placeMatchTask = Task {
+            let named = try? await container.placeSearchProvider.reverseGeocode(
+                location: coordinate,
+                name: nil
+            )
+            guard !Task.isCancelled, let named else { return }
+            // Only if this is still the pin on screen. A second press while the first was resolving
+            // would otherwise rename the new pin with the old one's answer.
+            guard let current = tappedPlace, current.isDroppedPin,
+                  current.coordinate.latitude == coordinate.latitude,
+                  current.coordinate.longitude == coordinate.longitude else { return }
+            tappedPlace = TappedPlace(
+                name: named.name,
+                coordinate: coordinate,
+                isDroppedPin: true
+            )
+        }
+    }
+
     /// A trip Live "Go" was running when iOS terminated the app, most likely underground, which is
     /// exactly the case the store was written for.
     ///
@@ -250,6 +311,8 @@ struct MapContainerView: View {
                         tappedPlace = nil
                     }
                     .ignoresSafeArea()
+                } else if place.isDroppedPin {
+                    droppedPinCard(place)
                 } else {
                     PlaceLoadingView(name: place.name)
                 }
@@ -282,7 +345,12 @@ struct MapContainerView: View {
             // that drag can get eaten by the embedded MKMapItemDetailViewController's own
             // scroll content. Binding + resetting to .large in handlePlaceTapped makes the
             // card open already expanded instead of relying on that drag succeeding.
-            .presentationDetents([.medium, .large], selection: $placeCardDetent)
+            // A dropped pin is a name and a coordinate. At `.medium` that is two lines of text over
+            // half a screen of nothing, and it hides the map the rider is pointing at.
+            .presentationDetents(
+                place.isDroppedPin ? [.fraction(0.3), .medium, .large] : [.medium, .large],
+                selection: $placeCardDetent
+            )
             .presentationDragIndicator(.visible)
         }
         .onDisappear {
@@ -320,7 +388,8 @@ struct MapContainerView: View {
             },
             onStationSelected: openStation,
             onPlaceTapped: handlePlaceTapped,
-            onPlaceResolved: handlePlaceResolved
+            onPlaceResolved: handlePlaceResolved,
+            onMapLongPressed: handleMapLongPressed
         )
     }
 
@@ -760,6 +829,20 @@ struct MapContainerView: View {
             if parts.count >= 2 {
                 didCenterOnUser = true
                 path = [.line(cityID: parts[0], lineID: parts[1])]
+                return
+            }
+        }
+        // The card a long press opens. The press itself cannot be injected in this environment, so
+        // the handler is driven directly: everything after the gesture is the same code path.
+        if let pin = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_PIN"] {
+            let parts = pin.split(separator: ",").compactMap { Double($0) }
+            if parts.count >= 2 {
+                didCenterOnUser = true
+                viewModel?.updateCamera(
+                    to: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]),
+                    spanDelta: MapCameraSpan.focused
+                )
+                handleMapLongPressed(CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]))
                 return
             }
         }

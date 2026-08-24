@@ -45,6 +45,10 @@ struct TransitMapView: UIViewRepresentable {
     // (slow, server-side) MKMapItemRequest has produced the full place card item.
     var onPlaceTapped: ((_ name: String?, _ coordinate: CLLocationCoordinate2D) -> Void)?
     var onPlaceResolved: ((MKMapItem) -> Void)?
+    /// A press on ground that is not a POI and not a station. `selectableMapFeatures` only makes
+    /// Apple's own points of interest tappable, so a park entrance, a street corner or a friend's
+    /// building could not become an endpoint at all — the one interaction every mainstream map has.
+    var onMapLongPressed: ((CLLocationCoordinate2D) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -58,6 +62,17 @@ struct TransitMapView: UIViewRepresentable {
         mapView.pointOfInterestFilter = .includingAll
         mapView.selectableMapFeatures = [.pointsOfInterest]
         mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
+        // On the map view itself, never on the window. ContentView's keyboard dismisser is
+        // window-level and its comment records what that cost: an always-live window recogniser
+        // sees every touch in the app and stopped Profile → Settings from opening. A recogniser
+        // owned by this map sees only this map.
+        let longPress = UILongPressGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleLongPress(_:))
+        )
+        longPress.minimumPressDuration = 0.5
+        mapView.addGestureRecognizer(longPress)
+        context.coordinator.longPressRecognizer = longPress
         context.coordinator.sync(parent: self, on: mapView)
         return mapView
     }
@@ -68,10 +83,15 @@ struct TransitMapView: UIViewRepresentable {
 
     static func dismantleUIView(_ mapView: MKMapView, coordinator: Coordinator) {
         coordinator.cancelPOIResolution()
+        if let longPress = coordinator.longPressRecognizer {
+            mapView.removeGestureRecognizer(longPress)
+            coordinator.longPressRecognizer = nil
+        }
         mapView.delegate = nil
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
+        var longPressRecognizer: UILongPressGestureRecognizer?
         private var parent: TransitMapView
         private var regionSignature = ""
         private var networkSignature = ""
@@ -99,6 +119,15 @@ struct TransitMapView: UIViewRepresentable {
 
         deinit {
             poiTask?.cancel()
+        }
+
+        /// `.began` only. A long press keeps reporting through `.changed` and `.ended`, and acting
+        /// on those would drop a second pin for the same press.
+        @objc
+        func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+            guard recognizer.state == .began, let mapView = recognizer.view as? MKMapView else { return }
+            let point = recognizer.location(in: mapView)
+            parent.onMapLongPressed?(mapView.convert(point, toCoordinateFrom: mapView))
         }
 
         func cancelPOIResolution() {

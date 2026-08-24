@@ -970,6 +970,21 @@ struct RouteDetailView: View {
                             .rotationEffect(.degrees(isExpanded ? 180 : 0))
                     }
                 }
+                // Which way the train goes, above what it passes. On a platform this is the only
+                // question that has to be answered before boarding, and the app has known the
+                // answer all along: `directionTerminalStationName` was computed for every ride leg
+                // and read by no view. Absent when the branch is genuinely ambiguous, in which case
+                // the rider reads the sign rather than a guess.
+                if let terminal = segment.transitContext?.directionTerminalStationName {
+                    Text(AppLocalization.text(
+                        english: "Toward \(terminal)",
+                        simplified: "开往 \(terminal)",
+                        traditional: "開往 \(terminal)"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.accentColor)
+                }
                 if let detail = journeyDetail(segment, index: index) {
                     Text(detail)
                         .font(.subheadline)

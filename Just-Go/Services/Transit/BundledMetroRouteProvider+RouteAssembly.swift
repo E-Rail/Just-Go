@@ -266,7 +266,7 @@ extension BundledMetroRouteProvider {
         let last = group.last!
         let next = graph.stationsByID[first.toStationID]
         let previous = graph.stationsByID[last.fromStationID]
-        let terminal = directionTerminal(for: first, line: line, graph: graph)
+        let terminal = directionTerminal(for: group, line: line, graph: graph)
         return TransitLegContext(
             lineID: line.id,
             lineName: line.name,
@@ -281,22 +281,38 @@ extension BundledMetroRouteProvider {
         )
     }
 
+    /// The terminus on the front of the train the rider should board — what the platform sign says.
+    ///
+    /// Resolved from the whole leg rather than its first hop, and required to be unambiguous. The
+    /// first-hop version matched any pattern containing that one pair, which on a branching line is
+    /// every branch, because they all share the trunk the rider boards on. Whichever branch happened
+    /// to sit at index 0 won, so a trip down one arm could be labelled with the other arm's
+    /// terminus. 24 bundled lines genuinely branch, so this was not hypothetical.
+    ///
+    /// Requiring the pattern to contain the boarding *and* alighting stations, in that order, picks
+    /// the branch the rider is actually riding. Where several patterns still qualify and disagree —
+    /// the trip ends before the divergence, so both branches would serve it — the honest answer is
+    /// no answer: the rider must read the platform sign, and naming one branch would be a guess
+    /// dressed as instruction.
     private func directionTerminal(
-        for edge: MetroGraphEdge,
+        for group: [MetroGraphEdge],
         line: MetroLine,
         graph: MetroRoutingGraph
     ) -> MetroStation? {
+        guard let boarding = group.first?.fromStationID, let alighting = group.last?.toStationID else { return nil }
+
+        var terminals: [String] = []
         for pattern in line.servicePatterns where pattern.count > 1 && pattern.first != pattern.last {
-            if pattern.adjacentPairs.contains(where: { $0.0 == edge.fromStationID && $0.1 == edge.toStationID }),
-               let terminalID = pattern.last {
-                return graph.stationsByID[terminalID]
-            }
-            if pattern.adjacentPairs.contains(where: { $0.0 == edge.toStationID && $0.1 == edge.fromStationID }),
-               let terminalID = pattern.first {
-                return graph.stationsByID[terminalID]
-            }
+            guard let start = pattern.firstIndex(of: boarding),
+                  let end = pattern.firstIndex(of: alighting),
+                  start != end else { continue }
+            // Riding with the pattern's own order means the far end is ahead; against it, the near
+            // end is. A pattern is stored in one arbitrary direction and trains run both ways.
+            guard let terminalID = start < end ? pattern.last : pattern.first else { continue }
+            if !terminals.contains(terminalID) { terminals.append(terminalID) }
         }
-        return nil
+        guard terminals.count == 1, let terminalID = terminals.first else { return nil }
+        return graph.stationsByID[terminalID]
     }
 
     func walkingSegment(

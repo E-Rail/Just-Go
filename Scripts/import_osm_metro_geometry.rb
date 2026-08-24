@@ -961,12 +961,135 @@ def physical_station_patterns(node_paths, station_nodes)
   end
 end
 
-def unique_service_patterns(patterns)
-  unique = patterns.uniq { |pattern| [pattern, pattern.reverse].min.join("|") }
+# How many times the infill pass may run before giving up. Splicing one station can expose the
+# next gap along, so it has to repeat, but a fixpoint that has not settled by now is a bug rather
+# than a deep chain.
+MAX_INFILL_PASSES = 4
+
+# Two derivations of the same corridor reach here: the physical track walk and the relation member
+# order. Neither is authoritative alone. A track walk stops wherever the ways happen to connect, and
+# a relation carries whatever order its members were filed in, so one line routinely arrives as two
+# patterns that disagree about a single station or about the order of a tail.
+#
+# Left alone every disagreement becomes a routing defect, because `servicePatterns` is what the
+# graph is built from. A pattern running A -> B while its sibling stops in between becomes a real
+# edge, and `trainCost` prices a hop by distance with no per-stop penalty, so the non-stop version
+# is always cheaper and the search always takes it. 广惠城际 shipped one edge spanning 24 stations
+# and 115 km that way, and 14号线 shipped one that skipped 陶然桥.
+#
+# Three passes, in this order: collapse the patterns that are the same service written differently,
+# drop a scrambled duplicate in favour of the ordering that follows the track, then splice back any
+# station a sibling proves belongs between two others. A genuine branch survives all three, because
+# none of them can invent a station the pattern's own siblings never served.
+def unique_service_patterns(patterns, coordinates = {})
+  unique = collapse_equivalent_patterns(patterns)
+  unique = drop_scrambled_duplicate_patterns(unique, coordinates)
+  unique = collapse_equivalent_patterns(infill_skipped_stations(unique))
   unique.reject do |pattern|
     station_set = pattern.to_set
     unique.any? { |candidate| candidate.length > pattern.length && station_set.subset?(candidate.to_set) }
   end
+end
+
+# A closed pattern is a ring, and a ring has no first station. 哈尔滨3号线 arrived as the same
+# 36-station loop entered at two different points, which is one service written twice.
+def equivalent_pattern_key(pattern)
+  return [pattern, pattern.reverse].min.join("|") unless pattern.length > 2 && pattern.first == pattern.last
+
+  cycle = pattern[0...-1]
+  forward = cycle.length.times.map { |offset| cycle.rotate(offset) }
+  backward = cycle.reverse.length.times.map { |offset| cycle.reverse.rotate(offset) }
+  "ring|#{(forward + backward).min.join('|')}"
+end
+
+def collapse_equivalent_patterns(patterns)
+  patterns.uniq { |pattern| equivalent_pattern_key(pattern) }
+end
+
+# Same stations, same length, different order: one derivation has its members filed out of service
+# order. Keep whichever ordering walks the shorter total distance, which is the one following the
+# track instead of jumping the corridor. Thresholdless on purpose — 广惠城际 is 137 km against
+# 308 km, and the loser is the one carrying a 115 km hop between two list-adjacent stations.
+#
+# Rings are left out. Their rotations are already collapsed above, and a rotation legitimately
+# changes which pair sits at the seam.
+def drop_scrambled_duplicate_patterns(patterns, coordinates)
+  return patterns if coordinates.empty?
+
+  dropped = Set.new
+  patterns.each_with_index do |pattern, index|
+    next if dropped.include?(index) || pattern.first == pattern.last
+
+    patterns.each_with_index do |candidate, candidate_index|
+      next if candidate_index <= index || dropped.include?(candidate_index)
+      next if candidate.first == candidate.last
+      next unless candidate.length == pattern.length && candidate.to_set == pattern.to_set
+
+      pattern_length = pattern_chain_length(pattern, coordinates)
+      candidate_length = pattern_chain_length(candidate, coordinates)
+      next if pattern_length.nil? || candidate_length.nil?
+
+      dropped << (candidate_length < pattern_length ? index : candidate_index)
+    end
+  end
+  patterns.each_with_index.map { |pattern, index| dropped.include?(index) ? nil : pattern }.compact
+end
+
+def pattern_chain_length(pattern, coordinates)
+  total = 0.0
+  pattern.each_cons(2) do |from, to|
+    from_coordinate = coordinates[from]
+    to_coordinate = coordinates[to]
+    return nil unless from_coordinate && to_coordinate
+
+    total += meters_between(from_coordinate, to_coordinate)
+  end
+  total
+end
+
+# A sibling pattern is proof. If it stops at S between A and B, a pattern running A -> B non-stop is
+# missing S rather than expressing a limited-stop service: OSM has no way to say "skips S", so the
+# only honest reading of the disagreement is that one derivation is incomplete.
+#
+# Only a contiguous run between the same two anchors is spliced, and that is what keeps a real Y
+# branch intact — a branch's own stations never sit between two stations the other branch serves.
+def infill_skipped_stations(patterns)
+  working = patterns.map(&:dup)
+  MAX_INFILL_PASSES.times do
+    changed = false
+    working.each_with_index do |pattern, index|
+      position = 0
+      while position < pattern.length - 1
+        run = skipped_run_between(pattern[position], pattern[position + 1], working, index)
+        if run && run.none? { |station| pattern.include?(station) }
+          pattern.insert(position + 1, *run)
+          changed = true
+        end
+        position += 1
+      end
+    end
+    break unless changed
+  end
+  working
+end
+
+def skipped_run_between(from, to, patterns, skip_index)
+  patterns.each_with_index do |candidate, index|
+    # A ring's "between" can mean either way round the loop, so it cannot prove a gap.
+    next if index == skip_index || candidate.first == candidate.last
+
+    from_index = candidate.index(from)
+    to_index = candidate.index(to)
+    next if from_index.nil? || to_index.nil? || (from_index - to_index).abs <= 1
+
+    run = if from_index < to_index
+            candidate[(from_index + 1)...to_index]
+          else
+            candidate[(to_index + 1)...from_index].reverse
+          end
+    return run unless run.empty?
+  end
+  nil
 end
 
 def validate_selected_corridors!(relations, elements_by_key, ways)
@@ -1181,7 +1304,15 @@ def build_network(city_id, city, source)
     end
 
     relation_patterns = selected_relations.flat_map { |relation| ordered_relation_station_patterns(relation, elements_by_key) }
-    service_patterns = unique_service_patterns(track_station_patterns + relation_patterns)
+    # Coordinates are only used to tell two orderings of the same station set apart, so the datum
+    # does not matter here: both orderings measure the same points.
+    pattern_coordinates = station_groups.each_with_object({}) do |(station_name, station), result|
+      result[station_name] = average_coordinate(station) unless station["coordinates"].empty?
+    end
+    service_patterns = unique_service_patterns(
+      track_station_patterns + relation_patterns,
+      pattern_coordinates
+    )
 
     {
       "id" => id,
@@ -1580,6 +1711,37 @@ def self_test
   merged_patterns = unique_service_patterns([%w[a c], %w[a reopened c], %w[a branch]])
   fail_with("physical topology did not supersede stale relation stops") unless merged_patterns.include?(%w[a reopened c]) && !merged_patterns.include?(%w[a c])
   fail_with("physical topology collapsed a genuine branch") unless merged_patterns.include?(%w[a branch])
+
+  # A ring entered at two different points is one service, not two. 哈尔滨3号线 shipped as both.
+  ring_patterns = unique_service_patterns([%w[a b c d a], %w[c d a b c]])
+  fail_with("ring rotations were not collapsed") unless ring_patterns.length == 1
+
+  # Same stations, different order: keep the ordering that follows the track. Laid out so the
+  # scrambled one is listed first, proving the rule reads the geometry rather than the position.
+  scrambled_coordinates = {
+    "a" => [0.0, 0.0], "b" => [0.0, 0.1], "c" => [0.0, 0.2], "d" => [0.0, 0.3]
+  }
+  scrambled_patterns = unique_service_patterns(
+    [%w[a c b d], %w[a b c d]],
+    scrambled_coordinates
+  )
+  fail_with("scrambled duplicate pattern was not dropped") unless scrambled_patterns == [%w[a b c d]]
+
+  # The 14号线 shape, and the reason the existing subset rule was not enough: neither derivation
+  # is the line and neither contains the other. One holds an interior station the other skips
+  # (陶然桥); the other runs further north. Only their union is the real service.
+  infilled_patterns = unique_service_patterns([%w[m n infill p q], %w[k l m n p q]])
+  fail_with("skipped station was not spliced back") unless infilled_patterns == [%w[k l m n infill p q]]
+
+  # The invariant the whole repair rests on: a genuine Y branch must survive as two patterns.
+  # Both branches share the trunk and diverge at the junction, and neither branch's stations sit
+  # between two stations the other serves, so nothing above may merge them.
+  branch_patterns = unique_service_patterns(
+    [%w[trunk1 trunk2 junction west1 west2], %w[trunk1 trunk2 junction east1 east2]],
+    "trunk1" => [0.0, 0.0], "trunk2" => [0.0, 0.1], "junction" => [0.0, 0.2],
+    "west1" => [0.1, 0.3], "west2" => [0.2, 0.4], "east1" => [-0.1, 0.3], "east2" => [-0.2, 0.4]
+  )
+  fail_with("a genuine branch was merged away") unless branch_patterns.length == 2
   directional_pair = [
     fixture_relation.call(31, [1, 2, 3], [100]).merge(
       "tags" => { "route" => "train", "network" => "Regional Rail", "from" => "A", "to" => "C" }

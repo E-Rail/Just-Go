@@ -17,7 +17,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     func routes(
         from origin: TransitPlace,
         to destination: TransitPlace,
-        accessibilityFilter: AccessibilityFilter
+        accessibilityFilter: AccessibilityFilter,
+        excludingLineIDs: Set<String>
     ) async throws -> [Route] {
         // Bounds-only pass first: decoding and permanently caching all ~46 supported cities'
         // full station/line/polyline data on every search (via networks()) just to compare
@@ -56,7 +57,12 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         var seen = Set<String>()
         var uniquePaths: [(order: Int, path: MetroPath, preference: MetroSearchPreference)] = []
         for preference in preferences {
-            guard let path = shortestPath(in: context, graph: graph, preference: preference) else { continue }
+            guard let path = shortestPath(
+                in: context,
+                graph: graph,
+                preference: preference,
+                excludingLineIDs: excludingLineIDs
+            ) else { continue }
             let key = path.edges.map { "\($0.fromStationID)>\($0.toStationID)@\($0.lineID)" }.joined(separator: "|")
             guard seen.insert(key).inserted else { continue }
             uniquePaths.append((uniquePaths.count, path, preference))
@@ -350,7 +356,16 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         graphs.removeAll()
     }
 
-    private func shortestPath(in context: MetroRouteContext, graph: MetroRoutingGraph, preference: MetroSearchPreference) -> MetroPath? {
+    /// The exclusion is applied here rather than when the graph is built, and that is deliberate:
+    /// `routingGraph(for:)` memoises on `cityID:version` alone, so a graph built without a line at
+    /// 23:50 would still be missing it at 08:00 the next morning. Per-search state belongs to the
+    /// search.
+    private func shortestPath(
+        in context: MetroRouteContext,
+        graph: MetroRoutingGraph,
+        preference: MetroSearchPreference,
+        excludingLineIDs: Set<String>
+    ) -> MetroPath? {
         var distances: [MetroSearchState: Double] = [:]
         var previous: [MetroSearchState: MetroPreviousStep] = [:]
         var heap = MetroMinHeap()
@@ -384,6 +399,9 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             if let best, item.cost >= best.cost { break }
 
             for edge in graph.adjacency[item.state.stationID, default: []] {
+                // An interchange walk is never excluded: it is the corridor between two platforms,
+                // not a train, and it stays walkable whatever has stopped running.
+                if edge.interchange == nil, excludingLineIDs.contains(edge.lineID) { continue }
                 // An interchange link is the transfer, so it pays the penalty and the boarding on
                 // the far side of it does not: charging both would price one change as two.
                 let arrivedByInterchange = item.state.lineID == metroInterchangeLineID

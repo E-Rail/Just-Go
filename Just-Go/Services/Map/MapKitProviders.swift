@@ -99,10 +99,16 @@ struct CurrentPlaceResolver {
 }
 
 protocol TransitRouteProviding {
+    /// - Parameter excludingLineIDs: lines the caller has established are not running when this
+    ///   rider would board them. The graph itself is deliberately time-blind — it is a mechanical
+    ///   shortest path, and first/last train is enrichment's business, arriving from an operator
+    ///   or a routing provider long after the search would need it. This is how the clock reaches
+    ///   the search anyway: not as a timetable it cannot read, but as the conclusion drawn from one.
     func routes(
         from origin: TransitPlace,
         to destination: TransitPlace,
-        accessibilityFilter: AccessibilityFilter
+        accessibilityFilter: AccessibilityFilter,
+        excludingLineIDs: Set<String>
     ) async throws -> [Route]
 }
 

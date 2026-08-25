@@ -99,6 +99,28 @@ enum RouteServiceStatus: Equatable {
     }
 }
 
+extension RouteServiceStatus {
+    /// Whether a rider standing on the platform at this moment cannot get on a train.
+    ///
+    /// `.lastTrainSoon` is deliberately not one of these: there *is* still a train, and hurrying
+    /// for it is a decision the rider gets to make. `.unknown` is not one either — nobody checked,
+    /// and demoting a route on the strength of a question nobody answered would be a guess.
+    var blocksBoarding: Bool {
+        switch self {
+        case .serviceEndedToday: return true
+        case .notYetStarted: return true
+        case .running, .lastTrainSoon, .unknown: return false
+        }
+    }
+
+    /// Pattern matching on `.notYetStarted` needs its associated text spelled out at every site,
+    /// which reads as noise wherever the question is only "is it shut".
+    var isNotYetStarted: Bool {
+        if case .notYetStarted = self { return true }
+        return false
+    }
+}
+
 extension RouteServiceStatus: Codable {
     private enum CodingKeys: String, CodingKey { case kind, minutes, startsAt }
     private enum Kind: String, Codable { case running, lastTrainSoon, serviceEndedToday, notYetStarted, unknown }

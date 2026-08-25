@@ -266,7 +266,8 @@ extension BundledMetroRouteProvider {
         let last = group.last!
         let next = graph.stationsByID[first.toStationID]
         let previous = graph.stationsByID[last.fromStationID]
-        let terminal = directionTerminal(for: group, line: line, graph: graph)
+        let onward = onwardStationIDs(for: group, line: line)
+        let terminal = onward?.last.flatMap { graph.stationsByID[$0] }
         return TransitLegContext(
             lineID: line.id,
             lineName: line.name,
@@ -277,11 +278,13 @@ extension BundledMetroRouteProvider {
             arrivalPreviousStationID: previous.map { graph.qualifiedID(for: $0.id) },
             arrivalPreviousStationName: previous?.name,
             directionTerminalStationID: terminal.map { graph.qualifiedID(for: $0.id) },
-            directionTerminalStationName: terminal?.name
+            directionTerminalStationName: terminal?.name,
+            onwardStationNames: onward?.compactMap { graph.stationsByID[$0]?.name }
         )
     }
 
-    /// The terminus on the front of the train the rider should board — what the platform sign says.
+    /// The stations ahead of the rider on the train they board, from where they get on to the end
+    /// of its run, in travel order. The last of them is the terminus the platform sign names.
     ///
     /// Resolved from the whole leg rather than its first hop, and required to be unambiguous. The
     /// first-hop version matched any pattern containing that one pair, which on a branching line is
@@ -294,25 +297,25 @@ extension BundledMetroRouteProvider {
     /// the trip ends before the divergence, so both branches would serve it — the honest answer is
     /// no answer: the rider must read the platform sign, and naming one branch would be a guess
     /// dressed as instruction.
-    private func directionTerminal(
-        for group: [MetroGraphEdge],
-        line: MetroLine,
-        graph: MetroRoutingGraph
-    ) -> MetroStation? {
+    private func onwardStationIDs(for group: [MetroGraphEdge], line: MetroLine) -> [String]? {
         guard let boarding = group.first?.fromStationID, let alighting = group.last?.toStationID else { return nil }
 
-        var terminals: [String] = []
+        var candidates: [[String]] = []
         for pattern in line.servicePatterns where pattern.count > 1 && pattern.first != pattern.last {
             guard let start = pattern.firstIndex(of: boarding),
                   let end = pattern.firstIndex(of: alighting),
                   start != end else { continue }
             // Riding with the pattern's own order means the far end is ahead; against it, the near
             // end is. A pattern is stored in one arbitrary direction and trains run both ways.
-            guard let terminalID = start < end ? pattern.last : pattern.first else { continue }
-            if !terminals.contains(terminalID) { terminals.append(terminalID) }
+            let onward = start < end
+                ? Array(pattern[start...])
+                : Array(pattern[...start].reversed())
+            if !candidates.contains(onward) { candidates.append(onward) }
         }
-        guard terminals.count == 1, let terminalID = terminals.first else { return nil }
-        return graph.stationsByID[terminalID]
+        // Two branches that disagree about where this train ends up cannot both be right, and
+        // picking one would hand the rider the other arm's terminus and the other arm's last train.
+        guard candidates.count == 1 else { return nil }
+        return candidates.first
     }
 
     func walkingSegment(

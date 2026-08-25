@@ -106,6 +106,8 @@
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
 		A1000304 /* Transit/TripStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000304 /* Transit/TripStep.swift */; };
 		A1000305 /* Transit/TripConfidenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000305 /* Transit/TripConfidenceServices.swift */; };
+		A1000315 /* Transit/ServiceHoursResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000315 /* Transit/ServiceHoursResolver.swift */; };
+		A1000316 /* Transit/TransitNameMatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000316 /* Transit/TransitNameMatching.swift */; };
 		A1000306 /* Notifications/TripReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000306 /* Notifications/TripReminderService.swift */; };
 		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
 		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
@@ -229,6 +231,8 @@
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
 		A2000304 /* Transit/TripStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripStep.swift; sourceTree = "<group>"; };
 		A2000305 /* Transit/TripConfidenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripConfidenceServices.swift; sourceTree = "<group>"; };
+		A2000315 /* Transit/ServiceHoursResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/ServiceHoursResolver.swift; sourceTree = "<group>"; };
+		A2000316 /* Transit/TransitNameMatching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransitNameMatching.swift; sourceTree = "<group>"; };
 		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
 		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
 		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
@@ -338,6 +342,8 @@
 			children = (
 				A2000600 /* Data/OfficialTransitResourceCatalog.swift */,
 				A2000305 /* Transit/TripConfidenceServices.swift */,
+				A2000315 /* Transit/ServiceHoursResolver.swift */,
+				A2000316 /* Transit/TransitNameMatching.swift */,
 				A2000306 /* Notifications/TripReminderService.swift */,
 				A200001B /* Map/MapKitProviders.swift */,
 				A2000904 /* Map/BaiduMapsClient.swift */,
@@ -544,6 +550,8 @@
 				A1000302 /* Transit/TripTiming.swift in Sources */,
 				A1000304 /* Transit/TripStep.swift in Sources */,
 				A1000305 /* Transit/TripConfidenceServices.swift in Sources */,
+				A1000315 /* Transit/ServiceHoursResolver.swift in Sources */,
+				A1000316 /* Transit/TransitNameMatching.swift in Sources */,
 				A1000306 /* Notifications/TripReminderService.swift in Sources */,
 				A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */,
 				A1000308 /* Route/LiveGoView.swift in Sources */,

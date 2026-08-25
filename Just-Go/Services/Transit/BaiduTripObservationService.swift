@@ -82,6 +82,14 @@ struct ObservedTaxiFare: Equatable, Sendable {
 struct ObservedLineHours: Equatable, Sendable {
     let lineName: String
     let boardingStationName: String
+    /// `direct_text`, e.g. "潞阳方向" — the service these hours belong to.
+    ///
+    /// Load-bearing, not decoration. The two directions of one line at one station are routinely
+    /// an hour apart, and a line subdivides again into full runs and short-turns: 花园桥 on 6号线
+    /// eastbound is 22:45 to 潞阳 and 23:56 to 草房. Baidu resolves both for the exact ride it
+    /// costed and says which in this field, so carrying it is the difference between a last train
+    /// this rider can use and the most optimistic one at the station.
+    let directionText: String?
     let firstTrain: String
     let lastTrain: String
 }
@@ -339,11 +347,15 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
                       let first = detail.firstTime, !first.isEmpty,
                       let last = detail.lastTime, !last.isEmpty else { continue }
                 let boarding = TransitLineMatching.normalizedStationName(station)
-                let key = "\(boarding)|\(lineName)"
+                // Keyed on the service too. Without it, first-writer-wins across the five routes
+                // Baidu returns would let one direction's window stand in for the other's at the
+                // same station, which is the whole failure this field exists to stop.
+                let key = "\(boarding)|\(lineName)|\(detail.directText ?? "")"
                 if lineHours[key] == nil {
                     lineHours[key] = ObservedLineHours(
                         lineName: lineName,
                         boardingStationName: boarding,
+                        directionText: detail.directText,
                         firstTrain: first,
                         lastTrain: last
                     )

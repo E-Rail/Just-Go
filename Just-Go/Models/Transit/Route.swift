@@ -322,6 +322,20 @@ struct TransitLegContext: Codable, Equatable {
     let arrivalPreviousStationName: String?
     let directionTerminalStationID: String?
     let directionTerminalStationName: String?
+    /// Every station this train calls at from the boarding station to the end of its run, in
+    /// travel order.
+    ///
+    /// It exists to attribute a first/last-train window to *this* rider. An operator publishes one
+    /// window per service, and a service is named by where it terminates: 花园桥 on 6号线 eastbound
+    /// has a full run to 潞阳 whose last train is 22:45 and a short-turn to 草房 whose last train is
+    /// 23:56. Which of those two the rider can still use is decided entirely by whether their own
+    /// alighting station is before or after 草房, so the answer needs the order of the stations
+    /// ahead of them and nothing less.
+    ///
+    /// Optional, and `nil` rather than empty when the branch is ambiguous, for the same reason
+    /// `directionTerminalStationName` is: guessing which arm of a branch the rider is on would put
+    /// another branch's timetable against their trip.
+    let onwardStationNames: [String]?
 }
 
 struct TransferContext: Codable, Equatable {

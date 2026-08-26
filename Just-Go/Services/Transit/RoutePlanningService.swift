@@ -102,6 +102,12 @@ final class RoutePlanningService {
         // return. Built alongside the search rather than after it. It costs one MKDirections call
         // and the two are independent.
         async let directWalk = directWalkingRoute(from: origin, to: destination)
+        // Started alongside the search for the same reason the walk is: it is a MapKit call the
+        // graph does not wait on, and on a trip where driving wins the rider should not have to
+        // guess that it does.
+        let driveTask = Task { [weak self] in
+            await self?.directDrivingRoute(from: origin, to: destination) ?? nil
+        }
 
         let metroRoutes: [Route]
         do {
@@ -114,7 +120,8 @@ final class RoutePlanningService {
         } catch {
             // No train answer at all. If the two ends are within walking distance that is not a
             // failure, it is the answer; otherwise the original error is still the honest reply.
-            if let walk = await directWalk { return [walk] }
+            if let walk = await directWalk { return including(await driveTask.value, beside: [walk]) }
+            if let drive = await driveTask.value { return [drive] }
             throw error
         }
 
@@ -126,7 +133,7 @@ final class RoutePlanningService {
             ?? metroRoutes
         guard !routes.isEmpty else {
             // Every alternative lost to walking, which means walking is the plan.
-            if let walk { return [walk] }
+            if let walk { return including(await driveTask.value, beside: [walk]) }
             throw RoutePlanningError.noRouteFound
         }
 
@@ -155,7 +162,9 @@ final class RoutePlanningService {
             legs: legs,
             observation: observation
         )
-        guard !planned.closedLineIDs.isEmpty else { return planned.routes }
+        guard !planned.closedLineIDs.isEmpty else {
+            return including(await driveTask.value, beside: planned.routes)
+        }
 
         // The graph is time-blind by design — it is a mechanical shortest path and the enrichment
         // above is what knows the clock. So rather than teach the search a timetable it has no
@@ -172,11 +181,11 @@ final class RoutePlanningService {
             )
         } catch {
             // Nothing runs at this hour, which is a real answer and the one already in hand.
-            return planned.routes
+            return including(await driveTask.value, beside: planned.routes)
         }
         let viable = walk.map { walk in alternatives.filter { $0.totalDuration < walk.totalDuration } }
             ?? alternatives
-        guard !viable.isEmpty else { return planned.routes }
+        guard !viable.isEmpty else { return including(await driveTask.value, beside: planned.routes) }
 
         let replanned = await enrichAll(
             viable,
@@ -192,7 +201,7 @@ final class RoutePlanningService {
         // had one is noise dressed as helpfulness — so unless something in it runs, the first
         // answer stands.
         guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
-            return planned.routes
+            return including(await driveTask.value, beside: planned.routes)
         }
         // The re-plan exists to find a train the rider can actually catch. Late enough and there is
         // no such train on any line, and adding two more shut itineraries to a list that already
@@ -203,7 +212,10 @@ final class RoutePlanningService {
         }
         // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
         // better served by seeing a shut line named than by an empty screen.
-        return merging(running: replanned.routes, with: planned.routes)
+        return including(
+            await driveTask.value,
+            beside: merging(running: replanned.routes, with: planned.routes)
+        )
     }
 
     /// Enriches a set of alternatives together and reports which lines came back definitively shut.
@@ -856,6 +868,65 @@ final class RoutePlanningService {
             accessGuidance: [],
             dataCoverage: .unknown
         )
+    }
+
+    /// The whole journey by car, with no station in it.
+    ///
+    /// The sibling of `directWalkingRoute` and built the same way: a single access leg, no
+    /// enrichment, no fare, no service hours, because none of those mean anything without a train.
+    /// MapKit's `.automobile` router, so it costs no provider quota at all.
+    ///
+    /// No distance ceiling, unlike the walk. A walk stops being an answer past a few kilometres; a
+    /// drive is exactly the answer that gets better the further it goes, and further is where the
+    /// metro's own transfers start to cost more than the ride.
+    private func directDrivingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
+        let from = origin.routeCoordinate
+        let to = destination.routeCoordinate
+        guard from.distance(to: to) >= 1_000 else { return nil }
+        guard let segment = await walkingRoutes.accessSegment(
+            from: from,
+            to: to,
+            fromName: origin.name,
+            toName: destination.name,
+            mode: .driving
+        ), segment.type == .driving else {
+            return nil
+        }
+
+        return Route(
+            id: UUID(),
+            origin: origin.name,
+            destination: destination.name,
+            originStationID: "",
+            destinationStationID: "",
+            strategy: .fastest,
+            segments: [segment],
+            totalDuration: segment.duration,
+            // Not one metre of this is walked, and `walkingDistance` is what the card prints as
+            // "N m walk". `SegmentType.isOnFoot` draws the same line for the same reason.
+            walkingDistance: 0,
+            totalStops: 0,
+            transferCount: 0,
+            isFullyAccessible: false,
+            stepFreeAssessment: .unknown,
+            warnings: [],
+            accessGuidance: [],
+            dataCoverage: .unknown
+        )
+    }
+
+    /// Adds the drive only where it answers something the trains do not.
+    ///
+    /// Two cases, and no others. It is faster than every train plan, which is the comparison a
+    /// rider is entitled to make; or nothing on rail can be boarded at all, which is the honest
+    /// answer at 01:00 and the one the app has never been able to give. Beside a metro plan that
+    /// wins on both counts it is noise, and this screen is a list a rider chooses from.
+    private func including(_ drive: Route?, beside routes: [Route]) -> [Route] {
+        guard let drive, !routes.isEmpty else { return routes }
+        let nothingRuns = routes.allSatisfy { $0.serviceStatus.blocksBoarding }
+        let beatsEveryTrain = routes.allSatisfy { drive.totalDuration < $0.totalDuration }
+        guard nothingRuns || beatsEveryTrain else { return routes }
+        return nothingRuns ? [drive] + routes : routes + [drive]
     }
 
     private func enrichedRoute(

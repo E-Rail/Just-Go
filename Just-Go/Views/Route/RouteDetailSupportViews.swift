@@ -69,14 +69,19 @@ struct ConfidenceScoreRing: View {
 /// Returning nil is the point. A green "high confidence" badge on a route with nothing wrong with
 /// it is decoration, and decoration on every row is what made the list unreadable.
 enum RouteConcern {
+    /// - Parameter gradesData: whether this route rides anything the confidence score is about.
+    ///   The score grades station and network data; a walk or a drive uses neither, so "Medium
+    ///   confidence" on one is a verdict about nothing. Feasibility still applies to both — it
+    ///   reads the walking directions, and stairs on a footpath are a real finding.
     static func worst(
         feasibility: RouteFeasibility,
-        confidence: RouteConfidence
+        confidence: RouteConfidence,
+        gradesData: Bool = true
     ) -> (title: String, icon: String, tint: Color)? {
         if feasibility.level != .good, feasibility.level != .unknown {
             return (feasibility.title, feasibility.level.iconName, feasibility.level.color)
         }
-        guard confidence.level != .high else { return nil }
+        guard gradesData, confidence.level != .high else { return nil }
         let icon: String = confidence.level == .medium
             ? "exclamationmark.triangle.fill"
             : "exclamationmark.octagon.fill"

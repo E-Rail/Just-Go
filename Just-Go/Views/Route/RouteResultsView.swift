@@ -421,12 +421,16 @@ struct RouteResultsView: View {
                 // existed for a long time and lived only on the detail screen, so the list — the
                 // screen a rider actually chooses from — showed a shut line as a perfectly ordinary
                 // "28 min · 1 change". Naming it here is the whole point of checking it.
-                if let notice = route.serviceStatus.bannerText {
+                // Both of these are about trains, so neither belongs on a route with none. A drive
+                // showing "the last train could not be checked" is answering a question nobody
+                // asked, and a confidence grade on it is a verdict about station data it never
+                // touches. `RouteDetailView` already gates its own copies on the same test.
+                if route.boardingTransitSegment != nil, let notice = route.serviceStatus.bannerText {
                     Label(notice, systemImage: route.serviceStatus.iconName)
                         .font(.footnote)
                         .fontWeight(.medium)
                         .foregroundStyle(route.serviceStatus.uiColor)
-                } else if let unverified = unverifiedServiceHoursNotice(
+                } else if route.boardingTransitSegment != nil, let unverified = unverifiedServiceHoursNotice(
                     status: route.serviceStatus,
                     departing: TripTimeContext(
                         anchor: viewModel.tripAnchor,
@@ -442,7 +446,11 @@ struct RouteResultsView: View {
                 // "Walking-heavy route" into a two-line stub. Only what is wrong, and only in
                 // words: this row used to lead with a 50 pt red "38", an unexplained score on a
                 // scale the rider had never been shown.
-                if let concern = RouteConcern.worst(feasibility: feasibility, confidence: confidence) {
+                if let concern = RouteConcern.worst(
+                    feasibility: feasibility,
+                    confidence: confidence,
+                    gradesData: route.boardingTransitSegment != nil
+                ) {
                     Label(concern.title, systemImage: concern.icon)
                         .font(.footnote)
                         .fontWeight(.medium)
@@ -531,6 +539,15 @@ struct RouteResultsView: View {
     private func bestForReason(for route: Route, in routes: [Route]) -> String {
         guard routes.count > 1 else {
             return AppLocalization.text(english: "Recommended", simplified: "推荐", traditional: "推薦")
+        }
+        // A drive or a walk is not one of the train plans being compared, it is the alternative to
+        // all of them. Every label below answers "why this train rather than that one", and none
+        // of them means anything here — least of all "Balanced", which is a comparison against
+        // nothing. The mode badge on the card already says what it is.
+        guard route.boardingTransitSegment != nil else {
+            return route.segments.first?.type == .driving
+                ? AppLocalization.text(english: "By car", simplified: "驾车", traditional: "駕車")
+                : AppLocalization.text(english: "On foot", simplified: "步行", traditional: "步行")
         }
         // Every test below is *strictly* better than every alternative, never equal-best. Two ¥5
         // routes are not one cheap route and one expensive one, and two routes that both walk 0 m

@@ -104,7 +104,17 @@ expected_web_literals = Set.new([
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.bjsubway.com/station/xltcx/"],
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mtr.bj.cn/service/line/"],
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mtr.com.hk/en/customer/services/system_map.html"],
-  ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mlm.com.mo/en/"]
+  ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mlm.com.mo/en/"],
+  # Outbound handoff, not a fetch. These are opened in the rider's browser or their own installed
+  # app when they tap "Apple Maps"/"Amap"/"Baidu Maps"/"DiDi" on a bike or car leg; the app never
+  # requests them, never reads a response and never stores one. They exist as https fallbacks for
+  # riders who do not have the app, which is also the only path testable without a device.
+  #
+  # What leaves the phone is the two coordinates of that one leg, which the rider chose, plus the
+  # destination name. Nothing about the trip's other legs, no history, no identifier.
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://uri.amap.com/navigation?from=\\(origin.longitude),\\(origin.latitude)"],
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://api.map.baidu.com/direction?origin=\\(origin.latitude),\\(origin.longitude)"],
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://common.diditaxi.com.cn/general/webEntry?fromlat=\\(origin.latitude)"]
 ]).freeze
 
 actual_web_literals = Set.new

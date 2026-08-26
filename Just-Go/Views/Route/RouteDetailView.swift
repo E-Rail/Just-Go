@@ -856,12 +856,17 @@ struct RouteDetailView: View {
             // Provenance needs a subject. On its own the chip said "Not available" under a section
             // header, naming nothing: a red badge for the rider to worry about with no way to tell
             // what it referred to.
-            detailRow(
-                icon: "building.columns.fill",
-                tint: .secondary,
-                title: AppLocalization.text(english: "Station data", simplified: "车站数据", traditional: "車站資料")
-            ) {
-                DataConfidenceChip(confidence: decisionDataConfidence, compact: true)
+            //
+            // And a subject needs to exist. On a drive or a walk there are no stations, so a red
+            // "Not available" claimed a lookup had failed when none was ever owed.
+            if route.boardingTransitSegment != nil {
+                detailRow(
+                    icon: "building.columns.fill",
+                    tint: .secondary,
+                    title: AppLocalization.text(english: "Station data", simplified: "车站数据", traditional: "車站資料")
+                ) {
+                    DataConfidenceChip(confidence: decisionDataConfidence, compact: true)
+                }
             }
         }
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
@@ -1016,6 +1021,7 @@ struct RouteDetailView: View {
                         .font(.footnote)
                         .foregroundStyle(Color.accentColor)
                 }
+                handoffRow(for: segment)
                 if isExpanded {
                     stationStops(segment)
                 }
@@ -1122,6 +1128,47 @@ struct RouteDetailView: View {
         // The first and last mile share one colour on purpose: they are the same kind of thing to
         // a rider reading the strip, and the icon already says which of the three it is.
         case .walking, .cycling, .driving, nil: return .gray
+        }
+    }
+
+    /// "Open in …" for a leg this app knowingly models worse than a road router does.
+    ///
+    /// Bike and car only, and that restriction is the point rather than a limitation. The trains,
+    /// the walk to the platform and the exit to use are what Just-Go is for; handing those to
+    /// another app would be giving up. What it genuinely cannot do is live road navigation or hail
+    /// a car — and a cycling leg with no provider key is the pedestrian route re-timed, while a
+    /// driving leg is MapKit's road route with no traffic, no restrictions and no parking. Naming
+    /// an app that does those properly is more useful than pretending.
+    @ViewBuilder
+    private func handoffRow(for segment: RouteSegment) -> some View {
+        let mode = segment.accessLegMode
+        if segment.type.isAccessLeg, mode != .walking,
+           let start = segment.polylineCoordinates.first,
+           let end = segment.polylineCoordinates.last {
+            let from = CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude)
+            let to = CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude)
+            let destinations = ExternalRouteHandoff.destinations(for: mode)
+            if !destinations.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(destinations) { destination in
+                        Button {
+                            ExternalRouteHandoff.open(
+                                destination,
+                                from: from,
+                                to: to,
+                                destinationName: segment.toStationName ?? route.destination,
+                                mode: mode
+                            )
+                        } label: {
+                            Label(destination.title, systemImage: destination.symbolName)
+                                .font(.footnote)
+                        }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.capsule)
+                    }
+                }
+                .padding(.top, 2)
+            }
         }
     }
 

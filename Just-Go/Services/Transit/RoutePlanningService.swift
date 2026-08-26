@@ -461,6 +461,45 @@ final class RoutePlanningService {
     /// refusal all mean "no official answer", never a failed plan. Bounded at four seconds because
     /// this is an *upgrade* to an answer that already exists. A rider waiting on a route must not
     /// wait on an operator's website.
+    /// The operator's own first/last train at one boarding station, one row per direction and per
+    /// service, for the trip screen to display.
+    ///
+    /// It exists because the screen was reading `officialStationData.serviceWindows`, which is the
+    /// city pack and nothing else — and every bundled pack ships `schedules: []`, because operator
+    /// timetables must not be committed. So the row it fed rendered nothing in all 58 cities. This
+    /// is the same operator lookup the planner already makes for the same station on the same
+    /// screen, so it costs no extra request; the pack stays as the fallback for whichever city
+    /// eventually ships redistributable times.
+    func boardingServiceWindows(
+        stationID: String,
+        stationName: String,
+        cityID: String,
+        lineName: String?
+    ) async -> [StationServiceWindow] {
+        let official = Self.serviceWindows(
+            from: await officialStationSnapshots(
+                for: [RouteStationStop(
+                    stationID: stationID,
+                    name: stationName,
+                    lineName: lineName,
+                    lineColorHex: nil,
+                    coordinate: nil,
+                    arrivalTimeText: nil,
+                    isTransfer: false
+                )]
+            )[stationName]
+        )
+        let windows = official.isEmpty
+            ? await officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
+            : official
+        guard let lineName, !lineName.isEmpty else { return windows }
+        let matched = windows.filter {
+            fullTransitLineName($0.lineName) == fullTransitLineName(lineName) ||
+                !transitLineReferences($0.lineName).isDisjoint(with: transitLineReferences(lineName))
+        }
+        return matched.isEmpty ? windows : matched
+    }
+
     private func officialStationSnapshots(
         for stops: [RouteStationStop]
     ) async -> [String: OfficialStationInformationSnapshot] {

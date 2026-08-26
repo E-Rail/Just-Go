@@ -767,16 +767,35 @@ struct RouteDetailView: View {
                 rowDivider
             }
 
-            if let hours = boardingServiceHours {
+            if !boardingServiceWindows.isEmpty {
                 detailRow(
                     icon: "clock.fill",
                     tint: .blue,
                     title: AppLocalization.text(english: "Service hours", simplified: "运营时间", traditional: "營運時間")
                 ) {
-                    Text(verbatim: "\(hours.first) – \(hours.last)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
+                    // One row per direction, never a merged range. Merging takes the earliest
+                    // first train and the latest last train across every direction, which at
+                    // 天通苑南 on 5号线 turns 22:51 southbound and 23:57 northbound into a single
+                    // "5:03 – 23:57" that is true of neither platform.
+                    VStack(alignment: .trailing, spacing: 4) {
+                        ForEach(boardingServiceWindows, id: \.self) { window in
+                            VStack(alignment: .trailing, spacing: 1) {
+                                if let direction = window.direction, !direction.isEmpty {
+                                    Text(AppLocalization.text(
+                                        english: "Toward \(direction)",
+                                        simplified: "开往 \(direction)",
+                                        traditional: "開往 \(direction)"
+                                    ))
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                }
+                                Text(verbatim: "\(window.firstTime ?? "—") – \(window.lastTime ?? "—")")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
+                        }
+                    }
                 }
                 rowDivider
             }
@@ -880,33 +899,32 @@ struct RouteDetailView: View {
         route.departurePlan(anchor: tripAnchor)
     }
 
-    /// Scheduled first/last train times for the boarding line (official city-pack data).
-    /// This is NOT a live countdown: the data sources have no real-time arrival feed.
-    private var boardingServiceHours: (first: String, last: String)? {
-        let firsts = boardingServiceWindows.compactMap(\.firstTime).filter { !$0.isEmpty }
-        let lasts = boardingServiceWindows.compactMap(\.lastTime).filter { !$0.isEmpty }
-        guard let first = firsts.min(), let last = lasts.max() else { return nil }
-        return (first, last)
-    }
-
+    /// Scheduled first/last train times for the boarding line, per direction.
+    ///
+    /// This is NOT a live countdown: none of the sources has a real-time departure feed.
+    ///
+    /// It reads the operator through the planner rather than the city pack directly. The pack was
+    /// the only source here and every bundled pack ships `schedules: []` — operator timetables
+    /// must not be committed — so this row rendered nothing in all 58 cities for as long as it has
+    /// existed.
     private func loadServiceHours(cityID: String) async {
-        guard let stationName = route.boardingTransitSegment?.fromStationName else {
+        guard let segment = route.boardingTransitSegment,
+              let stationName = segment.fromStationName,
+              let stationID = segment.fromStationID else {
             boardingServiceWindows = []
             return
         }
-        let windows = await container.officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
+        let windows = await container.routePlanningService.boardingServiceWindows(
+            stationID: stationID,
+            stationName: stationName,
+            cityID: segment.packCityID ?? cityID,
+            lineName: segment.lineName
+        )
         // .task(id:) cancelled this load because the rider switched route tabs, without this
         // guard a slow (e.g. network-bound) load for the OLD route lands after the new route's
         // cached one and shows the wrong service hours.
         guard !Task.isCancelled else { return }
-        if let lineName = route.boardingTransitSegment?.lineName {
-            let matched = windows.filter {
-                $0.lineName == lineName || $0.lineName.contains(lineName) || lineName.contains($0.lineName)
-            }
-            boardingServiceWindows = matched.isEmpty ? windows : matched
-        } else {
-            boardingServiceWindows = windows
-        }
+        boardingServiceWindows = windows
     }
 
     /// The journey as one continuous path: an unbroken vertical rail running the height of the

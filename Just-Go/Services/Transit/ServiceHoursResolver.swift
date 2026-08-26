@@ -3,7 +3,7 @@ import Foundation
 /// The Sendable slice of an official schedule row that crosses the
 /// `OfficialCityPackService` actor boundary. Shared by time-aware-confidence
 /// and departure-planner.
-struct StationServiceWindow: Sendable, Codable, Equatable {
+struct StationServiceWindow: Sendable, Codable, Equatable, Hashable {
     let lineName: String
     let direction: String?
     let firstTime: String?

@@ -187,6 +187,20 @@ final class RoutePlanningService {
             legs: legs,
             observation: observation
         )
+        // The re-plan exists to find a train the rider can actually catch. Late enough and there is
+        // no such train on any line, and adding two more shut itineraries to a list that already
+        // had one is noise dressed as helpfulness — so unless something in it runs, the first
+        // answer stands.
+        guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
+            return planned.routes
+        }
+        // The re-plan exists to find a train the rider can actually catch. Late enough and there is
+        // no such train on any line, and adding two more shut itineraries to a list that already
+        // had one is noise dressed as helpfulness — so unless something in it runs, the first
+        // answer stands.
+        guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
+            return planned.routes
+        }
         // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
         // better served by seeing a shut line named than by an empty screen.
         return merging(running: replanned.routes, with: planned.routes)
@@ -597,10 +611,11 @@ final class RoutePlanningService {
                 continue
             }
             sawAnswer = true
-            // Only an attributed closure may take a line out of the search. An unattributed one is
-            // a merge across directions, which over-states how long a line runs, so acting on it
-            // would ban a line on the strength of a window that was never this rider's.
-            if verdict.isAttributed,
+            // Only a definitive closure may take a line out of the search — see
+            // `ServiceHoursVerdict.isDefinitive`. A merged window that still reads as running may
+            // be another direction's train, and banning a line on the strength of one that was
+            // never this rider's is the same error in the other direction.
+            if verdict.isDefinitive,
                let lineID = segment.transitContext?.lineID,
                verdict.status == .serviceEndedToday || verdict.status.isNotYetStarted {
                 closedLineIDs.insert(lineID)

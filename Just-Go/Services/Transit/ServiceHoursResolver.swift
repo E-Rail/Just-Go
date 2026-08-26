@@ -14,16 +14,21 @@ struct StationServiceWindow: Sendable, Codable, Equatable {
 /// the rider's own train.
 struct ServiceHoursVerdict: Equatable {
     let status: RouteServiceStatus
-    /// Whether the window was attributed to the rider's own direction *and* service.
+    /// Whether this verdict is sound enough to re-plan on, as opposed to merely worth showing.
     ///
-    /// False means several windows were merged because none could be attributed, which is the old
-    /// behaviour and is optimistic by construction: it takes the earliest first train and the
-    /// latest last train across every direction, so it can only ever over-state how long the line
-    /// runs. A verdict that is not attributed may be shown, but must never demote or exclude a
-    /// route — being wrong about a direction is exactly how a rider gets sent to a dark platform.
-    let isAttributed: Bool
+    /// Two ways to earn it. Either the window was pinned to the rider's own direction and service,
+    /// or the merged window — the earliest first train and the latest last train across every
+    /// direction — *already* says the line is shut. The merge is an upper bound by construction, so
+    /// it can only ever over-state how long a line runs: "still running" out of it may be another
+    /// direction's train and must never demote a route, while "ended" out of it means every
+    /// direction has ended and is as certain as an attributed one.
+    ///
+    /// That second case is not a technicality. Ring lines have no terminus to order stations
+    /// against, so nothing on 北京 2号线 or 10号线 can ever be attributed — and without this they
+    /// would be the two lines a re-plan never fired for.
+    let isDefinitive: Bool
 
-    static let unanswered = ServiceHoursVerdict(status: .unknown, isAttributed: false)
+    static let unanswered = ServiceHoursVerdict(status: .unknown, isDefinitive: false)
 }
 
 /// Pure, synchronous resolver that turns first/last-train rows into a `RouteServiceStatus` for a
@@ -62,13 +67,14 @@ struct ServiceHoursResolver {
 
         if let serving = servingWindows(in: pool, onward: onwardStationNames, alighting: alightingStationName),
            !serving.isEmpty {
-            return ServiceHoursVerdict(status: status(from: serving, at: departure), isAttributed: true)
+            return ServiceHoursVerdict(status: status(from: serving, at: departure), isDefinitive: true)
         }
-        // One window is not a merge, so there is nothing to be optimistic about and the answer is
-        // as attributable as it will ever be.
+        // One window is not a merge, so there is nothing to be optimistic about; and a merge that
+        // already reads as shut is an upper bound that has passed. See `isDefinitive`.
+        let merged = status(from: pool, at: departure)
         return ServiceHoursVerdict(
-            status: status(from: pool, at: departure),
-            isAttributed: pool.count == 1
+            status: merged,
+            isDefinitive: pool.count == 1 || merged == .serviceEndedToday || merged.isNotYetStarted
         )
     }
 

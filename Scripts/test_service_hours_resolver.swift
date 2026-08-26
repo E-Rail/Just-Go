@@ -18,6 +18,11 @@ enum RouteServiceStatus: Equatable {
     case notYetStarted(startsAtText: String)
     case unknown
 
+    var isNotYetStarted: Bool {
+        if case .notYetStarted = self { return true }
+        return false
+    }
+
     var label: String {
         switch self {
         case .running: return "running"
@@ -99,7 +104,7 @@ enum ServiceHoursResolverTests {
     )
     // The direction that is shut must be reported as attributed, or the planner will not act on it.
     check(
-        "southbound is attributed",
+        "southbound is definitive",
         String(
             resolver.verdict(
                 boardingLineName: "5号线",
@@ -107,7 +112,7 @@ enum ServiceHoursResolverTests {
                 alightingStationName: "雍和宫",
                 windows: tiantongyuannan,
                 at: at(23, 20)
-            ).isAttributed
+            ).isDefinitive
         ),
         "true"
     )
@@ -183,7 +188,7 @@ enum ServiceHoursResolverTests {
         "running"
     )
     check(
-        "...and says it could not attribute it",
+        "...and says it is not safe to re-plan on",
         String(
             resolver.verdict(
                 boardingLineName: "5号线",
@@ -191,13 +196,51 @@ enum ServiceHoursResolverTests {
                 alightingStationName: "雍和宫",
                 windows: tiantongyuannan,
                 at: at(23, 20)
-            ).isAttributed
+            ).isDefinitive
         ),
         "false"
     )
+    // A ring has no terminus to order stations against, so nothing on it is ever attributable.
+    // 北京 2号线 and 10号线 are rings, and without the upper-bound rule they would be the two lines
+    // a re-plan never fired for. Live windows for 西直门 on 2号线, 2026-08-25: every direction is
+    // shut well before 23:36, so the merge — the latest of them — is shut too.
+    let ringLine = [
+        StationServiceWindow(lineName: "2号线", direction: "车公庄", firstTime: "5:10", lastTime: "22:14"),
+        StationServiceWindow(lineName: "2号线", direction: "车公庄", firstTime: "5:10", lastTime: "22:59"),
+        StationServiceWindow(lineName: "2号线", direction: "积水潭", firstTime: "5:05", lastTime: "22:59")
+    ]
+    check(
+        "a ring with every direction shut is definitive",
+        String(
+            resolver.verdict(
+                boardingLineName: "2号线",
+                onwardStationNames: nil,
+                alightingStationName: "雍和宫",
+                windows: ringLine,
+                at: at(23, 36)
+            ).isDefinitive
+        ),
+        "true"
+    )
+    // ...but the same ring earlier in the evening is not, because "still running" out of a merge
+    // may be the other direction's train.
+    check(
+        "a ring still inside the merged window is not",
+        String(
+            resolver.verdict(
+                boardingLineName: "2号线",
+                onwardStationNames: nil,
+                alightingStationName: "雍和宫",
+                windows: ringLine,
+                at: at(22, 30)
+            ).isDefinitive
+        ),
+        "false"
+    )
+
     // One window is not a merge, so there is nothing to be optimistic about.
     check(
-        "a lone window is attributed even with no onward list",
+        "a lone window is definitive even with no onward list",
         String(
             resolver.verdict(
                 boardingLineName: "5号线",
@@ -205,7 +248,7 @@ enum ServiceHoursResolverTests {
                 alightingStationName: "雍和宫",
                 windows: [tiantongyuannan[0]],
                 at: at(23, 20)
-            ).isAttributed
+            ).isDefinitive
         ),
         "true"
     )

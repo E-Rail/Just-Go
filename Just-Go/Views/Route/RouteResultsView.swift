@@ -189,6 +189,25 @@ struct RouteResultsView: View {
             applyTiming()
         }
         .onChange(of: chosenDate) { _, _ in applyTiming() }
+        // The control is local state, so it starts at "Now" whatever the trip is actually anchored
+        // to. `tripAnchor` has another writer — the `route/plan` deep link — and without this the
+        // screen reads "Now" while planning for 23:40 and arriving at 00:11. Assigning what is
+        // already there is a no-op: `applyTiming` compares before it re-plans.
+        .onAppear { adoptAnchor(viewModel.tripAnchor) }
+        .onChange(of: viewModel.tripAnchor) { _, anchor in adoptAnchor(anchor) }
+    }
+
+    private func adoptAnchor(_ anchor: TripTimeAnchor) {
+        switch anchor {
+        case .now:
+            timingMode = .now
+        case .departBy(let date):
+            timingMode = .departAt
+            chosenDate = date
+        case .arriveBy(let date):
+            timingMode = .arriveBy
+            chosenDate = date
+        }
     }
 
     private func applyTiming() {
@@ -396,6 +415,27 @@ struct RouteResultsView: View {
                     )
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                }
+
+                // Whether this trip can actually be ridden at the hour it departs. The banner has
+                // existed for a long time and lived only on the detail screen, so the list — the
+                // screen a rider actually chooses from — showed a shut line as a perfectly ordinary
+                // "28 min · 1 change". Naming it here is the whole point of checking it.
+                if let notice = route.serviceStatus.bannerText {
+                    Label(notice, systemImage: route.serviceStatus.iconName)
+                        .font(.footnote)
+                        .fontWeight(.medium)
+                        .foregroundStyle(route.serviceStatus.uiColor)
+                } else if let unverified = unverifiedServiceHoursNotice(
+                    status: route.serviceStatus,
+                    departing: TripTimeContext(
+                        anchor: viewModel.tripAnchor,
+                        totalDuration: route.totalDuration
+                    ).departureDate
+                ) {
+                    Label(unverified, systemImage: RouteServiceStatus.unknown.iconName)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
 
                 // Full width, below everything: sharing a line with the duration column squeezed

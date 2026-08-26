@@ -922,10 +922,26 @@ struct MapContainerView: View {
             default: break
             }
         }
-        let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
-        guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
-        plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)
-        plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
+        // A named pair beats the widest one whenever the thing being looked at depends on *which*
+        // lines the trip rides — a service-hours check is only interesting where one line has
+        // stopped and another has not, and the widest pair in the viewport is whatever it is.
+        if let endpoints = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ENDPOINTS"] {
+            let parts = endpoints.split(separator: ",").compactMap { Double($0) }
+            guard parts.count >= 4 else { return }
+            plannerViewModel.selectPlace(
+                debugPlace(at: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1])),
+                for: .origin
+            )
+            plannerViewModel.selectPlace(
+                debugPlace(at: CLLocationCoordinate2D(latitude: parts[2], longitude: parts[3])),
+                for: .destination
+            )
+        } else {
+            let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
+            guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
+            plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)
+            plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
+        }
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
         switch screen {
         case "mapRoute":
@@ -954,6 +970,16 @@ struct MapContainerView: View {
         )
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
         path = [.results, .detail(first.id)]
+    }
+
+    /// A bare coordinate as an endpoint. The planner walks to the nearest station from it, which
+    /// is what a rider dropping a pin gets, so a named pair still exercises the real path.
+    private func debugPlace(at coordinate: CLLocationCoordinate2D) -> TransitPlace {
+        TransitPlace(
+            name: String(format: "%.4f, %.4f", coordinate.latitude, coordinate.longitude),
+            coordinate: coordinate,
+            source: .localStationData
+        )
     }
 
     private func debugPlace(for station: Station) -> TransitPlace {

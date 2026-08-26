@@ -212,6 +212,30 @@ extension RouteServiceStatus {
 }
 
 /// Whether the rider can still catch the last train given the planned departure.
+/// The note a rider needs when nobody could answer for the last train, shown only in the window
+/// where not knowing changes what they do.
+///
+/// Silent by day on purpose. Only 4 of 58 cities publish first/last train at all, and only while
+/// online; everywhere else the answer comes from one routing-provider response or from nowhere. A
+/// permanent "we could not check" on every card in every other city would be noise attached to
+/// every trip, and noise attached to everything is read as attached to nothing. Late in the
+/// evening, or before the network opens, it is the difference between catching a train and
+/// standing at a locked entrance.
+///
+/// The window is the service day's own edges rather than the calendar's: Chinese metros close
+/// between roughly 22:30 and 00:30 and open between 05:00 and 06:30, so a trip departing inside
+/// those hours is one where the answer matters and we do not have it.
+func unverifiedServiceHoursNotice(status: RouteServiceStatus, departing departure: Date) -> String? {
+    guard status == .unknown else { return nil }
+    let minutes = ChinaClock.minutesOfDay(of: departure)
+    guard minutes >= 22 * 60 + 30 || minutes < 6 * 60 else { return nil }
+    return AppLocalization.text(
+        english: "The last train could not be checked for this city",
+        simplified: "本城市末班车时间无法核实",
+        traditional: "本城市末班車時間無法核實"
+    )
+}
+
 enum LastTrainStatus: Equatable {
     case unknown
     case ok

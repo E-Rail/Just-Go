@@ -39,7 +39,30 @@ struct MetroLine: Codable, Equatable, Identifiable {
     let colorHex: String
     let stationIDs: [String]
     let servicePatterns: [[String]]
+    /// Express and short-turn trains on this line, if the operator runs any.
+    ///
+    /// Deliberately separate from `servicePatterns`, which is the only thing the routing graph
+    /// reads. A variant calls at a strict subset of the ordinary service's stops, so putting one
+    /// in the graph would create a non-stop edge past stations the line stops at — the defect
+    /// `43a6aaa` removed 81 of — and Dijkstra would always take it, because it is genuinely
+    /// faster. It would also be a promise the data cannot keep: not one of the 46 variant
+    /// relations in OpenStreetMap says *when* these trains run.
+    ///
+    /// So they are shown and never routed on. Optional because most lines have none and because
+    /// a pack written before this existed must still decode.
+    let serviceVariants: [MetroServiceVariant]?
     let paths: [[MetroCoordinate]]
+}
+
+/// One kind of train on a line that is not the ordinary all-stops service.
+struct MetroServiceVariant: Codable, Equatable, Identifiable {
+    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车.
+    let kind: String
+    let name: String
+    let sourceRelationID: String
+    let stationIDs: [String]
+
+    var id: String { sourceRelationID }
 }
 
 /// Two named stations riders treat as one interchange.

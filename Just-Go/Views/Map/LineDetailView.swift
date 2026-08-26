@@ -67,6 +67,7 @@ struct LineDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Metrics.l) {
                         header(for: line)
+                        serviceVariants(for: line)
                         stopList(for: line)
                         operatorCheck(for: line)
                     }
@@ -81,6 +82,7 @@ struct LineDetailView: View {
                         .frame(height: 260)
                         .clipShape(RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
                     header(for: line)
+                    serviceVariants(for: line)
                     stopList(for: line)
                     operatorCheck(for: line)
                 }
@@ -108,6 +110,50 @@ struct LineDetailView: View {
             // ODbL: every screen that draws this geometry has to say where it came from.
             MetroGeometryAttributionView()
                 .padding(8)
+        }
+    }
+
+    /// The other kinds of train that run on this line: an express that skips stops, a short-turn
+    /// that ends part way along.
+    ///
+    /// Shown, and never routed on. OpenStreetMap publishes each as its own relation and not one of
+    /// them carries `opening_hours`, `interval` or `frequency` — it says the train exists and never
+    /// says when it runs. Planning a rider onto a service that may not be running at all is exactly
+    /// what this project refuses to do, so the stop count is stated and the timing is not.
+    @ViewBuilder
+    private func serviceVariants(for line: MetroLine) -> some View {
+        let variants = line.serviceVariants ?? []
+        if !variants.isEmpty {
+            GlassCard {
+                VStack(alignment: .leading, spacing: Metrics.s) {
+                    Text(AppLocalization.text(
+                        english: "Other trains on this line",
+                        simplified: "本线其他车次",
+                        traditional: "本線其他車次"
+                    ))
+                    .rowTitle()
+                    ForEach(variants) { variant in
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(variant.kind)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text(AppLocalization.text(
+                                english: "Calls at \(variant.stationIDs.count) of this line's \(line.stationIDs.count) stations",
+                                simplified: "停靠本线 \(line.stationIDs.count) 站中的 \(variant.stationIDs.count) 站",
+                                traditional: "停靠本線 \(line.stationIDs.count) 站中的 \(variant.stationIDs.count) 站"
+                            ))
+                            .rowMeta()
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    Text(AppLocalization.text(
+                        english: "Timetables for these are not published, so routes are planned on the all-stops service.",
+                        simplified: "这些车次没有公开时刻表，因此路线按站站停车次规划。",
+                        traditional: "這些車次沒有公開時刻表，因此路線按站站停車次規劃。"
+                    ))
+                    .rowMeta()
+                }
+            }
         }
     }
 

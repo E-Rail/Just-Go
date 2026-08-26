@@ -6,6 +6,10 @@ require "set"
 
 ROOT = File.expand_path("..", __dir__)
 EARTH_RADIUS = 6_371_000.0
+# Spelled out here rather than read from the importer, on purpose and for the same reason the
+# rights declarations are triplicated: a validator that imports the thing it validates cannot
+# catch the thing it validates changing.
+SERVICE_VARIANT_KINDS = %w[大站快车 直达快车 大站车 直达车 区间车 快车].freeze
 paths = Dir.glob(File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort
 abort "metro network validation failed: no assets" if paths.empty?
 city_service_source = File.read(File.join(ROOT, "Just-Go", "Services", "Data", "CityService.swift"))
@@ -105,6 +109,27 @@ paths.each do |path|
     relation_ids = line.fetch("selectedSourceRelationIDs")
     abort "#{city}: selected source relation outside canonical line" unless relation_ids.all? { |id| line.fetch("sourceRelationIDs").include?(id) }
     abort "#{city}: selected source relation count does not match service patterns" unless relation_ids.length == line.fetch("servicePatternCount")
+
+    # Express and short-turn services: 大站车, 直达车, 快车, 区间车. Display-only by construction.
+    #
+    # The last check here is the one that matters. A variant calls at a strict subset of the
+    # ordinary service's stops, which is precisely the shape that becomes a phantom non-stop edge
+    # if it ever reaches the routing graph — 43a6aaa removed 81 of those. And nothing in OSM says
+    # when these trains run: not one of the 46 variant relations carries opening_hours, interval
+    # or frequency. So they must be shown and never routed on.
+    variants = line.fetch("serviceVariants", [])
+    routable = patterns.map(&:to_a).to_set
+    variants.each do |variant|
+      kind = variant.fetch("kind")
+      abort "#{city}: unknown service variant kind #{kind}" unless SERVICE_VARIANT_KINDS.include?(kind)
+      stops = variant.fetch("stationIDs")
+      abort "#{city}: service variant has fewer than two stops" if stops.length < 2
+      abort "#{city}: service variant references unknown station" unless stops.all? { |id| station_ids.include?(id) }
+      abort "#{city}: service variant leaves its own line" unless stops.all? { |id| line.fetch("stationIDs").include?(id) }
+      abort "#{city}: service variant adjacent duplicate" if stops.each_cons(2).any? { |left, right| left == right }
+      abort "#{city}: service variant reached the routing graph" if routable.include?(stops)
+      abort "#{city}: service variant is the whole line" if stops.length >= line.fetch("stationIDs").length
+    end
     abort "#{city}: duplicate selected source relation" unless relation_ids.uniq.length == relation_ids.length
     path_keys = line.fetch("paths").map do |points|
       forward = points.map { |point| "#{point["latitude"]},#{point["longitude"]}" }.join("|")

@@ -24,6 +24,9 @@ final class DIContainer {
     let stationInformationDirectory: StationInformationDirectory
     let metroNetworkProvider: MetroNetworkProviding
     let routePlanningService: RoutePlanningService
+    /// Present only when a key is configured. Held so one screen can show what this launch has
+    /// spent and what the provider last refused; nothing else reads it.
+    let baiduMapsClient: BaiduMapsClient?
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
@@ -52,6 +55,7 @@ final class DIContainer {
         stationInformationDirectory: StationInformationDirectory,
         metroNetworkProvider: MetroNetworkProviding,
         routePlanningService: RoutePlanningService,
+        baiduMapsClient: BaiduMapsClient?,
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
@@ -74,6 +78,7 @@ final class DIContainer {
         self.stationInformationDirectory = stationInformationDirectory
         self.metroNetworkProvider = metroNetworkProvider
         self.routePlanningService = routePlanningService
+        self.baiduMapsClient = baiduMapsClient
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
@@ -257,6 +262,7 @@ final class DIContainer {
             stationInformationDirectory: stationInformationDirectory,
             metroNetworkProvider: metroNetworkProvider,
             routePlanningService: routePlanningService,
+            baiduMapsClient: baiduClient,
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,

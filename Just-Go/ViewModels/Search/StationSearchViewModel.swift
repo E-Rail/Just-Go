@@ -97,7 +97,7 @@ final class StationSearchViewModel {
         applyFilters()
     }
 
-    func search() async {
+    func search(includingPlaces: Bool = true) async {
         let query = searchText.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else {
             await loadInitialStations()
@@ -132,7 +132,8 @@ final class StationSearchViewModel {
         do {
             let results = try await stationSearchService.search(
                 keyword: query,
-                near: locationService.mapSpaceLocation?.coordinate
+                near: locationService.mapSpaceLocation?.coordinate,
+                includingPlaces: includingPlaces
             )
             guard stationLoadID == loadID,
                   searchText.trimmingCharacters(in: .whitespaces) == query else { return }
@@ -144,12 +145,23 @@ final class StationSearchViewModel {
         }
     }
 
+    /// Typing. Answers from the bundled station index only, so it costs nothing and can stay as
+    /// responsive as it likes. See `StationSearchService.search(keyword:near:includingPlaces:)`
+    /// for why the network half moved behind an explicit submit.
     func scheduleSearch() {
         searchTask?.cancel()
         searchTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(180))
             guard !Task.isCancelled else { return }
-            await self?.search()
+            await self?.search(includingPlaces: false)
+        }
+    }
+
+    /// The rider asked. This is the one that spends a place search.
+    func submitSearch() {
+        searchTask?.cancel()
+        searchTask = Task { [weak self] in
+            await self?.search(includingPlaces: true)
         }
     }
 

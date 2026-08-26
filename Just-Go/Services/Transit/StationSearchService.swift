@@ -24,7 +24,17 @@ final class StationSearchService {
     /// orders the answers instead of gating them. Searching 人民广场 from Beijing therefore lists
     /// Shanghai's: last, but listed, which is what "distance-ranked" means and what a city filter
     /// could never do.
-    func search(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [Station] {
+    /// - Parameter includingPlaces: whether to ask the place-search provider as well as the
+    ///   bundled network. `false` answers entirely from data already on the device, which is what
+    ///   every keystroke gets: the provider's free allowance is **100 searches a day for the whole
+    ///   account**, about five riders, and this used to spend one on every typing pause. The
+    ///   bundled index is the reason that costs nothing to give up — it holds every station in
+    ///   every supported city and is what a rider searching a station name is looking for anyway.
+    func search(
+        keyword: String,
+        near coordinate: CLLocationCoordinate2D?,
+        includingPlaces: Bool = true
+    ) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return await nearestStations(to: coordinate, limit: nearbyStationLimit) }
         let needle = query.lowercased()
@@ -32,6 +42,7 @@ final class StationSearchService {
             await metroNetworkProvider.allStations().filter { $0.searchKey.contains(needle) },
             from: coordinate
         )
+        guard includingPlaces else { return bundledMatches }
         let region = coordinate.map {
             MKCoordinateRegion(center: $0, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
         }

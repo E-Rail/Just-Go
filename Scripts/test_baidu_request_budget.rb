@@ -61,8 +61,70 @@ class RequestBudgetTest < Minitest::Test
   def test_exhaustion_is_a_throw_so_callers_already_handle_it
     # Every caller treats a throw as "no answer" and falls back, so this needs no new handling: it
     # degrades the app to exactly what it is with no key.
+    #
+    # The behaviour itself is exercised at runtime by Scripts/test_baidu_request_gate.sh, which
+    # spends a whole ceiling against a stub URLProtocol and counts what reaches the wire. This
+    # stays a source check because it is about the *shape* callers depend on.
     assert_includes CLIENT, "case budgetExhausted(path: String)"
-    assert_includes CLIENT, "throw BaiduMapsError.budgetExhausted(path: path)"
+    assert_includes CLIENT, "BaiduMapsError.budgetExhausted(path: path)"
+    assert_match(/let error = BaiduMapsError\.budgetExhausted.*\n.*record\(error.*\n.*throw error/, CLIENT,
+                 "an exhausted budget must be recorded as well as thrown, or nobody can tell which limit was hit")
+  end
+
+  def test_the_rate_gate_stays_inside_the_published_free_tier
+    # 3 QPS, per account, shared by every rider using the app. Both halves matter: concurrency
+    # alone does not bound a rate, because two slots with instant responses is unlimited
+    # throughput. Measured for real in Scripts/test_baidu_request_gate.sh.
+    concurrent = CLIENT[/maximumConcurrentRequests = (\d+)/, 1]
+    refute_nil concurrent, "no concurrency ceiling declared"
+    assert_operator concurrent.to_i, :<=, 3
+    assert_operator concurrent.to_i, :>=, 1
+
+    spacing = CLIENT[/minimumRequestSpacing = Duration\.milliseconds\((\d+)\)/, 1]
+    refute_nil spacing, "no request spacing declared"
+    assert_operator spacing.to_i, :>=, 334, "a gap under 1/3 s lets a burst exceed 3 QPS"
+  end
+
+  def test_identical_requests_in_flight_are_joined
+    # The per-service caches check on the way in and write on the way out, so two identical plans
+    # starting together both miss and both spend a call.
+    assert_includes CLIENT, "private var coalescing: [String: Task<Data, Error>] = [:]"
+    coalesce_index = CLIENT.index("if let existing = coalescing[key]")
+    budget_index = CLIENT.index("if let ceiling = RequestBudget.ceilings[path]")
+    refute_nil coalesce_index
+    refute_nil budget_index
+    assert_operator coalesce_index, :<, budget_index,
+                    "a joined request must cost no budget, so coalescing comes first"
+  end
+end
+
+class TypingCostsNothingTest < Minitest::Test
+  VIEW = File.read(File.join(ROOT, "Just-Go/Views/Search/StationSearchView.swift"), encoding: "UTF-8")
+  MODEL = File.read(
+    File.join(ROOT, "Just-Go/ViewModels/Search/StationSearchViewModel.swift"), encoding: "UTF-8"
+  )
+  SERVICE = File.read(
+    File.join(ROOT, "Just-Go/Services/Transit/StationSearchService.swift"), encoding: "UTF-8"
+  )
+
+  def test_a_keystroke_never_reaches_the_place_provider
+    # 100 place searches a day for the whole account is about five riders, and this page used to
+    # spend two of them on every typing pause: one at limit 20 through the view model and one at
+    # limit 12 through the view. Typing is now answered entirely from the bundled station index.
+    assert_includes MODEL, "await self?.search(includingPlaces: false)"
+    assert_includes SERVICE, "guard includingPlaces else { return bundledMatches }"
+    assert_includes VIEW, ".onSubmit { searchOnline() }"
+
+    setter = VIEW[/set: \{ newValue in(.*?)\n            \)\)/m, 1]
+    refute_nil setter, "could not find the search field's setter"
+    refute_includes setter, "schedulePlaceSearch(",
+                    "typing must not start a place search"
+  end
+
+  def test_the_online_search_is_reachable_without_a_keyboard
+    # A capability that only answers the return key is one most riders never find.
+    assert_includes VIEW, "private var searchOnlineRow: some View"
+    assert_includes VIEW, "private func searchOnline() {"
   end
 end
 

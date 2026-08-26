@@ -123,9 +123,38 @@ actor BaiduMapsClient {
         ]
     }
 
+    /// At most this many requests may be in flight at once.
+    ///
+    /// The published free tier allows 3 QPS. Two, not three, because the ceiling is enforced on
+    /// Baidu's side across the whole account — every rider using the app shares it — so sitting
+    /// exactly on the limit means the first two devices to plan a trip in the same second decide
+    /// whether the third gets an answer. Concurrency is not the same as rate, which is why
+    /// `minimumRequestSpacing` exists as well.
+    static let maximumConcurrentRequests = 2
+    /// Minimum wall-clock gap between two request *starts*, which is what a per-second quota
+    /// actually measures. 350 ms keeps a burst under 3/s even when every response is instant.
+    static let minimumRequestSpacing = Duration.milliseconds(350)
+
     let configuration: BaiduMapsConfiguration
     private let session: URLSession
     private var spent: [String: Int] = [:]
+    /// The last thing Baidu said no about, per endpoint.
+    ///
+    /// Recorded because every one of the five call sites turns a failure into
+    /// `AppLog.…info("… unavailable: \(error)")` and moves on. `BaiduMapsError.service` has always
+    /// carried Baidu's own status code — 302 daily quota, 401 concurrency, 240 service disabled —
+    /// and nothing has ever read it, so "the API stopped working" has been unanswerable from
+    /// inside the app. Kept in memory only, like everything else this client touches.
+    private var failures: [String: BaiduEndpointDiagnostics.Failure] = [:]
+    private var inFlightRequests = 0
+    private var waiting: [CheckedContinuation<Void, Never>] = []
+    private var earliestNextStart: ContinuousClock.Instant = .now
+    /// Identical requests already on the wire, keyed by URL.
+    ///
+    /// The per-service caches check on the way in and write on the way out, so two identical plans
+    /// starting together both miss and both spend a call. This closes that window, and it closes it
+    /// for every endpoint at once rather than once per service.
+    private var coalescing: [String: Task<Data, Error>] = [:]
 
     init(configuration: BaiduMapsConfiguration, session: URLSession? = nil) {
         self.configuration = configuration
@@ -152,15 +181,6 @@ actor BaiduMapsClient {
     ) async throws -> Response {
         guard configuration.isConfigured else { throw BaiduMapsError.notConfigured }
 
-        // Checked before the request is built, so an exhausted budget costs nothing at all. Every
-        // caller already treats a throw as "no answer" and falls back, so this needs no new
-        // handling anywhere: it degrades the app to what it is with no key.
-        if let ceiling = RequestBudget.ceilings[path] {
-            let used = spent[path, default: 0]
-            guard used < ceiling else { throw BaiduMapsError.budgetExhausted(path: path) }
-            spent[path] = used + 1
-        }
-
         var ordered = parameters
         ordered.append((name: "output", value: "json"))
         ordered.append((name: "ak", value: configuration.accessKey))
@@ -179,21 +199,137 @@ actor BaiduMapsClient {
             throw BaiduMapsError.malformedResponse
         }
 
-        let data: Data
-        do {
-            (data, _) = try await session.data(from: url)
-        } catch {
-            throw BaiduMapsError.service(status: -1, message: error.localizedDescription)
-        }
+        let data = try await fetch(url, path: path)
 
         guard let decoded = try? JSONDecoder().decode(Response.self, from: data) else {
+            record(BaiduMapsError.malformedResponse, for: path)
             throw BaiduMapsError.malformedResponse
         }
         guard decoded.status == 0 else {
-            throw BaiduMapsError.service(status: decoded.status, message: decoded.message ?? "")
+            let error = BaiduMapsError.service(status: decoded.status, message: decoded.message ?? "")
+            record(error, for: path)
+            throw error
         }
         return decoded
     }
+
+    /// Everything between deciding to make a request and having its bytes: coalescing, the budget,
+    /// the concurrency gate and the rate gate, in that order.
+    ///
+    /// The order matters. Coalescing comes first so a request that is already on the wire costs no
+    /// budget and takes no slot; the budget comes next so an exhausted one is refused without ever
+    /// queueing; and the two gates come last, closest to the wire.
+    private func fetch(_ url: URL, path: String) async throws -> Data {
+        let key = url.absoluteString
+        if let existing = coalescing[key] {
+            return try await existing.value
+        }
+
+        // Checked before anything is sent, so an exhausted budget costs nothing at all. Every
+        // caller already treats a throw as "no answer" and falls back, so this needs no new
+        // handling anywhere: it degrades the app to what it is with no key.
+        if let ceiling = RequestBudget.ceilings[path] {
+            let used = spent[path, default: 0]
+            guard used < ceiling else {
+                let error = BaiduMapsError.budgetExhausted(path: path)
+                record(error, for: path)
+                throw error
+            }
+            spent[path] = used + 1
+        }
+
+        // Detached on purpose. A plain `Task` inside an actor method inherits that actor's
+        // isolation, so `enterGate` would be a same-actor call — synchronous, never suspending,
+        // and the gate would admit everything it was written to hold back.
+        let task = Task.detached { [session] () throws -> Data in
+            await self.enterGate()
+            do {
+                let (data, _) = try await session.data(from: url)
+                await self.leaveGate()
+                return data
+            } catch {
+                await self.leaveGate()
+                throw BaiduMapsError.service(status: -1, message: error.localizedDescription)
+            }
+        }
+        coalescing[key] = task
+        defer { coalescing[key] = nil }
+        do {
+            return try await task.value
+        } catch {
+            record(error, for: path)
+            throw error
+        }
+    }
+
+    /// Waits until this request is allowed to start, by concurrency and then by rate.
+    private func enterGate() async {
+        if inFlightRequests >= Self.maximumConcurrentRequests {
+            // The slot is handed over directly by `leaveGate` rather than released and re-taken,
+            // so a third caller cannot slip into it between the resume and this continuation
+            // running.
+            await withCheckedContinuation { waiting.append($0) }
+        } else {
+            inFlightRequests += 1
+        }
+
+        // The slot is reserved *before* the sleep, not after it. An actor releases its lock across
+        // an await, so reading the next free instant, sleeping to it, and only then writing the one
+        // after lets every waiter read the same instant and wake together — which is the shape of
+        // the burst this exists to prevent. Reserving first is the only part that has to be atomic,
+        // and between these two lines there is no suspension point.
+        let start = max(ContinuousClock.now, earliestNextStart)
+        earliestNextStart = start.advanced(by: Self.minimumRequestSpacing)
+        try? await Task.sleep(until: start, clock: ContinuousClock())
+    }
+
+    private func leaveGate() {
+        if waiting.isEmpty {
+            inFlightRequests -= 1
+        } else {
+            waiting.removeFirst().resume()
+        }
+    }
+
+    private func record(_ error: Error, for path: String) {
+        guard let error = error as? BaiduMapsError else { return }
+        let summary: String
+        switch error {
+        case .notConfigured: return
+        case .malformedResponse: summary = "malformed response"
+        case .budgetExhausted: summary = "this launch's own budget for this endpoint"
+        case .service(let status, let message):
+            summary = message.isEmpty ? "status \(status)" : "\(status) \(message)"
+        }
+        failures[path] = BaiduEndpointDiagnostics.Failure(at: Date(), summary: summary)
+    }
+
+    /// What this launch has spent and what it was last refused, per endpoint.
+    func diagnostics() -> [BaiduEndpointDiagnostics] {
+        RequestBudget.ceilings.keys.sorted().map { path in
+            BaiduEndpointDiagnostics(
+                path: path,
+                spent: spent[path, default: 0],
+                ceiling: RequestBudget.ceilings[path] ?? 0,
+                lastFailure: failures[path]
+            )
+        }
+    }
+}
+
+/// One endpoint's usage this launch, for the Transit Data screen.
+struct BaiduEndpointDiagnostics: Sendable, Identifiable {
+    struct Failure: Sendable, Equatable {
+        let at: Date
+        let summary: String
+    }
+
+    let path: String
+    let spent: Int
+    let ceiling: Int
+    let lastFailure: Failure?
+
+    var id: String { path }
 }
 
 /// A coordinate as Baidu returns it. Requested as GCJ-02 on every endpoint, which is the frame the

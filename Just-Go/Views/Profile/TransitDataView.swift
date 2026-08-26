@@ -17,6 +17,9 @@ struct TransitDataView: View {
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
+    /// What this launch has spent against the route provider, and what it was last refused.
+    /// Empty when no key is configured, which is a normal state.
+    @State private var providerUsage: [BaiduEndpointDiagnostics] = []
 
     /// Only the cities whose pack actually holds station data. 14 Of the 53, not all 53.
     ///
@@ -207,6 +210,41 @@ struct TransitDataView: View {
                             traditional: "僅列出擁有車站資料的城市。其他城市仍可使用內置線網規劃路線。刪除下載的更新後會恢復內置版本。"
                         ))
                     }
+                    if !providerUsage.isEmpty {
+                        Section {
+                            ForEach(providerUsage) { endpoint in
+                                VStack(alignment: .leading, spacing: 3) {
+                                    HStack {
+                                        Text(endpoint.path)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                        Spacer()
+                                        Text(verbatim: "\(endpoint.spent) / \(endpoint.ceiling)")
+                                            .font(.caption)
+                                            .monospacedDigit()
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    if let failure = endpoint.lastFailure {
+                                        Text(failure.summary)
+                                            .font(.caption2)
+                                            .foregroundStyle(.orange)
+                                    }
+                                }
+                            }
+                        } header: {
+                            Text(AppLocalization.text(
+                                english: "Route Provider Usage",
+                                simplified: "路线服务用量",
+                                traditional: "路線服務用量"
+                            ))
+                        } footer: {
+                            Text(AppLocalization.text(
+                                english: "This launch only, and never written to disk. The daily allowance is shared by everyone using the app, so these counts are a guard against one device spending it, not a measure of what is left.",
+                                simplified: "仅统计本次启动，且不会写入磁盘。每日额度由所有使用者共享，因此这里只是防止单台设备耗尽额度，并非剩余额度。",
+                                traditional: "僅統計本次啟動，且不會寫入磁碟。每日額度由所有使用者共享，因此這裡只是防止單一裝置耗盡額度，並非剩餘額度。"
+                            ))
+                        }
+                    }
                 }
                 .listRowBackground(Color.clear)
             }
@@ -224,6 +262,7 @@ struct TransitDataView: View {
             }
             .task {
                 await refreshPackStatuses()
+                providerUsage = await container.baiduMapsClient?.diagnostics() ?? []
             }
         }
     }

@@ -74,8 +74,18 @@ struct SearchPageView: View {
             // screen but cannot type into it.
             if let seed = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SEARCH"] {
                 viewModel?.searchText = seed
+                // Exactly what typing does, and nothing more: the station index and the line
+                // match, both local. It used to call `schedulePlaceSearch` and never
+                // `scheduleSearch`, so the list under "Stations" was the nearby list this screen
+                // opens with rather than an answer to the seeded query — which read as a working
+                // search and was not one.
+                viewModel?.scheduleSearch()
                 scheduleLineSearch(seed)
-                schedulePlaceSearch(seed)
+                // The online half is a separate seed because it is now a separate act, and it is
+                // the one that spends a place search.
+                if ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SEARCH_ONLINE"] != nil {
+                    searchOnline()
+                }
             }
             // Filter chips are taps, and taps cannot be injected here. Same handler the chip uses.
             switch ProcessInfo.processInfo.environment["JUST_GO_DEBUG_FILTER"] {
@@ -93,8 +103,8 @@ struct SearchPageView: View {
         }
     }
 
-    /// Debounced hard, because this is a network search that runs on every keystroke and Apple
-    /// rate-limits it. Stations are already on screen by the time this returns.
+    /// Runs only when the rider submits, never while typing. Stations are already on screen from
+    /// the bundled index by the time this is offered at all.
     /// Lines are matched entirely in memory against the station list the app already holds, so
     /// this needs no debounce for the network's sake. It gets a short one anyway so a fast typist
     /// does not rebuild the index on every keystroke.
@@ -127,8 +137,7 @@ struct SearchPageView: View {
         }
         isSearchingPlaces = true
         placeSearchTask = Task {
-            try? await Task.sleep(for: .milliseconds(350))
-            guard !Task.isCancelled else { return }
+            // No debounce any more. This runs when the rider asks for it, once.
             // Biased to the rider, not to a city centroid. The same position the station list
             // is ranked by, so both halves of this page answer "near me" the same way.
             let region = container.locationService.mapSpaceLocation.map {
@@ -423,18 +432,24 @@ struct SearchPageView: View {
                 get: { viewModel?.searchText ?? "" },
                 set: { newValue in
                     viewModel?.searchText = newValue
+                    // Both of these are local: the bundled station index and an in-memory line
+                    // match. Nothing here reaches the network any more — the provider's place
+                    // search is 100 a day for the whole account and this ran two of them on every
+                    // typing pause, one at limit 20 and one at limit 12.
                     viewModel?.scheduleSearch()
-                    schedulePlaceSearch(newValue)
                     scheduleLineSearch(newValue)
+                    if placeResults.isEmpty == false || isSearchingPlaces {
+                        // Results for a query the rider has since edited are worse than none.
+                        placeSearchTask?.cancel()
+                        placeResults = []
+                        isSearchingPlaces = false
+                    }
                 }
             ))
             .textFieldStyle(.plain)
             .focused($isSearchFocused)
-            .onSubmit {
-                // Route through the single debounced searchTask slot rather than spawning an
-                // untracked Task that races the in-flight debounced search on stationLoadID.
-                viewModel?.scheduleSearch()
-            }
+            .submitLabel(.search)
+            .onSubmit { searchOnline() }
 
             if !(viewModel?.searchText.isEmpty ?? true) {
                 Button {
@@ -600,10 +615,61 @@ struct SearchPageView: View {
             if !placeResults.isEmpty {
                 placesSection
                     .listRowBackground(Color.clear)
+            } else if canSearchOnline {
+                searchOnlineRow
+                    .listRowBackground(Color.clear)
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    /// Whether asking the place-search provider would tell the rider anything new.
+    private var canSearchOnline: Bool {
+        guard !isSearchingPlaces, placeResults.isEmpty else { return false }
+        return (viewModel?.searchText ?? "").trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
+    }
+
+    /// The searches that used to happen on every keystroke, made deliberate and visible.
+    ///
+    /// A capability that only responds to the return key is a capability most riders never find,
+    /// so it gets a row. The wording names what it does rather than what it costs: "100 a day for
+    /// the whole account" is our problem, not the rider's.
+    private var searchOnlineRow: some View {
+        Section {
+            Button {
+                searchOnline()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass.circle.fill")
+                        .foregroundStyle(Color.accentColor)
+                    Text(AppLocalization.text(
+                        english: "Search online for places",
+                        simplified: "在线搜索地点",
+                        traditional: "線上搜尋地點"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    Spacer(minLength: 4)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Stations above come from the offline network and are already complete.",
+                simplified: "以上车站来自离线线网，已经完整。",
+                traditional: "以上車站來自離線線網，已經完整。"
+            ))
+        }
+    }
+
+    /// Both halves of the online answer, together and once. They ask the same provider the same
+    /// question, so running one without the other spends a call and shows half the result.
+    private func searchOnline() {
+        isSearchFocused = false
+        viewModel?.submitSearch()
+        schedulePlaceSearch(viewModel?.searchText ?? "")
     }
 
     /// The last few journeys, newest first.

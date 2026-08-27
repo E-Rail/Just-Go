@@ -171,7 +171,7 @@ enum ServiceHoursResolverTests {
     // MARK: - Falling back honestly
     //
     // A ring, an ambiguous branch or a station list that does not reach the alighting stop all arrive
-    // here as a nil/непassing onward list. The old merged answer is still given — it is all there is —
+    // here as a nil/non-passing onward list. The old merged answer is still given — it is all there is —
     // but it must NOT claim to be attributed, because acting on it is how a rider gets sent to a dark
     // platform on the strength of the other direction's timetable.
 
@@ -325,6 +325,173 @@ enum ServiceHoursResolverTests {
             alightingStationName: "雍和宫",
             windows: [],
             at: at(23, 20)
+        ).status.label,
+        "unknown"
+    )
+
+    // MARK: - The substring fallback that admitted the other direction
+    //
+    // Live from bjsubway.com …?accLocation=150995222 (国贸) on 2026-08-26. One fused line, four
+    // services, and the two that matter here run in opposite directions:
+    //   direction 1, toward 环球度假区   first 5:32  last 23:34
+    //   direction 2, toward 苹果园       first 5:01  last 23:16
+    //
+    // The bundled pattern is 福寿岭 - 苹果园 - … - 国贸 - … - 果园 - … - 环球度假区, so an eastbound
+    // rider has 苹果园 behind them and 果园 twenty-nine stops ahead. `"苹果园".contains("果园")` is
+    // true, so the old containment fallback resolved the *westbound* window to the eastbound 果园
+    // and admitted it as this rider's own service — pulling its 5:01 into the merge and marking the
+    // result definitive. There are 158 such same-line pairs across 107 lines in 34 packs.
+
+    let guomao = [
+        StationServiceWindow(lineName: "1号线八通线", direction: "环球度假区", destination: "环球度假区", firstTime: "5:32", lastTime: "23:34"),
+        StationServiceWindow(lineName: "1号线八通线", direction: "四惠东", destination: "四惠东", firstTime: "5:32", lastTime: "0:16"),
+        StationServiceWindow(lineName: "1号线八通线", direction: "苹果园", destination: "苹果园", firstTime: "5:01", lastTime: "23:16"),
+        StationServiceWindow(lineName: "1号线八通线", direction: "古城", destination: "古城", firstTime: "5:01", lastTime: "23:37")
+    ]
+    let guomaoEastbound = [
+        "国贸", "大望路", "四惠", "四惠东", "高碑店", "传媒大学", "双桥", "管庄", "八里桥",
+        "通州北苑", "果园", "九棵树", "梨园", "临河里", "土桥", "花庄", "环球度假区"
+    ]
+
+    print("国贸 1号线/八通线 — the 苹果园 ⊃ 果园 trap")
+    // At 5:15 the eastbound first train (5:32) has not left. Borrowing the westbound 5:01 said it had.
+    check(
+        "eastbound at 5:15 is before its own first train",
+        resolver.verdict(
+            boardingLineName: "1号线/八通线",
+            onwardStationNames: guomaoEastbound,
+            alightingStationName: "传媒大学",
+            windows: guomao,
+            at: at(5, 15)
+        ).status.label,
+        "notYetStarted(5:32)"
+    )
+    // The short-turn to 四惠东 turns back before 传媒大学, so its 0:16 is not this rider's last train.
+    check(
+        "eastbound past the short-turn is judged by the full run",
+        resolver.verdict(
+            boardingLineName: "1号线/八通线",
+            onwardStationNames: guomaoEastbound,
+            alightingStationName: "传媒大学",
+            windows: guomao,
+            at: at(23, 45)
+        ).status.label,
+        "serviceEnded"
+    )
+    // ...but a rider who only goes as far as 四惠东 can still catch it.
+    check(
+        "eastbound to the short-turn's own terminus is still running",
+        resolver.verdict(
+            boardingLineName: "1号线/八通线",
+            onwardStationNames: guomaoEastbound,
+            alightingStationName: "四惠东",
+            windows: guomao,
+            at: at(23, 45)
+        ).status.label,
+        "running"
+    )
+
+    // MARK: - Three services under one direction marker
+    //
+    // Same station, 10号线, same fetch. Every northbound row carries terminalStationName 双井; only
+    // destStationName separates them:
+    //   → 车道沟  5:18 – 21:28      → 成寿寺  5:18 – 23:36      → 巴沟  5:18 – 23:12
+    // Keying on the direction marker alone collapsed these to one 23:36 window. 成寿寺 is seventeen
+    // stops short of 车道沟, so that 23:36 belongs to a train that turns back long before this rider
+    // gets off: their real last train is the 23:12 to 巴沟, which carries on round the ring past
+    // 车道沟. Twenty-four minutes, in the direction that leaves someone on a closed platform.
+
+    let guomaoLine10 = [
+        StationServiceWindow(lineName: "10号线", direction: "双井", destination: "车道沟", firstTime: "5:18", lastTime: "21:28"),
+        StationServiceWindow(lineName: "10号线", direction: "双井", destination: "成寿寺", firstTime: "5:18", lastTime: "23:36"),
+        StationServiceWindow(lineName: "10号线", direction: "双井", destination: "巴沟", firstTime: "5:18", lastTime: "23:12")
+    ]
+    // 10号线 is a ring; this is the northbound arc as the graph would hand it over.
+    let line10Onward = ["国贸", "双井", "劲松", "潘家园", "十里河", "成寿寺", "分钟寺", "大红门", "石榴庄", "角门东", "角门西", "草桥", "纪家庙", "首经贸", "丰台站", "泥洼", "西局", "六里桥", "莲花桥", "公主坟", "西钓鱼台", "慈寿寺", "车道沟", "长春桥", "火器营", "巴沟"]
+
+    print("国贸 10号线 — three services, one direction marker")
+    // 23:12 is the answer, so at 23:20 the platform is dark — the merged 23:36 said otherwise.
+    check(
+        "to 车道沟, after the last train that actually reaches it",
+        resolver.verdict(
+            boardingLineName: "10号线",
+            onwardStationNames: line10Onward,
+            alightingStationName: "车道沟",
+            windows: guomaoLine10,
+            at: at(23, 20)
+        ).status.label,
+        "serviceEnded"
+    )
+    // The same moment, a stop the 23:36 short-turn does reach.
+    check(
+        "to 成寿寺, which the 23:36 short-turn does reach",
+        resolver.verdict(
+            boardingLineName: "10号线",
+            onwardStationNames: line10Onward,
+            alightingStationName: "成寿寺",
+            windows: guomaoLine10,
+            at: at(23, 20)
+        ).status.label,
+        "lastTrainSoon(16)"
+    )
+
+    // MARK: - No line match is no answer, not somebody else's answer
+    //
+    // 西直门 carries 2号线, 4号线 and 13号线. When the pack and the operator spell a line differently
+    // — 首都机场线 against 机场线 share no reference — the pool used to fall back to *every* window at
+    // the station, and a single-row fallback was even marked definitive.
+
+    print("cross-line contamination")
+    check(
+        "an unmatched line is unanswered, not judged by its neighbours",
+        resolver.verdict(
+            boardingLineName: "首都机场线",
+            onwardStationNames: nil,
+            alightingStationName: nil,
+            windows: [StationServiceWindow(lineName: "13号线", direction: "东直门", firstTime: "5:30", lastTime: "22:40")],
+            at: at(23, 30)
+        ).status.label,
+        "unknown"
+    )
+
+    // MARK: - A last train with no first train
+    //
+    // Hangzhou nulls placeholder times per field and Beijing's own merge can leave either side
+    // empty, so these arrive regularly. Reporting `unknown` withheld the one fact the feature is for.
+
+    let lastOnly = [StationServiceWindow(lineName: "1号线", direction: "湘湖", firstTime: nil, lastTime: "23:12")]
+    print("a row with only a last train")
+    check(
+        "shortly before it, the countdown still fires",
+        resolver.verdict(
+            boardingLineName: "1号线",
+            onwardStationNames: nil,
+            alightingStationName: nil,
+            windows: lastOnly,
+            at: at(23, 0)
+        ).status.label,
+        "lastTrainSoon(12)"
+    )
+    check(
+        "shortly after it, service has ended",
+        resolver.verdict(
+            boardingLineName: "1号线",
+            onwardStationNames: nil,
+            alightingStationName: nil,
+            windows: lastOnly,
+            at: at(23, 40)
+        ).status.label,
+        "serviceEnded"
+    )
+    // At breakfast the last train says nothing about today, and guessing is how this got wrong.
+    check(
+        "hours later it claims nothing",
+        resolver.verdict(
+            boardingLineName: "1号线",
+            onwardStationNames: nil,
+            alightingStationName: nil,
+            windows: lastOnly,
+            at: at(8, 0)
         ).status.label,
         "unknown"
     )

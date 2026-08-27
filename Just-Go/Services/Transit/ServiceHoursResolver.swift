@@ -5,9 +5,35 @@ import Foundation
 /// and departure-planner.
 struct StationServiceWindow: Sendable, Codable, Equatable, Hashable {
     let lineName: String
+    /// The direction marker a rider reads on the platform sign — Beijing's `terminalStationName`,
+    /// Shanghai's `往滴水湖`, Baidu's `潞阳方向`. Names *a* way, not necessarily where this train ends.
     let direction: String?
+    /// Where this individual service actually terminates, when the operator distinguishes it.
+    ///
+    /// Beijing publishes both and they are not the same field: at 国贸 every northbound 10号线 row
+    /// carries `terminalStationName = 双井` while `destStationName` is 车道沟, 成寿寺 or 巴沟 — three
+    /// services, three different last trains, 21:28 / 23:36 / 23:12. Keying only on the direction
+    /// marker collapsed them into one 23:36 window, which is what told a rider bound for 车道沟 that
+    /// they had two hours they did not have. Optional because most sources publish only one name,
+    /// and because a cache written before this existed must still decode.
+    let destination: String?
+
     let firstTime: String?
     let lastTime: String?
+
+    init(
+        lineName: String,
+        direction: String?,
+        destination: String? = nil,
+        firstTime: String?,
+        lastTime: String?
+    ) {
+        self.lineName = lineName
+        self.direction = direction
+        self.destination = destination
+        self.firstTime = firstTime
+        self.lastTime = lastTime
+    }
 }
 
 /// What the operator's timetable says about one ride, and how much of it we could actually pin to
@@ -41,7 +67,7 @@ struct ServiceHoursResolver {
     /// The last train out of this station, for this rider, in the direction they are going and on a
     /// train that gets them where they are going.
     ///
-    /// All three qualifiers are load-bearing, and until now only the first was applied.
+    /// All three qualifiers are load-bearing, and until recently only the first was applied.
     ///
     /// **Direction.** An operator publishes one window per direction and they are not close. Across
     /// a 60-station sample of Beijing, 92 % of station/line pairs had their two directions more than
@@ -62,8 +88,14 @@ struct ServiceHoursResolver {
     ) -> ServiceHoursVerdict {
         guard !windows.isEmpty else { return .unanswered }
 
-        let matched = matchingWindows(lineName: boardingLineName, windows: windows)
-        let pool = matched.isEmpty ? windows : matched
+        // No line match is no answer, not somebody else's answer. `pool` used to fall back to every
+        // window at the station, so a station whose operator spells the line differently from the
+        // pack — 首都机场线 against 机场线, which share no `transitLineReferences` — was judged by
+        // whatever other lines call there. At 西直门 that is 2号线, 4号线 and 13号线 together, and a
+        // single-row fallback was even marked definitive and could ban the rider's line on the
+        // strength of a different line's last train.
+        let pool = matchingWindows(lineName: boardingLineName, windows: windows)
+        guard !pool.isEmpty else { return .unanswered }
 
         if let serving = servingWindows(in: pool, onward: onwardStationNames, alighting: alightingStationName),
            !serving.isEmpty {
@@ -100,23 +132,47 @@ struct ServiceHoursResolver {
 
     /// Where a window's service ends, as a position in the stations ahead of the rider.
     ///
-    /// Operators name a service by its destination and each spells it differently: Beijing sends
-    /// `terminalStationName` ("宋家庄"), Guangzhou `toStationName`, Shanghai a sentence, Baidu
-    /// "潞阳方向". Rather than parse four grammars, look for any onward station named inside the
-    /// text and take the furthest — which is the destination, since a service's own text never
-    /// names a stop beyond where it stops.
+    /// `destination` first, because where a service terminates is exactly this question; the
+    /// direction marker only answers it for sources that publish one name for both.
+    ///
+    /// Matching is **exact, after stripping the wrapper words**, and deliberately has no substring
+    /// fallback. Operators name a service plainly — Beijing `环球度假区`, Shanghai `往滴水湖`,
+    /// Guangzhou `toStationName`, Baidu `潞阳方向` — so containment bought nothing and cost a great
+    /// deal: `"苹果园".contains("果园")` is true, and 苹果园 and 果园 are 29 stops apart at opposite
+    /// ends of Beijing's fused 1号线/八通线. An eastbound rider at 国贸 therefore had the *westbound*
+    /// window admitted as their own service, and marked definitive. There are 158 such same-line
+    /// pairs across 107 lines in 34 packs — `西安北站`⊃`西安站`, `火车东站`⊃`火车站`,
+    /// `天通苑北`⊃`天通苑` — and `normalizedStationName` strips every `站`, which manufactures more.
+    ///
+    /// A name that does not resolve returns nil, which `servingWindows` reads as "not this rider's
+    /// train". That is the safe direction: the trip falls back to the merged upper bound, which is
+    /// shown but never acted on.
     private func destinationIndex(of window: StationServiceWindow, along onward: [String]) -> Int? {
-        guard let direction = window.direction else { return nil }
-        let haystack = normalizedStationName(direction)
-        guard !haystack.isEmpty else { return nil }
-
-        if let exact = onward.lastIndex(where: { normalizedStationName($0) == haystack }) { return exact }
-        // Containment is the fallback for "…方向" and full sentences. Single-character names are
-        // excluded from it: with 站 stripped, 西站 becomes 西, which is inside half the network.
-        return onward.lastIndex { name in
-            let needle = normalizedStationName(name)
-            return needle.count >= 2 && haystack.contains(needle)
+        for text in [window.destination, window.direction] {
+            guard let text else { continue }
+            let needle = serviceDestinationName(text)
+            guard !needle.isEmpty else { continue }
+            if let match = onward.lastIndex(where: { normalizedStationName($0) == needle }) { return match }
         }
+        return nil
+    }
+
+    /// A service's destination text reduced to the bare station name it contains.
+    ///
+    /// The wrapper words are the only variation across the five sources, so removing them and
+    /// comparing exactly is enough. Anything else — a full sentence, an unrecognised grammar —
+    /// simply fails to match, which is the honest outcome.
+    private func serviceDestinationName(_ text: String) -> String {
+        var value = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        for prefix in ["开往", "驶往", "往", "至", "终点站", "终点"] where value.hasPrefix(prefix) {
+            value = String(value.dropFirst(prefix.count))
+            break
+        }
+        for suffix in ["方向", "终点站", "终点"] where value.hasSuffix(suffix) {
+            value = String(value.dropLast(suffix.count))
+            break
+        }
+        return normalizedStationName(value)
     }
 
     private func stationNamesMatch(_ lhs: String, _ rhs: String) -> Bool {
@@ -131,7 +187,11 @@ struct ServiceHoursResolver {
         // e.g. "23:45 / 0:06". Split so every value is considered.
         let firstMinutes = pool.flatMap { Self.times($0.firstTime) }
         let lastMinutes = pool.flatMap { Self.times($0.lastTime) }
-        guard let firstMin = firstMinutes.min() else { return .unknown }
+        let nowMin = ChinaClock.minutesOfDay(of: departure)
+
+        guard let firstMin = firstMinutes.min() else {
+            return statusFromLastTrainAlone(lastMinutes, at: nowMin)
+        }
         // Pick the service-latest last train: a value before the first train wrapped past
         // midnight (e.g. 0:06 is *after* 23:45), so order by service-day minutes then fold back.
         guard let lastMin = lastMinutes
@@ -139,7 +199,6 @@ struct ServiceHoursResolver {
             .max()
             .map({ $0 % 1440 }) else { return .unknown }
 
-        let nowMin = ChinaClock.minutesOfDay(of: departure)
         let running: Bool
         if firstMin <= lastMin {
             running = nowMin >= firstMin && nowMin <= lastMin
@@ -168,6 +227,35 @@ struct ServiceHoursResolver {
             return .serviceEndedToday
         }
         return .notYetStarted(startsAtText: ChinaClock.clockText(minutes: firstMin))
+    }
+
+    /// What a row holding a last train and no first train can honestly say.
+    ///
+    /// Not much, but not nothing, and until now it said `.unknown` — withholding the single fact
+    /// this whole feature exists to report. `RoutePlanningService` deliberately keeps one-sided rows
+    /// (Hangzhou nulls placeholder times per field, and Beijing's own merge can leave either side
+    /// empty), so they arrive here regularly.
+    ///
+    /// Without a first train there is no way to place `now` inside the service day, so `.running`
+    /// and `.notYetStarted` are both unreachable: claiming either would be inventing the half of the
+    /// window we were not given. Two things do follow:
+    ///
+    /// - Shortly *before* the last train, service is certainly running — no metro's first train is
+    ///   twenty minutes before its last — so the countdown is sound.
+    /// - Shortly *after* it, service has certainly ended. Bounded to four hours so that a query at
+    ///   breakfast is not answered with last night's closure.
+    private func statusFromLastTrainAlone(_ lastMinutes: [Int], at nowMin: Int) -> RouteServiceStatus {
+        guard !lastMinutes.isEmpty else { return .unknown }
+        let toLast = lastMinutes.map { ($0 - nowMin + 1440) % 1440 }
+        if let soonest = toLast.min(), soonest <= lastTrainSoonThresholdMinutes {
+            return .lastTrainSoon(minutesRemaining: soonest)
+        }
+        // Every published service has gone, and recently.
+        let sinceLast = lastMinutes.map { (nowMin - $0 + 1440) % 1440 }
+        if let mostRecent = sinceLast.min(), (1...240).contains(mostRecent) {
+            return .serviceEndedToday
+        }
+        return .unknown
     }
 
     /// Parses a possibly multi-value ("23:45 / 0:06") time field into minutes-of-day.

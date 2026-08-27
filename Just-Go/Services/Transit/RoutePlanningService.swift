@@ -46,6 +46,18 @@ private actor WalkingLegMemo {
     }
 }
 
+/// The operator's service hours for one boarding station, and which service day they describe.
+///
+/// A pair rather than a bare array because the note qualifies every window in it: Hangzhou publishes
+/// a weekday-only timetable, and a first and last train shown on a Saturday without that caveat is
+/// an assertion the operator never made.
+struct BoardingServiceHours {
+    let windows: [StationServiceWindow]
+    let serviceDayNote: String?
+
+    static let none = BoardingServiceHours(windows: [], serviceDayNote: nil)
+}
+
 /// One trip's whole verdict on whether it can actually be ridden at the time it departs.
 ///
 /// `closedLineIDs` is the part that is new and the part that is acted on: the lines an operator
@@ -487,29 +499,30 @@ final class RoutePlanningService {
         stationName: String,
         cityID: String,
         lineName: String?
-    ) async -> [StationServiceWindow] {
-        let official = Self.serviceWindows(
-            from: await officialStationSnapshots(
-                for: [RouteStationStop(
-                    stationID: stationID,
-                    name: stationName,
-                    lineName: lineName,
-                    lineColorHex: nil,
-                    coordinate: nil,
-                    arrivalTimeText: nil,
-                    isTransfer: false
-                )]
-            )[stationName]
-        )
-        let windows = official.isEmpty
-            ? await officialStationData.serviceWindows(cityID: cityID, stationName: stationName)
-            : official
-        guard let lineName, !lineName.isEmpty else { return windows }
+    ) async -> BoardingServiceHours {
+        let snapshot = await officialStationSnapshots(
+            for: [RouteStationStop(
+                stationID: stationID,
+                name: stationName,
+                lineName: lineName,
+                lineColorHex: nil,
+                coordinate: nil,
+                arrivalTimeText: nil,
+                isTransfer: false
+            )]
+        )[stationName]
+        let windows = Self.serviceWindows(from: snapshot)
+        guard let lineName, !lineName.isEmpty else {
+            return BoardingServiceHours(windows: windows, serviceDayNote: snapshot?.serviceDayNote)
+        }
         let matched = windows.filter {
             fullTransitLineName($0.lineName) == fullTransitLineName(lineName) ||
                 !transitLineReferences($0.lineName).isDisjoint(with: transitLineReferences(lineName))
         }
-        return matched.isEmpty ? windows : matched
+        // No line match is no answer. Falling back to every window at the station published another
+        // line's first and last train under this ride's heading — see `ServiceHoursResolver.verdict`,
+        // which stopped doing the same thing for the same reason.
+        return BoardingServiceHours(windows: matched, serviceDayNote: snapshot?.serviceDayNote)
     }
 
     private func officialStationSnapshots(
@@ -728,6 +741,7 @@ final class RoutePlanningService {
                 return StationServiceWindow(
                     lineName: line.lineName,
                     direction: service.direction,
+                    destination: service.destination,
                     firstTime: service.firstTrain,
                     lastTime: service.lastTrain
                 )

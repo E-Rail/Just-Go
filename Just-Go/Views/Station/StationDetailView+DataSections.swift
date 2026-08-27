@@ -252,6 +252,17 @@ extension StationDetailView {
             // One block per line holding every direction it serves, rather than a flat list that
             // repeated the line name and its colour on each direction.
             VStack(alignment: .leading, spacing: 0) {
+                // Hangzhou's payload is headed 工作日时刻表 and these are weekday times. Shown
+                // unlabelled every Saturday and Sunday until now.
+                if let caveat = serviceDayCaveat(
+                    viewModel?.officialStationInformation?.serviceDayNote,
+                    on: Date()
+                ) {
+                    Label(caveat, systemImage: "calendar.badge.exclamationmark")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .padding(.bottom, 8)
+                }
                 ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                     if index > 0 {
                         Divider()
@@ -267,10 +278,13 @@ extension StationDetailView {
                                 .fontWeight(.semibold)
                             ForEach(line.services) { service in
                                 VStack(alignment: .leading, spacing: 5) {
+                                    // The terminus where it differs from the direction marker: at
+                                    // 国贸 all three northbound 10号线 services read 双井 and end at
+                                    // 车道沟, 成寿寺 and 巴沟, hours apart. See `serviceDirectionLabel`.
                                     Text(AppLocalization.text(
-                                        english: "Toward \(service.direction)",
-                                        simplified: "开往 \(service.direction)",
-                                        traditional: "開往 \(service.direction)"
+                                        english: "Toward \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)",
+                                        simplified: "开往 \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)",
+                                        traditional: "開往 \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)"
                                     ))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)

@@ -33,7 +33,7 @@ struct RouteDetailView: View {
     @State var tripNote = ""
     @State var detailDestination: RouteDetailDestination?
     @State private var expandedLegs: Set<UUID> = []
-    @State private var boardingServiceWindows: [StationServiceWindow] = []
+    @State private var boardingServiceHours: BoardingServiceHours = .none
     /// Which of the three stops the trip sheet is resting at.
     @State private var tripCardDetent: PresentationDetent = .medium
     @State private var showsTripCard = false
@@ -174,7 +174,7 @@ struct RouteDetailView: View {
             ensureSelectedRouteIsCurrent()
         }
         .task(id: routeDataKey) {
-            boardingServiceWindows = []
+            boardingServiceHours = .none
             // Operator content belongs to a trip that actually uses that operator. A walking-only
             // route rides nothing, and `networkCityID` is nil for it. Falling back to the selected
             // city put Beijing Subway service advisories and first/last-train times on a trip that
@@ -767,24 +767,28 @@ struct RouteDetailView: View {
                 rowDivider
             }
 
-            if !boardingServiceWindows.isEmpty {
+            if !boardingServiceHours.windows.isEmpty {
                 detailRow(
                     icon: "clock.fill",
                     tint: .blue,
                     title: AppLocalization.text(english: "Service hours", simplified: "运营时间", traditional: "營運時間")
                 ) {
-                    // One row per direction, never a merged range. Merging takes the earliest
-                    // first train and the latest last train across every direction, which at
-                    // 天通苑南 on 5号线 turns 22:51 southbound and 23:57 northbound into a single
-                    // "5:03 – 23:57" that is true of neither platform.
+                    // One row per service, never a merged range. Merging takes the earliest first
+                    // train and the latest last train across everything, which at 天通苑南 on 5号线
+                    // turns 22:51 southbound and 23:57 northbound into a single "5:03 – 23:57" that
+                    // is true of neither platform — and at 国贸 on 10号线 attaches a short-turn's
+                    // 23:36 to a run that stops seventeen stations earlier.
                     VStack(alignment: .trailing, spacing: 4) {
-                        ForEach(boardingServiceWindows, id: \.self) { window in
+                        ForEach(boardingServiceHours.windows, id: \.self) { window in
                             VStack(alignment: .trailing, spacing: 1) {
-                                if let direction = window.direction, !direction.isEmpty {
+                                if let label = serviceDirectionLabel(
+                                    direction: window.direction,
+                                    destination: window.destination
+                                ) {
                                     Text(AppLocalization.text(
-                                        english: "Toward \(direction)",
-                                        simplified: "开往 \(direction)",
-                                        traditional: "開往 \(direction)"
+                                        english: "Toward \(label)",
+                                        simplified: "开往 \(label)",
+                                        traditional: "開往 \(label)"
                                     ))
                                     .font(.caption2)
                                     .foregroundStyle(.tertiary)
@@ -794,6 +798,12 @@ struct RouteDetailView: View {
                                     .foregroundStyle(.secondary)
                                     .monospacedDigit()
                             }
+                        }
+                        if let caveat = serviceDayCaveat(boardingServiceHours.serviceDayNote, on: Date()) {
+                            Text(caveat)
+                                .font(.caption2)
+                                .foregroundStyle(.orange)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                 }
@@ -916,10 +926,10 @@ struct RouteDetailView: View {
         guard let segment = route.boardingTransitSegment,
               let stationName = segment.fromStationName,
               let stationID = segment.fromStationID else {
-            boardingServiceWindows = []
+            boardingServiceHours = .none
             return
         }
-        let windows = await container.routePlanningService.boardingServiceWindows(
+        let hours = await container.routePlanningService.boardingServiceWindows(
             stationID: stationID,
             stationName: stationName,
             cityID: segment.packCityID ?? cityID,
@@ -929,7 +939,7 @@ struct RouteDetailView: View {
         // guard a slow (e.g. network-bound) load for the OLD route lands after the new route's
         // cached one and shows the wrong service hours.
         guard !Task.isCancelled else { return }
-        boardingServiceWindows = windows
+        boardingServiceHours = hours
     }
 
     /// The journey as one continuous path: an unbroken vertical rail running the height of the

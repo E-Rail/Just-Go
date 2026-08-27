@@ -80,7 +80,7 @@ Apply the `map` and `rules`, then validate against `schema/station-information.s
   "freshness": { "state": "live" },
   "lines": [
     { "lineName": "2号线", "lineColorHex": "#8CC220", "services": [
-        { "direction": "往广兰路", "firstTrain": null, "lastTrain": "23:23", "liveTime": null }
+        { "direction": "往广兰路", "destination": null, "firstTrain": null, "lastTrain": "23:23", "liveTime": null }
     ] }
   ],
   "exits": [ … ],
@@ -97,10 +97,15 @@ These live per-source in `sources.json`, but three are universal:
 1. **Service-day ordering.** A last train at `00:21` is *later* than one at `23:39`. Comparing the
    strings, or parsing them as plain clock times, ranks the real last train earliest and drops it.
    Add 24h to any hour `< 4` before comparing.
-2. **Collapse services, not directions.** Operators often return one row per short-turn *run*, not
-   per direction — several rows sharing a line, a direction and a first-train time, differing only
-   in the last-train digits. Merge them (earliest first, latest last). Never merge a line's two
-   directions; a rider needs the one they are travelling.
+2. **Keep short-turns apart.** Operators often return one row per short-turn *run*, not per
+   direction — several rows sharing a line, a direction marker and a first-train time, differing in
+   the last-train digits. Do not merge them: the latest of those last trains belongs to whichever run
+   goes furthest, and a rider getting off beyond where the others turn back cannot catch it. At 国贸
+   all three northbound 10号线 rows read `direction` = 双井 and separate only by `destination`
+   (车道沟 21:28 / 成寿寺 23:36 / 巴沟 23:12); merged, the published 23:36 belongs to a train that
+   stops seventeen stops short of 车道沟. Key on (`direction`, `destination`); merge two rows only
+   when both match. Never merge a line's two directions either; a rider needs the one they are
+   travelling.
 3. **Placeholders are not data.** `无`, `暂无`, `/`, `--`, `n/a` and friends mean *unavailable*.
    Emit `null`; do not copy the token through as if it were a time or a location.
 

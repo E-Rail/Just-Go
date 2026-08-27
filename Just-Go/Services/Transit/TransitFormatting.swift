@@ -174,3 +174,41 @@ private func suffixSafeContains(_ longer: String, _ shorter: String) -> Bool {
     }
     return false
 }
+
+/// How a rider is told which train a service row describes.
+///
+/// One rule, two screens: the route sheet's Service hours row and the station sheet's line block
+/// render the same fact and drifted apart once already over exit names.
+///
+/// The direction marker and the terminus are not always the same station, and where they differ the
+/// terminus is what the rider needs — it is what the train itself is labelled with, and it is what
+/// decides whether the service reaches their stop. At 国贸 all three northbound 10号线 services read
+/// `direction` 双井 and terminate at 车道沟, 成寿寺 and 巴沟, with last trains 2h08m apart. Showing
+/// three identical "开往 双井" rows with different times would be the same fact withheld a new way.
+func serviceDirectionLabel(direction: String?, destination: String?) -> String? {
+    let marker = direction?.trimmingCharacters(in: .whitespacesAndNewlines)
+    let terminus = destination?.trimmingCharacters(in: .whitespacesAndNewlines)
+    if let terminus, !terminus.isEmpty { return terminus }
+    guard let marker, !marker.isEmpty else { return nil }
+    return marker
+}
+
+/// The source's own words for which service day its times describe, shown only when it is not
+/// today's.
+///
+/// Hangzhou publishes `工作日时刻表` — the weekday timetable — and the app rendered it unlabelled on
+/// Saturdays and Sundays for as long as the source has been wired up. Nothing here tries to parse
+/// the Chinese into a weekday set: it checks whether the note says "weekday" and whether today is
+/// one, and otherwise stays quiet rather than captioning a correct table with a wrong caveat.
+func serviceDayCaveat(_ note: String?, on date: Date) -> String? {
+    guard let note = note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty else { return nil }
+    guard note.contains("工作日") else { return nil }
+    // ChinaClock weekday: 1 = Sunday … 7 = Saturday.
+    let weekday = ChinaClock.weekday(of: date)
+    guard weekday == 1 || weekday == 7 else { return nil }
+    return AppLocalization.text(
+        english: "Weekday timetable — the operator publishes no weekend times",
+        simplified: "工作日时刻表 —— 运营方未公布周末时间",
+        traditional: "工作日時刻表 —— 營運方未公布週末時間"
+    )
+}

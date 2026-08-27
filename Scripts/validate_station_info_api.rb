@@ -42,14 +42,19 @@ fail_validation("schema is missing $defs") unless defs.is_a?(Hash)
   fail_validation("schema is missing $defs.#{name}") unless defs.key?(name)
 end
 snapshot_props = defs.dig("snapshot", "properties") || {}
-%w[stationID stationName source freshness lines exits facilityGroups].each do |field|
+%w[stationID stationName source freshness serviceDayNote lines exits facilityGroups].each do |field|
   fail_validation("schema snapshot is missing field #{field}") unless snapshot_props.key?(field)
 end
 unless defs.dig("snapshot", "properties", "source", "type") == "string"
   fail_validation("schema `source` must stay an open string so adding a city is additive")
 end
-unless defs.dig("envelope", "properties", "schemaVersion", "const") == 2
-  fail_validation("schema envelope must pin schemaVersion 2 (matches the on-device cache)")
+unless defs.dig("envelope", "properties", "schemaVersion", "const") == 3
+  fail_validation("schema envelope must pin schemaVersion 3 (matches the on-device cache)")
+end
+# `destination` is what separates a short-turn from the full run under a shared direction marker.
+# Dropping it would silently restore a last train belonging to a train that turns back early.
+unless (defs.dig("service", "required") || []).include?("destination")
+  fail_validation("schema service must require `destination`")
 end
 
 # ---- Source registry ----------------------------------------------------------------------

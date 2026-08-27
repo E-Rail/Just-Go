@@ -417,6 +417,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             stationName: stationName,
             source: .hangzhouMetroOnline,
             freshness: .live,
+            serviceDayNote: trimmed(network.title),
             // The payload carries neither exits nor facilities for Hangzhou; the station detail
             // view falls back to the bundled sections for those categories.
             lines: lines,
@@ -501,10 +502,17 @@ private struct HangzhouPayload: Decodable {
 struct HangzhouNetwork: Decodable, Sendable {
     let stationlist: [HangzhouListedStation]
     let subwaySiteDetail: [String: [HangzhouDirection]]
+    /// The payload's own heading — live, `工作日时刻表`: the **weekday** timetable.
+    ///
+    /// One field, and until now nobody read it, so every Saturday and Sunday the app presented
+    /// weekday first and last trains as if they were today's. `sources.json` has recorded that this
+    /// title exists and states the service day for as long as the source has been wired up.
+    let title: String?
 
     private enum CodingKeys: String, CodingKey {
         case stationlist
         case subwaySiteDetail
+        case title
     }
 
     init(from decoder: Decoder) throws {
@@ -514,6 +522,7 @@ struct HangzhouNetwork: Decodable, Sendable {
             [String: [HangzhouDirection]].self,
             forKey: .subwaySiteDetail
         ) ?? [:]
+        title = try values.decodeIfPresent(String.self, forKey: .title)
     }
 }
 

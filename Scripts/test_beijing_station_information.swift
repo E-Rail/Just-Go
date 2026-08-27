@@ -512,13 +512,19 @@ private func testInvalidReviewedReference() async throws {
     }
 }
 
-/// Regression test for the duplicate first/last rows users saw on Beijing station pages.
+/// What may be folded together, and what must not.
 ///
 /// The payload here is the real shape captured from the live endpoint for 宋家庄 (line 10) and
-/// 西直门 (line 2): `terminalStationName` is a *direction* marker, not a terminus, so one
-/// direction served by several short-turn services returns several records that share a line
-/// name, direction and first-train time and differ only in the last-train digits. Those rendered
-/// as visually identical duplicate rows.
+/// 西直门 (line 2): `terminalStationName` is a *direction* marker, not a terminus, so one direction
+/// served by several short-turn services returns several records sharing a line name, direction and
+/// first-train time. This originally collapsed them all on (line, direction), which fixed the
+/// duplicate rows on the station page and introduced a much worse bug: the surviving window took
+/// the **latest** last train, which belongs to whichever run goes furthest. A rider getting off
+/// beyond where the others turn back was handed a train that was never going to carry them —
+/// 23:28 for a service that stops at 车道沟 at 21:44.
+///
+/// So the key is the pair (direction, destination). Genuine duplicates — both names equal, as the
+/// two 四惠东 rows below — still collapse, which is what the duplicate-row complaint was about.
 private func testDirectionGroupingCollapsesDuplicateRows() async throws {
     let payload = try JSONSerialization.data(withJSONObject: [
         "status": 200,
@@ -559,32 +565,49 @@ private func testDirectionGroupingCollapsesDuplicateRows() async throws {
     let rows = snapshot.lines.flatMap { line in
         line.services.map { (lineName: line.lineName, service: $0) }
     }
-    let identities = rows.map { "\($0.lineName)|\($0.service.direction)" }
+    let identities = rows.map { "\($0.lineName)|\($0.service.direction)|\($0.service.destination ?? "nil")" }
     guard Set(identities).count == identities.count else {
-        throw HarnessFailure(description: "Duplicate line/direction rows survived: \(identities)")
+        throw HarnessFailure(description: "Duplicate service rows survived: \(identities)")
     }
-    guard rows.count == 3 else {
+    // Three 石榴庄 short-turns + the opposite direction + one collapsed 四惠东 pair.
+    guard rows.count == 5 else {
         throw HarnessFailure(
-            description: "Expected 3 grouped rows, got \(rows.count): \(identities)"
+            description: "Expected 5 service rows, got \(rows.count): \(identities)"
         )
     }
 
-    guard let shiliuzhuang = rows.first(where: { $0.service.direction == "石榴庄" })?.service else {
-        throw HarnessFailure(description: "石榴庄 direction row missing")
-    }
-    guard shiliuzhuang.firstTrain == "5:07", shiliuzhuang.lastTrain == "23:28" else {
-        throw HarnessFailure(
-            description: "石榴庄 window should span 5:07–23:28, got "
-                + "\(shiliuzhuang.firstTrain ?? "nil")–\(shiliuzhuang.lastTrain ?? "nil")"
-        )
+    // Each short-turn keeps its own last train. Folding these was the bug: 23:28 belongs to the
+    // 巴沟 run, and quoting it to a rider bound for 车道沟 is 1h44m of train that does not exist.
+    for (destination, lastTrain) in [("车道沟", "21:44"), ("成寿寺", "22:05"), ("巴沟", "23:28")] {
+        guard let service = rows.first(where: {
+            $0.service.direction == "石榴庄" && $0.service.destination == destination
+        })?.service else {
+            throw HarnessFailure(description: "石榴庄 → \(destination) row missing")
+        }
+        guard service.firstTrain == "5:07", service.lastTrain == lastTrain else {
+            throw HarnessFailure(
+                description: "石榴庄 → \(destination) should be 5:07–\(lastTrain), got "
+                    + "\(service.firstTrain ?? "nil")–\(service.lastTrain ?? "nil")"
+            )
+        }
     }
 
-    guard let sihuidong = rows.first(where: { $0.service.direction == "四惠东" })?.service else {
-        throw HarnessFailure(description: "四惠东 direction row missing")
+    // The opposite direction survives as its own row.
+    guard rows.contains(where: { $0.service.direction == "成寿寺" && $0.service.lastTrain == "23:22" }) else {
+        throw HarnessFailure(description: "成寿寺 direction row missing or re-timed")
     }
-    guard sihuidong.lastTrain == "0:21" else {
+
+    // Same direction, same terminus, two rows: a genuine duplicate, and still one row — with the
+    // past-midnight last train winning rather than being ranked as the earliest of the day.
+    let sihuidongRows = rows.filter { $0.service.direction == "四惠东" }
+    guard sihuidongRows.count == 1 else {
         throw HarnessFailure(
-            description: "Past-midnight last train should win, got \(sihuidong.lastTrain ?? "nil")"
+            description: "四惠东 duplicates should collapse to one row, got \(sihuidongRows.count)"
+        )
+    }
+    guard sihuidongRows[0].service.lastTrain == "0:21" else {
+        throw HarnessFailure(
+            description: "Past-midnight last train should win, got \(sihuidongRows[0].service.lastTrain ?? "nil")"
         )
     }
 }
@@ -596,7 +619,7 @@ private enum BeijingStationInformationHarness {
             try await testParsingAndRequestContract()
             print("PASS: native categories and request contract")
             try await testDirectionGroupingCollapsesDuplicateRows()
-            print("PASS: direction grouping collapses duplicate first/last rows")
+            print("PASS: short-turns stay apart, true duplicates collapse")
             try await testCacheCoalescingAndRelease()
             print("PASS: cache, coalescing, and memory release")
             try await testIdentityAndServiceValidation()

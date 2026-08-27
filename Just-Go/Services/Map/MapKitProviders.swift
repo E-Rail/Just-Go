@@ -98,17 +98,37 @@ struct CurrentPlaceResolver {
     }
 }
 
+/// One direction of one line, established to have stopped running when the rider would board it.
+///
+/// A direction, not a line, because that is what the timetable actually says. 天通苑南 on 5号线 has
+/// a southbound last train at 22:51 and a northbound one at 23:57 — 66 minutes apart, and across a
+/// 60-station Beijing sample 92 % of station/line pairs differ by more than 15 minutes. Banning the
+/// whole line on the strength of one direction threw away a train that was still running, which at
+/// 23:20 is when there are fewest of them left.
+///
+/// The direction is carried as one oriented hop the shut service makes rather than as a name or a
+/// terminus: the graph can order any pattern against it, and it needs no vocabulary shared with
+/// whichever operator supplied the verdict.
+struct ClosedServiceDirection: Hashable, Sendable {
+    let lineID: String
+    /// Qualified (`network-<city>-<station>`) IDs, so a caller holding a route's own leg context can
+    /// build one without reaching into the graph's internal identifiers.
+    let fromStationID: String
+    let toStationID: String
+}
+
 protocol TransitRouteProviding {
-    /// - Parameter excludingLineIDs: lines the caller has established are not running when this
-    ///   rider would board them. The graph itself is deliberately time-blind — it is a mechanical
-    ///   shortest path, and first/last train is enrichment's business, arriving from an operator
-    ///   or a routing provider long after the search would need it. This is how the clock reaches
-    ///   the search anyway: not as a timetable it cannot read, but as the conclusion drawn from one.
+    /// - Parameter excludingServices: line directions the caller has established are not running
+    ///   when this rider would board them. The graph itself is deliberately time-blind — it is a
+    ///   mechanical shortest path, and first/last train is enrichment's business, arriving from an
+    ///   operator or a routing provider long after the search would need it. This is how the clock
+    ///   reaches the search anyway: not as a timetable it cannot read, but as the conclusion drawn
+    ///   from one.
     func routes(
         from origin: TransitPlace,
         to destination: TransitPlace,
         accessibilityFilter: AccessibilityFilter,
-        excludingLineIDs: Set<String>
+        excludingServices: Set<ClosedServiceDirection>
     ) async throws -> [Route]
 }
 

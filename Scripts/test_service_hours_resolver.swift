@@ -496,6 +496,47 @@ enum ServiceHoursResolverTests {
         "unknown"
     )
 
+    // MARK: - Banning the shut direction, not the shut line
+    //
+    // The verdict is reached from the rider's own onward stations, so it speaks for the way they
+    // are travelling and nothing else. 天通苑南 southbound on 5号线 finishes at 22:51 while
+    // northbound runs to 23:57; excluding the line banned a train that was still running, at the
+    // hour when there are fewest of them left.
+
+    let line5 = [["a", "b", "c", "d", "e"]]
+    print("directed hops")
+    let shutDirection = directedHops(lineID: "5", from: "b", to: "c", patterns: line5, identify: { $0 })
+    check(
+        "one observed hop expands to the whole direction",
+        shutDirection.sorted { $0.fromStationID < $1.fromStationID }
+            .map { "\($0.fromStationID)>\($0.toStationID)" }.joined(separator: ","),
+        "a>b,b>c,c>d,d>e"
+    )
+    check(
+        "and leaves the opposite direction alone",
+        String(shutDirection.contains(DirectedServiceHop(lineID: "5", fromStationID: "c", toStationID: "b"))),
+        "false"
+    )
+    // A branch that does not contain both stations says nothing about which way the rider is going.
+    // Guessing would ban the arm they could still use; 24 bundled lines genuinely branch.
+    let branching = [["trunk", "junction", "west1", "west2"], ["trunk", "junction", "east1", "east2"]]
+    let westbound = directedHops(lineID: "9", from: "junction", to: "west1", patterns: branching, identify: { $0 })
+    check(
+        "an unrelated branch is not banned",
+        String(westbound.contains(DirectedServiceHop(lineID: "9", fromStationID: "junction", toStationID: "east1"))),
+        "false"
+    )
+    check(
+        "...while the shared trunk in that direction is",
+        String(westbound.contains(DirectedServiceHop(lineID: "9", fromStationID: "trunk", toStationID: "junction"))),
+        "true"
+    )
+    check(
+        "a hop the line does not make expands to nothing",
+        String(directedHops(lineID: "5", from: "a", to: "zz", patterns: line5, identify: { $0 }).count),
+        "0"
+    )
+
     if recorder.failures > 0 {
         print("\n\(recorder.failures) failure(s)")
         exit(1)

@@ -18,7 +18,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         from origin: TransitPlace,
         to destination: TransitPlace,
         accessibilityFilter: AccessibilityFilter,
-        excludingLineIDs: Set<String>
+        excludingServices: Set<ClosedServiceDirection>
     ) async throws -> [Route] {
         // Bounds-only pass first: decoding and permanently caching all ~46 supported cities'
         // full station/line/polyline data on every search (via networks()) just to compare
@@ -52,6 +52,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             throw RoutePlanningError.outsideSubwayCoverage
         }
         let graph = routingGraph(for: context.networks)
+        let bannedHops = Self.bannedHops(for: excludingServices, graph: graph)
 
         let preferences: [MetroSearchPreference] = [.fastest, .fewestTransfers, .leastWalking]
         var seen = Set<String>()
@@ -61,7 +62,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                 in: context,
                 graph: graph,
                 preference: preference,
-                excludingLineIDs: excludingLineIDs
+                excludingHops: bannedHops
             ) else { continue }
             let key = path.edges.map { "\($0.fromStationID)>\($0.toStationID)@\($0.lineID)" }.joined(separator: "|")
             guard seen.insert(key).inserted else { continue }
@@ -357,6 +358,27 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     }
 
     /// The exclusion is applied here rather than when the graph is built, and that is deliberate:
+    /// The hops every shut service covers, for this search only.
+    ///
+    /// `routingGraph(for:)` memoises on `cityID:version`, so this must never be folded into the
+    /// graph: a graph built without a line at 23:50 would still be missing it at 08:00.
+    private static func bannedHops(
+        for services: Set<ClosedServiceDirection>,
+        graph: MetroRoutingGraph
+    ) -> Set<DirectedServiceHop> {
+        guard !services.isEmpty else { return [] }
+        return services.reduce(into: Set<DirectedServiceHop>()) { hops, service in
+            guard let line = graph.linesByID[service.lineID] else { return }
+            hops.formUnion(directedHops(
+                lineID: service.lineID,
+                from: service.fromStationID,
+                to: service.toStationID,
+                patterns: line.servicePatterns,
+                identify: { graph.qualifiedID(for: $0) }
+            ))
+        }
+    }
+
     /// `routingGraph(for:)` memoises on `cityID:version` alone, so a graph built without a line at
     /// 23:50 would still be missing it at 08:00 the next morning. Per-search state belongs to the
     /// search.
@@ -364,7 +386,7 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         in context: MetroRouteContext,
         graph: MetroRoutingGraph,
         preference: MetroSearchPreference,
-        excludingLineIDs: Set<String>
+        excludingHops: Set<DirectedServiceHop>
     ) -> MetroPath? {
         var distances: [MetroSearchState: Double] = [:]
         var previous: [MetroSearchState: MetroPreviousStep] = [:]
@@ -401,7 +423,14 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             for edge in graph.adjacency[item.state.stationID, default: []] {
                 // An interchange walk is never excluded: it is the corridor between two platforms,
                 // not a train, and it stays walkable whatever has stopped running.
-                if edge.interchange == nil, excludingLineIDs.contains(edge.lineID) { continue }
+                if edge.interchange == nil,
+                   excludingHops.contains(DirectedServiceHop(
+                       lineID: edge.lineID,
+                       fromStationID: edge.fromStationID,
+                       toStationID: edge.toStationID
+                   )) {
+                    continue
+                }
                 // An interchange link is the transfer, so it pays the penalty and the boarding on
                 // the far side of it does not: charging both would price one change as two.
                 let arrivedByInterchange = item.state.lineID == metroInterchangeLineID

@@ -60,16 +60,16 @@ struct BoardingServiceHours {
 
 /// One trip's whole verdict on whether it can actually be ridden at the time it departs.
 ///
-/// `closedLineIDs` is the part that is new and the part that is acted on: the lines an operator
+/// `closedServices` is the part that is new and the part that is acted on: the lines an operator
 /// definitively says are not running when this rider would board them. It is deliberately not a
 /// field on `Route` — it is search state, and `ActiveTripStore` persists routes to disk, where a
 /// stale "10号线 was shut" from last night would be worse than no answer at all.
 struct ServiceReading {
     let status: RouteServiceStatus
     let warning: RouteWarning?
-    let closedLineIDs: Set<String>
+    let closedServices: Set<ClosedServiceDirection>
 
-    static let unanswered = ServiceReading(status: .unknown, warning: nil, closedLineIDs: [])
+    static let unanswered = ServiceReading(status: .unknown, warning: nil, closedServices: [])
 }
 
 final class RoutePlanningService {
@@ -127,7 +127,7 @@ final class RoutePlanningService {
                 from: origin,
                 to: destination,
                 accessibilityFilter: accessibilityFilter,
-                excludingLineIDs: []
+                excludingServices: []
             )
         } catch {
             // No train answer at all. If the two ends are within walking distance that is not a
@@ -174,7 +174,7 @@ final class RoutePlanningService {
             legs: legs,
             observation: observation
         )
-        guard !planned.closedLineIDs.isEmpty else {
+        guard !planned.closedServices.isEmpty else {
             return including(await driveTask.value, beside: planned.routes)
         }
 
@@ -189,7 +189,7 @@ final class RoutePlanningService {
                 from: origin,
                 to: destination,
                 accessibilityFilter: accessibilityFilter,
-                excludingLineIDs: planned.closedLineIDs
+                excludingServices: planned.closedServices
             )
         } catch {
             // Nothing runs at this hour, which is a real answer and the one already in hand.
@@ -215,13 +215,6 @@ final class RoutePlanningService {
         guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
             return including(await driveTask.value, beside: planned.routes)
         }
-        // The re-plan exists to find a train the rider can actually catch. Late enough and there is
-        // no such train on any line, and adding two more shut itineraries to a list that already
-        // had one is noise dressed as helpfulness — so unless something in it runs, the first
-        // answer stands.
-        guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
-            return planned.routes
-        }
         // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
         // better served by seeing a shut line named than by an empty screen.
         return including(
@@ -239,13 +232,13 @@ final class RoutePlanningService {
         tripAnchor: TripTimeAnchor,
         legs: WalkingLegMemo,
         observation: Task<TripObservations, Never>
-    ) async -> (routes: [Route], closedLineIDs: Set<String>) {
+    ) async -> (routes: [Route], closedServices: Set<ClosedServiceDirection>) {
         // Each route's enrichment below is a handful of officialStationData lookups that don't
         // touch any shared mutable state: running them one route after another multiplied
         // enrichment latency by the number of alternatives. They're independent, so enrich
         // concurrently instead (same fix already applied to the analogous per-alternative
         // fetch in BundledMetroRouteProvider.routes).
-        let enriched = await withTaskGroup(of: (Int, Route, Set<String>).self) { group in
+        let enriched = await withTaskGroup(of: (Int, Route, Set<ClosedServiceDirection>).self) { group in
             for (index, route) in routes.enumerated() {
                 group.addTask {
                     let result = await self.enrichedRoute(
@@ -263,21 +256,21 @@ final class RoutePlanningService {
                         tripAnchor: tripAnchor,
                         legs: legs
                     )
-                    return (index, result.route, result.closedLineIDs)
+                    return (index, result.route, result.closedServices)
                 }
             }
-            var collected: [(Int, Route, Set<String>)] = []
+            var collected: [(Int, Route, Set<ClosedServiceDirection>)] = []
             for await result in group {
                 collected.append(result)
             }
             return collected.sorted { $0.0 < $1.0 }
         }
 
-        var closed = enriched.reduce(into: Set<String>()) { $0.formUnion($1.2) }
+        var closed = enriched.reduce(into: Set<ClosedServiceDirection>()) { $0.formUnion($1.2) }
         // Awaited only now that enrichment is done, so the two ran side by side. On the second
         // pass this is already resolved and costs nothing.
         let applied = applying(await observation.value, to: enriched.map(\.1), tripAnchor: tripAnchor)
-        closed.formUnion(applied.closedLineIDs)
+        closed.formUnion(applied.closedServices)
         return (applied.routes, closed)
     }
 
@@ -344,7 +337,7 @@ final class RoutePlanningService {
         _ observed: TripObservations,
         to routes: [Route],
         tripAnchor: TripTimeAnchor
-    ) -> (routes: [Route], closedLineIDs: Set<String>) {
+    ) -> (routes: [Route], closedServices: Set<ClosedServiceDirection>) {
         // A direct ride has no change to measure but still has a fare, so this no longer skips on
         // transfer count alone.
         guard !observed.isEmpty, !routes.isEmpty else { return (routes, []) }
@@ -352,11 +345,11 @@ final class RoutePlanningService {
         // Transfers first, then everything that only annotates. Re-costing rebuilds the route
         // through `replacingSegments`, which copies field by field, so the annotations go last and
         // stay out of reach of anything that could drop them on the way past.
-        var closed: Set<String> = []
+        var closed: Set<ClosedServiceDirection> = []
         let applied = routes.map { route -> Route in
             let measured = measuringTransfers(in: route, with: observed.transfers)
             let timed = upgradingServiceHours(of: measured, with: observed, tripAnchor: tripAnchor)
-            closed.formUnion(timed.closedLineIDs)
+            closed.formUnion(timed.closedServices)
             return pricing(timed.route, with: observed)
         }
         return (applied, closed)
@@ -377,14 +370,14 @@ final class RoutePlanningService {
         of route: Route,
         with observed: TripObservations,
         tripAnchor: TripTimeAnchor
-    ) -> (route: Route, closedLineIDs: Set<String>) {
+    ) -> (route: Route, closedServices: Set<ClosedServiceDirection>) {
         let departure = TripTimeContext(
             anchor: tripAnchor,
             totalDuration: route.totalDuration
         ).departureDate
 
         var upgraded = route
-        var closedLineIDs: Set<String> = []
+        var closedServices: Set<ClosedServiceDirection> = []
         if route.serviceStatus == .unknown, !observed.lineHours.isEmpty {
             let verdict = serviceVerdict(for: route, departure: departure) { segment in
                 guard let station = segment.fromStationName, let line = segment.lineName else { return [] }
@@ -405,7 +398,7 @@ final class RoutePlanningService {
             }
             if verdict.status != .unknown {
                 upgraded.serviceStatus = verdict.status
-                closedLineIDs = verdict.closedLineIDs
+                closedServices = verdict.closedServices
                 if let warning = verdict.warning { upgraded.warnings.append(warning) }
             }
         }
@@ -422,7 +415,7 @@ final class RoutePlanningService {
         case .running, .notYetStarted, .unknown:
             break
         }
-        return (upgraded, closedLineIDs)
+        return (upgraded, closedServices)
     }
 
     /// Re-costs the changes this route makes, where a corridor was measured for one.
@@ -655,7 +648,7 @@ final class RoutePlanningService {
     ) -> ServiceReading {
         var elapsed: TimeInterval = 0
         var worst: (verdict: ServiceHoursVerdict, segment: RouteSegment)?
-        var closedLineIDs: Set<String> = []
+        var closedServices: Set<ClosedServiceDirection> = []
         var sawUnknown = false
         var sawAnswer = false
 
@@ -679,10 +672,20 @@ final class RoutePlanningService {
             // `ServiceHoursVerdict.isDefinitive`. A merged window that still reads as running may
             // be another direction's train, and banning a line on the strength of one that was
             // never this rider's is the same error in the other direction.
+            // The direction, not the line. The verdict was reached from this rider's own onward
+            // stations, so it speaks for the way they are travelling and for nothing else: at
+            // 天通苑南 on 5号线 southbound has finished at 22:51 while northbound runs to 23:57.
+            // `directionNextStationID` names that direction as an oriented hop, and until now was
+            // computed on every plan and read by nothing.
             if verdict.isDefinitive,
-               let lineID = segment.transitContext?.lineID,
+               let context = segment.transitContext,
+               let next = context.directionNextStationID,
                verdict.status == .serviceEndedToday || verdict.status.isNotYetStarted {
-                closedLineIDs.insert(lineID)
+                closedServices.insert(ClosedServiceDirection(
+                    lineID: context.lineID,
+                    fromStationID: context.boardingStationID,
+                    toStationID: next
+                ))
             }
             if verdict.status.severity > (worst?.verdict.status.severity ?? 0) {
                 worst = (verdict, segment)
@@ -695,7 +698,7 @@ final class RoutePlanningService {
             return ServiceReading(
                 status: sawAnswer && !sawUnknown ? .running : .unknown,
                 warning: nil,
-                closedLineIDs: []
+                closedServices: []
             )
         }
 
@@ -724,7 +727,7 @@ final class RoutePlanningService {
                     )
                 }
             },
-            closedLineIDs: closedLineIDs
+            closedServices: closedServices
         )
     }
 
@@ -950,7 +953,7 @@ final class RoutePlanningService {
         accessibilityFilter: AccessibilityFilter,
         tripAnchor: TripTimeAnchor,
         legs: WalkingLegMemo
-    ) async -> (route: Route, closedLineIDs: Set<String>) {
+    ) async -> (route: Route, closedServices: Set<ClosedServiceDirection>) {
         var route = route
         // The pack that actually produced the route. A walking-only plan has none, and every
         // official-data lookup below then finds nothing and reports unavailable, which is the
@@ -1096,7 +1099,7 @@ final class RoutePlanningService {
             destinationChoice: destinationChoice
         )
 
-        return (route, service.closedLineIDs)
+        return (route, service.closedServices)
     }
 
     /// Distance below which re-walking the leg to a specific door is not worth an `MKDirections`

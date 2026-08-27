@@ -275,3 +275,45 @@ struct ServiceHoursResolver {
         }
     }
 }
+
+/// One hop of one line, in one direction. The unit a search bans by.
+struct DirectedServiceHop: Hashable, Sendable {
+    let lineID: String
+    let fromStationID: String
+    let toStationID: String
+}
+
+/// Every hop a shut service makes, expanded from the one oriented hop that was observed.
+///
+/// A verdict is reached about a rider boarding at A heading toward B. What a search needs is not
+/// that pair but the whole direction: any edge on the same line running the same way is the same
+/// train and equally gone. So each pattern holding both stations is read once to establish which
+/// way round they sit, and every consecutive pair is taken in that order.
+///
+/// Patterns holding only one of the two say nothing about the direction and are skipped. On a
+/// branching line that is most of them, and guessing would ban the branch the rider could still
+/// use. A ring orders by index like anything else.
+///
+/// `patterns` are raw station IDs and `from`/`to` are whatever the caller identifies stations by,
+/// so `identify` bridges the two. The returned hops use the raw IDs, because they are compared
+/// against graph edges once per edge considered.
+func directedHops(
+    lineID: String,
+    from: String,
+    to: String,
+    patterns: [[String]],
+    identify: (String) -> String
+) -> Set<DirectedServiceHop> {
+    var hops: Set<DirectedServiceHop> = []
+    for pattern in patterns where pattern.count > 1 {
+        let identified = pattern.map(identify)
+        guard let start = identified.firstIndex(of: from),
+              let end = identified.firstIndex(of: to),
+              start != end else { continue }
+        let ordered = start < end ? pattern : Array(pattern.reversed())
+        for pair in zip(ordered, ordered.dropFirst()) {
+            hops.insert(DirectedServiceHop(lineID: lineID, fromStationID: pair.0, toStationID: pair.1))
+        }
+    }
+    return hops
+}

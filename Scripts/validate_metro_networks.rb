@@ -105,6 +105,18 @@ paths.each do |path|
     abort "#{city}: service pattern contains unknown station" unless patterns.flatten.all? { |id| station_ids.include?(id) }
     abort "#{city}: service pattern contains station outside canonical line" unless patterns.flatten.all? { |id| line.fetch("stationIDs").include?(id) }
     abort "#{city}: service pattern contains adjacent duplicate station" if patterns.any? { |pattern| pattern.each_cons(2).any? { |left, right| left == right } }
+  # A non-ring pattern that returns to its own first station is a relation carrying the journey
+  # back as well as the journey out. The joins that creates are not adjacencies: 广清城际 shipped
+  # 飞霞 → 广州白云 (63 km, the whole line) and 广州白云 → 花都 (21 km past three stops the train
+  # calls at), and a skip edge always beats the stops it replaces on `trainCost`, so the graph took
+  # it every time. Adjacent duplicates were already checked; this is the same defect one step apart,
+  # and it is why that check did not see it.
+  patterns.each do |pattern|
+    next if pattern.length < 3 || pattern.first == pattern.last
+    next unless pattern.drop(1).include?(pattern.first)
+
+    abort "#{city}: service pattern returns to its first station (return journey not trimmed)"
+  end
     abort "#{city}: line has no physical paths" unless line.fetch("paths").any? { |path_points| path_points.length >= 2 }
     relation_ids = line.fetch("selectedSourceRelationIDs")
     abort "#{city}: selected source relation outside canonical line" unless relation_ids.all? { |id| line.fetch("sourceRelationIDs").include?(id) }

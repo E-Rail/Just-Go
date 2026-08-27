@@ -1004,8 +1004,33 @@ MAX_INFILL_PASSES = 4
 # drop a scrambled duplicate in favour of the ordering that follows the track, then splice back any
 # station a sibling proves belongs between two others. A genuine branch survives all three, because
 # none of them can invent a station the pattern's own siblings never served.
+# A relation whose member list carries the journey back as well as the journey out.
+#
+# 广清城际 arrives as 广州白云 - 白云湖 - 江高 - 神山 - 花都 - … - 飞霞 - 广州白云 - 花都: the outbound
+# run, then the first two stops of the return. `pattern.first != pattern.last` so the ring guard lets
+# it through, and the two joins it invents are not adjacencies at all — 飞霞 → 广州白云 is 63 km
+# across the whole line, and 广州白云 → 花都 is 21 km past three stations the train stops at.
+#
+# The second one is the dangerous half. `trainCost` charges a flat 30 s per hop plus distance, so a
+# skip edge is always cheaper than the stops it replaces (2 213 s against 2 328 s here) and Dijkstra
+# takes it every time, returning the trip as one stop and drawing straight over 白云湖, 江高 and 神山.
+# That is the defect 43a6aaa removed 81 of, arriving through the data instead of the code.
+#
+# Cutting where the pattern comes back to its own first station keeps the outbound run whole. It is
+# deliberately narrower than "cut at any repeat": 黄埔有轨电车1号线 genuinely runs 水西 → 峻泰路 →
+# 水西, a 397 m out-and-back mid-line, and every pair in it is a real adjacency. Truncating there
+# would throw away eleven stations to fix nothing.
+def trim_return_journeys(patterns)
+  patterns.map do |pattern|
+    next pattern unless pattern.length > 2 && pattern.first != pattern.last
+
+    revisit = pattern.each_with_index.find { |name, index| index.positive? && name == pattern.first }
+    revisit ? pattern[0, revisit.last] : pattern
+  end
+end
+
 def unique_service_patterns(patterns, coordinates = {})
-  unique = collapse_equivalent_patterns(patterns)
+  unique = collapse_equivalent_patterns(trim_return_journeys(patterns))
   unique = drop_scrambled_duplicate_patterns(unique, coordinates)
   unique = collapse_equivalent_patterns(infill_skipped_stations(unique))
   unique.reject do |pattern|
@@ -1870,6 +1895,21 @@ def self_test
     directional_pair,
     fixture_elements
   ).length == 1
+  # The 广清城际 shape: the outbound run with the first stops of the return journey appended. The
+  # tail is cut at the point the pattern comes back to its own first station, which is where the
+  # 63 km and 21 km non-adjacencies were being invented.
+  return_journey = unique_service_patterns([%w[a b c d e a b]])
+  fail_with("return journey tail was not trimmed") unless return_journey == [%w[a b c d e]]
+
+  # ...but a real out-and-back spur mid-line is not a return journey and must survive whole.
+  # 黄埔有轨电车1号线 runs 水西 → 峻泰路 → 水西 over 397 m, and every pair in it is an adjacency.
+  spur = unique_service_patterns([%w[a b spur b c d]])
+  fail_with("a mid-line out-and-back spur was truncated") unless spur == [%w[a b spur b c d]]
+
+  # A ring closes on its first station by definition and must not be mistaken for one.
+  ring = unique_service_patterns([%w[a b c d a]])
+  fail_with("a ring was truncated as a return journey") unless ring == [%w[a b c d a]]
+
   puts "OSM metro importer self-test ok"
 end
 

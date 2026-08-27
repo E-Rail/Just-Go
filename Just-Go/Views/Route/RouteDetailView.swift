@@ -174,7 +174,18 @@ struct RouteDetailView: View {
             ensureSelectedRouteIsCurrent()
         }
         .task(id: routeDataKey) {
+            // Everything the previous route put here, cleared together.
+            //
+            // Only `boardingServiceHours` used to be reset, so the two that were not survived the
+            // switch: picking a walking-only alternative returns at the guard below and left the
+            // last route's Beijing advisories on a trip with no train, and switching between two
+            // packs left Beijing notices on a Shanghai route — with `noticeRow` captioning them
+            // "Beijing Subway · published …". That is the exact failure the comment below was
+            // written to prevent, arriving through what the reset missed rather than through the
+            // fallback it removed.
             boardingServiceHours = .none
+            cityResources = []
+            serviceNotices = []
             // Operator content belongs to a trip that actually uses that operator. A walking-only
             // route rides nothing, and `networkCityID` is nil for it. Falling back to the selected
             // city put Beijing Subway service advisories and first/last-train times on a trip that

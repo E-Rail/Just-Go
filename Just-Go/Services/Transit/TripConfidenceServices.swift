@@ -85,6 +85,6 @@ struct LiveGoTripBuilder {
         guard let stationName else { return nil }
         return route.stationGuidance.first {
             $0.stationName == stationName && ($0.role == .arrival || $0.role == .transfer)
-        }?.exit?.name
+        }?.exit?.namedDoor
     }
 }

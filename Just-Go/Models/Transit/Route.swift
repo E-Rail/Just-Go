@@ -510,19 +510,24 @@ enum RouteAccessKind: String, Codable {
     case destination
 }
 
-struct RouteAccessPoint: Identifiable, Codable {
-    let id: String
-    let name: String
-    let coordinate: CodableCoordinate?
-    let isWheelchairLikely: Bool
-    let hasElevatorHint: Bool
-    let source: RouteAccessPointSource
+/// One rule for naming a station door, shared by every type that holds one.
+///
+/// This lived on `RouteAccessPoint` alone, with a comment saying it was "shared so the detail screen
+/// and the navigator cannot label the same door two different ways" — and the navigator's *other*
+/// half read `StationAccessPoint.name` raw. So one Live Go step said "Get off toward D" and the
+/// next said "Walk to Exit D", about the same door; and for a `.stationPOI` the detail screen
+/// printed nothing while Live Go printed a bare letter. Both types conform now, so there is no
+/// second copy to drift.
+protocol NamedStationDoor {
+    var name: String { get }
+    var source: RouteAccessPointSource { get }
+}
 
+extension NamedStationDoor {
     /// The door named the way a rider would look for it on a sign.
     ///
     /// Surveyed entrances arrive as anything from a bare "D" to "五道口 B 出口" depending on the
-    /// source, and "Walk to D" on its own names nothing findable. Shared so the detail screen and
-    /// the navigator cannot label the same door two different ways.
+    /// source, and "Walk to D" on its own names nothing findable.
     var displayName: String {
         guard !name.lowercased().contains("exit"), !name.contains("出口"), !name.contains("入口") else {
             return name
@@ -534,11 +539,20 @@ struct RouteAccessPoint: Identifiable, Codable {
         )
     }
 
-    /// The door to name, or nil when none was resolved. `.StationPOI` is the station itself, so
+    /// The door to name, or nil when none was resolved. `.stationPOI` is the station itself, so
     /// there is no specific entrance and nothing honest to print.
     var namedDoor: String? {
         source == .stationPOI ? nil : displayName
     }
+}
+
+struct RouteAccessPoint: Identifiable, Codable, NamedStationDoor {
+    let id: String
+    let name: String
+    let coordinate: CodableCoordinate?
+    let isWheelchairLikely: Bool
+    let hasElevatorHint: Bool
+    let source: RouteAccessPointSource
 }
 
 enum RouteAccessPointSource: String, Codable {
@@ -608,7 +622,7 @@ enum AccessPointKind: String, Codable {
 /// A specific station entrance/exit (or vertical-access point). Either authored in a city pack
 /// (`source == .specificEntrance`/`.localStationData`, `confidence == .official`) or best-effort
 /// extracted from accessibility text (`source == .inferred`, `confidence == .estimated`).
-struct StationAccessPoint: Identifiable, Codable {
+struct StationAccessPoint: Identifiable, Codable, NamedStationDoor {
     let id: String
     let name: String
     let kind: AccessPointKind

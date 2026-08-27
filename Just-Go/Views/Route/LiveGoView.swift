@@ -90,6 +90,7 @@ struct LiveGoView: View {
     @State private var lastRerouteAt = Date.distantPast
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
+    @State private var rerouteTask: Task<Void, Never>?
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
@@ -206,6 +207,7 @@ struct LiveGoView: View {
             speechSynthesizer.stopSpeaking(at: .immediate)
             announcementTask?.cancel()
             rerouteNoticeTask?.cancel()
+            rerouteTask?.cancel()
         }
         .onChange(of: viewModel.currentIndex) { _, _ in
             // Reading ahead is an explicit request to look at that step, not at where you are.
@@ -695,7 +697,11 @@ struct LiveGoView: View {
         guard offRouteStrikes >= 2, !isRerouting,
               Date().timeIntervalSince(lastRerouteAt) > 45 else { return }
         offRouteStrikes = 0
-        Task { await reroute(from: location.coordinate) }
+        // Stored, so closing the navigator stops it. Unstructured and untracked, a reroute in
+        // flight when the rider walked away still ran to completion and wrote its new route into
+        // `ActiveTripStore` — overwriting the resume-trip record for a journey they had left.
+        rerouteTask?.cancel()
+        rerouteTask = Task { await reroute(from: location.coordinate) }
     }
 
     @MainActor
@@ -722,6 +728,10 @@ struct LiveGoView: View {
                 )
             )
             guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }
+            // The plan can outlive the screen: MKLocalSearch ignores task cancellation, so a
+            // reroute started just before the rider closed the navigator can still land here.
+            // Nothing below should happen to a trip they have left.
+            guard !Task.isCancelled else { return }
             viewModel.reroute(with: newRoute)
             transferGuidance = nil
             // Keep the resume banner's stored trip in step with what's actually guiding.

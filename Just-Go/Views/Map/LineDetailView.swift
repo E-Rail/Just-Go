@@ -183,6 +183,15 @@ struct LineDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                // The operator answer was asked about one branch and is only true of that branch.
+                // `observedSummary` kept printing branch A's first and last train after a switch to
+                // B, while the stop-count comparison beside it had already moved to B's count — so
+                // the two halves of the same card described different trains. First and last train
+                // attributed to the wrong arm of a branching line is a missed-last-train error.
+                .onChange(of: selectedPatternIndex) { _, _ in
+                    observed = nil
+                    observationState = .idle
+                }
             }
         }
     }

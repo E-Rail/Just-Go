@@ -45,6 +45,11 @@ final class TripReminderService {
 
         var components = ChinaClock.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         components.timeZone = ChinaClock.calendar.timeZone
+        // The calendar too, not only the zone. `UNCalendarNotificationTrigger` matches components
+        // against `Calendar.current` when they name none, so Gregorian year 2026 handed to a device
+        // set to the Buddhist, Japanese or Republic-of-China calendar is a date centuries away —
+        // and the reminder simply never fires.
+        components.calendar = ChinaClock.calendar
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         let request = UNNotificationRequest(identifier: identifier(for: routeID), content: content, trigger: trigger)
         try? await center.add(request)

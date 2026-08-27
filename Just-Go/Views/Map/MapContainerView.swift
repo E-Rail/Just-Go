@@ -874,6 +874,25 @@ struct MapContainerView: View {
                 return
             }
         }
+        // A named station's own sheet. Every other seed reaches a screen the *planner* produces;
+        // this is the only route to the station page, whose accessibility section is the one place
+        // in the app where a wrong claim has a physical cost and so is the one most worth looking
+        // at. The station is named rather than derived, because which station it is decides which
+        // data source answers — an OpenStreetMap entrance record and Hong Kong's surveyed
+        // barrier-free record render entirely different sections.
+        if let station = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_STATION"] {
+            Task {
+                guard await waitForNetwork() else { return }
+                guard let match = viewModel?.stations.first(where: {
+                    $0.localizedName == station || $0.name == station || $0.stationID == station
+                }) else { return }
+                // Through `openStation`, not by pushing `.station` directly: the destination reads
+                // the station out of `openedStations`, which only that path fills, so a direct push
+                // lands on "Station unavailable".
+                openStation(match)
+            }
+        }
+
         guard let screen = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SCREEN"] else { return }
         switch screen {
         case "search":

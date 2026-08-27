@@ -193,6 +193,51 @@ func serviceDirectionLabel(direction: String?, destination: String?) -> String? 
     return marker
 }
 
+/// The same labels, made distinguishable from one another.
+///
+/// A terminus names a service unambiguously on a line with two ends and not on a ring, where both
+/// directions arrive at the same place by going opposite ways round. 国贸 on 10号线 has five
+/// services and they render as `车道沟 / 成寿寺 / 巴沟 / 巴沟 / 车道沟` — two pairs a rider cannot
+/// tell apart, each pair nearly two hours apart in its last train. That is the duplicate-row
+/// problem the operator grouping was originally written to solve, arriving from the other side.
+///
+/// Where a label repeats, the direction marker is what separates the two — it is the next station
+/// toward that end, which is exactly the thing printed on the platform they are standing on.
+func distinguishedServiceLabels<Service: ServiceDirectionNaming>(_ services: [Service]) -> [String?] {
+    let labels = services.map { serviceDirectionLabel(direction: $0.directionMarker, destination: $0.serviceDestination) }
+    var counts: [String: Int] = [:]
+    for label in labels.compactMap({ $0 }) { counts[label, default: 0] += 1 }
+
+    return zip(labels, services).map { label, service in
+        guard let label, counts[label, default: 0] > 1 else { return label }
+        guard let marker = service.directionMarker?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !marker.isEmpty, marker != label else { return label }
+        return AppLocalization.text(
+            english: "\(label) via \(marker)",
+            simplified: "\(label)（经\(marker)）",
+            traditional: "\(label)（經\(marker)）"
+        )
+    }
+}
+
+/// A service row that can name where it is going. Two shapes carry this — the resolver's
+/// `StationServiceWindow` and the wire's `OfficialStationServiceInformation` — and the route sheet
+/// and the station sheet render one each. They must not disagree about what a service is called.
+protocol ServiceDirectionNaming {
+    var directionMarker: String? { get }
+    var serviceDestination: String? { get }
+}
+
+extension StationServiceWindow: ServiceDirectionNaming {
+    var directionMarker: String? { direction }
+    var serviceDestination: String? { destination }
+}
+
+extension OfficialStationServiceInformation: ServiceDirectionNaming {
+    var directionMarker: String? { direction }
+    var serviceDestination: String? { destination }
+}
+
 /// The source's own words for which service day its times describe, shown only when it is not
 /// today's.
 ///

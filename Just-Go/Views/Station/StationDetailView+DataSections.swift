@@ -276,15 +276,20 @@ extension StationDetailView {
                             Text(line.lineName)
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                            ForEach(line.services) { service in
+                            let serviceLabels = distinguishedServiceLabels(line.services)
+                            ForEach(Array(line.services.enumerated()), id: \.element.id) { serviceIndex, service in
                                 VStack(alignment: .leading, spacing: 5) {
                                     // The terminus where it differs from the direction marker: at
                                     // 国贸 all three northbound 10号线 services read 双井 and end at
-                                    // 车道沟, 成寿寺 and 巴沟, hours apart. See `serviceDirectionLabel`.
+                                    // 车道沟, 成寿寺 and 巴沟, hours apart. And on a ring the terminus
+                                    // alone repeats — both ways round 2号线 end at 积水潭 — so a
+                                    // repeated label falls back to naming the next station along.
+                                    // Same rule as the route sheet, which renders the same fact.
+                                    let label = serviceLabels[serviceIndex] ?? service.direction
                                     Text(AppLocalization.text(
-                                        english: "Toward \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)",
-                                        simplified: "开往 \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)",
-                                        traditional: "開往 \(serviceDirectionLabel(direction: service.direction, destination: service.destination) ?? service.direction)"
+                                        english: "Toward \(label)",
+                                        simplified: "开往 \(label)",
+                                        traditional: "開往 \(label)"
                                     ))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)

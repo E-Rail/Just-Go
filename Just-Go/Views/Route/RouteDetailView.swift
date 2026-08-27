@@ -789,13 +789,11 @@ struct RouteDetailView: View {
                     // turns 22:51 southbound and 23:57 northbound into a single "5:03 – 23:57" that
                     // is true of neither platform — and at 国贸 on 10号线 attaches a short-turn's
                     // 23:36 to a run that stops seventeen stations earlier.
+                    let labels = distinguishedServiceLabels(boardingServiceHours.windows)
                     VStack(alignment: .trailing, spacing: 4) {
-                        ForEach(boardingServiceHours.windows, id: \.self) { window in
+                        ForEach(Array(boardingServiceHours.windows.enumerated()), id: \.offset) { index, window in
                             VStack(alignment: .trailing, spacing: 1) {
-                                if let label = serviceDirectionLabel(
-                                    direction: window.direction,
-                                    destination: window.destination
-                                ) {
+                                if let label = labels[index] {
                                     Text(AppLocalization.text(
                                         english: "Toward \(label)",
                                         simplified: "开往 \(label)",

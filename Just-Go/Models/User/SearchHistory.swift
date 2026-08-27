@@ -6,8 +6,6 @@ struct SearchHistory: Identifiable, Codable {
     var stationID: String
     var stationName: String
     var cityID: String
-    var searchDate: Date
-    var searchCount: Int
 
     init(
         searchID: String = UUID().uuidString,
@@ -19,8 +17,6 @@ struct SearchHistory: Identifiable, Codable {
         self.stationID = stationID
         self.stationName = stationName
         self.cityID = cityID
-        self.searchDate = .now
-        self.searchCount = 1
     }
 
     enum CodingKeys: String, CodingKey {
@@ -29,8 +25,6 @@ struct SearchHistory: Identifiable, Codable {
         case stationID
         case stationName
         case cityID
-        case searchDate
-        case searchCount
     }
 
     init(from decoder: Decoder) throws {
@@ -41,8 +35,6 @@ struct SearchHistory: Identifiable, Codable {
         self.stationID = try container.decode(String.self, forKey: .stationID)
         self.stationName = try container.decode(String.self, forKey: .stationName)
         self.cityID = try container.decode(String.self, forKey: .cityID)
-        self.searchDate = try container.decodeIfPresent(Date.self, forKey: .searchDate) ?? .now
-        self.searchCount = try container.decodeIfPresent(Int.self, forKey: .searchCount) ?? 1
     }
 
     func encode(to encoder: Encoder) throws {
@@ -51,7 +43,5 @@ struct SearchHistory: Identifiable, Codable {
         try container.encode(stationID, forKey: .stationID)
         try container.encode(stationName, forKey: .stationName)
         try container.encode(cityID, forKey: .cityID)
-        try container.encode(searchDate, forKey: .searchDate)
-        try container.encode(searchCount, forKey: .searchCount)
     }
 }

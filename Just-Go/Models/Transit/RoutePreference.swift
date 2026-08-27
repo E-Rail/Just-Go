@@ -69,12 +69,4 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
             self = .leastWalking
         }
     }
-
-    /// All four fit on one row, so there is no overflow menu any more. It used to hold seven and
-    /// then, once the dead ones were gone, would have held exactly one.
-    static let primary: [RoutePreference] = allCases
-
-    var isPrimary: Bool {
-        Self.primary.contains(self)
-    }
 }

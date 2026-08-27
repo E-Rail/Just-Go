@@ -61,6 +61,7 @@ struct LiveGoTripBuilder {
                     walkingDistance: 0,
                     duration: segment.duration,
                     exitHint: arrivalExit(for: segment.toStationName, in: route),
+                    alightAfterStationName: segment.transitContext?.arrivalPreviousStationName,
                     segmentIndex: index
                 ))
             }

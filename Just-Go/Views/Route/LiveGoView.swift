@@ -858,6 +858,21 @@ struct LiveGoView: View {
                 }
             }
 
+            // Where to stand up, named by the stop before theirs. `arrivalPreviousStationName` has
+            // been resolved from the graph on every plan since it was added and read by nothing;
+            // "one more stop" and "get off next" are different instructions and this is the only
+            // thing on the screen that can tell them apart.
+            if let readyToAlight = step.readyToAlightText {
+                HStack(spacing: 12) {
+                    Label(readyToAlight, systemImage: "figure.stand")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                        .minimumScaleFactor(0.8)
+                    Spacer()
+                }
+            }
+
             if step.kind == .ride {
                 Toggle(isOn: $arrivalAlertEnabled) {
                     Label(
@@ -869,7 +884,11 @@ struct LiveGoView: View {
                 .tint(themeColor)
             }
         }
-        .accessibilityElement(children: .combine)
+        // `.contain`, not `.combine`. Combining folded the exit chip, the get-ready cue and the
+        // "Alert before getting off" Toggle into one label built from title and detail alone, so a
+        // VoiceOver user got neither the exit hint nor a reliably focusable alarm switch — on the
+        // screen this app's own accessibility settings route people to.
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(step.accessibilityLabel)
     }
 

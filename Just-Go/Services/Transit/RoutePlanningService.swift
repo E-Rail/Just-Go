@@ -69,7 +69,6 @@ struct ServiceReading {
     let warning: RouteWarning?
     let closedServices: Set<ClosedServiceDirection>
 
-    static let unanswered = ServiceReading(status: .unknown, warning: nil, closedServices: [])
 }
 
 final class RoutePlanningService {
@@ -1444,39 +1443,6 @@ final class RoutePlanningService {
         if access.allSatisfy(\.isFullyAccessible) { return .confirmed }
         if access.allSatisfy({ $0.hasElevator || $0.hasWheelchairRamp }) { return .likely }
         return .unknown
-    }
-
-    private func accessibilityScore(for route: Route, preferences: AccessibilityPreference) -> Double {
-        var score: Double = 1.0
-
-        if preferences.requiresWheelchairAccess {
-            if !route.stepFreeAssessment.supportsStepFreeTravel {
-                score -= 0.5
-            }
-        }
-
-        if preferences.avoidStairs {
-            for segment in route.segments {
-                for note in segment.accessibilityNotes where note.localizedCaseInsensitiveContains("stairs") || note.contains("楼梯") || note.contains("階梯") {
-                    score -= 0.2
-                }
-            }
-        }
-
-        for warning in route.warnings {
-            switch warning.type {
-            case .stairsDetected:
-                score -= preferences.avoidStairs ? 0.3 : 0.1
-            case .stepFreeAccessUnconfirmed:
-                score -= preferences.requiresWheelchairAccess ? 0.3 : 0.15
-            case .longWalk:
-                score -= 0.1
-            default:
-                break
-            }
-        }
-
-        return max(0, min(1, score))
     }
 
     func sortRoutes(

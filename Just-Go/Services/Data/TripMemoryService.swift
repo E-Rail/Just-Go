@@ -27,10 +27,9 @@ final class TripMemoryService {
         }
     }
 
-    func recordPlannedTrip(route: Route, cityID: String, accessibilityFilter: AccessibilityFilter, savedTripID: String? = nil) -> TripRecord {
+    func recordPlannedTrip(route: Route, cityID: String) -> TripRecord {
         let record = TripRecord(
             id: UUID().uuidString,
-            savedTripID: savedTripID,
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
@@ -39,7 +38,6 @@ final class TripMemoryService {
             walkingDistance: route.walkingDistance,
             transferCount: route.transferCount,
             strategy: route.strategy,
-            accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: nil,
@@ -51,10 +49,9 @@ final class TripMemoryService {
         return record
     }
 
-    func markTripComplete(route: Route, cityID: String, accessibilityFilter: AccessibilityFilter = .none, note: String? = nil) {
+    func markTripComplete(route: Route, cityID: String, note: String? = nil) {
         let record = TripRecord(
             id: UUID().uuidString,
-            savedTripID: nil,
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
@@ -63,7 +60,6 @@ final class TripMemoryService {
             walkingDistance: route.walkingDistance,
             transferCount: route.transferCount,
             strategy: route.strategy,
-            accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: .now,

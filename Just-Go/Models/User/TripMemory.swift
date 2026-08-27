@@ -33,21 +33,8 @@ extension TransitPlaceSnapshot {
     }
 }
 
-struct SavedTripAccessibilityFilter: Codable, Equatable {
-    var requiresWheelchairAccess: Bool
-    var requiresElevator: Bool
-    var avoidStairs: Bool
-
-    init(filter: AccessibilityFilter) {
-        requiresWheelchairAccess = filter.requiresWheelchairAccess
-        requiresElevator = filter.requiresElevator
-        avoidStairs = filter.avoidStairs
-    }
-}
-
 struct TripRecord: Identifiable, Codable, Equatable {
     let id: String
-    let savedTripID: String?
     let originName: String
     let destinationName: String
     let cityID: String
@@ -56,7 +43,11 @@ struct TripRecord: Identifiable, Codable, Equatable {
     let walkingDistance: Double
     let transferCount: Int
     let strategy: RouteStrategy
-    let accessibilityFilter: SavedTripAccessibilityFilter
+    // No `accessibilityFilter` and no `savedTripID`. Both were written on every trip and read
+    // nowhere in the app. `savedTripID` was passed nil at both call sites, and the filter meant
+    // every record persisted the rider's wheelchair, elevator and stairs settings into
+    // UserDefaults — a copy of health-adjacent information, kept indefinitely, that bought nothing.
+    // Old records decode without them.
     let warningMessages: [String]
     let createdAt: Date
     var completedAt: Date?

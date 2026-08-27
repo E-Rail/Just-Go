@@ -25,6 +25,12 @@ struct TripStep: Identifiable, Equatable {
     var duration: TimeInterval = 0
     /// Recommended exit/entrance at the step's end station, when known (best-available).
     var exitHint: String? = nil
+    /// The stop before the rider's, so a `.ride` step can tell them when to stand up.
+    ///
+    /// Resolved from the graph on every plan as `arrivalPreviousStationName` and read by nothing
+    /// until now. "One more stop" is not the same instruction as "get off next" and this is the
+    /// only thing on the screen that can say which.
+    var alightAfterStationName: String? = nil
     /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
     /// separately verified indoor guidance.
     /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working.
@@ -151,8 +157,21 @@ struct TripStep: Identifiable, Equatable {
         return AppLocalization.stopsLeft(stopCount)
     }
 
+    /// The cue to get ready, named by the stop it happens at.
+    ///
+    /// Only for rides long enough for it to mean anything: on a one- or two-stop hop the rider is
+    /// standing by the door already, and the previous station is where they got on.
+    var readyToAlightText: String? {
+        guard kind == .ride, stopCount > 2, let previous = alightAfterStationName else { return nil }
+        return AppLocalization.text(
+            english: "Get ready after \(previous)",
+            simplified: "过\(previous)后准备下车",
+            traditional: "過\(previous)後準備下車"
+        )
+    }
+
     var accessibilityLabel: String {
-        [title, detail].compactMap { $0 }.joined(separator: ", ")
+        [title, detail, rideStopsRemainingText, readyToAlightText].compactMap { $0 }.joined(separator: ", ")
     }
 }
 

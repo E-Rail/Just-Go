@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var showQuickTags = false
     @State private var showClearCacheConfirmation = false
     @State private var didClearCache = false
+    @State private var showForgetAnswersConfirmation = false
+    @State private var didForgetAnswers = false
 
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
 
@@ -170,9 +172,40 @@ struct SettingsView: View {
                     traditional: "已儲存的官方車站資訊和暫存網頁資料將被刪除，需要時會重新取得。您的標籤、行程、記錄和設定不受影響。"
                 ))
             }
+            // The one thing a rider gives this app that it keeps, and until now there was no way
+            // to take it back. `forgetEverything()` has existed since transfer answers were added,
+            // with a comment saying it was for "whatever delete-my-data control ships"; nothing
+            // ever called it. Deliberately not folded into Clear Cache above, whose alert promises
+            // that records are not affected — these are records, and deleting them belongs to its
+            // own decision.
+            Button(role: .destructive) {
+                showForgetAnswersConfirmation = true
+            } label: {
+                Label(forgetAnswersTitle, systemImage: "person.crop.circle.badge.xmark")
+            }
+            .alert(forgetAnswersTitle, isPresented: $showForgetAnswersConfirmation) {
+                Button(forgetAnswersTitle, role: .destructive) {
+                    container.transferInsightService.forgetEverything()
+                    didForgetAnswers = true
+                }
+                Button(AppLocalization.localized("Cancel"), role: .cancel) {}
+            } message: {
+                Text(AppLocalization.text(
+                    english: "How you rated transfers will be deleted from this device. It has never been sent anywhere else.",
+                    simplified: "您对换乘的评价将从本机删除。这些内容从未发送到别处。",
+                    traditional: "您對換乘的評價將從本機刪除。這些內容從未傳送到別處。"
+                ))
+            }
         } header: {
             Text(AppLocalization.localized("Transit Data"))
         } footer: {
+            if didForgetAnswers {
+                Text(AppLocalization.text(
+                    english: "Your transfer answers were deleted.",
+                    simplified: "您的换乘回答已删除。",
+                    traditional: "您的換乘回答已刪除。"
+                ))
+            }
             if didClearCache {
                 Text(AppLocalization.text(
                     english: "Cache cleared.",
@@ -185,6 +218,14 @@ struct SettingsView: View {
 
     private var clearCacheTitle: String {
         AppLocalization.text(english: "Clear Cache", simplified: "清除缓存", traditional: "清除快取")
+    }
+
+    private var forgetAnswersTitle: String {
+        AppLocalization.text(
+            english: "Delete My Transfer Answers",
+            simplified: "删除我的换乘回答",
+            traditional: "刪除我的換乘回答"
+        )
     }
 
     // MARK: - Accessibility

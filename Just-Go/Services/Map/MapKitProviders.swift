@@ -305,7 +305,26 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             mapRoute = nil
         }
         guard let mapRoute else {
-            return await walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+            // Retyped, not returned as-is. `SegmentType.isOnFoot`'s own docstring says a summary
+            // folding a drive into walking distance "would be lying in the one number riders check
+            // hardest" — and that is exactly what this path did: the leg was classified driving
+            // because it is over 8 km, and it came back typed .walking, so "Walk 12 km" went on the
+            // card, into route.walkingDistance, into the Least Walking sort and into the confidence
+            // penalty. The mode was decided by the distance and does not change because MapKit
+            // declined to draw it.
+            guard let walk = await walkingSegment(
+                from: from,
+                to: to,
+                fromName: fromName,
+                toName: toName
+            ) else { return nil }
+            var notes = walk.accessibilityNotes
+            notes.append(AppLocalization.text(
+                english: "Drawn along the walking route. No driving directions are available.",
+                simplified: "沿步行路线绘制，没有可用的驾车导航数据。",
+                traditional: "沿步行路線繪製，沒有可用的駕車導航資料。"
+            ))
+            return walk.retyped(as: .driving, duration: walk.duration, accessibilityNotes: notes)
         }
         return RouteSegment(
             id: UUID(),

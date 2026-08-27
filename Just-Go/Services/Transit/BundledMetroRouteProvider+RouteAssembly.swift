@@ -137,7 +137,7 @@ extension BundledMetroRouteProvider {
                     toStationName: from.name,
                     fromStationID: graph.qualifiedID(for: from.id),
                     toStationID: graph.qualifiedID(for: from.id),
-                    duration: 300,
+                    duration: RouteSegment.changeoverAllowance,
                     distance: 0,
                     stops: 0,
                     stationStops: [],
@@ -240,14 +240,19 @@ extension BundledMetroRouteProvider {
         return RouteSegment(
             id: UUID(),
             type: .transfer,
-            lineName: to.name,
+            // No line: this leg is a walk between two stations, not a train. It used to carry the
+            // destination *station's* name here, which `TripStep.title` renders as
+            // "Transfer to \(lineName)" — so Live Go read "换乘牛街", "transfer to [station]",
+            // naming no line at all while the actual instruction (leave the gates and cross the
+            // road) sat in `accessibilityNotes` where that step does not look.
+            lineName: nil,
             lineColorHex: nil,
             fromStationName: from.name,
             toStationName: to.name,
             fromStationID: graph.qualifiedID(for: from.id),
             toStationID: graph.qualifiedID(for: to.id),
             // Walking pace, plus the same fixed allowance an in-station change already carries.
-            duration: edge.distance / 1.25 + 300,
+            duration: edge.distance / 1.25 + RouteSegment.changeoverAllowance,
             distance: edge.distance,
             stops: 0,
             stationStops: [],

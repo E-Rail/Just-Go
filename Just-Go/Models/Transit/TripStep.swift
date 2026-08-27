@@ -84,8 +84,24 @@ struct TripStep: Identifiable, Equatable {
             let line = lineName ?? AppLocalization.text(english: "the train", simplified: "列车", traditional: "列車")
             return AppLocalization.text(english: "Board \(line)", simplified: "乘坐\(line)", traditional: "乘坐\(line)")
         case .transfer:
-            let line = lineName ?? AppLocalization.text(english: "the next line", simplified: "下一条线路", traditional: "下一條路線")
-            return AppLocalization.text(english: "Transfer to \(line)", simplified: "换乘\(line)", traditional: "換乘\(line)")
+            // An out-of-station interchange has no outgoing line to name — it is a walk between two
+            // stations — so it names the station instead of falling through to "the next line",
+            // which tells a rider standing at the gates nothing they can act on.
+            guard let lineName else {
+                if let station = toStationName, station != fromStationName {
+                    return AppLocalization.text(
+                        english: "Walk to \(station) to change",
+                        simplified: "出站步行至\(station)换乘",
+                        traditional: "出站步行至\(station)換乘"
+                    )
+                }
+                return AppLocalization.text(english: "Change here", simplified: "在此换乘", traditional: "在此換乘")
+            }
+            return AppLocalization.text(
+                english: "Transfer to \(lineName)",
+                simplified: "换乘\(lineName)",
+                traditional: "換乘\(lineName)"
+            )
         case .walkToDestination:
             let place = toStationName ?? AppLocalization.text(english: "your destination", simplified: "目的地", traditional: "目的地")
             switch accessMode {

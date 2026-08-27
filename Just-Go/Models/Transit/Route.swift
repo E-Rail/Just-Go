@@ -433,12 +433,26 @@ struct RouteSegment: Identifiable, Codable {
         )
     }
 
+    /// What a change costs beyond the walking, in seconds: platform to platform, the wait, the
+    /// crowd at the gate. Named here because three places need the same number and two of them had
+    /// it as a literal — which is how the third came to omit it.
+    static let changeoverAllowance: TimeInterval = 300
+
     /// A transfer leg re-costed from a measured corridor length.
     ///
     /// Separate from `retyped` because the meaning is different: this does not change what the leg
     /// *is*, it replaces a modelled guess with an observed distance. The duration is derived here
     /// at the app's own 1.25 m/s rather than taken from whoever supplied the metres. See
     /// `TransferPace.init(distanceMetres:)` for why a provider's seconds are not a second source.
+    ///
+    /// The walk is what the measurement replaces; the changeover allowance is not. Both modelled
+    /// forms carry a fixed 300 s — an in-station change is exactly that, and an out-of-station one
+    /// is `distance / 1.25 + 300`, whose own comment says it is "the same fixed allowance an
+    /// in-station change already carries". Dropping it here turned a measured 231 m corridor from
+    /// 300 s into 185 s, so a two-change trip claimed to arrive four minutes early, `.arriveBy`
+    /// back-solved a departure four minutes too late, and — because only routes Baidu returned
+    /// geometry for were ever measured — measured routes were quietly discounted against
+    /// unmeasured ones under `.fastest`.
     func measuringTransfer(distance measuredDistance: Double) -> RouteSegment {
         RouteSegment(
             id: id,
@@ -449,7 +463,7 @@ struct RouteSegment: Identifiable, Codable {
             toStationName: toStationName,
             fromStationID: fromStationID,
             toStationID: toStationID,
-            duration: measuredDistance / 1.25,
+            duration: measuredDistance / 1.25 + RouteSegment.changeoverAllowance,
             distance: measuredDistance,
             stops: stops,
             stationStops: stationStops,

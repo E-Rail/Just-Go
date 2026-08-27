@@ -49,12 +49,33 @@ extension StationDetailView {
                     )
                 }
 
-                if accessibility.wheelchairRampAvailability != .unknown || !accessibility.accessibleEntrances.isEmpty {
+                if accessibility.wheelchairRampAvailability != .unknown {
                     accessibilityRow(
                         icon: "figure.roll",
                         title: AppLocalization.localized("Wheelchair Ramp"),
                         subtitle: detailText(accessibility.accessibleEntrances, fallback: accessibility.wheelchairRampAvailability.localizedStatusText),
                         status: AccessibilityStatus(accessibility.wheelchairRampAvailability)
+                    )
+                } else if !accessibility.accessibleEntrances.isEmpty {
+                    // An exit letter, under its own heading, claiming nothing.
+                    //
+                    // 484 of the 582 bundled accessibility records are OpenStreetMap entrance data:
+                    // hasElevator null, hasWheelchairRamp null, accessibleEntrances ["D"]. That was
+                    // rendered as "♿ Wheelchair Ramp / D" under a "Partial Accessibility — Some
+                    // accessibility features are verified" header, above a note saying the data was
+                    // not available. OSM says a door exists there. It does not say it is step-free,
+                    // and for the rider this section is written for, the difference between those
+                    // two is the difference between reaching the platform and being stranded at the
+                    // concourse. The letter is still worth showing; the wheelchair claim is not.
+                    accessibilityRow(
+                        icon: "door.left.hand.open",
+                        title: AppLocalization.text(
+                            english: "Station exits",
+                            simplified: "车站出入口",
+                            traditional: "車站出入口"
+                        ),
+                        subtitle: detailText(accessibility.accessibleEntrances, fallback: ""),
+                        status: .unknown
                     )
                 }
 
@@ -140,12 +161,25 @@ extension StationDetailView {
         }
     }
 
+    /// Where this station's accessibility data actually came from.
+    ///
+    /// The branches here were `dataSource == "beijing_official"` and `contains("official")`, and no
+    /// pack has ever shipped either. The only three values that exist are
+    /// `openstreetmap/subway-entrances` (366 stations), `data.taipei/taipei-metro-station-exits`
+    /// (118) and `data.gov.hk/mtr-barrier-free-facilities` (98) — none containing the substring
+    /// "official" — so every station fell through to "not available yet", including Hong Kong's
+    /// fully surveyed barrier-free records. Matched against the values that ship.
     private func accessibilitySourceNote(_ accessibility: StationAccessibility) -> some View {
+        let source = accessibility.dataSource ?? ""
         let message: String
-        if accessibility.dataSource == "beijing_official" {
-            message = AppLocalization.localized("Accessibility information from official Beijing Subway data.")
-        } else if accessibility.dataSource?.contains("official") == true {
+        if source.hasPrefix("data.gov.hk") || source.hasPrefix("data.taipei") {
             message = AppLocalization.localized("Accessibility information from official city data.")
+        } else if source.hasPrefix("openstreetmap") {
+            message = AppLocalization.text(
+                english: "Entrances mapped by OpenStreetMap contributors. Step-free access is not recorded.",
+                simplified: "出入口来自 OpenStreetMap 社区测绘，未记录无障碍通行信息。",
+                traditional: "出入口來自 OpenStreetMap 社群測繪，未記錄無障礙通行資訊。"
+            )
         } else {
             message = AppLocalization.localized("Official accessibility data is not available for this station yet.")
         }

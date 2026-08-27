@@ -829,7 +829,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let stations = names.compactMap { stationRecord(cityID: cityID, normalizedName: $0) }
         return RouteDataCoverage(
             stationCount: names.count,
-            officialAccessibilityCount: stations.filter { $0.accessibility != nil }.count,
+            // A record exists for 582 stations; 484 of them are an OpenStreetMap entrance letter
+            // with hasElevator and hasWheelchairRamp both null. Counting those awarded the route
+            // "Official accessibility information available" on the strength of a mapped door, so
+            // the count asks for something actually stated.
+            officialAccessibilityCount: stations.filter { station in
+                guard let accessibility = station.accessibility else { return false }
+                return accessibility.hasElevator != nil
+                    || accessibility.hasWheelchairRamp != nil
+                    || !(accessibility.elevatorLocations ?? []).isEmpty
+            }.count,
             officialScheduleCount: stations.filter { !$0.schedules.isEmpty }.count,
             officialFacilityCount: stations.filter { !$0.stationFacilities.isEmpty || !($0.accessibility?.facilityNotes ?? []).isEmpty }.count
         )

@@ -1029,6 +1029,19 @@ struct RouteDetailView: View {
                     .fontWeight(.medium)
                     .foregroundStyle(Color.accentColor)
                 }
+                // The stop after this one, which is what a rider actually checks against the
+                // platform sign when a terminus name is ambiguous or the sign lists a short-turn.
+                // Computed on every plan since `directionNextStationName` was added, and read by
+                // nothing until now.
+                if let next = segment.transitContext?.directionNextStationName {
+                    Text(AppLocalization.text(
+                        english: "Next stop \(next)",
+                        simplified: "下一站 \(next)",
+                        traditional: "下一站 \(next)"
+                    ))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
                 if let detail = journeyDetail(segment, index: index) {
                     Text(detail)
                         .font(.subheadline)
@@ -1037,7 +1050,16 @@ struct RouteDetailView: View {
                 // What we do not know about this door, that an exit is estimated rather than
                 // surveyed, or that nothing here is recorded as step-free. It rides with the leg
                 // it qualifies, so removing the card it used to live in loses nothing.
-                ForEach(accessNotes(for: index), id: \.self) { note in
+                //
+                // `segment.accessibilityNotes` joins it here. Seven carefully worded disclosures
+                // were being written into that field and read by nobody — the only reader in the
+                // repo sat inside `accessibilityScore`, which is itself never called, and the line
+                // above reads a *different* property of the same name on `RouteAccessGuide`. So a
+                // rider was never told that an out-of-station interchange means leaving the gates,
+                // that Beijing's two 虚拟换乘 count as one fare, that a cycling leg was drawn on the
+                // pedestrian route, that a bike leg has stairs on it, or that a walking distance is
+                // a straight-line guess.
+                ForEach(legNotes(for: segment, index: index), id: \.self) { note in
                     Label(note, systemImage: "info.circle")
                         .font(.footnote)
                         .foregroundStyle(Color.accentColor)
@@ -1224,6 +1246,15 @@ struct RouteDetailView: View {
                 )
             }
         }
+    }
+
+    /// Everything qualifying this leg, from the leg itself and from the door guide, in one list.
+    ///
+    /// Deduplicated because both sources can reach the same conclusion about the same walk, and a
+    /// caveat printed twice reads as two separate problems.
+    private func legNotes(for segment: RouteSegment, index: Int) -> [String] {
+        var seen = Set<String>()
+        return (segment.accessibilityNotes + accessNotes(for: index)).filter { seen.insert($0).inserted }
     }
 
     private func journeyDetail(_ segment: RouteSegment, index: Int) -> String? {

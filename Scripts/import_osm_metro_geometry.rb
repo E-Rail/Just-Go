@@ -592,18 +592,32 @@ end
 # `canonical_profile` prefers it for having the most name tokens. `sameCorridor` is the one
 # merge kind where no profile's name covers the others (Shenzhen's 2号线 and 8号线 relations
 # each carry only their own single-token name), so the display name has to be synthesised.
+# 普通车 marks a relation as *the ordinary service*, which is a distinction OSM needs only because
+# the same line also has 大站车 and 直达车 relations beside it. It is not part of the line's name:
+# 上海 16号线 shipped as "16号线普通车", so every route card, every station page and every service
+# window read it back to riders as though the operator called it that.
+#
+# Stripped for display only. The relation name still carries it where it matters, which is
+# `service_variant_kind` deciding what is a variant of what.
+def strip_ordinary_service_marker(name)
+  return name if name.nil? || name.empty?
+
+  stripped = name.sub(/普通(车|列车)\z/, "").strip
+  stripped.empty? ? name : stripped
+end
+
 def display_line_name(profiles, canonical, same_corridor)
-  return canonical[:name] if canonical[:name_tokens].length > 1
+  return strip_ordinary_service_marker(canonical[:name]) if canonical[:name_tokens].length > 1
   # Only synthesise a combined name for a group that merged *because of* the sameCorridor rule
   # (two logical lines with no textual overlap, unioned solely on identical stations + colour,
   # e.g. Shenzhen 2号线/8号线). An ordinary two-direction line's relations already merge via
   # `structuredIdentity`/`sameName` and also happen to share a station set — synthesising there
   # would concatenate every direction's raw OSM name (seen on Taiyuan/Changzhou/Hefei/Luoyang
   # etc., whose direction relations are tagged with distinct from/to-suffixed names).
-  return canonical[:name] unless same_corridor
+  return strip_ordinary_service_marker(canonical[:name]) unless same_corridor
 
   by_key = profiles.each_with_object({}) { |profile, names| names[profile[:name_key]] ||= profile[:name] }
-  return canonical[:name] if by_key.length <= 1
+  return strip_ordinary_service_marker(canonical[:name]) if by_key.length <= 1
 
   by_key.values.sort_by { |name| [name.length, name] }.join("/")
 end

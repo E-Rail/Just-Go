@@ -229,7 +229,10 @@ struct ProfileView: View {
             HStack {
                 Text(AppLocalization.localized("Version"))
                 Spacer()
-                Text("1.0.0")
+                // From the bundle, not a literal. This read "1.0.0" while the plist and
+                // MARKETING_VERSION both said 1.0, and would have gone on saying it through every
+                // release. The validator cannot see it: its literal check requires a letter.
+                Text(verbatim: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
                     .foregroundStyle(.secondary)
             }
 

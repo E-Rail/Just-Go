@@ -18,8 +18,6 @@ final class RoutePlannerViewModel {
     var destinationName: String = ""
     var originPlace: TransitPlace?
     var destinationPlace: TransitPlace?
-    var originSuggestions: [TransitPlace] = []
-    var destinationSuggestions: [TransitPlace] = []
     var routes: [Route] = []
     var recentRoutes: [RecentRoute] = []
     var isLoading = false
@@ -31,7 +29,6 @@ final class RoutePlannerViewModel {
         didSet { invalidateInFlightSearch() }
     }
 
-    private var suggestionTask: Task<Void, Never>?
     private var routeSearchGeneration = 0
     /// A search published routes and no input has changed since. Cleared by every mutation, so
     /// "Save this trip" can trust that what it snapshots is what is on screen.
@@ -77,10 +74,6 @@ final class RoutePlannerViewModel {
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
     }
 
-    deinit {
-        suggestionTask?.cancel()
-    }
-
     var accessibilityFilter: AccessibilityFilter {
         AccessibilityFilter(
             requiresWheelchairAccess: requiresWheelchairAccess,
@@ -112,16 +105,10 @@ final class RoutePlannerViewModel {
         field == .origin ? originName : destinationName
     }
 
-    func suggestions(for field: RouteInputField?) -> [TransitPlace] {
-        guard let field else { return [] }
-        return field == .origin ? originSuggestions : destinationSuggestions
-    }
-
     func updateName(_ name: String, for field: RouteInputField) {
         invalidateInFlightSearch()
         setName(name, for: field)
         setPlace(nil, for: field)
-        updateSuggestions(for: field)
     }
 
     /// Any input mutation supersedes an in-flight route search: bump the generation so a
@@ -351,8 +338,6 @@ final class RoutePlannerViewModel {
 
     func swapOriginDestination() {
         invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
         swap(&originName, &destinationName)
         swap(&originPlace, &destinationPlace)
     }
@@ -385,47 +370,6 @@ final class RoutePlannerViewModel {
         return route
     }
 
-    private func updateSuggestions(for field: RouteInputField) {
-        suggestionTask?.cancel()
-
-        let keyword = name(for: field)
-        guard !keyword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            clearSuggestions(for: field)
-            return
-        }
-        let region = searchRegion(for: field, radiusMeters: 80_000)
-
-        // [weak self]: MKLocalSearch (behind placeSearchProvider) is known to ignore Swift
-        // task cancellation elsewhere in this codebase, so a superseded keystroke's search
-        // keeps running in the background. A strong self capture here would pin the whole
-        // view model alive for as long as that stale network call takes to resolve.
-        suggestionTask = Task { [weak self, placeSearchProvider] in
-            do {
-                try await Task.sleep(for: .milliseconds(120))
-                let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
-                guard let self,
-                      !Task.isCancelled,
-                      name(for: field) == keyword,
-                      place(for: field) == nil else { return }
-                setSuggestions(suggestions, for: field)
-            } catch {
-                // Autocomplete is best-effort: a failed lookup while typing must not raise
-                // the "No Routes Found" alert (errorMessage feeds it). Searching surfaces
-                // real connectivity errors itself.
-                return
-            }
-        }
-    }
-
-    private func clearSuggestions(for field: RouteInputField) {
-        setSuggestions([], for: field)
-    }
-
-    private func clearSuggestions() {
-        originSuggestions = []
-        destinationSuggestions = []
-    }
-
     private func resolveTypedPlace(_ name: String, field: RouteInputField, generation: Int) async throws -> TransitPlace {
         let query = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { throw RoutePlanningError.stationNotFound }
@@ -443,11 +387,8 @@ final class RoutePlannerViewModel {
 
     private func assignPlace(_ place: TransitPlace, for field: RouteInputField) {
         invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
         setPlace(place, for: field)
         setName(place.name, for: field)
-        clearSuggestions(for: field)
     }
 
     private func setName(_ name: String, for field: RouteInputField) {
@@ -468,14 +409,6 @@ final class RoutePlannerViewModel {
 
     func place(for field: RouteInputField) -> TransitPlace? {
         field == .origin ? originPlace : destinationPlace
-    }
-
-    private func setSuggestions(_ suggestions: [TransitPlace], for field: RouteInputField) {
-        if field == .origin {
-            originSuggestions = suggestions
-        } else {
-            destinationSuggestions = suggestions
-        }
     }
 
     private func saveRecentRoute(_ route: Route, cityID: String?) {

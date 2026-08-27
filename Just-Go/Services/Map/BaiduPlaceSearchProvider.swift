@@ -84,11 +84,16 @@ final class BaiduPlaceSearchProvider: PlaceSearchProviding {
     }
 }
 
-/// Baidu where Baidu is better, Apple everywhere else, and Apple again whenever Baidu says nothing.
+/// Apple wherever Apple can answer, Baidu only where it cannot.
 ///
-/// The fallback is not defensive padding: a missing or rate-limited key must degrade the app to
-/// exactly what it was before Baidu existed, never to a blank screen. `isConfigured` being false is
-/// a normal state: the project builds and runs with no key at all.
+/// Both entry points here run Apple first. The quota is the reason: Baidu allows 100 place searches
+/// and 300 reverse geocodes a day for the whole account — a handful of riders — while Apple's
+/// lookups are unmetered. Every question this app can get an answer to without spending one of
+/// those is a question that should not spend one.
+///
+/// The fallback is not defensive padding either: a missing or rate-limited key must degrade the app
+/// to exactly what it was before Baidu existed, never to a blank screen. `isConfigured` being false
+/// is a normal state — the project builds and runs with no key at all.
 @MainActor
 final class CompositePlaceSearchProvider: PlaceSearchProviding {
     private let baidu: BaiduPlaceSearchProvider?
@@ -102,33 +107,50 @@ final class CompositePlaceSearchProvider: PlaceSearchProviding {
         self.appleMaps = appleMaps ?? MapKitPlaceSearchProvider()
     }
 
+    /// Apple first, Baidu only where Apple has nothing.
+    ///
+    /// This used to run the other way round for any Chinese-language query, and then call Apple
+    /// anyway whenever Baidu came back empty — spending one of the day's hundred searches to learn
+    /// nothing. The original reason was real: Apple's mainland POI results for a station's Chinese
+    /// name were four unrelated places and no station.
+    ///
+    /// What changed is that the station half of that problem is now answered offline. The bundled
+    /// index holds every station in every supported city and is consulted before this provider is
+    /// ever reached, so the query that actually arrives here is the one Apple has a fair chance at.
+    /// Trying Apple first costs a lookup that is free and unmetered; trying Baidu first costs one
+    /// that is neither.
     func searchPlaces(keyword: String, region: MKCoordinateRegion?, limit: Int) async throws -> [TransitPlace] {
-        if let baidu, Self.prefersBaidu(for: region), Self.containsCJK(keyword) {
-            do {
-                let results = try await baidu.searchPlaces(keyword: keyword, region: region, limit: limit)
-                if !results.isEmpty { return results }
-            } catch {
-                AppLog.data.info("Baidu place search unavailable, falling back to Apple: \(error)")
-            }
+        do {
+            let results = try await appleMaps.searchPlaces(keyword: keyword, region: region, limit: limit)
+            if !results.isEmpty { return results }
+        } catch {
+            AppLog.data.info("Apple place search unavailable, trying Baidu: \(error)")
         }
-        return try await appleMaps.searchPlaces(keyword: keyword, region: region, limit: limit)
+        guard let baidu, Self.prefersBaidu(for: region), Self.containsCJK(keyword) else { return [] }
+        return try await baidu.searchPlaces(keyword: keyword, region: region, limit: limit)
     }
 
     /// Apple first, and Baidu only if Apple has nothing.
     ///
-    /// The opposite of `searchPlaces`, on purpose. Baidu was brought in because Apple's mainland
-    /// results for a *Chinese place name* are thin, which is a statement about POI search and not
-    /// about turning a coordinate into a street address, where Apple is perfectly good. Reverse
-    /// geocoding is also the call the app makes most casually, on launch and on every "start from
-    /// my location", and it draws on an allowance of 300 a day shared by every rider.
+    /// Baidu was brought in because Apple's mainland results for a *Chinese place name* are thin,
+    /// which is a statement about POI search and not about turning a coordinate into a street
+    /// address, where Apple is perfectly good. Reverse geocoding is also the call the app makes
+    /// most casually — on every "start from my location" and every dropped pin — and it draws on an
+    /// allowance of 300 a day shared by every rider.
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace {
+        var applePlace: TransitPlace?
         do {
             let place = try await appleMaps.reverseGeocode(location: location, name: name)
             if place.address?.isEmpty == false { return place }
+            applePlace = place
         } catch {
             AppLog.data.info("Apple reverse geocode unavailable, trying Baidu: \(error)")
         }
+        // Outside Baidu's coverage there is nothing else to ask, so Apple's answer stands whether
+        // it carried an address or not. This used to ask Apple a second time for the reply it had
+        // just given — a second round trip for the same nil.
         guard let baidu, Self.prefersBaidu(for: nil, coordinate: location) else {
+            if let applePlace { return applePlace }
             return try await appleMaps.reverseGeocode(location: location, name: name)
         }
         return try await baidu.reverseGeocode(location: location, name: name)

@@ -96,6 +96,7 @@ struct LiveGoView: View {
     /// Measured corridor lengths for this trip's interchanges, fetched once and held for the
     /// screen's lifetime only: nothing about them is written to disk.
     @State private var transferGeometries: [TransferGeometry] = []
+    @State private var didRequestTransferGeometries = false
     /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
     /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
     /// The Accessibility toggle below is a stronger promise than this one. See `onAppear`.
@@ -232,6 +233,12 @@ struct LiveGoView: View {
         .task(id: viewModel.route.id) {
             await container.officialStationData.prefetchTransferAssets(for: viewModel.route)
         }
+        // A reroute is a different journey and gets its own attempt. Without this the once-per-trip
+        // guard below would carry the old route's answer, or its failure, into the new one.
+        .onChange(of: viewModel.route.id) { _, _ in
+            didRequestTransferGeometries = false
+            transferGeometries = []
+        }
     }
 
     // MARK: - Transfer step
@@ -325,14 +332,26 @@ struct LiveGoView: View {
     }
 
     private func loadTransferGeometries() async {
-        guard transferGeometries.isEmpty,
-              let provider = container.tripObservationProvider,
+        // Attempted once per trip, whatever the answer was.
+        //
+        // This lives on a `.task` inside a conditional branch — the prompt appears only while the
+        // rider is at a change — so SwiftUI rebuilds the subtree and restarts it at every
+        // interchange. The only guard was `transferGeometries.isEmpty`, which holds after *any*
+        // failed attempt, so with Baidu refusing, a four-change trip spent one route call per
+        // change, each a live round trip into a quota that had already said no.
+        guard !didRequestTransferGeometries else { return }
+        didRequestTransferGeometries = true
+        guard let provider = container.tripObservationProvider,
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return }
         transferGeometries = await provider.observations(from: origin, to: destination).transfers
     }
 
     /// Mirror of `destinationCoordinate` from the other end of the route.
+    ///
+    /// Note these are the route's own geometry, not the rider's origin and destination places. That
+    /// is deliberate — the corridor being measured is station to station — but it does mean this
+    /// asks a different question from the one the planner asked, so the two cannot share an answer.
     private var originCoordinate: CLLocationCoordinate2D? {
         for segment in viewModel.route.segments {
             if let first = segment.polylineCoordinates.first {

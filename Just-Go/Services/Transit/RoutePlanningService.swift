@@ -317,16 +317,18 @@ final class RoutePlanningService {
         to destination: CLLocationCoordinate2D
     ) async -> TripObservations {
         guard let tripObservations else { return .none }
-        return await withTaskGroup(of: TripObservations.self) { group in
-            group.addTask { await tripObservations.observations(from: origin, to: destination) }
-            group.addTask {
-                try? await Task.sleep(for: .seconds(3))
-                return .none
-            }
-            let first = await group.next() ?? .none
-            group.cancelAll()
-            return first
+        // `withDeadline` rather than a hand-rolled race. The race that was here returned the first
+        // of the two children but could not return *before* the other finished: `withTaskGroup`
+        // drains its children on exit and `cancelAll()` only marks them, so the three seconds this
+        // comment promised were really `timeoutIntervalForRequest` — twelve — with the whole plan
+        // waiting behind it. The client's request is genuinely cancellable now, which is what makes
+        // any deadline here mean anything.
+        let observed = try? await withDeadline(seconds: 3) {
+            CancellationError()
+        } operation: {
+            await tripObservations.observations(from: origin, to: destination)
         }
+        return observed ?? .none
     }
 
     /// Applies one already-fetched observation to a set of alternatives.
@@ -1154,10 +1156,20 @@ final class RoutePlanningService {
         guard let existing, let centre = stationPositions[guide.stationName] else { return fallback }
         let mode = existing.accessLegMode
 
-        let measurable = ranked.points.filter { point in
+        let candidates = ranked.points.filter { point in
             guard let coordinate = point.coordinate else { return false }
             return centre.metres(to: coordinate) > Self.exitRerouteThresholdMetres
         }
+        // Comparing doors is free on foot and expensive on a bike.
+        //
+        // MapKit draws walking and driving legs for nothing, so all three candidates are measured
+        // and the shortest wins. A cycling leg has no MapKit equivalent and goes to Baidu, and this
+        // runs per route, per end — three routes, two ends, three doors is eighteen riding calls to
+        // settle one question, plus six from the assembler. Against a 3 km ride the difference
+        // between two doors of the same station is noise, and `rankedAccessPoints` has already put
+        // the nearest one first by straight-line distance, so on a bike that pick stands and one
+        // call confirms it.
+        let measurable = mode == .cycling ? Array(candidates.prefix(1)) : candidates
         guard !measurable.isEmpty else { return fallback }
 
         let riderCoordinate = CLLocationCoordinate2D(latitude: rider.latitude, longitude: rider.longitude)

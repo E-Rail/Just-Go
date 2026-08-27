@@ -88,6 +88,41 @@ enum BaiduMapsError: Error, Equatable {
     /// This launch has already made as many calls to that endpoint as it is allowed. Local, so it
     /// costs no round trip, and indistinguishable to every caller from having no key at all.
     case budgetExhausted(path: String)
+    /// Baidu refused this endpoint recently enough that asking again would only be refused again.
+    /// Also local, also free.
+    case refusedRecently(path: String)
+}
+
+/// A handle on an in-flight `URLSessionDataTask`, so a caller that has stopped waiting can stop the
+/// transfer too.
+///
+/// A class, and not an actor, because `onCancel:` runs synchronously and cannot await. `NSLock`
+/// rather than a bare `var` because the adopting side and the cancelling side are different tasks:
+/// this is the one piece of shared mutable state the client has outside its own actor isolation.
+private final class SessionTaskBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var task: URLSessionDataTask?
+    private var cancelled = false
+
+    func adopt(_ task: URLSessionDataTask) {
+        lock.lock()
+        defer { lock.unlock() }
+        // Cancelled before the task even started: honour it rather than leaving a transfer running
+        // that nobody is waiting for.
+        if cancelled {
+            task.cancel()
+        } else {
+            self.task = task
+        }
+    }
+
+    func cancel() {
+        lock.lock()
+        defer { lock.unlock() }
+        cancelled = true
+        task?.cancel()
+        task = nil
+    }
 }
 
 /// Every Baidu Web Service response carries this envelope, and a non-zero `status` means the
@@ -134,6 +169,13 @@ actor BaiduMapsClient {
     /// Minimum wall-clock gap between two request *starts*, which is what a per-second quota
     /// actually measures. 350 ms keeps a burst under 3/s even when every response is instant.
     static let minimumRequestSpacing = Duration.milliseconds(350)
+    /// Baidu status codes that mean "and it will still be no in a moment": daily quota, concurrency
+    /// ceiling, service disabled, referer/IP rejected.
+    private static let refusalStatuses: Set<Int> = [210, 211, 240, 302, 401]
+    /// How long an endpoint is left alone after one of those. Long enough that a screen redrawing
+    /// or a rider retrying does not walk straight back into it; short enough that a concurrency
+    /// refusal clears on its own within a session.
+    private static let refusalHoldOff = Duration.seconds(120)
 
     let configuration: BaiduMapsConfiguration
     private let session: URLSession
@@ -146,6 +188,8 @@ actor BaiduMapsClient {
     /// and nothing has ever read it, so "the API stopped working" has been unanswerable from
     /// inside the app. Kept in memory only, like everything else this client touches.
     private var failures: [String: BaiduEndpointDiagnostics.Failure] = [:]
+    /// Endpoints Baidu has refused, and the instant it is worth asking again.
+    private var refusedUntil: [String: ContinuousClock.Instant] = [:]
     private var inFlightRequests = 0
     private var waiting: [CheckedContinuation<Void, Never>] = []
     private var earliestNextStart: ContinuousClock.Instant = .now
@@ -225,6 +269,17 @@ actor BaiduMapsClient {
             return try await existing.value
         }
 
+        // Baidu has already said no about this endpoint and said it recently. Every other provider
+        // in this app holds a `retryNotBefore` after a refusal; this one, which is the only one with
+        // a hard daily quota, kept sending until the local ceiling tripped — turning one 302
+        // 每日配额超限 into as many round trips as the rider had patience for. A refusal is the
+        // clearest possible signal that the next call is also wasted.
+        if let until = refusedUntil[path], until > ContinuousClock.now {
+            let error = BaiduMapsError.refusedRecently(path: path)
+            record(error, for: path)
+            throw error
+        }
+
         // Checked before anything is sent, so an exhausted budget costs nothing at all. Every
         // caller already treats a throw as "no answer" and falls back, so this needs no new
         // handling anywhere: it degrades the app to what it is with no key.
@@ -241,10 +296,26 @@ actor BaiduMapsClient {
         // Detached on purpose. A plain `Task` inside an actor method inherits that actor's
         // isolation, so `enterGate` would be a same-actor call — synchronous, never suspending,
         // and the gate would admit everything it was written to hold back.
+        //
+        // Detaching also severs cancellation, which is what `leaveGate` needs — a caller walking
+        // away must not abandon a held slot — and is exactly what made every deadline around this
+        // client a fiction. `withTaskGroup` drains its children before it returns, `cancelAll()`
+        // only marks them, and the awaiting side of `task.value` does not throw when *it* is
+        // cancelled. So the planner's three-second budget for an observation was really
+        // `timeoutIntervalForRequest`, twelve seconds, with the plan waiting behind it.
+        //
+        // The URLSession task is therefore cancelled explicitly on the way out. The detached body
+        // still owns the slot and still releases it, because the throw it takes is
+        // `session.data`'s own.
+        let sessionTask = SessionTaskBox()
         let task = Task.detached { [session] () throws -> Data in
             await self.enterGate()
             do {
-                let (data, _) = try await session.data(from: url)
+                let data = try await withTaskCancellationHandler {
+                    try await Self.data(from: url, session: session, box: sessionTask)
+                } onCancel: {
+                    sessionTask.cancel()
+                }
                 await self.leaveGate()
                 return data
             } catch {
@@ -255,10 +326,30 @@ actor BaiduMapsClient {
         coalescing[key] = task
         defer { coalescing[key] = nil }
         do {
-            return try await task.value
+            return try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: {
+                sessionTask.cancel()
+            }
         } catch {
             record(error, for: path)
             throw error
+        }
+    }
+
+    /// `URLSession.data(from:)` with a handle on the underlying task, so a caller that has given up
+    /// waiting can stop the transfer rather than merely stop listening to it.
+    private static func data(from url: URL, session: URLSession, box: SessionTaskBox) async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            let task = session.dataTask(with: url) { data, _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: data ?? Data())
+                }
+            }
+            box.adopt(task)
+            task.resume()
         }
     }
 
@@ -298,8 +389,15 @@ actor BaiduMapsClient {
         case .notConfigured: return
         case .malformedResponse: summary = "malformed response"
         case .budgetExhausted: summary = "this launch's own budget for this endpoint"
+        case .refusedRecently: summary = "held off after a recent refusal"
         case .service(let status, let message):
             summary = message.isEmpty ? "status \(status)" : "\(status) \(message)"
+            // Baidu's own refusals, not ours, and not a transport failure (which arrives as -1 and
+            // may well succeed on the next try): 302 daily quota, 401 concurrency, 240 service
+            // disabled, 210/211 referer or IP rejected. None of these changes within a few seconds.
+            if Self.refusalStatuses.contains(status) {
+                refusedUntil[path] = ContinuousClock.now.advanced(by: Self.refusalHoldOff)
+            }
         }
         failures[path] = BaiduEndpointDiagnostics.Failure(at: Date(), summary: summary)
     }

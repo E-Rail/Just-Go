@@ -50,7 +50,7 @@ class RequestBudgetTest < Minitest::Test
   def test_exhaustion_costs_no_round_trip
     # Checked before the request is built, so a spent budget is free rather than a timeout.
     budget_index = CLIENT.index("RequestBudget.ceilings[path]")
-    request_index = CLIENT.index("session.data(from: url)")
+    request_index = CLIENT.index("session.dataTask(with: url)")
 
     refute_nil budget_index
     refute_nil request_index
@@ -121,6 +121,23 @@ class TypingCostsNothingTest < Minitest::Test
                     "typing must not start a place search"
   end
 
+  QUICK_TAG = File.read(File.join(ROOT, "Just-Go/Views/Profile/QuickTagAddView.swift"), encoding: "UTF-8")
+
+  def test_quick_tag_typing_never_reaches_the_place_provider
+    # The same defect as above, on the screen that was missed when it was fixed. This one was worse:
+    # it fired *two* searches per 300 ms pause — one through searchStations, which omitted
+    # includingPlaces: and so took its true default, and a second through searchMapPlaces at a
+    # different limit, which is a different URL and so not even coalesced by the client.
+    assert_includes QUICK_TAG, "includingPlaces: false",
+                    "quick-tag typing must answer from the bundled index alone"
+    assert_includes QUICK_TAG, ".onSubmit(of: .search) { searchOnline() }"
+
+    typing = QUICK_TAG[/private func runSearch\(keyword: String\) \{(.*?)\n    \}/m, 1]
+    refute_nil typing, "could not find runSearch"
+    refute_includes typing, "searchMapPlaces(",
+                    "typing must not start a place search"
+  end
+
   def test_the_online_search_is_reachable_without_a_keyboard
     # A capability that only answers the return key is one most riders never find.
     assert_includes VIEW, "private var searchOnlineRow: some View"
@@ -149,13 +166,64 @@ class SearchRoutingPolicyTest < Minitest::Test
                     "Apple must be tried before spending one of 300 daily reverse geocodes"
   end
 
-  def test_place_search_still_asks_baidu_first_for_chinese
-    # The inverse of the rule above, and the reason the provider exists at all. Do not "tidy" these
-    # two methods into the same order.
-    baidu_index = COMPOSITE.index("try await baidu.searchPlaces")
-    apple_index = COMPOSITE.index("return try await appleMaps.searchPlaces")
+  def test_place_search_asks_apple_first_too
+    # This used to run the other way round for any Chinese query, and then call Apple anyway when
+    # Baidu came back empty — spending one of the day's hundred to learn nothing. The reason it was
+    # written that way is now answered offline: the bundled station index holds every station in
+    # every supported city and is consulted before this provider is reached, so what arrives here is
+    # a query Apple has a fair chance at. Apple's lookups are unmetered; Baidu's are the scarcest
+    # resource this app has.
+    apple_index = COMPOSITE.index("let results = try await appleMaps.searchPlaces")
+    baidu_index = COMPOSITE.index("return try await baidu.searchPlaces")
 
-    assert_operator baidu_index, :<, apple_index,
-                    "a Chinese place query must reach Baidu before Apple"
+    refute_nil apple_index
+    refute_nil baidu_index
+    assert_operator apple_index, :<, baidu_index,
+                    "Apple must be tried before spending one of 100 daily place searches"
+  end
+
+  def test_apple_is_never_asked_the_same_question_twice
+    # The outside-China branch used to call Apple a second time for the reply it had just given,
+    # whenever the first answer carried no address. No Baidu cost, but a wasted round trip on the
+    # call the app makes most casually.
+    assert_includes COMPOSITE, "if let applePlace { return applePlace }",
+                    "the first Apple answer must be reused rather than re-requested"
+  end
+end
+
+class RefusalBackoffTest < Minitest::Test
+  CLIENT = File.read(File.join(ROOT, "Just-Go/Services/Map/BaiduMapsClient.swift"), encoding: "UTF-8")
+
+  def test_a_refusal_holds_the_endpoint_off_the_wire
+    # Every other provider in the app holds a retryNotBefore after a refusal. This one, the only one
+    # with a hard daily quota, kept sending until the local ceiling tripped — turning one
+    # 302 每日配额超限 into as many round trips as the rider had patience for.
+    assert_includes CLIENT, "refusedUntil[path]"
+    assert_includes CLIENT, "case refusedRecently(path: String)"
+
+    hold_index = CLIENT.index("if let until = refusedUntil[path]")
+    request_index = CLIENT.index("session.dataTask(with: url)")
+    refute_nil hold_index
+    assert_operator hold_index, :<, request_index,
+                    "the hold-off must be checked before the network call"
+  end
+
+  def test_only_baidus_own_refusals_start_a_hold_off
+    # A transport failure arrives as status -1 and may well succeed on the next try; holding the
+    # endpoint off for it would turn one dropped packet into two minutes of nothing.
+    statuses = CLIENT[/refusalStatuses: Set<Int> = \[([^\]]*)\]/, 1]
+    refute_nil statuses, "could not find the refusal status list"
+    codes = statuses.split(",").map { |value| value.strip.to_i }
+
+    assert_includes codes, 302, "daily quota must start a hold-off"
+    assert_includes codes, 401, "the concurrency ceiling must start a hold-off"
+    refute_includes codes,(-1), "a transport failure must not start a hold-off"
+  end
+
+  def test_a_request_can_actually_be_cancelled
+    # Task.detached severs cancellation, which is what the gate needs and what made every deadline
+    # around this client a fiction: a three-second budget was really timeoutIntervalForRequest.
+    assert_includes CLIENT, "withTaskCancellationHandler"
+    assert_includes CLIENT, "sessionTask.cancel()"
   end
 end

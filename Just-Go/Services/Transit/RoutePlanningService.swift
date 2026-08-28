@@ -1465,7 +1465,7 @@ final class RoutePlanningService {
         // option behind an unmet requirement helps no one, and the route cards carry the
         // barrier warning explaining the ordering. (Path-level avoidance would need
         // accessibility data inside the routing graph. Not available there today.)
-        guard preferences.requiresWheelchairAccess || preferences.prefersElevator else { return ranked }
+        guard preferences.requiresStepFreeEntrance else { return ranked }
         let clear = ranked.filter { $0.stepFreeAssessment != .barrierDetected }
         let barriers = ranked.filter { $0.stepFreeAssessment == .barrierDetected }
         return clear + barriers

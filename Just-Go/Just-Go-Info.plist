@@ -37,10 +37,14 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<!-- The build settings, not literals. MARKETING_VERSION and CURRENT_PROJECT_VERSION both
+	     exist in the project and were inert while these were spelled out here, so a TestFlight
+	     upload — which needs a unique CFBundleVersion every time — meant editing a hand-written
+	     plist that nothing points at. Verify against the built .app, never against this file. -->
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>BaiduMapsAK</key>

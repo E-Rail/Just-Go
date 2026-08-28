@@ -8,15 +8,15 @@ struct AccessibilitySettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     @State private var voiceOverOn = UIAccessibility.isVoiceOverRunning
-
+    @AppStorage("showAccessibilityBadges") private var showBadges = true
     var body: some View {
         NavigationStack {
             Form {
-                primaryCategorySection
                 mobilitySection
                 visionSection
                 hearingSection
                 cognitiveSection
+                stationListSection
             }
             .navigationTitle(AppLocalization.localized("Accessibility"))
             .navigationBarTitleDisplayMode(.inline)
@@ -33,23 +33,14 @@ struct AccessibilitySettingsView: View {
         }
     }
 
-    private var primaryCategorySection: some View {
-        Section {
-            Picker(AppLocalization.localized("Primary Category"), selection: preferenceBinding(\.primaryCategory)) {
-                ForEach(DisabilityCategory.allCases, id: \.self) { category in
-                    Label(category.displayName, systemImage: category.icon)
-                        .tag(category)
-                }
-            }
-        } header: {
-            Text(AppLocalization.localized("Primary Disability Category"))
-        }
-    }
 
     private var mobilitySection: some View {
         Section(AppLocalization.localized("Mobility")) {
             Toggle(AppLocalization.localized("Requires Wheelchair Access"), isOn: preferenceBinding(\.requiresWheelchairAccess))
-            Toggle(AppLocalization.localized("Prefer Elevator"), isOn: preferenceBinding(\.prefersElevator))
+            Toggle(
+                AppLocalization.text(english: "Requires Elevator", simplified: "需要电梯", traditional: "需要電梯"),
+                isOn: preferenceBinding(\.prefersElevator)
+            )
             Toggle(AppLocalization.localized("Avoid Stairs"), isOn: preferenceBinding(\.avoidStairs))
 
             VStack(alignment: .leading, spacing: 8) {
@@ -159,6 +150,20 @@ struct AccessibilitySettingsView: View {
                 english: "Step-by-Step Guidance opens the guided navigator directly when you view a route.",
                 simplified: "分步指引会在查看路线时直接进入分步导航。",
                 traditional: "分步指引會在查看路線時直接進入分步導航。"
+            ))
+        }
+    }
+
+    private var stationListSection: some View {
+        Section {
+            Toggle(AppLocalization.localized("Show Accessibility Badges"), isOn: $showBadges)
+        } header: {
+            Text(AppLocalization.text(english: "Station list", simplified: "车站列表", traditional: "車站列表"))
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Icons on a station row when elevator, ramp or tactile-path data exists.",
+                simplified: "在车站行上显示电梯、坡道或盲道图标（仅在有数据时）。",
+                traditional: "在車站列上顯示電梯、坡道或導盲磚圖示（僅在有資料時）。"
             ))
         }
     }

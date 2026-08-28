@@ -130,21 +130,8 @@ struct ProfileView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(AppLocalization.localized("Current Profile"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                HStack {
-                    Image(systemName: appState.accessibilityPreference.primaryCategory.icon)
-                        .foregroundStyle(Color.accentColor)
-                    Text(appState.accessibilityPreference.primaryCategory.displayName)
-                        .font(.subheadline)
-                }
-            }
         } header: {
-            Text(AppLocalization.localized("Trip Preferences"))
+            Text(AppLocalization.localized("Accessibility"))
         }
     }
 

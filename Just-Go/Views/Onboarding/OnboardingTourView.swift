@@ -49,9 +49,9 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Compare and go", simplified: "比较路线，出发", traditional: "比較路線，出發"),
                 points: [
                     ("list.bullet", AppLocalization.text(
-                        english: "A search returns several routes. Sort them by time, by fare, or by fewest changes.",
-                        simplified: "一次搜索会给出多条路线，可按时间、票价或换乘次数排序。",
-                        traditional: "一次搜尋會給出多條路線，可按時間、票價或轉乘次數排序。"
+                        english: "A search returns several routes. Sort them by time, by walking, or by fewest changes.",
+                        simplified: "一次搜索会给出多条路线，可按时间、步行或换乘次数排序。",
+                        traditional: "一次搜尋會給出多條路線，可按時間、步行或轉乘次數排序。"
                     )),
                     ("figure.walk", AppLocalization.text(
                         english: "A long first or last stretch switches to cycling or driving. The route says which.",

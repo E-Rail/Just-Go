@@ -11,7 +11,6 @@
 "Boarding Access" = "進站入口";
 "Cancel" = "取消";
 "Cognitive" = "認知";
-"Current Profile" = "目前設定檔";
 "Delete" = "刪除";
 "Direct" = "直達";
 "Distance" = "距離";
@@ -23,9 +22,7 @@
 "Flash Alerts" = "閃光提醒";
 "Fully Accessible" = "完全無障礙";
 "Hearing" = "聽力";
-"Hearing Impairment" = "聽力障礙";
 "High Contrast Mode" = "高對比模式";
-"Language" = "語言";
 "Language changes take effect after restarting Just-Go." = "語言更改將在重新啟動 Just-Go 後生效。";
 "Large Text" = "大字體";
 "Least Walking" = "最少步行";
@@ -33,7 +30,6 @@
 "Map" = "地圖";
 "Max Walking Distance" = "最大步行距離";
 "Mobility" = "行動能力";
-"Multiple" = "多重障礙";
 "Network connection failed. Try again later." = "網路連線失敗。請稍後再試。";
 "No Results" = "無結果";
 "No Routes Found" = "未找到路線";
@@ -46,14 +42,10 @@
 "Walking-heavy route" = "步行較多的路線";
 "Step-free barrier detected" = "偵測到無障礙通行障礙";
 "Live countdown unavailable" = "暫無即時倒數";
-"None" = "無";
 "Not available" = "不可用";
 "Not verified" = "未驗證";
 "OK" = "好";
 "Partial Accessibility" = "部分無障礙";
-"Prefer Elevator" = "優先電梯";
-"Primary Category" = "主要類別";
-"Primary Disability Category" = "主要障礙類別";
 "Privacy Policy" = "隱私權政策";
 "Profile" = "個人";
 "Recent Searches" = "最近搜尋";
@@ -79,8 +71,6 @@
 "Map, station search, and routes" = "地圖、車站搜尋和路線";
 "Accessibility and station facilities" = "無障礙與車站設施";
 "Official city packs when public sources exist" = "有公開官方來源時使用官方城市資料包";
-"Official Station Details" = "官方車站詳情";
-"City Packs" = "城市資料包";
 "Transfer" = "轉乘";
 "Try a different search term" = "請嘗試其他搜尋詞";
 "Version" = "版本";
@@ -88,7 +78,6 @@
 "Vision" = "視力";
 "Visual Announcements" = "視覺播報";
 "Visual Display" = "視覺顯示";
-"Visual Impairment" = "視力障礙";
 "VoiceOver Support" = "旁白支援";
 "Wheelchair" = "輪椅";
 "Wheelchair Ramp" = "輪椅坡道";
@@ -144,7 +133,6 @@
 "Walking distance is estimated" = "步行距離為估算值。";
 "Accessibility risk" = "無障礙風險";
 "Accessibility unknown" = "無障礙情況未知";
-"Apple Maps" = "Apple 地圖";
 "Apple Maps walking directions mention a ramp." = "Apple 地圖步行指引提到坡道。";
 "Apple Maps walking directions mention an elevator." = "Apple 地圖步行指引提到電梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地圖步行指引提到電扶梯。";
@@ -189,7 +177,6 @@
 "Train times" = "列車時刻";
 "Notifications" = "通知";
 "Avg duration" = "平均時長";
-"Trip Preferences" = "行程偏好";
 "My Activity" = "我的活動";
 "Total trips" = "總行程";
 "This month" = "本月";

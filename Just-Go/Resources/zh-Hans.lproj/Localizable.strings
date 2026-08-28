@@ -12,7 +12,6 @@
 "Boarding Access" = "进站入口";
 "Cancel" = "取消";
 "Cognitive" = "认知";
-"Current Profile" = "当前配置";
 "Delete" = "删除";
 "Direct" = "直达";
 "Distance" = "距离";
@@ -24,9 +23,7 @@
 "Flash Alerts" = "闪光提醒";
 "Fully Accessible" = "完全无障碍";
 "Hearing" = "听力";
-"Hearing Impairment" = "听力障碍";
 "High Contrast Mode" = "高对比度模式";
-"Language" = "语言";
 "Language changes take effect after restarting Just-Go." = "语言更改将在重新启动 Just-Go 后生效。";
 "Large Text" = "大号文字";
 "Least Walking" = "最少步行";
@@ -34,7 +31,6 @@
 "Map" = "地图";
 "Max Walking Distance" = "最大步行距离";
 "Mobility" = "行动能力";
-"Multiple" = "多重障碍";
 "Network connection failed. Try again later." = "网络连接失败。请稍后再试。";
 "No Results" = "无结果";
 "No Routes Found" = "未找到路线";
@@ -47,13 +43,9 @@
 "Walking-heavy route" = "步行较多的路线";
 "Step-free barrier detected" = "检测到无障碍通行障碍";
 "Live countdown unavailable" = "暂无实时倒计时";
-"None" = "无";
 "Not available" = "不可用";
 "Not verified" = "未验证";
 "Partial Accessibility" = "部分无障碍";
-"Prefer Elevator" = "优先电梯";
-"Primary Category" = "主要类别";
-"Primary Disability Category" = "主要障碍类别";
 "Privacy Policy" = "隐私政策";
 "Profile" = "个人";
 "Recent Searches" = "最近搜索";
@@ -79,8 +71,6 @@
 "Map, station search, and routes" = "地图、车站搜索和路线";
 "Accessibility and station facilities" = "无障碍与车站设施";
 "Official city packs when public sources exist" = "有公开官方来源时使用官方城市数据包";
-"Official Station Details" = "官方车站详情";
-"City Packs" = "城市数据包";
 "Transfer" = "换乘";
 "Try a different search term" = "请尝试其他搜索词";
 "Version" = "版本";
@@ -88,7 +78,6 @@
 "Vision" = "视力";
 "Visual Announcements" = "视觉播报";
 "Visual Display" = "视觉显示";
-"Visual Impairment" = "视力障碍";
 "VoiceOver Support" = "旁白支持";
 "Wheelchair" = "轮椅";
 "Wheelchair Ramp" = "轮椅坡道";
@@ -144,7 +133,6 @@
 "Walking distance is estimated" = "步行距离为估算值。";
 "Accessibility risk" = "无障碍风险";
 "Accessibility unknown" = "无障碍情况未知";
-"Apple Maps" = "Apple 地图";
 "Apple Maps walking directions mention a ramp." = "Apple 地图步行指引提到坡道。";
 "Apple Maps walking directions mention an elevator." = "Apple 地图步行指引提到电梯。";
 "Apple Maps walking directions mention an escalator." = "Apple 地图步行指引提到扶梯。";
@@ -189,7 +177,6 @@
 "Train times" = "列车时刻";
 "Notifications" = "通知";
 "Avg duration" = "平均时长";
-"Trip Preferences" = "行程偏好";
 "My Activity" = "我的活动";
 "Total trips" = "总行程";
 "This month" = "本月";

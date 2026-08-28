@@ -3,8 +3,6 @@ import Foundation
 /// `Equatable` so a view can key work on "the rider changed a preference". `MapContainerView`
 /// re-seeds the planner from this, which is the only path by which these settings reach a plan.
 struct AccessibilityPreference: Codable, Equatable {
-    var primaryCategory: DisabilityCategory
-
     // Mobility
     var requiresWheelchairAccess: Bool
     var prefersElevator: Bool
@@ -26,7 +24,6 @@ struct AccessibilityPreference: Codable, Equatable {
 
     static var `default`: AccessibilityPreference {
         AccessibilityPreference(
-            primaryCategory: .none,
             requiresWheelchairAccess: false,
             prefersElevator: false,
             maxWalkingDistance: 500,
@@ -64,35 +61,8 @@ extension AccessibilityPreference {
             maxWalkingDistance: maxWalkingDistance
         )
     }
-}
 
-enum DisabilityCategory: String, Codable, CaseIterable {
-    case mobility = "mobility"
-    case visualImpairment = "visual_impairment"
-    case hearingImpairment = "hearing_impairment"
-    case cognitive = "cognitive"
-    case multiple = "multiple"
-    case none = "none"
-
-    var displayName: String {
-        switch self {
-        case .mobility: return AppLocalization.localized("Mobility")
-        case .visualImpairment: return AppLocalization.localized("Visual Impairment")
-        case .hearingImpairment: return AppLocalization.localized("Hearing Impairment")
-        case .cognitive: return AppLocalization.localized("Cognitive")
-        case .multiple: return AppLocalization.localized("Multiple")
-        case .none: return AppLocalization.localized("None")
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .mobility: return "figure.roll"
-        case .visualImpairment: return "eye.slash"
-        case .hearingImpairment: return "ear.badge.waveform"
-        case .cognitive: return "brain.head.profile"
-        case .multiple: return "accessibility"
-        case .none: return "person"
-        }
+    var requiresStepFreeEntrance: Bool {
+        requiresWheelchairAccess || prefersElevator || avoidStairs
     }
 }

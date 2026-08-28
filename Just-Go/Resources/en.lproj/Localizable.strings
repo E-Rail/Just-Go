@@ -12,7 +12,6 @@
 "Boarding Access" = "Boarding Access";
 "Cancel" = "Cancel";
 "Cognitive" = "Cognitive";
-"Current Profile" = "Current Profile";
 "Delete" = "Delete";
 "Direct" = "Direct";
 "Distance" = "Distance";
@@ -24,9 +23,7 @@
 "Flash Alerts" = "Flash Alerts";
 "Fully Accessible" = "Fully Accessible";
 "Hearing" = "Hearing";
-"Hearing Impairment" = "Hearing Impairment";
 "High Contrast Mode" = "High Contrast Mode";
-"Language" = "Language";
 "Language changes take effect after restarting Just-Go." = "Language changes take effect after restarting Just-Go.";
 "Large Text" = "Large Text";
 "Least Walking" = "Least Walking";
@@ -34,7 +31,6 @@
 "Map" = "Map";
 "Max Walking Distance" = "Max Walking Distance";
 "Mobility" = "Mobility";
-"Multiple" = "Multiple";
 "Network connection failed. Try again later." = "Network connection failed. Try again later.";
 "No Results" = "No Results";
 "No Routes Found" = "No Routes Found";
@@ -47,13 +43,9 @@
 "Walking-heavy route" = "Walking-heavy route";
 "Step-free barrier detected" = "Step-free barrier detected";
 "Live countdown unavailable" = "Live countdown unavailable";
-"None" = "None";
 "Not available" = "Not available";
 "Not verified" = "Not verified";
 "Partial Accessibility" = "Partial Accessibility";
-"Prefer Elevator" = "Prefer Elevator";
-"Primary Category" = "Primary Category";
-"Primary Disability Category" = "Primary Disability Category";
 "Privacy Policy" = "Privacy Policy";
 "Profile" = "Profile";
 "Recent Searches" = "Recent Searches";
@@ -79,8 +71,6 @@
 "Map, station search, and routes" = "Map, station search, and routes";
 "Accessibility and station facilities" = "Accessibility and station facilities";
 "Official city packs when public sources exist" = "Official city packs when public sources exist";
-"Official Station Details" = "Official Station Details";
-"City Packs" = "City Packs";
 "Transfer" = "Transfer";
 "Try a different search term" = "Try a different search term";
 "Version" = "Version";
@@ -88,7 +78,6 @@
 "Vision" = "Vision";
 "Visual Announcements" = "Visual Announcements";
 "Visual Display" = "Visual Display";
-"Visual Impairment" = "Visual Impairment";
 "VoiceOver Support" = "VoiceOver Support";
 "Wheelchair" = "Wheelchair";
 "Wheelchair Ramp" = "Wheelchair Ramp";
@@ -144,7 +133,6 @@
 "Walking distance is estimated" = "Walking distance is estimated";
 "Accessibility risk" = "Accessibility risk";
 "Accessibility unknown" = "Accessibility unknown";
-"Apple Maps" = "Apple Maps";
 "Apple Maps walking directions mention a ramp." = "Apple Maps walking directions mention a ramp.";
 "Apple Maps walking directions mention an elevator." = "Apple Maps walking directions mention an elevator.";
 "Apple Maps walking directions mention an escalator." = "Apple Maps walking directions mention an escalator.";
@@ -189,7 +177,6 @@
 "Train times" = "Train times";
 "Notifications" = "Notifications";
 "Avg duration" = "Avg duration";
-"Trip Preferences" = "Trip Preferences";
 "My Activity" = "My Activity";
 "Total trips" = "Total trips";
 "This month" = "This month";

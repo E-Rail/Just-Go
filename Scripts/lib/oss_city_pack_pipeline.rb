@@ -690,7 +690,7 @@ module OSSCityPackPipeline
             "scope" => "Generated catalog, rights inventory, and deterministic pack structure",
             "licenseSPDX" => "MIT",
             "licenseURL" => "https://opensource.org/license/mit",
-            "sourceURL" => "https://github.com/e-rail/justgo",
+            "sourceURL" => "https://github.com/E-Rail/Just-Go",
             "attribution" => "Just-Go contributors",
             "redistribution" => "Covered by the repository MIT license; third-party fields retain their separately declared terms."
           },

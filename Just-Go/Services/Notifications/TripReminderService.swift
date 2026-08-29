@@ -45,6 +45,11 @@ final class TripReminderService {
 
         var components = ChinaClock.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         components.timeZone = ChinaClock.calendar.timeZone
+        // The calendar too, not only the zone. `UNCalendarNotificationTrigger` matches components
+        // against `Calendar.current` when they name none, so Gregorian year 2026 handed to a device
+        // set to the Buddhist, Japanese or Republic-of-China calendar is a date centuries away —
+        // and the reminder simply never fires.
+        components.calendar = ChinaClock.calendar
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         let request = UNNotificationRequest(identifier: identifier(for: routeID), content: content, trigger: trigger)
         try? await center.add(request)
@@ -56,7 +61,7 @@ final class TripReminderService {
     }
 
     /// Schedules an estimated "get off" alert to fire at `fireDate`. Timing is derived from the
-    /// route's segment durations — there is NO live train-position feed, so the copy says so.
+    /// route's segment durations: there is NO live train-position feed, so the copy says so.
     /// Returns false if the fire time is already in the past.
     @discardableResult
     func scheduleArrivalReminder(stationID: String, stationName: String, exitHint: String?, fireDate: Date) async -> Bool {
@@ -68,13 +73,13 @@ final class TripReminderService {
         content.title = AppLocalization.text(english: "Get ready to get off", simplified: "准备下车", traditional: "準備下車")
         if let exitHint, !exitHint.isEmpty {
             content.body = AppLocalization.text(
-                english: "Approaching \(stationName) — get off and head to \(exitHint). (estimated from route time)",
+                english: "Approaching \(stationName). Get off and head to \(exitHint). (estimated from route time)",
                 simplified: "即将到达\(stationName)，请下车前往\(exitHint)。（根据线路时间估算）",
                 traditional: "即將抵達\(stationName)，請下車前往\(exitHint)。（根據路線時間估算）"
             )
         } else {
             content.body = AppLocalization.text(
-                english: "Approaching \(stationName) — get ready to get off. (estimated from route time)",
+                english: "Approaching \(stationName). Get ready to get off. (estimated from route time)",
                 simplified: "即将到达\(stationName)，请准备下车。（根据线路时间估算）",
                 traditional: "即將抵達\(stationName)，請準備下車。（根據路線時間估算）"
             )

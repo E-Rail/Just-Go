@@ -49,7 +49,7 @@ class OSSCityPackPipelineTest < Minitest::Test
     assert_equal ["macau-official-landing-link", "osm-metro-networks"], macau.fetch("rightsIDs")
     assert_equal "https://www.mlm.com.mo/en/", macau.fetch("externalResources").first.fetch("landingPageURL")
 
-    assert_equal 444, beijing.fetch("stations").length
+    assert_equal 449, beijing.fetch("stations").length
     assert_equal 162, hong_kong.fetch("stations").length
     assert_equal 98, hong_kong.fetch("stations").count { |station| station["accessibility"] }
     assert_equal 2_047, hong_kong.fetch("stations").sum { |station| station.fetch("stationFacilities").length }
@@ -59,7 +59,7 @@ class OSSCityPackPipelineTest < Minitest::Test
     assert_equal 121, references.count { |reference| reference["mode"] == "heavyRail" }
     assert_equal 205, references.count { |reference| reference["mode"] == "lightRail" }
     assert_equal 326, references.length
-    assert_equal({ "covered" => 0, "total" => 444 }, beijing.dig("coverage", "externalLayouts"))
+    assert_equal({ "covered" => 0, "total" => 449 }, beijing.dig("coverage", "externalLayouts"))
 
     barrier = sources.fetch("resources").find do |resource|
       resource["fileName"] == "barrier_free_facilities.csv"

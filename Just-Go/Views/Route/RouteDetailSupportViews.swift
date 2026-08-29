@@ -12,12 +12,12 @@ extension RouteConfidenceLevel {
 }
 
 /// The single universal way a route's confidence reads: a dial filled clockwise from twelve
-/// o'clock to `score`/100 of the way round — tinted green/orange/red by the level — with the
+/// o'clock to `score`/100 of the way round. Tinted green/orange/red by the level, with the
 /// score at its center. Shared by the route-selection rows and the route-detail card so the same
 /// number and geometry appear everywhere confidence is shown.
 ///
 /// The arc used to sweep forever instead of stopping at the score. That is a spinner's motion,
-/// and a spinner means "still working" — so a settled 42 read as a value still loading, and the
+/// and a spinner means "still working", so a settled 42 read as a value still loading, and the
 /// full circle read as 100 regardless of the number inside it. The fill is now the score.
 struct ConfidenceScoreRing: View {
     let score: Int
@@ -38,7 +38,7 @@ struct ConfidenceScoreRing: View {
             Circle()
                 // Derived from `score` rather than grown in from `@State` on appear: `onAppear`
                 // does not fire under `ImageRenderer` or in previews, and a fill that depends on
-                // it renders as an empty ring there — the one failure that looks like real data.
+                // it renders as an empty ring there. The one failure that looks like real data.
                 .trim(from: 0, to: fraction)
                 .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 // `trim` starts at three o'clock; a dial has to start at twelve.
@@ -63,20 +63,25 @@ struct ConfidenceScoreRing: View {
 ///
 /// Feasibility outranks confidence: "there are stairs" is a fact about the trip, while a confidence
 /// score is a fact about our data. Shared by the results row and the detail hero so a route cannot
-/// be flagged on one screen and clean on the other — they used to decide separately, and the list
+/// be flagged on one screen and clean on the other. They used to decide separately, and the list
 /// led with a red "38" that the detail screen then described as merely medium.
 ///
 /// Returning nil is the point. A green "high confidence" badge on a route with nothing wrong with
 /// it is decoration, and decoration on every row is what made the list unreadable.
 enum RouteConcern {
+    /// - Parameter gradesData: whether this route rides anything the confidence score is about.
+    ///   The score grades station and network data; a walk or a drive uses neither, so "Medium
+    ///   confidence" on one is a verdict about nothing. Feasibility still applies to both — it
+    ///   reads the walking directions, and stairs on a footpath are a real finding.
     static func worst(
         feasibility: RouteFeasibility,
-        confidence: RouteConfidence
+        confidence: RouteConfidence,
+        gradesData: Bool = true
     ) -> (title: String, icon: String, tint: Color)? {
         if feasibility.level != .good, feasibility.level != .unknown {
             return (feasibility.title, feasibility.level.iconName, feasibility.level.color)
         }
-        guard confidence.level != .high else { return nil }
+        guard gradesData, confidence.level != .high else { return nil }
         let icon: String = confidence.level == .medium
             ? "exclamationmark.triangle.fill"
             : "exclamationmark.octagon.fill"
@@ -86,8 +91,8 @@ enum RouteConcern {
 
 /// Confidence and feasibility on one screen.
 ///
-/// They used to be two stacked cards that answered the same rider question — "can I rely on this
-/// plan?" — from two angles, after the header above them had already printed both verdicts as
+/// They used to be two stacked cards that answered the same rider question. "Can I rely on this
+/// plan?": from two angles, after the header above them had already printed both verdicts as
 /// chips. Three renderings of two numbers. This is the one place that detail lives now, one tap
 /// from the route.
 struct RouteConfidenceDetailView: View {
@@ -183,13 +188,13 @@ struct RouteConfidenceDetailView: View {
     /// Warnings the screen has not already made, capped at five.
     ///
     /// The feasibility verdict heads its own section above, and `confidence.warnings` repeats it
-    /// verbatim — "Walking-heavy route" appeared twice on one screen, once as a heading and once as
+    /// verbatim: "Walking-heavy route" appeared twice on one screen, once as a heading and once as
     /// a bullet under it, which reads as two separate problems.
     private var warnings: [String] {
         confidence.warnings.filter { $0 != feasibility.title }.prefix(5).map { $0 }
     }
 
-    /// The bottleneck first, then the explanations — and nothing at all when there is nothing to
+    /// The bottleneck first, then the explanations, and nothing at all when there is nothing to
     /// report. A card that says "no concerns found" is a screenful of no information.
     private var accessibilityNotes: [String] {
         var notes: [String] = []
@@ -201,7 +206,7 @@ struct RouteConfidenceDetailView: View {
     }
 }
 
-/// Single source of truth for how a `DataConfidence` reads visually — fixed semantic
+/// Single source of truth for how a `DataConfidence` reads visually. Fixed semantic
 /// indicators (official/verified = green, anything estimated/pending/personal = orange,
 /// unavailable = red, unknown = gray), intentionally not theme-tinted. Shared by
 /// `DataConfidenceChip` below and `StationDetailView`'s confidence rows.
@@ -257,14 +262,14 @@ struct DataConfidenceChip: View {
 /// transition and then blinks out at the end.
 ///
 /// This hooked `interactivePopGestureRecognizer` before, which covered exactly one way of going
-/// back. A tapped back button produces no gesture and no `.began`, so nothing fired for it at all —
+/// back. A tapped back button produces no gesture and no `.began`, so nothing fired for it at all,
 /// and that is the more common way to leave. `viewWillDisappear` is the signal UIKit sends for
 /// both: at the start of the push-pop animation for a tapped back, and at the start of the
 /// interactive transition for a swipe, with `viewWillAppear` again if that swipe is abandoned.
 /// Appearance callbacks propagate to child view controllers, which is what this is.
 ///
-/// It does not fire for a sheet presented over the page — `.pageSheet` leaves the presenter on
-/// screen and UIKit sends it no appearance callbacks — so the trip card cannot dismiss itself.
+/// It does not fire for a sheet presented over the page. `.PageSheet` leaves the presenter on
+/// screen and UIKit sends it no appearance callbacks, so the trip card cannot dismiss itself.
 struct PageTransitionObserver: UIViewControllerRepresentable {
     /// The page is starting to leave. Runs for a back button and for a back-swipe alike.
     let onLeaving: () -> Void

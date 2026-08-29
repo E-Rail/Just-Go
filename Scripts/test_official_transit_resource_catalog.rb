@@ -16,16 +16,16 @@ class OfficialTransitResourceCatalogBuilderTest < Minitest::Test
     resources = hong_kong.fetch("resources") + hong_kong.fetch("stationResources").flat_map { |station| station.fetch("resources") }
 
     assert_equal 58, catalog.fetch("cities").length
-    assert_equal 444, beijing.fetch("stationResources").length
-    assert_equal 416, beijing.fetch("stationResources").count { |station|
+    assert_equal 449, beijing.fetch("stationResources").length
+    assert_equal 421, beijing.fetch("stationResources").count { |station|
       station.fetch("resources").any? {
         |resource| resource.fetch("targetURL").include?("/station/siteinfo.html?loc=")
       }
     }
-    assert_equal 416, beijing.fetch("stationResources").count {
+    assert_equal 421, beijing.fetch("stationResources").count {
       |station| station.fetch("providerStationID", "").match?(/\A\d{9}\z/)
     }
-    assert_equal 418, beijing.fetch("stationResources").count {
+    assert_equal 423, beijing.fetch("stationResources").count {
       |station| station.fetch("stationInformationStatus") == "exactPage"
     }
     assert_equal 18, beijing.fetch("stationResources").count {

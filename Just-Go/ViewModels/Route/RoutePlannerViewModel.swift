@@ -18,8 +18,6 @@ final class RoutePlannerViewModel {
     var destinationName: String = ""
     var originPlace: TransitPlace?
     var destinationPlace: TransitPlace?
-    var originSuggestions: [TransitPlace] = []
-    var destinationSuggestions: [TransitPlace] = []
     var routes: [Route] = []
     var recentRoutes: [RecentRoute] = []
     var isLoading = false
@@ -31,19 +29,18 @@ final class RoutePlannerViewModel {
         didSet { invalidateInFlightSearch() }
     }
 
-    private var suggestionTask: Task<Void, Never>?
     private var routeSearchGeneration = 0
     /// A search published routes and no input has changed since. Cleared by every mutation, so
     /// "Save this trip" can trust that what it snapshots is what is on screen.
     ///
-    /// This used to be the planned network's city ID, doing double duty as a has-a-plan flag —
+    /// This used to be the planned network's city ID, doing double duty as a has-a-plan flag,
     /// which quietly stopped working the moment a plan could be a walk, since a walk enters no
     /// network and so had no city to record.
     private(set) var hasPlannedForCurrentInputs = false
 
     /// Persisted app-wide accessibility defaults (the 无障碍 sheet), refreshed by the view
     /// on each appearance. Feeds max-walk warnings and ranking; the chips below override
-    /// the mobility flags per-trip. Plain set on purpose — refreshing it must not
+    /// the mobility flags per-trip. Plain set on purpose. Refreshing it must not
     /// invalidate an in-flight search.
     var basePreference: AccessibilityPreference = .default
 
@@ -77,10 +74,6 @@ final class RoutePlannerViewModel {
         recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
     }
 
-    deinit {
-        suggestionTask?.cancel()
-    }
-
     var accessibilityFilter: AccessibilityFilter {
         AccessibilityFilter(
             requiresWheelchairAccess: requiresWheelchairAccess,
@@ -112,20 +105,14 @@ final class RoutePlannerViewModel {
         field == .origin ? originName : destinationName
     }
 
-    func suggestions(for field: RouteInputField?) -> [TransitPlace] {
-        guard let field else { return [] }
-        return field == .origin ? originSuggestions : destinationSuggestions
-    }
-
     func updateName(_ name: String, for field: RouteInputField) {
         invalidateInFlightSearch()
         setName(name, for: field)
         setPlace(nil, for: field)
-        updateSuggestions(for: field)
     }
 
     /// Any input mutation supersedes an in-flight route search: bump the generation so a
-    /// slow search's publish/error guards fail, and clear the spinner here — the superseded
+    /// slow search's publish/error guards fail, and clear the spinner here. The superseded
     /// search's defer (correctly) refuses to touch it once the token has moved on. Also
     /// voids the has-a-plan flag and any error, both of which described the
     /// previous inputs (a "No Routes Found" alert must not outlive the query it was for).
@@ -185,8 +172,8 @@ final class RoutePlannerViewModel {
         assignPlace(place, for: field)
     }
 
-    /// Fills one end of the trip from the device. Returns whether THIS invocation applied a fill —
-    /// false on failure, denial, or a stale-context drop.
+    /// Fills one end of the trip from the device. Returns whether THIS invocation applied a fill.
+    /// False on failure, denial, or a stale-context drop.
     ///
     /// The ladder that produces the coordinate lives in `CurrentPlaceResolver`, shared with the
     /// search page's "my location" chip. What stays here is the only part that is the planner's
@@ -198,7 +185,7 @@ final class RoutePlannerViewModel {
         // quick-place setup must be dropped, not applied over the newer input.
         let expectedName = name(for: field)
         let expectedPlace = self.place(for: field)
-        // self.place(for:) — the local `place` declared below shadows the method in here.
+        // self.place(for:): the local `place` declared below shadows the method in here.
         func contextUnchanged() -> Bool {
             name(for: field) == expectedName && self.place(for: field) == expectedPlace
         }
@@ -229,7 +216,7 @@ final class RoutePlannerViewModel {
         locationService.prewarmLocation()
     }
 
-    /// Returns whether THIS invocation published non-empty routes — a superseded or failed
+    /// Returns whether THIS invocation published non-empty routes. A superseded or failed
     /// search returns false, so callers (saved-trip credit, results push) act only on the
     /// search they own instead of inspecting the shared `routes` after the await.
     @discardableResult
@@ -280,9 +267,9 @@ final class RoutePlannerViewModel {
                 )
             case (nil, nil):
                 // Resolve both names here (concurrently, as the service's name-based path
-                // did — same region/limit/first-hit semantics) instead of delegating to it:
+                // did: same region/limit/first-hit semantics) instead of delegating to it:
                 // the service never surfaced its resolutions, so saving after a both-typed
-                // search — the recents-replay path — persisted name-only (0,0) endpoints.
+                // search: the recents-replay path. Persisted name-only (0,0) endpoints.
                 let originQuery = originName.trimmingCharacters(in: .whitespacesAndNewlines)
                 let destinationQuery = destinationName.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !originQuery.isEmpty, !destinationQuery.isEmpty else {
@@ -321,7 +308,7 @@ final class RoutePlannerViewModel {
             if let firstRoute = routes.first {
                 // The network that actually planned it, so replaying the recent resolves its
                 // station names in the right pack. A walking-only route has no network and
-                // stores none — `resolvedCityID` recovers one from the station ID when it can.
+                // stores none: `resolvedCityID` recovers one from the station ID when it can.
                 saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID)
             }
             return !routes.isEmpty
@@ -351,8 +338,6 @@ final class RoutePlannerViewModel {
 
     func swapOriginDestination() {
         invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
         swap(&originName, &destinationName)
         swap(&originPlace, &destinationPlace)
     }
@@ -385,47 +370,6 @@ final class RoutePlannerViewModel {
         return route
     }
 
-    private func updateSuggestions(for field: RouteInputField) {
-        suggestionTask?.cancel()
-
-        let keyword = name(for: field)
-        guard !keyword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            clearSuggestions(for: field)
-            return
-        }
-        let region = searchRegion(for: field, radiusMeters: 80_000)
-
-        // [weak self]: MKLocalSearch (behind placeSearchProvider) is known to ignore Swift
-        // task cancellation elsewhere in this codebase, so a superseded keystroke's search
-        // keeps running in the background — a strong self capture here would pin the whole
-        // view model alive for as long as that stale network call takes to resolve.
-        suggestionTask = Task { [weak self, placeSearchProvider] in
-            do {
-                try await Task.sleep(for: .milliseconds(120))
-                let suggestions = try await placeSearchProvider.searchPlaces(keyword: keyword, region: region, limit: 8)
-                guard let self,
-                      !Task.isCancelled,
-                      name(for: field) == keyword,
-                      place(for: field) == nil else { return }
-                setSuggestions(suggestions, for: field)
-            } catch {
-                // Autocomplete is best-effort: a failed lookup while typing must not raise
-                // the "No Routes Found" alert (errorMessage feeds it). Searching surfaces
-                // real connectivity errors itself.
-                return
-            }
-        }
-    }
-
-    private func clearSuggestions(for field: RouteInputField) {
-        setSuggestions([], for: field)
-    }
-
-    private func clearSuggestions() {
-        originSuggestions = []
-        destinationSuggestions = []
-    }
-
     private func resolveTypedPlace(_ name: String, field: RouteInputField, generation: Int) async throws -> TransitPlace {
         let query = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { throw RoutePlanningError.stationNotFound }
@@ -443,11 +387,8 @@ final class RoutePlannerViewModel {
 
     private func assignPlace(_ place: TransitPlace, for field: RouteInputField) {
         invalidateInFlightSearch()
-        suggestionTask?.cancel()
-        suggestionTask = nil
         setPlace(place, for: field)
         setName(place.name, for: field)
-        clearSuggestions(for: field)
     }
 
     private func setName(_ name: String, for field: RouteInputField) {
@@ -468,14 +409,6 @@ final class RoutePlannerViewModel {
 
     func place(for field: RouteInputField) -> TransitPlace? {
         field == .origin ? originPlace : destinationPlace
-    }
-
-    private func setSuggestions(_ suggestions: [TransitPlace], for field: RouteInputField) {
-        if field == .origin {
-            originSuggestions = suggestions
-        } else {
-            destinationSuggestions = suggestions
-        }
     }
 
     private func saveRecentRoute(_ route: Route, cityID: String?) {
@@ -527,7 +460,7 @@ struct RecentRoute: Identifiable, Codable {
     /// City the route was planned in; nil on rows saved before this field existed.
     let cityID: String?
 
-    /// The stored city, or one recovered from the station ID for legacy rows — every route
+    /// The stored city, or one recovered from the station ID for legacy rows. Every route
     /// producer builds IDs as "network-<cityID>-<station>", so the middle component is the
     /// city. Returns nil (caller keeps the selected city) when neither source is usable.
     var resolvedCityID: String? {

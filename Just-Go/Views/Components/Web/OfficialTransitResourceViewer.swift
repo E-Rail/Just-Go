@@ -90,7 +90,7 @@ struct OfficialTransitResourceButton: View {
         .padding(.horizontal, 10)
         .frame(minHeight: 36)
         .background(Color.secondary.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
         .contentShape(Rectangle())
     }
 
@@ -101,7 +101,7 @@ struct OfficialTransitResourceButton: View {
             .padding(.horizontal, 4)
             .padding(.vertical, 1)
             .background(Color.secondary.opacity(0.12))
-            .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 
     private var iconName: String {
@@ -141,7 +141,7 @@ struct OfficialTransitResourceViewer: View {
                             .controlSize(.large)
                             .padding(20)
                             .background(.regularMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                             .accessibilityLabel(AppLocalization.text(
                                 english: "Loading official resource",
                                 simplified: "正在加载官方资源",
@@ -228,7 +228,7 @@ struct OfficialTransitResourceViewer: View {
                 .padding(.horizontal, 6)
                 .padding(.vertical, 3)
                 .background(Color.secondary.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
         }
         .padding(.horizontal)
         .frame(minHeight: 50)
@@ -397,7 +397,7 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
 
             do {
                 // `timeoutIntervalForRequest`/`timeoutIntervalForResource` only fire when no
-                // bytes arrive for the interval — a connection that trickles data indefinitely
+                // bytes arrive for the interval: a connection that trickles data indefinitely
                 // never trips them, so a buffered `session.data(for:)` can hang well past the
                 // declared 30s and leave the viewer looking frozen. Race it against an explicit
                 // deadline, mirroring the fix in OfficialStationInformationProvider.swift.
@@ -508,9 +508,9 @@ private enum OfficialTransitBinaryLoadError: LocalizedError {
             )
         case .insecureRedirect:
             return AppLocalization.text(
-                english: "Just-Go blocked a redirect to a non-secure address.",
-                simplified: "Just-Go 已阻止重定向至非安全地址。",
-                traditional: "Just-Go 已封鎖重新導向至非安全位址。"
+                english: "That page tried to send you somewhere unsecure, so we stopped.",
+                simplified: "该页面试图跳转到非安全地址，已为你停止。",
+                traditional: "該頁面試圖跳轉到非安全位址，已為你停止。"
             )
         case .tooLarge:
             return AppLocalization.text(
@@ -622,7 +622,7 @@ private final class OfficialTransitResourceWebState: ObservableObject {
     private var loadWatchdog: Task<Void, Never>?
 
     /// Nothing else here has a time limit. WebKit reports a failed load through its delegate, but
-    /// a DNS lookup that never answers produces no delegate call at all — the operator hosts this
+    /// a DNS lookup that never answers produces no delegate call at all. The operator hosts this
     /// app links to are exactly the ones that do that on a restricted network, and the result was
     /// a screen showing a spinner and nothing else, forever. Every load now ends one way or the
     /// other within this window.
@@ -1018,9 +1018,9 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
                     state.failed(
                         webView,
                         message: AppLocalization.text(
-                            english: "Just-Go blocked a non-secure link from this page.",
-                            simplified: "Just-Go 已阻止此页面中的非安全链接。",
-                            traditional: "Just-Go 已封鎖此頁面中的非安全連結。"
+                            english: "That link isn't secure, so we didn't open it.",
+                            simplified: "该链接不安全，已为你拦下。",
+                            traditional: "該連結不安全，已為你擋下。"
                         )
                     )
                 }
@@ -1058,9 +1058,9 @@ private struct OfficialTransitResourceWebView: UIViewRepresentable {
                 state.failed(
                     webView,
                     message: AppLocalization.text(
-                        english: "This operator file cannot be displayed inside Just-Go.",
-                        simplified: "此运营方文件无法在 Just-Go 内显示。",
-                        traditional: "此營運方檔案無法在 Just-Go 內顯示。"
+                        english: "This file can't be opened here.",
+                        simplified: "此文件无法在此打开。",
+                        traditional: "此檔案無法在此開啟。"
                     )
                 )
                 decisionHandler(.cancel)

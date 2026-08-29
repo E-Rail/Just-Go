@@ -24,15 +24,25 @@ final class DIContainer {
     let stationInformationDirectory: StationInformationDirectory
     let metroNetworkProvider: MetroNetworkProviding
     let routePlanningService: RoutePlanningService
+    /// Present only when a key is configured. Held so one screen can show what this launch has
+    /// spent and what the provider last refused; nothing else reads it.
+    let baiduMapsClient: BaiduMapsClient?
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
+    let transferInsightService: TransferInsightService
+    /// Measured transfer corridor lengths, when a provider can supply them. Optional because the
+    /// app must build, launch and route with no Baidu key at all.
+    let tripObservationProvider: TripObservationProviding?
+    /// The same service seen through a different port, and optional for the same reason: with no
+    /// key the line page still draws, it simply cannot offer to check itself against the operator.
+    let lineObservationProvider: LineObservationProviding?
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
     let stationInformationDiskCache: OfficialStationInformationDiskCache?
     /// Operator notices, fetched on the device and held in memory only. Not in `init` because it
-    /// has no configuration and no test seam yet — one city publishes a parseable list.
+    /// has no configuration and no test seam yet. One city publishes a parseable list.
     let serviceNoticeProvider = BeijingServiceNoticeProvider()
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
     private var memoryWarningObserver: NSObjectProtocol?
@@ -45,9 +55,13 @@ final class DIContainer {
         stationInformationDirectory: StationInformationDirectory,
         metroNetworkProvider: MetroNetworkProviding,
         routePlanningService: RoutePlanningService,
+        baiduMapsClient: BaiduMapsClient?,
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
+        transferInsightService: TransferInsightService,
+        tripObservationProvider: TripObservationProviding? = nil,
+        lineObservationProvider: LineObservationProviding? = nil,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         tripReminderService: TripReminderService,
@@ -64,9 +78,13 @@ final class DIContainer {
         self.stationInformationDirectory = stationInformationDirectory
         self.metroNetworkProvider = metroNetworkProvider
         self.routePlanningService = routePlanningService
+        self.baiduMapsClient = baiduMapsClient
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
+        self.transferInsightService = transferInsightService
+        self.tripObservationProvider = tripObservationProvider
+        self.lineObservationProvider = lineObservationProvider
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.tripReminderService = tripReminderService
@@ -85,8 +103,8 @@ final class DIContainer {
         }
     }
 
-    /// Settings → Clear Cache. Deletes every downloaded/cached tier — city packs on disk and
-    /// in memory, the device-local station-information snapshots, and URL caches — while
+    /// Settings → Clear Cache. Deletes every downloaded/cached tier. City packs on disk and
+    /// in memory, the device-local station-information snapshots, and URL caches, while
     /// leaving user data (tags, trips, records, personal media, preferences) untouched.
     func clearAllCaches() async {
         await memoryWarningReleaseTargets.officialStationData?.clearAllCaches()
@@ -126,7 +144,7 @@ final class DIContainer {
     /// Held here rather than in a `@State` on the map, because the map's navigation router has to
     /// be able to build any of those three screens *synchronously*, at any moment, with no
     /// dependency on whether some `.task` has run yet. When it was optional state, a push that
-    /// arrived before that task produced `EmptyView` — a pushed screen with no title and no
+    /// arrived before that task produced `EmptyView`. A pushed screen with no title and no
     /// content, which is exactly what a blank page is.
     @MainActor
     func sharedRoutePlannerViewModel() -> RoutePlannerViewModel {
@@ -165,16 +183,27 @@ final class DIContainer {
     @MainActor
     static func configure() -> DIContainer {
         let locationService = LocationService()
-        let placeSearchProvider = MapKitPlaceSearchProvider()
+        // Baidu answers Chinese place queries that Apple misses. Searching a station name used to
+        // return unrelated places and no station. The key comes from the git-ignored
+        // Secrets.xcconfig; when it is absent the composite is pure MapKit and nothing else in the
+        // app can tell the difference.
+        let baiduConfiguration = BaiduMapsConfiguration.fromBundle()
+        let baiduClient = baiduConfiguration.isConfigured
+            ? BaiduMapsClient(configuration: baiduConfiguration)
+            : nil
+        let placeSearchProvider = CompositePlaceSearchProvider(
+            baidu: baiduClient.map { BaiduPlaceSearchProvider(client: $0) }
+        )
+        let tripObservationProvider = baiduClient.map { BaiduTripObservationService(client: $0) }
         let metroNetworkProvider = BundledMetroNetworkService()
         // Dedicated ephemeral sessions (no cookies, no shared cache) instead of `URLSession.shared`
-        // — a stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
+        //. A stuck city-pack/realtime fetch shouldn't serialize behind unrelated shared-session
         // traffic, matching the pattern already used for the Beijing station-info provider.
         let realtimeArrivalProvider = HongKongRealtimeArrivalProvider(session: Self.makeEphemeralSession())
         let stationInformationDiskCache = OfficialStationInformationDiskCache()
         // One provider per source, dispatched by a router. The app decides which source a station
         // uses by reading the bundled Station Information API directory, exactly as a third-party
-        // consumer would — no per-city branching at the call sites.
+        // consumer would: no per-city branching at the call sites.
         let stationInformationRouter = OfficialStationInformationRouter(
             beijing: BeijingStationInformationProvider(diskCache: stationInformationDiskCache),
             shanghai: ShanghaiStationInformationProvider(diskCache: stationInformationDiskCache),
@@ -190,10 +219,16 @@ final class DIContainer {
             realtimeArrivals: realtimeArrivalProvider,
             officialResourceCatalogLoader: { try .bundled() }
         )
-        // One walking-leg builder for both callers: the graph walks to the station, enrichment
+        // One access-leg builder for both callers: the graph walks to the station, enrichment
         // re-walks to the door it picks. Two instances would be harmless but two implementations
         // would not, so the shared one is passed explicitly rather than defaulted twice.
-        let walkingRouteProvider = MapKitWalkingRouteProvider()
+        //
+        // Walking and driving stay with MapKit. Cycling goes to Baidu, which has a cycling router
+        // where MapKit has no cycling transport type at all; with no key the composite is pure
+        // MapKit and the bike leg is the re-timed walking shape it has always been.
+        let walkingRouteProvider = CompositeAccessRouteProvider(
+            riding: baiduClient.map { BaiduRidingRouteProvider(client: $0) }
+        )
         let transitRouteProvider = BundledMetroRouteProvider(
             metroNetworks: metroNetworkProvider,
             walkingRoutes: walkingRouteProvider
@@ -210,9 +245,11 @@ final class DIContainer {
             officialStationData: officialStationData,
             walkingRoutes: walkingRouteProvider,
             officialStationInformation: stationInformationRouter,
-            stationInformationDirectory: stationInformationDirectory
+            stationInformationDirectory: stationInformationDirectory,
+            tripObservations: tripObservationProvider
         )
         let tripMemoryService = TripMemoryService()
+        let transferInsightService = TransferInsightService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
@@ -225,9 +262,13 @@ final class DIContainer {
             stationInformationDirectory: stationInformationDirectory,
             metroNetworkProvider: metroNetworkProvider,
             routePlanningService: routePlanningService,
+            baiduMapsClient: baiduClient,
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,
+            transferInsightService: transferInsightService,
+            tripObservationProvider: tripObservationProvider,
+            lineObservationProvider: tripObservationProvider,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             tripReminderService: tripReminderService,

@@ -5,7 +5,7 @@ struct RouteTabs: View {
     @Binding var selection: UUID
     /// Drawn over the map rather than on a page background. `Color.appSurface` and a 15% accent
     /// tint are both partly transparent, which is fine against a solid page and unreadable against
-    /// moving cartography — so the floating form swaps in a material and an opaque selected fill.
+    /// moving cartography, so the floating form swaps in a material and an opaque selected fill.
     var floating = false
 
     var body: some View {
@@ -39,7 +39,7 @@ struct RouteTabs: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, floating ? 11 : 9)
                         .background {
-                            let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            let shape = RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
                             if floating {
                                 shape.fill(.regularMaterial)
                                     .overlay(shape.fill(
@@ -47,7 +47,7 @@ struct RouteTabs: View {
                                             ? Color.accentColor.opacity(0.22)
                                             : Color.clear
                                     ))
-                                    .shadow(color: .black.opacity(0.22), radius: 6, y: 3)
+                                    .elevated(.floating)
                             } else {
                                 shape.fill(
                                     selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface
@@ -55,7 +55,7 @@ struct RouteTabs: View {
                             }
                         }
                         .overlay {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
                                 .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
                         }
                     }
@@ -105,7 +105,7 @@ struct SortChip: View {
             .padding(.vertical, 9)
             // Tinted rather than filled. `Color.accentColor` is the theme lightened for *foreground*
             // legibility in dark mode, so using it as a fill under white text collapses the contrast
-            // it exists to protect — the selected chip was pale green with white text on it.
+            // it exists to protect: the selected chip was pale green with white text on it.
             .background(isSelected ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
             .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
             .overlay(Capsule().stroke(isSelected ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))

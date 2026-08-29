@@ -1,24 +1,25 @@
 # Just-Go
 
-[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjustgo-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/justgo)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/justgo)
+[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjust--go-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/just-go)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/just-go)
 [![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
 [![License: MIT](https://img.shields.io/badge/software-MIT-green.svg)](LICENSE)
 
 English | [中文](README-zh.md)
 
 Just-Go is an iPhone and iPad transit companion for route planning, station context, and honest
-data confidence. It combines bundled metro routing, Apple Maps place search and walking legs,
-attributed metro geometry, and narrowly
-scoped official city data. Missing schedules, layouts, transfer paths, and door positions are
-shown as unavailable rather than inferred.
+data confidence. Rail routing runs on a bundled network graph, so it works underground and with no
+signal. Apple Maps supplies place search and walking legs, and narrowly scoped official city data
+is layered on top. Missing schedules, layouts, transfer paths and door positions are shown as
+unavailable rather than inferred.
 
 ## What Ships
 
+- Offline rail routing across a 58-city catalog. 53 of those cities carry a canonical
+  metro-network baseline, separately attributed to OpenStreetMap under ODbL 1.0, covering 6,718
+  stations. The remaining 5 are catalog-only.
 - Apple Maps place search, walking directions, and map rendering.
-- A 58-city catalog with 46 canonical metro-network baselines, separately attributed to
-  OpenStreetMap under ODbL 1.0; 12 entries are catalog-only.
-- Two included offline city-data baselines: Beijing and Hong Kong.
+- Station accessibility data for 582 stations across 14 cities, from each city's own open data.
 - Hong Kong MTR and Light Rail station, route, accessibility, and live-reference data from
   DATA.GOV.HK under its custom reuse terms.
 - Official Hong Kong live arrivals from the government transport API, with timeout, cache,
@@ -28,19 +29,33 @@ shown as unavailable rather than inferred.
   (Live Trains, Exits, Facilities).
 - A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
   rider-facing maps, travel information, accessibility resources, and help pages.
-- Private station images imported from Photos or Files, normalized and stored only on-device.
+- Optional online enrichment where a Baidu Maps key is configured: ticket fare, measured transfer
+  corridor lengths, first and last train times, a taxi estimate beside a last-train warning, and
+  cycling and e-bike routing for the first and last mile. None of it is bundled, cached to disk or
+  committed, and the app plans routes without it.
 
-The current bundled coverage is:
+Bundled station accessibility coverage, by city:
 
-| City | Network | Matched | Accessibility | Live arrivals | External maps | Media | Verified transfers |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Beijing | 444 | 444 | 0 | 0 | 0 | 0 | 0 |
-| Hong Kong | 162 | 162 | 98 | 162 | 0 | 0 | 0 |
+| City | Network stations | With accessibility data |
+| --- | ---: | ---: |
+| Xi'an | 247 | 164 |
+| Taipei | 151 | 118 |
+| Hong Kong | 162 | 98 |
+| Shanghai | 471 | 56 |
+| Beijing | 444 | 43 |
+| Guangzhou | 414 | 37 |
+| Shenzhen | 372 | 19 |
+| Nanjing | 210 | 11 |
+| Hangzhou | 270 | 10 |
+| Chengdu | 396 | 9 |
+| Wuhan | 293 | 7 |
+| Tianjin | 239 | 5 |
+| Chongqing | 273 | 3 |
+| Suzhou | 235 | 2 |
 
-The other 56 city packs are source-pending. Of those cities, 44 retain an attributed network
-baseline and 12 are catalog-only. Included metro topology powers rail routing independently of
-optional city-pack details; Apple Maps supplies place search and walking legs. No current city
-pack is presented as downloadable.
+The other 44 catalog cities are source-pending for station data. Bundled metro topology powers
+rail routing independently of optional city-pack details. No current city pack is presented as
+downloadable.
 
 ## Official Resource Directory
 
@@ -87,8 +102,9 @@ no rider could open. Just-Go claims no 3D maps, indoor routes, boarding cars, do
 transfer corridors. On a transfer, Live Go shows the station, any official operator links, and
 tells the rider to follow station signs.
 
-What it does show comes from official open data: exits and entrances where a city publishes them,
-and corridor/platform hints where an operator does.
+What it does show comes from official open data: exits and entrances where a city publishes them.
+Corridor lengths between platforms come from an online routing provider when one is configured,
+and are shown as a distance rather than a path.
 
 ## Setup
 
@@ -114,7 +130,7 @@ ruby Scripts/validate_official_transit_resources.rb
 ruby Scripts/validate_universal_city_data.rb
 ```
 
-Developers consuming Just-Go's data can use the Universal City Data Format —
+Developers consuming Just-Go's data can use the Universal City Data Format.
 [`DataPacks/universal/`](DataPacks/universal/) publishes all 58 cities in one versioned,
 integrity-indexed JSON schema documented in
 [DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md).
@@ -134,12 +150,12 @@ license treatment.
 - Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
   station ID to `www.bjsubway.com`. Just-Go displays selected response text, does not send it to a
   Just-Go server, and keeps only a device-local, backup-excluded copy of the last good snapshot for
-  offline access — served clearly labeled as cached and deletable via Settings → Clear Cache.
+  offline access, served clearly labeled as cached and deletable via Settings → Clear Cache.
   Opening the exact source page may also contact provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
-- The app links to the published [Privacy Policy](https://e-rail.github.io/justgo/docs/privacy/)
-  and [Terms of Service](https://e-rail.github.io/justgo/docs/terms/).
+- The app links to the published [Privacy Policy](https://e-rail.github.io/just-go/docs/privacy/)
+  and [Terms of Service](https://e-rail.github.io/just-go/docs/terms/).
 
 ## License
 

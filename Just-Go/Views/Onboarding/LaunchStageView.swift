@@ -23,7 +23,7 @@ struct LaunchStageView: View {
             Text(wordmark)
                 // San Francisco, at the weight the system uses for a large title. The wordmark was
                 // set in New York (`design: .serif`), which is also an Apple face but reads as a
-                // reading typeface — the first thing the app shows should look like the platform
+                // reading typeface: the first thing the app shows should look like the platform
                 // it is part of, and every other screen is already SF.
                 .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 52 : 44, weight: .semibold))
                 .foregroundStyle(themeColor)
@@ -45,7 +45,7 @@ struct LaunchStageView: View {
     }
 
     /// Drawn rather than a `ProgressView(value:)` so the fill is exactly the theme colour at
-    /// exactly this weight — the system bar renders its own track styling and cannot be pinned
+    /// exactly this weight: the system bar renders its own track styling and cannot be pinned
     /// to a 3pt capsule.
     private var progressBar: some View {
         GeometryReader { geometry in

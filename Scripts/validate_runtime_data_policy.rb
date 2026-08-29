@@ -89,8 +89,12 @@ swift_sources = swift_files.to_h { |path| [path, File.read(path, encoding: "UTF-
 
 expected_web_literals = Set.new([
   ["Just-Go/Views/Map/TransitMapView.swift", "https://www.openstreetmap.org/copyright"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/privacy/"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/justgo/docs/terms/"],
+  # Baidu is fetch-only. Its terms forbid storing or caching what the service releases, so nothing
+  # it returns may be persisted or committed — the check below enforces that no response payload
+  # ever lands in the repo.
+  ["Just-Go/Services/Map/BaiduMapsClient.swift", "https://api.map.baidu.com"],
+  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
+  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],
@@ -100,7 +104,17 @@ expected_web_literals = Set.new([
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.bjsubway.com/station/xltcx/"],
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mtr.bj.cn/service/line/"],
   ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mtr.com.hk/en/customer/services/system_map.html"],
-  ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mlm.com.mo/en/"]
+  ["Just-Go/Services/Data/OfficialCityPackService.swift", "https://www.mlm.com.mo/en/"],
+  # Outbound handoff, not a fetch. These are opened in the rider's browser or their own installed
+  # app when they tap "Apple Maps"/"Amap"/"Baidu Maps"/"DiDi" on a bike or car leg; the app never
+  # requests them, never reads a response and never stores one. They exist as https fallbacks for
+  # riders who do not have the app, which is also the only path testable without a device.
+  #
+  # What leaves the phone is the two coordinates of that one leg, which the rider chose, plus the
+  # destination name. Nothing about the trip's other legs, no history, no identifier.
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://uri.amap.com/navigation?from=\\(origin.longitude),\\(origin.latitude)"],
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://api.map.baidu.com/direction?origin=\\(origin.latitude),\\(origin.longitude)"],
+  ["Just-Go/Services/Map/ExternalRouteHandoff.swift", "https://common.diditaxi.com.cn/general/webEntry?fromlat=\\(origin.latitude)"]
 ]).freeze
 
 actual_web_literals = Set.new
@@ -156,6 +170,106 @@ swift_sources.each do |absolute_path, source|
 
   %w[jsdelivr.net wikimedia.org wikipedia.org githubusercontent.com].each do |host|
     errors << "runtime source references forbidden media/data host #{host}: #{absolute_path.delete_prefix("#{ROOT}/")}" if source.include?(host)
+  end
+end
+
+# --- Baidu is fetch-only, and must stay that way -----------------------------------------------
+#
+# Baidu's terms forbid storing or caching what the service releases (clause 3.3.2), so the app may
+# read a response and must not keep it. Three things are asserted, because "we remembered not to"
+# is not a guarantee: the client cannot cache, the consumer cannot persist, and no response payload
+# has been committed. The last one is the trap the LicenseRef-External-Link-Only cities already
+# taught us — the leak is a generated file landing in the repo, not a line of Swift.
+baidu_client_path = File.join(ROOT, "Just-Go/Services/Map/BaiduMapsClient.swift")
+if File.file?(baidu_client_path)
+  baidu_client_source = File.read(baidu_client_path, encoding: "UTF-8")
+  ["URLSessionConfiguration.ephemeral", "urlCache = nil", "reloadIgnoringLocalCacheData"].each do |marker|
+    errors << "Baidu client must not cache responses (missing #{marker})" unless
+      baidu_client_source.include?(marker)
+  end
+
+  # Named, and required to exist. This used to skip silently when the file was absent, which meant
+  # renaming the consumer would have turned the persistence check off without failing anything.
+  observation_path = File.join(ROOT, "Just-Go/Services/Transit/BaiduTripObservationService.swift")
+  if File.file?(observation_path)
+    observation_source = File.read(observation_path, encoding: "UTF-8")
+    %w[UserDefaults FileManager setCodable NSKeyedArchiver].each do |marker|
+      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduTripObservationService)" if
+        observation_source.include?(marker)
+    end
+  else
+    errors << "BaiduTripObservationService.swift is missing; the no-persistence check cannot run"
+  end
+
+  # The checks above only watch the two files that *fetch* from Baidu, and a fare does not stay
+  # there: it is attached to a `Route`, and a `Route` is one Codable struct that `ActiveTripStore`
+  # writes to UserDefaults whole so a trip survives the app being killed underground. That is how
+  # the fare and the missed-train taxi price reached disk for months without tripping anything.
+  #
+  # So the consumer end is pinned too. `ActiveTripStore` is the only place a route is persisted;
+  # it must strip the provider's numbers on the way past, and `Route` must keep the helper that
+  # does it. Named explicitly, and required to exist, for the same reason as above: renaming
+  # either one would otherwise turn this check off without failing anything.
+  trip_store_path = File.join(ROOT, "Just-Go/Services/Data/ActiveTripStore.swift")
+  route_path = File.join(ROOT, "Just-Go/Models/Transit/Route.swift")
+  if File.file?(trip_store_path) && File.file?(route_path)
+    trip_store_source = File.read(trip_store_path, encoding: "UTF-8")
+    route_source = File.read(route_path, encoding: "UTF-8")
+    unless trip_store_source.include?("setCodable(route.withoutObservedPricing")
+      errors << "ActiveTripStore must strip provider pricing before persisting a route"
+    end
+    unless route_source.include?("var withoutObservedPricing: Route") &&
+           route_source[/var withoutObservedPricing: Route.*?\n    \}/m].to_s.include?("stripped.fare = nil") &&
+           route_source[/var withoutObservedPricing: Route.*?\n    \}/m].to_s.include?("stripped.missedTrainTaxiYuan = nil")
+      errors << "Route.withoutObservedPricing must clear both fare and missedTrainTaxiYuan"
+    end
+    # Anything else that reaches for the same persistence primitives with a whole route.
+    other_persisting = Dir[File.join(ROOT, "Just-Go/**/*.swift")].select do |candidate|
+      next false if candidate == trip_store_path
+
+      File.read(candidate, encoding: "UTF-8").match?(/setCodable\(\s*route\b/)
+    end
+    unless other_persisting.empty?
+      errors << "a route is persisted outside ActiveTripStore: #{other_persisting.map { |f| f.sub("#{ROOT}/", '') }.join(', ')}"
+    end
+  else
+    errors << "ActiveTripStore.swift or Route.swift is missing; the route-persistence check cannot run"
+  end
+
+  # The cycling provider gets the same treatment, with one marker relaxed: it reads a rider's own
+  # "I ride an electric bike" preference out of UserDefaults, which is the rider's setting rather
+  # than anything the provider released. Writing is still forbidden.
+  riding_path = File.join(ROOT, "Just-Go/Services/Map/BaiduRidingRouteProvider.swift")
+  if File.file?(riding_path)
+    riding_source = File.read(riding_path, encoding: "UTF-8")
+    ["UserDefaults.standard.set", "FileManager", "setCodable", "NSKeyedArchiver"].each do |marker|
+      errors << "Baidu-derived data must not be persisted (#{marker} in BaiduRidingRouteProvider)" if
+        riding_source.include?(marker)
+    end
+  else
+    errors << "BaiduRidingRouteProvider.swift is missing; the no-persistence check cannot run"
+  end
+
+  # No committed byte may have come from Baidu. Fare and taxi amounts are operator data under the
+  # same rule as the LicenseRef-External-Link-Only cities: read on the device, kept nowhere. A
+  # generated file carrying a price is the shape this leak would actually take.
+  #
+  # Timetables are deliberately not listed here. `oss_data_validators.rb` already fails a pack whose
+  # `schedules` is non-empty, and matching on `first_time`/`last_time` flags the source-rule files
+  # that legitimately map an operator's key names onto model fields ("firstTrain": "first_time").
+  fare_markers = %w[price_detail ticket_price taxi_fee 票价 票價]
+  committed_data = Dir.glob(File.join(ROOT, "{DataPacks,StationInfoAPI}/**/*.json")) +
+                   Dir.glob(File.join(ROOT, "Just-Go/Resources/**/*.json"))
+  committed_data.each do |path|
+    contents = File.read(path, encoding: "UTF-8")
+    relative = path.delete_prefix("#{ROOT}/")
+
+    errors << "Baidu-derived content is committed: #{relative}" if
+      contents.include?("baidu") || contents.include?("百度")
+
+    leaked = fare_markers.select { |marker| contents.include?(marker) }
+    errors << "Operator fare/timetable content is committed in #{relative}: #{leaked.join(", ")}" unless
+      leaked.empty?
   end
 end
 

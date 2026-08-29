@@ -32,7 +32,7 @@ struct StepSecondaryButtonLabel: View {
         Label(title, systemImage: systemImage)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 }
 
@@ -42,14 +42,33 @@ struct StepPrimaryButtonLabel: View {
     let systemImage: String
     /// Raw hex, not `themeColor`: this is a solid fill under white text, and
     /// `Color.adaptive` lightens toward white in dark mode specifically for *foreground*
-    /// legibility — used as a fill it collapses contrast instead.
+    /// legibility: used as a fill it collapses contrast instead.
     let fillHex: String
 
     var body: some View {
         Label(title, systemImage: systemImage)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(Color(hex: fillHex), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(Color(hex: fillHex), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
             .foregroundStyle(.white)
+    }
+}
+
+/// An `HStack` that becomes a `VStack` when the rider's text size makes two columns untenable.
+///
+/// Extracted because a second copy of this decision was about to be written for the route card.
+/// `StepControlPair` below is its first caller and the reason it exists: two buttons squeezed
+/// side by side at accessibility sizes are two buttons nobody can read.
+struct AdaptiveStack<Content: View>: View {
+    let isVertical: Bool
+    var spacing: CGFloat
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if isVertical {
+            VStack(alignment: .leading, spacing: spacing, content: content)
+        } else {
+            HStack(alignment: .top, spacing: spacing, content: content)
+        }
     }
 }

@@ -1,10 +1,8 @@
 import Foundation
 
-/// `Equatable` so a view can key work on "the rider changed a preference" — `MapContainerView`
+/// `Equatable` so a view can key work on "the rider changed a preference". `MapContainerView`
 /// re-seeds the planner from this, which is the only path by which these settings reach a plan.
 struct AccessibilityPreference: Codable, Equatable {
-    var primaryCategory: DisabilityCategory
-
     // Mobility
     var requiresWheelchairAccess: Bool
     var prefersElevator: Bool
@@ -12,7 +10,7 @@ struct AccessibilityPreference: Codable, Equatable {
     var avoidStairs: Bool
 
     // Vision. VoiceOver / high contrast / large text are SYSTEM features an app can't
-    // toggle — the settings sheet points to the right iOS Settings paths instead of
+    // toggle: the settings sheet points to the right iOS Settings paths instead of
     // carrying dead switches for them.
     var audioNavigation: Bool
 
@@ -26,7 +24,6 @@ struct AccessibilityPreference: Codable, Equatable {
 
     static var `default`: AccessibilityPreference {
         AccessibilityPreference(
-            primaryCategory: .none,
             requiresWheelchairAccess: false,
             prefersElevator: false,
             maxWalkingDistance: 500,
@@ -46,7 +43,7 @@ struct RouteAffectingAccessibilitySignature: Equatable {
     let avoidStairs: Bool
     let maxWalkingDistance: Double
 
-    /// The mobility trio only — a maxWalkingDistance change alone must not reseed the
+    /// The mobility trio only: a maxWalkingDistance change alone must not reseed the
     /// planner's per-trip chips.
     func mobilityMatches(_ other: RouteAffectingAccessibilitySignature) -> Bool {
         requiresWheelchairAccess == other.requiresWheelchairAccess &&
@@ -64,35 +61,8 @@ extension AccessibilityPreference {
             maxWalkingDistance: maxWalkingDistance
         )
     }
-}
 
-enum DisabilityCategory: String, Codable, CaseIterable {
-    case mobility = "mobility"
-    case visualImpairment = "visual_impairment"
-    case hearingImpairment = "hearing_impairment"
-    case cognitive = "cognitive"
-    case multiple = "multiple"
-    case none = "none"
-
-    var displayName: String {
-        switch self {
-        case .mobility: return AppLocalization.localized("Mobility")
-        case .visualImpairment: return AppLocalization.localized("Visual Impairment")
-        case .hearingImpairment: return AppLocalization.localized("Hearing Impairment")
-        case .cognitive: return AppLocalization.localized("Cognitive")
-        case .multiple: return AppLocalization.localized("Multiple")
-        case .none: return AppLocalization.localized("None")
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .mobility: return "figure.roll"
-        case .visualImpairment: return "eye.slash"
-        case .hearingImpairment: return "ear.badge.waveform"
-        case .cognitive: return "brain.head.profile"
-        case .multiple: return "accessibility"
-        case .none: return "person"
-        }
+    var requiresStepFreeEntrance: Bool {
+        requiresWheelchairAccess || prefersElevator || avoidStairs
     }
 }

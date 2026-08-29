@@ -4,3 +4,8 @@ CITY_PACK_BASE_URL = $(CITY_PACK_SECRET_BASE_URL)
 CITY_PACK_MAINLAND_MIRROR_URL = $(CITY_PACK_SECRET_MAINLAND_MIRROR_URL)
 CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
 CITY_PACK_FALLBACK_BASE_URL =
+
+// Baidu Maps 服务端 credentials. Values live in the git-ignored Secrets.xcconfig; an absent key is
+// a supported state — every Baidu-backed feature falls back to Apple rather than failing.
+BAIDU_MAPS_AK = $(BAIDU_MAPS_SECRET_AK)
+BAIDU_MAPS_SK = $(BAIDU_MAPS_SECRET_SK)

@@ -2,7 +2,7 @@ import Foundation
 
 /// The `network-<city>-<station>` identifier every screen indexes a bundled station by.
 ///
-/// Minted where the packs are decoded and taken apart in four other files — two of which carried
+/// Minted where the packs are decoded and taken apart in four other files. Two of which carried
 /// byte-identical copies of the same parser, and a third a subtly stricter one. It is one format,
 /// and a station whose ID is read by a slightly different rule does not error: it silently finds no
 /// data, which is this app's hardest class of bug to see.

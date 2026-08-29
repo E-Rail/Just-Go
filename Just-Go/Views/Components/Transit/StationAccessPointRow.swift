@@ -5,7 +5,7 @@ import SwiftUI
 /// printed access-point names raw and so showed a blank row for every entrance OpenStreetMap
 /// positioned without a sign letter.
 ///
-/// `PlatformHintRow` used to live here too. It is gone with the rest of the transfer guide — no
+/// `PlatformHintRow` used to live here too. It is gone with the rest of the transfer guide. No
 /// pack has ever carried a platform hint, and `validate_indoor_maps.rb` keeps it that way.
 
 /// One entrance row: a named exit, or a counted group of unlabeled entrances facing one direction.

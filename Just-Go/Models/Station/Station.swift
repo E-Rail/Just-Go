@@ -24,7 +24,7 @@ final class Station: Identifiable, Hashable {
     /// The station's names, lowercased and joined once, for keyword search to scan.
     ///
     /// Search used to build this string per station per keystroke and then run
-    /// `localizedCaseInsensitiveContains` — a locale-aware ICU search — over each one. Measured on
+    /// `localizedCaseInsensitiveContains`. A locale-aware ICU search. Over each one. Measured on
     /// device (Release, 6,718 stations, worst-case single-character query): **21.7 ms per
     /// keystroke, against 5.0 ms** for a plain `contains` on a precomputed key. Search is
     /// debounced at 180 ms, so this is not a hang; it is 17 ms of CPU burned on every typing pause.

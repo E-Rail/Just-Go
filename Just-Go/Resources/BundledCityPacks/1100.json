@@ -16,34 +16,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 444,
+    "networkStations": 449,
     "matchedStations": {
-      "covered": 444,
-      "total": 444
+      "covered": 449,
+      "total": 449
     },
     "accessibility": {
       "covered": 43,
-      "total": 444
+      "total": 449
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 444
+      "total": 449
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 444
+      "total": 449
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 444
+      "total": 449
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 444
+      "total": 449
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 444
+      "total": 449
     }
   },
   "stations": [
@@ -13848,6 +13848,41 @@
       ]
     },
     {
+      "stationID": "989832111dd2d195",
+      "stationName": "文华路",
+      "stationNameEn": "Wenhualu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
       "stationID": "998f8a9dc12ed43f",
       "stationName": "霍营东",
       "stationNameEn": "Huoyingdong",
@@ -15296,6 +15331,41 @@
       ]
     },
     {
+      "stationID": "a5cdc4024801a800",
+      "stationName": "回龙观西大街",
+      "stationNameEn": "Huilongguan Xidajie",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
       "stationID": "a5f789b7ee527d31",
       "stationName": "望京南",
       "stationNameEn": "Wangjing South",
@@ -16468,6 +16538,41 @@
           "isAccessible": false,
           "source": "specificEntrance"
         }
+      ]
+    },
+    {
+      "stationID": "ae55c22a026f3cad",
+      "stationName": "东北旺",
+      "stationNameEn": "Dongbeiwang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
       ]
     },
     {
@@ -19987,6 +20092,41 @@
       ]
     },
     {
+      "stationID": "cf9635fc8e1c0bf4",
+      "stationName": "龙泽西",
+      "stationNameEn": "Longzexi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
       "stationID": "cfd235c2e126af60",
       "stationName": "灵境胡同",
       "stationNameEn": "Lingjing Hutong",
@@ -20398,6 +20538,41 @@
       "stationID": "d3acdfe9e858fdf2",
       "stationName": "湾子",
       "stationNameEn": "Wanzi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
+      "stationID": "d4f53e110a95ddc6",
+      "stationName": "上地软件园",
+      "stationNameEn": "Shangdi Software Park",
       "aliases": [
 
       ],

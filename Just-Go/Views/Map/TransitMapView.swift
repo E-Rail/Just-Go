@@ -11,7 +11,7 @@ struct MetroGeometryAttributionView: View {
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 4)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(AppLocalization.localized("Metro geometry © OpenStreetMap contributors"))
@@ -22,7 +22,7 @@ struct TransitMapView: UIViewRepresentable {
     @Binding var visibleRegion: MapVisibleRegion?
     let stations: [Station]
     /// Draws every supplied station regardless of zoom. The browse map hides non-transfer
-    /// stations above a 0.1° span, because a city's worth of them at that scale is a smear — but a
+    /// stations above a 0.1° span, because a city's worth of them at that scale is a smear, but a
     /// route map is handed only the ~30 stops the trip actually calls at, and hiding those is
     /// hiding the answer. Whole-trip spans are wider than 0.1° almost by definition, which is why
     /// the route map drew a line through an empty city.
@@ -34,7 +34,7 @@ struct TransitMapView: UIViewRepresentable {
     ///
     /// Everything this app draws and measures against is GCJ-02 (`coordinateSystem` in every
     /// bundled network, and Apple's basemap across Greater China). A `CLLocation` is the one input
-    /// that nothing converts — so on a device that reports WGS-84 the rider's own position is the
+    /// that nothing converts, so on a device that reports WGS-84 the rider's own position is the
     /// only coordinate in the app in the wrong frame, ~540 m out in Beijing. This is the map's
     /// answer, in the map's frame, by definition: see `LocationService.mapSpaceCorrection`.
     var onUserLocationChanged: ((CLLocationCoordinate2D) -> Void)?
@@ -45,6 +45,10 @@ struct TransitMapView: UIViewRepresentable {
     // (slow, server-side) MKMapItemRequest has produced the full place card item.
     var onPlaceTapped: ((_ name: String?, _ coordinate: CLLocationCoordinate2D) -> Void)?
     var onPlaceResolved: ((MKMapItem) -> Void)?
+    /// A press on ground that is not a POI and not a station. `selectableMapFeatures` only makes
+    /// Apple's own points of interest tappable, so a park entrance, a street corner or a friend's
+    /// building could not become an endpoint at all — the one interaction every mainstream map has.
+    var onMapLongPressed: ((CLLocationCoordinate2D) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -58,6 +62,17 @@ struct TransitMapView: UIViewRepresentable {
         mapView.pointOfInterestFilter = .includingAll
         mapView.selectableMapFeatures = [.pointsOfInterest]
         mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
+        // On the map view itself, never on the window. ContentView's keyboard dismisser is
+        // window-level and its comment records what that cost: an always-live window recogniser
+        // sees every touch in the app and stopped Profile → Settings from opening. A recogniser
+        // owned by this map sees only this map.
+        let longPress = UILongPressGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleLongPress(_:))
+        )
+        longPress.minimumPressDuration = 0.5
+        mapView.addGestureRecognizer(longPress)
+        context.coordinator.longPressRecognizer = longPress
         context.coordinator.sync(parent: self, on: mapView)
         return mapView
     }
@@ -68,16 +83,24 @@ struct TransitMapView: UIViewRepresentable {
 
     static func dismantleUIView(_ mapView: MKMapView, coordinator: Coordinator) {
         coordinator.cancelPOIResolution()
+        if let longPress = coordinator.longPressRecognizer {
+            mapView.removeGestureRecognizer(longPress)
+            coordinator.longPressRecognizer = nil
+        }
         mapView.delegate = nil
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
+        var longPressRecognizer: UILongPressGestureRecognizer?
         private var parent: TransitMapView
         private var regionSignature = ""
         private var networkSignature = ""
         private var stationSignature = ""
         private var routeSignature = ""
         private var markerVisibilityBand = -1
+        /// Drives `strokeScale`. Seeded wide so the first stroke of a freshly-built map is sized
+        /// for the zoom it is actually at, rather than for a street-level view it may never show.
+        private var currentMaxDelta: CLLocationDegrees = 0.05
         private var annotationStations: [ObjectIdentifier: Station] = [:]
         private var stationAnnotationsByID: [String: StationAnnotation] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
@@ -96,6 +119,15 @@ struct TransitMapView: UIViewRepresentable {
 
         deinit {
             poiTask?.cancel()
+        }
+
+        /// `.began` only. A long press keeps reporting through `.changed` and `.ended`, and acting
+        /// on those would drop a second pin for the same press.
+        @objc
+        func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+            guard recognizer.state == .began, let mapView = recognizer.view as? MKMapView else { return }
+            let point = recognizer.location(in: mapView)
+            parent.onMapLongPressed?(mapView.convert(point, toCoordinateFrom: mapView))
         }
 
         func cancelPOIResolution() {
@@ -153,7 +185,7 @@ struct TransitMapView: UIViewRepresentable {
         /// They were drawn at every zoom, and 广安门内 ↔ 牛街 is 498 m: viewed across a whole city
         /// that is a grey lozenge a few points long, sitting on a map where neither of its two
         /// endpoints is drawn at all. A link is an instruction to walk somewhere, and it can only
-        /// mean something when the rider can see both ends of the walk — which is the same
+        /// mean something when the rider can see both ends of the walk, which is the same
         /// threshold `StationAnnotationStyle` already uses for an ordinary station.
         private func syncInterchangeVisibility(on mapView: MKMapView) {
             guard !interchangeOverlays.isEmpty else { return }
@@ -230,7 +262,7 @@ struct TransitMapView: UIViewRepresentable {
 
         /// Every loaded pack's lines, with each stretch of track drawn once.
         ///
-        /// Adjacent cities each ship the intercity corridors they share, byte for byte — 234 paths
+        /// Adjacent cities each ship the intercity corridors they share, byte for byte. 234 Paths
         /// across the Guangzhou / Foshan / Dongguan packs, 130 of them distinct. Drawn per pack,
         /// the shared corridors were laid down two and three times over. Identity is the path's own
         /// points, so this can only ever collapse a way onto a copy of itself; it is the drawing
@@ -267,7 +299,7 @@ struct TransitMapView: UIViewRepresentable {
         /// walk stays inside the building, dashed when it goes out to the street.
         ///
         /// Resolved across every loaded network rather than within each one, because a link's two
-        /// halves can live in different packs — Shenzhen's 罗湖 and Hong Kong's 羅湖 are one
+        /// halves can live in different packs. Shenzhen's 罗湖 and Hong Kong's 羅湖 are one
         /// crossing in two networks, and neither pack can draw it alone.
         private func addInterchanges(across networks: [MetroNetwork]) {
             var coordinatesByID: [String: CLLocationCoordinate2D] = [:]
@@ -297,8 +329,8 @@ struct TransitMapView: UIViewRepresentable {
         ///
         /// This used to be dashed only for a change that leaves the paid area and solid for one
         /// inside the station. Two marks for one idea is a legend the rider has to learn, and the
-        /// difference between them is already stated in words on the leg — "leave the station and
-        /// walk to X" versus "connected inside the station" — where it cannot be misread. One mark
+        /// difference between them is already stated in words on the leg. "Leave the station and
+        /// walk to X" versus "connected inside the station", where it cannot be misread. One mark
         /// for every change, and the words carry the distinction.
         static let transferDashPattern: [NSNumber] = [2, 6]
 
@@ -312,7 +344,7 @@ struct TransitMapView: UIViewRepresentable {
                 // Round dots, the convention every map app uses for a leg on foot, and the thing
                 // that makes a walk legible at all: solid grey at this width is the same mark the
                 // basemap draws roads with, so a walking-only route read as no route. A bike leg
-                // gets a longer dash — near enough to read as the same family of "you cover this
+                // gets a longer dash: near enough to read as the same family of "you cover this
                 // yourself", far enough apart to tell at a glance. A drive is solid: it is a road
                 // route, and it earns its own colour below rather than a grey the basemap owns.
                 let dashPattern: [NSNumber]?
@@ -325,7 +357,7 @@ struct TransitMapView: UIViewRepresentable {
                 }
                 // A casing under every ride, because a line's colour is data and some of it is
                 // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
-                // importer's fallback gives them #8E8E93 — the same grey the basemap draws roads
+                // importer's fallback gives them #8E8E93. The same grey the basemap draws roads
                 // with, which made a real leg of a real route look like nothing was drawn at all.
                 // Widening and darkening what sits underneath fixes it for every line at once,
                 // rather than inventing a colour for the ones that don't state theirs. Solid legs
@@ -352,20 +384,20 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        /// Joins a ride's drawn track back to the stations it calls at — in grey dots, never in
+        /// Joins a ride's drawn track back to the stations it calls at, in grey dots, never in
         /// the line's colour.
         ///
         /// A station node can sit a few hundred metres from the rail that serves it (顺义 is 272 m
         /// from 15号线's track and 366 m from 市郊铁路通密线's; 339 of 8,108 station-on-line pairs
         /// across the bundled networks are more than 60 m off). The ride itself draws the track and
-        /// only the track, because that is where the train goes — bending the coloured line out to
+        /// only the track, because that is where the train goes. Bending the coloured line out to
         /// the platform and back drew a right-angled spike per station, which is what made a trip
         /// through 顺义 look like a rectangle bolted to the route.
         ///
         /// But leaving the gap open read as a broken route. So the gap is drawn as what it
         /// actually is: the bit the rider covers themselves, getting between the entrance and the
-        /// platform. Same grey, same round dots as a walk, because it is the same kind of thing —
-        /// colour on this map means "the train runs here", and this is not track.
+        /// platform. Same grey, same round dots as a walk, because it is the same kind of thing.
+        /// Colour on this map means "the train runs here", and this is not track.
         private func addStationConnectors(for segment: RouteSegment, drawn: [CLLocationCoordinate2D]) {
             guard segment.type.isTransit,
                   let first = segment.stationStops.first?.coordinate,
@@ -392,7 +424,7 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        /// Grey round dots: every part of a trip the rider covers under their own power — the walk
+        /// Grey round dots: every part of a trip the rider covers under their own power. The walk
         /// at each end, the change between platforms, and the hop between a station and the track
         /// that serves it. One colour and one pattern for all of them, so the map has exactly two
         /// vocabularies: coloured means a train carries you, grey means you move yourself.
@@ -406,13 +438,13 @@ struct TransitMapView: UIViewRepresentable {
             case .cycling:
                 return "#34C759"
             // Not grey. A drive is drawn solid, and solid grey at this width is indistinguishable
-            // from the roads underneath it — the same trap the walking dots exist to avoid.
+            // from the roads underneath it: the same trap the walking dots exist to avoid.
             case .driving:
                 return "#5856D6"
             case .subway:
                 return segment.lineColorHex ?? "#007AFF"
             // Grey, not the orange it used to be. A change is the rider walking between two
-            // platforms — the same thing as the walk at either end of the trip and the hop from a
+            // platforms: the same thing as the walk at either end of the trip and the hop from a
             // platform to its track, so it gets the same mark. Orange read as a third mode of
             // travel on a map whose colours otherwise mean "which line".
             case .transfer:
@@ -421,7 +453,7 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         // Builds the polyline and records it for a single batched `addOverlays(_:level:)` call
-        // by the caller (`addNetwork`/`addRoute`) once their loop finishes — adding overlays
+        // by the caller (`addNetwork`/`addRoute`) once their loop finishes. Adding overlays
         // one at a time triggers MapKit's per-insertion layout/renderer bookkeeping for every
         // line segment, which is a visible hitch the first time a large city (e.g. Beijing's
         // 33 lines) syncs.
@@ -494,7 +526,7 @@ struct TransitMapView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard let annotation = view.annotation else { return }
             if let station = annotationStations[ObjectIdentifier(annotation)] {
-                // A station tap supersedes any in-flight POI resolve — stop the request
+                // A station tap supersedes any in-flight POI resolve. Stop the request
                 // instead of letting it run to completion for a result nobody will show.
                 cancelPOIResolution()
                 parent.onStationSelected(station)
@@ -510,7 +542,7 @@ struct TransitMapView: UIViewRepresentable {
                 poiTask = Task { @MainActor [weak self, weak mapView] in
                     let mapItem = try? await MKMapItemRequest(mapFeatureAnnotation: feature).mapItem
                     mapView?.deselectAnnotation(feature, animated: false)
-                    // MKMapItemRequest, like MKLocalSearch, ignores task cancellation — so guard
+                    // MKMapItemRequest, like MKLocalSearch, ignores task cancellation, so guard
                     // explicitly to avoid a superseded tap firing onPlaceResolved with a stale
                     // item; weak self prevents the cancelled task from retaining the Coordinator.
                     guard !Task.isCancelled, let self, let mapItem else { return }
@@ -536,13 +568,60 @@ struct TransitMapView: UIViewRepresentable {
             // Marker size/visibility only changes when maxDelta crosses one of the style or
             // visibility thresholds; within a band every annotation reconfigures identically, so
             // skip the O(N) sweep while panning at a fixed zoom.
-            let band = markerBand(for: max(region.span.latitudeDelta, region.span.longitudeDelta))
+            let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
+            let band = markerBand(for: maxDelta)
             if band != markerVisibilityBand {
                 markerVisibilityBand = band
+                currentMaxDelta = maxDelta
                 refreshMarkerVisibility(on: mapView)
                 syncInterchangeVisibility(on: mapView)
+                // Safe to hang off the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) are a
+                // superset of strokeScale's (0.055, 0.18, 0.8), so no stroke change can happen
+                // without a band change. Keep that true if either set moves.
+                refreshOverlayWidths(on: mapView)
             }
             parent.onRegionChanged?(visibleRegion)
+        }
+
+        /// How much to shrink every stroke at the current zoom, and why there has to be a factor
+        /// at all.
+        ///
+        /// `MKPolylineRenderer.lineWidth` is in screen points, so it does not change as the map
+        /// zooms: a 7pt line is 7pt whether it spans a street or a province. Zoom out to fit a
+        /// whole trip and the route collapses toward a point while its stroke stays put, so the
+        /// round dots of a walk stop reading as a dotted line and merge into one fat grey blob.
+        /// The dash pattern is scaled by the same factor so the dot-to-gap rhythm is preserved
+        /// rather than turning into sparse specks.
+        private func strokeScale(for maxDelta: CLLocationDegrees) -> CGFloat {
+            switch maxDelta {
+            case ..<0.055: return 1
+            case ..<0.18: return 0.85
+            case ..<0.8: return 0.62
+            default: return 0.45
+            }
+        }
+
+        private func applyStrokeWidth(to renderer: MKPolylineRenderer, polyline: MKPolyline) {
+            let key = ObjectIdentifier(polyline)
+            let scale = strokeScale(for: currentMaxDelta)
+            // Floored so a hairline never disappears entirely at the widest zooms.
+            renderer.lineWidth = max(1.5, (overlayWidths[key] ?? 5) * scale)
+            renderer.lineDashPattern = overlayDashes[key]?.map {
+                NSNumber(value: max(0.1, $0.doubleValue * Double(scale)))
+            }
+        }
+
+        /// Re-strokes the overlays already on screen. Cheap: MapKit hands back the renderer it
+        /// already made, so this touches two numbers per overlay and asks for a redraw.
+        private func refreshOverlayWidths(on mapView: MKMapView) {
+            for overlay in mapView.overlays {
+                guard let polyline = overlay as? MKPolyline,
+                      let renderer = mapView.renderer(for: overlay) as? MKPolylineRenderer else {
+                    continue
+                }
+                applyStrokeWidth(to: renderer, polyline: polyline)
+                renderer.setNeedsDisplay()
+            }
         }
 
         private func markerBand(for maxDelta: CLLocationDegrees) -> Int {
@@ -633,8 +712,7 @@ struct TransitMapView: UIViewRepresentable {
 
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
-            renderer.lineWidth = overlayWidths[ObjectIdentifier(polyline)] ?? 5
-            renderer.lineDashPattern = overlayDashes[ObjectIdentifier(polyline)] ?? nil
+            applyStrokeWidth(to: renderer, polyline: polyline)
             renderer.lineCap = .round
             renderer.lineJoin = .round
             return renderer

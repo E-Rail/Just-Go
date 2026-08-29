@@ -3,7 +3,7 @@ import SwiftUI
 /// The app's colour choice, as one horizontal row of swatches.
 ///
 /// Extracted from `SettingsView` when onboarding gained the same control. One implementation for
-/// both on purpose — the station sheet and the transfer sheet each grew their own copy of an
+/// both on purpose: the station sheet and the transfer sheet each grew their own copy of an
 /// access-point row once, drifted, and shipped blank rows. A picker that disagrees with itself
 /// about which colour is selected is the same class of bug.
 ///

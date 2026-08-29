@@ -406,6 +406,29 @@ def express_variant_service?(left, right, evidence)
   evidence[:sharedStations] >= 2 && evidence[:trackContainment] >= 0.5
 end
 
+# The service-type markers Chinese operators put in a route's name, longest first so 大站快车 is
+# not read as 快车 and 直达快车 not as 直达车.
+#
+# These name a *different kind of train on the same line*, not a different line: an express that
+# skips stops, or a short-turn that ends part way along. OSM publishes each as its own relation —
+# 46 of them across 9 cities — and every one calls at a strict subset of the ordinary service's
+# stops, which is exactly the shape `passenger_service_patterns` folds away. So they were being
+# merged into the all-stops service and demoted to rendering-only track, and 上海 16号线's 大站车
+# and 直达车 reached no pack at all.
+#
+# The name is the whole discriminator, deliberately. `service=express` exists in OSM and cannot be
+# trusted: 16号线直达车：龙阳路 -> 滴水湖 is tagged `service=local` while its own reverse direction
+# is tagged `service=express`.
+SERVICE_VARIANT_MARKERS = %w[大站快车 直达快车 大站车 直达车 区间车 快车].freeze
+
+# 普通车 ("ordinary train") is deliberately absent: it labels the base service rather than a
+# variant of it, and treating it as one would leave a line with no ordinary service at all.
+def service_variant_kind(name)
+  return nil if name.to_s.empty?
+
+  SERVICE_VARIANT_MARKERS.find { |marker| name.include?(marker) }
+end
+
 def express_of(name_key)
   stripped = name_key.sub(/大?站?快车\z/, "")
   stripped == name_key ? nil : stripped
@@ -569,18 +592,32 @@ end
 # `canonical_profile` prefers it for having the most name tokens. `sameCorridor` is the one
 # merge kind where no profile's name covers the others (Shenzhen's 2号线 and 8号线 relations
 # each carry only their own single-token name), so the display name has to be synthesised.
+# 普通车 marks a relation as *the ordinary service*, which is a distinction OSM needs only because
+# the same line also has 大站车 and 直达车 relations beside it. It is not part of the line's name:
+# 上海 16号线 shipped as "16号线普通车", so every route card, every station page and every service
+# window read it back to riders as though the operator called it that.
+#
+# Stripped for display only. The relation name still carries it where it matters, which is
+# `service_variant_kind` deciding what is a variant of what.
+def strip_ordinary_service_marker(name)
+  return name if name.nil? || name.empty?
+
+  stripped = name.sub(/普通(车|列车)\z/, "").strip
+  stripped.empty? ? name : stripped
+end
+
 def display_line_name(profiles, canonical, same_corridor)
-  return canonical[:name] if canonical[:name_tokens].length > 1
+  return strip_ordinary_service_marker(canonical[:name]) if canonical[:name_tokens].length > 1
   # Only synthesise a combined name for a group that merged *because of* the sameCorridor rule
   # (two logical lines with no textual overlap, unioned solely on identical stations + colour,
   # e.g. Shenzhen 2号线/8号线). An ordinary two-direction line's relations already merge via
   # `structuredIdentity`/`sameName` and also happen to share a station set — synthesising there
   # would concatenate every direction's raw OSM name (seen on Taiyuan/Changzhou/Hefei/Luoyang
   # etc., whose direction relations are tagged with distinct from/to-suffixed names).
-  return canonical[:name] unless same_corridor
+  return strip_ordinary_service_marker(canonical[:name]) unless same_corridor
 
   by_key = profiles.each_with_object({}) { |profile, names| names[profile[:name_key]] ||= profile[:name] }
-  return canonical[:name] if by_key.length <= 1
+  return strip_ordinary_service_marker(canonical[:name]) if by_key.length <= 1
 
   by_key.values.sort_by { |name| [name.length, name] }.join("/")
 end
@@ -819,17 +856,43 @@ def element_coordinate(element, nodes)
   end
 end
 
-def named_relation_members(relation, elements_by_key, role_prefix)
+# Whether a relation member is claiming to *be* a station, whatever role it was given.
+#
+# PTv2 asks every station in a route relation to be a `stop_position` node with `role=stop`, and
+# most of the world's mapping follows that. Beijing 18号线 does not: relations 20010805/20010820
+# list five of their eleven stations as `public_transport=station` nodes with an **empty** role.
+# Those five never entered the pack, while the track ways still drew the line full length past
+# them — a complete line with a hole in it, no markers, and a single 9.37 km graph edge from
+# 马连洼 to 回龙观东大街 where five boardable stations belong. bjsubway.com published all eleven
+# the whole time; `beijing_station_information_importer.rb` had them pinned as an accepted gap.
+#
+# The role is a convention about how a member was filed. These tags are the member's claim about
+# what it is, and the claim is the thing worth trusting.
+def station_tagged_element?(element)
+  tags = element.is_a?(Hash) ? element.fetch("tags", {}) : {}
+  # A platform is not a station, whatever else it has been tagged with. Hong Kong's MTR platform
+  # ways carry a stray `station=subway` beside `railway=platform`, and trusting that tag alone put
+  # two stations named literally "1" and "2" into 屯馬綫 — platform numbers, promoted to stations.
+  return false if tags["public_transport"] == "platform" || tags["railway"] == "platform"
+  tags["public_transport"] == "station" || tags["railway"] == "station" || tags["station"] == "subway"
+end
+
+# `accept_station_tags` widens the role filter without widening it to everything: a track way
+# carries an empty role too, and is admitted by neither test. Member order is preserved either
+# way, which is what lets the recovered stations land at the right index in the service pattern
+# rather than being appended to the end of the line.
+def named_relation_members(relation, elements_by_key, role_prefix, accept_station_tags: false)
   relation.fetch("members", []).map do |member|
-    next unless member["role"].to_s.start_with?(role_prefix)
     element = elements_by_key["#{member["type"]}:#{member["ref"]}"]
+    matches_role = member["role"].to_s.start_with?(role_prefix)
+    next unless matches_role || (accept_station_tags && station_tagged_element?(element))
     name = element&.dig("tags", "name:zh") || element&.dig("tags", "name")
     [member, element, name] unless name.to_s.empty?
   end.compact
 end
 
 def passenger_station_members(relation, elements_by_key, include_unbuilt: false)
-  stops = named_relation_members(relation, elements_by_key, "stop")
+  stops = named_relation_members(relation, elements_by_key, "stop", accept_station_tags: true)
   usable_stops = stops.reject { |_member, _element, name| unbuilt_station_name?(name) }
   if include_unbuilt
     return stops unless usable_stops.empty?
@@ -935,12 +998,160 @@ def physical_station_patterns(node_paths, station_nodes)
   end
 end
 
-def unique_service_patterns(patterns)
-  unique = patterns.uniq { |pattern| [pattern, pattern.reverse].min.join("|") }
+# How many times the infill pass may run before giving up. Splicing one station can expose the
+# next gap along, so it has to repeat, but a fixpoint that has not settled by now is a bug rather
+# than a deep chain.
+MAX_INFILL_PASSES = 4
+
+# Two derivations of the same corridor reach here: the physical track walk and the relation member
+# order. Neither is authoritative alone. A track walk stops wherever the ways happen to connect, and
+# a relation carries whatever order its members were filed in, so one line routinely arrives as two
+# patterns that disagree about a single station or about the order of a tail.
+#
+# Left alone every disagreement becomes a routing defect, because `servicePatterns` is what the
+# graph is built from. A pattern running A -> B while its sibling stops in between becomes a real
+# edge, and `trainCost` prices a hop by distance with no per-stop penalty, so the non-stop version
+# is always cheaper and the search always takes it. 广惠城际 shipped one edge spanning 24 stations
+# and 115 km that way, and 14号线 shipped one that skipped 陶然桥.
+#
+# Three passes, in this order: collapse the patterns that are the same service written differently,
+# drop a scrambled duplicate in favour of the ordering that follows the track, then splice back any
+# station a sibling proves belongs between two others. A genuine branch survives all three, because
+# none of them can invent a station the pattern's own siblings never served.
+# A relation whose member list carries the journey back as well as the journey out.
+#
+# 广清城际 arrives as 广州白云 - 白云湖 - 江高 - 神山 - 花都 - … - 飞霞 - 广州白云 - 花都: the outbound
+# run, then the first two stops of the return. `pattern.first != pattern.last` so the ring guard lets
+# it through, and the two joins it invents are not adjacencies at all — 飞霞 → 广州白云 is 63 km
+# across the whole line, and 广州白云 → 花都 is 21 km past three stations the train stops at.
+#
+# The second one is the dangerous half. `trainCost` charges a flat 30 s per hop plus distance, so a
+# skip edge is always cheaper than the stops it replaces (2 213 s against 2 328 s here) and Dijkstra
+# takes it every time, returning the trip as one stop and drawing straight over 白云湖, 江高 and 神山.
+# That is the defect 43a6aaa removed 81 of, arriving through the data instead of the code.
+#
+# Cutting where the pattern comes back to its own first station keeps the outbound run whole. It is
+# deliberately narrower than "cut at any repeat": 黄埔有轨电车1号线 genuinely runs 水西 → 峻泰路 →
+# 水西, a 397 m out-and-back mid-line, and every pair in it is a real adjacency. Truncating there
+# would throw away eleven stations to fix nothing.
+def trim_return_journeys(patterns)
+  patterns.map do |pattern|
+    next pattern unless pattern.length > 2 && pattern.first != pattern.last
+
+    revisit = pattern.each_with_index.find { |name, index| index.positive? && name == pattern.first }
+    revisit ? pattern[0, revisit.last] : pattern
+  end
+end
+
+def unique_service_patterns(patterns, coordinates = {})
+  unique = collapse_equivalent_patterns(trim_return_journeys(patterns))
+  unique = drop_scrambled_duplicate_patterns(unique, coordinates)
+  unique = collapse_equivalent_patterns(infill_skipped_stations(unique))
   unique.reject do |pattern|
     station_set = pattern.to_set
     unique.any? { |candidate| candidate.length > pattern.length && station_set.subset?(candidate.to_set) }
   end
+end
+
+# A closed pattern is a ring, and a ring has no first station. 哈尔滨3号线 arrived as the same
+# 36-station loop entered at two different points, which is one service written twice.
+def equivalent_pattern_key(pattern)
+  return [pattern, pattern.reverse].min.join("|") unless pattern.length > 2 && pattern.first == pattern.last
+
+  cycle = pattern[0...-1]
+  forward = cycle.length.times.map { |offset| cycle.rotate(offset) }
+  backward = cycle.reverse.length.times.map { |offset| cycle.reverse.rotate(offset) }
+  "ring|#{(forward + backward).min.join('|')}"
+end
+
+def collapse_equivalent_patterns(patterns)
+  patterns.uniq { |pattern| equivalent_pattern_key(pattern) }
+end
+
+# Same stations, same length, different order: one derivation has its members filed out of service
+# order. Keep whichever ordering walks the shorter total distance, which is the one following the
+# track instead of jumping the corridor. Thresholdless on purpose — 广惠城际 is 137 km against
+# 308 km, and the loser is the one carrying a 115 km hop between two list-adjacent stations.
+#
+# Rings are left out. Their rotations are already collapsed above, and a rotation legitimately
+# changes which pair sits at the seam.
+def drop_scrambled_duplicate_patterns(patterns, coordinates)
+  return patterns if coordinates.empty?
+
+  dropped = Set.new
+  patterns.each_with_index do |pattern, index|
+    next if dropped.include?(index) || pattern.first == pattern.last
+
+    patterns.each_with_index do |candidate, candidate_index|
+      next if candidate_index <= index || dropped.include?(candidate_index)
+      next if candidate.first == candidate.last
+      next unless candidate.length == pattern.length && candidate.to_set == pattern.to_set
+
+      pattern_length = pattern_chain_length(pattern, coordinates)
+      candidate_length = pattern_chain_length(candidate, coordinates)
+      next if pattern_length.nil? || candidate_length.nil?
+
+      dropped << (candidate_length < pattern_length ? index : candidate_index)
+    end
+  end
+  patterns.each_with_index.map { |pattern, index| dropped.include?(index) ? nil : pattern }.compact
+end
+
+def pattern_chain_length(pattern, coordinates)
+  total = 0.0
+  pattern.each_cons(2) do |from, to|
+    from_coordinate = coordinates[from]
+    to_coordinate = coordinates[to]
+    return nil unless from_coordinate && to_coordinate
+
+    total += meters_between(from_coordinate, to_coordinate)
+  end
+  total
+end
+
+# A sibling pattern is proof. If it stops at S between A and B, a pattern running A -> B non-stop is
+# missing S rather than expressing a limited-stop service: OSM has no way to say "skips S", so the
+# only honest reading of the disagreement is that one derivation is incomplete.
+#
+# Only a contiguous run between the same two anchors is spliced, and that is what keeps a real Y
+# branch intact — a branch's own stations never sit between two stations the other branch serves.
+def infill_skipped_stations(patterns)
+  working = patterns.map(&:dup)
+  MAX_INFILL_PASSES.times do
+    changed = false
+    working.each_with_index do |pattern, index|
+      position = 0
+      while position < pattern.length - 1
+        run = skipped_run_between(pattern[position], pattern[position + 1], working, index)
+        if run && run.none? { |station| pattern.include?(station) }
+          pattern.insert(position + 1, *run)
+          changed = true
+        end
+        position += 1
+      end
+    end
+    break unless changed
+  end
+  working
+end
+
+def skipped_run_between(from, to, patterns, skip_index)
+  patterns.each_with_index do |candidate, index|
+    # A ring's "between" can mean either way round the loop, so it cannot prove a gap.
+    next if index == skip_index || candidate.first == candidate.last
+
+    from_index = candidate.index(from)
+    to_index = candidate.index(to)
+    next if from_index.nil? || to_index.nil? || (from_index - to_index).abs <= 1
+
+    run = if from_index < to_index
+            candidate[(from_index + 1)...to_index]
+          else
+            candidate[(to_index + 1)...from_index].reverse
+          end
+    return run unless run.empty?
+  end
+  nil
 end
 
 def validate_selected_corridors!(relations, elements_by_key, ways)
@@ -976,11 +1187,17 @@ def passenger_service_patterns(relations, elements_by_key)
       key: key,
       stations: relation_station_names(candidates.first, elements_by_key).to_set,
       terminal_keys: candidates.map { |relation| service_terminal_key(relation) }.compact.to_set,
+      # The kind of train, from the relation's own name. Two relations that disagree about it are
+      # two different services and must not be folded into one, however completely one contains
+      # the other — containment is what an express *is*.
+      variant: candidates.map { |relation| service_variant_kind(relation.dig("tags", "name")) }.compact.first,
       candidates: candidates
     }
   end
   patterns.sort_by { |pattern| -pattern[:stations].length }.each_with_object([]) do |pattern, merged|
     containing = merged.find do |candidate|
+      next false unless candidate[:variant] == pattern[:variant]
+
       shared_stations = pattern[:stations] & candidate[:stations]
       same_terminals = !(pattern[:terminal_keys] & candidate[:terminal_keys]).empty?
       station_containment = [
@@ -1003,6 +1220,7 @@ def select_service_relations(relations, elements_by_key, ways)
   selected_nodes = Set.new
   decisions = []
   extra_geometry_ways = []
+  variant_kinds = {}
   selections = patterns.map do |pattern|
     candidates = pattern[:candidates]
     selected = candidates.max_by do |relation|
@@ -1025,6 +1243,7 @@ def select_service_relations(relations, elements_by_key, ways)
       "uniqueTrackNodes" => (nodes - selected_nodes).length
     }
     selected_nodes.merge(nodes)
+    variant_kinds[selected["id"].to_s] = pattern[:variant]
 
     # Rendering-only recovery: every candidate in this group that is not the selected one
     # contributes its track back to the drawn path, never to the routing graph.
@@ -1045,7 +1264,13 @@ def select_service_relations(relations, elements_by_key, ways)
     selected
   end
   validate_selected_corridors!(selections, elements_by_key, ways)
-  [selections, patterns.length, decisions, extra_geometry_ways.uniq { |way| way["id"] }.sort_by { |way| way["id"] }]
+  [
+    selections,
+    patterns.length,
+    decisions,
+    extra_geometry_ways.uniq { |way| way["id"] }.sort_by { |way| way["id"] },
+    variant_kinds
+  ]
 end
 
 def canonical_path_key(path)
@@ -1099,9 +1324,18 @@ def build_network(city_id, city, source)
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
-    selected_relations, service_pattern_count, pattern_decisions, extra_geometry_ways =
+    all_selected_relations, service_pattern_count, pattern_decisions, extra_geometry_ways, variant_kinds =
       select_service_relations(direction_relations, elements_by_key, ways)
     service_pattern_decisions.concat(pattern_decisions.map { |decision| decision.merge("logicalLineID" => id) })
+    # An express or a short-turn is a variant only *relative to an ordinary service on the same
+    # line*. `广肇-广惠城际快车` is its own line with no local counterpart in its group, so there it
+    # is simply the service — partitioning it away would leave that line with no trains at all.
+    variant_relations, base_relations = all_selected_relations.partition do |relation|
+      variant_kinds[relation["id"].to_s]
+    end
+    base_relations = all_selected_relations if base_relations.empty?
+    variant_relations = [] if base_relations.equal?(all_selected_relations)
+    selected_relations = base_relations
     member_ways = selected_relations.flat_map { |relation| relation_track_ways(relation, ways) }
       .uniq { |way| way["id"] }
     seen_paths = Set.new
@@ -1113,7 +1347,11 @@ def build_network(city_id, city, source)
     # 首都机场线's one-way loop through T2 that the selected direction never visits. Union it in
     # here so the drawn line is complete. `track_station_patterns` above (and hence the routing
     # graph) is computed from `selected_relations` alone and is untouched by this.
-    geometry_ways = (member_ways + extra_geometry_ways).uniq { |way| way["id"] }.sort_by { |way| way["id"] }
+    geometry_ways = (
+      member_ways +
+        extra_geometry_ways +
+        variant_relations.flat_map { |relation| relation_track_ways(relation, ways) }
+    ).uniq { |way| way["id"] }.sort_by { |way| way["id"] }
     geometry_seen_paths = Set.new
     geometry_node_paths = join_way_paths(geometry_ways)
       .select { |path| geometry_seen_paths.add?(canonical_path_key(path)) }
@@ -1155,7 +1393,15 @@ def build_network(city_id, city, source)
     end
 
     relation_patterns = selected_relations.flat_map { |relation| ordered_relation_station_patterns(relation, elements_by_key) }
-    service_patterns = unique_service_patterns(track_station_patterns + relation_patterns)
+    # Coordinates are only used to tell two orderings of the same station set apart, so the datum
+    # does not matter here: both orderings measure the same points.
+    pattern_coordinates = station_groups.each_with_object({}) do |(station_name, station), result|
+      result[station_name] = average_coordinate(station) unless station["coordinates"].empty?
+    end
+    service_patterns = unique_service_patterns(
+      track_station_patterns + relation_patterns,
+      pattern_coordinates
+    )
 
     {
       "id" => id,
@@ -1169,9 +1415,32 @@ def build_network(city_id, city, source)
       "servicePatterns" => service_patterns.map do |pattern|
         pattern.map { |name| station_id(city_id, name) }
       end,
+      # Deliberately NOT in `servicePatterns`, and this is the whole safety property of the
+      # feature. `servicePatterns` is what builds the routing graph, so an express left in it
+      # would give Dijkstra a non-stop edge past stations the line stops at — the exact defect
+      # 43a6aaa removed 81 of — and it would always win, because it is genuinely faster.
+      #
+      # And it would be a lie to route on. Not one of the 46 variant relations across the 53
+      # cached cities carries `opening_hours`, `interval` or `frequency`: OSM says an express
+      # exists and never says when it runs. Per CLAUDE.md an unknown schedule is shown as
+      # unavailable rather than inferred, so this is information for the rider to act on, not a
+      # train the planner may put them on.
+      "serviceVariants" => variant_relations.map do |relation|
+        stations = ordered_relation_station_patterns(relation, elements_by_key).first || []
+        {
+          "kind" => variant_kinds[relation["id"].to_s],
+          "name" => LineNames.clean(relation.dig("tags", "name")).to_s,
+          "sourceRelationID" => relation["id"].to_s,
+          "stationIDs" => stations.map { |name| station_id(city_id, name) }
+        }
+      end.reject { |variant| variant["stationIDs"].length < 2 }
+        .sort_by { |variant| [variant["kind"].to_s, variant["sourceRelationID"]] },
       "paths" => coordinate_paths,
       "sourceRelationIDs" => direction_relations.map { |relation| relation["id"].to_s }.sort,
-      "selectedSourceRelationIDs" => selected_relations.map { |relation| relation["id"].to_s }.sort,
+      # Variants included: they were selected as this line's sources and their track is drawn.
+      # What they do not do is feed `servicePatterns`, and `servicePatternCount` counts both, so
+      # `validate_metro_networks.rb` can still hold selected-relations == patterns.
+      "selectedSourceRelationIDs" => all_selected_relations.map { |relation| relation["id"].to_s }.sort,
       "servicePatternCount" => service_pattern_count
     }
   end.compact
@@ -1183,6 +1452,9 @@ def build_network(city_id, city, source)
     next group.first if group.length == 1
     base = group.first
     base["servicePatterns"] = group.flat_map { |line| line["servicePatterns"] }.uniq
+    base["serviceVariants"] = group.flat_map { |line| line["serviceVariants"] }
+      .uniq { |variant| variant["sourceRelationID"] }
+      .sort_by { |variant| [variant["kind"].to_s, variant["sourceRelationID"]] }
     base["paths"] = group.flat_map { |line| line["paths"] }
     base["sourceRelationIDs"] = group.flat_map { |line| line["sourceRelationIDs"] }.uniq.sort
     base["selectedSourceRelationIDs"] = group.flat_map { |line| line["selectedSourceRelationIDs"] }.uniq.sort
@@ -1404,6 +1676,46 @@ def self_test
     fixture_ways
   )
   fail_with("platform difference created a service pattern") unless platform_patterns == 1 && platform_selected.length == 1
+
+  # Express and short-turn services, which OSM publishes as their own relations.
+  fail_with("大站快车 must not be read as 快车") unless service_variant_kind("16号线大站快车：甲 -> 乙") == "大站快车"
+  fail_with("直达快车 must not be read as 直达车") unless service_variant_kind("城际 (直达快车)") == "直达快车"
+  fail_with("大站车 not recognised") unless service_variant_kind("16号线大站车：滴水湖 -> 龙阳路") == "大站车"
+  fail_with("快车 not recognised") unless service_variant_kind("地铁 18号线快车") == "快车"
+  # 普通车 labels the ordinary service. Reading it as a variant would leave a line with no
+  # ordinary train at all, which is how 上海 16号线 would lose the only service it actually ships.
+  fail_with("普通车 must not be a variant") unless service_variant_kind("16号线普通车：滴水湖 -> 龙阳路").nil?
+  fail_with("an ordinary name must not be a variant") unless service_variant_kind("6号线").nil?
+
+  # An express calls at a strict subset of the ordinary service's stops, which is exactly what
+  # `passenger_service_patterns` folds away — so before this rule 上海 16号线大站车 and 直达车 were
+  # merged into 普通车 and demoted to rendering-only track, reaching no pack at all.
+  named_variant = lambda do |id, stops, name|
+    fixture_relation.call(id, stops, [100]).tap { |relation| relation["tags"] = { "name" => name } }
+  end
+  variant_selected, variant_patterns, _decisions, _extra, variant_kinds = select_service_relations(
+    [
+      named_variant.call(7, [10, 11, 12], "9号线普通车：甲 -> 丙"),
+      named_variant.call(8, [10, 12], "9号线大站车：甲 -> 丙")
+    ],
+    fixture_elements,
+    fixture_ways
+  )
+  fail_with("a named service variant was folded into the ordinary service") unless variant_patterns == 2 && variant_selected.length == 2
+  fail_with("the variant was not tagged as one") unless variant_kinds["8"] == "大站车"
+  fail_with("the ordinary service was tagged as a variant") unless variant_kinds["7"].nil?
+
+  # Two relations of the *same* service still collapse: this must not turn every direction into
+  # its own pattern.
+  same_variant_selected, same_variant_patterns = select_service_relations(
+    [
+      named_variant.call(9, [10, 11, 12], "9号线大站车：甲 -> 丙"),
+      named_variant.call(10, [12, 11, 10], "9号线大站车：丙 -> 甲")
+    ],
+    fixture_elements,
+    fixture_ways
+  )
+  fail_with("two directions of one variant became two patterns") unless same_variant_patterns == 1 && same_variant_selected.length == 1
   subset_patterns = passenger_service_patterns(
     [
       fixture_relation.call(30, [10, 11, 12], [100]),
@@ -1493,6 +1805,41 @@ def self_test
     "tags" => { "route" => "subway", "name" => "Line 20 Direction", "network" => "Metro A", "ref" => "20" }
   )
   fail_with("evidence-only relation classification test failed") unless passenger_station_members(evidence_only, fixture_elements).empty?
+
+  # Beijing 18号线 (relations 20010805/20010820) files five of its eleven stations as
+  # `public_transport=station` nodes with an **empty** role rather than PTv2 `stop_position` nodes
+  # with `role=stop`. All five were dropped while the track ways still drew the line full length
+  # past them: a complete line with a hole in it, no markers, and one 9.37 km graph edge where five
+  # boardable stations belong. Both halves of the fix are pinned here — a station-tagged member is
+  # taken whatever its role and lands at its member-order index, and a platform way carrying a
+  # stray `station=subway` (as Hong Kong's MTR platform ways do) stays out. Trusting that tag alone
+  # promoted two platform numbers into stations named "1" and "2" on 屯馬綫.
+  role_gap_elements = {
+    "node:40" => { "tags" => { "name" => "P", "public_transport" => "stop_position", "subway" => "yes" } },
+    "node:41" => { "tags" => { "name" => "Q", "public_transport" => "station", "railway" => "station", "station" => "subway" } },
+    "node:42" => { "tags" => { "name" => "R", "railway" => "station", "station" => "subway" } },
+    "node:43" => { "tags" => { "name" => "S", "public_transport" => "stop_position", "subway" => "yes" } },
+    "way:44" => { "tags" => { "name" => "1", "public_transport" => "platform", "railway" => "platform", "station" => "subway" } }
+  }
+  role_gap_relation = {
+    "id" => 40,
+    "members" => [
+      { "type" => "node", "ref" => 40, "role" => "stop" },
+      { "type" => "node", "ref" => 41, "role" => "" },
+      { "type" => "node", "ref" => 42, "role" => "" },
+      { "type" => "node", "ref" => 43, "role" => "stop" },
+      { "type" => "way", "ref" => 44, "role" => "" },
+      { "type" => "way", "ref" => 100, "role" => "" }
+    ]
+  }
+  fail_with("mis-tagged platform must not be read as a station") if station_tagged_element?(
+    role_gap_elements.fetch("way:44")
+  )
+  recovered = passenger_station_members(role_gap_relation, role_gap_elements).map { |_member, _element, name| name }
+  fail_with("empty-role station members must be recovered in member order") unless recovered == %w[P Q R S]
+  fail_with("empty-role recovery must reach the service pattern") unless ordered_relation_station_patterns(
+    role_gap_relation, role_gap_elements
+  ) == [%w[p q r s]]
   fail_with("light-rail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "light_rail" })
   fail_with("monorail eligibility test failed") unless supported_route_relation?("tags" => { "route" => "monorail" })
   fail_with("tram eligibility test failed") unless supported_route_relation?("tags" => { "route" => "tram" })
@@ -1519,6 +1866,37 @@ def self_test
   merged_patterns = unique_service_patterns([%w[a c], %w[a reopened c], %w[a branch]])
   fail_with("physical topology did not supersede stale relation stops") unless merged_patterns.include?(%w[a reopened c]) && !merged_patterns.include?(%w[a c])
   fail_with("physical topology collapsed a genuine branch") unless merged_patterns.include?(%w[a branch])
+
+  # A ring entered at two different points is one service, not two. 哈尔滨3号线 shipped as both.
+  ring_patterns = unique_service_patterns([%w[a b c d a], %w[c d a b c]])
+  fail_with("ring rotations were not collapsed") unless ring_patterns.length == 1
+
+  # Same stations, different order: keep the ordering that follows the track. Laid out so the
+  # scrambled one is listed first, proving the rule reads the geometry rather than the position.
+  scrambled_coordinates = {
+    "a" => [0.0, 0.0], "b" => [0.0, 0.1], "c" => [0.0, 0.2], "d" => [0.0, 0.3]
+  }
+  scrambled_patterns = unique_service_patterns(
+    [%w[a c b d], %w[a b c d]],
+    scrambled_coordinates
+  )
+  fail_with("scrambled duplicate pattern was not dropped") unless scrambled_patterns == [%w[a b c d]]
+
+  # The 14号线 shape, and the reason the existing subset rule was not enough: neither derivation
+  # is the line and neither contains the other. One holds an interior station the other skips
+  # (陶然桥); the other runs further north. Only their union is the real service.
+  infilled_patterns = unique_service_patterns([%w[m n infill p q], %w[k l m n p q]])
+  fail_with("skipped station was not spliced back") unless infilled_patterns == [%w[k l m n infill p q]]
+
+  # The invariant the whole repair rests on: a genuine Y branch must survive as two patterns.
+  # Both branches share the trunk and diverge at the junction, and neither branch's stations sit
+  # between two stations the other serves, so nothing above may merge them.
+  branch_patterns = unique_service_patterns(
+    [%w[trunk1 trunk2 junction west1 west2], %w[trunk1 trunk2 junction east1 east2]],
+    "trunk1" => [0.0, 0.0], "trunk2" => [0.0, 0.1], "junction" => [0.0, 0.2],
+    "west1" => [0.1, 0.3], "west2" => [0.2, 0.4], "east1" => [-0.1, 0.3], "east2" => [-0.2, 0.4]
+  )
+  fail_with("a genuine branch was merged away") unless branch_patterns.length == 2
   directional_pair = [
     fixture_relation.call(31, [1, 2, 3], [100]).merge(
       "tags" => { "route" => "train", "network" => "Regional Rail", "from" => "A", "to" => "C" }
@@ -1531,6 +1909,21 @@ def self_test
     directional_pair,
     fixture_elements
   ).length == 1
+  # The 广清城际 shape: the outbound run with the first stops of the return journey appended. The
+  # tail is cut at the point the pattern comes back to its own first station, which is where the
+  # 63 km and 21 km non-adjacencies were being invented.
+  return_journey = unique_service_patterns([%w[a b c d e a b]])
+  fail_with("return journey tail was not trimmed") unless return_journey == [%w[a b c d e]]
+
+  # ...but a real out-and-back spur mid-line is not a return journey and must survive whole.
+  # 黄埔有轨电车1号线 runs 水西 → 峻泰路 → 水西 over 397 m, and every pair in it is an adjacency.
+  spur = unique_service_patterns([%w[a b spur b c d]])
+  fail_with("a mid-line out-and-back spur was truncated") unless spur == [%w[a b spur b c d]]
+
+  # A ring closes on its first station by definition and must not be mistaken for one.
+  ring = unique_service_patterns([%w[a b c d a]])
+  fail_with("a ring was truncated as a return journey") unless ring == [%w[a b c d a]]
+
   puts "OSM metro importer self-test ok"
 end
 

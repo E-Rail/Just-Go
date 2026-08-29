@@ -8,11 +8,11 @@ final class CityService {
     // operator-filtered, own-city-only data). Cities are listed only when they have a
     // drawable network. Regenerate via Scripts/import_osm_metro_geometry.rb.
     private static let seedCities: [City] = [
-        City(id: "1100", name: "北京", nameEn: "Beijing", namePinyin: "beijing", latitude: 39.9042, longitude: 116.4074, stationCount: 444, lineCount: 33),
+        City(id: "1100", name: "北京", nameEn: "Beijing", namePinyin: "beijing", latitude: 39.9042, longitude: 116.4074, stationCount: 449, lineCount: 33),
         City(id: "3100", name: "上海", nameEn: "Shanghai", namePinyin: "shanghai", latitude: 31.2304, longitude: 121.4737, stationCount: 471, lineCount: 26),
         City(id: "4401", name: "广州", nameEn: "Guangzhou", namePinyin: "guangzhou", latitude: 23.1291, longitude: 113.2644, stationCount: 414, lineCount: 28),
         City(id: "4403", name: "深圳", nameEn: "Shenzhen", namePinyin: "shenzhen", latitude: 22.5431, longitude: 114.0579, stationCount: 372, lineCount: 18),
-        City(id: "5101", name: "成都", nameEn: "Chengdu", namePinyin: "chengdu", latitude: 30.5728, longitude: 104.0668, stationCount: 396, lineCount: 20),
+        City(id: "5101", name: "成都", nameEn: "Chengdu", namePinyin: "chengdu", latitude: 30.5728, longitude: 104.0668, stationCount: 402, lineCount: 20),
         City(id: "3301", name: "杭州", nameEn: "Hangzhou", namePinyin: "hangzhou", latitude: 30.2741, longitude: 120.1551, stationCount: 270, lineCount: 13),
         City(id: "1200", name: "天津", nameEn: "Tianjin", namePinyin: "tianjin", latitude: 39.0842, longitude: 117.2009, stationCount: 239, lineCount: 13),
         City(id: "5000", name: "重庆", nameEn: "Chongqing", namePinyin: "chongqing", latitude: 29.563, longitude: 106.5516, stationCount: 273, lineCount: 13),
@@ -42,7 +42,7 @@ final class CityService {
         City(id: "1501", name: "呼和浩特", nameEn: "Hohhot", namePinyin: "huhehaote", latitude: 40.8424, longitude: 111.749, stationCount: 44, lineCount: 2),
         City(id: "1401", name: "太原", nameEn: "Taiyuan", namePinyin: "taiyuan", latitude: 37.8706, longitude: 112.5489, stationCount: 46, lineCount: 2),
         City(id: "4419", name: "东莞", nameEn: "Dongguan", namePinyin: "dongguan", latitude: 23.0207, longitude: 113.7518, stationCount: 93, lineCount: 5),
-        City(id: "4406", name: "佛山", nameEn: "Foshan", namePinyin: "foshan", latitude: 23.0218, longitude: 113.1219, stationCount: 123, lineCount: 8),
+        City(id: "4406", name: "佛山", nameEn: "Foshan", namePinyin: "foshan", latitude: 23.0218, longitude: 113.1219, stationCount: 132, lineCount: 8),
         City(id: "3303", name: "温州", nameEn: "Wenzhou", namePinyin: "wenzhou", latitude: 27.9939, longitude: 120.6994, stationCount: 36, lineCount: 2),
         City(id: "3306", name: "绍兴", nameEn: "Shaoxing", namePinyin: "shaoxing", latitude: 30.0023, longitude: 120.581, stationCount: 41, lineCount: 2),
         City(id: "3203", name: "徐州", nameEn: "Xuzhou", namePinyin: "xuzhou", latitude: 34.2058, longitude: 117.2848, stationCount: 33, lineCount: 2),
@@ -71,8 +71,8 @@ final class CityService {
         cities.first { $0.id == id }
     }
 
-    /// The city a coordinate belongs to. Used to *label* things — which pack a quick tag files
-    /// under, which network to warm on launch — never to gate what the app will load, search,
+    /// The city a coordinate belongs to. Used to *label* things, which pack a quick tag files
+    /// under, which network to warm on launch. Never to gate what the app will load, search,
     /// draw or route. That gate is gone: the map is one network you pan.
     func findNearestCity(to location: CLLocation) -> City? {
         cities.min { city1, city2 in

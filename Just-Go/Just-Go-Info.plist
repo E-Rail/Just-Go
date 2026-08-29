@@ -17,16 +17,40 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<!-- canOpenURL returns false for any scheme not listed here, whatever is installed, so a
+	     handoff button would silently offer nothing. It has to live in this file: the
+	     INFOPLIST_KEY_* build settings only apply when GENERATE_INFOPLIST_FILE is YES, and this
+	     target ships a hand-written plist — the same trap that kept CFBundleDisplayName out of
+	     every build above.
+
+	     Declaring a scheme is a query, not a capability: it lets the app ask whether a map or
+	     hailing app is installed so it can offer the right button, and nothing more. Each has an
+	     https fallback for riders who have none of them, which is the only path testable without
+	     a device — no simulator has any of these apps installed. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>baidumap</string>
+		<string>iosamap</string>
+		<string>diditaxi</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<!-- The build settings, not literals. MARKETING_VERSION and CURRENT_PROJECT_VERSION both
+	     exist in the project and were inert while these were spelled out here, so a TestFlight
+	     upload — which needs a unique CFBundleVersion every time — meant editing a hand-written
+	     plist that nothing points at. Verify against the built .app, never against this file. -->
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>BaiduMapsAK</key>
+	<string>$(BAIDU_MAPS_AK)</string>
+	<key>BaiduMapsSK</key>
+	<string>$(BAIDU_MAPS_SK)</string>
 	<key>CityPackBaseURL</key>
 	<string>$(CITY_PACK_BASE_URL)</string>
 	<key>CityPackFallbackBaseURL</key>

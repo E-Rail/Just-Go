@@ -13,15 +13,18 @@ enum StationInformationCacheLocation {
 /// Device-only persistence for the last good official station-information snapshot per
 /// station, so riders keep access to exits, facilities, and first/last trains offline.
 ///
-/// Policy (enforced by validate_runtime_data_policy.rb): storage only — no network code in
+/// Policy (enforced by validate_runtime_data_policy.rb): storage only. No network code in
 /// this file; lives under Application Support excluded from iCloud/iTunes backup; never
 /// bundled into the app or exported; wiped by both Settings → Clear Cache and the
 /// data-rights epoch cleanup at launch.
 actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
-    /// v2 nests services under their line and gives every enum a stable string wire value; see
-    /// `DataPacks/STATION_INFORMATION_SCHEMA.md`. A stored v1 entry fails the version check in
-    /// `storedSnapshot` and is simply refetched, so no migration is needed.
-    static let schemaVersion = 2
+    /// v2 nests services under their line and gives every enum a stable string wire value; v3 adds
+    /// `destination`, which separates a short-turn from the full run under a shared direction
+    /// marker. See `DataPacks/STATION_INFORMATION_SCHEMA.md`. A stored older entry fails the version
+    /// check in `storedSnapshot` and is simply refetched, so no migration is needed — and for v3
+    /// that refetch is the point: an entry written before this field existed would keep serving the
+    /// merged last train offline, which is the answer this version exists to stop giving.
+    static let schemaVersion = 3
     // Mirrors the provider's network response cap: anything larger than a legitimate
     // response has no business being read back either.
     private static let maximumEntryBytes = 1_048_576

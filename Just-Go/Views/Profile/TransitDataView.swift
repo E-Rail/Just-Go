@@ -11,15 +11,21 @@ private final class TransitDataState: ObservableObject {
 }
 
 struct TransitDataView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
+    /// What this launch has spent against the route provider, and what it was last refused.
+    /// Empty when no key is configured, which is a normal state.
+    @State private var providerUsage: [BaiduEndpointDiagnostics] = []
 
-    /// Only the cities whose pack actually holds station data — 14 of the 53, not all 53.
+    /// Only the cities whose pack actually holds station data. 14 Of the 53, not all 53.
     ///
     /// Routing is untouched: every city keeps its bundled OSM network and stays searchable and
     /// plannable. This page is about the *station* layer, and listing a city with an empty pack
-    /// put a download control in front of nothing — there are no remote packs at all, since none
+    /// put a download control in front of nothing. There are no remote packs at all, since none
     /// of the `CityPack*URL` Info.plist keys is set. Advertising 39 packs that cannot arrive is
     /// the same failure as claiming a transfer nobody surveyed.
     private var cities: [City] {
@@ -73,9 +79,9 @@ struct TransitDataView: View {
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(AppLocalization.text(
-                                            english: "Official links for 58 reviewed cities — 43 have at least one; maps and accessibility pages are rarer",
-                                            simplified: "58 个已审核城市的官方链接——其中 43 个至少有一条；地图与无障碍页面较少",
-                                            traditional: "58 個已審核城市的官方連結——其中 43 個至少有一條；地圖與無障礙頁面較少"
+                                            english: "Official links for 58 reviewed cities. 43 have at least one. Maps and accessibility pages are rarer.",
+                                            simplified: "58 个已审核城市的官方链接，其中 43 个至少有一条。地图与无障碍页面较少。",
+                                            traditional: "58 個已審核城市的官方連結，其中 43 個至少有一條。地圖與無障礙頁面較少。"
                                         ))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
@@ -108,7 +114,7 @@ struct TransitDataView: View {
                         dataCapabilityRow(
                             icon: "clock.fill",
                             title: AppLocalization.localized("Train times"),
-                            // No bundled pack carries a timetable — operator schedule content must
+                            // No bundled pack carries a timetable. Operator schedule content must
                             // not be committed, so `schedules` is empty for all 2,849 stations.
                             // First and last trains exist only as a device-side fetch, in the
                             // cities that publish one.
@@ -204,6 +210,41 @@ struct TransitDataView: View {
                             traditional: "僅列出擁有車站資料的城市。其他城市仍可使用內置線網規劃路線。刪除下載的更新後會恢復內置版本。"
                         ))
                     }
+                    if !providerUsage.isEmpty {
+                        Section {
+                            ForEach(providerUsage) { endpoint in
+                                VStack(alignment: .leading, spacing: 3) {
+                                    HStack {
+                                        Text(endpoint.path)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                        Spacer()
+                                        Text(verbatim: "\(endpoint.spent) / \(endpoint.ceiling)")
+                                            .font(.caption)
+                                            .monospacedDigit()
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    if let failure = endpoint.lastFailure {
+                                        Text(failure.summary)
+                                            .font(.caption2)
+                                            .foregroundStyle(.orange)
+                                    }
+                                }
+                            }
+                        } header: {
+                            Text(AppLocalization.text(
+                                english: "Route Provider Usage",
+                                simplified: "路线服务用量",
+                                traditional: "路線服務用量"
+                            ))
+                        } footer: {
+                            Text(AppLocalization.text(
+                                english: "This launch only, and never written to disk. The daily allowance is shared by everyone using the app, so these counts are a guard against one device spending it, not a measure of what is left.",
+                                simplified: "仅统计本次启动，且不会写入磁盘。每日额度由所有使用者共享，因此这里只是防止单台设备耗尽额度，并非剩余额度。",
+                                traditional: "僅統計本次啟動，且不會寫入磁碟。每日額度由所有使用者共享，因此這裡只是防止單一裝置耗盡額度，並非剩餘額度。"
+                            ))
+                        }
+                    }
                 }
                 .listRowBackground(Color.clear)
             }
@@ -214,11 +255,14 @@ struct TransitDataView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
             .task {
                 await refreshPackStatuses()
+                providerUsage = await container.baiduMapsClient?.diagnostics() ?? []
             }
         }
     }
@@ -474,7 +518,7 @@ struct OfficialResourcesDirectoryView: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(Color.secondary.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
     }
 }
 
@@ -536,9 +580,9 @@ private struct OfficialResourceCityView: View {
 
             Section {
                 Text(AppLocalization.text(
-                    english: "Reviewed \(city.verifiedAt). External maps remain operator content and do not establish a verified indoor path or door position in Just-Go.",
-                    simplified: "审核日期：\(city.verifiedAt)。外部地图仍属于运营方内容，并不代表 Just-Go 已核实站内路径或车门位置。",
-                    traditional: "審核日期：\(city.verifiedAt)。外部地圖仍屬於營運方內容，並不代表 Just-Go 已核實站內路徑或車門位置。"
+                    english: "Checked \(city.verifiedAt). These are the operator's own maps. Just-Go adds no station layouts or door positions.",
+                    simplified: "核对于 \(city.verifiedAt)。这些是运营方自己的地图，我们不会另行标注站内路线或车门位置。",
+                    traditional: "核對於 \(city.verifiedAt)。這些是營運方自己的地圖，我們不會另行標註站內路線或車門位置。"
                 ))
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -552,12 +596,12 @@ private struct OfficialResourceCityView: View {
 struct CityCapabilityTags: View, Equatable {
     let coverage: CityDataCoverage
     /// True for cities whose accessibility/facility facts are served live from the official
-    /// operator (Beijing) — the bundled coverage metric honestly reads 0 there, but showing
+    /// operator (Beijing): the bundled coverage metric honestly reads 0 there, but showing
     /// "0" would contradict the online facilities every station page renders.
     var hasOfficialOnlineStationInformation: Bool = false
 
     /// Cap held to 3: a city row is a compact summary, not the full coverage table (that
-    /// detail lives on the city's own page) — more than a handful of chips just wraps and
+    /// detail lives on the city's own page). More than a handful of chips just wraps and
     /// crowds every other row in the list.
     private static let maximumTagCount = 3
 

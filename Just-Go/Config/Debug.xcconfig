@@ -5,6 +5,11 @@ CITY_PACK_MAINLAND_MIRROR_URL = $(CITY_PACK_SECRET_MAINLAND_MIRROR_URL)
 CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
 CITY_PACK_FALLBACK_BASE_URL =
 
+// Baidu Maps 服务端 credentials. Values live in the git-ignored Secrets.xcconfig; an absent key is
+// a supported state — every Baidu-backed feature falls back to Apple rather than failing.
+BAIDU_MAPS_AK = $(BAIDU_MAPS_SECRET_AK)
+BAIDU_MAPS_SK = $(BAIDU_MAPS_SECRET_SK)
+
 // Xcode 16 defaults Debug app targets to the "debug dylib" layout for SwiftUI Previews: the
 // executable becomes a 40 KB stub and all ~23 MB of app code moves into Just-Go.debug.dylib,
 // which dyld must map and bind before main — outside the shared cache, unoptimised. On device

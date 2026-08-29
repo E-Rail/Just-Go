@@ -1,7 +1,7 @@
 import Foundation
 
 /// Routes a station-information request to the provider for its source. The app looks a station
-/// up in the bundled directory, builds the matching reference, and this dispatches it — so adding
+/// up in the bundled directory, builds the matching reference, and this dispatches it, so adding
 /// a city is a new provider plus a directory entry, with no change to the call sites.
 actor OfficialStationInformationRouter: OfficialStationInformationProviding {
     private let beijing: BeijingStationInformationProvider
@@ -321,7 +321,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
                 guard let name = stringValue(entrance["id"]) else { continue }
                 // Shanghai packs every road an exit reaches into one space-separated string
                 // ("西藏南路 复兴东路 盐城路"). Split it so `details` means one place per element,
-                // the way Beijing's `nearby` array already does — the exits view groups on that.
+                // the way Beijing's `nearby` array already does. The exits view groups on that.
                 let details = trimmed(entrance["description"] as? String)
                     .map { $0.split(whereSeparator: \.isWhitespace).map(String.init) }?
                     .uniqued() ?? []
@@ -354,7 +354,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     }
 
     /// Group `func=fltime` rows by direction, keeping the earliest first train and latest last
-    /// train across a direction's short-turn runs — the same service-day merge the recipe requires.
+    /// train across a direction's short-turn runs. The same service-day merge the recipe requires.
     private static func mergedServices(
         _ rows: [(direction: String, first: String?, last: String?)]
     ) -> [OfficialStationServiceInformation] {

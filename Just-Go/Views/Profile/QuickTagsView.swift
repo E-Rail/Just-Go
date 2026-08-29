@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct QuickTagsView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
@@ -122,7 +125,9 @@ struct QuickTagsView: View {
                     .accessibilityLabel(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
             .sheet(isPresented: $showAddTag) {
@@ -152,9 +157,9 @@ struct QuickTagsView: View {
                 }
             } message: { _ in
                 Text(AppLocalization.text(
-                    english: "Quick Tags appear as one-tap chips in the route planner.",
-                    simplified: "快捷标签会显示在路线规划的一键填入按钮中。",
-                    traditional: "快捷標籤會顯示在路線規劃的一鍵填入按鈕中。"
+                    english: "Quick tags fill a start or destination field in one tap.",
+                    simplified: "快捷标签可一键填入起点或终点。",
+                    traditional: "快捷標籤可一鍵填入起點或終點。"
                 ))
             }
             .alert(

@@ -49,7 +49,7 @@ final class RouteFeasibilityService {
                 level = max(level, .risky)
                 reasons.append(warning.message)
             case .stationNotServingPassengers:
-                // Not a caution — the rider cannot get on or off here at all, so the plan is wrong
+                // Not a caution: the rider cannot get on or off here at all, so the plan is wrong
                 // rather than merely uncertain.
                 level = max(level, .risky)
                 reasons.append(warning.message)

@@ -2,18 +2,21 @@ import SwiftUI
 import UIKit
 
 struct AccessibilitySettingsView: View {
+    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
+    /// in a column, so a Done button there is a control that looks live and does nothing.
+    var showsDoneButton = true
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     @State private var voiceOverOn = UIAccessibility.isVoiceOverRunning
-
+    @AppStorage("showAccessibilityBadges") private var showBadges = true
     var body: some View {
         NavigationStack {
             Form {
-                primaryCategorySection
                 mobilitySection
                 visionSection
                 hearingSection
                 cognitiveSection
+                stationListSection
             }
             .navigationTitle(AppLocalization.localized("Accessibility"))
             .navigationBarTitleDisplayMode(.inline)
@@ -22,29 +25,22 @@ struct AccessibilitySettingsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(AppLocalization.localized("Done")) { dismiss() }
+                    if showsDoneButton {
+                        Button(AppLocalization.localized("Done")) { dismiss() }
+                    }
                 }
             }
         }
     }
 
-    private var primaryCategorySection: some View {
-        Section {
-            Picker(AppLocalization.localized("Primary Category"), selection: preferenceBinding(\.primaryCategory)) {
-                ForEach(DisabilityCategory.allCases, id: \.self) { category in
-                    Label(category.displayName, systemImage: category.icon)
-                        .tag(category)
-                }
-            }
-        } header: {
-            Text(AppLocalization.localized("Primary Disability Category"))
-        }
-    }
 
     private var mobilitySection: some View {
         Section(AppLocalization.localized("Mobility")) {
             Toggle(AppLocalization.localized("Requires Wheelchair Access"), isOn: preferenceBinding(\.requiresWheelchairAccess))
-            Toggle(AppLocalization.localized("Prefer Elevator"), isOn: preferenceBinding(\.prefersElevator))
+            Toggle(
+                AppLocalization.text(english: "Requires Elevator", simplified: "需要电梯", traditional: "需要電梯"),
+                isOn: preferenceBinding(\.prefersElevator)
+            )
             Toggle(AppLocalization.localized("Avoid Stairs"), isOn: preferenceBinding(\.avoidStairs))
 
             VStack(alignment: .leading, spacing: 8) {
@@ -71,8 +67,8 @@ struct AccessibilitySettingsView: View {
 
     // VoiceOver / high contrast / large text / LED flash are SYSTEM features: an app
     // cannot toggle them (and there is no public deep-link to Settings > Accessibility),
-    // so these rows show the real state where readable and the exact Settings path —
-    // honest guidance instead of switches that silently do nothing.
+    // so these rows show the real state where readable and the exact Settings path.
+    // Honest guidance instead of switches that silently do nothing.
     private var visionSection: some View {
         Section {
             systemFeatureRow(
@@ -81,7 +77,7 @@ struct AccessibilitySettingsView: View {
                     ? AppLocalization.text(english: "On", simplified: "已开启", traditional: "已開啟")
                     : AppLocalization.text(english: "Off", simplified: "未开启", traditional: "未開啟"),
                 path: AppLocalization.text(
-                    english: "Turn on in Settings > Accessibility > VoiceOver — or ask Siri, or triple-click the side button.",
+                    english: "Turn on in Settings > Accessibility > VoiceOver. You can also ask Siri, or triple-click the side button.",
                     simplified: "请在 设置 > 辅助功能 > 旁白 中开启，也可通过 Siri 或连按三下侧边按钮。",
                     traditional: "請在 設定 > 輔助使用 > 旁白 中開啟，也可透過 Siri 或連按三下側邊按鈕。"
                 )
@@ -142,8 +138,8 @@ struct AccessibilitySettingsView: View {
 
     private var cognitiveSection: some View {
         Section {
-            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI` — no
-            // view hid anything — so a rider with a cognitive-accessibility need flipped a switch
+            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI`. No
+            // view hid anything, so a rider with a cognitive-accessibility need flipped a switch
             // that did nothing, on the one screen that exists to serve them. A control that lies
             // is worse than a control that is absent.
             Toggle(AppLocalization.localized("Step-by-Step Guidance"), isOn: preferenceBinding(\.stepByStepGuidance))
@@ -154,6 +150,20 @@ struct AccessibilitySettingsView: View {
                 english: "Step-by-Step Guidance opens the guided navigator directly when you view a route.",
                 simplified: "分步指引会在查看路线时直接进入分步导航。",
                 traditional: "分步指引會在查看路線時直接進入分步導航。"
+            ))
+        }
+    }
+
+    private var stationListSection: some View {
+        Section {
+            Toggle(AppLocalization.localized("Show Accessibility Badges"), isOn: $showBadges)
+        } header: {
+            Text(AppLocalization.text(english: "Station list", simplified: "车站列表", traditional: "車站列表"))
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Icons on a station row when elevator, ramp or tactile-path data exists.",
+                simplified: "在车站行上显示电梯、坡道或盲道图标（仅在有数据时）。",
+                traditional: "在車站列上顯示電梯、坡道或導盲磚圖示（僅在有資料時）。"
             ))
         }
     }

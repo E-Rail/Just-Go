@@ -11,14 +11,14 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private var continuousSessionCount = 0
 
     /// The fix exactly as Core Location reported it. Correct for asking "which city is this" and
-    /// for measuring the correction below — and wrong for everything else. See `mapSpaceLocation`.
+    /// for measuring the correction below, and wrong for everything else. See `mapSpaceLocation`.
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
 
     /// How far Core Location's frame sits from the map's, measured rather than assumed.
     ///
-    /// Every coordinate this app stores, draws and measures against is GCJ-02 — each bundled
+    /// Every coordinate this app stores, draws and measures against is GCJ-02, each bundled
     /// network declares `"coordinateSystem": "gcj02"`, and Apple's basemap uses it across Greater
     /// China. A `CLLocation` is the sole input nothing converts, so on a device that reports
     /// WGS-84 the rider's own position is the one coordinate in the whole app in a different
@@ -26,13 +26,13 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     ///
     /// Deliberately not a datum transform. Whether a given iPhone reports WGS-84 or already-shifted
     /// GCJ-02 is not something this code can know, and converting a coordinate that was already
-    /// converted would double the error rather than remove it. So the offset is *observed* — the
+    /// converted would double the error rather than remove it, so the offset is *observed*. The
     /// difference between what MapKit says (always the map's frame) and what Core Location said at
     /// the same instant. A phone that needs no correction measures ~0 and nothing moves.
     private(set) var mapSpaceCorrection: (latitude: CLLocationDegrees, longitude: CLLocationDegrees)?
 
     /// The fix in the frame the rest of the app lives in. Identical to `currentLocation` until the
-    /// map has reported a user location — unknown is left uncorrected rather than guessed at.
+    /// map has reported a user location. Unknown is left uncorrected rather than guessed at.
     var mapSpaceLocation: CLLocation? {
         guard let currentLocation else { return nil }
         return mapSpaceLocation(from: currentLocation)
@@ -49,8 +49,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func requestCurrentLocation() async throws -> CLLocation {
         locationErrorMessage = nil
 
-        // The cache fast path returns before the cancellation handler below is armed —
-        // without this check an already-cancelled caller (e.g. locate-me superseded by a
+        // The cache fast path returns before the cancellation handler below is armed.
+        // Without this check an already-cancelled caller (e.g. locate-me superseded by a
         // city switch) would still receive a fix and act on it.
         try Task.checkCancellation()
 
@@ -81,7 +81,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
                     manager.requestWhenInUseAuthorization()
                 case .authorizedAlways, .authorizedWhenInUse:
                     // Acquire via the continuous stream (more forgiving than a single shot) and
-                    // stop it the moment a fix passes the gate — see finishPendingLocationRequests.
+                    // stop it the moment a fix passes the gate. See finishPendingLocationRequests.
                     startUpdatingLocation()
                 case .denied, .restricted:
                     let error = LocationServiceError.permissionDenied
@@ -106,7 +106,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         guard let raw = currentLocation?.coordinate else { return }
         // A fix that arrived seconds ago and a MapKit update from now can differ because the rider
         // moved, which is not a frame difference. Anything past a plausible datum shift (the GCJ-02
-        // obfuscation peaks around 800 m) is movement or a bad fix, so ignore it — a wrong
+        // obfuscation peaks around 800 m) is movement or a bad fix, so ignore it. A wrong
         // correction is worse than none.
         let latitude = coordinate.latitude - raw.latitude
         let longitude = coordinate.longitude - raw.longitude
@@ -145,8 +145,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
     }
 
-    /// Keep the location stream running until the matching `endContinuousUpdates()` —
-    /// balanced calls, e.g. from a live-navigation screen's appear/disappear.
+    /// Keep the location stream running until the matching `endContinuousUpdates()`.
+    /// Balanced calls, e.g. from a live-navigation screen's appear/disappear.
     func beginContinuousUpdates() {
         continuousSessionCount += 1
         startUpdatingLocation()
@@ -186,7 +186,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
 
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
             // Only start acquiring when a request is actually waiting (or a navigation
-            // session is active) — granting permission alone shouldn't leave a continuous
+            // session is active): granting permission alone shouldn't leave a continuous
             // stream running for the app's lifetime.
             if !pendingLocationContinuations.isEmpty || continuousSessionCount > 0 {
                 startUpdatingLocation()
@@ -203,7 +203,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // kCLErrorLocationUnknown is transient — Core Location keeps trying and will deliver
+        // kCLErrorLocationUnknown is transient. Core Location keeps trying and will deliver
         // a fix (or a real error) shortly. Failing every pending request here made a cold GPS
         // start (indoors, first fix after launch) error out instantly; keep waiting instead.
         // The 15s request timeout remains the backstop and stops the stream on expiry.
@@ -223,8 +223,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     private func finishPendingLocationRequests(with result: Result<CLLocation, Error>) {
-        // Tear down the continuous stream once the request(s) it was acquiring for resolve —
-        // success, failure, or timeout — so GPS doesn't keep running for the app's lifetime.
+        // Tear down the continuous stream once the request(s) it was acquiring for resolve.
+        // Success, failure, or timeout, so GPS doesn't keep running for the app's lifetime.
         // Unless a live-navigation session holds it open.
         if continuousSessionCount == 0 {
             manager.stopUpdatingLocation()

@@ -15,7 +15,7 @@ enum LaunchClock {
     private static let log = Logger(subsystem: "com.e-rail.just-go.diag", category: "launch")
 
     /// Kernel-recorded process start, via `sysctl(KERN_PROC_PID)`. Falls back to first-touch of
-    /// this static — which just means pre-main time reads as zero rather than as a wrong number.
+    /// this static, which just means pre-main time reads as zero rather than as a wrong number.
     private static let processStart: Date = {
         var info = kinfo_proc()
         var size = MemoryLayout<kinfo_proc>.stride

@@ -175,25 +175,25 @@ beijing = cities.find { |city| city.fetch("cityID") == "1100" }
 beijing_station_resources = beijing.fetch("stationResources")
 beijing_station_pages = beijing_station_resources.flat_map { |station| station.fetch("resources") }
   .select { |resource| resource.fetch("kind") == "stationInformation" }
-fail_validation("Beijing must review all 444 canonical stations") unless beijing_station_resources.length == 444
-fail_validation("Beijing must expose 418 exact station pages") unless beijing_station_pages.length == 418
+fail_validation("Beijing must review all 449 canonical stations") unless beijing_station_resources.length == 449
+fail_validation("Beijing must expose 423 exact station pages") unless beijing_station_pages.length == 423
 beijing_provider_references = beijing_station_resources.each_with_object([]) do |station, references|
   references << station["providerStationID"] if station.key?("providerStationID")
 end
-fail_validation("Beijing must expose 416 reviewed native provider references") unless
-  beijing_provider_references.length == 416
+fail_validation("Beijing must expose 421 reviewed native provider references") unless
+  beijing_provider_references.length == 421
 fail_validation("Beijing native provider references must be unique nine-digit IDs") unless
-  beijing_provider_references.uniq.length == 416 &&
+  beijing_provider_references.uniq.length == 421 &&
     beijing_provider_references.all? { |station_id| station_id.match?(/\A\d{9}\z/) }
 fail_validation("Beijing source station count changed") unless beijing_source.fetch("sourceStationCount") == 423
-fail_validation("Beijing native mapping count changed") unless beijing_source.fetch("mappedStationCount") == 416
-fail_validation("Beijing Subway station-page coverage changed") unless beijing_source.fetch("stationPageCount") == 417
+fail_validation("Beijing native mapping count changed") unless beijing_source.fetch("mappedStationCount") == 421
+fail_validation("Beijing Subway station-page coverage changed") unless beijing_source.fetch("stationPageCount") == 422
 fail_validation("Beijing station-page gap count changed") unless beijing_source.fetch("stationPageGapCount") == 27
 fail_validation("Beijing station-page counts are inconsistent") unless
   beijing_source.fetch("stationPageCount") + beijing_source.fetch("stationPageGapCount") ==
     beijing_source.fetch("canonicalStationCount")
 fail_validation("Beijing canonical gap count changed") unless beijing_source.fetch("canonicalCoverageGaps").length == 28
-fail_validation("Beijing official-only station count changed") unless beijing_source.fetch("sourceOnlyStationCount") == 7
+fail_validation("Beijing official-only station count changed") unless beijing_source.fetch("sourceOnlyStationCount") == 2
 expected_beijing_ids = (
   beijing_source.fetch("stations") +
   beijing_source.fetch("legacyStationPages") +
@@ -222,7 +222,7 @@ status_counts = beijing_station_resources
   .group_by { |station| station.fetch("stationInformationStatus") }
   .transform_values(&:length)
 expected_status_counts = {
-  "exactPage" => 418,
+  "exactPage" => 423,
   "officialContextOnly" => 18,
   "notOpenForPassengerService" => 3,
   "noCurrentPassengerService" => 5

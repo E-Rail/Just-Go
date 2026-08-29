@@ -95,16 +95,44 @@ enum OfficialStationInformationSource: String, Sendable, Equatable, Codable {
 /// One direction of travel from this station: the service window a rider sees on the platform
 /// sign, plus a live countdown where an operator publishes one.
 struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Codable {
+    /// The direction marker a rider reads on the platform sign. Names *a* way, not necessarily
+    /// where this particular train ends.
     let direction: String
+    /// Where this individual service terminates, when the operator distinguishes it from the
+    /// direction marker.
+    ///
+    /// Beijing publishes both, and at 国贸 every northbound 10号线 row shares
+    /// `terminalStationName = 双井` while `destStationName` separates them into 车道沟, 成寿寺 and
+    /// 巴沟 — three services, three last trains. Folding them together published one 23:36 window,
+    /// which belongs to a train that turns back seventeen stops before 车道沟.
+    ///
+    /// Optional and defaulted: most sources publish one name for both, and a device cache written
+    /// before this field existed must still decode.
+    let destination: String?
     let firstTrain: String?
     let lastTrain: String?
     let liveTime: String?
+
+    init(
+        direction: String,
+        destination: String? = nil,
+        firstTrain: String?,
+        lastTrain: String?,
+        liveTime: String?
+    ) {
+        self.direction = direction
+        self.destination = destination
+        self.firstTrain = firstTrain
+        self.lastTrain = lastTrain
+        self.liveTime = liveTime
+    }
 
     /// Positional, not `compactMap`-ed: dropping nils before joining made
     /// `(first: "5:27", last: nil)` and `(first: nil, last: "5:27")` collide on one id, and the
     /// `uniqued(by:)` at the call sites then silently deleted the second row.
     var id: String {
-        [direction, firstTrain ?? "", lastTrain ?? "", liveTime ?? ""].joined(separator: "|")
+        [direction, destination ?? "", firstTrain ?? "", lastTrain ?? "", liveTime ?? ""]
+            .joined(separator: "|")
     }
 }
 
@@ -195,9 +223,36 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
     let stationName: String
     let source: OfficialStationInformationSource
     let freshness: OfficialStationInformationFreshness
+    /// Which service day these times describe, in the source's own words, when it says.
+    ///
+    /// Hangzhou's payload is titled `工作日时刻表` — the *weekday* timetable — and the app has been
+    /// showing it on Saturdays as though it were today's. `StationInfoAPI/sources/sources.json`
+    /// recorded that the title existed; nothing read it. Optional because only Hangzhou publishes
+    /// one, and because a cache written before this existed must still decode.
+    let serviceDayNote: String?
     let lines: [OfficialStationLineInformation]
     let exits: [OfficialStationExitInformation]
     let facilityGroups: [OfficialStationFacilityGroup]
+
+    init(
+        stationID: String,
+        stationName: String,
+        source: OfficialStationInformationSource,
+        freshness: OfficialStationInformationFreshness,
+        serviceDayNote: String? = nil,
+        lines: [OfficialStationLineInformation],
+        exits: [OfficialStationExitInformation],
+        facilityGroups: [OfficialStationFacilityGroup]
+    ) {
+        self.stationID = stationID
+        self.stationName = stationName
+        self.source = source
+        self.freshness = freshness
+        self.serviceDayNote = serviceDayNote
+        self.lines = lines
+        self.exits = exits
+        self.facilityGroups = facilityGroups
+    }
 
     func withFreshness(_ freshness: OfficialStationInformationFreshness) -> OfficialStationInformationSnapshot {
         OfficialStationInformationSnapshot(
@@ -205,6 +260,7 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
             stationName: stationName,
             source: source,
             freshness: freshness,
+            serviceDayNote: serviceDayNote,
             lines: lines,
             exits: exits,
             facilityGroups: facilityGroups
@@ -238,7 +294,7 @@ enum OfficialStationInformationReference: Hashable, Sendable {
     /// its per-line codes, so the reference carries a single representative stationShowCode.
     case guangzhou(stationShowCode: String, expectedNames: [String])
     /// Hangzhou returns the whole network in one response, so the reference carries every station
-    /// code the operator publishes for this physical station — usually one, but 火车东站 is split
+    /// code the operator publishes for this physical station. Usually one, but 火车东站 is split
     /// upstream into a main-hall and an east-plaza record that have to be read together.
     case hangzhou(stationCodes: [String], expectedNames: [String])
 }
@@ -266,8 +322,8 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
     case contractViolation(String)
 
     /// Transient failures worth another attempt before the rider sees an error. A cold first
-    /// request after launch — the initial DNS/TLS handshake, racing the app's own launch work —
-    /// can time out or have its connection reset while the endpoint is perfectly reachable, then
+    /// request after launch: the initial DNS/TLS handshake, racing the app's own launch work.
+    /// Can time out or have its connection reset while the endpoint is perfectly reachable, then
     /// load on a retry. Permanent failures (bad request, contract mismatch, oversize response)
     /// and rate limiting (which carries its own backoff) are never retried.
     var isRetryable: Bool {
@@ -305,7 +361,7 @@ private final class BeijingStationInformationRedirectDelegate:
 
 actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     /// Cities whose station accessibility/facility facts come from this official online
-    /// surface rather than the bundled pack — coverage UI uses this to avoid claiming the
+    /// surface rather than the bundled pack. Coverage UI uses this to avoid claiming the
     /// data doesn't exist while every station page renders it.
     static func servesStationInformation(forCityID cityID: String) -> Bool {
         cityID == "1100"
@@ -318,7 +374,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     private static let requestTimeout: TimeInterval = 5
     // First/last trains, exits, and facilities change rarely; a longer in-session cache
     // keeps station re-visits instant instead of re-fetching every few minutes. The provider
-    // itself never touches storage APIs — the injected `diskCache` (a separate file with its
+    // itself never touches storage APIs. The injected `diskCache` (a separate file with its
     // own validate_runtime_data_policy.rb rules) keeps a device-only last-good snapshot that
     // is served, clearly labeled as cached, only when the official service is unreachable.
     private static let cacheLifetime: TimeInterval = 1800
@@ -370,7 +426,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         let now = Self.clock.now
 
         // Entries otherwise only leave `cache` when that same station is looked up again after
-        // expiring — over a session visiting many distinct stations it only ever shrinks on an
+        // expiring: over a session visiting many distinct stations it only ever shrinks on an
         // OS memory warning. Sweep proactively; bounded by the reviewed station count, so this
         // is cheap even every call.
         if !cache.isEmpty {
@@ -449,7 +505,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     }
 
     /// Availability failures fall back to the last snapshot this device stored, labeled as
-    /// cached. Caller and contract errors never do — a stored copy must not paper over a
+    /// cached. Caller and contract errors never do. A stored copy must not paper over a
     /// station-identity mismatch or a malformed request.
     private func servingStoredSnapshot(
         for request: PreparedRequest,
@@ -518,7 +574,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         }
     }
 
-    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval — a
+    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
     /// connection that trickles data indefinitely (observed on throttled routes to this host)
     /// never triggers it, so the byte-by-byte read below could hang well past `requestTimeout`
     /// and leave the loading spinner stuck. Race the whole fetch against an explicit deadline,
@@ -696,21 +752,33 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
 
     /// The upstream returns one record per *service*, not per direction: `terminalStationName`
     /// is a direction marker (the next station toward that end of the line) while
-    /// `destStationName` is that individual service's terminus. A direction served by several
-    /// short-turn services therefore yields several records sharing a line name, a direction and
-    /// a first-train time, differing only in the last-train digits — which rendered as visually
-    /// identical duplicate rows. Observed at 宋家庄 line 10 (three records, all "开往 石榴庄",
-    /// all first 5:07, last 21:44/22:05/23:28) and at 西直门 line 2.
+    /// `destStationName` is that individual service's terminus.
     ///
-    /// Collapse each (line, direction) to a single row spanning the whole service window:
-    /// earliest first train, latest last train — which is what platform signage shows.
-    /// The two directions then nest under their line, so a rider (and any other consumer of the
-    /// schema) sees one block per line holding both of its service windows.
+    /// Both are kept, and the grouping key is the pair. Keying on the direction marker alone —
+    /// which is what this did — folded every short-turn in a direction into one row spanning the
+    /// earliest first train and the **latest** last train. At 国贸, live, the three northbound
+    /// 10号线 records all read `terminalStationName = 双井` and differ only in `destStationName`:
+    ///
+    ///     → 车道沟  5:18 – 21:28      → 成寿寺  5:18 – 23:36      → 巴沟  5:18 – 23:12
+    ///
+    /// Folded, that published 5:18 – 23:36. But the 23:36 train turns back at 成寿寺, seventeen
+    /// stops before 车道沟, so a rider heading further round the ring was given a last train that
+    /// was never going to carry them. `ServiceHoursResolver.servingWindows` exists precisely to
+    /// pick the service that reaches a rider's own stop, and until now it was handed a single
+    /// pre-merged row and nothing to choose between.
+    ///
+    /// Records that genuinely describe the same service — same direction, same terminus, differing
+    /// only in the last-train digits — still collapse to one window, which is what platform signage
+    /// shows and what the duplicate-row problem this originally solved was about.
     private static func groupedLines(_ lines: [BeijingLine]) -> [OfficialStationLineInformation] {
+        struct ServiceKey: Hashable {
+            let direction: String
+            let destination: String
+        }
         var lineOrder: [String] = []
         var colors: [String: String] = [:]
-        var directionOrder: [String: [String]] = [:]
-        var services: [String: [String: OfficialStationServiceInformation]] = [:]
+        var serviceOrder: [String: [ServiceKey]] = [:]
+        var services: [String: [ServiceKey: OfficialStationServiceInformation]] = [:]
 
         for line in lines {
             guard let lineName = trimmed(line.lineName),
@@ -719,28 +787,32 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             let first = trimmed(line.firstTime)
             let last = trimmed(line.lastTime)
             guard first != nil || last != nil else { continue }
+            let destination = trimmed(line.destStationName) ?? direction
+            let key = ServiceKey(direction: direction, destination: destination)
 
             if services[lineName] == nil {
                 lineOrder.append(lineName)
                 services[lineName] = [:]
-                directionOrder[lineName] = []
+                serviceOrder[lineName] = []
             }
             if colors[lineName] == nil, let color = normalizedColor(line.lineColor) {
                 colors[lineName] = color
             }
 
-            guard let existing = services[lineName]?[direction] else {
-                directionOrder[lineName]?.append(direction)
-                services[lineName]?[direction] = OfficialStationServiceInformation(
+            guard let existing = services[lineName]?[key] else {
+                serviceOrder[lineName]?.append(key)
+                services[lineName]?[key] = OfficialStationServiceInformation(
                     direction: direction,
+                    destination: destination,
                     firstTrain: first,
                     lastTrain: last,
                     liveTime: nil
                 )
                 continue
             }
-            services[lineName]?[direction] = OfficialStationServiceInformation(
+            services[lineName]?[key] = OfficialStationServiceInformation(
                 direction: existing.direction,
+                destination: existing.destination,
                 firstTrain: preferredServiceTime(existing.firstTrain, first, earliest: true),
                 lastTrain: preferredServiceTime(existing.lastTrain, last, earliest: false),
                 liveTime: nil
@@ -751,13 +823,13 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             OfficialStationLineInformation(
                 lineName: lineName,
                 lineColorHex: colors[lineName],
-                services: (directionOrder[lineName] ?? []).compactMap { services[lineName]?[$0] }
+                services: (serviceOrder[lineName] ?? []).compactMap { services[lineName]?[$0] }
             )
         }
     }
 
     /// Minutes into the *service* day. A metro service day runs past midnight, so a last train
-    /// at "0:21" is later than one at "23:39" — comparing the raw strings, or a plain clock
+    /// at "0:21" is later than one at "23:39". Comparing the raw strings, or a plain clock
     /// time, would rank it as the earliest of the day and discard the real last train.
     private static func serviceMinutes(_ value: String) -> Int? {
         let parts = value.split(separator: ":")
@@ -992,12 +1064,12 @@ struct OperatorServiceNotice: Identifiable, Sendable, Equatable {
 /// Fetches Beijing Subway's 运营信息 notices from the operator's own site, on the rider's device.
 ///
 /// The operator's content is `LicenseRef-External-Link-Only`: it may not be committed to this
-/// repository, and it is not — this fetches at runtime, holds the result in memory only, and
+/// repository, and it is not: this fetches at runtime, holds the result in memory only, and
 /// redistributes it to nobody. That is the same arrangement the station-information providers in
 /// this file already operate under.
 ///
 /// **This is not a live advisory feed and must not be presented as one.** Beijing publishes here
-/// irregularly — at the time this was written the newest notice was 2026-05-16 — so every notice
+/// irregularly: at the time this was written the newest notice was 2026-05-16, so every notice
 /// carries its own publication date and the UI shows it. A rider needs to know they are reading
 /// something from May.
 actor BeijingServiceNoticeProvider {

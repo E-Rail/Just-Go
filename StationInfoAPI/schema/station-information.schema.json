@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/e-rail/justgo/StationInfoAPI/schema/station-information.schema.json",
+  "$id": "https://github.com/E-Rail/Just-Go/StationInfoAPI/schema/station-information.schema.json",
   "title": "Station Information Snapshot",
-  "description": "The normalized shape every source is mapped into, whatever its raw upstream form. This is the machine-readable twin of DataPacks/STATION_INFORMATION_SCHEMA.md (schema version 2). A producer outputs a `snapshot`; the on-device cache wraps it in an `envelope` (see $defs.envelope).",
-  "$comment": "schemaVersion 2. The `source` field is an open string on purpose: adding a city (e.g. shanghaiMetroOnline) is additive and does not bump this schema. The authoritative list of valid source identifiers lives in ../sources/sources.json.",
+  "description": "The normalized shape every source is mapped into, whatever its raw upstream form. This is the machine-readable twin of DataPacks/STATION_INFORMATION_SCHEMA.md (schema version 3). A producer outputs a `snapshot`; the on-device cache wraps it in an `envelope` (see $defs.envelope).",
+  "$comment": "schemaVersion 3. The `source` field is an open string on purpose: adding a city (e.g. shanghaiMetroOnline) is additive and does not bump this schema. The authoritative list of valid source identifiers lives in ../sources/sources.json.",
   "$ref": "#/$defs/snapshot",
   "$defs": {
     "snapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stationID", "stationName", "source", "freshness", "lines", "exits", "facilityGroups"],
+      "required": ["stationID", "stationName", "source", "freshness", "serviceDayNote", "lines", "exits", "facilityGroups"],
       "properties": {
         "stationID": {
           "type": "string",
@@ -25,6 +25,11 @@
           "examples": ["beijingSubwayOnline", "shanghaiMetroOnline", "guangzhouMetroOnline", "hongKongGovernment"]
         },
         "freshness": { "$ref": "#/$defs/freshness" },
+        "serviceDayNote": {
+          "type": ["string", "null"],
+          "description": "Which service day these times describe, in the source's own words, when it says. Hangzhou's payload is headed 工作日时刻表 — the weekday timetable — so a consumer showing it on a Saturday must say so rather than presenting it as today's. Null when the source does not state a service day.",
+          "examples": ["工作日时刻表"]
+        },
         "lines": {
           "type": "array",
           "description": "Service information grouped by line. One block per line, holding every direction it serves.",
@@ -90,11 +95,16 @@
     "service": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["direction", "firstTrain", "lastTrain", "liveTime"],
+      "required": ["direction", "destination", "firstTrain", "lastTrain", "liveTime"],
       "properties": {
         "direction": {
           "type": "string",
-          "description": "Direction of travel, as a rider reads it on the platform sign."
+          "description": "Direction of travel, as a rider reads it on the platform sign. Names a way, not necessarily where this train ends."
+        },
+        "destination": {
+          "type": ["string", "null"],
+          "description": "Where this individual service terminates, when the source distinguishes it from `direction`. Beijing's northbound 10号线 rows at 国贸 all share one direction marker while terminating at three different stations, with three different last trains; a consumer deciding whether a service reaches a given stop must read this, not `direction`. Null when the source publishes one name for both.",
+          "examples": ["车道沟", "成寿寺"]
         },
         "firstTrain": {
           "type": ["string", "null"],
@@ -172,7 +182,7 @@
       "properties": {
         "schemaVersion": {
           "type": "integer",
-          "const": 2
+          "const": 3
         },
         "externalStationID": {
           "type": "string",

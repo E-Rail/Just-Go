@@ -46,11 +46,13 @@
 		A100002F /* User/SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002F /* User/SearchHistory.swift */; };
 		A1000033 /* Extensions/Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* Extensions/Color+Hex.swift */; };
 		A1000312 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000312 /* AppTheme.swift */; };
+		A1000950 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000950 /* DesignSystem.swift */; };
 		A100003C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A200003C /* Assets.xcassets */; };
 		A100003D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000012 /* Localizable.strings */; };
 		A100003E /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200003E /* Localization.swift */; };
 		A100003F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000013 /* InfoPlist.strings */; };
 		A1000040 /* Map/TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* Map/TransitMapView.swift */; };
+		A1000960 /* Map/LineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000960 /* Map/LineDetailView.swift */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
 		A100004B /* Transit/TransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Transit/TransitFormatting.swift */; };
@@ -104,10 +106,20 @@
 		A1000302 /* Transit/TripTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000302 /* Transit/TripTiming.swift */; };
 		A1000304 /* Transit/TripStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000304 /* Transit/TripStep.swift */; };
 		A1000305 /* Transit/TripConfidenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000305 /* Transit/TripConfidenceServices.swift */; };
+		A1000315 /* Transit/ServiceHoursResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000315 /* Transit/ServiceHoursResolver.swift */; };
+		A1000316 /* Transit/TransitNameMatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000316 /* Transit/TransitNameMatching.swift */; };
+		A1000317 /* Map/ExternalRouteHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000317 /* Map/ExternalRouteHandoff.swift */; };
 		A1000306 /* Notifications/TripReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000306 /* Notifications/TripReminderService.swift */; };
 		A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000307 /* Route/ConfidenceFeatureViews.swift */; };
 		A1000308 /* Route/LiveGoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000308 /* Route/LiveGoView.swift */; };
 		A1000309 /* User/StationQuickTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000309 /* User/StationQuickTag.swift */; };
+		A1000903 /* Route/TransferPacePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000903 /* Route/TransferPacePrompt.swift */; };
+		A1000902 /* Data/TransferInsightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000902 /* Data/TransferInsightService.swift */; };
+		A1000904 /* Map/BaiduMapsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000904 /* Map/BaiduMapsClient.swift */; };
+		A1000907 /* Map/BaiduRidingRouteProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000907 /* Map/BaiduRidingRouteProvider.swift */; };
+		A1000905 /* Map/BaiduPlaceSearchProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000905 /* Map/BaiduPlaceSearchProvider.swift */; };
+		A1000906 /* Transit/BaiduTripObservationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000906 /* Transit/BaiduTripObservationService.swift */; };
+		A1000901 /* Transit/TransferPace.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000901 /* Transit/TransferPace.swift */; };
 		A1000310 /* Profile/QuickTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000310 /* Profile/QuickTagsView.swift */; };
 		A1000605 /* Profile/QuickTagAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000605 /* Profile/QuickTagAddView.swift */; };
 		A1000311 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000311 /* manifest.json */; };
@@ -156,6 +168,7 @@
 		A200003D /* Just-Go-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Just-Go-Info.plist"; sourceTree = "<group>"; };
 		A200003E /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		A2000312 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		A2000950 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		A200003F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		A2000040 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		A2000041 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -163,6 +176,7 @@
 		A2000043 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000044 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000045 /* Map/TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/TransitMapView.swift; sourceTree = "<group>"; };
+		A2000960 /* Map/LineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/LineDetailView.swift; sourceTree = "<group>"; };
 		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -218,10 +232,20 @@
 		A2000302 /* Transit/TripTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTiming.swift; sourceTree = "<group>"; };
 		A2000304 /* Transit/TripStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripStep.swift; sourceTree = "<group>"; };
 		A2000305 /* Transit/TripConfidenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripConfidenceServices.swift; sourceTree = "<group>"; };
+		A2000315 /* Transit/ServiceHoursResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/ServiceHoursResolver.swift; sourceTree = "<group>"; };
+		A2000316 /* Transit/TransitNameMatching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransitNameMatching.swift; sourceTree = "<group>"; };
+		A2000317 /* Map/ExternalRouteHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/ExternalRouteHandoff.swift; sourceTree = "<group>"; };
 		A2000306 /* Notifications/TripReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/TripReminderService.swift; sourceTree = "<group>"; };
 		A2000307 /* Route/ConfidenceFeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/ConfidenceFeatureViews.swift; sourceTree = "<group>"; };
 		A2000308 /* Route/LiveGoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/LiveGoView.swift; sourceTree = "<group>"; };
 		A2000309 /* User/StationQuickTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/StationQuickTag.swift; sourceTree = "<group>"; };
+		A2000903 /* Route/TransferPacePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/TransferPacePrompt.swift; sourceTree = "<group>"; };
+		A2000902 /* Data/TransferInsightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/TransferInsightService.swift; sourceTree = "<group>"; };
+		A2000904 /* Map/BaiduMapsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduMapsClient.swift; sourceTree = "<group>"; };
+		A2000907 /* Map/BaiduRidingRouteProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduRidingRouteProvider.swift; sourceTree = "<group>"; };
+		A2000905 /* Map/BaiduPlaceSearchProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/BaiduPlaceSearchProvider.swift; sourceTree = "<group>"; };
+		A2000906 /* Transit/BaiduTripObservationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/BaiduTripObservationService.swift; sourceTree = "<group>"; };
+		A2000901 /* Transit/TransferPace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransferPace.swift; sourceTree = "<group>"; };
 		A2000310 /* Profile/QuickTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagsView.swift; sourceTree = "<group>"; };
 		A2000605 /* Profile/QuickTagAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/QuickTagAddView.swift; sourceTree = "<group>"; };
 		A2000311 /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = manifest.json; path = DataPacks/manifest.json; sourceTree = SOURCE_ROOT; };
@@ -286,6 +310,7 @@
 				A200003E /* Localization.swift */,
 				A200006C /* Logging.swift */,
 				A2000312 /* AppTheme.swift */,
+				A2000950 /* DesignSystem.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -309,6 +334,7 @@
 				A200002F /* User/SearchHistory.swift */,
 				A2000051 /* User/TripMemory.swift */,
 				A2000309 /* User/StationQuickTag.swift */,
+				A2000901 /* Transit/TransferPace.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -318,8 +344,15 @@
 			children = (
 				A2000600 /* Data/OfficialTransitResourceCatalog.swift */,
 				A2000305 /* Transit/TripConfidenceServices.swift */,
+				A2000315 /* Transit/ServiceHoursResolver.swift */,
+				A2000316 /* Transit/TransitNameMatching.swift */,
+				A2000317 /* Map/ExternalRouteHandoff.swift */,
 				A2000306 /* Notifications/TripReminderService.swift */,
 				A200001B /* Map/MapKitProviders.swift */,
+				A2000904 /* Map/BaiduMapsClient.swift */,
+				A2000907 /* Map/BaiduRidingRouteProvider.swift */,
+				A2000905 /* Map/BaiduPlaceSearchProvider.swift */,
+				A2000906 /* Transit/BaiduTripObservationService.swift */,
 				A2000701 /* Diagnostics/MainThreadHangMonitor.swift */,
 				A2000076 /* Diagnostics/LaunchClock.swift */,
 				A200004A /* Data/OfficialCityPackService.swift */,
@@ -342,6 +375,7 @@
 				A2000020 /* Location/LocationService.swift */,
 				A2000023 /* Data/CityService.swift */,
 				A2000054 /* Data/TripMemoryService.swift */,
+				A2000902 /* Data/TransferInsightService.swift */,
 				A2000314 /* Data/ActiveTripStore.swift */,
 			);
 			path = Services;
@@ -366,12 +400,14 @@
 				A2000072 /* Route/TransferStationSheet.swift */,
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
+				A2000960 /* Map/LineDetailView.swift */,
 				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
 				A2000063 /* Station/StationDetailView+DataSections.swift */,
 				A2000064 /* Station/FullScreenStationImageView.swift */,
 				A200000B /* Route/RouteResultsView.swift */,
+				A2000903 /* Route/TransferPacePrompt.swift */,
 				A200000C /* Route/RouteDetailView.swift */,
 				A2000065 /* Route/RouteDetailView+Segments.swift */,
 				A2000066 /* Route/RouteDetailView+Sheets.swift */,
@@ -517,6 +553,9 @@
 				A1000302 /* Transit/TripTiming.swift in Sources */,
 				A1000304 /* Transit/TripStep.swift in Sources */,
 				A1000305 /* Transit/TripConfidenceServices.swift in Sources */,
+				A1000315 /* Transit/ServiceHoursResolver.swift in Sources */,
+				A1000316 /* Transit/TransitNameMatching.swift in Sources */,
+				A1000317 /* Map/ExternalRouteHandoff.swift in Sources */,
 				A1000306 /* Notifications/TripReminderService.swift in Sources */,
 				A1000307 /* Route/ConfidenceFeatureViews.swift in Sources */,
 				A1000308 /* Route/LiveGoView.swift in Sources */,
@@ -530,6 +569,7 @@
 				A1000005 /* Map/MapContainerView.swift in Sources */,
 				A1000006 /* Map/MapViewModel.swift in Sources */,
 				A1000040 /* Map/TransitMapView.swift in Sources */,
+				A1000960 /* Map/LineDetailView.swift in Sources */,
 				A1000008 /* Station/StationDetailView.swift in Sources */,
 				A1000062 /* Station/StationDetailView+Accessibility.swift in Sources */,
 				A1000063 /* Station/StationDetailView+DataSections.swift in Sources */,
@@ -555,6 +595,10 @@
 				A1000411 /* Components/ThemePickerRow.swift in Sources */,
 				A1000074 /* Components/Transit/StepControls.swift in Sources */,
 				A100001B /* Map/MapKitProviders.swift in Sources */,
+				A1000904 /* Map/BaiduMapsClient.swift in Sources */,
+				A1000907 /* Map/BaiduRidingRouteProvider.swift in Sources */,
+				A1000905 /* Map/BaiduPlaceSearchProvider.swift in Sources */,
+				A1000906 /* Transit/BaiduTripObservationService.swift in Sources */,
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,
 				A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */,
 				A1000602 /* Components/Web/OfficialTransitResourceViewer.swift in Sources */,
@@ -593,6 +637,9 @@
 				A100002F /* User/SearchHistory.swift in Sources */,
 				A1000051 /* User/TripMemory.swift in Sources */,
 				A1000309 /* User/StationQuickTag.swift in Sources */,
+				A1000903 /* Route/TransferPacePrompt.swift in Sources */,
+				A1000902 /* Data/TransferInsightService.swift in Sources */,
+				A1000901 /* Transit/TransferPace.swift in Sources */,
 				A1000057 /* Profile/TripMemoryView.swift in Sources */,
 				A1000310 /* Profile/QuickTagsView.swift in Sources */,
 				A1000605 /* Profile/QuickTagAddView.swift in Sources */,
@@ -603,6 +650,7 @@
 				A100003E /* Localization.swift in Sources */,
 				A100006C /* Logging.swift in Sources */,
 				A1000312 /* AppTheme.swift in Sources */,
+				A1000950 /* DesignSystem.swift in Sources */,
 				A1000313 /* Map/MapItemDetailSheet.swift in Sources */,
 				A1000072 /* Route/TransferStationSheet.swift in Sources */,
 				A1000401 /* Onboarding/OnboardingTourView.swift in Sources */,
@@ -665,7 +713,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 376LB43J9M;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -722,7 +770,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 376LB43J9M;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -752,7 +800,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 376LB43J9M;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -786,7 +834,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 376LB43J9M;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

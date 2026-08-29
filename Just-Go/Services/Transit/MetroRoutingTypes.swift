@@ -20,7 +20,7 @@ struct MetroRoutingGraph {
     let adjacency: [String: [MetroGraphEdge]]
     let edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]]
     /// Which pack each station came from. The graph spans several, and every rider-facing station
-    /// ID is `network-<city>-<station>` — so the city is a property of the station now, not of the
+    /// ID is `network-<city>-<station>`, so the city is a property of the station now, not of the
     /// search.
     let cityIDByStationID: [String: String]
     /// Duplicate copies of one line, mapped onto the copy that survived. A station's own `lineIDs`
@@ -32,7 +32,7 @@ struct MetroRoutingGraph {
         cityIDByStationID[stationID] ?? ""
     }
 
-    /// How many of the graph's lines call at this station — the test for "this is an interchange".
+    /// How many of the graph's lines call at this station. The test for "this is an interchange".
     func lineCount(for station: MetroStation) -> Int {
         Set(station.lineIDs.map { canonicalLineIDs[$0] ?? $0 }.filter { linesByID[$0] != nil }).count
     }
@@ -79,7 +79,7 @@ struct MetroGraphEdgeKey: Hashable {
 }
 
 /// The synthetic line an interchange link rides on. Interchange links belong to no real line, and
-/// the route assembly chunks by line — giving them their own identifier is what keeps them from
+/// the route assembly chunks by line. Giving them their own identifier is what keeps them from
 /// being folded into the ride on either side of them.
 let metroInterchangeLineID = "__interchange__"
 
@@ -167,7 +167,7 @@ struct MetroMinHeap {
 /// map sliced OSM ways per edge while the browse map drew the raw way, so the same corridor could
 /// be continuous on one screen and broken on the other.
 enum MetroTrackGeometry {
-    /// The track between two adjacent stations — the line's own geometry, clipped to this hop, and
+    /// The track between two adjacent stations. The line's own geometry, clipped to this hop, and
     /// **never** empty.
     ///
     /// Returning nothing was the old answer whenever the way could not be sliced sensibly, and it
@@ -177,8 +177,8 @@ enum MetroTrackGeometry {
     /// leg as a whole still had 44 points, so no "this segment has no shape" fallback could fire.
     /// A straight chord says "these two are connected, the shape is unknown"; a gap says nothing.
     ///
-    /// The ends are the stations' **projections onto the track**, not the stations themselves —
-    /// this is where the train runs, and a station node can sit a few hundred metres off it. What
+    /// The ends are the stations' **projections onto the track**, not the stations themselves.
+    /// This is where the train runs, and a station node can sit a few hundred metres off it. What
     /// closes that gap is a grey connector drawn by `TransitMapView`, not a detour bolted onto the
     /// coloured line; see `addStationConnectors`.
     static func edge(
@@ -232,7 +232,7 @@ enum MetroTrackGeometry {
         } else {
             // Closed ring where the seam-crossing arc is shorter: walk from the higher
             // offset forward off the end of the array and back in at the start. The ring's
-            // duplicated closing vertex meets the first vertex at the seam — dedup it.
+            // duplicated closing vertex meets the first vertex at the seam. Dedup it.
             slice = [highPoint]
             for index in points.indices where match.cumulative[index] > highOffset {
                 slice.append(points[index])
@@ -255,7 +255,7 @@ enum MetroTrackGeometry {
         guard slice.count >= 2, arcLength(slice) <= max(2.5 * separation, separation + 1_500) else {
             return chord.map { CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
         }
-        // The track and nothing else — the line's own geometry, clipped to this hop.
+        // The track and nothing else: the line's own geometry, clipped to this hop.
         //
         // This used to prepend `from` and append `to`, so that a station sitting off its way kept
         // "both facts". Drawn, that is a spike from the platform out to the rail and back, and at
@@ -266,7 +266,7 @@ enum MetroTrackGeometry {
         //
         // The train does not go to the station building; it goes along the track. Drawing the
         // track is the true statement, and it makes the ride identical to what the browse map
-        // draws for the same stretch, which is the point — two maps, one geometry.
+        // draws for the same stretch, which is the point. Two maps, one geometry.
         //
         // Joints still land: consecutive hops on one leg share a station projected onto the *same*
         // path, so they meet exactly. Where two legs meet at a change, the transfer segment now
@@ -282,7 +282,7 @@ enum MetroTrackGeometry {
 
     /// A station's closest point ON a path's polyline (not its closest vertex): the point,
     /// how far the station sits from the track, and the point's arc-length offset from the
-    /// path start — which is what the slicer walks by.
+    /// path start, which is what the slicer walks by.
     private struct PathProjection {
         let point: CLLocationCoordinate2D
         let distance: Double

@@ -6,7 +6,7 @@ struct MapKitTimeoutError: Error {}
 /// Races `operation` against a deadline so a stalled MapKit call (MKLocalSearch, MKDirections)
 /// can't hang a user-facing spinner indefinitely. MapKit calls are known elsewhere in this
 /// codebase to ignore Swift task cancellation, so the abandoned call may keep running in the
-/// background after this throws — but the caller (and its loading UI) is unblocked either way.
+/// background after this throws, but the caller (and its loading UI) is unblocked either way.
 func withMapKitTimeout<T: Sendable>(
     seconds: TimeInterval = 12,
     operation: @escaping @Sendable () async throws -> T
@@ -32,8 +32,8 @@ protocol PlaceSearchProviding {
 
 /// "Where I am", as somewhere a trip can start from.
 ///
-/// The ladder below has four ways to go wrong — a cached fix that is fresh enough, a live request,
-/// a coarser last-known fallback, and a reverse-geocode that may fail on its own — and it used to
+/// The ladder below has four ways to go wrong. A cached fix that is fresh enough, a live request,
+/// a coarser last-known fallback, and a reverse-geocode that may fail on its own, and it used to
 /// live inside `RoutePlannerViewModel.useCurrentLocation` because the deleted route-entry page was
 /// the only thing that ever asked. Two screens ask now, and a second copy of a four-branch fallback
 /// is exactly the drift `CLAUDE.md` warns about.
@@ -50,7 +50,7 @@ struct CurrentPlaceResolver {
            recent.horizontalAccuracy <= 100,
            abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
             // A recent, sufficiently accurate fix (e.g. from pre-warming) is good enough for a
-            // route origin — use it instead of waiting on a fresh one that can stall indoors, on
+            // route origin: use it instead of waiting on a fresh one that can stall indoors, on
             // weak GPS, or in the simulator. The ≤120 s window is looser than
             // requestCurrentLocation's 30 s so a just-prewarmed fix answers instantly; the
             // accuracy gate is what keeps it safe.
@@ -76,7 +76,7 @@ struct CurrentPlaceResolver {
         }
     }
 
-    /// Names the coordinate. A failed reverse-geocode is not a failed locate — the rider still
+    /// Names the coordinate. A failed reverse-geocode is not a failed locate. The rider still
     /// gets a start they can route from, just labelled generically.
     func place(at coordinate: CLLocationCoordinate2D) async -> TransitPlace {
         do {
@@ -98,18 +98,44 @@ struct CurrentPlaceResolver {
     }
 }
 
+/// One direction of one line, established to have stopped running when the rider would board it.
+///
+/// A direction, not a line, because that is what the timetable actually says. 天通苑南 on 5号线 has
+/// a southbound last train at 22:51 and a northbound one at 23:57 — 66 minutes apart, and across a
+/// 60-station Beijing sample 92 % of station/line pairs differ by more than 15 minutes. Banning the
+/// whole line on the strength of one direction threw away a train that was still running, which at
+/// 23:20 is when there are fewest of them left.
+///
+/// The direction is carried as one oriented hop the shut service makes rather than as a name or a
+/// terminus: the graph can order any pattern against it, and it needs no vocabulary shared with
+/// whichever operator supplied the verdict.
+struct ClosedServiceDirection: Hashable, Sendable {
+    let lineID: String
+    /// Qualified (`network-<city>-<station>`) IDs, so a caller holding a route's own leg context can
+    /// build one without reaching into the graph's internal identifiers.
+    let fromStationID: String
+    let toStationID: String
+}
+
 protocol TransitRouteProviding {
+    /// - Parameter excludingServices: line directions the caller has established are not running
+    ///   when this rider would board them. The graph itself is deliberately time-blind — it is a
+    ///   mechanical shortest path, and first/last train is enrichment's business, arriving from an
+    ///   operator or a routing provider long after the search would need it. This is how the clock
+    ///   reaches the search anyway: not as a timetable it cannot read, but as the conclusion drawn
+    ///   from one.
     func routes(
         from origin: TransitPlace,
         to destination: TransitPlace,
-        accessibilityFilter: AccessibilityFilter
+        accessibilityFilter: AccessibilityFilter,
+        excludingServices: Set<ClosedServiceDirection>
     ) async throws -> [Route]
 }
 
 /// Builds one walking leg. Extracted from `BundledMetroRouteProvider` because enrichment needs it
 /// too: the graph walks the rider to the station, then `RoutePlanningService` picks which door they
 /// should actually use, and the leg has to be recomputed against that door. Two callers, one
-/// implementation — a second copy would drift on exactly the numbers riders read.
+/// implementation: a second copy would drift on exactly the numbers riders read.
 protocol WalkingRouteProviding {
     func walkingSegment(
         from: CLLocationCoordinate2D,
@@ -216,7 +242,7 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
 
     /// A bike ride along the **walking** route, re-timed.
     ///
-    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any` — there is
+    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any`. There is
     /// no cycling type, and `.transit` refuses to calculate at all (measured: `MKErrorDomain` 5).
     /// So there is no cycling routing available to this app, and the honest thing to do with that
     /// is say it rather than draw a line that pretends otherwise: the shape is the pedestrian
@@ -238,24 +264,24 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
         let hasStairs = steps.contains(where: \.hasStairs)
         var notes = walk.accessibilityNotes
         notes.append(AppLocalization.text(
-            english: "Follows the walking route — no cycling directions are published",
-            simplified: "沿步行路线绘制 — 没有可用的骑行导航数据",
-            traditional: "沿步行路線繪製 — 沒有可用的騎行導航資料"
+            english: "Follows the walking route. No cycling directions are published.",
+            simplified: "沿步行路线绘制，没有可用的骑行导航数据。",
+            traditional: "沿步行路線繪製，沒有可用的騎行導航資料。"
         ))
         if hasStairs {
             notes.append(AppLocalization.text(
-                english: "This route includes stairs — you may have to walk the bike",
-                simplified: "此路线含台阶 — 可能需要推行",
-                traditional: "此路線含階梯 — 可能需要推行"
+                english: "This route includes stairs. You may have to walk the bike.",
+                simplified: "此路线含台阶，可能需要推行。",
+                traditional: "此路線含階梯，可能需要推行。"
             ))
         }
         // 14 km/h: a shared bike in city traffic, and slow enough that a rider who beats it is
-        // early rather than late. Not applied where stairs were named — see above.
+        // early rather than late. Not applied where stairs were named. See above.
         let duration = hasStairs ? walk.duration : walk.distance / Self.cyclingMetresPerSecond
         return walk.retyped(as: .cycling, duration: duration, accessibilityNotes: notes)
     }
 
-    /// A real driving route from MapKit — `.automobile` is a transport type `MKDirections` will
+    /// A real driving route from MapKit. `.Automobile` is a transport type `MKDirections` will
     /// actually calculate, unlike `.transit`, so unlike the bike this one is measured rather than
     /// derived. Falls back to the walking leg when MapKit declines, because a leg that exists is
     /// worth more than a mode that is missing.
@@ -279,7 +305,26 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             mapRoute = nil
         }
         guard let mapRoute else {
-            return await walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+            // Retyped, not returned as-is. `SegmentType.isOnFoot`'s own docstring says a summary
+            // folding a drive into walking distance "would be lying in the one number riders check
+            // hardest" — and that is exactly what this path did: the leg was classified driving
+            // because it is over 8 km, and it came back typed .walking, so "Walk 12 km" went on the
+            // card, into route.walkingDistance, into the Least Walking sort and into the confidence
+            // penalty. The mode was decided by the distance and does not change because MapKit
+            // declined to draw it.
+            guard let walk = await walkingSegment(
+                from: from,
+                to: to,
+                fromName: fromName,
+                toName: toName
+            ) else { return nil }
+            var notes = walk.accessibilityNotes
+            notes.append(AppLocalization.text(
+                english: "Drawn along the walking route. No driving directions are available.",
+                simplified: "沿步行路线绘制，没有可用的驾车导航数据。",
+                traditional: "沿步行路線繪製，沒有可用的駕車導航資料。"
+            ))
+            return walk.retyped(as: .driving, duration: walk.duration, accessibilityNotes: notes)
         }
         return RouteSegment(
             id: UUID(),

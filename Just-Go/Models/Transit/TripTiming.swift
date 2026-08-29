@@ -42,6 +42,28 @@ struct TripTimeContext: Equatable {
     var arrivalDate: Date {
         departureDate.addingTimeInterval(totalDuration)
     }
+
+    var arrivalDetail: String { approximateArrivalText(arrivalDate) }
+}
+
+/// "Arrive about 14:37" — the only wording an arrival from this app can honestly carry.
+///
+/// Ride time is `distance / 9.7 + 30` per hop (`BundledMetroRouteProvider.trainCost`) and every
+/// change is a flat five minutes. Nothing in the model waits for a train: no headway, no first-train
+/// wait, no variation by time of day, because no bundled pack carries a timetable and inventing one
+/// from station spacing is the inference this project exists to refuse. A total built that way is
+/// honest as a duration and dishonest as a clock time, so the clock time says "about".
+///
+/// One function because two screens each hand-rolled the unhedged version while building the very
+/// `TripTimeContext` that already knew how to word it, and the Chinese strings had carried 约/約 the
+/// whole time — only the English had quietly dropped the hedge.
+func approximateArrivalText(_ date: Date) -> String {
+    let clock = ChinaClock.clockText(date)
+    return AppLocalization.text(
+        english: "Arrive about \(clock)",
+        simplified: "约 \(clock) 到达",
+        traditional: "約 \(clock) 抵達"
+    )
 }
 
 /// Whether the subway is actually running for this route at the planned departure
@@ -64,7 +86,7 @@ enum RouteServiceStatus: Equatable {
     }
 
     /// How bad this is for the rider, so a trip made of several rides can report its worst leg.
-    /// `running` and `unknown` share the floor deliberately — neither is a problem to report, and
+    /// `running` and `unknown` share the floor deliberately, neither is a problem to report, and
     /// which of the two a whole trip deserves is a question about certainty, not severity, decided
     /// by the caller.
     var severity: Int {
@@ -74,6 +96,28 @@ enum RouteServiceStatus: Equatable {
         case .notYetStarted: return 2
         case .serviceEndedToday: return 3
         }
+    }
+}
+
+extension RouteServiceStatus {
+    /// Whether a rider standing on the platform at this moment cannot get on a train.
+    ///
+    /// `.lastTrainSoon` is deliberately not one of these: there *is* still a train, and hurrying
+    /// for it is a decision the rider gets to make. `.unknown` is not one either — nobody checked,
+    /// and demoting a route on the strength of a question nobody answered would be a guess.
+    var blocksBoarding: Bool {
+        switch self {
+        case .serviceEndedToday: return true
+        case .notYetStarted: return true
+        case .running, .lastTrainSoon, .unknown: return false
+        }
+    }
+
+    /// Pattern matching on `.notYetStarted` needs its associated text spelled out at every site,
+    /// which reads as noise wherever the question is only "is it shut".
+    var isNotYetStarted: Bool {
+        if case .notYetStarted = self { return true }
+        return false
     }
 }
 
@@ -124,9 +168,9 @@ extension RouteServiceStatus {
             return nil
         case .lastTrainSoon(let minutes):
             return AppLocalization.text(
-                english: "Last train in about \(minutes) min — leave soon",
-                simplified: "末班车约\(minutes)分钟后 — 请尽快出发",
-                traditional: "末班車約\(minutes)分鐘後 — 請盡快出發"
+                english: "Last train in about \(minutes) min. Leave soon.",
+                simplified: "末班车约\(minutes)分钟后，请尽快出发。",
+                traditional: "末班車約\(minutes)分鐘後，請盡快出發。"
             )
         case .serviceEndedToday:
             return AppLocalization.text(
@@ -168,6 +212,30 @@ extension RouteServiceStatus {
 }
 
 /// Whether the rider can still catch the last train given the planned departure.
+/// The note a rider needs when nobody could answer for the last train, shown only in the window
+/// where not knowing changes what they do.
+///
+/// Silent by day on purpose. Only 4 of 58 cities publish first/last train at all, and only while
+/// online; everywhere else the answer comes from one routing-provider response or from nowhere. A
+/// permanent "we could not check" on every card in every other city would be noise attached to
+/// every trip, and noise attached to everything is read as attached to nothing. Late in the
+/// evening, or before the network opens, it is the difference between catching a train and
+/// standing at a locked entrance.
+///
+/// The window is the service day's own edges rather than the calendar's: Chinese metros close
+/// between roughly 22:30 and 00:30 and open between 05:00 and 06:30, so a trip departing inside
+/// those hours is one where the answer matters and we do not have it.
+func unverifiedServiceHoursNotice(status: RouteServiceStatus, departing departure: Date) -> String? {
+    guard status == .unknown else { return nil }
+    let minutes = ChinaClock.minutesOfDay(of: departure)
+    guard minutes >= 22 * 60 + 30 || minutes < 6 * 60 else { return nil }
+    return AppLocalization.text(
+        english: "The last train could not be checked for this city",
+        simplified: "本城市末班车时间无法核实",
+        traditional: "本城市末班車時間無法核實"
+    )
+}
+
 enum LastTrainStatus: Equatable {
     case unknown
     case ok
@@ -211,19 +279,13 @@ struct DeparturePlan: Equatable {
             )
         }
         return AppLocalization.text(
-            english: "Leave by \(clock) — in \(minutes) min",
-            simplified: "请于 \(clock) 前出发 — 还有 \(minutes) 分钟",
-            traditional: "請於 \(clock) 前出發 — 還有 \(minutes) 分鐘"
+            english: "Leave by \(clock), in \(minutes) min",
+            simplified: "请于 \(clock) 前出发，还有 \(minutes) 分钟",
+            traditional: "請於 \(clock) 前出發，還有 \(minutes) 分鐘"
         )
     }
 
-    var arriveByDetail: String {
-        AppLocalization.text(
-            english: "Arrive about \(arriveByText)",
-            simplified: "约 \(arriveByText) 到达",
-            traditional: "約 \(arriveByText) 抵達"
-        )
-    }
+    var arriveByDetail: String { approximateArrivalText(arrivalDate) }
 
     var lastTrainDetail: String? {
         switch lastTrainStatus {

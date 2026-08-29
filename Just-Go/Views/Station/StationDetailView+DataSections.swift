@@ -10,7 +10,7 @@ struct OfficialStationExitStreet: Identifiable {
 }
 
 extension StationDetailView {
-    /// The categories the loaded snapshot actually has data for — so a lines-only source
+    /// The categories the loaded snapshot actually has data for, so a lines-only source
     /// (Guangzhou) shows just its trains with no empty Exits/Facilities tabs, and the segmented
     /// control appears only when there is more than one thing to switch between.
     private var officialInformationCategories: [OfficialStationInformationCategory] {
@@ -252,6 +252,17 @@ extension StationDetailView {
             // One block per line holding every direction it serves, rather than a flat list that
             // repeated the line name and its colour on each direction.
             VStack(alignment: .leading, spacing: 0) {
+                // Hangzhou's payload is headed 工作日时刻表 and these are weekday times. Shown
+                // unlabelled every Saturday and Sunday until now.
+                if let caveat = serviceDayCaveat(
+                    viewModel?.officialStationInformation?.serviceDayNote,
+                    on: Date()
+                ) {
+                    Label(caveat, systemImage: "calendar.badge.exclamationmark")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .padding(.bottom, 8)
+                }
                 ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                     if index > 0 {
                         Divider()
@@ -265,12 +276,20 @@ extension StationDetailView {
                             Text(line.lineName)
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                            ForEach(line.services) { service in
+                            let serviceLabels = distinguishedServiceLabels(line.services)
+                            ForEach(Array(line.services.enumerated()), id: \.element.id) { serviceIndex, service in
                                 VStack(alignment: .leading, spacing: 5) {
+                                    // The terminus where it differs from the direction marker: at
+                                    // 国贸 all three northbound 10号线 services read 双井 and end at
+                                    // 车道沟, 成寿寺 and 巴沟, hours apart. And on a ring the terminus
+                                    // alone repeats — both ways round 2号线 end at 积水潭 — so a
+                                    // repeated label falls back to naming the next station along.
+                                    // Same rule as the route sheet, which renders the same fact.
+                                    let label = serviceLabels[serviceIndex] ?? service.direction
                                     Text(AppLocalization.text(
-                                        english: "Toward \(service.direction)",
-                                        simplified: "开往 \(service.direction)",
-                                        traditional: "開往 \(service.direction)"
+                                        english: "Toward \(label)",
+                                        simplified: "开往 \(label)",
+                                        traditional: "開往 \(label)"
                                     ))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -320,7 +339,7 @@ extension StationDetailView {
     }
 
     /// Exits keyed by the street each one opens onto. Operators publish exits as a number plus
-    /// the roads it reaches ("1 — 西藏南路 复兴东路") and nothing positional, so this inverts that
+    /// the roads it reaches ("1, 西藏南路 复兴东路") and nothing positional, so this inverts that
     /// same text into "which exit do I take for this street" without inventing any geometry. An
     /// exit reaching two streets is listed under both, which is what its own record says.
     private func officialExitsByStreet(
@@ -354,7 +373,7 @@ extension StationDetailView {
             let streets = officialExitsByStreet(exits)
             VStack(alignment: .leading, spacing: 0) {
                 if streets.isEmpty {
-                    // No street text published — fall back to the plain numbered list.
+                    // No street text published: fall back to the plain numbered list.
                     officialExitList(exits)
                 } else {
                     ForEach(Array(streets.enumerated()), id: \.element.id) { index, street in
@@ -405,7 +424,7 @@ extension StationDetailView {
     }
 
     /// Just the part of an entrance name that tells exits apart. Packs name them in full
-    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels — on the map
+    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels, on the map
     /// the station is already the centre pin, so only the number carries information. The full
     /// name stays in the accessibility label and in the list below.
     private func shortAccessPointLabel(_ point: StationAccessPoint) -> String {
@@ -466,7 +485,7 @@ extension StationDetailView {
             }
         }
         .frame(height: StationDetailView.entranceMapHeight)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
         .accessibilityLabel(AppLocalization.text(
             english: "Map of station entrances",
             simplified: "车站出入口地图",
@@ -689,7 +708,7 @@ extension StationDetailView {
             )
         case .officialContextOnly:
             return AppLocalization.text(
-                english: "Official line/operator context only — no dedicated station page.",
+                english: "Official line and operator context only. There is no dedicated station page.",
                 simplified: "仅有官方线路或运营背景资料，没有本站专属页面。",
                 traditional: "僅有官方路線或營運背景資料，沒有本站專屬頁面。"
             )
@@ -727,7 +746,7 @@ extension StationDetailView {
         viewModel?.isLoadingCityPack == true || !(viewModel?.accessPoints ?? []).isEmpty
     }
 
-    /// "Station Guide" — the specific entrance/exit guidance riders ask for, labeled with a
+    /// "Station Guide": the specific entrance/exit guidance riders ask for, labeled with a
     /// confidence chip.
     @ViewBuilder
     var stationGuideSection: some View {
@@ -757,7 +776,7 @@ extension StationDetailView {
                         }
 
                         // The official online surface lists this station's *named* exits already,
-                        // with the streets each one reaches — richer than a bare name. Repeating
+                        // with the streets each one reaches. Richer than a bare name. Repeating
                         // those would print the same list twice on one screen. It never covers the
                         // unlabeled entrances, so those stay either way.
                         let listed = officialSurfaceListsExits ? exits.filter(\.isUnlabeled) : exits
@@ -932,8 +951,8 @@ extension StationDetailView {
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 160)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                             .font(.caption)
@@ -944,7 +963,7 @@ extension StationDetailView {
                             .padding(8)
                     }
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: Radius.small, style: .continuous)
                             .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
                     }
                 }

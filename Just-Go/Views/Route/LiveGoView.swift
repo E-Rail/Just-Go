@@ -59,7 +59,7 @@ struct LiveGoView: View {
     /// Rendered inside another screen rather than over it. The route detail turns *into* the
     /// navigator rather than covering itself with a second one, so this drops the navigation
     /// chrome that only a presented copy needs and hands the exit back to its host. One
-    /// implementation, two containers — a second navigator would drift from this one, and this is
+    /// implementation, two containers: a second navigator would drift from this one, and this is
     /// where the off-route recovery, the arrival alert and the transfer surface all live.
     var embedded = false
     var onExit: (() -> Void)?
@@ -90,12 +90,17 @@ struct LiveGoView: View {
     @State private var lastRerouteAt = Date.distantPast
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
+    @State private var rerouteTask: Task<Void, Never>?
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
+    /// Measured corridor lengths for this trip's interchanges, fetched once and held for the
+    /// screen's lifetime only: nothing about them is written to disk.
+    @State private var transferGeometries: [TransferGeometry] = []
+    @State private var didRequestTransferGeometries = false
     /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
     /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
-    /// The Accessibility toggle below is a stronger promise than this one — see `onAppear`.
+    /// The Accessibility toggle below is a stronger promise than this one. See `onAppear`.
     @AppStorage("guidanceVoiceEnabled") private var voiceEnabled = true
     /// Whether the camera tracks the rider. On while guiding, because "where am I on this route"
     /// is the question guidance exists to answer; stepping through manually turns it off so the
@@ -126,11 +131,18 @@ struct LiveGoView: View {
                 if isActiveTransferStep {
                     transferStepSurface
                 } else {
-                    ZStack(alignment: .bottom) {
-                        liveMap
-                            .ignoresSafeArea(edges: .bottom)
-                        instructionPanel
-                    }
+                    // The panel is a safe-area inset rather than a ZStack overlay so MapKit knows
+                    // the space is taken. Stacked, the map believed it owned the whole screen and
+                    // laid its own POI labels and pin glyphs out underneath our opaque card.
+                    // Apple's icons peeking out from behind our text, which is what it looked
+                    // like. Insetting keeps the map drawing full-bleed (the panel still floats
+                    // over live map) while moving MapKit's own labelling, controls and legal
+                    // attribution into the part of the screen the rider can actually see.
+                    liveMap
+                        .ignoresSafeArea(edges: .bottom)
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            instructionPanel
+                        }
                 }
             }
             .overlay(alignment: .top) {
@@ -195,6 +207,7 @@ struct LiveGoView: View {
             speechSynthesizer.stopSpeaking(at: .immediate)
             announcementTask?.cancel()
             rerouteNoticeTask?.cancel()
+            rerouteTask?.cancel()
         }
         .onChange(of: viewModel.currentIndex) { _, _ in
             // Reading ahead is an explicit request to look at that step, not at where you are.
@@ -206,7 +219,7 @@ struct LiveGoView: View {
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
         // Observes the raw fix because that is what changes, but hands on the corrected one: off-route
         // detection, the arrival alert and the reroute origin are all measured against GCJ-02 route
-        // geometry, and a raw WGS-84 fix is ~540 m from it — enough to declare a rider off a route
+        // geometry, and a raw WGS-84 fix is ~540 m from it. Enough to declare a rider off a route
         // they are standing on. See LocationService.mapSpaceCorrection.
         .onChange(of: container.locationService.currentLocation) { _, _ in
             handleLocationUpdate(container.locationService.mapSpaceLocation)
@@ -221,6 +234,12 @@ struct LiveGoView: View {
         }
         .task(id: viewModel.route.id) {
             await container.officialStationData.prefetchTransferAssets(for: viewModel.route)
+        }
+        // A reroute is a different journey and gets its own attempt. Without this the once-per-trip
+        // guard below would carry the old route's answer, or its failure, into the new one.
+        .onChange(of: viewModel.route.id) { _, _ in
+            didRequestTransferGeometries = false
+            transferGeometries = []
         }
     }
 
@@ -244,6 +263,24 @@ struct LiveGoView: View {
             ?? AppLocalization.localized("Transfer station")
     }
 
+    /// Which change the rider is making, as something answerable about.
+    ///
+    /// Built from names rather than identifiers because `TripStep` carries names, and that is
+    /// fine while every answer stays on the device that produced it. **Before answers are ever
+    /// pooled between riders this has to move to stable IDs**: `localizedName` differs by
+    /// language, so a Chinese and an English rider standing in the same corridor would key the
+    /// same change two different ways. `TransferKey` is the one type that has to change.
+    private var activeTransferKey: TransferKey? {
+        guard let step = viewModel.currentStep,
+              step.kind == .transfer,
+              let station = step.fromStationName,
+              let toLine = step.lineName else { return nil }
+        let fromLine = viewModel.plan.steps[..<viewModel.currentIndex]
+            .last { $0.kind == .ride }?.lineName
+        guard let fromLine, fromLine != toLine else { return nil }
+        return TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
+    }
+
     private var activeTransferGuidance: LiveTransferGuidance? {
         guard let step = viewModel.currentStep,
               step.kind == .transfer,
@@ -259,6 +296,74 @@ struct LiveGoView: View {
             instructionPanel
         }
         .background(Color.appBackground)
+    }
+
+    /// The one moment the rider knows how long the change took is while they are making it, so
+    /// the question lives here and nowhere else. Shown under both the guidance and the
+    /// "no information" state: the app having nothing to say about a transfer is exactly when
+    /// hearing from the rider is worth most.
+    @ViewBuilder
+    private var transferPaceSection: some View {
+        if let key = activeTransferKey {
+            TransferPacePrompt(
+                key: key,
+                insight: insight(for: key)
+            ) { pace in
+                container.transferInsightService.record(pace, for: key)
+            }
+            .padding(.horizontal, 24)
+            // Fetched here rather than when the trip starts: a journey with no change never asks,
+            // so a direct ride costs no request at all.
+            .task(id: viewModel.route.id) { await loadTransferGeometries() }
+        }
+    }
+
+    /// What the app knows about this change, best source first.
+    ///
+    /// The rider's own answer outranks a measured corridor because they were standing in it. The
+    /// geometry knows the distance but nothing about the stairs, the lift queue or the crowd. When
+    /// neither exists this returns nil and the prompt simply asks, which is the honest state.
+    private func insight(for key: TransferKey) -> TransferInsight? {
+        if let recorded = container.transferInsightService.insight(for: key) { return recorded }
+        guard let geometry = transferGeometries.first(where: { $0.matches(key) }) else { return nil }
+        return TransferInsight(
+            pace: TransferPace(distanceMetres: geometry.distanceMetres),
+            source: .mapProvider,
+            distanceMetres: geometry.distanceMetres
+        )
+    }
+
+    private func loadTransferGeometries() async {
+        // Attempted once per trip, whatever the answer was.
+        //
+        // This lives on a `.task` inside a conditional branch — the prompt appears only while the
+        // rider is at a change — so SwiftUI rebuilds the subtree and restarts it at every
+        // interchange. The only guard was `transferGeometries.isEmpty`, which holds after *any*
+        // failed attempt, so with Baidu refusing, a four-change trip spent one route call per
+        // change, each a live round trip into a quota that had already said no.
+        guard !didRequestTransferGeometries else { return }
+        didRequestTransferGeometries = true
+        guard let provider = container.tripObservationProvider,
+              let origin = originCoordinate,
+              let destination = destinationCoordinate else { return }
+        transferGeometries = await provider.observations(from: origin, to: destination).transfers
+    }
+
+    /// Mirror of `destinationCoordinate` from the other end of the route.
+    ///
+    /// Note these are the route's own geometry, not the rider's origin and destination places. That
+    /// is deliberate — the corridor being measured is station to station — but it does mean this
+    /// asks a different question from the one the planner asked, so the two cannot share an answer.
+    private var originCoordinate: CLLocationCoordinate2D? {
+        for segment in viewModel.route.segments {
+            if let first = segment.polylineCoordinates.first {
+                return CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
+            }
+            if let stop = segment.stationStops.first?.coordinate {
+                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
+            }
+        }
+        return nil
     }
 
     @ViewBuilder
@@ -298,34 +403,39 @@ struct LiveGoView: View {
                 }
                 if guidance.externalResources.contains(where: { $0.kind.isTransferRelevant }) {
                     Text(AppLocalization.text(
-                        english: "Official links are reference material only. Just-Go infers nothing from them.",
-                        simplified: "官方链接仅供参考；Just-Go 不会据此作任何推断。",
-                        traditional: "官方連結僅供參考；Just-Go 不會據此作任何推斷。"
+                        english: "Straight from the operator, for reference.",
+                        simplified: "由运营方提供，仅供参考。",
+                        traditional: "由營運方提供，僅供參考。"
                     ))
                         .rowMeta()
                         .multilineTextAlignment(.center)
                 }
+                transferPaceSection
+                    .padding(.horizontal, -24)
             }
             .padding(24)
             .accessibilityElement(children: .contain)
         } else {
-            ContentUnavailableView {
-                Label(
-                    AppLocalization.text(
-                        english: "Transfer information unavailable",
-                        simplified: "暂无换乘信息",
-                        traditional: "暫無轉乘資訊"
-                    ),
-                    systemImage: "signpost.right"
-                )
-            } description: {
-                Text(AppLocalization.text(
-                    english: "Follow station signs for this transfer.",
-                    simplified: "本次换乘请以站内标识为准。",
-                    traditional: "本次轉乘請以站內標識為準。"
-                ))
+            VStack(spacing: 18) {
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(
+                            english: "Transfer information unavailable",
+                            simplified: "暂无换乘信息",
+                            traditional: "暫無轉乘資訊"
+                        ),
+                        systemImage: "signpost.right"
+                    )
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Follow station signs for this transfer.",
+                        simplified: "本次换乘请以站内标识为准。",
+                        traditional: "本次轉乘請以站內標識為準。"
+                    ))
+                }
+                transferPaceSection
             }
-            .padding(24)
+            .padding(.vertical, 24)
         }
     }
 
@@ -488,8 +598,8 @@ struct LiveGoView: View {
     }
 
     /// Re-frame the camera on the current step's geometry. The rider stays free to pan and
-    /// zoom afterwards (and can follow their own position via the map's location button) —
-    /// only a step change or a reroute moves the camera.
+    /// zoom afterwards (and can follow their own position via the map's location button).
+    /// Only a step change or a reroute moves the camera.
     private func frameCurrentStep(animated: Bool) {
         guard let region = region(for: viewModel.currentStep) else { return }
         if animated {
@@ -553,8 +663,8 @@ struct LiveGoView: View {
     /// constantly replan a trip the rider is following correctly.
     private func handleLocationUpdate(_ location: CLLocation?) {
         // Centre on the rider, zoomed in, for as long as they are following rather than reading
-        // ahead. `MapCameraSpan.station` is the app's existing tightest scale — the same number the
-        // map uses for one station and its exits — so guidance does not introduce a fifth zoom.
+        // ahead. `MapCameraSpan.station` is the app's existing tightest scale. The same number the
+        // map uses for one station and its exits, so guidance does not introduce a fifth zoom.
         if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
             withAnimation(.easeInOut(duration: 0.35)) {
                 camera = .region(MKCoordinateRegion(
@@ -587,7 +697,11 @@ struct LiveGoView: View {
         guard offRouteStrikes >= 2, !isRerouting,
               Date().timeIntervalSince(lastRerouteAt) > 45 else { return }
         offRouteStrikes = 0
-        Task { await reroute(from: location.coordinate) }
+        // Stored, so closing the navigator stops it. Unstructured and untracked, a reroute in
+        // flight when the rider walked away still ran to completion and wrote its new route into
+        // `ActiveTripStore` — overwriting the resume-trip record for a journey they had left.
+        rerouteTask?.cancel()
+        rerouteTask = Task { await reroute(from: location.coordinate) }
     }
 
     @MainActor
@@ -609,10 +723,15 @@ struct LiveGoView: View {
                 accessibilityFilter: AccessibilityFilter(
                     requiresWheelchairAccess: preference.requiresWheelchairAccess,
                     requiresElevator: preference.prefersElevator,
-                    avoidStairs: preference.avoidStairs
+                    avoidStairs: preference.avoidStairs,
+                    maxWalkingDistance: preference.maxWalkingDistance
                 )
             )
             guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }
+            // The plan can outlive the screen: MKLocalSearch ignores task cancellation, so a
+            // reroute started just before the rider closed the navigator can still land here.
+            // Nothing below should happen to a trip they have left.
+            guard !Task.isCancelled else { return }
             viewModel.reroute(with: newRoute)
             transferGuidance = nil
             // Keep the resume banner's stored trip in step with what's actually guiding.
@@ -627,7 +746,7 @@ struct LiveGoView: View {
             ))
         } catch {
             showRerouteNotice(AppLocalization.text(
-                english: "Couldn't reroute — following the original route",
+                english: "Couldn't reroute, so the original route stands",
                 simplified: "重新规划失败，继续按原路线导航",
                 traditional: "重新規劃失敗，繼續按原路線導航"
             ))
@@ -645,7 +764,7 @@ struct LiveGoView: View {
     }
 
     /// Minimum distance from a point to a polyline (point-to-segment projections in a
-    /// small local planar frame — exact enough at street scale).
+    /// small local planar frame: exact enough at street scale).
     private func distance(from coordinate: CLLocationCoordinate2D, toPolyline path: [CLLocationCoordinate2D]) -> Double {
         var best = Double.greatestFiniteMagnitude
         for index in 0..<(path.count - 1) {
@@ -684,8 +803,8 @@ struct LiveGoView: View {
         // `.ultraThinMaterial` let the map through: walking past a park turned the panel green,
         // walking past water turned it blue, and the instruction the rider is following changed
         // contrast with the scenery. This is the one surface on screen that has to stay readable.
-        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: .black.opacity(0.2), radius: 12, y: 4)
+        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
+        .elevated(.floating)
         .padding([.horizontal, .bottom], 12)
     }
 
@@ -695,6 +814,9 @@ struct LiveGoView: View {
                 Image(systemName: icon(for: step))
                     .font(.title)
                     .foregroundStyle(color(for: step))
+                    // The glyph is the one thing on this panel that says what the rider is doing
+                    // right now, so it animates when it changes rather than swapping silently.
+                    .contentTransition(.symbolEffect(.replace))
                     .frame(width: 40)
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -736,6 +858,21 @@ struct LiveGoView: View {
                 }
             }
 
+            // Where to stand up, named by the stop before theirs. `arrivalPreviousStationName` has
+            // been resolved from the graph on every plan since it was added and read by nothing;
+            // "one more stop" and "get off next" are different instructions and this is the only
+            // thing on the screen that can tell them apart.
+            if let readyToAlight = step.readyToAlightText {
+                HStack(spacing: 12) {
+                    Label(readyToAlight, systemImage: "figure.stand")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                        .minimumScaleFactor(0.8)
+                    Spacer()
+                }
+            }
+
             if step.kind == .ride {
                 Toggle(isOn: $arrivalAlertEnabled) {
                     Label(
@@ -747,7 +884,11 @@ struct LiveGoView: View {
                 .tint(themeColor)
             }
         }
-        .accessibilityElement(children: .combine)
+        // `.contain`, not `.combine`. Combining folded the exit chip, the get-ready cue and the
+        // "Alert before getting off" Toggle into one label built from title and detail alone, so a
+        // VoiceOver user got neither the exit hint nor a reliably focusable alarm switch — on the
+        // screen this app's own accessibility settings route people to.
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(step.accessibilityLabel)
     }
 
@@ -791,7 +932,7 @@ struct LiveGoView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .padding(.horizontal, 14)
-                        .frame(height: 36)
+                        .frame(minHeight: Metrics.minimumTapTarget)
                         .background(Color.secondary.opacity(0.16), in: Capsule())
                         .foregroundStyle(.primary)
                 }
@@ -812,7 +953,7 @@ struct LiveGoView: View {
         Button(action: action) {
             Image(systemName: isOn ? onImage : offImage)
                 .font(.subheadline)
-                .frame(width: 36, height: 36)
+                .tappable()
                 .background(isOn ? themeColor.opacity(0.18) : Color.secondary.opacity(0.16), in: Circle())
                 .foregroundStyle(isOn ? themeColor : Color.secondary)
         }
@@ -892,7 +1033,7 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
     }
 
     private func noticeBanner(text: String, icon: String, showsSpinner: Bool = false) -> some View {
@@ -912,8 +1053,8 @@ struct LiveGoView: View {
         .foregroundStyle(.white)
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
+        .elevated(.floating)
     }
 
     /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving,
@@ -952,13 +1093,13 @@ struct LiveGoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(hex: selectedThemeHex), in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
         .foregroundStyle(.white)
-        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
+        .elevated(.floating)
     }
 
     /// (Re)arms the estimated "get off" alert for the current step. Cancels any prior alert first,
-    /// then — only for a ride step with the toggle on — schedules a hands-free local notification
+    /// then: only for a ride step with the toggle on. Schedules a hands-free local notification
     /// and an in-app timer that buzzes + shows a banner if the app is still foreground at fire time.
     @MainActor
     private func refreshArrivalAlert() {
@@ -979,8 +1120,8 @@ struct LiveGoView: View {
             guard await container.tripReminderService.requestAuthorization() else { return }
             // requestAuthorization can take a while (first-run system prompt). If the rider
             // advanced past this step while it was pending, cancelArrivalAlert() already ran
-            // with the OLD scheduledStationKey and found nothing registered yet to cancel —
-            // registering now would leave a stale "get off" alert for an already-passed stop.
+            // with the OLD scheduledStationKey and found nothing registered yet to cancel.
+            // Registering now would leave a stale "get off" alert for an already-passed stop.
             guard !Task.isCancelled, scheduledStationKey == key else { return }
             await container.tripReminderService.scheduleArrivalReminder(
                 stationID: key,

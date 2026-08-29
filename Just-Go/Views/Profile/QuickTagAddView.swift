@@ -12,6 +12,8 @@ struct QuickTagAddView: View {
     @State private var searchText = ""
     @State private var stationResults: [Station] = []
     @State private var placeResults: [TransitPlace] = []
+    @State private var onlineSearchTask: Task<Void, Never>?
+    @State private var isSearchingOnline = false
     @State private var isSearching = false
     @State private var searchTask: Task<Void, Never>?
     // Held separately from the editor's presentation flag: the custom-label alert outlives
@@ -65,7 +67,10 @@ struct QuickTagAddView: View {
                             Text(AppLocalization.text(english: "Places", simplified: "地点", traditional: "地點"))
                         }
                     }
-                    if stationResults.isEmpty && placeResults.isEmpty {
+                    if canSearchOnline {
+                        searchOnlineRow
+                    }
+                    if stationResults.isEmpty && placeResults.isEmpty && !canSearchOnline {
                         Section {
                             Text(emptyStateText)
                                 .font(.caption)
@@ -100,6 +105,7 @@ struct QuickTagAddView: View {
             .onChange(of: searchText) { _, keyword in
                 runSearch(keyword: keyword)
             }
+            .onSubmit(of: .search) { searchOnline() }
             .quickTagEditor(
                 isPresented: $showEditor,
                 title: pendingTargetTitle,
@@ -114,6 +120,7 @@ struct QuickTagAddView: View {
         }
         .onDisappear {
             searchTask?.cancel()
+            onlineSearchTask?.cancel()
         }
     }
 
@@ -161,40 +168,107 @@ struct QuickTagAddView: View {
         }
     }
 
+    /// Typing answers from the bundled network and nothing else.
+    ///
+    /// This fired two place searches on every 300 ms pause — one through `searchStations`, which
+    /// omitted `includingPlaces:` and so took its `true` default, and a second through
+    /// `searchMapPlaces` with a different `limit`, which is a different URL and so not even
+    /// coalesced. A six-character query could cost twelve of the day's hundred. The search page
+    /// was moved off this pattern when the budget work was done; this screen was missed, and it is
+    /// the one a rider uses while browsing rather than while going somewhere.
+    ///
+    /// The bundled index holds every station in every supported city, which is what someone
+    /// tagging a place is usually reaching for. Everything else is one tap away below.
+    /// Two characters, matching the search page. A single character is almost never a place name
+    /// and is the query most likely to be a rider still typing.
+    private var canSearchOnline: Bool {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
+    }
+
+    /// A capability that only responds to the return key is one most riders never find, so it gets
+    /// a row. The wording names what it does rather than what it costs: the daily allowance is our
+    /// problem, not the rider's.
+    private var searchOnlineRow: some View {
+        Section {
+            Button {
+                searchOnline()
+            } label: {
+                HStack(spacing: 10) {
+                    if isSearchingOnline {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "magnifyingglass.circle.fill")
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    Text(AppLocalization.text(
+                        english: "Search online for places",
+                        simplified: "在线搜索地点",
+                        traditional: "線上搜尋地點"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    Spacer(minLength: 4)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(isSearchingOnline)
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Stations above come from the offline network and are already complete.",
+                simplified: "以上车站来自离线线网，已经完整。",
+                traditional: "以上車站來自離線線網，已經完整。"
+            ))
+        }
+    }
+
     private func runSearch(keyword: String) {
         searchTask?.cancel()
         let trimmed = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Results for a query the rider has since edited are worse than none.
+        placeResults = []
         guard !trimmed.isEmpty else {
             stationResults = []
-            placeResults = []
             isSearching = false
             return
         }
         isSearching = true
-        // Both halves are biased to the rider rather than to a selected city — a quick tag is
-        // almost always somewhere they have been, and there is no selected city to fall back to.
+        // Biased to the rider rather than to a selected city. A quick tag is almost always
+        // somewhere they have been, and there is no selected city to fall back to.
         let here = container.locationService.mapSpaceLocation?.coordinate
         searchTask = Task {
-            do {
-                try await Task.sleep(for: .milliseconds(300))
-            } catch {
-                return
-            }
-            async let stationsFound = searchStations(keyword: trimmed, near: here)
-            async let placesFound = searchMapPlaces(keyword: trimmed, near: here)
-            let (stations, places) = await (stationsFound, placesFound)
-            // MKLocalSearch ignores task cancellation, so guard on the live query text
-            // instead of trusting Task.isCancelled alone.
+            let stations = await searchStations(keyword: trimmed, near: here)
             guard !Task.isCancelled,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == trimmed else { return }
             stationResults = stations
-            placeResults = places
             isSearching = false
         }
     }
 
+    /// The place search that used to run on every keystroke, made deliberate and visible.
+    private func searchOnline() {
+        onlineSearchTask?.cancel()
+        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2 else { return }
+        isSearchingOnline = true
+        let here = container.locationService.mapSpaceLocation?.coordinate
+        onlineSearchTask = Task {
+            let places = await searchMapPlaces(keyword: trimmed, near: here)
+            // MKLocalSearch ignores task cancellation, so guard on the live query text
+            // instead of trusting Task.isCancelled alone.
+            guard !Task.isCancelled,
+                  searchText.trimmingCharacters(in: .whitespacesAndNewlines) == trimmed else { return }
+            placeResults = places
+            isSearchingOnline = false
+        }
+    }
+
     private func searchStations(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [Station] {
-        let matches = (try? await container.stationSearchService.search(keyword: keyword, near: coordinate)) ?? []
+        let matches = (try? await container.stationSearchService.search(
+            keyword: keyword,
+            near: coordinate,
+            includingPlaces: false
+        )) ?? []
         return await container.stationSearchService.enrichStations(Array(matches.prefix(6)))
     }
 

@@ -18,6 +18,11 @@ enforce that. When you cannot verify something, say so — do not fill the gap w
 There are **no Xcode test targets**. The gate is Ruby suites, shell suites, validators, and two
 builds. `.github/workflows/ci.yml` is the source of truth; keep them in sync.
 
+**Xcode 26 or newer is the floor.** `CardSurface` in `Core/DesignSystem.swift` calls
+`.glassEffect`, which only exists in the iOS 26 SDK. The `if #available(iOS 26.0, *)` around it
+guards the *runtime*, not the compile — an older SDK fails with "has no member 'glassEffect'" a long
+way from anything that names an SDK. CI asserts the SDK version before it builds, for that reason.
+
 ```bash
 export DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer
 
@@ -45,6 +50,28 @@ cp Just-Go.xcodeproj/project.pbxproj /tmp/pbxproj.bak
 cp /tmp/pbxproj.bak Just-Go.xcodeproj/project.pbxproj
 ```
 
+### Archiving for TestFlight
+
+Two traps, both of which fail in a way that does not name the cause.
+
+- **Archive unsigned; let the export sign.** Automatic signing asks for a *development* profile
+  during `xcodebuild archive`, and team `44UAJ3CD7S` has no registered devices, so it dies on "Your
+  team has no devices from which to generate a provisioning profile". Forcing
+  `CODE_SIGN_IDENTITY="Apple Distribution"` does not help either — automatic signing rejects it as a
+  conflicting manual identity. Archive with `CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+  CODE_SIGN_IDENTITY=""`, then `-exportArchive -allowProvisioningUpdates` with the
+  `app-store-connect` options plist, which creates the store profile and signs there.
+- **A release Xcode, not the beta.** A bundle stamped `DTXcodeBuild = 27A5194q` is rejected on
+  upload. Check `DTSDKName`/`DTXcodeBuild` in the exported `.app`'s Info.plist, not the Xcode you
+  think you ran.
+
+`CURRENT_PROJECT_VERSION=<n>` on the archive sets `CFBundleVersion`; App Store Connect refuses a
+build number it has already seen. `build/release.sh <n>` does all of this, but `build/` is
+git-ignored, so this section is the record.
+
+A correct export reports `Cloud Managed Apple Distribution`, an `iOS Team Store Provisioning
+Profile`, and `beta-reports-active` in its entitlements — that last one is the TestFlight bit.
+
 ### Regenerating data
 
 Generators are byte-for-byte deterministic and CI runs each twice and diffs. After touching
@@ -60,7 +87,11 @@ ruby Scripts/generate_station_info_api.rb
 ## Traps that have actually cost time
 
 - **Ruby is 2.6.10.** No `filter_map` (2.7+), no `Hash#except`. Use `map {}.compact` and
-  `each_with_object`.
+  `each_with_object`. It also pins the *bytes* of every generated file: that json gem renders an
+  empty array as `[\n\n]` where anything newer renders `[]`, so running a generator under a newer
+  Ruby rewrites every pack's `sizeBytes` and `sha256` and fails CI's determinism check with no
+  source change behind it. This is why CI stays on the `macos-15` runner and selects its Xcode
+  explicitly instead of moving to a newer image.
 - **Coordinates are GCJ-02 everywhere the app draws.** OpenStreetMap and most open data publish
   WGS-84. Convert with `GCJ02.from_wgs84(lat, lon)` from `Scripts/lib/gcj02.rb` *before* measuring
   or matching. Unconverted coordinates land ~600 m away and produce an **empty-but-valid** import —

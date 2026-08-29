@@ -35,7 +35,7 @@ struct CityDataCapabilities: Equatable {
         )
     }
 
-    /// `manifestCapabilities` is a lazily-computed `static let` — its first touch decodes
+    /// `manifestCapabilities` is a lazily-computed `static let`. Its first touch decodes
     /// `manifest.json` synchronously. `forCity` is called directly from SwiftUI view bodies
     /// (city list rows), so an un-prewarmed first access blocks the main thread mid-render.
     /// Call this once, off the main thread, during app launch so the lazy static is already
@@ -102,7 +102,7 @@ struct CityDataCoverage: Codable, Equatable, Sendable {
     /// `networkStations` is deliberately excluded: it counts the routable OSM network, which every
     /// city has. The manifest catalogs 58 cities and only 14 carry station data, so a page keyed on
     /// the catalog advertises 44 packs that hold nothing. `verifiedTransferContexts` is excluded
-    /// too — `validate_indoor_maps.rb` pins it at zero everywhere, so it can never be the reason a
+    /// too: `validate_indoor_maps.rb` pins it at zero everywhere, so it can never be the reason a
     /// city has data.
     var hasStationData: Bool {
         [matchedStations, accessibility, staticSchedules, liveArrivals, externalLayouts, licensedMedia]

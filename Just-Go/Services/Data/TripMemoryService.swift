@@ -27,10 +27,9 @@ final class TripMemoryService {
         }
     }
 
-    func recordPlannedTrip(route: Route, cityID: String, accessibilityFilter: AccessibilityFilter, savedTripID: String? = nil) -> TripRecord {
+    func recordPlannedTrip(route: Route, cityID: String) -> TripRecord {
         let record = TripRecord(
             id: UUID().uuidString,
-            savedTripID: savedTripID,
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
@@ -39,7 +38,6 @@ final class TripMemoryService {
             walkingDistance: route.walkingDistance,
             transferCount: route.transferCount,
             strategy: route.strategy,
-            accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: nil,
@@ -51,10 +49,9 @@ final class TripMemoryService {
         return record
     }
 
-    func markTripComplete(route: Route, cityID: String, accessibilityFilter: AccessibilityFilter = .none, note: String? = nil) {
+    func markTripComplete(route: Route, cityID: String, note: String? = nil) {
         let record = TripRecord(
             id: UUID().uuidString,
-            savedTripID: nil,
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
@@ -63,7 +60,6 @@ final class TripMemoryService {
             walkingDistance: route.walkingDistance,
             transferCount: route.transferCount,
             strategy: route.strategy,
-            accessibilityFilter: SavedTripAccessibilityFilter(filter: accessibilityFilter),
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: .now,
@@ -154,8 +150,8 @@ final class TripMemoryService {
 
     /// Re-syncs each tag's frozen station snapshot (station ID, coordinates, line
     /// names/colors, English names) against the current bundled network data. Tags capture
-    /// this data at save time, and data refreshes regenerate the content-hash station IDs —
-    /// without this pass, tags saved before a refresh drift out of sync with what the rest
+    /// this data at save time, and data refreshes regenerate the content-hash station IDs.
+    /// Without this pass, tags saved before a refresh drift out of sync with what the rest
     /// of the app shows for the same station.
     func repairQuickTagStationData(stationLookup: @MainActor (StationQuickTag) async -> Station?) async {
         let original = stationQuickTags
@@ -175,7 +171,7 @@ final class TripMemoryService {
                 didRepair = true
             }
         }
-        // A user mutation while a lookup was in flight wins — drop this pass instead of
+        // A user mutation while a lookup was in flight wins. Drop this pass instead of
         // clobbering it; the next launch repairs whatever is still stale.
         guard didRepair, stationQuickTags == original else { return }
         stationQuickTags = StationQuickTagPolicy.normalized(repaired)

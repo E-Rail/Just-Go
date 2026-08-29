@@ -3,10 +3,10 @@ import SwiftUI
 enum AppTheme: String, CaseIterable, Identifiable {
     /// The app's own colour, taken from the icon.
     ///
-    /// Not the icon's orange exactly. `#E58216` measures 2.79:1 against white — below the 3:1 the
-    /// smallest tinted things in this app need, let alone the 4.5:1 a tab-bar label wants — so a
+    /// Not the icon's orange exactly. `#E58216` measures 2.79:1 against white. Below the 3:1 the
+    /// smallest tinted things in this app need, let alone the 4.5:1 a tab-bar label wants, so a
     /// tinted label in light mode would have been decoration rather than text. This is the same
-    /// hue (31°) at the same saturation, darkened until it clears **4.51:1 on white** — #B06411
+    /// hue (31°) at the same saturation, darkened until it clears **4.51:1 on white**. #B06411
     /// shipped first and measured 4.49:1, because 8-bit rounding ate the last hundredth. Dark mode
     /// lifts it back to roughly the icon's own orange (see `legibleOnDarkBackground`), so the two
     /// appearances read as one colour and both are legible.
@@ -17,7 +17,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
     /// Four, and these four. Every remaining pair is at least 48° apart on the hue wheel and every
     /// one clears 4.5:1 on white, so no two are confusable and none is unreadable. Dropped:
-    /// `skyTeal` sat 11° from `oceanBlue` — the same colour to a rider; `rubyRed` sat at hue 0°,
+    /// `skyTeal` sat 11° from `oceanBlue`. The same colour to a rider; `rubyRed` sat at hue 0°,
     /// the red this app already spends on errors, warnings and the destination pin; `roseGold` was
     /// 28° off that same red. A palette whose entries collide with each other, or with the
     /// semantics of the UI drawn on top of them, is a longer list rather than a better one.

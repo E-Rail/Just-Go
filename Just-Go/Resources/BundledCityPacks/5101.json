@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 396,
+    "networkStations": 402,
     "matchedStations": {
       "covered": 184,
-      "total": 396
+      "total": 402
     },
     "accessibility": {
       "covered": 9,
-      "total": 396
+      "total": 402
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 396
+      "total": 402
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 396
+      "total": 402
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 396
+      "total": 402
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 396
+      "total": 402
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 396
+      "total": 402
     }
   },
   "stations": [

@@ -25,20 +25,26 @@ struct TripStep: Identifiable, Equatable {
     var duration: TimeInterval = 0
     /// Recommended exit/entrance at the step's end station, when known (best-available).
     var exitHint: String? = nil
+    /// The stop before the rider's, so a `.ride` step can tell them when to stand up.
+    ///
+    /// Resolved from the graph on every plan as `arrivalPreviousStationName` and read by nothing
+    /// until now. "One more stop" is not the same instruction as "get off next" and this is the
+    /// only thing on the screen that can say which.
+    var alightAfterStationName: String? = nil
     /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
     /// separately verified indoor guidance.
-    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working —
-    /// matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
+    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working.
+    /// Matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
     var transferCoordinate: CodableCoordinate? = nil
     /// Apple's real, already-computed walking-route polyline for `.walkToStation`/
     /// `.walkToDestination` steps (the same data already stored on `RouteSegment.polylineCoordinates`).
     var walkingPathCoordinates: [CodableCoordinate] = []
     /// Index of the `Route.segments` entry this step came from (nil for the synthetic
-    /// `.arrive` step) — lets the live map frame the step's real geometry.
+    /// `.arrive` step): lets the live map frame the step's real geometry.
     var segmentIndex: Int? = nil
     var transferContext: TransferContext? = nil
     /// How the rider covers this access leg. The step *kind* stays `.walkToStation` /
-    /// `.walkToDestination` because everything structural about the step is the same — it is the
+    /// `.walkToDestination` because everything structural about the step is the same. It is the
     /// first or last mile, it has a drawn path, it frames the same way. Only the verb changes,
     /// and telling someone to "walk" a 9 km drive is exactly the kind of confident wrong sentence
     /// this app exists not to produce.
@@ -55,7 +61,7 @@ struct TripStep: Identifiable, Equatable {
     var title: String {
         switch kind {
         case .walkToStation:
-            // The entrance when the plan resolved one — this is a rider standing on the street
+            // The entrance when the plan resolved one. This is a rider standing on the street
             // looking for a way in, and "walk to 北京站" points at a building with eight of them.
             let target = exitHint
                 ?? toStationName
@@ -84,8 +90,24 @@ struct TripStep: Identifiable, Equatable {
             let line = lineName ?? AppLocalization.text(english: "the train", simplified: "列车", traditional: "列車")
             return AppLocalization.text(english: "Board \(line)", simplified: "乘坐\(line)", traditional: "乘坐\(line)")
         case .transfer:
-            let line = lineName ?? AppLocalization.text(english: "the next line", simplified: "下一条线路", traditional: "下一條路線")
-            return AppLocalization.text(english: "Transfer to \(line)", simplified: "换乘\(line)", traditional: "換乘\(line)")
+            // An out-of-station interchange has no outgoing line to name — it is a walk between two
+            // stations — so it names the station instead of falling through to "the next line",
+            // which tells a rider standing at the gates nothing they can act on.
+            guard let lineName else {
+                if let station = toStationName, station != fromStationName {
+                    return AppLocalization.text(
+                        english: "Walk to \(station) to change",
+                        simplified: "出站步行至\(station)换乘",
+                        traditional: "出站步行至\(station)換乘"
+                    )
+                }
+                return AppLocalization.text(english: "Change here", simplified: "在此换乘", traditional: "在此換乘")
+            }
+            return AppLocalization.text(
+                english: "Transfer to \(lineName)",
+                simplified: "换乘\(lineName)",
+                traditional: "換乘\(lineName)"
+            )
         case .walkToDestination:
             let place = toStationName ?? AppLocalization.text(english: "your destination", simplified: "目的地", traditional: "目的地")
             switch accessMode {
@@ -135,8 +157,21 @@ struct TripStep: Identifiable, Equatable {
         return AppLocalization.stopsLeft(stopCount)
     }
 
+    /// The cue to get ready, named by the stop it happens at.
+    ///
+    /// Only for rides long enough for it to mean anything: on a one- or two-stop hop the rider is
+    /// standing by the door already, and the previous station is where they got on.
+    var readyToAlightText: String? {
+        guard kind == .ride, stopCount > 2, let previous = alightAfterStationName else { return nil }
+        return AppLocalization.text(
+            english: "Get ready after \(previous)",
+            simplified: "过\(previous)后准备下车",
+            traditional: "過\(previous)後準備下車"
+        )
+    }
+
     var accessibilityLabel: String {
-        [title, detail].compactMap { $0 }.joined(separator: ", ")
+        [title, detail, rideStopsRemainingText, readyToAlightText].compactMap { $0 }.joined(separator: ", ")
     }
 }
 

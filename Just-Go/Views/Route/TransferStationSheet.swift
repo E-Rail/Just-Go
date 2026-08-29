@@ -20,7 +20,7 @@ struct TransferStationSheet: View {
     }
 
     /// The transfer station's real coordinate. A transfer segment's own stationStops is always
-    /// empty by construction — the coordinate lives on the ride segment that follows it (same
+    /// empty by construction: the coordinate lives on the ride segment that follows it (same
     /// station, matched by ID with a defensive first-stop fallback).
     private var transferStopCoordinate: CLLocationCoordinate2D? {
         let stop = nextTransitSegment?.stationStops.first { $0.stationID == transferSegment.toStationID }
@@ -28,7 +28,7 @@ struct TransferStationSheet: View {
         return stop?.coordinate.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
-    /// What entrances without a sign letter are described relative to. Nil is handled — those
+    /// What entrances without a sign letter are described relative to. Nil is handled. Those
     /// entrances fall back to a plain "station entrance" rather than an empty row.
     private var stationCoordinate: CodableCoordinate? {
         (transferStopCoordinate ?? enrichedStation?.coordinate).map(CodableCoordinate.init)
@@ -62,8 +62,8 @@ struct TransferStationSheet: View {
             async let initialResourceLoad = container.officialStationData.externalResources(for: initialLookupStation)
             // Match only when the route carries the real transfer-station coordinate
             // (provider-built routes always do). With a (0,0) placeholder, same-named
-            // stations disambiguate by distance to Null Island and pick an arbitrary one —
-            // showing the wrong station's accessibility data is worse than showing none.
+            // stations disambiguate by distance to Null Island and pick an arbitrary one.
+            // Showing the wrong station's accessibility data is worse than showing none.
             if let coordinate = transferStopCoordinate {
                 let place = TransitPlace(
                     name: stationName,
@@ -98,7 +98,7 @@ struct TransferStationSheet: View {
         }
     }
 
-    /// The whole instruction — which line, which direction, how long the walk — beside the badge
+    /// The whole instruction, which line, which direction, how long the walk. Beside the badge
     /// of the line to look for.
     ///
     /// A separate header above this card repeated the station name that the navigation bar was
@@ -140,13 +140,13 @@ struct TransferStationSheet: View {
     }
 
     /// The in-station walkthrough riders (especially less sign-savvy ones) ask for: which
-    /// exits/entrances exist, the transfer corridor, and boarding car/door hints — each
-    /// The station's exits. What used to sit here was a "Transfer Guide" — a heading, a
+    /// exits/entrances exist, the transfer corridor, and boarding car/door hints. Each
+    /// The station's exits. What used to sit here was a "Transfer Guide". A heading, a
     /// confidence chip that read `unknown` on every route in the app, a sentence apologising for
     /// having no exit data, and rows for corridor and platform hints. Not one of the 58 bundled
     /// packs carries an `interchangeHints` or `platformHints` entry, and none ever has: the card
     /// promised to tell riders how to make the change and had nothing to say. The exits are real
-    /// — 329 of Guangzhou's 329 stations carry them — so they stay, as themselves.
+    ///. 329 Of Guangzhou's 329 stations carry them, so they stay, as themselves.
     @ViewBuilder
     private var stationExitsSection: some View {
         let exits = guidance?.accessPoints ?? []
@@ -172,7 +172,7 @@ struct TransferStationSheet: View {
     private var stationMapSection: some View {
         let relevantResources = externalResources.filter(\.kind.isTransferRelevant)
         // Drawn only when there is something to link to. This card previously rendered a title
-        // followed by "No official station resources are listed for this station" — a named
+        // followed by "No official station resources are listed for this station". A named
         // feature reporting its own absence, in the middle of a transfer a rider is walking. The
         // Transfer Guide below already carries the provenance chip that says what is and is not
         // known about this station, so nothing honest is lost by leaving the empty case out.
@@ -191,9 +191,9 @@ struct TransferStationSheet: View {
                         OfficialTransitResourceButton(resource: resource, compact: true)
                     }
                     Text(AppLocalization.text(
-                        english: "These official resources are displayed inside Just-Go. Just-Go does not verify or interpret what they show.",
-                        simplified: "这些官方资源会在 Just-Go 内显示；Just-Go 不对其内容作核实或解读。",
-                        traditional: "這些官方資源會在 Just-Go 內顯示；Just-Go 不對其內容作核實或解讀。"
+                        english: "Straight from the operator, opened here for you to read.",
+                        simplified: "由运营方提供，可在此直接查看。",
+                        traditional: "由營運方提供，可在此直接查看。"
                     ))
                         .rowMeta()
                 }
@@ -202,7 +202,7 @@ struct TransferStationSheet: View {
     }
 
     /// Elevator / ramp / accessible restroom as one compact row of tri-state chips
-    /// (✓ / ✗ / ?) — three full-width rows said the same thing in 3× the height.
+    /// (✓ / ✗ / ?): three full-width rows said the same thing in 3× the height.
     @ViewBuilder
     private var accessibilitySection: some View {
         GlassCard {
@@ -268,7 +268,7 @@ struct TransferStationSheet: View {
     }
 
     /// Apple's Look Around has no coverage underground, so this can only ever show the
-    /// station's street-level entrance, not the platform itself — the caption makes that
+    /// station's street-level entrance, not the platform itself. The caption makes that
     /// explicit. Renders nothing when no coverage exists for the coordinate.
     @ViewBuilder
     private var lookAroundSection: some View {
@@ -276,7 +276,7 @@ struct TransferStationSheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 LookAroundPreview(initialScene: lookAroundScene)
                     .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
                 Text(AppLocalization.text(
                     english: "Station entrance (street view)",
                     simplified: "车站入口（街景）",
@@ -285,11 +285,5 @@ struct TransferStationSheet: View {
                 .rowMeta()
             }
         }
-    }
-}
-
-private extension String {
-    var nilIfEmpty: String? {
-        isEmpty ? nil : self
     }
 }

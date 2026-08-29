@@ -39,20 +39,43 @@ struct MetroLine: Codable, Equatable, Identifiable {
     let colorHex: String
     let stationIDs: [String]
     let servicePatterns: [[String]]
+    /// Express and short-turn trains on this line, if the operator runs any.
+    ///
+    /// Deliberately separate from `servicePatterns`, which is the only thing the routing graph
+    /// reads. A variant calls at a strict subset of the ordinary service's stops, so putting one
+    /// in the graph would create a non-stop edge past stations the line stops at — the defect
+    /// `43a6aaa` removed 81 of — and Dijkstra would always take it, because it is genuinely
+    /// faster. It would also be a promise the data cannot keep: not one of the 46 variant
+    /// relations in OpenStreetMap says *when* these trains run.
+    ///
+    /// So they are shown and never routed on. Optional because most lines have none and because
+    /// a pack written before this existed must still decode.
+    let serviceVariants: [MetroServiceVariant]?
     let paths: [[MetroCoordinate]]
+}
+
+/// One kind of train on a line that is not the ordinary all-stops service.
+struct MetroServiceVariant: Codable, Equatable, Identifiable {
+    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车.
+    let kind: String
+    let name: String
+    let sourceRelationID: String
+    let stationIDs: [String]
+
+    var id: String { sourceRelationID }
 }
 
 /// Two named stations riders treat as one interchange.
 ///
 /// The network graph only charges a transfer where a line changes *at one node*, so two stations
-/// with no line in common were two unconnected places however close together they sat — the app
+/// with no line in common were two unconnected places however close together they sat. The app
 /// could not plan Beijing's 广安门内 ↔ 牛街 at all, and drew nothing between them.
 ///
 /// Declared per pair in the importer, never inferred from distance: 南礼士路 and 复兴门 are 372 m
 /// apart and are *not* an interchange, while 太平桥 and 复兴门 at 625 m are.
 struct MetroInterchange: Codable, Equatable {
-    /// What the walk is, and nothing more. `inStation` — connected inside the building, as at
-    /// Guangzhou's metro/intercity concourses. `outOfStation` — out to the street, as at Beijing's
+    /// What the walk is, and nothing more. `inStation`. Connected inside the building, as at
+    /// Guangzhou's metro/intercity concourses. `outOfStation`. Out to the street, as at Beijing's
     /// 广安门内/牛街. Drawn solid and dashed respectively.
     enum Kind: String, Codable {
         case inStation
@@ -65,7 +88,7 @@ struct MetroInterchange: Codable, Equatable {
     /// share a concourse and still need two separate tickets. nil means unknown, and unknown is
     /// said as unknown rather than guessed from the geometry.
     enum Fare: String, Codable {
-        /// Tap out, walk, tap in — the two halves bill as a single trip.
+        /// Tap out, walk, tap in: the two halves bill as a single trip.
         case continuous
     }
 
@@ -85,7 +108,7 @@ struct MetroStation: Codable, Equatable, Identifiable {
     let lineIDs: [String]
 }
 
-/// Just enough of a network file to run the bounds-distance city match — decoding this instead
+/// Just enough of a network file to run the bounds-distance city match. Decoding this instead
 /// of the full `MetroNetwork` skips allocating every candidate city's station/line/polyline
 /// arrays (the bulk of the file) for the ~50 cities that don't end up matching a given search.
 struct MetroNetworkSummary: Decodable {
@@ -125,8 +148,8 @@ struct MetroNetworkStationIndex: Decodable {
 }
 
 /// The one place a `MetroStation` becomes a rider-facing `Station`. Shared by the full network
-/// and the station-only index above so the two can never disagree about an ID or a line list —
-/// the map draws one and search lists the other, and a station that differs between them reads
+/// and the station-only index above so the two can never disagree about an ID or a line list.
+/// The map draws one and search lists the other, and a station that differs between them reads
 /// as two different places.
 private func makeDisplayStation(
     _ item: MetroStation,
@@ -347,7 +370,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             let cityStations = index.displayStations
             stationsByCity[index.cityID] = cityStations
             stations += cityStations
-            // The file is open and its bounds are already decoded — record them, so the map's
+            // The file is open and its bounds are already decoded. Record them, so the map's
             // "which packs are in view" question is answered without a second pass over all 53.
             summaries[index.cityID] = MetroNetworkSummary(
                 cityID: index.cityID,
@@ -356,7 +379,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             )
         }
         // Sorted so the list is stable across launches regardless of which city's decode
-        // finished first — the ranking that matters is applied by the caller, per rider.
+        // finished first: the ranking that matters is applied by the caller, per rider.
         stations.sort { $0.stationID < $1.stationID }
         allStationsCache = stations
         return stations
@@ -387,8 +410,8 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         if let summary = summaries[cityID] {
             return summary
         }
-        // A full network already cached (e.g. the user's current city) has the same bounds —
-        // reuse it instead of re-reading and re-parsing the file a second time.
+        // A full network already cached (e.g. the user's current city) has the same bounds.
+        // Reuse it instead of re-reading and re-parsing the file a second time.
         if let network = networks[cityID] {
             let summary = MetroNetworkSummary(cityID: network.cityID, bounds: network.bounds, geometryKind: network.geometryKind)
             summaries[cityID] = summary

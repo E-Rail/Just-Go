@@ -50,6 +50,28 @@ cp Just-Go.xcodeproj/project.pbxproj /tmp/pbxproj.bak
 cp /tmp/pbxproj.bak Just-Go.xcodeproj/project.pbxproj
 ```
 
+### Archiving for TestFlight
+
+Two traps, both of which fail in a way that does not name the cause.
+
+- **Archive unsigned; let the export sign.** Automatic signing asks for a *development* profile
+  during `xcodebuild archive`, and team `44UAJ3CD7S` has no registered devices, so it dies on "Your
+  team has no devices from which to generate a provisioning profile". Forcing
+  `CODE_SIGN_IDENTITY="Apple Distribution"` does not help either — automatic signing rejects it as a
+  conflicting manual identity. Archive with `CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+  CODE_SIGN_IDENTITY=""`, then `-exportArchive -allowProvisioningUpdates` with the
+  `app-store-connect` options plist, which creates the store profile and signs there.
+- **A release Xcode, not the beta.** A bundle stamped `DTXcodeBuild = 27A5194q` is rejected on
+  upload. Check `DTSDKName`/`DTXcodeBuild` in the exported `.app`'s Info.plist, not the Xcode you
+  think you ran.
+
+`CURRENT_PROJECT_VERSION=<n>` on the archive sets `CFBundleVersion`; App Store Connect refuses a
+build number it has already seen. `build/release.sh <n>` does all of this, but `build/` is
+git-ignored, so this section is the record.
+
+A correct export reports `Cloud Managed Apple Distribution`, an `iOS Team Store Provisioning
+Profile`, and `beta-reports-active` in its entitlements — that last one is the TestFlight bit.
+
 ### Regenerating data
 
 Generators are byte-for-byte deterministic and CI runs each twice and diffs. After touching

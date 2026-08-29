@@ -5,7 +5,7 @@ Guidance for Claude Code when working in this repository.
 ## What this is
 
 Just-Go is a universal iPhone/iPadOS transit companion (SwiftUI, iOS 18+, Swift 5 mode,
-`TARGETED_DEVICE_FAMILY = "1,2"`, bundle id `com.e-rail.just-go`). It plans metro routes from a
+`TARGETED_DEVICE_FAMILY = "1,2"`, bundle id `com.erail.just-go`). It plans metro routes from a
 bundled network graph, uses Apple Maps for place search and walking legs, and layers on narrowly
 scoped official city data.
 
@@ -123,8 +123,8 @@ This environment has **no tap or scroll injection**. Two workable approaches:
 
 ```bash
 xcrun simctl install <UDID> path/to/Just-Go.app
-SIMCTL_CHILD_JUST_GO_DEBUG_PROBE=1 xcrun simctl launch <UDID> com.e-rail.just-go
-cat "$(xcrun simctl get_app_container <UDID> com.e-rail.just-go data)/Documents/probe.txt"
+SIMCTL_CHILD_JUST_GO_DEBUG_PROBE=1 xcrun simctl launch <UDID> com.erail.just-go
+cat "$(xcrun simctl get_app_container <UDID> com.erail.just-go data)/Documents/probe.txt"
 ```
 
 To see a section below the fold, temporarily reorder it to the top of the `VStack` and screenshot

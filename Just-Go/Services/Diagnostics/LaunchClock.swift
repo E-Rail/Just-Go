@@ -12,7 +12,7 @@ import os
 /// process's real start time out of the kernel makes "before main" a measurable quantity, which
 /// is the only way to tell "our services are slow" apart from "the app had not started yet".
 enum LaunchClock {
-    private static let log = Logger(subsystem: "com.e-rail.just-go.diag", category: "launch")
+    private static let log = Logger(subsystem: "com.erail.just-go.diag", category: "launch")
 
     /// Kernel-recorded process start, via `sysctl(KERN_PROC_PID)`. Falls back to first-touch of
     /// this static, which just means pre-main time reads as zero rather than as a wrong number.

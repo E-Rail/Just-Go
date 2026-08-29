@@ -18,6 +18,11 @@ enforce that. When you cannot verify something, say so — do not fill the gap w
 There are **no Xcode test targets**. The gate is Ruby suites, shell suites, validators, and two
 builds. `.github/workflows/ci.yml` is the source of truth; keep them in sync.
 
+**Xcode 26 or newer is the floor.** `CardSurface` in `Core/DesignSystem.swift` calls
+`.glassEffect`, which only exists in the iOS 26 SDK. The `if #available(iOS 26.0, *)` around it
+guards the *runtime*, not the compile — an older SDK fails with "has no member 'glassEffect'" a long
+way from anything that names an SDK. CI asserts the SDK version before it builds, for that reason.
+
 ```bash
 export DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer
 

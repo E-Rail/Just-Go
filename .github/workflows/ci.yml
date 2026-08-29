@@ -16,7 +16,7 @@ permissions:
 jobs:
   build:
     name: Build
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
 
     steps:
@@ -68,6 +68,20 @@ jobs:
           ruby Scripts/generate_station_info_api.rb
           ruby Scripts/generate_station_info_api.rb
           git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal Just-Go/Resources/BundledCityPacks StationInfoAPI/directory/directory.json Just-Go/Resources/StationInfo
+
+      # `.glassEffect` in Core/DesignSystem.swift needs the iOS 26 SDK. macos-15 defaults to
+      # Xcode 16.4 / iOS 18.5, where the symbol does not exist, and the failure arrives as a
+      # "has no member 'glassEffect'" compile error three hundred lines into a build log with
+      # nothing pointing at the SDK. Assert the floor here, where the message can say so.
+      - name: Assert the toolchain has the iOS SDK this app compiles against
+        run: |
+          xcodebuild -version
+          sdk="$(xcrun --sdk iphonesimulator --show-sdk-version)"
+          echo "iOS Simulator SDK $sdk"
+          if [ "${sdk%%.*}" -lt 26 ]; then
+            echo "::error::iOS SDK $sdk is too old. Just-Go needs 26 or newer."
+            exit 1
+          fi
 
       - name: Build for iOS Simulator
         run: |

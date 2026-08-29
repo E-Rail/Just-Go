@@ -16,7 +16,12 @@ permissions:
 jobs:
   build:
     name: Build
-    runs-on: macos-26
+    # macos-15, deliberately, and not a newer image. The generators' output bytes depend on the
+    # json gem's pretty_generate, which renders an empty array as "[\n\n]" on the Ruby 2.6.10
+    # this repo is written against and as "[]" on anything newer — so a newer image fails
+    # "Verify deterministic generated data" on every pack's sizeBytes and sha256 without a
+    # single line of source having changed. The Xcode on this image is chosen below instead.
+    runs-on: macos-15
     timeout-minutes: 30
 
     steps:
@@ -69,19 +74,26 @@ jobs:
           ruby Scripts/generate_station_info_api.rb
           git diff --exit-code -- DataPacks/manifest.json DataPacks/rights_inventory.json DataPacks/sources/8100/metadata.json DataPacks/official_transit_resources.json DataPacks/universal Just-Go/Resources/BundledCityPacks StationInfoAPI/directory/directory.json Just-Go/Resources/StationInfo
 
-      # `.glassEffect` in Core/DesignSystem.swift needs the iOS 26 SDK. macos-15 defaults to
+      # `.glassEffect` in Core/DesignSystem.swift needs the iOS 26 SDK. This image defaults to
       # Xcode 16.4 / iOS 18.5, where the symbol does not exist, and the failure arrives as a
       # "has no member 'glassEffect'" compile error three hundred lines into a build log with
-      # nothing pointing at the SDK. Assert the floor here, where the message can say so.
-      - name: Assert the toolchain has the iOS SDK this app compiles against
+      # nothing in it pointing at an SDK. Pick the newest Xcode that can compile this app, and
+      # say so in one line when the image no longer carries one.
+      - name: Select an Xcode that has the iOS SDK this app compiles against
         run: |
-          xcodebuild -version
-          sdk="$(xcrun --sdk iphonesimulator --show-sdk-version)"
-          echo "iOS Simulator SDK $sdk"
-          if [ "${sdk%%.*}" -lt 26 ]; then
-            echo "::error::iOS SDK $sdk is too old. Just-Go needs 26 or newer."
+          selected=""
+          for app in $(ls -d /Applications/Xcode*.app | sort -Vr); do
+            version="$("$app/Contents/Developer/usr/bin/xcodebuild" -version 2>/dev/null | head -1 | awk '{print $2}')"
+            case "${version%%.*}" in ''|*[!0-9]*) continue ;; esac
+            if [ "${version%%.*}" -ge 26 ]; then selected="$app"; break; fi
+          done
+          if [ -z "$selected" ]; then
+            echo "::error::No Xcode 26 or newer on this runner. Just-Go cannot compile without the iOS 26 SDK."
             exit 1
           fi
+          sudo xcode-select -s "$selected"
+          xcodebuild -version
+          echo "iOS Simulator SDK $(xcrun --sdk iphonesimulator --show-sdk-version)"
 
       - name: Build for iOS Simulator
         run: |

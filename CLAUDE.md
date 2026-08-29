@@ -65,7 +65,11 @@ ruby Scripts/generate_station_info_api.rb
 ## Traps that have actually cost time
 
 - **Ruby is 2.6.10.** No `filter_map` (2.7+), no `Hash#except`. Use `map {}.compact` and
-  `each_with_object`.
+  `each_with_object`. It also pins the *bytes* of every generated file: that json gem renders an
+  empty array as `[\n\n]` where anything newer renders `[]`, so running a generator under a newer
+  Ruby rewrites every pack's `sizeBytes` and `sha256` and fails CI's determinism check with no
+  source change behind it. This is why CI stays on the `macos-15` runner and selects its Xcode
+  explicitly instead of moving to a newer image.
 - **Coordinates are GCJ-02 everywhere the app draws.** OpenStreetMap and most open data publish
   WGS-84. Convert with `GCJ02.from_wgs84(lat, lon)` from `Scripts/lib/gcj02.rb` *before* measuring
   or matching. Unconverted coordinates land ~600 m away and produce an **empty-but-valid** import —

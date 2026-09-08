@@ -1138,6 +1138,7 @@ struct RouteDetailView: View {
                 }
                 liveArrivalsRow(for: segment)
                 handoffRow(for: segment)
+                bikeScannerRow(for: segment)
                 if isExpanded {
                     stationStops(segment)
                 }
@@ -1292,6 +1293,36 @@ struct RouteDetailView: View {
             .foregroundStyle(.green)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(AppLocalization.localized("Live arrivals"))
+        }
+    }
+
+    /// The step between "cycle this bit" and actually cycling it.
+    ///
+    /// A shared bike in mainland China is unlocked by scanning its QR code in Alipay or WeChat.
+    /// The app was proposing a cycling leg and leaving the rider to go find that themselves.
+    ///
+    /// **It does not say a bike is here.** Just-Go has no bike-share data — not where the bikes
+    /// are, not whether a dock is empty, not which operator serves the street — so the button is
+    /// named for the action it performs and promises nothing about the outcome.
+    @ViewBuilder
+    private func bikeScannerRow(for segment: RouteSegment) -> some View {
+        if segment.accessLegMode == .cycling {
+            let scanners = ExternalRouteHandoff.bikeScanners()
+            if !scanners.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(scanners) { scanner in
+                        Button {
+                            ExternalRouteHandoff.open(scanner)
+                        } label: {
+                            Label(scanner.title, systemImage: "qrcode.viewfinder")
+                                .font(.footnote)
+                        }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.capsule)
+                    }
+                }
+                .padding(.top, 2)
+            }
         }
     }
 

@@ -32,6 +32,8 @@
 		<string>baidumap</string>
 		<string>iosamap</string>
 		<string>diditaxi</string>
+		<string>alipay</string>
+		<string>weixin</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>

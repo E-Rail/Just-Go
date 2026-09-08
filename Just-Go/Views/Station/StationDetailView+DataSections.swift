@@ -532,7 +532,11 @@ extension StationDetailView {
     }
 
     private func officialExitChip(_ exit: OfficialStationExitInformation) -> some View {
+        // `isAccessible` here is already a `Bool?` — three states — and this collapsed it with
+        // `== true`, so Shanghai's `w_n.png`, the only genuinely surveyed per-exit negative in any
+        // live source, rendered exactly like an exit nobody had checked.
         let isAccessible = exit.isAccessible == true
+        let surveyedUnusable = exit.isAccessible == false
         return HStack(spacing: 4) {
             if isAccessible {
                 Image(systemName: "figure.roll")
@@ -542,11 +546,11 @@ extension StationDetailView {
                 .font(.caption)
                 .fontWeight(.medium)
         }
-        .foregroundStyle(isAccessible ? Color.green : Color.accentColor)
+        .foregroundStyle(isAccessible ? Color.green : (surveyedUnusable ? Color.secondary : Color.accentColor))
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
         .background(
-            (isAccessible ? Color.green : Color.accentColor).opacity(0.14),
+            (isAccessible ? Color.green : (surveyedUnusable ? Color.secondary : Color.accentColor)).opacity(0.14),
             in: Capsule()
         )
         .accessibilityElement(children: .combine)
@@ -555,6 +559,12 @@ extension StationDetailView {
                 english: "Exit \(exit.name), step-free",
                 simplified: "出入口 \(exit.name)，无障碍",
                 traditional: "出入口 \(exit.name)，無障礙"
+            )
+            : surveyedUnusable
+            ? AppLocalization.text(
+                english: "Exit \(exit.name), not step-free",
+                simplified: "出入口 \(exit.name)，非无障碍",
+                traditional: "出入口 \(exit.name)，非無障礙"
             )
             : AppLocalization.text(
                 english: "Exit \(exit.name)",

@@ -77,6 +77,7 @@
           "latitude": 30.55251,
           "longitude": 114.316615,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -86,6 +87,7 @@
           "latitude": 30.553158,
           "longitude": 114.31811,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -95,6 +97,7 @@
           "latitude": 30.553864,
           "longitude": 114.316536,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -104,6 +107,7 @@
           "latitude": 30.553909,
           "longitude": 114.318539,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -113,6 +117,7 @@
           "latitude": 30.554206,
           "longitude": 114.316962,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -148,6 +153,7 @@
           "latitude": 30.577594,
           "longitude": 114.361194,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -157,6 +163,7 @@
           "latitude": 30.577051,
           "longitude": 114.362491,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -166,6 +173,7 @@
           "latitude": 30.577178,
           "longitude": 114.361326,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -201,6 +209,7 @@
           "latitude": 30.505839,
           "longitude": 114.236352,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -236,6 +245,7 @@
           "latitude": 30.607322,
           "longitude": 114.406271,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -245,6 +255,7 @@
           "latitude": 30.608318,
           "longitude": 114.406513,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -254,6 +265,7 @@
           "latitude": 30.607527,
           "longitude": 114.405064,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -263,6 +275,7 @@
           "latitude": 30.608111,
           "longitude": 114.404948,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -298,6 +311,7 @@
           "latitude": 30.574748,
           "longitude": 114.371472,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -307,6 +321,7 @@
           "latitude": 30.574421,
           "longitude": 114.371112,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -358,6 +373,7 @@
           "latitude": 30.489139,
           "longitude": 114.522049,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -367,6 +383,7 @@
           "latitude": 30.488441,
           "longitude": 114.52186,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -376,6 +393,7 @@
           "latitude": 30.488396,
           "longitude": 114.523802,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -385,6 +403,7 @@
           "latitude": 30.489081,
           "longitude": 114.523765,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -420,6 +439,7 @@
           "latitude": 30.548402,
           "longitude": 114.26583,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -429,6 +449,7 @@
           "latitude": 30.549387,
           "longitude": 114.26646,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -464,6 +485,7 @@
           "latitude": 30.674833,
           "longitude": 114.342,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -473,6 +495,7 @@
           "latitude": 30.674579,
           "longitude": 114.341917,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -508,6 +531,7 @@
           "latitude": 30.53406,
           "longitude": 114.301051,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -517,6 +541,7 @@
           "latitude": 30.534485,
           "longitude": 114.301078,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -568,6 +593,7 @@
           "latitude": 30.488586,
           "longitude": 114.490879,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -577,6 +603,7 @@
           "latitude": 30.488751,
           "longitude": 114.491886,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -586,6 +613,7 @@
           "latitude": 30.488885,
           "longitude": 114.49292,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -595,6 +623,7 @@
           "latitude": 30.489656,
           "longitude": 114.492968,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -630,6 +659,7 @@
           "latitude": 30.496799,
           "longitude": 114.411228,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -665,6 +695,7 @@
           "latitude": 30.631337,
           "longitude": 114.385661,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -674,6 +705,7 @@
           "latitude": 30.630672,
           "longitude": 114.386129,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -683,6 +715,7 @@
           "latitude": 30.632264,
           "longitude": 114.387592,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -692,6 +725,7 @@
           "latitude": 30.631859,
           "longitude": 114.388014,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -727,6 +761,7 @@
           "latitude": 30.500531,
           "longitude": 114.166812,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -736,6 +771,7 @@
           "latitude": 30.500929,
           "longitude": 114.166336,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -745,6 +781,7 @@
           "latitude": 30.499655,
           "longitude": 114.165277,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -754,6 +791,7 @@
           "latitude": 30.499198,
           "longitude": 114.1659,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -763,6 +801,7 @@
           "latitude": 30.499852,
           "longitude": 114.167651,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -772,6 +811,7 @@
           "latitude": 30.499386,
           "longitude": 114.167267,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -781,6 +821,7 @@
           "latitude": 30.498998,
           "longitude": 114.167901,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -790,6 +831,7 @@
           "latitude": 30.499196,
           "longitude": 114.168652,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -825,6 +867,7 @@
           "latitude": 30.437323,
           "longitude": 114.429261,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -834,6 +877,7 @@
           "latitude": 30.437395,
           "longitude": 114.429694,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -843,6 +887,7 @@
           "latitude": 30.436972,
           "longitude": 114.43024,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -878,6 +923,7 @@
           "latitude": 30.461006,
           "longitude": 114.318436,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -913,6 +959,7 @@
           "latitude": 30.643469,
           "longitude": 114.330475,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -922,6 +969,7 @@
           "latitude": 30.643852,
           "longitude": 114.330598,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -957,6 +1005,7 @@
           "latitude": 30.369421,
           "longitude": 114.322546,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -966,6 +1015,7 @@
           "latitude": 30.369588,
           "longitude": 114.321667,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -975,6 +1025,7 @@
           "latitude": 30.370656,
           "longitude": 114.322294,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -984,6 +1035,7 @@
           "latitude": 30.370405,
           "longitude": 114.321584,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -993,6 +1045,7 @@
           "latitude": 30.372223,
           "longitude": 114.320864,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1002,6 +1055,7 @@
           "latitude": 30.371897,
           "longitude": 114.322132,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1011,6 +1065,7 @@
           "latitude": 30.373927,
           "longitude": 114.321364,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1020,6 +1075,7 @@
           "latitude": 30.373697,
           "longitude": 114.32203,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1055,6 +1111,7 @@
           "latitude": 30.488153,
           "longitude": 114.562238,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1064,6 +1121,7 @@
           "latitude": 30.487284,
           "longitude": 114.561934,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1073,6 +1131,7 @@
           "latitude": 30.486995,
           "longitude": 114.563941,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1108,6 +1167,7 @@
           "latitude": 30.542354,
           "longitude": 114.269538,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1117,6 +1177,7 @@
           "latitude": 30.543524,
           "longitude": 114.269147,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1126,6 +1187,7 @@
           "latitude": 30.543103,
           "longitude": 114.268551,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1161,6 +1223,7 @@
           "latitude": 30.453233,
           "longitude": 114.268555,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1170,6 +1233,7 @@
           "latitude": 30.454004,
           "longitude": 114.269001,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1179,6 +1243,7 @@
           "latitude": 30.454452,
           "longitude": 114.268435,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1188,6 +1253,7 @@
           "latitude": 30.454712,
           "longitude": 114.267896,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1197,6 +1263,7 @@
           "latitude": 30.453587,
           "longitude": 114.267244,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1206,6 +1273,7 @@
           "latitude": 30.453388,
           "longitude": 114.267849,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1215,6 +1283,7 @@
           "latitude": 30.45299,
           "longitude": 114.26889,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1224,6 +1293,7 @@
           "latitude": 30.454005,
           "longitude": 114.269447,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1259,6 +1329,7 @@
           "latitude": 30.656281,
           "longitude": 114.335012,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1294,6 +1365,7 @@
           "latitude": 30.52783,
           "longitude": 114.188633,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -1303,6 +1375,7 @@
           "latitude": 30.527985,
           "longitude": 114.189719,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1312,6 +1385,7 @@
           "latitude": 30.526886,
           "longitude": 114.188829,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1321,6 +1395,7 @@
           "latitude": 30.52899,
           "longitude": 114.189139,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1356,6 +1431,7 @@
           "latitude": 30.579845,
           "longitude": 114.010081,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1365,6 +1441,7 @@
           "latitude": 30.57983,
           "longitude": 114.009868,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1374,6 +1451,7 @@
           "latitude": 30.579347,
           "longitude": 114.009821,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1383,6 +1461,7 @@
           "latitude": 30.579868,
           "longitude": 114.008461,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1418,6 +1497,7 @@
           "latitude": 30.486601,
           "longitude": 114.605329,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1427,6 +1507,7 @@
           "latitude": 30.485716,
           "longitude": 114.604932,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1436,6 +1517,7 @@
           "latitude": 30.486189,
           "longitude": 114.606934,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1445,6 +1527,7 @@
           "latitude": 30.487031,
           "longitude": 114.606234,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1480,6 +1563,7 @@
           "latitude": 30.680335,
           "longitude": 114.365713,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1489,6 +1573,7 @@
           "latitude": 30.680766,
           "longitude": 114.365546,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1524,6 +1609,7 @@
           "latitude": 30.605811,
           "longitude": 114.415698,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1533,6 +1619,7 @@
           "latitude": 30.604574,
           "longitude": 114.416117,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1542,6 +1629,7 @@
           "latitude": 30.604812,
           "longitude": 114.416918,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1551,6 +1639,7 @@
           "latitude": 30.605979,
           "longitude": 114.416517,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1586,6 +1675,7 @@
           "latitude": 30.52654,
           "longitude": 114.354822,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1595,6 +1685,7 @@
           "latitude": 30.526606,
           "longitude": 114.352126,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1604,6 +1695,7 @@
           "latitude": 30.52718,
           "longitude": 114.352462,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1613,6 +1705,7 @@
           "latitude": 30.525861,
           "longitude": 114.354813,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1648,6 +1741,7 @@
           "latitude": 30.522509,
           "longitude": 114.363683,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1657,6 +1751,7 @@
           "latitude": 30.521985,
           "longitude": 114.364349,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1666,6 +1761,7 @@
           "latitude": 30.523608,
           "longitude": 114.362125,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1675,6 +1771,7 @@
           "latitude": 30.523056,
           "longitude": 114.363066,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1684,6 +1781,7 @@
           "latitude": 30.522809,
           "longitude": 114.364179,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1693,6 +1791,7 @@
           "latitude": 30.523368,
           "longitude": 114.363448,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1702,6 +1801,7 @@
           "latitude": 30.524541,
           "longitude": 114.362691,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1737,6 +1837,7 @@
           "latitude": 30.532042,
           "longitude": 114.316999,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1746,6 +1847,7 @@
           "latitude": 30.532926,
           "longitude": 114.317365,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1781,6 +1883,7 @@
           "latitude": 30.592531,
           "longitude": 114.371323,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1790,6 +1893,7 @@
           "latitude": 30.593095,
           "longitude": 114.371214,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1799,6 +1903,7 @@
           "latitude": 30.592644,
           "longitude": 114.371792,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1808,6 +1913,7 @@
           "latitude": 30.593185,
           "longitude": 114.371967,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1843,6 +1949,7 @@
           "latitude": 30.48304,
           "longitude": 114.313095,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1852,6 +1959,7 @@
           "latitude": 30.483347,
           "longitude": 114.313607,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1861,6 +1969,7 @@
           "latitude": 30.484402,
           "longitude": 114.313156,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1870,6 +1979,7 @@
           "latitude": 30.484666,
           "longitude": 114.313607,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1905,6 +2015,7 @@
           "latitude": 30.512842,
           "longitude": 114.369492,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1914,6 +2025,7 @@
           "latitude": 30.511943,
           "longitude": 114.370555,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1923,6 +2035,7 @@
           "latitude": 30.511742,
           "longitude": 114.371237,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1932,6 +2045,7 @@
           "latitude": 30.51309,
           "longitude": 114.369977,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -1967,6 +2081,7 @@
           "latitude": 30.469341,
           "longitude": 114.293559,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1976,6 +2091,7 @@
           "latitude": 30.46929,
           "longitude": 114.292957,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1985,6 +2101,7 @@
           "latitude": 30.468162,
           "longitude": 114.292969,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -1994,6 +2111,7 @@
           "latitude": 30.468167,
           "longitude": 114.293565,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2029,6 +2147,7 @@
           "latitude": 30.558859,
           "longitude": 114.220343,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2038,6 +2157,7 @@
           "latitude": 30.559606,
           "longitude": 114.219701,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2047,6 +2167,7 @@
           "latitude": 30.559233,
           "longitude": 114.21863,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2056,6 +2177,7 @@
           "latitude": 30.559748,
           "longitude": 114.218844,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2091,6 +2213,7 @@
           "latitude": 30.570184,
           "longitude": 114.356101,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2100,6 +2223,7 @@
           "latitude": 30.570846,
           "longitude": 114.355752,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2109,6 +2233,7 @@
           "latitude": 30.570182,
           "longitude": 114.355147,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2118,6 +2243,7 @@
           "latitude": 30.569878,
           "longitude": 114.355784,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2153,6 +2279,7 @@
           "latitude": 30.478194,
           "longitude": 114.430523,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2162,6 +2289,7 @@
           "latitude": 30.476864,
           "longitude": 114.430556,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2171,6 +2299,7 @@
           "latitude": 30.476705,
           "longitude": 114.429874,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2206,6 +2335,7 @@
           "latitude": 30.505531,
           "longitude": 114.397025,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2215,6 +2345,7 @@
           "latitude": 30.505525,
           "longitude": 114.398111,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2224,6 +2355,7 @@
           "latitude": 30.506025,
           "longitude": 114.397792,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2233,6 +2365,7 @@
           "latitude": 30.505798,
           "longitude": 114.395966,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2268,6 +2401,7 @@
           "latitude": 30.564583,
           "longitude": 114.364615,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2277,6 +2411,7 @@
           "latitude": 30.565489,
           "longitude": 114.36543,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2286,6 +2421,7 @@
           "latitude": 30.564725,
           "longitude": 114.365561,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2321,6 +2457,7 @@
           "latitude": 30.666499,
           "longitude": 114.338239,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2356,6 +2493,7 @@
           "latitude": 30.494858,
           "longitude": 114.293502,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2365,6 +2503,7 @@
           "latitude": 30.494955,
           "longitude": 114.293011,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2374,6 +2513,7 @@
           "latitude": 30.495982,
           "longitude": 114.293791,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2383,6 +2523,7 @@
           "latitude": 30.496072,
           "longitude": 114.293299,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2418,6 +2559,7 @@
           "latitude": 30.535346,
           "longitude": 114.353652,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2427,6 +2569,7 @@
           "latitude": 30.536493,
           "longitude": 114.350897,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2462,6 +2605,7 @@
           "latitude": 30.618085,
           "longitude": 114.313551,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2497,6 +2641,7 @@
           "latitude": 30.625075,
           "longitude": 114.377284,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2506,6 +2651,7 @@
           "latitude": 30.625521,
           "longitude": 114.376696,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2515,6 +2661,7 @@
           "latitude": 30.624637,
           "longitude": 114.375567,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2524,6 +2671,7 @@
           "latitude": 30.624299,
           "longitude": 114.375849,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2559,6 +2707,7 @@
           "latitude": 30.563585,
           "longitude": 114.349175,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2568,6 +2717,7 @@
           "latitude": 30.563175,
           "longitude": 114.34975,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2577,6 +2727,7 @@
           "latitude": 30.562228,
           "longitude": 114.348858,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2612,6 +2763,7 @@
           "latitude": 30.50702,
           "longitude": 114.415121,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2621,6 +2773,7 @@
           "latitude": 30.507092,
           "longitude": 114.414428,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2630,6 +2783,7 @@
           "latitude": 30.506827,
           "longitude": 114.413685,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2639,6 +2793,7 @@
           "latitude": 30.507628,
           "longitude": 114.414243,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2648,6 +2803,7 @@
           "latitude": 30.507466,
           "longitude": 114.415932,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2657,6 +2813,7 @@
           "latitude": 30.5069,
           "longitude": 114.412877,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2692,6 +2849,7 @@
           "latitude": 30.481314,
           "longitude": 114.326663,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2701,6 +2859,7 @@
           "latitude": 30.48096,
           "longitude": 114.326208,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2710,6 +2869,7 @@
           "latitude": 30.482098,
           "longitude": 114.32617,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2719,6 +2879,7 @@
           "latitude": 30.482123,
           "longitude": 114.325738,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2754,6 +2915,7 @@
           "latitude": 30.583929,
           "longitude": 114.368403,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2763,6 +2925,7 @@
           "latitude": 30.584384,
           "longitude": 114.369442,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2772,6 +2935,7 @@
           "latitude": 30.583989,
           "longitude": 114.369638,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2781,6 +2945,7 @@
           "latitude": 30.583651,
           "longitude": 114.368951,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2816,6 +2981,7 @@
           "latitude": 30.564854,
           "longitude": 114.201402,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2825,6 +2991,7 @@
           "latitude": 30.564493,
           "longitude": 114.200578,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2834,6 +3001,7 @@
           "latitude": 30.564181,
           "longitude": 114.201969,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2843,6 +3011,7 @@
           "latitude": 30.564687,
           "longitude": 114.202196,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2878,6 +3047,7 @@
           "latitude": 30.605592,
           "longitude": 114.389766,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2887,6 +3057,7 @@
           "latitude": 30.605082,
           "longitude": 114.390072,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2896,6 +3067,7 @@
           "latitude": 30.604654,
           "longitude": 114.38843,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2905,6 +3077,7 @@
           "latitude": 30.605608,
           "longitude": 114.388537,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -2956,6 +3129,7 @@
           "latitude": 30.485529,
           "longitude": 114.465207,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -2965,6 +3139,7 @@
           "latitude": 30.484732,
           "longitude": 114.464729,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -2974,6 +3149,7 @@
           "latitude": 30.485006,
           "longitude": 114.467177,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -2983,6 +3159,7 @@
           "latitude": 30.48575,
           "longitude": 114.467041,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3018,6 +3195,7 @@
           "latitude": 30.431319,
           "longitude": 114.261975,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3027,6 +3205,7 @@
           "latitude": 30.430729,
           "longitude": 114.26192,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3036,6 +3215,7 @@
           "latitude": 30.430446,
           "longitude": 114.261658,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3045,6 +3225,7 @@
           "latitude": 30.431597,
           "longitude": 114.261755,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3080,6 +3261,7 @@
           "latitude": 30.638836,
           "longitude": 114.205661,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3089,6 +3271,7 @@
           "latitude": 30.639698,
           "longitude": 114.205215,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3098,6 +3281,7 @@
           "latitude": 30.639793,
           "longitude": 114.204274,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3107,6 +3291,7 @@
           "latitude": 30.639146,
           "longitude": 114.204116,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3142,6 +3327,7 @@
           "latitude": 30.462869,
           "longitude": 114.420074,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3151,6 +3337,7 @@
           "latitude": 30.462202,
           "longitude": 114.420106,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3160,6 +3347,7 @@
           "latitude": 30.461367,
           "longitude": 114.420149,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3169,6 +3357,7 @@
           "latitude": 30.461266,
           "longitude": 114.4211,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3178,6 +3367,7 @@
           "latitude": 30.462913,
           "longitude": 114.421026,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3213,6 +3403,7 @@
           "latitude": 30.559042,
           "longitude": 114.266341,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3248,6 +3439,7 @@
           "latitude": 30.684482,
           "longitude": 114.342682,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3257,6 +3449,7 @@
           "latitude": 30.684032,
           "longitude": 114.342669,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3308,6 +3501,7 @@
           "latitude": 30.506203,
           "longitude": 114.423209,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3317,6 +3511,7 @@
           "latitude": 30.506891,
           "longitude": 114.423376,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3326,6 +3521,7 @@
           "latitude": 30.50682,
           "longitude": 114.42425,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -3335,6 +3531,7 @@
           "latitude": 30.506165,
           "longitude": 114.424422,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3370,6 +3567,7 @@
           "latitude": 30.578314,
           "longitude": 114.33031,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3379,6 +3577,7 @@
           "latitude": 30.577216,
           "longitude": 114.32901,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3388,6 +3587,7 @@
           "latitude": 30.577361,
           "longitude": 114.328842,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3397,6 +3597,7 @@
           "latitude": 30.578494,
           "longitude": 114.330142,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3406,6 +3607,7 @@
           "latitude": 30.576811,
           "longitude": 114.328512,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3415,6 +3617,7 @@
           "latitude": 30.57694,
           "longitude": 114.328335,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3450,6 +3653,7 @@
           "latitude": 30.44835,
           "longitude": 114.420619,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3459,6 +3663,7 @@
           "latitude": 30.446966,
           "longitude": 114.420644,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3468,6 +3673,7 @@
           "latitude": 30.447018,
           "longitude": 114.421506,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3477,6 +3683,7 @@
           "latitude": 30.448493,
           "longitude": 114.421439,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3512,6 +3719,7 @@
           "latitude": 30.556515,
           "longitude": 114.230741,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3521,6 +3729,7 @@
           "latitude": 30.556199,
           "longitude": 114.232318,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3530,6 +3739,7 @@
           "latitude": 30.556983,
           "longitude": 114.231022,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3539,6 +3749,7 @@
           "latitude": 30.556781,
           "longitude": 114.232256,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3574,6 +3785,7 @@
           "latitude": 30.427076,
           "longitude": 114.295178,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3583,6 +3795,7 @@
           "latitude": 30.426689,
           "longitude": 114.294968,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3592,6 +3805,7 @@
           "latitude": 30.42685,
           "longitude": 114.294678,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3601,6 +3815,7 @@
           "latitude": 30.42778,
           "longitude": 114.295307,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3610,6 +3825,7 @@
           "latitude": 30.427689,
           "longitude": 114.294831,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3645,6 +3861,7 @@
           "latitude": 30.537219,
           "longitude": 114.333052,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3654,6 +3871,7 @@
           "latitude": 30.53754,
           "longitude": 114.333168,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3689,6 +3907,7 @@
           "latitude": 30.55439,
           "longitude": 114.342051,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3698,6 +3917,7 @@
           "latitude": 30.554689,
           "longitude": 114.3414,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3707,6 +3927,7 @@
           "latitude": 30.553268,
           "longitude": 114.341417,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3716,6 +3937,7 @@
           "latitude": 30.553546,
           "longitude": 114.340779,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3751,6 +3973,7 @@
           "latitude": 30.566494,
           "longitude": 114.189804,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3760,6 +3983,7 @@
           "latitude": 30.565997,
           "longitude": 114.188809,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3769,6 +3993,7 @@
           "latitude": 30.566603,
           "longitude": 114.187371,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3778,6 +4003,7 @@
           "latitude": 30.567063,
           "longitude": 114.189418,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3813,6 +4039,7 @@
           "latitude": 30.547717,
           "longitude": 114.302353,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3822,6 +4049,7 @@
           "latitude": 30.547486,
           "longitude": 114.302753,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3831,6 +4059,7 @@
           "latitude": 30.546171,
           "longitude": 114.302256,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3866,6 +4095,7 @@
           "latitude": 30.560334,
           "longitude": 114.30864,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3875,6 +4105,7 @@
           "latitude": 30.561774,
           "longitude": 114.309458,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3884,6 +4115,7 @@
           "latitude": 30.56219,
           "longitude": 114.308928,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3893,6 +4125,7 @@
           "latitude": 30.560589,
           "longitude": 114.308032,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3928,6 +4161,7 @@
           "latitude": 30.500555,
           "longitude": 114.431119,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3937,6 +4171,7 @@
           "latitude": 30.499992,
           "longitude": 114.430686,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3946,6 +4181,7 @@
           "latitude": 30.499473,
           "longitude": 114.431331,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -3981,6 +4217,7 @@
           "latitude": 30.484878,
           "longitude": 114.511575,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3990,6 +4227,7 @@
           "latitude": 30.484484,
           "longitude": 114.512719,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -3999,6 +4237,7 @@
           "latitude": 30.484422,
           "longitude": 114.513506,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4008,6 +4247,7 @@
           "latitude": 30.485281,
           "longitude": 114.513764,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4017,6 +4257,7 @@
           "latitude": 30.485541,
           "longitude": 114.512715,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4052,6 +4293,7 @@
           "latitude": 30.505095,
           "longitude": 114.171433,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4061,6 +4303,7 @@
           "latitude": 30.506529,
           "longitude": 114.171921,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4070,6 +4313,7 @@
           "latitude": 30.506805,
           "longitude": 114.171238,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4079,6 +4323,7 @@
           "latitude": 30.50575,
           "longitude": 114.170376,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4114,6 +4359,7 @@
           "latitude": 30.488762,
           "longitude": 114.535179,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4123,6 +4369,7 @@
           "latitude": 30.487969,
           "longitude": 114.534988,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4132,6 +4379,7 @@
           "latitude": 30.48802,
           "longitude": 114.532973,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4141,6 +4389,7 @@
           "latitude": 30.489056,
           "longitude": 114.533981,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -4176,6 +4425,7 @@
           "latitude": 30.631448,
           "longitude": 114.322808,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4211,6 +4461,7 @@
           "latitude": 30.562638,
           "longitude": 114.210814,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4220,6 +4471,7 @@
           "latitude": 30.562549,
           "longitude": 114.209909,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4229,6 +4481,7 @@
           "latitude": 30.561637,
           "longitude": 114.209516,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4264,6 +4517,7 @@
           "latitude": 30.600208,
           "longitude": 114.376791,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4273,6 +4527,7 @@
           "latitude": 30.598801,
           "longitude": 114.376812,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4282,6 +4537,7 @@
           "latitude": 30.599574,
           "longitude": 114.3774,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4291,6 +4547,7 @@
           "latitude": 30.600192,
           "longitude": 114.37866,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4300,6 +4557,7 @@
           "latitude": 30.600639,
           "longitude": 114.379629,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4309,6 +4567,7 @@
           "latitude": 30.600939,
           "longitude": 114.380354,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4318,6 +4577,7 @@
           "latitude": 30.601256,
           "longitude": 114.379827,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4327,6 +4587,7 @@
           "latitude": 30.60037,
           "longitude": 114.377875,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4336,6 +4597,7 @@
           "latitude": 30.599429,
           "longitude": 114.375989,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4371,6 +4633,7 @@
           "latitude": 30.47513,
           "longitude": 114.31358,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4380,6 +4643,7 @@
           "latitude": 30.475006,
           "longitude": 114.313006,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4389,6 +4653,7 @@
           "latitude": 30.473432,
           "longitude": 114.313797,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4398,6 +4663,7 @@
           "latitude": 30.473312,
           "longitude": 114.313234,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4433,6 +4699,7 @@
           "latitude": 30.615083,
           "longitude": 114.164238,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4442,6 +4709,7 @@
           "latitude": 30.614867,
           "longitude": 114.163832,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4477,6 +4745,7 @@
           "latitude": 30.485718,
           "longitude": 114.503105,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4486,6 +4755,7 @@
           "latitude": 30.485712,
           "longitude": 114.502627,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4495,6 +4765,7 @@
           "latitude": 30.484475,
           "longitude": 114.502635,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4504,6 +4775,7 @@
           "latitude": 30.484479,
           "longitude": 114.503124,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4513,6 +4785,7 @@
           "latitude": 30.48487,
           "longitude": 114.5035,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4522,6 +4795,7 @@
           "latitude": 30.485298,
           "longitude": 114.503503,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4531,6 +4805,7 @@
           "latitude": 30.484881,
           "longitude": 114.502231,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4582,6 +4857,7 @@
           "latitude": 30.552157,
           "longitude": 114.346257,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -4591,6 +4867,7 @@
           "latitude": 30.551957,
           "longitude": 114.346746,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -4600,6 +4877,7 @@
           "latitude": 30.551737,
           "longitude": 114.345717,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -4609,6 +4887,7 @@
           "latitude": 30.550597,
           "longitude": 114.345822,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -4644,6 +4923,7 @@
           "latitude": 30.553512,
           "longitude": 114.305252,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4653,6 +4933,7 @@
           "latitude": 30.55494,
           "longitude": 114.305016,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4688,6 +4969,7 @@
           "latitude": 30.443477,
           "longitude": 114.263016,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4697,6 +4979,7 @@
           "latitude": 30.443568,
           "longitude": 114.262796,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4706,6 +4989,7 @@
           "latitude": 30.442939,
           "longitude": 114.262749,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4715,6 +4999,7 @@
           "latitude": 30.443001,
           "longitude": 114.262526,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4750,6 +5035,7 @@
           "latitude": 30.542278,
           "longitude": 114.301508,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4759,6 +5045,7 @@
           "latitude": 30.541991,
           "longitude": 114.301875,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4794,6 +5081,7 @@
           "latitude": 30.479228,
           "longitude": 114.292857,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4803,6 +5091,7 @@
           "latitude": 30.47926,
           "longitude": 114.293376,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4812,6 +5101,7 @@
           "latitude": 30.478257,
           "longitude": 114.29339,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4847,6 +5137,7 @@
           "latitude": 30.580718,
           "longitude": 114.226662,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4856,6 +5147,7 @@
           "latitude": 30.580164,
           "longitude": 114.22613,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4891,6 +5183,7 @@
           "latitude": 30.530341,
           "longitude": 114.340275,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4900,6 +5193,7 @@
           "latitude": 30.529878,
           "longitude": 114.341503,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4909,6 +5203,7 @@
           "latitude": 30.530309,
           "longitude": 114.342087,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4918,6 +5213,7 @@
           "latitude": 30.530519,
           "longitude": 114.341485,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4927,6 +5223,7 @@
           "latitude": 30.530954,
           "longitude": 114.34015,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -4962,6 +5259,7 @@
           "latitude": 30.683426,
           "longitude": 114.372746,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4971,6 +5269,7 @@
           "latitude": 30.683963,
           "longitude": 114.37397,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4980,6 +5279,7 @@
           "latitude": 30.68435,
           "longitude": 114.373653,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -4989,6 +5289,7 @@
           "latitude": 30.683832,
           "longitude": 114.372536,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -5024,6 +5325,7 @@
           "latitude": 30.506422,
           "longitude": 114.227868,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -5059,6 +5361,7 @@
           "latitude": 30.552811,
           "longitude": 114.243355,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5068,6 +5371,7 @@
           "latitude": 30.553331,
           "longitude": 114.243623,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5077,6 +5381,7 @@
           "latitude": 30.553961,
           "longitude": 114.241855,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5086,6 +5391,7 @@
           "latitude": 30.553485,
           "longitude": 114.2417,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -5137,6 +5443,7 @@
           "latitude": 30.515978,
           "longitude": 114.350762,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -5146,6 +5453,7 @@
           "latitude": 30.51389,
           "longitude": 114.350547,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5155,6 +5463,7 @@
           "latitude": 30.516338,
           "longitude": 114.350065,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -5190,6 +5499,7 @@
           "latitude": 30.504525,
           "longitude": 114.382099,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5199,6 +5509,7 @@
           "latitude": 30.504923,
           "longitude": 114.383651,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5208,6 +5519,7 @@
           "latitude": 30.505047,
           "longitude": 114.381885,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5217,6 +5529,7 @@
           "latitude": 30.505204,
           "longitude": 114.383635,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5226,6 +5539,7 @@
           "latitude": 30.505318,
           "longitude": 114.381784,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -5261,6 +5575,7 @@
           "latitude": 30.564388,
           "longitude": 114.173348,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -5270,6 +5585,7 @@
           "latitude": 30.565243,
           "longitude": 114.173318,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -5321,6 +5637,7 @@
           "latitude": 30.487096,
           "longitude": 114.479907,
           "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -5330,6 +5647,7 @@
           "latitude": 30.486964,
           "longitude": 114.481293,
           "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -5339,6 +5657,7 @@
           "latitude": 30.487806,
           "longitude": 114.479822,
           "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]

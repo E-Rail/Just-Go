@@ -32,7 +32,7 @@ module OSSDataValidators
   # open-data source for its entrances, absent everywhere else.
   OPTIONAL_STATION_KEYS = %w[stationAccessPoints].freeze
   REQUIRED_ACCESS_POINT_KEYS = %w[
-    id name kind latitude longitude isAccessible source
+    id name kind latitude longitude isAccessible stepFree source
   ].freeze
   ACCESS_POINT_KINDS = %w[entrance exit elevator escalator unknown].freeze
   ACCESS_POINT_SOURCES = %w[specificEntrance localStationData].freeze
@@ -701,6 +701,13 @@ module OSSDataValidators
           ACCESS_POINT_SOURCES.include?(point["source"])
         fail_validation("#{city_id} access point isAccessible must be boolean") unless
           [true, false].include?(point["isAccessible"])
+        # The three-state claim the source actually carries. `isAccessible` keeps its published
+        # meaning — asserted step-free — and `stepFree` says whether a `false` is a survey or a
+        # silence. They must never disagree, or two readers of one pack answer differently.
+        fail_validation("#{city_id} access point stepFree must be yes/no/unknown") unless
+          %w[yes no unknown].include?(point["stepFree"])
+        fail_validation("#{city_id} access point stepFree disagrees with isAccessible") unless
+          point["isAccessible"] == (point["stepFree"] == "yes")
         latitude = point["latitude"]
         longitude = point["longitude"]
         unless latitude.is_a?(Numeric) && longitude.is_a?(Numeric)
@@ -800,24 +807,31 @@ module OSSDataValidators
 
     # Cities whose pack is nothing but OpenStreetMap station entrances. Beijing also carries them
     # but is pinned with the operator cities above, since its pack predates this source.
+    #
+    # `surveyedNotStepFree` counts the doors somebody stood at and recorded as unusable —
+    # `wheelchair=no` or `limited`. It is pinned separately from `accessibility` because the two
+    # used to be indistinguishable: everything that was not an unqualified `yes` was written as
+    # `isAccessible: false`, so 848 real negative surveys were stored exactly like the 8,465 doors
+    # nobody has ever looked at. Losing these again would be silent without a pin, and in Xi'an,
+    # where 455 of them are, it is the majority of what the survey actually says.
     OSM_ENTRANCE_PACK_EXPECTATIONS = {
-      "1200" => { stations: 108, exits: 344, accessibility: 5, network: 239 },
-      "3100" => { stations: 369, exits: 1430, accessibility: 56, network: 471 },
-      "3201" => { stations: 100, exits: 376, accessibility: 11, network: 210 },
-      "3205" => { stations: 53, exits: 230, accessibility: 2, network: 235 },
-      "3301" => { stations: 262, exits: 1333, accessibility: 10, network: 270 },
-      "4201" => { stations: 89, exits: 319, accessibility: 7, network: 293 },
+      "1200" => { stations: 108, exits: 344, accessibility: 5, surveyedNotStepFree: 1, network: 239 },
+      "3100" => { stations: 369, exits: 1430, accessibility: 56, surveyedNotStepFree: 128, network: 471 },
+      "3201" => { stations: 100, exits: 376, accessibility: 11, surveyedNotStepFree: 3, network: 210 },
+      "3205" => { stations: 53, exits: 230, accessibility: 2, surveyedNotStepFree: 14, network: 235 },
+      "3301" => { stations: 262, exits: 1333, accessibility: 10, surveyedNotStepFree: 18, network: 270 },
+      "4201" => { stations: 89, exits: 319, accessibility: 7, surveyedNotStepFree: 10, network: 293 },
       # Seven metro/intercity concourse pairs stopped being merged into one node and became
       # declared in-station interchanges instead (see `build_interchanges`), so the network is
       # back to its true 414. Entrances follow: 326 -> 329 stations carry exits and 1259 -> 1262
       # bind, because each half is matched against its own platform rather than against a node
       # sitting in the gap between them. The two now-ambiguous exits are at 广州白云, in range of
       # both halves — reported and dropped rather than guessed at.
-      "4401" => { stations: 329, exits: 1262, accessibility: 37, network: 414 },
-      "4403" => { stations: 321, exits: 1504, accessibility: 19, network: 372 },
-      "5000" => { stations: 83, exits: 299, accessibility: 3, network: 273 },
-      "5101" => { stations: 184, exits: 771, accessibility: 9, network: 402 },
-      "6101" => { stations: 227, exits: 920, accessibility: 164, network: 247 }
+      "4401" => { stations: 329, exits: 1262, accessibility: 37, surveyedNotStepFree: 79, network: 414 },
+      "4403" => { stations: 321, exits: 1504, accessibility: 19, surveyedNotStepFree: 44, network: 372 },
+      "5000" => { stations: 83, exits: 299, accessibility: 3, surveyedNotStepFree: 8, network: 273 },
+      "5101" => { stations: 184, exits: 771, accessibility: 9, surveyedNotStepFree: 15, network: 402 },
+      "6101" => { stations: 227, exits: 920, accessibility: 164, surveyedNotStepFree: 455, network: 247 }
     }.freeze
 
     def validate_city_expectations!(city_id, pack, network)
@@ -831,6 +845,7 @@ module OSSDataValidators
           "networkStations" => 449,
           "matchedStations" => { "covered" => 449, "total" => 449 },
           "accessibility" => { "covered" => 43, "total" => 449 },
+          # 73 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
           "staticSchedules" => { "covered" => 0, "total" => 449 },
           "liveArrivals" => { "covered" => 0, "total" => 449 },
           "externalLayouts" => { "covered" => 0, "total" => 449 },
@@ -843,6 +858,12 @@ module OSSDataValidators
         # the exact split is pinned here to catch a silent regression in either direction.
         exits = stations.sum { |station| Array(station["stationAccessPoints"]).length }
         fail_validation("Taipei pack lost station exits (#{exits})") unless exits == 388
+        # The only fully surveyed source in the app: 193 是 and 195 否 with no blanks, so every
+        # Taipei exit carries a real answer and none of them is "unknown".
+        surveyed = stations.sum do |station|
+          Array(station["stationAccessPoints"]).count { |point| point["stepFree"] != "unknown" }
+        end
+        fail_validation("Taipei exits lost their survey (#{surveyed})") unless surveyed == 388
         unless stations.all? { |station| !Array(station["stationAccessPoints"]).empty? }
           fail_validation("Taipei pack has a station with no exits")
         end
@@ -870,6 +891,15 @@ module OSSDataValidators
         end
         if stations.any? { |station| Array(station["stationAccessPoints"]).empty? }
           fail_validation("#{city_id} OSM entrance pack has a station with no exits")
+        end
+        negatives = stations.sum do |station|
+          Array(station["stationAccessPoints"]).count { |point| point["stepFree"] == "no" }
+        end
+        unless negatives == pinned.fetch(:surveyedNotStepFree)
+          fail_validation(
+            "#{city_id} surveyed-not-step-free exits drifted: #{negatives}, " \
+            "expected #{pinned.fetch(:surveyedNotStepFree)}"
+          )
         end
         total = pinned.fetch(:network)
         {

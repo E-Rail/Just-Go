@@ -15,8 +15,10 @@
 #
 # Both used to be far worse than anyone had counted. Resolving each hop independently let two
 # consecutive hops put their shared station on two different ways: 2,012 of 7,612 joins were
-# discontinuous, 26 by more than 50 m, the worst an 823 m leap through 三重國小. And an arc-length
-# floor measured against the wrong quantity discarded six real hops, among them 金鐘 → 中環.
+# discontinuous, 26 by more than 50 m, the worst an 823 m leap through 三重國小. Carrying an anchor
+# forward greedily fixed most of that and could not fix the rest, because a greedy chain commits to
+# hop *i* before it can see what hop *i+1* needs — 17 visible breaks survived, the worst 772 m at
+# 大橋頭. Solving the whole pattern at once takes that to zero.
 #
 # This file is a **reference implementation** of the shipped resolver, run over the real packs. It
 # exists because there is no Xcode test target and no other way to hold these numbers still. It has
@@ -35,8 +37,10 @@ module TrackGeometry
   CANDIDATE_DISTANCE_CAP = 900.0
   CANDIDATE_LIMIT = 4
   CANDIDATE_SEPARATION = 100.0
-  SEAM_TOLERANCE = 50.0
-  SEAM_WEIGHT = 12.0
+  SEAM_WEIGHT = 120.0
+  SEED_SEPARATION = 25.0
+  STATION_CANDIDATE_LIMIT = 6
+  CHAIN_BEAM = 48
 
   module_function
 
@@ -123,6 +127,7 @@ module TrackGeometry
         result << points[i]
       end
       result << low_point
+      result.reverse!
     end
     result.reverse! if reversed
     result
@@ -150,50 +155,63 @@ module TrackGeometry
     end.compact
   end
 
-  # Continuity first, then fit.
-  def prefers?(score, seam, other_score, other_seam)
-    joins = seam <= SEAM_TOLERANCE
-    other_joins = other_seam <= SEAM_TOLERANCE
-    return joins if joins != other_joins
+  # Where one station could sit on each of the line's ways. Every way's view of the station seeds
+  # every other way's list, because the point where two ways meet is a projection of a projection.
+  def station_candidates(coordinate, prepared)
+    per_path = prepared.map { |points, cumulative| projections(coordinate, points, cumulative) }
+    seeds = []
+    per_path.flatten.each do |candidate|
+      next if seeds.any? { |s| distance(s, candidate[:point]) < SEED_SEPARATION }
 
-    score < other_score
+      seeds << candidate[:point]
+    end
+
+    per_path.each_with_index do |list, path_index|
+      points, cumulative = prepared[path_index]
+      seeds.each do |seed|
+        projections(seed, points, cumulative).each do |carried|
+          # Both tests, always. Offset alone discards the seam candidate at a branch; position
+          # alone merges a ring's start and end, which are one point at opposite offsets.
+          next if list.any? do |existing|
+            (existing[:offset] - carried[:offset]).abs < CANDIDATE_SEPARATION &&
+              distance(existing[:point], carried[:point]) < 5
+          end
+
+          d = distance(coordinate, carried[:point])
+          next if d > CANDIDATE_DISTANCE_CAP
+
+          list << { point: carried[:point], offset: carried[:offset], distance: d }
+        end
+      end
+      per_path[path_index] = list.sort_by { |c| c[:distance] }.first(STATION_CANDIDATE_LIMIT)
+    end
+    per_path
   end
 
-  def hop(from, to, paths, anchor)
+  def chord_ends(coordinate, per_path)
+    ends = [{ point: coordinate, distance: 0.0, offset: 0.0 }]
+    per_path.flatten.each do |candidate|
+      next if ends.any? { |e| distance(e[:point], candidate[:point]) < SEED_SEPARATION }
+
+      ends << candidate
+    end
+    ends
+  end
+
+  # Every way this one hop could be drawn along, with what drawing it that way costs.
+  def hop_candidates(from, to, from_per_path, to_per_path, prepared)
     separation = distance(from, to)
     ceiling = [2.5 * separation, separation + 1_500].max
     floor = 0.75 * separation
-    best = nil
-    best_fallback = nil
 
-    paths.each_with_index do |(points, cumulative), path_index|
-      if anchor && anchor[0] == path_index
-        from_candidates = [anchor[1]]
-      else
-        from_candidates = projections(from, points, cumulative)
-        if anchor
-          projections(anchor[1][:point], points, cumulative).each do |carried|
-            next if from_candidates.any? { |c| (c[:offset] - carried[:offset]).abs < CANDIDATE_SEPARATION }
+    track = []
+    prepared.each_with_index do |(points, cumulative), path_index|
+      heads = from_per_path[path_index]
+      tails = to_per_path[path_index]
+      next if heads.empty? || tails.empty?
 
-            from_candidates << carried
-          end
-        end
-      end
-      to_candidates = projections(to, points, cumulative)
-      next if from_candidates.empty? || to_candidates.empty?
-
-      from_candidates.each do |f|
-        to_candidates.each do |t|
-          next_anchor = [path_index, t]
-          entry_seam = anchor ? distance(anchor[1][:point], f[:point]) : 0.0
-          off_track = 3 * (f[:distance] + t[:distance])
-
-          fallback_score = off_track + (SEAM_WEIGHT * entry_seam)
-          if best_fallback.nil? ||
-             prefers?(fallback_score, entry_seam, best_fallback[0], best_fallback[1])
-            best_fallback = [fallback_score, entry_seam, [f[:point], t[:point]], next_anchor, :chord]
-          end
-
+      heads.each do |f|
+        tails.each do |t|
           candidate = slice(points, cumulative, f, t)
           next if candidate.size < 2
 
@@ -204,29 +222,66 @@ module TrackGeometry
           joined = deduplicated(candidate)
           next if joined.size < 2
 
-          head = distance(joined.first, from) <= distance(joined.last, from) ? joined.first : joined.last
-          seam = anchor ? distance(anchor[1][:point], head) : 0.0
-          score = arc + off_track + (SEAM_WEIGHT * seam)
-          best = [score, seam, joined, next_anchor, :track] if best.nil? || prefers?(score, seam, best[0], best[1])
+          track << { head: joined.first, tail: joined.last, geometry: joined,
+                     cost: arc + (3 * (f[:distance] + t[:distance])) }
         end
       end
     end
+    return [track, :track] unless track.empty?
 
-    chosen = best || best_fallback
-    return [[from, to], nil, :chord] if chosen.nil?
-
-    geometry = chosen[2]
-    geometry = geometry.reverse if distance(geometry.first, from) > distance(geometry.last, from)
-    [geometry, chosen[3], chosen[4]]
+    # Nothing on this line reaches both stations, so the hop is a straight line and the only
+    # question left is where to draw it from — every point either station could sit at is offered,
+    # so the chain can begin it exactly where its known track ran out.
+    chords = []
+    chord_ends(from, from_per_path).each do |f|
+      chord_ends(to, to_per_path).each do |t|
+        chords << { head: f[:point], tail: t[:point], geometry: [f[:point], t[:point]],
+                    cost: distance(f[:point], t[:point]) + (3 * (f[:distance] + t[:distance])) }
+      end
+    end
+    [chords, :chord]
   end
 
-  def resolve_pattern(coordinates, paths)
-    anchor = nil
-    coordinates.each_cons(2).map do |from, to|
-      geometry, next_anchor, kind = hop(from, to, paths, anchor)
-      anchor = next_anchor
-      [geometry, kind]
+  # Shortest path through a layered graph: one layer per hop, one node per way the hop could be
+  # drawn along, edges weighted by the gap they would leave at the station two hops share.
+  def resolve(coordinates, prepared)
+    per_station = coordinates.map { |c| station_candidates(c, prepared) }
+    kinds = []
+    layers = []
+
+    coordinates.each_cons(2).with_index do |(from, to), index|
+      candidates, kind = hop_candidates(from, to, per_station[index], per_station[index + 1], prepared)
+      kinds << kind
+      previous = layers.last
+      layer = candidates.map do |candidate|
+        if previous.nil?
+          { cost: candidate[:cost], tail: candidate[:tail], geometry: candidate[:geometry], back: 0 }
+        else
+          best_cost = Float::INFINITY
+          best_index = 0
+          previous.each_with_index do |state, state_index|
+            reached = state[:cost] + (SEAM_WEIGHT * distance(state[:tail], candidate[:head]))
+            if reached < best_cost
+              best_cost = reached
+              best_index = state_index
+            end
+          end
+          { cost: best_cost + candidate[:cost], tail: candidate[:tail],
+            geometry: candidate[:geometry], back: best_index }
+        end
+      end
+      layer = layer.sort_by { |s| s[:cost] }.first(CHAIN_BEAM) if layer.size > CHAIN_BEAM
+      layers << layer
     end
+
+    chain = Array.new(layers.size) { [] }
+    state_index = layers.last.each_index.min_by { |i| layers.last[i][:cost] }
+    (layers.size - 1).downto(0) do |layer_index|
+      state = layers[layer_index][state_index]
+      chain[layer_index] = state[:geometry]
+      state_index = state[:back]
+    end
+    chain.each_with_index.map { |geometry, i| [geometry, kinds[i]] }
   end
 end
 
@@ -253,7 +308,7 @@ def measure_bundled_track
         next if coordinates.any?(&:nil?) || coordinates.size < 2
 
         previous = nil
-        TrackGeometry.resolve_pattern(coordinates, prepared).each do |geometry, kind|
+        TrackGeometry.resolve(coordinates, prepared).each do |geometry, kind|
           hops += 1
           chords += 1 if kind == :chord
           gaps << TrackGeometry.distance(previous, geometry.first) if previous
@@ -276,28 +331,31 @@ class TrackGeometryTest < Minitest::Test
   end
 
   def test_almost_every_hop_draws_real_track
-    # 9 with the shipped resolver. These are hops where no way on the line reaches both stations:
-    # 南口 → 八达岭 and 康庄 → 沙城 on the S2 line, 清河 → 昌平北 on 怀密线, 馬場 → 沙田, and four
-    # tram pairs. Each is drawn as a straight line, which is the honest rendering of "no track
-    # here", not a bug to be papered over.
-    assert_operator MEASURED[:chords], :<=, 11,
-                    "more hops lost their track geometry (was 9 of 8,015)"
+    # 6 with the shipped resolver, in 4 distinct pairs: 南口 → 八达岭 and 康庄 → 沙城 on the S2
+    # line, 清河 → 昌平北 on 怀密线, and 馬場 → 沙田 across the East Rail racecourse spur. No way on
+    # any of those lines reaches both stations, so each is drawn as a straight line — the honest
+    # rendering of "there is no track here in the data", not a bug to be papered over.
+    assert_operator MEASURED[:chords], :<=, 8,
+                    "more hops lost their track geometry (was 6 of 8,015)"
   end
 
   def test_legs_hold_together_at_their_joins
     gaps = MEASURED[:gaps]
     # A leg is one polyline, so a join gap is drawn as a straight segment through the station.
     # Under 1 m is a rounding artefact of two projections onto the same point.
-    assert_operator gaps.count { |g| g > 1 }, :<=, 90,
-                    "more joins came apart (was 75 of 7,612)"
-    # The visible ones. 17 remain, all of them OSM ways that genuinely do not meet near the shared
-    # station; closing those would mean drawing track the train does not run on.
-    assert_operator gaps.count { |g| g > 50 }, :<=, 20,
-                    "more joins broke visibly (was 17 of 7,612)"
+    assert_operator gaps.count { |g| g > 1 }, :<=, 30,
+                    "more joins came apart (was 19 of 7,612)"
+    # The visible ones. This is the number the whole design exists for and it is zero: solving a
+    # pattern as a chain rather than hop by hop means a break is only ever accepted when no chain
+    # avoids it, and across the bundled data none has to be.
+    assert_equal 0, gaps.count { |g| g > 50 },
+                 "a join broke visibly; the chain solver accepted a seam it should have routed around"
   end
 
   def test_the_worst_join_has_not_got_worse
-    assert_operator MEASURED[:gaps].max, :<=, 900,
-                    "the widest join gap grew (was 772 m, at 大橋頭 on 台北捷運中和新蘆線)"
+    # 13.5 m, which is a way-to-way seam in the source data and not a chosen discontinuity. The
+    # bound is set below the 50 m the test above calls visible, so this fails first.
+    assert_operator MEASURED[:gaps].max, :<=, 40,
+                    "the widest join gap grew (was 13.5 m)"
   end
 end

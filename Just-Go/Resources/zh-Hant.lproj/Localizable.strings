@@ -137,7 +137,6 @@
 "Apple Maps walking directions mention stairs." = "Apple 地圖步行指引提到樓梯。";
 "Complete Trip" = "完成行程";
 "First" = "首班";
-"My Trips" = "我的行程";
 "No Quick Tags yet" = "暫無快捷標籤";
 "No trip history yet" = "暫無行程歷史";
 "Official accessibility data is not available for this station yet." = "本站暫未提供官方無障礙資料。";
@@ -175,7 +174,6 @@
 "Train times" = "列車時刻";
 "Notifications" = "通知";
 "Avg duration" = "平均時長";
-"My Activity" = "我的活動";
 "Total trips" = "總行程";
 "This month" = "本月";
 "Your stats" = "我的統計";

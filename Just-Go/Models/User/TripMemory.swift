@@ -52,6 +52,14 @@ struct TripRecord: Identifiable, Codable, Equatable {
     let createdAt: Date
     var completedAt: Date?
     var note: String?
+    /// The two ends, as station IDs rather than the names above, because a name cannot be planned
+    /// from: two cities share plenty of them and a rider's own history should not be re-matched by
+    /// string. Optional because rows saved before this field existed have neither, and those rows
+    /// simply do not offer to replan — the same shape `RecentRoute.cityID` already uses.
+    var originStationID: String?
+    var destinationStationID: String?
+
+    var canReplan: Bool { originStationID != nil && destinationStationID != nil }
 
     var isCompleted: Bool {
         completedAt != nil

@@ -135,6 +135,12 @@ struct MapContainerView: View {
             guard let pending else { return }
             beginPlan(to: pending)
         }
+        // Same shape, from the Trips tab, which has both ends of a journey and no way to plan one.
+        .onChange(of: appState.pendingTripReplay) { _, replay in
+            guard let replay else { return }
+            appState.pendingTripReplay = nil
+            replayTrip(replay)
+        }
         // The planner's `basePreference` had no writer, so everything set in Accessibility
         // Settings: step-free requirement, lift preference, avoid-stairs, and the walking-distance
         // limit the long-walk warning is measured against. Stopped at the settings screen and
@@ -157,6 +163,27 @@ struct MapContainerView: View {
     /// end that did resolve is still filled and the plan is *not* run. The results header then
     /// shows which end is missing, which is a truthful half-answer rather than a journey planned
     /// from a guessed endpoint.
+    /// Plans a trip the rider picked out of their own history, from the Trips tab.
+    ///
+    /// Deliberately the same resolution as `replayRecentTrip`: both ends are looked up among the
+    /// city's own stations by ID, and nothing is planned unless both are found. A history row that
+    /// predates the stored IDs never offers this, so there is no name matching anywhere in it.
+    private func replayTrip(_ replay: AppState.PendingTripReplay) {
+        let planner = self.planner
+        path = [.results]
+        planTask?.cancel()
+        planTask = Task {
+            let stations = await container.stationSearchService.stations(in: replay.cityID)
+            let origin = stations.first { $0.stationID == replay.originStationID }
+            let destination = stations.first { $0.stationID == replay.destinationStationID }
+            guard !Task.isCancelled else { return }
+            if let origin { planner.selectPlace(origin.asTransitPlace, for: .origin) }
+            if let destination { planner.selectPlace(destination.asTransitPlace, for: .destination) }
+            guard origin != nil, destination != nil else { return }
+            _ = await planner.searchRoutes()
+        }
+    }
+
     private func replayRecentTrip(_ trip: RecentRoute) {
         let planner = self.planner
         path = [.results]

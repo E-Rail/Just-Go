@@ -45,6 +45,7 @@ struct LiveGoTripBuilder {
                     stopCount: 0,
                     walkingDistance: 0,
                     duration: segment.duration,
+                    notes: segment.accessibilityNotes,
                     transferCoordinate: transferStop?.coordinate,
                     segmentIndex: index,
                     transferContext: segment.transferContext

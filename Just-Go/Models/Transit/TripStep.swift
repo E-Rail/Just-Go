@@ -31,6 +31,14 @@ struct TripStep: Identifiable, Equatable {
     /// until now. "One more stop" is not the same instruction as "get off next" and this is the
     /// only thing on the screen that can say which.
     var alightAfterStationName: String? = nil
+    /// What the route already knows about this change, in the assembler's own words.
+    ///
+    /// For an out-of-station interchange that is "Leave the station and walk to X" and, where the
+    /// operator treats it as one journey, "Counts as one trip, with no second fare". The route
+    /// screen has shown these from `RouteSegment.accessibilityNotes` all along; Live Go never
+    /// copied them onto the step, so the rider standing at the gate deciding whether to tap out
+    /// was the one person not told. It is money, and a wrong guess costs a fare.
+    var notes: [String] = []
     /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
     /// separately verified indoor guidance.
     /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working.

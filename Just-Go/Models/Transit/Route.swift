@@ -63,6 +63,19 @@ struct Route: Identifiable, Codable {
     /// which for a rider on a late shift is the part that decides whether they run for the train.
     var missedTrainTaxiYuan: Double?
 
+    /// The two ends of the whole journey on the ground, for handing it to an app that drives it.
+    ///
+    /// Taken from the drawn geometry rather than from a station record, because the rider's origin
+    /// is wherever the first leg starts — a doorstep, a dropped pin — and not necessarily a station
+    /// at all. `nil` when nothing was drawn, in which case no handoff is offered.
+    var groundOrigin: CodableCoordinate? {
+        segments.first { !$0.polylineCoordinates.isEmpty }?.polylineCoordinates.first
+    }
+
+    var groundDestination: CodableCoordinate? {
+        segments.last { !$0.polylineCoordinates.isEmpty }?.polylineCoordinates.last
+    }
+
     var boardingTransitSegment: RouteSegment? {
         segments.first { $0.type.isTransit }
     }

@@ -75,6 +75,8 @@ struct LiveGoView: View {
     // environment value propagated and would otherwise flash system blue.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @Environment(AppState.self) private var appState
+    @Environment(TripMemoryService.self) private var tripMemoryService
+    @State private var asksPostTripQuestions = false
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?
     // Accessibility step-change effects (无障碍 sheet): speech, haptics, visual banner.
@@ -182,12 +184,45 @@ struct LiveGoView: View {
 
     /// Leaving guidance. Presented, that is a dismissal; embedded, the host decides what the page
     /// becomes next, so it is told rather than dismissed out from under.
-    private func exit() {
+    private func leave() {
         if let onExit { onExit() } else { dismiss() }
+    }
+
+    /// Ending a trip finishes it in the rider's history, and may ask the one or two things the app
+    /// could not answer for it.
+    ///
+    /// The history used to depend on the rider separately remembering to open the trip card and
+    /// tap "Log this trip": `markTripComplete` had exactly one caller and it was that button, so
+    /// finishing a guided journey recorded nothing at all. Both ways into this view end here, so
+    /// both now record.
+    ///
+    /// The questions are asked *before* leaving rather than after, because the screen that comes
+    /// next already presents a sheet of its own and two presentations on one node is a failure
+    /// this app has shipped twice.
+    private func exit() {
+        let cityID = viewModel.route.networkCityID ?? ""
+        tripMemoryService.markTripComplete(route: viewModel.route, cityID: cityID)
+        let questions = PostTripQuestionsSheet.questions(for: viewModel.route, cityID: cityID) {
+            container.riderAnswerService.hasAnswered($0)
+        }
+        if questions.isEmpty {
+            leave()
+        } else {
+            asksPostTripQuestions = true
+        }
     }
 
     var body: some View {
         navigatorSurface
+        .sheet(isPresented: $asksPostTripQuestions) {
+            PostTripQuestionsSheet(
+                route: viewModel.route,
+                cityID: viewModel.route.networkCityID ?? ""
+            ) {
+                asksPostTripQuestions = false
+                leave()
+            }
+        }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             // Continuous fixes drive the puck and off-route detection; ended on disappear.

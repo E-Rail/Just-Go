@@ -213,15 +213,18 @@ struct SettingsView: View {
             }
             .alert(forgetAnswersTitle, isPresented: $showForgetAnswersConfirmation) {
                 Button(forgetAnswersTitle, role: .destructive) {
+                    // Both stores, or the control lies. Post-trip answers about lifts and exits
+                    // are the same kind of thing as a transfer rating and are kept the same way.
                     container.transferInsightService.forgetEverything()
+                    container.riderAnswerService.forgetEverything()
                     didForgetAnswers = true
                 }
                 Button(AppLocalization.localized("Cancel"), role: .cancel) {}
             } message: {
                 Text(AppLocalization.text(
-                    english: "Your transfer ratings live on this phone and nowhere else. This removes them.",
-                    simplified: "您的换乘评价只存在本机。此操作会将其删除。",
-                    traditional: "您的換乘評價只存在本機。此操作會將其刪除。"
+                    english: "Your answers live on this phone and nowhere else. This removes them.",
+                    simplified: "您的回答只存在本机。此操作会将其删除。",
+                    traditional: "您的回答只存在本機。此操作會將其刪除。"
                 ))
             }
         } header: {
@@ -250,9 +253,9 @@ struct SettingsView: View {
 
     private var forgetAnswersTitle: String {
         AppLocalization.text(
-            english: "Delete My Transfer Answers",
-            simplified: "删除我的换乘回答",
-            traditional: "刪除我的換乘回答"
+            english: "Delete My Answers",
+            simplified: "删除我的回答",
+            traditional: "刪除我的回答"
         )
     }
 

@@ -297,11 +297,17 @@ module OSSCityPackPipeline
         "latitude" => entrance.fetch("latitude").round(6),
         "longitude" => entrance.fetch("longitude").round(6),
         # OSM's wheelchair values are yes/no/limited/designated. Only an unqualified yes is
-        # reported as step-free; "limited" is precisely the case a rider must not be told is fine,
-        # and an untagged entrance — most of them — is simply not a step-free claim. The UI shows
-        # the green wheelchair only for true, so false reads as "not asserted" rather than as
-        # "surveyed and inaccessible".
+        # reported as step-free; "limited" is precisely the case a rider must not be told is fine.
+        #
+        # `isAccessible` keeps its original meaning — "asserted step-free" — because it is part of
+        # the published Universal City Data contract and every existing reader treats it that way.
+        # But `== true` was the *only* thing recorded, and it collapsed two different facts into
+        # one: a door somebody surveyed and marked `no`, and a door nobody has ever looked at.
+        # Measured across the vendored entrance data, that discarded 848 negative surveys (784
+        # `no`, 64 `limited`) against 570 positives — more doors are surveyed unusable than usable,
+        # and Xi'an alone loses 455 of them. `stepFree` carries the distinction the source has.
         "isAccessible" => accessible_wheelchair_value?(entrance["wheelchair"]) == true,
+        "stepFree" => step_free_claim(entrance["wheelchair"]),
         "source" => "specificEntrance"
       }
     end
@@ -310,6 +316,16 @@ module OSSCityPackPipeline
       case value.to_s.strip.downcase
       when "yes", "designated" then true
       when "no", "limited" then false
+      end
+    end
+
+    # Three states, because the source has three. "unknown" is the honest word for an untagged
+    # door and it is the overwhelming majority; it must never render as a negative claim.
+    def step_free_claim(value)
+      case accessible_wheelchair_value?(value)
+      when true then "yes"
+      when false then "no"
+      else "unknown"
       end
     end
 
@@ -519,7 +535,12 @@ module OSSCityPackPipeline
         longitude = Float(row.fetch("經度"))
         # The open data is WGS-84; everything the app draws is GCJ-02 (see Scripts/lib/gcj02.rb).
         latitude, longitude = GCJ02.from_wgs84(latitude, longitude)
-        accessible = row.fetch("是否為無障礙用").to_s.strip == "是"
+        # Taipei is the one source that has surveyed every door: 193 是 and 195 否 across the
+        # whole file, with no blanks. So its negatives are real negatives — this is the only city
+        # where "this exit is not step-free" can be said about every exit it has.
+        surveyed = row.fetch("是否為無障礙用").to_s.strip
+        accessible = surveyed == "是"
+        claim = surveyed == "是" ? "yes" : (surveyed == "否" ? "no" : "unknown")
         record.fetch("stationAccessPoints") << {
           "id" => "#{canonical.fetch("id")}-#{label.empty? ? "exit" : label}",
           "name" => source_name,
@@ -527,6 +548,7 @@ module OSSCityPackPipeline
           "latitude" => latitude.round(6),
           "longitude" => longitude.round(6),
           "isAccessible" => accessible,
+          "stepFree" => claim,
           "source" => "specificEntrance"
         }
       end

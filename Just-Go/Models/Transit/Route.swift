@@ -641,9 +641,38 @@ struct StationAccessPoint: Identifiable, Codable, NamedStationDoor {
     let kind: AccessPointKind
     let coordinate: CodableCoordinate?
     let isAccessible: Bool
+    /// What the survey actually says, which `isAccessible` alone cannot express.
+    ///
+    /// `isAccessible` means "asserted step-free" and keeps that meaning — it is part of the
+    /// published Universal City Data contract. But a `false` used to mean two entirely different
+    /// things: a door somebody stood at and recorded as unusable, and a door nobody has ever
+    /// looked at. Across the bundled packs those are 1,043 and 8,465 doors respectively, and a
+    /// wheelchair user deciding which exit to walk to needs them told apart.
+    ///
+    /// Defaults to `.unknown` so a pack written before this field decodes as silence rather than
+    /// as a claim.
+    var stepFree: StepFreeClaim = .unknown
     let notes: [String]
     let source: RouteAccessPointSource
     let confidence: DataConfidence
+}
+
+/// Three states, because the sources have three. Never collapse this back to a Bool.
+enum StepFreeClaim: String, Codable, Equatable, Sendable {
+    /// Surveyed and step-free.
+    case yes
+    /// Surveyed and **not** step-free. A real finding, not an absence.
+    case no
+    /// Nobody has looked. The majority of every OSM-sourced pack, and never a negative claim.
+    case unknown
+
+    /// `yes` beats `no` beats `unknown` when two doors merge into one row: a station with one
+    /// step-free entrance has step-free access, and a surveyed negative still outranks silence.
+    static func merging(_ lhs: StepFreeClaim, _ rhs: StepFreeClaim) -> StepFreeClaim {
+        if lhs == .yes || rhs == .yes { return .yes }
+        if lhs == .no || rhs == .no { return .no }
+        return .unknown
+    }
 }
 
 /// The eight-point compass sector an entrance sits in, measured from its station.
@@ -699,6 +728,9 @@ struct StationAccessPointGroup: Identifiable {
     let count: Int
     /// True when any entrance in the group is recorded as step-free.
     let isAccessible: Bool
+    /// The strongest claim in the group: step-free if any door is, otherwise a surveyed negative
+    /// if any door carries one, otherwise silence.
+    var stepFree: StepFreeClaim = .unknown
 
     /// Entrances imported from OpenStreetMap are named by the letter on the sign. "C", "A1",
     /// because that is all the survey records. On a map pin that is exactly right, but a list of
@@ -737,7 +769,8 @@ extension Collection where Element == StationAccessPoint {
                     id: point.id,
                     name: name,
                     count: 1,
-                    isAccessible: point.isAccessible
+                    isAccessible: point.isAccessible,
+                    stepFree: point.stepFree
                 ))
                 continue
             }
@@ -746,7 +779,8 @@ extension Collection where Element == StationAccessPoint {
                 id: existing.id,
                 name: existing.name,
                 count: existing.count + 1,
-                isAccessible: existing.isAccessible || point.isAccessible
+                isAccessible: existing.isAccessible || point.isAccessible,
+                stepFree: StepFreeClaim.merging(existing.stepFree, point.stepFree)
             )
         }
         return groups

@@ -1375,7 +1375,37 @@ struct RouteDetailView: View {
     /// caveat printed twice reads as two separate problems.
     private func legNotes(for segment: RouteSegment, index: Int) -> [String] {
         var seen = Set<String>()
-        return (segment.accessibilityNotes + accessNotes(for: index)).filter { seen.insert($0).inserted }
+        let all = segment.accessibilityNotes + accessNotes(for: index) + doorAccessNotes(for: index)
+        return all.filter { seen.insert($0).inserted }
+    }
+
+    /// What the app already worked out about the door it just named.
+    ///
+    /// `RouteAccessPoint.isWheelchairLikely` and `.hasElevatorHint` are written in two places and
+    /// were read in none. The leg above this already prints the door — "Walk to Exit C" — and the
+    /// one thing a rider who needs a lift wants to know about that door was sitting one field away
+    /// from where it was drawn.
+    ///
+    /// Only positives. A door with neither flag says nothing here, because the flags are built
+    /// from what a source asserted and their absence is silence rather than a negative finding.
+    private func doorAccessNotes(for index: Int) -> [String] {
+        guard let point = accessGuide(for: index)?.accessPoint else { return [] }
+        var notes: [String] = []
+        if point.isWheelchairLikely {
+            notes.append(AppLocalization.text(
+                english: "This entrance is recorded as step-free",
+                simplified: "该出入口记录为无障碍",
+                traditional: "該出入口記錄為無障礙"
+            ))
+        }
+        if point.hasElevatorHint, !point.isWheelchairLikely {
+            notes.append(AppLocalization.text(
+                english: "This entrance is recorded as having a lift",
+                simplified: "该出入口记录有电梯",
+                traditional: "該出入口記錄有電梯"
+            ))
+        }
+        return notes
     }
 
     private func journeyDetail(_ segment: RouteSegment, index: Int) -> String? {

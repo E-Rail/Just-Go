@@ -28,10 +28,25 @@ struct StationAccessPointRow: View {
                         traditional: "\(group.count) 個出入口"
                     ))
             }
-            if group.isAccessible {
+            // Three states, three treatments, and only two of them say anything. `.unknown` is the
+            // overwhelming majority of every OSM-sourced pack — 8,465 doors against 1,043 surveyed
+            // negatives — and it is silence, not a warning. Labelling it would turn "nobody has
+            // looked" into "this is not step-free", which is the one thing this app must not do.
+            switch group.stepFree {
+            case .yes:
                 Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))
                     .font(.caption2)
                     .foregroundStyle(.green)
+            case .no:
+                Text(AppLocalization.text(
+                    english: "Not step-free",
+                    simplified: "非无障碍",
+                    traditional: "非無障礙"
+                ))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            case .unknown:
+                EmptyView()
             }
             Spacer()
         }

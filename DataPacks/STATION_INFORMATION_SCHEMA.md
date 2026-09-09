@@ -99,7 +99,7 @@ and a rider needs the one they are travelling in.
 |---|---|---|
 | `name` | string | Exit label, e.g. `A`, `B2`. |
 | `details` | array of string | Landmarks the provider associates with the exit. |
-| `isAccessible` | boolean \| null | Null means *not stated*, which is not the same as `false`. |
+| `isAccessible` | boolean \| null | Null means *not stated*, which is not the same as `false`. The app renders all three: step-free, surveyed and not step-free, and unstated. It used to test `== true`, which collapsed the last two — Shanghai's `w_n.png` is the only genuinely surveyed per-exit negative in any live source and it rendered as though nobody had looked. Bundled packs carry the same distinction in `stationAccessPoints[].stepFree`. |
 
 ### `facilityGroups[]`
 

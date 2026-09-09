@@ -1855,6 +1855,9 @@ private struct OfficialAccessPoint: Decodable {
     let latitude: Double?
     let longitude: Double?
     let isAccessible: Bool?
+    /// Absent in a pack written before the three-state claim existed, which decodes as `.unknown`
+    /// — silence, which is what such a pack was actually recording.
+    let stepFree: String?
     let notes: [String]?
     let source: String?
 
@@ -1866,6 +1869,7 @@ private struct OfficialAccessPoint: Decodable {
             kind: AccessPointKind(rawValue: kind ?? "") ?? .exit,
             coordinate: coordinate,
             isAccessible: isAccessible ?? false,
+            stepFree: StepFreeClaim(rawValue: stepFree ?? "") ?? .unknown,
             notes: notes ?? [],
             source: RouteAccessPointSource(rawValue: source ?? "") ?? .specificEntrance,
             confidence: .official

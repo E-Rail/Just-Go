@@ -5,24 +5,24 @@ enum AppWebLinks {
     static let termsOfService = URL(string: "https://e-rail.github.io/just-go/docs/terms/")!
 }
 
-/// The five screens Profile can open. One `sheet(item:)` rather than five `sheet(isPresented:)`
-/// on the same node: stacked presentation modifiers are a documented failure class in this app
-/// already: `RouteDetailView` carries the same note about `navigationDestination(item:)`. Where
-/// one registration shadows another and the shadowed row simply stops opening. Settings was the
-/// fourth of the five, and the fourth is exactly the one riders reported as dead.
+/// The three screens Profile can open. One `sheet(item:)` rather than one `sheet(isPresented:)`
+/// each: stacked presentation modifiers are a documented failure class in this app already, where
+/// one registration shadows another and the shadowed row simply stops opening. `RouteDetailView`
+/// carries the same note about `navigationDestination(item:)`. Settings was the row riders
+/// reported as dead.
+///
+/// Trips and Quick Tags used to be here too. They are what the rider *owns*, not how the app
+/// behaves, and they now have their own tab.
 private enum ProfileDestination: String, Identifiable {
     case accessibility
     case transitData
-    case tripMemory
     case settings
-    case quickTags
 
     var id: String { rawValue }
 }
 
 struct ProfileView: View {
     @Environment(AppState.self) private var appState
-    @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var destination: ProfileDestination?
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.openURL) private var openURL
@@ -96,7 +96,6 @@ struct ProfileView: View {
 
     private var profileList: some View {
         List {
-            activitySection
             appSection
             aboutSection
         }
@@ -114,36 +113,18 @@ struct ProfileView: View {
         switch destination {
         case .accessibility: AccessibilitySettingsView(showsDoneButton: showsDoneButton)
         case .transitData: TransitDataView(showsDoneButton: showsDoneButton)
-        case .tripMemory: TripMemoryView(showsDoneButton: showsDoneButton)
         case .settings: SettingsView(showsDoneButton: showsDoneButton)
-        case .quickTags: QuickTagsView(showsDoneButton: showsDoneButton)
         }
     }
 
-    /// What the rider has put into the app.
-    private var activitySection: some View {
-        Section {
-            row(
-                AppLocalization.localized("Quick Tags"),
-                icon: "tag.fill",
-                detail: "\(tripMemoryService.stationQuickTags.count)"
-            ) { destination = .quickTags }
-            row(AppLocalization.localized("My Trips"), icon: "bookmark.fill") {
-                destination = .tripMemory
-            }
-        } header: {
-            Text(AppLocalization.localized("My Activity"))
-        }
-    }
-
-    /// The three screens that are not "your stuff" and not "about the app", in one group.
+    /// How the app behaves, in one group.
     ///
     /// These were three separate sections, two of which held a single row under a header that
     /// restated it — an "Accessibility" header over a row called "Accessibility Settings", a
     /// "Data Source" header over a row called "Transit Data" — and the third was a headerless
-    /// island holding Settings alone. Four headers for seven rows made a short screen read as a
-    /// long one. No header here on purpose: three rows together are a group, where one row alone
-    /// was an orphan, and any header naming the group would restate one of the rows again.
+    /// island holding Settings alone. No header here on purpose: three rows together are a group,
+    /// where one row alone was an orphan, and any header naming the group would restate one of
+    /// the rows again.
     private var appSection: some View {
         Section {
             row(AppLocalization.localized("Settings"), icon: "gearshape.fill") {

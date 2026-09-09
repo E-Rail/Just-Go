@@ -75,6 +75,7 @@ final class AppState {
     /// the map and a bare `selectedTab = 1` silently means something different afterwards.
     enum Tab: Hashable {
         case map
+        case trips
         case profile
     }
 
@@ -82,9 +83,13 @@ final class AppState {
     // Lets a headless diagnostic launch open straight onto a given tab, since this environment has
     // no way to inject a tap: confirmed, not assumed: this Xcode install ships no Simulator.app,
     // so the device is booted headlessly and there is no GUI to click.
-    var selectedTab: Tab = ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] == "profile"
-        ? .profile
-        : .map
+    var selectedTab: Tab = {
+        switch ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] {
+        case "profile": return .profile
+        case "trips": return .trips
+        default: return .map
+        }
+    }()
     #else
     var selectedTab: Tab = .map
     #endif
@@ -94,6 +99,19 @@ final class AppState {
         let role: RouteInputField
     }
     var pendingRouteInput: PendingRouteInput?
+
+    /// A trip the rider asked to plan again, from a tab that cannot plan.
+    ///
+    /// Same one-shot shape as `pendingRouteInput` and consumed the same way: the Trips tab writes
+    /// it and switches tabs, the map reads it once and clears it. Station IDs rather than names,
+    /// because the map re-resolves both ends against the city's own stations and a name is not
+    /// enough to do that with.
+    struct PendingTripReplay: Equatable {
+        let cityID: String
+        let originStationID: String
+        let destinationStationID: String
+    }
+    var pendingTripReplay: PendingTripReplay?
 
     var accessibilityPreference: AccessibilityPreference {
         didSet {

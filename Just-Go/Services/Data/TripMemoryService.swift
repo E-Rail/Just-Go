@@ -41,7 +41,9 @@ final class TripMemoryService {
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: nil,
-            note: nil
+            note: nil,
+            originStationID: route.originStationID,
+            destinationStationID: route.destinationStationID
         )
         tripRecords.insert(record, at: 0)
         tripRecords = Array(tripRecords.prefix(maxTripRecords))
@@ -49,7 +51,28 @@ final class TripMemoryService {
         return record
     }
 
+    /// Completes the trip that was already recorded when it was planned, rather than writing a
+    /// second one.
+    ///
+    /// This used to insert unconditionally, so planning a trip and then logging it left two rows
+    /// for one journey — the planned one and a completed twin beside it. Nothing showed that until
+    /// the history got a screen of its own. The planned row is found by its two ends and city
+    /// among the still-incomplete records, newest first, which is the same trip by any reading a
+    /// rider would give it.
     func markTripComplete(route: Route, cityID: String, note: String? = nil) {
+        let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        if let index = tripRecords.firstIndex(where: {
+            $0.completedAt == nil &&
+                $0.cityID == cityID &&
+                $0.originName == route.origin &&
+                $0.destinationName == route.destination
+        }) {
+            tripRecords[index].completedAt = .now
+            tripRecords[index].note = trimmedNote
+            persistTripRecords()
+            return
+        }
+
         let record = TripRecord(
             id: UUID().uuidString,
             originName: route.origin,
@@ -63,7 +86,9 @@ final class TripMemoryService {
             warningMessages: route.warnings.map(\.message),
             createdAt: .now,
             completedAt: .now,
-            note: note?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+            note: trimmedNote,
+            originStationID: route.originStationID,
+            destinationStationID: route.destinationStationID
         )
         tripRecords.insert(record, at: 0)
         tripRecords = Array(tripRecords.prefix(maxTripRecords))

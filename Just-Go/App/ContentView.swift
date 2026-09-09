@@ -108,13 +108,25 @@ struct ContentView: View {
 
     var body: some View {
         @Bindable var appState = appState
-        // Two tabs, because the map is the app. Planning a trip and searching for a place are
-        // things you do *to* somewhere on the map, not separate destinations to walk to. A rider
-        // looking at a place had to leave it, switch tabs, and type its name back in. Both now
-        // live on the map's own navigation stack (see `MapRoute`).
+        // The map is still the app: planning a trip and searching for a place are things you do
+        // *to* somewhere on the map, not separate destinations to walk to, and both stay on the
+        // map's own navigation stack (see `MapRoute`). A rider looking at a place must never have
+        // to leave it, switch tabs and type its name back in.
+        //
+        // Trips is a third tab rather than a fourth row inside Profile because it is not a
+        // setting. Profile had become two unrelated things wearing one label — what the rider owns
+        // (their trips, their saved places, the answers they have given) and how the app behaves
+        // (appearance, language, accessibility, data) — and only the second of those is a profile.
         TabView(selection: $appState.selectedTab) {
             Tab(AppLocalization.localized("Map"), systemImage: "map.fill", value: AppState.Tab.map) {
                 MapContainerView()
+            }
+            Tab(
+                AppLocalization.text(english: "Trips", simplified: "行程", traditional: "行程"),
+                systemImage: "bookmark.fill",
+                value: AppState.Tab.trips
+            ) {
+                TripsView()
             }
             Tab(AppLocalization.localized("Profile"), systemImage: "person.fill", value: AppState.Tab.profile) {
                 ProfileView()

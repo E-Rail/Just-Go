@@ -248,7 +248,7 @@ struct TripsView: View {
                         traditional: "你告訴過我們的"
                     ))
                     Spacer()
-                    Text("\(container.transferInsightService.allNotes.count)")
+                    Text("\(container.transferInsightService.allNotes.count + container.riderAnswerService.allAnswers.count)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -285,16 +285,43 @@ struct TransferAnswersView: View {
     var body: some View {
         List {
             let notes = container.transferInsightService.allNotes
-            if notes.isEmpty {
+            let answers = container.riderAnswerService.allAnswers
+            if notes.isEmpty && answers.isEmpty {
                 Section {
                     Text(AppLocalization.text(
-                        english: "You have not answered any transfer questions yet.",
-                        simplified: "你还没有回答过换乘问题。",
-                        traditional: "你還沒有回答過換乘問題。"
+                        english: "You have not answered any questions yet.",
+                        simplified: "你还没有回答过任何问题。",
+                        traditional: "你還沒有回答過任何問題。"
                     ))
                     .foregroundStyle(.secondary)
                 }
-            } else {
+            }
+            if !answers.isEmpty {
+                Section {
+                    ForEach(answers, id: \.key.storageID) { record in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(record.stationName)
+                                .font(.headline)
+                            Text(questionText(for: record))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            HStack(spacing: 6) {
+                                Text(answerText(for: record.answer))
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                Text(record.recordedAt, style: .date)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } header: {
+                    Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
+                }
+            }
+            if !notes.isEmpty {
+                Section {
                 ForEach(notes, id: \.key.storageID) { note in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(note.key.stationID)
@@ -313,6 +340,9 @@ struct TransferAnswersView: View {
                     }
                     .padding(.vertical, 4)
                 }
+                } header: {
+                    Text(AppLocalization.localized("Transfer"))
+                }
             }
         }
         .listStyle(.insetGrouped)
@@ -324,5 +354,38 @@ struct TransferAnswersView: View {
             traditional: "你告訴過我們的"
         ))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func questionText(for record: RiderAnswerRecord) -> String {
+        switch record.key.question {
+        case .liftToPlatform:
+            return AppLocalization.text(
+                english: "Lift from the concourse to the platform",
+                simplified: "站厅到站台的直梯",
+                traditional: "車站大堂到月台的電梯"
+            )
+        case .exitSide:
+            let exit = record.detail ?? ""
+            return AppLocalization.text(
+                english: "\(exit) came out on the right side",
+                simplified: "\(exit)出来的方向",
+                traditional: "\(exit)出來的方向"
+            )
+        }
+    }
+
+    private func answerText(for answer: RiderAnswer) -> String {
+        switch answer {
+        case .yes:
+            return AppLocalization.text(english: "You said yes", simplified: "你说有", traditional: "你說有")
+        case .no:
+            return AppLocalization.text(english: "You said no", simplified: "你说没有", traditional: "你說沒有")
+        case .didNotLook:
+            return AppLocalization.text(
+                english: "You didn't look",
+                simplified: "你说没注意",
+                traditional: "你說沒注意"
+            )
+        }
     }
 }

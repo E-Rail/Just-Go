@@ -433,6 +433,7 @@ struct LiveGoView: View {
                 ))
                 .font(.headline)
                 .multilineTextAlignment(.center)
+                transferNotes
                 ForEach(guidance.externalResources.filter(\.kind.isTransferRelevant)) { resource in
                     OfficialTransitResourceButton(resource: resource, compact: true)
                 }
@@ -468,9 +469,35 @@ struct LiveGoView: View {
                         traditional: "本次轉乘請以站內標識為準。"
                     ))
                 }
+                transferNotes
+                    .padding(.horizontal, 24)
                 transferPaceSection
             }
             .padding(.vertical, 24)
+        }
+    }
+
+    /// What the route already worked out about this change, shown where the rider is making it.
+    ///
+    /// Two sentences at most, both written by the assembler: whether the change leaves the paid
+    /// area, and — only where the operator says so — that it still counts as one journey. The route
+    /// screen has shown these all along. Live Go never did, so the rider standing at the gate
+    /// deciding whether to tap out was the one person who could not see them.
+    ///
+    /// Silence where the fare is unknown is deliberate and comes from the assembler: saying nothing
+    /// lets the rider read the gates, and saying the wrong thing sends them through the wrong one.
+    @ViewBuilder
+    private var transferNotes: some View {
+        let notes = viewModel.currentStep?.kind == .transfer ? (viewModel.currentStep?.notes ?? []) : []
+        if !notes.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(notes, id: \.self) { note in
+                    Label(note, systemImage: "info.circle")
+                        .font(.subheadline)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

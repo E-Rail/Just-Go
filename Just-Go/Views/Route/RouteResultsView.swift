@@ -428,11 +428,17 @@ struct RouteResultsView: View {
                 // showing "the last train could not be checked" is answering a question nobody
                 // asked, and a confidence grade on it is a verdict about station data it never
                 // touches. `RouteDetailView` already gates its own copies on the same test.
-                if route.boardingTransitSegment != nil, let notice = route.serviceStatus.bannerText {
-                    Label(notice, systemImage: route.serviceStatus.iconName)
-                        .font(.footnote)
-                        .fontWeight(.medium)
-                        .foregroundStyle(route.serviceStatus.uiColor)
+                if route.boardingTransitSegment != nil, route.serviceStatus.bannerText != nil {
+                    // The shared banner rather than a bare `Label`, which is what this drew and
+                    // which silently dropped the taxi price. This is the screen where the rider
+                    // *chooses*; being told the last train has gone without being told what the
+                    // alternative costs is exactly half an answer.
+                    ServiceStatusBanner(
+                        status: route.serviceStatus,
+                        compact: true,
+                        missedTrainTaxiYuan: route.missedTrainTaxiYuan,
+                        hail: route.hailRequest
+                    )
                 } else if route.boardingTransitSegment != nil, let unverified = unverifiedServiceHoursNotice(
                     status: route.serviceStatus,
                     departing: TripTimeContext(

@@ -126,6 +126,7 @@ struct RouteDetailView: View {
     @State private var stopBeforePush: PresentationDetent?
     /// Guidance replaces this page's content rather than covering it, "but in the same page".
     @State private var isGuiding = false
+    @State private var boardingArrivals: [RealTimeArrival] = []
     @State private var cityResources: [ExternalTransitResource] = []
     @State private var serviceNotices: [OperatorServiceNotice] = []
     // Raw theme hex for the "Navigate" button's solid fill. See RouteEntryView's
@@ -267,6 +268,7 @@ struct RouteDetailView: View {
                     serviceNotices = (try? await container.serviceNoticeProvider.notices()) ?? []
                 }
                 await loadServiceHours(cityID: cityID)
+                await loadBoardingArrivals(cityID: cityID)
             }
             await transferAssets
         }
@@ -620,7 +622,8 @@ struct RouteDetailView: View {
                 if notice != nil {
                     ServiceStatusBanner(
                         status: route.serviceStatus,
-                        missedTrainTaxiYuan: route.missedTrainTaxiYuan
+                        missedTrainTaxiYuan: route.missedTrainTaxiYuan,
+                        hail: route.hailRequest
                     )
                         .padding(.horizontal, 4)
                         .padding(.top, 4)
@@ -1133,6 +1136,7 @@ struct RouteDetailView: View {
                         .font(.footnote)
                         .foregroundStyle(Color.accentColor)
                 }
+                liveArrivalsRow(for: segment)
                 handoffRow(for: segment)
                 if isExpanded {
                     stationStops(segment)
@@ -1240,6 +1244,54 @@ struct RouteDetailView: View {
         // The first and last mile share one colour on purpose: they are the same kind of thing to
         // a rider reading the strip, and the icon already says which of the three it is.
         case .walking, .cycling, .driving, nil: return .gray
+        }
+    }
+
+    /// Best effort, like the operator notices above it: no spinner, no error state. Nothing is
+    /// loading that the rider is waiting on, and a route is perfectly usable without a countdown.
+    private func loadBoardingArrivals(cityID: String) async {
+        guard let boarding = route.boardingTransitSegment,
+              let stationID = boarding.fromStationID else { return }
+        let stations = await container.stationSearchService.stations(in: cityID)
+        guard let station = stations.first(where: { $0.stationID == stationID }) else { return }
+        let snapshot = await container.officialStationData.arrivalSnapshot(for: station)
+        boardingArrivals = Array(
+            snapshot.arrivals
+                .filter(\.isLiveArrival)
+                // The rider's own line. A countdown for a train they are not catching is noise on
+                // a row that names the line they are.
+                .filter { boarding.lineName == nil || $0.lineName == boarding.lineName }
+                .sorted { ($0.minutesRemaining ?? .max) < ($1.minutesRemaining ?? .max) }
+                .prefix(3)
+        )
+    }
+
+    /// When the next trains are, on the platform the rider is about to stand on.
+    ///
+    /// `arrivalSnapshot(for:)` has had exactly one caller since it was written — the station sheet
+    /// — while Hong Kong ships live-arrival references for all 162 of its stations behind a
+    /// 704-line provider. A rider planning a route had to back out of their trip and open the
+    /// station to find out whether the train was two minutes away or twelve.
+    ///
+    /// Boarding segment only. A countdown against the second leg is a number that will have moved
+    /// by the time they get there, and presenting it beside one that has not is the kind of thing
+    /// that makes both look unreliable.
+    ///
+    /// Filtered to `isLiveArrival`, so nothing here is a timetable wearing a countdown's clothes.
+    /// Cities without a live feed return nothing and this draws nothing.
+    @ViewBuilder
+    private func liveArrivalsRow(for segment: RouteSegment) -> some View {
+        if segment.id == route.boardingTransitSegment?.id, !boardingArrivals.isEmpty {
+            HStack(spacing: 6) {
+                Image(systemName: "dot.radiowaves.up.forward")
+                    .font(.caption)
+                Text(boardingArrivals.map(\.formattedArrival).joined(separator: " · "))
+                    .font(.footnote)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(.green)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(AppLocalization.localized("Live arrivals"))
         }
     }
 

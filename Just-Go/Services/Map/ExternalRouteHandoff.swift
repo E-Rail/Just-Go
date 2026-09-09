@@ -92,9 +92,17 @@ enum ExternalRouteHandoff {
         mode: AccessLegMode
     ) {
         if destination == .appleMaps {
+            // Both ends, deliberately. `openInMaps` on a single item routes from wherever the
+            // rider is standing, and this row is only ever drawn on an access leg — the first or
+            // last mile — so the origin is a station they have not reached yet when they plan.
+            // A rider planning at home was handed directions from home to their destination, with
+            // the ride from the station they were actually going to leave from nowhere in it.
+            // Amap, Baidu and DiDi were all passed `origin` already; Apple Maps was the one that
+            // dropped it.
+            let start = MKMapItem(placemark: MKPlacemark(coordinate: origin))
             let item = MKMapItem(placemark: MKPlacemark(coordinate: target))
             item.name = destinationName
-            item.openInMaps(launchOptions: [
+            MKMapItem.openMaps(with: [start, item], launchOptions: [
                 MKLaunchOptionsDirectionsModeKey: mode == .driving
                     ? MKLaunchOptionsDirectionsModeDriving
                     : MKLaunchOptionsDirectionsModeWalking

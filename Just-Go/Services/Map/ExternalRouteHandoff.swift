@@ -68,6 +68,73 @@ enum ExternalRouteHandoff {
         }
     }
 
+    /// Opening a scanner, so a rider can unlock a shared bike.
+    ///
+    /// Not a `Destination`. Those all route between two points; this one goes nowhere — it opens a
+    /// camera. That is how every shared bike in mainland China is actually unlocked, and it is the
+    /// step this app was leaving a rider to find on their own after telling them to cycle.
+    ///
+    /// **Just-Go has no bike-share data and this button does not imply otherwise.** It does not
+    /// know a bike is there, whether the dock is empty, or which operator serves the street. It
+    /// opens a scanner and claims nothing else, which is why it is titled for the action rather
+    /// than the outcome.
+    ///
+    /// It also never tells anyone to photograph anything. Station photography is restricted in
+    /// parts of mainland China and enforcement is inconsistent; a scanner pointed at a bike's own
+    /// QR code is not that, and the app should not drift into instructing either way.
+    ///
+    /// **These two schemes are not documented by Tencent or Ant for third-party use.** They are
+    /// widely used and they may change or stop working without notice. Both are therefore offered
+    /// only when `canOpenURL` says the app is installed, and neither has a web fallback: a browser
+    /// cannot open a camera, and a link pretending to would be a dead end. If one stops working it
+    /// should be deleted rather than patched around.
+    enum BikeScanner: String, CaseIterable, Identifiable {
+        case alipay
+        case weChat
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .alipay:
+                return AppLocalization.text(english: "Scan in Alipay", simplified: "用支付宝扫码", traditional: "用支付寶掃碼")
+            case .weChat:
+                return AppLocalization.text(english: "Scan in WeChat", simplified: "用微信扫码", traditional: "用微信掃碼")
+            }
+        }
+
+        /// Must also appear in `LSApplicationQueriesSchemes` or `canOpenURL` answers false however
+        /// installed the app is.
+        var queryScheme: String {
+            switch self {
+            case .alipay: return "alipay"
+            case .weChat: return "weixin"
+            }
+        }
+
+        var url: URL? {
+            switch self {
+            case .alipay: return URL(string: "alipays://platformapi/startapp?saId=10000007")
+            case .weChat: return URL(string: "weixin://dl/scan")
+            }
+        }
+    }
+
+    /// The scanners actually installed, in the order a rider is most likely to want them.
+    @MainActor
+    static func bikeScanners() -> [BikeScanner] {
+        BikeScanner.allCases.filter { scanner in
+            guard let probe = URL(string: "\(scanner.queryScheme)://") else { return false }
+            return UIApplication.shared.canOpenURL(probe)
+        }
+    }
+
+    @MainActor
+    static func open(_ scanner: BikeScanner) {
+        guard let url = scanner.url, UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url)
+    }
+
     /// Which destinations are worth showing for this leg.
     ///
     /// Apple Maps is always in the list: it is reached through `MKMapItem` rather than a scheme, so

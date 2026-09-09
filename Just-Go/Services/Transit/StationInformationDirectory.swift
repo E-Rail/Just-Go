@@ -35,7 +35,7 @@ final class StationInformationDirectory: Sendable {
 
     /// Parsed on first use, not on construction.
     ///
-    /// `directory.json` is **453 KB / 1,598 entries**, and this type was built inside
+    /// `directory.json` is **455 KB / 1,603 entries**, and this type was built inside
     /// `DIContainer.configure()`, which runs in `JustGoApp.init()`, so the whole file was read,
     /// deserialised and walked on the main thread before the app had drawn anything. The comment
     /// on the very next line of `configure()` explains that the bundled catalog was handed a lazy

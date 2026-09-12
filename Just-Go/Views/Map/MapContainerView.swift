@@ -325,10 +325,6 @@ struct MapContainerView: View {
                             .lineLimit(1)
                             .layoutPriority(0)
                     }
-                    if viewModel?.activeRoute != nil {
-                        mapClearRouteButton
-                            .layoutPriority(1)
-                    }
                     mapLocateButton
                         .layoutPriority(1)
                 }
@@ -441,13 +437,13 @@ struct MapContainerView: View {
                 set: { viewModel?.visibleRegion = $0 }
             ),
             stations: viewModel?.stations ?? [],
-            // The browse map hides non-interchange stations above a 0.12° span, and a whole trip is
-            // usually wider than that, so without this the rider's own stops vanish at exactly the
-            // zoom that shows the whole journey. `alwaysShowsStations` exists for this case and
-            // says so; ordinary browsing keeps its thinning.
-            alwaysShowsStations: viewModel?.activeRoute != nil,
+            // Both `false` and `nil` because the browse map draws no trip at all now. It used to
+            // keep the chosen route underneath everything, and `alwaysShowsStations` existed to
+            // stop that trip's own stops thinning out at the zoom that showed the whole journey.
+            // With no trip there are no stops to protect, and ordinary browsing keeps its thinning.
+            alwaysShowsStations: false,
             metroNetworks: viewModel?.metroNetworks ?? [],
-            route: viewModel?.activeRoute,
+            route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
             topChromeHeight: topChromeHeight,
             onUserLocationChanged: { coordinate in
@@ -578,33 +574,6 @@ struct MapContainerView: View {
         .accessibilityLabel(AppLocalization.localized("Center map on my location"))
     }
 
-    /// Takes the drawn trip off the browse map.
-    ///
-    /// Backing out of a route deliberately leaves it drawn — see `replan`, where clearing on pop
-    /// would mean drawing a trip only on a map covered by the screen that drew it. But `clearRoute`
-    /// had exactly two callers, both of them *starting a new search*, so a rider who looked at a
-    /// route and went back was left with a dark-cased line lying across their metro lines for the
-    /// rest of the session with no way to remove it. Keeping it drawn was right; having no way to
-    /// undo that was not.
-    private var mapClearRouteButton: some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.2)) { viewModel?.clearRoute() }
-        } label: {
-            Image(systemName: "xmark")
-                .font(.headline)
-                .foregroundStyle(Color.primary)
-                .frame(width: 44, height: 44)
-                .background(.regularMaterial, in: Circle())
-        }
-        .buttonStyle(.plain)
-        .transition(.opacity)
-        .accessibilityLabel(AppLocalization.text(
-            english: "Clear the trip from the map",
-            simplified: "从地图上清除路线",
-            traditional: "從地圖上清除路線"
-        ))
-    }
-
     private func openStation(_ station: Station) {
         // Opening a station always wins over a place card. Dismiss any place sheet AND cancel a
         // prior POI tap's still-running station match, which would otherwise present a place
@@ -727,7 +696,6 @@ struct MapContainerView: View {
         // Consumed here rather than by the pushed screen: this is the only handler, and leaving it
         // set would re-fire the moment anything else observed it.
         appState.pendingRouteInput = nil
-        viewModel?.clearRoute()
         let planner = self.planner
         planner.selectPlace(pending.place, for: pending.role)
 
@@ -784,11 +752,6 @@ struct MapContainerView: View {
     /// Re-runs the current plan. Shared by the endpoint editor and the header's swap button so the
     /// two cannot disagree about what a changed endpoint means.
     private func replan() {
-        // The previously chosen trip stops being the answer the moment a different one is searched
-        // for. Not cleared when the rider merely pops back to the map: leaving it drawn is the
-        // whole point, and clearing on pop would have meant drawing it only on a map that is
-        // covered by the screen doing the drawing.
-        viewModel?.clearRoute()
         planTask?.cancel()
         planTask = Task { _ = await planner.searchRoutes() }
     }
@@ -826,7 +789,6 @@ struct MapContainerView: View {
             RouteResultsView(
                 viewModel: planner,
                 onSelect: { route in
-                    viewModel?.showRoute(route)
                     path.append(.detail(route.id))
                 },
                 onEditEndpoint: { path.append(.editEndpoint($0)) },
@@ -969,7 +931,7 @@ struct MapContainerView: View {
         switch screen {
         case "search":
             path = [.search]
-        case "results", "detail", "guiding", "editEndpoint", "mapRoute":
+        case "results", "detail", "guiding", "editEndpoint":
             Task { await seedDebugRoute(landingOn: screen) }
         default:
             break
@@ -1035,10 +997,6 @@ struct MapContainerView: View {
         }
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
         switch screen {
-        case "mapRoute":
-            // Chosen, then backed out of: the map keeps the trip.
-            viewModel?.showRoute(first)
-            path = []
         case "results":
             path = [.results]
         case "editEndpoint":

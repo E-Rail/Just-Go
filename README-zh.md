@@ -136,5 +136,5 @@ ruby Scripts/validate_universal_city_data.rb
 
 ## 许可证
 
-Just-Go 原创软件源代码采用 MIT 许可证。第三方数据和媒体不包含在 MIT 授权中，其条款记录在
+Just-Go 原创软件源代码采用 GPL-3.0 许可证。第三方数据和媒体不包含在 GPL-3.0 授权中，其条款记录在
 `DataPacks/rights_inventory.json` 和 `THIRD_PARTY_NOTICES.md`。

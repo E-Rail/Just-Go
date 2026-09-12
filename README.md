@@ -160,5 +160,5 @@ license treatment.
 ## License
 
 Just-Go's original software source is GPL-3.0 licensed. Third-party data and media are not granted
-under MIT; their terms are recorded in `DataPacks/rights_inventory.json` and
+under the GPL-3.0 license; their terms are recorded in `DataPacks/rights_inventory.json` and
 `THIRD_PARTY_NOTICES.md`.

@@ -1334,45 +1334,28 @@ struct RouteDetailView: View {
         }
     }
 
-    /// "Open in …" for a leg this app knowingly models worse than a road router does.
+    /// A bike or car leg's actual content, rather than a row of buttons under one.
     ///
     /// Bike and car only, and that restriction is the point rather than a limitation. The trains,
     /// the walk to the platform and the exit to use are what Just-Go is for; handing those to
-    /// another app would be giving up. What it genuinely cannot do is live road navigation or hail
-    /// a car — and a cycling leg with no provider key is the pedestrian route re-timed, while a
-    /// driving leg is MapKit's road route with no traffic, no restrictions and no parking. Naming
-    /// an app that does those properly is more useful than pretending.
+    /// another app would be giving up. What it genuinely cannot do is live road navigation — a
+    /// cycling leg with no provider key is the pedestrian route re-timed, and a driving leg is
+    /// MapKit's road route with no traffic, no restrictions and no parking. There is no version of
+    /// this app that guides a rider down a road, so on these legs the app that can is the answer,
+    /// not an afterthought. See `ExternalRouteHandoffCard`, which both this and live guidance use.
     @ViewBuilder
     private func handoffRow(for segment: RouteSegment) -> some View {
         let mode = segment.accessLegMode
         if segment.type.isAccessLeg, mode != .walking,
            let start = segment.polylineCoordinates.first,
            let end = segment.polylineCoordinates.last {
-            let from = CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude)
-            let to = CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude)
-            let destinations = ExternalRouteHandoff.destinations(for: mode)
-            if !destinations.isEmpty {
-                HStack(spacing: 8) {
-                    ForEach(destinations) { destination in
-                        Button {
-                            ExternalRouteHandoff.open(
-                                destination,
-                                from: from,
-                                originName: segment.fromStationName ?? route.origin,
-                                to: to,
-                                destinationName: segment.toStationName ?? route.destination,
-                                mode: mode
-                            )
-                        } label: {
-                            Label(destination.title, systemImage: destination.symbolName)
-                                .font(.footnote)
-                        }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                    }
-                }
-                .padding(.top, 2)
-            }
+            ExternalRouteHandoffCard(
+                mode: mode,
+                origin: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude),
+                originName: segment.fromStationName ?? route.origin,
+                target: CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude),
+                destinationName: segment.toStationName ?? route.destination
+            )
         }
     }
 

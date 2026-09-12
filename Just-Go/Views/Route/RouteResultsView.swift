@@ -138,6 +138,9 @@ struct RouteResultsView: View {
         }
         .padding(.horizontal, Metrics.l)
         .padding(.vertical, Metrics.s)
+        // A trailing tab bar runs the full height of the screen, so a header clears it the same way
+        // a bottom bar does. Inside the material, so the band still spans the width.
+        .safeAreaPadding(.horizontal)
         .readableColumn()
         .background(.regularMaterial)
         .overlay(alignment: .bottom) {
@@ -175,6 +178,7 @@ struct RouteResultsView: View {
         }
         .padding(.horizontal, Metrics.l)
         .padding(.bottom, Metrics.s)
+        .safeAreaPadding(.horizontal)
         .readableColumn()
         .background(.regularMaterial)
         .overlay(alignment: .bottom) { Divider() }

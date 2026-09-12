@@ -60,20 +60,24 @@ struct LineDetailView: View {
     @ViewBuilder
     private func content(for line: MetroLine) -> some View {
         if horizontalSizeClass == .regular {
-            HStack(spacing: 0) {
-                map(for: line)
-                    .frame(maxWidth: .infinity)
-                Divider()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Metrics.l) {
-                        header(for: line)
-                        serviceVariants(for: line)
-                        stopList(for: line)
-                        operatorCheck(for: line)
+            // See `sideColumn(max:in:)`: the stop list is given a measured width rather than left
+            // to infer one, which rendered as nothing at all.
+            GeometryReader { geo in
+                HStack(spacing: 0) {
+                    map(for: line)
+                        .frame(maxWidth: .infinity)
+                    Divider()
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Metrics.l) {
+                            header(for: line)
+                            serviceVariants(for: line)
+                            stopList(for: line)
+                            operatorCheck(for: line)
+                        }
+                        .padding(Metrics.l)
                     }
-                    .padding(Metrics.l)
+                    .sideColumn(max: Metrics.stopColumnWidth, in: geo.size.width)
                 }
-                .frame(width: 380)
             }
         } else {
             ScrollView {

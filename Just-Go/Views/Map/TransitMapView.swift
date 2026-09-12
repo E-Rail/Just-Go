@@ -904,7 +904,10 @@ extension MapVisibleRegion {
 /// bar* on a phone. An iPad has neither the floating tab bar nor as much of the screen given to
 /// that chrome, which is why this only ever looked wrong on a phone.
 ///
-/// The bottom needs no addition: the tab bar is already in `safeAreaInsets`.
+/// The tab bar needs no addition of its own: it is already in `safeAreaInsets`. Which edge it
+/// arrives on is not fixed, though — on a foldable the system moves the bar to the trailing edge,
+/// so it lands in `left`/`right` rather than `bottom`. `applyLayoutMargins` adds all four edges
+/// separately for that reason; do not collapse it back to a bottom-only addition.
 private final class ChromeInsetMapView: MKMapView {
     /// Added to the safe area, not replacing it.
     var chromeInsets: UIEdgeInsets = .zero {

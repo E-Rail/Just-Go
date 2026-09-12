@@ -26,14 +26,27 @@ enum Metrics {
     /// controls at 34 and 36.
     static let minimumTapTarget: CGFloat = 44
 
-    /// How wide a column of text or cards is allowed to get before it stops being readable. An
-    /// iPad in landscape is 1366 points across; a 1366-point-wide list row is not a design, it is
-    /// the absence of one.
     /// The trip column beside a map on regular width. Wide enough for a journey row with a line
     /// badge, a station pair and a duration without wrapping, and narrow enough to leave the map
     /// the larger half on every iPad this ships to.
+    ///
+    /// A **cap**, not a width — apply it through `sideColumn(max:)`. Regular width no longer means
+    /// an iPad: a folding phone reports it at 626 points, where a fixed 420 would leave the map 205
+    /// and invert the very split this number exists to protect.
     static let tripColumnWidth: CGFloat = 420
 
+    /// The same cap for the stop list beside a line's map. Its own number because a list of station
+    /// names needs less room than a journey row with a line badge and a duration.
+    static let stopColumnWidth: CGFloat = 380
+
+    /// How wide a column of text or cards is allowed to get before it stops being readable. An
+    /// iPad in landscape is 1366 points across; a 1366-point-wide list row is not a design, it is
+    /// the absence of one.
+    ///
+    /// Left at 620 deliberately, even though a folding phone's inner display is 626 points across
+    /// and the cap is therefore all but inert there. 620 points of text is still readable, and
+    /// retuning a constant against one device's exact width is the thing this number exists to
+    /// avoid doing.
     static let readableColumnWidth: CGFloat = 620
 }
 
@@ -98,6 +111,25 @@ extension View {
     func readableColumn() -> some View {
         frame(maxWidth: Metrics.readableColumnWidth)
             .frame(maxWidth: .infinity)
+    }
+
+    /// A secondary column beside a primary one: capped, but never more than its share of the width
+    /// the split actually has. Proportional below the cap and fixed above it, so the rule holds at
+    /// every width and no screen needs a breakpoint of its own.
+    ///
+    /// A flat width was safe while regular width meant an iPad, where any of these caps left the
+    /// primary side the larger half by construction. A folding phone reports regular width at 626
+    /// points, and there the same flat number quietly takes the bigger half instead.
+    ///
+    /// The width is passed in rather than read from the environment, and that is the whole point.
+    /// `containerRelativeFrame` is the obvious tool and is the wrong one: rendered headlessly at
+    /// 626, 1024 and 1366, a column sized that way inside an `HStack` came out **zero points wide
+    /// at every size** — the greedy primary took all of it. Its failure mode is the panel
+    /// vanishing rather than a slightly wrong width, and what counts as its "container" inside a
+    /// sheet or a navigation stack is precisely what cannot be checked without the device. An
+    /// explicit width has no ambient dependency; the same render measured 282 / 420 / 420.
+    func sideColumn(max cap: CGFloat, in available: CGFloat) -> some View {
+        frame(width: min(cap, available * 0.45))
     }
 }
 

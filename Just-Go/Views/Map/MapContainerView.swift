@@ -394,6 +394,9 @@ struct MapContainerView: View {
                     placeTagButton(for: taggedPlace)
                 }
                 .padding(.horizontal)
+                // Before the background, not after: the buttons move clear of a trailing tab bar
+                // while the material still runs the full width of the sheet.
+                .safeAreaPadding(.horizontal)
                 .padding(.vertical, 10)
                 .background(.regularMaterial)
             }

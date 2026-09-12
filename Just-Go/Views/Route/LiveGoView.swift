@@ -868,6 +868,10 @@ struct LiveGoView: View {
         .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
         .elevated(.floating)
         .padding([.horizontal, .bottom], 12)
+        // The card is the thing the rider is reading while walking, so it must not slide under a
+        // tab bar the system has moved to the trailing edge. Applied outside the material, so the
+        // panel moves rather than its background stretching.
+        .safeAreaPadding(.horizontal)
     }
 
     private func stepSummary(_ step: TripStep) -> some View {

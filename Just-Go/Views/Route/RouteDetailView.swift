@@ -461,6 +461,10 @@ struct RouteDetailView: View {
         }
         .buttonStyle(.plain)
         .padding(.horizontal)
+        // Clear of a tab bar that is not always along the bottom: on a foldable the system moves it
+        // to the trailing edge, and a bar padded by a fixed 16 runs underneath it. The background
+        // below is applied after this, so the surface still spans the full width.
+        .safeAreaPadding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 8)
         // Opaque now that this sits inside a sheet. It was transparent when the trip was the whole
@@ -481,12 +485,16 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        HStack(spacing: 0) {
-            mapHeader()
-                .frame(maxWidth: .infinity)
-            Divider()
-            tripCardContent(feasibility: feasibility, confidence: confidence)
-                .frame(width: Metrics.tripColumnWidth)
+        // The reader is here to hand the column a real width. Without one the trip column has to
+        // infer its share from an ambient container, which measured as zero points wide.
+        GeometryReader { geo in
+            HStack(spacing: 0) {
+                mapHeader()
+                    .frame(maxWidth: .infinity)
+                Divider()
+                tripCardContent(feasibility: feasibility, confidence: confidence)
+                    .sideColumn(max: Metrics.tripColumnWidth, in: geo.size.width)
+            }
         }
         // Sub-details are pushed inside the sheet on a phone and presented over the split here, so
         // the map and the trip both stay on screen behind them.

@@ -17,6 +17,10 @@ struct StationAssetImage<Content: View, Failure: View>: View {
 
     @State private var loadedImage: UIImage?
     @State private var didFail = false
+    /// Read from the environment rather than from `UIScreen.main`, which names one screen on a
+    /// device that has two and is on its way out. The decode runs off the main actor, so the value
+    /// is captured below before the task starts.
+    @Environment(\.displayScale) private var displayScale
 
     var body: some View {
         Group {
@@ -47,8 +51,9 @@ struct StationAssetImage<Content: View, Failure: View>: View {
             return
         }
         let dimension = targetDimension
+        let scale = displayScale
         let decoded = await Task.detached(priority: .userInitiated) {
-            StationAssetImageDecoder.decode(url: url, targetDimension: dimension)
+            StationAssetImageDecoder.decode(url: url, targetDimension: dimension, scale: scale)
         }.value
         guard !Task.isCancelled else { return }
         guard let decoded else {
@@ -66,10 +71,10 @@ struct StationAssetImage<Content: View, Failure: View>: View {
 /// main-actor-isolated `View` conformances across isolation (a Swift 6 error). A free helper carries
 /// no such conformances.
 private enum StationAssetImageDecoder {
-    static func decode(url: URL, targetDimension: CGFloat?) -> UIImage? {
+    static func decode(url: URL, targetDimension: CGFloat?, scale: CGFloat) -> UIImage? {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
         if let targetDimension {
-            let maxPixelSize = Int(targetDimension * UIScreen.main.scale)
+            let maxPixelSize = Int(targetDimension * scale)
             let options: [CFString: Any] = [
                 kCGImageSourceCreateThumbnailFromImageAlways: true,
                 kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,

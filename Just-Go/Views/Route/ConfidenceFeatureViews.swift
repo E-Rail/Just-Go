@@ -8,6 +8,8 @@ extension Route {
         return ServiceStatusBanner.Hail(
             origin: CLLocationCoordinate2D(latitude: origin.latitude, longitude: origin.longitude),
             destination: CLLocationCoordinate2D(latitude: target.latitude, longitude: target.longitude),
+            // `self.`, because the guard above shadows `origin` with the coordinate it unwrapped.
+            originName: self.origin,
             destinationName: destination
         )
     }
@@ -52,6 +54,10 @@ struct ServiceStatusBanner: View {
     struct Hail: Equatable {
         let origin: CLLocationCoordinate2D
         let destination: CLLocationCoordinate2D
+        /// Both ends are named. DiDi itself never reads the start's name, but
+        /// `ExternalRouteHandoff.open` asks every destination for one — Apple Maps drops a start it
+        /// cannot label — and a parameter only half the call sites fill is how they drift apart.
+        let originName: String
         let destinationName: String
 
         static func == (lhs: Hail, rhs: Hail) -> Bool {
@@ -59,6 +65,7 @@ struct ServiceStatusBanner: View {
                 lhs.origin.longitude == rhs.origin.longitude &&
                 lhs.destination.latitude == rhs.destination.latitude &&
                 lhs.destination.longitude == rhs.destination.longitude &&
+                lhs.originName == rhs.originName &&
                 lhs.destinationName == rhs.destinationName
         }
     }
@@ -102,6 +109,7 @@ struct ServiceStatusBanner: View {
                 ExternalRouteHandoff.open(
                     .didi,
                     from: hail.origin,
+                    originName: hail.originName,
                     to: hail.destination,
                     destinationName: hail.destinationName,
                     mode: .driving

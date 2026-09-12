@@ -54,8 +54,23 @@ class ExternalRouteHandoffTest < Minitest::Test
     assert_match(/case \.appleMaps: return nil/, HANDOFF)
   end
 
+  def test_apple_maps_names_both_ends
+    # Invisible at build time and at run time. Two map items are handed to Maps, but one built from
+    # a bare coordinate carries no name and no address, and Maps quietly swaps in the rider's own
+    # location for a start it cannot label. The destination always looked right because it was the
+    # one end that got a name. Handing over both items was already fixed once, in isolation, and
+    # the wrong start survived it — so pin the naming, not just the pair.
+    arm = HANDOFF[/if destination == \.appleMaps \{(.*?)\n            return/m, 1]
+    refute_nil arm, "the Apple Maps arm of open() has moved; this test no longer reads it"
+    assert_match(/start\.name = /, arm,
+                 "the start map item is unnamed, so Maps will route from the rider's location")
+    assert_match(/item\.name = /, arm, "the destination map item is unnamed")
+  end
+
   def test_every_third_party_destination_has_a_web_fallback
-    # The only path a rider without the app can use, and the only one exercisable without a device.
+    # Covers the app being installed but rejecting the URL built for it; a rider without the app
+    # never reaches `open`, because `destinations(for:)` dropped the button first. Still the only
+    # arm exercisable without a device.
     %w[amap baiduMaps didi].each do |destination|
       web = HANDOFF[/static func webURL\(.*?\n    \}/m]
       refute_nil web

@@ -1350,6 +1350,7 @@ struct RouteDetailView: View {
                             ExternalRouteHandoff.open(
                                 destination,
                                 from: from,
+                                originName: segment.fromStationName ?? route.origin,
                                 to: to,
                                 destinationName: segment.toStationName ?? route.destination,
                                 mode: mode

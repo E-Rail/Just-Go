@@ -12,9 +12,11 @@ import UIKit
 /// cycling leg with no key is the pedestrian route re-timed, and a driving leg is MapKit's road
 /// route with no traffic, no restrictions and no parking.
 ///
-/// Every destination carries an https fallback, and the fallback is not a nicety — it is the only
-/// path that can be exercised without a device, because no simulator has any of these apps
-/// installed and `canOpenURL` therefore answers false for all of them here.
+/// Every destination carries an https fallback, for the one case it actually covers: the app is
+/// installed — `destinations(for:)` has already dropped it otherwise — but rejects the particular
+/// URL built for it. A rider who does not have the app never reaches `open` at all, so the fallback
+/// is not what serves them; hiding the button is. It remains the only arm exercisable off-device,
+/// because no simulator has any of these apps and `canOpenURL` answers false for all of them here.
 ///
 /// Coordinates go out in GCJ-02, which is what the whole app already holds and what all three
 /// Chinese services expect. No conversion, and none wanted: converting would move the pin.
@@ -154,6 +156,7 @@ enum ExternalRouteHandoff {
     static func open(
         _ destination: Destination,
         from origin: CLLocationCoordinate2D,
+        originName: String,
         to target: CLLocationCoordinate2D,
         destinationName: String,
         mode: AccessLegMode
@@ -166,7 +169,15 @@ enum ExternalRouteHandoff {
             // the ride from the station they were actually going to leave from nowhere in it.
             // Amap, Baidu and DiDi were all passed `origin` already; Apple Maps was the one that
             // dropped it.
+            //
+            // **And both ends must be named.** Passing two items was not enough on its own. An
+            // `MKMapItem` built from a bare coordinate carries no name and no address, and Maps
+            // silently substitutes the rider's own location for a start it cannot label — the same
+            // wrong route as before, by a different mechanism. The destination end always looked
+            // right because it was the only one that got a name, and that asymmetry is what gave
+            // the cause away.
             let start = MKMapItem(placemark: MKPlacemark(coordinate: origin))
+            start.name = originName
             let item = MKMapItem(placemark: MKPlacemark(coordinate: target))
             item.name = destinationName
             MKMapItem.openMaps(with: [start, item], launchOptions: [

@@ -3,12 +3,12 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-DEVELOPER_DIR=${DEVELOPER_DIR:-/Applications/Xcode-beta.app/Contents/Developer}
+DEVELOPER_DIR=${DEVELOPER_DIR:-$(xcode-select -p)}
 SWIFTC="$DEVELOPER_DIR/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
 SDKROOT=$(env DEVELOPER_DIR="$DEVELOPER_DIR" /usr/bin/xcrun --sdk macosx --show-sdk-path)
 
 if [ ! -x "$SWIFTC" ]; then
-    echo "Xcode-beta swiftc not found at $SWIFTC" >&2
+    echo "swiftc not found at $SWIFTC" >&2
     exit 1
 fi
 

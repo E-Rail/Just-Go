@@ -461,6 +461,10 @@ struct RouteDetailView: View {
         }
         .buttonStyle(.plain)
         .padding(.horizontal)
+        // Clear of a tab bar that is not always along the bottom: on a foldable the system moves it
+        // to the trailing edge, and a bar padded by a fixed 16 runs underneath it. The background
+        // below is applied after this, so the surface still spans the full width.
+        .safeAreaPadding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 8)
         // Opaque now that this sits inside a sheet. It was transparent when the trip was the whole
@@ -481,12 +485,16 @@ struct RouteDetailView: View {
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        HStack(spacing: 0) {
-            mapHeader()
-                .frame(maxWidth: .infinity)
-            Divider()
-            tripCardContent(feasibility: feasibility, confidence: confidence)
-                .frame(width: Metrics.tripColumnWidth)
+        // The reader is here to hand the column a real width. Without one the trip column has to
+        // infer its share from an ambient container, which measured as zero points wide.
+        GeometryReader { geo in
+            HStack(spacing: 0) {
+                mapHeader()
+                    .frame(maxWidth: .infinity)
+                Divider()
+                tripCardContent(feasibility: feasibility, confidence: confidence)
+                    .sideColumn(max: Metrics.tripColumnWidth, in: geo.size.width)
+            }
         }
         // Sub-details are pushed inside the sheet on a phone and presented over the split here, so
         // the map and the trip both stay on screen behind them.
@@ -1326,44 +1334,28 @@ struct RouteDetailView: View {
         }
     }
 
-    /// "Open in …" for a leg this app knowingly models worse than a road router does.
+    /// A bike or car leg's actual content, rather than a row of buttons under one.
     ///
     /// Bike and car only, and that restriction is the point rather than a limitation. The trains,
     /// the walk to the platform and the exit to use are what Just-Go is for; handing those to
-    /// another app would be giving up. What it genuinely cannot do is live road navigation or hail
-    /// a car — and a cycling leg with no provider key is the pedestrian route re-timed, while a
-    /// driving leg is MapKit's road route with no traffic, no restrictions and no parking. Naming
-    /// an app that does those properly is more useful than pretending.
+    /// another app would be giving up. What it genuinely cannot do is live road navigation — a
+    /// cycling leg with no provider key is the pedestrian route re-timed, and a driving leg is
+    /// MapKit's road route with no traffic, no restrictions and no parking. There is no version of
+    /// this app that guides a rider down a road, so on these legs the app that can is the answer,
+    /// not an afterthought. See `ExternalRouteHandoffCard`, which both this and live guidance use.
     @ViewBuilder
     private func handoffRow(for segment: RouteSegment) -> some View {
         let mode = segment.accessLegMode
         if segment.type.isAccessLeg, mode != .walking,
            let start = segment.polylineCoordinates.first,
            let end = segment.polylineCoordinates.last {
-            let from = CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude)
-            let to = CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude)
-            let destinations = ExternalRouteHandoff.destinations(for: mode)
-            if !destinations.isEmpty {
-                HStack(spacing: 8) {
-                    ForEach(destinations) { destination in
-                        Button {
-                            ExternalRouteHandoff.open(
-                                destination,
-                                from: from,
-                                to: to,
-                                destinationName: segment.toStationName ?? route.destination,
-                                mode: mode
-                            )
-                        } label: {
-                            Label(destination.title, systemImage: destination.symbolName)
-                                .font(.footnote)
-                        }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                    }
-                }
-                .padding(.top, 2)
-            }
+            ExternalRouteHandoffCard(
+                mode: mode,
+                origin: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude),
+                originName: segment.fromStationName ?? route.origin,
+                target: CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude),
+                destinationName: segment.toStationName ?? route.destination
+            )
         }
     }
 

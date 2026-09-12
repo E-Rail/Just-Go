@@ -33,24 +33,25 @@ struct QuickTagsView: View {
             Group {
                 Section {
                     if tripMemoryService.stationQuickTags.isEmpty {
-                        VStack(spacing: 8) {
-                            Image(systemName: "tag.circle")
-                                .font(.largeTitle)
-                                .foregroundStyle(.secondary)
-                            Text(AppLocalization.localized("No Quick Tags yet"))
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
+                        // Apple's own empty state, and the separator hidden with it.
+                        //
+                        // A plain `List` aligns a row's separator to the leading edge of that row's
+                        // *content*. This row's content is centred, so both of its separators were
+                        // drawn starting a third of the way across the sheet — which reads as a
+                        // broken rule rather than a list. Hand-rolling the empty state is what
+                        // created a centred row in the first place; `ContentUnavailableView` is the
+                        // control Apple ships for this, and it is already used in fourteen other
+                        // places here.
+                        ContentUnavailableView {
+                            Label(AppLocalization.localized("No Quick Tags yet"), systemImage: "tag.circle")
+                        } description: {
                             Text(AppLocalization.text(
                                 english: "Tap + to add one.",
                                 simplified: "点击 + 添加。",
                                 traditional: "點擊 + 新增。"
                             ))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 32)
+                        .listRowSeparator(.hidden)
                     } else {
                         ForEach(tripMemoryService.stationQuickTags) { quickTag in
                             HStack(spacing: 10) {

@@ -742,6 +742,10 @@ struct LiveGoView: View {
               location.horizontalAccuracy >= 0,
               location.horizontalAccuracy <= 65,
               let step = viewModel.currentStep,
+              // A 9 km drive is not a walk that has gone wrong. Off-route detection and the replan
+              // behind it are tuned to a pedestrian corridor — 100 m of it — and a bike or car leg
+              // is handed to another app anyway, so the rider is not following our line at all.
+              step.accessMode == .walking,
               step.kind == .walkToStation || step.kind == .walkToDestination else {
             offRouteStrikes = 0
             return
@@ -868,6 +872,10 @@ struct LiveGoView: View {
         .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
         .elevated(.floating)
         .padding([.horizontal, .bottom], 12)
+        // The card is the thing the rider is reading while walking, so it must not slide under a
+        // tab bar the system has moved to the trailing edge. Applied outside the material, so the
+        // panel moves rather than its background stretching.
+        .safeAreaPadding(.horizontal)
     }
 
     private func stepSummary(_ step: TripStep) -> some View {
@@ -897,6 +905,8 @@ struct LiveGoView: View {
                 Text(viewModel.progressText)
                     .rowMeta()
             }
+
+            roadHandoff(for: step)
 
             if step.rideStopsRemainingText != nil || (step.kind == .ride && step.exitHint?.isEmpty == false) {
                 HStack(spacing: 12) {
@@ -952,6 +962,28 @@ struct LiveGoView: View {
         // screen this app's own accessibility settings route people to.
         .accessibilityElement(children: .contain)
         .accessibilityLabel(step.accessibilityLabel)
+    }
+
+    /// A bike or car leg, inside live guidance.
+    ///
+    /// The step stays in the sequence — the rider really does have to cross this ground, and
+    /// dropping it would renumber the trip and hide a leg — but this app has no turn-by-turn to
+    /// give for a road, so the panel offers the apps that do instead of a walking instruction over
+    /// a driving distance.
+    @ViewBuilder
+    private func roadHandoff(for step: TripStep) -> some View {
+        if step.accessMode != .walking,
+           step.kind == .walkToStation || step.kind == .walkToDestination,
+           let start = step.walkingPathCLCoordinates.first,
+           let end = step.walkingPathCLCoordinates.last {
+            ExternalRouteHandoffCard(
+                mode: step.accessMode,
+                origin: start,
+                originName: step.fromStationName ?? viewModel.route.origin,
+                target: end,
+                destinationName: step.toStationName ?? viewModel.route.destination
+            )
+        }
     }
 
     private var controls: some View {

@@ -3,16 +3,14 @@ import SwiftUI
 /// What the rider has put into this app, in one place.
 ///
 /// Split out of Profile, which had become two unrelated things under one label: what the rider
-/// owns and how the app behaves. Trips, saved places and the answers a rider has volunteered are
-/// the first of those; appearance, language, accessibility and data sources are the second. Only
+/// owns and how the app behaves. Trips and saved places are the first of those; appearance, language, accessibility and data sources are the second. Only
 /// the second is a profile.
 ///
 /// One `NavigationStack` at the root and stack-free content underneath it. A `NavigationStack`
-/// inside a pushed destination fails silently on iOS 18, which is why `QuickTagsView` and
-/// `TransferAnswersView` both take an `embedded` flag rather than carrying their own.
+/// inside a pushed destination fails silently on iOS 18, which is why `QuickTagsView` takes an
+/// `embedded` flag rather than carrying its own.
 struct TripsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
 
     private var thisMonthRecords: [TripRecord] {
@@ -36,7 +34,6 @@ struct TripsView: View {
                     statisticsSection
                     savedPlacesSection
                     historySection
-                    answersSection
                 }
                 .listRowBackground(Color.clear)
             }
@@ -49,8 +46,6 @@ struct TripsView: View {
                 switch destination {
                 case .savedPlaces:
                     QuickTagsView(showsDoneButton: false, embedded: true)
-                case .answers:
-                    TransferAnswersView()
                 }
             }
         }
@@ -145,6 +140,7 @@ struct TripsView: View {
             } else {
                 ForEach(tripMemoryService.tripRecords) { record in
                     tripRow(record)
+                        .listSeparatorAtRowLeading()
                         .swipeActions {
                             Button(role: .destructive) {
                                 tripMemoryService.deleteTripRecord(id: record.id)
@@ -236,156 +232,8 @@ struct TripsView: View {
         appState.selectedTab = .map
     }
 
-    // MARK: - Answers
-
-    private var answersSection: some View {
-        Section {
-            NavigationLink(value: TripsDestination.answers) {
-                HStack {
-                    Text(AppLocalization.text(
-                        english: "What you've told us",
-                        simplified: "你告诉过我们的",
-                        traditional: "你告訴過我們的"
-                    ))
-                    Spacer()
-                    Text("\(container.transferInsightService.allNotes.count + container.riderAnswerService.allAnswers.count)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Your answers about transfers. They stay on this phone.",
-                simplified: "你对换乘的回答。只保存在本机。",
-                traditional: "你對換乘的回答。只儲存在本機。"
-            ))
-        }
-    }
 }
 
 enum TripsDestination: Hashable {
     case savedPlaces
-    case answers
-}
-
-/// The answers a rider has volunteered, and the only place they can read them back.
-///
-/// `TransferInsightService.allNotes` has existed since the transfer prompt shipped, documented as
-/// feeding "a future 'things you've told us' screen", and had no reader at all — while the control
-/// that deletes them all has been in Settings the whole time. A rider could erase these without
-/// ever being shown what they were erasing.
-///
-/// `TransferKey`'s fields are named `stationID` and `*LineID` but hold display names: the one place
-/// that writes them builds the key from `step.fromStationName` and `step.lineName`. They are shown
-/// as-is rather than resolved, and the names are not renamed here because `storageID` is built from
-/// them and every answer already on a rider's phone is filed under it.
-struct TransferAnswersView: View {
-    @Environment(DIContainer.self) private var container
-
-    var body: some View {
-        List {
-            let notes = container.transferInsightService.allNotes
-            let answers = container.riderAnswerService.allAnswers
-            if notes.isEmpty && answers.isEmpty {
-                Section {
-                    Text(AppLocalization.text(
-                        english: "You have not answered any questions yet.",
-                        simplified: "你还没有回答过任何问题。",
-                        traditional: "你還沒有回答過任何問題。"
-                    ))
-                    .foregroundStyle(.secondary)
-                }
-            }
-            if !answers.isEmpty {
-                Section {
-                    ForEach(answers, id: \.key.storageID) { record in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(record.stationName)
-                                .font(.headline)
-                            Text(questionText(for: record))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            HStack(spacing: 6) {
-                                Text(answerText(for: record.answer))
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                Text(record.recordedAt, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                } header: {
-                    Text(AppLocalization.text(english: "Stations", simplified: "车站", traditional: "車站"))
-                }
-            }
-            if !notes.isEmpty {
-                Section {
-                ForEach(notes, id: \.key.storageID) { note in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(note.key.stationID)
-                            .font(.headline)
-                        Text("\(note.key.fromLineID) → \(note.key.toLineID)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        HStack(spacing: 6) {
-                            Text(note.pace.title)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                            Text(note.recordedAt, style: .date)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                } header: {
-                    Text(AppLocalization.localized("Transfer"))
-                }
-            }
-        }
-        .listStyle(.insetGrouped)
-        .scrollContentBackground(.hidden)
-        .background(Color.appBackground)
-        .navigationTitle(AppLocalization.text(
-            english: "What you've told us",
-            simplified: "你告诉过我们的",
-            traditional: "你告訴過我們的"
-        ))
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func questionText(for record: RiderAnswerRecord) -> String {
-        switch record.key.question {
-        case .liftToPlatform:
-            return AppLocalization.text(
-                english: "Lift from the concourse to the platform",
-                simplified: "站厅到站台的直梯",
-                traditional: "車站大堂到月台的電梯"
-            )
-        case .exitSide:
-            let exit = record.detail ?? ""
-            return AppLocalization.text(
-                english: "\(exit) came out on the right side",
-                simplified: "\(exit)出来的方向",
-                traditional: "\(exit)出來的方向"
-            )
-        }
-    }
-
-    private func answerText(for answer: RiderAnswer) -> String {
-        switch answer {
-        case .yes:
-            return AppLocalization.text(english: "You said yes", simplified: "你说有", traditional: "你說有")
-        case .no:
-            return AppLocalization.text(english: "You said no", simplified: "你说没有", traditional: "你說沒有")
-        case .didNotLook:
-            return AppLocalization.text(
-                english: "You didn't look",
-                simplified: "你说没注意",
-                traditional: "你說沒注意"
-            )
-        }
-    }
 }

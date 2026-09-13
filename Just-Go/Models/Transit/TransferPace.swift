@@ -1,19 +1,19 @@
 import Foundation
 
-/// How long a change between two lines actually took, in the only three sizes that change what a
-/// rider does about it.
+/// How long a change between two lines is likely to take, in the only three sizes that change
+/// what a rider does about it: under two minutes means do not hurry, over five means leave room.
 ///
-/// Deliberately not a number of minutes. Nobody times their own transfer with a stopwatch, and a
-/// rider who reports "3 minutes" is really reporting "a couple of minutes". Storing 3 would dress
-/// a rough answer up as a precise one. Three buckets is the finest grain a person can answer
-/// honestly from memory, and it is enough: under two minutes means do not hurry, over five means
-/// leave room for it.
-enum TransferPace: String, Codable, CaseIterable, Identifiable, Sendable {
+/// Only ever derived from a measured corridor (`init(distanceMetres:)`). Riders used to be asked
+/// for it during the change as well, and those answers were retired once the route provider
+/// measured the corridor itself: a length observed for every rider outranks a recollection kept by
+/// one, and asking someone mid-interchange is a cost that answer no longer bought.
+///
+/// Deliberately not a number of minutes. The metres were observed and the seconds were not, so a
+/// bucket is as fine as the figure honestly supports.
+enum TransferPace: Sendable {
     case quick
     case steady
     case long
-
-    var id: Self { self }
 
     var title: String {
         switch self {
@@ -55,23 +55,12 @@ enum TransferPace: String, Codable, CaseIterable, Identifiable, Sendable {
 ///
 /// Line-pair rather than station alone, because the two are not the same question. 西直门 is a
 /// two-minute change between two of its lines and a long walk between another pair; a per-station
-/// answer would average those into a number true of neither.
-struct TransferKey: Codable, Equatable, Hashable, Sendable {
+/// figure would average those into a number true of neither.
+///
+/// The fields hold display names, not identifiers, because `TripStep` and `RouteSegment` carry
+/// names; `TransferGeometry.matches` compares them through `TransitLineMatching`.
+struct TransferKey: Equatable, Hashable, Sendable {
     let stationID: String
     let fromLineID: String
     let toLineID: String
-
-    /// Stable across direction. A rider changing 2→13 and one changing 13→2 walk the same corridor,
-    /// so they answer the same question and belong in the same bucket.
-    var storageID: String {
-        let pair = [fromLineID, toLineID].sorted()
-        return "\(stationID)|\(pair[0])|\(pair[1])"
-    }
-}
-
-/// One rider's answer, kept on their own device.
-struct TransferNote: Codable, Equatable, Sendable {
-    let key: TransferKey
-    let pace: TransferPace
-    let recordedAt: Date
 }

@@ -76,7 +76,6 @@ struct LiveGoView: View {
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @State private var asksPostTripQuestions = false
     @State private var showGetOffBanner = false
     @State private var alertTask: Task<Void, Never>?
     // Accessibility step-change effects (无障碍 sheet): speech, haptics, visual banner.
@@ -188,41 +187,23 @@ struct LiveGoView: View {
         if let onExit { onExit() } else { dismiss() }
     }
 
-    /// Ending a trip finishes it in the rider's history, and may ask the one or two things the app
-    /// could not answer for it.
+    /// Ending a trip finishes it in the rider's history.
     ///
     /// The history used to depend on the rider separately remembering to open the trip card and
     /// tap "Log this trip": `markTripComplete` had exactly one caller and it was that button, so
     /// finishing a guided journey recorded nothing at all. Both ways into this view end here, so
     /// both now record.
     ///
-    /// The questions are asked *before* leaving rather than after, because the screen that comes
-    /// next already presents a sheet of its own and two presentations on one node is a failure
-    /// this app has shipped twice.
+    /// It asks nothing on the way out. Riders were once asked about lifts, exits and how long a
+    /// change took; the city packs and the route provider carry those now, and a question the data
+    /// already answers only teaches riders their answers do not matter.
     private func exit() {
-        let cityID = viewModel.route.networkCityID ?? ""
-        tripMemoryService.markTripComplete(route: viewModel.route, cityID: cityID)
-        let questions = PostTripQuestionsSheet.questions(for: viewModel.route, cityID: cityID) {
-            container.riderAnswerService.hasAnswered($0)
-        }
-        if questions.isEmpty {
-            leave()
-        } else {
-            asksPostTripQuestions = true
-        }
+        tripMemoryService.markTripComplete(route: viewModel.route, cityID: viewModel.route.networkCityID ?? "")
+        leave()
     }
 
     var body: some View {
         navigatorSurface
-        .sheet(isPresented: $asksPostTripQuestions) {
-            PostTripQuestionsSheet(
-                route: viewModel.route,
-                cityID: viewModel.route.networkCityID ?? ""
-            ) {
-                asksPostTripQuestions = false
-                leave()
-            }
-        }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             // Continuous fixes drive the puck and off-route detection; ended on disappear.
@@ -267,6 +248,14 @@ struct LiveGoView: View {
             }
             await loadTransferGuidance(for: request)
         }
+        // Corridor lengths are fetched on reaching a change rather than when the trip starts, so a
+        // direct ride makes no request at all. Keyed like the guidance above, and on this view
+        // rather than on the corridor row: that row only exists once a length has arrived, so a
+        // task hung on it would wait for its own result.
+        .task(id: transferGuidanceRequest) {
+            guard activeTransferKey != nil else { return }
+            await loadTransferGeometries()
+        }
         .task(id: viewModel.route.id) {
             await container.officialStationData.prefetchTransferAssets(for: viewModel.route)
         }
@@ -298,13 +287,7 @@ struct LiveGoView: View {
             ?? AppLocalization.localized("Transfer station")
     }
 
-    /// Which change the rider is making, as something answerable about.
-    ///
-    /// Built from names rather than identifiers because `TripStep` carries names, and that is
-    /// fine while every answer stays on the device that produced it. **Before answers are ever
-    /// pooled between riders this has to move to stable IDs**: `localizedName` differs by
-    /// language, so a Chinese and an English rider standing in the same corridor would key the
-    /// same change two different ways. `TransferKey` is the one type that has to change.
+    /// Which change the rider is making, in the names `TransferGeometry.matches` compares.
     private var activeTransferKey: TransferKey? {
         guard let step = viewModel.currentStep,
               step.kind == .transfer,
@@ -333,47 +316,54 @@ struct LiveGoView: View {
         .background(Color.appBackground)
     }
 
-    /// The one moment the rider knows how long the change took is while they are making it, so
-    /// the question lives here and nowhere else. Shown under both the guidance and the
-    /// "no information" state: the app having nothing to say about a transfer is exactly when
-    /// hearing from the rider is worth most.
-    @ViewBuilder
-    private var transferPaceSection: some View {
-        if let key = activeTransferKey {
-            TransferPacePrompt(
-                key: key,
-                insight: insight(for: key)
-            ) { pace in
-                container.transferInsightService.record(pace, for: key)
-            }
-            .padding(.horizontal, 24)
-            // Fetched here rather than when the trip starts: a journey with no change never asks,
-            // so a direct ride costs no request at all.
-            .task(id: viewModel.route.id) { await loadTransferGeometries() }
-        }
-    }
-
-    /// What the app knows about this change, best source first.
+    /// The measured walk between the two platforms, where the route provider returned one.
     ///
-    /// The rider's own answer outranks a measured corridor because they were standing in it. The
-    /// geometry knows the distance but nothing about the stairs, the lift queue or the crowd. When
-    /// neither exists this returns nil and the prompt simply asks, which is the honest state.
-    private func insight(for key: TransferKey) -> TransferInsight? {
-        if let recorded = container.transferInsightService.insight(for: key) { return recorded }
-        guard let geometry = transferGeometries.first(where: { $0.matches(key) }) else { return nil }
-        return TransferInsight(
-            pace: TransferPace(distanceMetres: geometry.distanceMetres),
-            source: .mapProvider,
-            distanceMetres: geometry.distanceMetres
-        )
+    /// Shown under both the guidance and the "no information" state. When nothing was measured,
+    /// and an in-station change often has nothing to measure, this shows nothing rather than a
+    /// figure the app would have had to make up.
+    @ViewBuilder
+    private var transferCorridorSection: some View {
+        if let key = activeTransferKey,
+           let geometry = transferGeometries.first(where: { $0.matches(key) }) {
+            let pace = TransferPace(distanceMetres: geometry.distanceMetres)
+            HStack(spacing: 10) {
+                Image(systemName: pace.icon)
+                    .font(.headline)
+                    .foregroundStyle(Color.accentColor)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    // "Walking distance", not "transfer time". The metres were measured; the
+                    // seconds were not, and naming this after time would be the app inventing the
+                    // precision it exists to refuse.
+                    Text(AppLocalization.text(
+                        english: "Walking distance between platforms",
+                        simplified: "站台之间的步行距离",
+                        traditional: "月台之間的步行距離"
+                    ))
+                    .rowMeta()
+                    // Leads with the metres, because that is the part that was observed; the bucket
+                    // beside it is this app's walking model applied to that distance. The literal
+                    // " m " once spliced an English unit into a Chinese sentence here, and the
+                    // validator skips interpolated literals, which is why it passed.
+                    Text("\(AppLocalization.distance(Double(geometry.distanceMetres))) · \(pace.title)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                Spacer(minLength: 0)
+            }
+            .accessibilityElement(children: .combine)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
+            .padding(.horizontal, 24)
+        }
     }
 
     private func loadTransferGeometries() async {
         // Attempted once per trip, whatever the answer was.
         //
-        // This lives on a `.task` inside a conditional branch — the prompt appears only while the
-        // rider is at a change — so SwiftUI rebuilds the subtree and restarts it at every
-        // interchange. The only guard was `transferGeometries.isEmpty`, which holds after *any*
+        // The task that calls this restarts at every interchange, because it is keyed on the
+        // transfer step. The only guard was `transferGeometries.isEmpty`, which holds after *any*
         // failed attempt, so with Baidu refusing, a four-change trip spent one route call per
         // change, each a live round trip into a quota that had already said no.
         guard !didRequestTransferGeometries else { return }
@@ -446,7 +436,7 @@ struct LiveGoView: View {
                         .rowMeta()
                         .multilineTextAlignment(.center)
                 }
-                transferPaceSection
+                transferCorridorSection
                     .padding(.horizontal, -24)
             }
             .padding(24)
@@ -471,7 +461,7 @@ struct LiveGoView: View {
                 }
                 transferNotes
                     .padding(.horizontal, 24)
-                transferPaceSection
+                transferCorridorSection
             }
             .padding(.vertical, 24)
         }

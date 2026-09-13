@@ -486,7 +486,14 @@ module OSSDataValidators
       unless ids == OSSCityPackPipeline::CATALOG_CITY_IDS
         fail_validation("manifest must contain all 58 catalog cities in stable order")
       end
-      fail_validation("manifest downloadURL values must all be null") unless cities.all? { |city| city["downloadURL"].nil? }
+      # A bundled city offers its pack for download from wherever this manifest is mirrored; a
+      # city with no pack has nothing to offer. The path is relative on purpose — see the
+      # pipeline — so an absolute URL here would pin one host into the data.
+      cities.each do |city|
+        expected = city["bundledResource"] ? "../Just-Go/Resources/BundledCityPacks/#{city.fetch("cityID")}.json" : nil
+        next if city["downloadURL"] == expected
+        fail_validation("#{city.fetch("cityID")} manifest downloadURL must be #{expected.inspect}")
+      end
       known_rights_ids = load_json(File.join(root, "DataPacks", "rights_inventory.json"))
         .fetch("rights").map { |right| right.fetch("id") }
       cities.each do |city|

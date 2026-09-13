@@ -1,8 +1,11 @@
 name: Official Transit Link Audit
 
+# Run by hand, not weekly. On a schedule this checked ~700 operator links from GitHub's US
+# runners, which cannot reach most mainland Chinese transit sites: the last scheduled run
+# reported 453 failures out of 712, and `continue-on-error` painted that green. The same links
+# answer in about a second from a machine in China, so the result said where the runner was, not
+# which links were broken. Run it from a network that can reach them.
 on:
-  schedule:
-    - cron: "17 4 * * 2"
   workflow_dispatch:
 
 permissions:
@@ -10,14 +13,13 @@ permissions:
 
 jobs:
   audit:
-    name: Non-blocking live link audit
+    name: Live link audit
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    continue-on-error: true
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check official targets and source pages
         run: ruby Scripts/audit_official_transit_links.rb

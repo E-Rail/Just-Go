@@ -4,7 +4,19 @@ import MapKit
 actor BundledMetroRouteProvider: TransitRouteProviding {
     private let metroNetworks: MetroNetworkProviding
     let walkingRoutes: WalkingRouteProviding
+    /// Built routing graphs, newest use last.
+    ///
+    /// Keyed on the set of networks a trip spans, and which networks those are depends on the trip:
+    /// anything within 25 km of either end. Around the Pearl River Delta {4401}, {4401,4406} and
+    /// {4401,4406,4419} are three different keys, each holding its own station, line and adjacency
+    /// tables plus every hop's geometry in both directions. Kept for the session, planning across a
+    /// region accumulated one of those per combination.
+    ///
+    /// Three, because a rider's trips cluster: home city, the neighbour they commute to, and one
+    /// more. A miss rebuilds from data already in memory and costs no network.
     private var graphs: [String: MetroRoutingGraph] = [:]
+    private var graphOrder: [String] = []
+    private static let maximumGraphs = 3
 
     init(
         metroNetworks: MetroNetworkProviding,
@@ -264,6 +276,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
     private func routingGraph(for networks: [MetroNetwork]) -> MetroRoutingGraph {
         let key = networks.map { "\($0.cityID):\($0.version)" }.sorted().joined(separator: "|")
         if let graph = graphs[key] {
+            graphOrder.removeAll { $0 == key }
+            graphOrder.append(key)
             return graph
         }
 
@@ -355,11 +369,18 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             canonicalLineIDs: canonicalLine
         )
         graphs[key] = graph
+        graphOrder.removeAll { $0 == key }
+        graphOrder.append(key)
+        while graphOrder.count > Self.maximumGraphs {
+            let evicted = graphOrder.removeFirst()
+            graphs[evicted] = nil
+        }
         return graph
     }
 
     func releaseMemory() {
         graphs.removeAll()
+        graphOrder.removeAll()
     }
 
     /// The exclusion is applied here rather than when the graph is built, and that is deliberate:

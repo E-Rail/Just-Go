@@ -6,12 +6,21 @@ private struct MemoryWarningReleaseTargets: Sendable {
     let stationInformationProvider: OfficialStationInformationRouter?
     let metroNetworkProvider: BundledMetroNetworkService?
     let transitRouteProvider: BundledMetroRouteProvider?
+    /// Everything Baidu answered this session, plus the access legs measured from it and MapKit.
+    /// All three are capped now, but a memory warning is exactly when a cap is not enough: every
+    /// one of these can be asked again, and the cost of doing so is a request, not a wrong answer.
+    let tripObservations: BaiduTripObservationService?
+    let ridingRoutes: BaiduRidingRouteProvider?
+    let accessRoutes: MemoizingAccessRouteProvider?
 
     func releaseMemory() async {
         await officialStationData?.releaseMemory()
         await stationInformationProvider?.releaseMemory()
         await metroNetworkProvider?.releaseMemory()
         await transitRouteProvider?.releaseMemory()
+        await tripObservations?.releaseMemory()
+        await ridingRoutes?.releaseMemory()
+        await accessRoutes?.releaseMemory()
     }
 }
 
@@ -63,7 +72,10 @@ final class DIContainer {
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
         memoryManagedStationInformationProvider: OfficialStationInformationRouter? = nil,
         memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
-        memoryManagedTransitRouteProvider: BundledMetroRouteProvider? = nil
+        memoryManagedTransitRouteProvider: BundledMetroRouteProvider? = nil,
+        memoryManagedTripObservations: BaiduTripObservationService? = nil,
+        memoryManagedRidingRoutes: BaiduRidingRouteProvider? = nil,
+        memoryManagedAccessRoutes: MemoizingAccessRouteProvider? = nil
     ) {
         self.locationService = locationService
         self.placeSearchProvider = placeSearchProvider
@@ -85,7 +97,10 @@ final class DIContainer {
             officialStationData: memoryManagedOfficialStationData,
             stationInformationProvider: memoryManagedStationInformationProvider,
             metroNetworkProvider: memoryManagedMetroNetworkProvider,
-            transitRouteProvider: memoryManagedTransitRouteProvider
+            transitRouteProvider: memoryManagedTransitRouteProvider,
+            tripObservations: memoryManagedTripObservations,
+            ridingRoutes: memoryManagedRidingRoutes,
+            accessRoutes: memoryManagedAccessRoutes
         )
     }
 
@@ -220,10 +235,9 @@ final class DIContainer {
         // MapKit and the bike leg is the re-timed walking shape it has always been.
         // Memoized once, around the shared instance, so the graph's station walks, enrichment's
         // door walks and every re-plan draw on one answer per leg rather than asking again.
+        let ridingRouteProvider = baiduClient.map { BaiduRidingRouteProvider(client: $0) }
         let walkingRouteProvider = MemoizingAccessRouteProvider(
-            provider: CompositeAccessRouteProvider(
-                riding: baiduClient.map { BaiduRidingRouteProvider(client: $0) }
-            )
+            provider: CompositeAccessRouteProvider(riding: ridingRouteProvider)
         )
         let transitRouteProvider = BundledMetroRouteProvider(
             metroNetworks: metroNetworkProvider,
@@ -269,7 +283,10 @@ final class DIContainer {
             memoryManagedOfficialStationData: officialStationData,
             memoryManagedStationInformationProvider: stationInformationRouter,
             memoryManagedMetroNetworkProvider: metroNetworkProvider,
-            memoryManagedTransitRouteProvider: transitRouteProvider
+            memoryManagedTransitRouteProvider: transitRouteProvider,
+            memoryManagedTripObservations: tripObservationProvider,
+            memoryManagedRidingRoutes: ridingRouteProvider,
+            memoryManagedAccessRoutes: walkingRouteProvider
         )
         container.installMemoryWarningReleaseHandler()
         return container

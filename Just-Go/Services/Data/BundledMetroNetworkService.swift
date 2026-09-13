@@ -291,12 +291,25 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     private var summaries: [String: MetroNetworkSummary] = [:]
     private var missingCityIDs: Set<String> = []
     private var allStationsCache: [Station]?
+    /// Decodes already running, by city. An actor suspends at every `await`, so two callers that
+    /// both miss the cache — and at launch the map, the station index and the quick-tag repair all
+    /// start together — each read and parsed the same 4.5 MB of network files.
+    private var inFlightNetworks: [String: Task<MetroNetwork?, Never>] = [:]
 
     func network(for cityID: String) async -> MetroNetwork? {
         if let network = networks[cityID] {
             return network
         }
         guard !missingCityIDs.contains(cityID) else { return nil }
+        if let existing = inFlightNetworks[cityID] { return await existing.value }
+        let task = Task { await decodeNetwork(for: cityID) }
+        inFlightNetworks[cityID] = task
+        let network = await task.value
+        inFlightNetworks[cityID] = nil
+        return network
+    }
+
+    private func decodeNetwork(for cityID: String) async -> MetroNetwork? {
         guard let url = bundledNetworkURL(for: cityID) else {
             missingCityIDs.insert(cityID)
             return nil

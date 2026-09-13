@@ -39,10 +39,21 @@ actor BaiduRidingRouteProvider {
     private let client: BaiduMapsClient
     /// Session-scoped, in memory only, for the same licensing reason as every other Baidu result
     /// in this app. See `BaiduTripObservationService` for the full note.
+    ///
+    /// Capped, newest use last. The key rounds the two ends to about a metre, and Live Go re-plans
+    /// from wherever the rider is standing, so a long guided journey added a new entry — each
+    /// holding a full cycling path — every time it rerouted, with nothing ever removing one.
     private var cache: [String: RidingRoute] = [:]
+    private var cacheOrder: [String] = []
+    private static let maximumCachedRoutes = 32
 
     init(client: BaiduMapsClient) {
         self.client = client
+    }
+
+    func releaseMemory() {
+        cache.removeAll()
+        cacheOrder.removeAll()
     }
 
     struct RidingRoute: Sendable, Equatable {
@@ -101,6 +112,12 @@ actor BaiduRidingRouteProvider {
             restriction: (restriction?.isEmpty ?? true) ? nil : restriction
         )
         cache[cacheKey] = result
+        cacheOrder.removeAll { $0 == cacheKey }
+        cacheOrder.append(cacheKey)
+        while cacheOrder.count > Self.maximumCachedRoutes {
+            let evicted = cacheOrder.removeFirst()
+            cache[evicted] = nil
+        }
         return result
     }
 

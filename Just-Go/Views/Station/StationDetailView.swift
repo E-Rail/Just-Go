@@ -153,6 +153,11 @@ struct StationDetailView: View {
             }
         }
         .task {
+            // Only once. `.task` runs again whenever this page reappears — coming back from a line
+            // page, for instance — and rebuilding here threw away everything already loaded, left
+            // the old view model's fetches running, and asked the operator for the same station
+            // again.
+            guard viewModel == nil else { return }
             viewModel = container.makeStationDetailViewModel()
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()

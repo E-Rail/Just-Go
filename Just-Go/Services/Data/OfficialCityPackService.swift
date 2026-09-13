@@ -154,7 +154,20 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
     private var failedManifestCooldownUntil: [URL: Date] = [:]
     private var packs: [String: LoadedPack] = [:]
+    /// Bundled packs decoded to answer a question about them, newest use last.
+    ///
+    /// Bounded, because the question is often asked about every city at once: opening Transit Data
+    /// asks for the status and coverage of all 14, and each answer decodes that city's pack and
+    /// builds three name indexes over its stations. Held for the session, that was the whole 4.9 MB
+    /// of bundled JSON plus its indexes, for a screen the rider is reading rather than routing from.
+    /// The decode is deliberate and stays — a pack that will not load must not report "Included" —
+    /// but the result no longer has to be kept.
+    ///
+    /// Four, so a rider moving between neighbouring cities keeps theirs, and the packs actually in
+    /// use live in `packs` and are not evicted by this at all.
     private var bundledBaselinePacks: [String: LoadedPack] = [:]
+    private var bundledBaselineOrder: [String] = []
+    private static let maximumBundledBaselinePacks = 4
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
     // Explicit update attempts cache failures briefly. Normal station enrichment only opens
     // installed or bundled data and never contacts a remote pack origin.
@@ -406,6 +419,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         failedManifestCooldownUntil.removeAll()
         packs.removeAll()
         bundledBaselinePacks.removeAll()
+        bundledBaselineOrder.removeAll()
         loadStatuses.removeAll()
         failedCooldownUntil.removeAll()
         cachedOfficialResourceCatalog = nil
@@ -1119,7 +1133,10 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private func bundledBaselinePack(for cityID: String) -> LoadedPack? {
-        if let cached = bundledBaselinePacks[cityID] { return cached }
+        if let cached = bundledBaselinePacks[cityID] {
+            touchBundledBaseline(cityID)
+            return cached
+        }
         guard let entry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }),
               let bundled = validatedBundledPack(for: entry) else { return nil }
         let loaded = LoadedPack(
@@ -1129,7 +1146,17 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             origin: .bundled
         )
         bundledBaselinePacks[cityID] = loaded
+        touchBundledBaseline(cityID)
+        while bundledBaselineOrder.count > Self.maximumBundledBaselinePacks {
+            let evicted = bundledBaselineOrder.removeFirst()
+            bundledBaselinePacks[evicted] = nil
+        }
         return loaded
+    }
+
+    private func touchBundledBaseline(_ cityID: String) {
+        bundledBaselineOrder.removeAll { $0 == cityID }
+        bundledBaselineOrder.append(cityID)
     }
 
     nonisolated private static func decodeValidatedManifest(_ data: Data) throws -> OfficialManifest {
@@ -1488,6 +1515,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let releasedCityIDs = Array(packs.keys)
         packs.removeAll()
         bundledBaselinePacks.removeAll()
+        bundledBaselineOrder.removeAll()
         cachedOfficialResourceCatalog = nil
         for cityID in releasedCityIDs {
             if loadStatuses[cityID]?.isMaterialized == true {

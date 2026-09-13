@@ -622,7 +622,10 @@ module OSSCityPackPipeline
               "sizeBytes" => bytes.bytesize,
               "sha256" => Digest::SHA256.hexdigest(bytes),
               "bundledResource" => "BundledCityPacks/#{city_id}.json",
-              "downloadURL" => nil,
+              # Relative to this manifest, so one manifest serves every origin it is mirrored
+              # to and no host is written into the data. The app resolves it against whichever
+              # manifest URL answered and refuses anything that lands on a different host.
+              "downloadURL" => "../Just-Go/Resources/BundledCityPacks/#{city_id}.json",
               "rightsIDs" => deep_copy(pack.fetch("rightsIDs")),
               "externalResources" => [],
               "capabilities" => deep_copy(pack.fetch("capabilities")),

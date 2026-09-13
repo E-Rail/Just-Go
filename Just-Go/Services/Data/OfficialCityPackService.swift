@@ -1026,47 +1026,25 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return decoded
     }
 
+    /// The first configured origin that answers, not all of them.
+    ///
+    /// They are mirrors of one another — the same repository, the same files — so asking all three
+    /// at once spent three requests to learn the same thing, and the two that are unreachable from
+    /// wherever the rider is each had to time out first. In order, stopping at the first success;
+    /// the rest are only tried when it fails.
     private func loadRemoteManifests() async -> [(url: URL, manifest: OfficialManifest)] {
-        let urls = Self.manifestURLs
-        guard !urls.isEmpty else { return [] }
-        var manifestsByURL: [URL: OfficialManifest] = [:]
-        await withTaskGroup(of: RemoteManifestLoadResult.self) { group in
-            for url in urls {
-                group.addTask { [self] in
-                    do {
-                        return RemoteManifestLoadResult(
-                            url: url,
-                            manifest: try await loadManifest(from: url),
-                            errorDescription: nil
-                        )
-                    } catch CityPackDiskError.manifestCooldown {
-                        return RemoteManifestLoadResult(
-                            url: url,
-                            manifest: nil,
-                            errorDescription: nil
-                        )
-                    } catch {
-                        return RemoteManifestLoadResult(
-                            url: url,
-                            manifest: nil,
-                            errorDescription: String(describing: error)
-                        )
-                    }
-                }
-            }
-            for await result in group {
-                if let manifest = result.manifest {
-                    manifestsByURL[result.url] = manifest
-                } else if let errorDescription = result.errorDescription {
-                    AppLog.data.warning(
-                        "City pack manifest failed via \(result.url.absoluteString, privacy: .public): \(errorDescription, privacy: .public)"
-                    )
-                }
+        for url in Self.manifestURLs {
+            do {
+                return [(url, try await loadManifest(from: url))]
+            } catch CityPackDiskError.manifestCooldown {
+                continue
+            } catch {
+                AppLog.data.warning(
+                    "City pack manifest failed via \(url.absoluteString, privacy: .public): \(String(describing: error), privacy: .public)"
+                )
             }
         }
-        return urls.compactMap { url in
-            manifestsByURL[url].map { (url, $0) }
-        }
+        return []
     }
 
     private func remoteEntries(
@@ -1283,17 +1261,19 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
         switch origin {
         case .bundled:
-            // A bundled pack ships inside the app binary, is pinned by the manifest's SHA-256,
-            // and is reviewed in-repo, so authored guidance is trusted from it. Rejecting
-            // `stationAccessPoints` here regardless of origin silently discarded the *entire*
-            // Taipei pack: every one of its stations carries the operator's official entrance
-            // coordinates, so every station failed and the city fell back to notConfigured.
             return station.licensedMedia.allSatisfy(validatesBundledMedia)
         case .downloaded:
-            // A downloaded pack is remote content. It must not be able to introduce authored
-            // guidance or licensed media that the app would then present to riders as official.
-            return station.licensedMedia.isEmpty &&
-                (station.stationAccessPoints ?? []).isEmpty
+            // `stationAccessPoints` used to be rejected here, and that made the download path
+            // useless the moment it was reachable: 13 of the 14 packs carry the operator's own
+            // entrance coordinates for almost every station, so the only city a mirror could
+            // deliver was Macau, which has none. The entrances *are* the reason to update a pack.
+            //
+            // What a downloaded pack still cannot introduce is licensed media, whose files live in
+            // the app bundle and cannot arrive over the wire at all. And it is not unchecked: the
+            // manifest names a size and a SHA-256, the bytes are verified against both before
+            // anything is parsed, every station is validated the same way a bundled one is, and a
+            // pack that fails is discarded in favour of the bundled copy.
+            return station.licensedMedia.isEmpty
         }
     }
 
@@ -1448,11 +1428,19 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
     }
 
+    /// Hosts a city pack may never be fetched from.
+    ///
+    /// Wikimedia stays out: its files are not this project's to redistribute, and a pack that
+    /// pulled from it would make the app a redistributor of media under someone else's terms.
+    ///
+    /// GitHub and jsDelivr used to be here too, which left the download path unreachable — no
+    /// origin was configured in any build, so every rider had exactly the packs their app version
+    /// shipped with until the next App Store release. They serve this repository's own reviewed
+    /// files, byte for byte, so they are where the packs now come from. What still protects the
+    /// rider is unchanged and is what actually matters: the manifest names a size and a SHA-256,
+    /// `decodeValidatedPack` checks both and validates every station, and a pack that fails any of
+    /// that is discarded in favour of the bundled one.
     nonisolated private static let forbiddenRuntimeDataHostSuffixes = [
-        "github.com",
-        "github.io",
-        "githubusercontent.com",
-        "jsdelivr.net",
         "wikimedia.org",
         "wikipedia.org"
     ]
@@ -1495,10 +1483,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private static var manifestURLs: [URL] {
+        // Mainland first: most riders are there, and the other two are usually unreachable from
+        // it. Tried in this order and stopped at the first that answers, so the rest cost nothing.
         let configuredValues = [
+            Bundle.main.object(forInfoDictionaryKey: "CityPackMainlandMirrorURL") as? String,
             Bundle.main.object(forInfoDictionaryKey: "CityPackManifestURL") as? String,
             Bundle.main.object(forInfoDictionaryKey: "CityPackBaseURL") as? String,
-            Bundle.main.object(forInfoDictionaryKey: "CityPackMainlandMirrorURL") as? String,
             Bundle.main.object(forInfoDictionaryKey: "CityPackFallbackBaseURL") as? String
         ]
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -1630,12 +1620,6 @@ private struct RemoteManifestEntry {
 /// Thrown by a single racing candidate in `performDownload`. Validation failed or the data
 /// didn't match its manifest entry. Never surfaces beyond the task group; siblings keep racing.
 private struct CityPackCandidateFailed: Error {}
-
-private struct RemoteManifestLoadResult: Sendable {
-    let url: URL
-    let manifest: OfficialManifest?
-    let errorDescription: String?
-}
 
 private struct OfficialManifest: Codable, Sendable {
     let schemaVersion: Int

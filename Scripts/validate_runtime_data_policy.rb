@@ -353,7 +353,7 @@ station_information_source = read.call(
   reloadIgnoringLocalAndRemoteCacheData
   httpCookieStorage
   httpShouldSetCookies
-  BeijingStationInformationRedirectDelegate
+  OperatorRedirectDelegate
   maximumResponseBytes
   cacheLifetime
   defaultRateLimitBackoff

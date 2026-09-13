@@ -44,23 +44,6 @@ actor OfficialStationInformationRouter: OfficialStationInformationProviding {
     }
 }
 
-private final class ShanghaiRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        willPerformHTTPRedirection response: HTTPURLResponse,
-        newRequest request: URLRequest,
-        completionHandler: @escaping (URLRequest?) -> Void
-    ) {
-        guard request.url?.scheme?.lowercased() == "https",
-              request.url?.host?.lowercased() == ShanghaiStationInformationProvider.host else {
-            completionHandler(nil)
-            return
-        }
-        completionHandler(request)
-    }
-}
-
 /// Fetches Shanghai Metro station information from the operator's own JSON endpoints, on the
 /// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
 /// in `StationInfoAPI/sources/sources.json` under `shanghaiMetroOnline`; the two quirks that recipe
@@ -90,6 +73,12 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     private let session: URLSession
     private let diskCache: (any OfficialStationInformationCaching)?
     private var cache: [PreparedRequest: CacheEntry] = [:]
+    private var inFlight: [PreparedRequest: InFlightRequest] = [:]
+
+    private struct InFlightRequest: Sendable {
+        let token: UUID
+        let task: Task<OfficialStationInformationSnapshot, Error>
+    }
 
     init(session: URLSession? = nil, diskCache: (any OfficialStationInformationCaching)? = nil) {
         self.diskCache = diskCache
@@ -121,18 +110,45 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             return cached.snapshot
         }
 
+        // Shared, not started again, the way Beijing's provider already did it. The planner
+        // enriches every alternative at once and the station page asks for the same station on
+        // top, so one station cost as many round trips as there were callers. And the fetch is
+        // an unstructured task, so the planner's deadline stops the waiting rather than the
+        // request: whoever asks next gets the cached answer instead of paying for it again.
+        if let active = inFlight[prepared] {
+            return try await finish(active, for: prepared)
+        }
+        let session = self.session
+        let active = InFlightRequest(
+            token: UUID(),
+            task: Task { try await Self.fetch(prepared, using: session) }
+        )
+        inFlight[prepared] = active
+        return try await finish(active, for: prepared)
+    }
+
+    private func finish(
+        _ active: InFlightRequest,
+        for prepared: PreparedRequest
+    ) async throws -> OfficialStationInformationSnapshot {
         do {
-            let snapshot = try await Self.fetch(prepared, using: session)
-            cache[prepared] = CacheEntry(
-                snapshot: snapshot,
-                expiresAt: now.advanced(by: .seconds(Self.cacheLifetime))
-            )
-            if let diskCache {
-                let key = prepared.primaryKey
-                Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: key) }
+            let snapshot = try await active.task.value
+            if inFlight[prepared]?.token == active.token {
+                inFlight.removeValue(forKey: prepared)
+                cache[prepared] = CacheEntry(
+                    snapshot: snapshot,
+                    expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
+                )
+                if let diskCache {
+                    let key = prepared.primaryKey
+                    Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: key) }
+                }
             }
             return snapshot
         } catch {
+            if inFlight[prepared]?.token == active.token {
+                inFlight.removeValue(forKey: prepared)
+            }
             return try await servingStoredSnapshot(for: prepared, insteadOf: error)
         }
     }
@@ -141,7 +157,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         for request: PreparedRequest,
         insteadOf error: Error
     ) async throws -> OfficialStationInformationSnapshot {
-        guard Self.allowsStoredFallback(error),
+        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
               let diskCache,
               let stored = await diskCache.storedSnapshot(
                   cityID: Self.cityID,
@@ -153,16 +169,6 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
     }
 
-    private static func allowsStoredFallback(_ error: Error) -> Bool {
-        guard let providerError = error as? OfficialStationInformationProviderError else { return false }
-        switch providerError {
-        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
-             .rateLimited, .httpStatus, .serviceUnavailable:
-            return true
-        case .invalidRequest, .contractViolation:
-            return false
-        }
-    }
 
     private static func prepare(
         _ request: OfficialStationInformationRequest
@@ -182,7 +188,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
                     "Shanghai station reference has no reviewed four-digit key"
                 )
             }
-            let names = expectedNames.compactMap(trimmed).uniqued().sorted()
+            let names = expectedNames.compactMap(OperatorFieldParsing.trimmed).uniqued().sorted()
             guard !names.isEmpty else {
                 throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
             }
@@ -233,11 +239,11 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         let colors = try await colorsTask
         let station = try await stationTask
 
-        guard let name = trimmed(station.nameCn) else {
+        guard let name = OperatorFieldParsing.trimmed(station.nameCn) else {
             throw OfficialStationInformationProviderError.contractViolation("station name missing")
         }
-        let expected = Set(request.expectedNames.map(normalizedName))
-        guard expected.contains(normalizedName(name)) else {
+        let expected = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
+        guard expected.contains(OperatorFieldParsing.normalizedName(name)) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
@@ -316,8 +322,8 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         let target = Int(statID)
         return rows.compactMap { row in
             guard intValue(row["stat_id"]) == target,
-                  let direction = trimmed(row["description"] as? String) else { return nil }
-            return (direction, placeholderAware(row["first_time"] as? String), placeholderAware(row["last_time"] as? String))
+                  let direction = OperatorFieldParsing.trimmed(row["description"] as? String) else { return nil }
+            return (direction, OperatorFieldParsing.placeholderAware(row["first_time"] as? String), OperatorFieldParsing.placeholderAware(row["last_time"] as? String))
         }
     }
 
@@ -357,7 +363,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
                 // Shanghai packs every road an exit reaches into one space-separated string
                 // ("西藏南路 复兴东路 盐城路"). Split it so `details` means one place per element,
                 // the way Beijing's `nearby` array already does. The exits view groups on that.
-                let details = trimmed(entrance["description"] as? String)
+                let details = OperatorFieldParsing.trimmed(entrance["description"] as? String)
                     .map { $0.split(whereSeparator: \.isWhitespace).map(String.init) }?
                     .uniqued() ?? []
                 let accessible: Bool?
@@ -382,7 +388,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
               let toilets = root["toilet"] as? [[String: Any]] else { return [] }
         let name = AppLocalization.text(english: "Restroom", simplified: "卫生间", traditional: "洗手間")
         let items = toilets.compactMap { toilet -> OfficialStationFacilityInformation? in
-            guard let location = trimmed(toilet["description"] as? String) else { return nil }
+            guard let location = OperatorFieldParsing.trimmed(toilet["description"] as? String) else { return nil }
             return OfficialStationFacilityInformation(name: name, location: location, availability: .available)
         }.uniqued(by: \OfficialStationFacilityInformation.id)
         return items.isEmpty ? [] : [OfficialStationFacilityGroup(name: name, items: items)]
@@ -400,8 +406,8 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             if let existing = byDirection[row.direction] {
                 byDirection[row.direction] = OfficialStationServiceInformation(
                     direction: row.direction,
-                    firstTrain: preferredServiceTime(existing.firstTrain, row.first, earliest: true),
-                    lastTrain: preferredServiceTime(existing.lastTrain, row.last, earliest: false),
+                    firstTrain: OperatorFieldParsing.preferredServiceTime(existing.firstTrain, row.first, earliest: true),
+                    lastTrain: OperatorFieldParsing.preferredServiceTime(existing.lastTrain, row.last, earliest: false),
                     liveTime: nil
                 )
             } else {
@@ -440,7 +446,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(for: urlRequest, delegate: ShanghaiRedirectDelegate())
+            (data, response) = try await session.data(for: urlRequest, delegate: OperatorRedirectDelegate(host: Self.host))
         } catch is CancellationError {
             throw CancellationError()
         } catch let error as URLError where error.code == .timedOut {
@@ -469,37 +475,9 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
 
     // MARK: - Helpers
 
-    private static func placeholderAware(_ value: String?) -> String? {
-        guard let value = trimmed(value) else { return nil }
-        return placeholders.contains(value.lowercased()) ? nil : value
-    }
-
-    private static let placeholders: Set<String> = ["--", "-", "/", "／", "—", "n/a", "na", "none", "无", "暂无"]
-
-    private static func serviceMinutes(_ value: String) -> Int? {
-        let parts = value.split(separator: ":")
-        guard parts.count == 2, let hour = Int(parts[0]), let minute = Int(parts[1]),
-              (0..<24).contains(hour), (0..<60).contains(minute) else { return nil }
-        return (hour < 4 ? hour + 24 : hour) * 60 + minute
-    }
-
-    private static func preferredServiceTime(_ lhs: String?, _ rhs: String?, earliest: Bool) -> String? {
-        guard let lhs else { return rhs }
-        guard let rhs else { return lhs }
-        guard let lhsMinutes = serviceMinutes(lhs) else { return rhs }
-        guard let rhsMinutes = serviceMinutes(rhs) else { return lhs }
-        let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
-        return preferLhs ? lhs : rhs
-    }
-
-    private static func trimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let result = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result.isEmpty ? nil : result
-    }
 
     private static func stringValue(_ value: Any?) -> String? {
-        if let string = value as? String { return trimmed(string) }
+        if let string = value as? String { return OperatorFieldParsing.trimmed(string) }
         if let number = value as? NSNumber { return number.stringValue }
         return nil
     }
@@ -511,30 +489,9 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     }
 
     private static func normalizedColor(_ value: String?) -> String? {
-        guard let value = trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")),
+        guard let value = OperatorFieldParsing.trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")),
               value.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else { return nil }
         return "#\(value.uppercased())"
     }
 
-    private static func normalizedName(_ value: String) -> String {
-        value.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
-            .unicodeScalars
-            .filter(CharacterSet.alphanumerics.contains)
-            .map(String.init)
-            .joined()
-    }
-}
-
-private extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
-    }
-}
-
-private extension Array {
-    func uniqued<Key: Hashable>(by keyPath: KeyPath<Element, Key>) -> [Element] {
-        var seen = Set<Key>()
-        return filter { seen.insert($0[keyPath: keyPath]).inserted }
-    }
 }

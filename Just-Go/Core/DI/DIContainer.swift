@@ -30,11 +30,8 @@ final class DIContainer {
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
-    /// Measured transfer corridor lengths, when a provider can supply them. Optional because the
-    /// app must build, launch and route with no Baidu key at all.
-    let tripObservationProvider: TripObservationProviding?
-    /// The same service seen through a different port, and optional for the same reason: with no
-    /// key the line page still draws, it simply cannot offer to check itself against the operator.
+    /// Optional because the app must build, launch and route with no Baidu key at all: with none,
+    /// the line page still draws, it simply cannot offer to check itself against the operator.
     let lineObservationProvider: LineObservationProviding?
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
@@ -58,7 +55,6 @@ final class DIContainer {
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
-        tripObservationProvider: TripObservationProviding? = nil,
         lineObservationProvider: LineObservationProviding? = nil,
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
@@ -80,7 +76,6 @@ final class DIContainer {
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
-        self.tripObservationProvider = tripObservationProvider
         self.lineObservationProvider = lineObservationProvider
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
@@ -223,8 +218,12 @@ final class DIContainer {
         // Walking and driving stay with MapKit. Cycling goes to Baidu, which has a cycling router
         // where MapKit has no cycling transport type at all; with no key the composite is pure
         // MapKit and the bike leg is the re-timed walking shape it has always been.
-        let walkingRouteProvider = CompositeAccessRouteProvider(
-            riding: baiduClient.map { BaiduRidingRouteProvider(client: $0) }
+        // Memoized once, around the shared instance, so the graph's station walks, enrichment's
+        // door walks and every re-plan draw on one answer per leg rather than asking again.
+        let walkingRouteProvider = MemoizingAccessRouteProvider(
+            provider: CompositeAccessRouteProvider(
+                riding: baiduClient.map { BaiduRidingRouteProvider(client: $0) }
+            )
         )
         let transitRouteProvider = BundledMetroRouteProvider(
             metroNetworks: metroNetworkProvider,
@@ -262,7 +261,6 @@ final class DIContainer {
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,
-            tripObservationProvider: tripObservationProvider,
             lineObservationProvider: tripObservationProvider,
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,

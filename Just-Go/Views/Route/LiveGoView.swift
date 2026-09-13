@@ -98,16 +98,19 @@ struct LiveGoView: View {
     @State private var isRerouting = false
     @State private var offRouteStrikes = 0
     @State private var lastRerouteAt = Date.distantPast
+    /// How long to wait before the next reroute, doubling each time until the rider advances.
+    ///
+    /// A fixed 45 s meant a rider taking a different street to the station was re-planned every
+    /// 45 s for the whole walk, and each re-plan is a full plan: several MapKit legs and a metered
+    /// transit call. Doubling backs off a rider who is simply going their own way, while still
+    /// answering quickly the first time someone genuinely turns the wrong way.
+    @State private var rerouteInterval: TimeInterval = 45
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
     @State private var rerouteTask: Task<Void, Never>?
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
-    /// Measured corridor lengths for this trip's interchanges, fetched once and held for the
-    /// screen's lifetime only: nothing about them is written to disk.
-    @State private var transferGeometries: [TransferGeometry] = []
-    @State private var didRequestTransferGeometries = false
     /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
     /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
     /// The Accessibility toggle below is a stronger promise than this one. See `onAppear`.
@@ -258,22 +261,8 @@ struct LiveGoView: View {
             }
             await loadTransferGuidance(for: request)
         }
-        // Corridor lengths are fetched on reaching a change rather than when the trip starts, so a
-        // direct ride makes no request at all. Keyed like the guidance above, and on this view
-        // rather than on the corridor row: that row only exists once a length has arrived, so a
-        // task hung on it would wait for its own result.
-        .task(id: transferGuidanceRequest) {
-            guard activeTransferKey != nil else { return }
-            await loadTransferGeometries()
-        }
         .task(id: viewModel.route.id) {
             await container.officialStationData.prefetchTransferAssets(for: viewModel.route)
-        }
-        // A reroute is a different journey and gets its own attempt. Without this the once-per-trip
-        // guard below would carry the old route's answer, or its failure, into the new one.
-        .onChange(of: viewModel.route.id) { _, _ in
-            didRequestTransferGeometries = false
-            transferGeometries = []
         }
     }
 
@@ -297,18 +286,6 @@ struct LiveGoView: View {
             ?? AppLocalization.localized("Transfer station")
     }
 
-    /// Which change the rider is making, in the names `TransferGeometry.matches` compares.
-    private var activeTransferKey: TransferKey? {
-        guard let step = viewModel.currentStep,
-              step.kind == .transfer,
-              let station = step.fromStationName,
-              let toLine = step.lineName else { return nil }
-        let fromLine = viewModel.plan.steps[..<viewModel.currentIndex]
-            .last { $0.kind == .ride }?.lineName
-        guard let fromLine, fromLine != toLine else { return nil }
-        return TransferKey(stationID: station, fromLineID: fromLine, toLineID: toLine)
-    }
-
     private var activeTransferGuidance: LiveTransferGuidance? {
         guard let step = viewModel.currentStep,
               step.kind == .transfer,
@@ -328,14 +305,15 @@ struct LiveGoView: View {
 
     /// The measured walk between the two platforms, where the route provider returned one.
     ///
-    /// Shown under both the guidance and the "no information" state. When nothing was measured,
-    /// and an in-station change often has nothing to measure, this shows nothing rather than a
-    /// figure the app would have had to make up.
+    /// Read off the leg the planner already costed, rather than asked for again: it used to
+    /// re-request the whole trip from the routing provider, one metered call per guided journey and
+    /// one more after each reroute, for a figure the plan was built from. When nothing was
+    /// measured, and an in-station change often has nothing to measure, this shows nothing rather
+    /// than a number the app would have had to invent.
     @ViewBuilder
     private var transferCorridorSection: some View {
-        if let key = activeTransferKey,
-           let geometry = transferGeometries.first(where: { $0.matches(key) }) {
-            let pace = TransferPace(distanceMetres: geometry.distanceMetres)
+        if let metres = viewModel.currentStep.flatMap(measuredCorridorMetres(for:)) {
+            let pace = TransferPace(distanceMetres: metres)
             HStack(spacing: 10) {
                 Image(systemName: pace.icon)
                     .font(.headline)
@@ -355,7 +333,7 @@ struct LiveGoView: View {
                     // beside it is this app's walking model applied to that distance. The literal
                     // " m " once spliced an English unit into a Chinese sentence here, and the
                     // validator skips interpolated literals, which is why it passed.
-                    Text("\(AppLocalization.distance(Double(geometry.distanceMetres))) · \(pace.title)")
+                    Text("\(AppLocalization.distance(Double(metres))) · \(pace.title)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }
@@ -369,36 +347,15 @@ struct LiveGoView: View {
         }
     }
 
-    private func loadTransferGeometries() async {
-        // Attempted once per trip, whatever the answer was.
-        //
-        // The task that calls this restarts at every interchange, because it is keyed on the
-        // transfer step. The only guard was `transferGeometries.isEmpty`, which holds after *any*
-        // failed attempt, so with Baidu refusing, a four-change trip spent one route call per
-        // change, each a live round trip into a quota that had already said no.
-        guard !didRequestTransferGeometries else { return }
-        didRequestTransferGeometries = true
-        guard let provider = container.tripObservationProvider,
-              let origin = originCoordinate,
-              let destination = destinationCoordinate else { return }
-        transferGeometries = await provider.observations(from: origin, to: destination).transfers
-    }
-
-    /// Mirror of `destinationCoordinate` from the other end of the route.
+    /// The corridor the planner measured for the change this step makes.
     ///
-    /// Note these are the route's own geometry, not the rider's origin and destination places. That
-    /// is deliberate — the corridor being measured is station to station — but it does mean this
-    /// asks a different question from the one the planner asked, so the two cannot share an answer.
-    private var originCoordinate: CLLocationCoordinate2D? {
-        for segment in viewModel.route.segments {
-            if let first = segment.polylineCoordinates.first {
-                return CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
-            }
-            if let stop = segment.stationStops.first?.coordinate {
-                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
-            }
-        }
-        return nil
+    /// Matched by the two stations the leg joins, because a step and a segment describe the same
+    /// change from different ends: the step is built from the segment it follows.
+    private func measuredCorridorMetres(for step: TripStep) -> Int? {
+        guard step.kind == .transfer, let station = step.fromStationName else { return nil }
+        return viewModel.route.segments.first {
+            $0.type == .transfer && $0.fromStationName == station && $0.measuredCorridorMetres != nil
+        }?.measuredCorridorMetres
     }
 
     @ViewBuilder
@@ -761,7 +718,7 @@ struct LiveGoView: View {
         // movement, not jitter) + a cooldown so a failed or just-finished replan doesn't
         // immediately fire again.
         guard offRouteStrikes >= 2, !isRerouting,
-              Date().timeIntervalSince(lastRerouteAt) > 45 else { return }
+              Date().timeIntervalSince(lastRerouteAt) > rerouteInterval else { return }
         offRouteStrikes = 0
         // Stored, so closing the navigator stops it. Unstructured and untracked, a reroute in
         // flight when the rider walked away still ran to completion and wrote its new route into
@@ -775,6 +732,7 @@ struct LiveGoView: View {
         guard let destination = destinationCoordinate else { return }
         isRerouting = true
         lastRerouteAt = Date()
+        rerouteInterval = min(rerouteInterval * 2, 480)
         defer { isRerouting = false }
 
         let preference = appState.accessibilityPreference
@@ -805,6 +763,8 @@ struct LiveGoView: View {
             // From any step but the first the index change runs framing, the alert and the
             // announcement through `onChange`; running them here too spoke the step twice.
             let indexChanges = viewModel.currentIndex != 0
+            // A fresh plan from where the rider actually is: the next divergence is new information.
+            rerouteInterval = 45
             viewModel.reroute(with: newRoute)
             // Step IDs restart with the new plan, so the old ride's start would pass for the new one.
             alertRideStart = nil

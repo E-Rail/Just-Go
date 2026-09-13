@@ -118,6 +118,107 @@ actor BaiduRidingRouteProvider {
     }
 }
 
+/// One answer per leg, for as long as that answer is worth reusing.
+///
+/// Every caller shares this. The graph walks to the station for each of up to three candidate
+/// paths, enrichment re-walks to the door it picks, and a re-plan — a changed departure time, a
+/// reroute mid-trip — asks for all of them again. Measured on one door-to-door Beijing trip, a
+/// single plan sent 6 MKDirections and 4 Baidu cycling requests, and the alternatives overwhelmingly
+/// share their first and last stations. Apple throttles directions per minute and a throttled leg
+/// degrades to "Walking distance is estimated", so the duplicates cost accuracy, not only time.
+///
+/// Ten minutes: a walking route between two fixed points does not change faster than that, and a
+/// trip the rider is still editing is the case this exists for. Bounded, so a session that plans
+/// all day cannot grow it without limit.
+actor MemoizingAccessRouteProvider: WalkingRouteProviding {
+    private struct Entry {
+        let segment: RouteSegment?
+        let at: ContinuousClock.Instant
+    }
+
+    private let provider: WalkingRouteProviding
+    private let lifetime: Duration
+    private let capacity: Int
+    private var entries: [String: Entry] = [:]
+    private var order: [String] = []
+    private var inFlight: [String: Task<RouteSegment?, Never>] = [:]
+
+    init(provider: WalkingRouteProviding, lifetime: Duration = .seconds(600), capacity: Int = 128) {
+        self.provider = provider
+        self.lifetime = lifetime
+        self.capacity = capacity
+    }
+
+    func walkingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        await memoized(from: from, to: to, fromName: fromName, toName: toName, mode: .walking) { provider in
+            await provider.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
+        }
+    }
+
+    func accessSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String,
+        mode: AccessLegMode
+    ) async -> RouteSegment? {
+        await memoized(from: from, to: to, fromName: fromName, toName: toName, mode: mode) { provider in
+            await provider.accessSegment(from: from, to: to, fromName: fromName, toName: toName, mode: mode)
+        }
+    }
+
+    func releaseMemory() {
+        entries.removeAll()
+        order.removeAll()
+    }
+
+    private func memoized(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String,
+        mode: AccessLegMode,
+        fetch: @escaping @Sendable (WalkingRouteProviding) async -> RouteSegment?
+    ) async -> RouteSegment? {
+        // ~1 m precision: finer than the coordinates differ by, coarser than float noise. The mode
+        // belongs in the key, because the same two points cycled and driven are different legs. The
+        // names do not: they label the leg rather than change its shape, so a cached answer is
+        // relabelled for the caller that asked.
+        let key = String(
+            format: "%.5f,%.5f>%.5f,%.5f|%@",
+            from.latitude, from.longitude, to.latitude, to.longitude,
+            String(describing: mode)
+        )
+        if let entry = entries[key], entry.at.duration(to: .now) < lifetime {
+            return entry.segment?.relabelled(from: fromName, to: toName)
+        }
+        if let existing = inFlight[key] {
+            return await existing.value?.relabelled(from: fromName, to: toName)
+        }
+        let provider = provider
+        let task = Task { await fetch(provider) }
+        inFlight[key] = task
+        let segment = await task.value
+        inFlight[key] = nil
+        store(segment, for: key)
+        return segment
+    }
+
+    private func store(_ segment: RouteSegment?, for key: String) {
+        if entries[key] == nil { order.append(key) }
+        entries[key] = Entry(segment: segment, at: .now)
+        while order.count > capacity, let oldest = order.first {
+            order.removeFirst()
+            entries[oldest] = nil
+        }
+    }
+}
+
 /// Routes the access legs, using the best source available for each mode.
 ///
 /// Walking and driving stay with MapKit, which routes both properly. Cycling goes to Baidu where a

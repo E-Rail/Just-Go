@@ -3,6 +3,18 @@ import CoreLocation
 import MapKit
 
 final class StationSearchService {
+    /// One place lookup per query, shared by the two callers that both want it.
+    ///
+    /// The search page asks twice for a single tap on Search: once to list places, and once inside
+    /// `search(keyword:near:)`, which uses them to find stations Apple knows about and the bundled
+    /// index does not. Measured, that was 2 MKLocalSearch and 2 Baidu `/place/v2/search` per tap —
+    /// against an allowance of 100 a day for the whole account. The two callers run concurrently on
+    /// purpose, so the later one joins the in-flight task rather than starting its own.
+    ///
+    /// Only the newest query is held. Riders search forwards, and a stale entry would answer the
+    /// query before last with the results before that.
+    @MainActor private static var placeLookup: (key: String, task: Task<[TransitPlace], Error>)?
+
     private let placeSearchProvider: PlaceSearchProviding
     private let officialStationData: OfficialStationDataProviding
     private let metroNetworkProvider: MetroNetworkProviding
@@ -43,12 +55,9 @@ final class StationSearchService {
             from: coordinate
         )
         guard includingPlaces else { return bundledMatches }
-        let region = coordinate.map {
-            MKCoordinateRegion(center: $0, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
-        }
         let places: [TransitPlace]
         do {
-            places = try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 20)
+            places = try await sharedPlaces(matching: query, near: coordinate)
         } catch {
             guard bundledMatches.isEmpty else { return bundledMatches }
             throw error
@@ -199,10 +208,43 @@ final class StationSearchService {
     /// Search anywhere (POIs, addresses, landmarks) via Apple Maps. Not just metro stations.
     /// Biased to `region` (the visible map area, or the rider) when one is known; unbiased
     /// otherwise, which is honest about having nowhere to bias it to.
-    func searchPlaces(keyword: String, region: MKCoordinateRegion?) async throws -> [TransitPlace] {
+    func searchPlaces(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [TransitPlace] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return [] }
-        return try await placeSearchProvider.searchPlaces(keyword: query, region: region, limit: 12)
+        return Array(try await sharedPlaces(matching: query, near: coordinate).prefix(12))
+    }
+
+    /// The place answer for this query, fetched once however many callers want it.
+    ///
+    /// Biased to the rider over 80 km rather than filtered by city: `MKLocalSearch`'s region is a
+    /// hint, so searching 人民广场 from Beijing still lists Shanghai's, last.
+    @MainActor
+    private func sharedPlaces(
+        matching query: String,
+        near coordinate: CLLocationCoordinate2D?
+    ) async throws -> [TransitPlace] {
+        let key = String(
+            format: "%@|%.3f,%.3f",
+            query.lowercased(),
+            coordinate?.latitude ?? 0,
+            coordinate?.longitude ?? 0
+        )
+        if let lookup = Self.placeLookup, lookup.key == key {
+            return try await lookup.task.value
+        }
+        let region = coordinate.map {
+            MKCoordinateRegion(center: $0, latitudinalMeters: 80_000, longitudinalMeters: 80_000)
+        }
+        let provider = placeSearchProvider
+        let task = Task { try await provider.searchPlaces(keyword: query, region: region, limit: 20) }
+        Self.placeLookup = (key, task)
+        do {
+            return try await task.value
+        } catch {
+            // Not kept: a refusal must not answer the next tap on Search.
+            if Self.placeLookup?.key == key { Self.placeLookup = nil }
+            throw error
+        }
     }
 
     /// The programmed metro station a place corresponds to, if any. Matched by name against the

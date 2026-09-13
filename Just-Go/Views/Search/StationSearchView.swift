@@ -137,22 +137,15 @@ struct SearchPageView: View {
         }
         isSearchingPlaces = true
         placeSearchTask = Task {
-            // No debounce any more. This runs when the rider asks for it, once.
-            // Biased to the rider, not to a city centroid. The same position the station list
-            // is ranked by, so both halves of this page answer "near me" the same way.
-            let region = container.locationService.mapSpaceLocation.map {
-                MKCoordinateRegion(
-                    center: $0.coordinate,
-                    span: MKCoordinateSpan(
-                        latitudeDelta: MapCameraSpan.city,
-                        longitudeDelta: MapCameraSpan.city
-                    )
-                )
-            }
-            let found = try? await container.placeSearchProvider.searchPlaces(
+            // No debounce any more. This runs when the rider asks for it, once — and through the
+            // search service, which shares one lookup with the station half of the same tap
+            // instead of paying the provider twice for the same query.
+            //
+            // Biased to the rider, not to a city centroid. The same position the station list is
+            // ranked by, so both halves of this page answer "near me" the same way.
+            let found = try? await container.stationSearchService.searchPlaces(
                 keyword: trimmed,
-                region: region,
-                limit: 12
+                near: container.locationService.mapSpaceLocation?.coordinate
             )
             guard !Task.isCancelled else { return }
             isSearchingPlaces = false

@@ -383,6 +383,14 @@ struct RouteSegment: Identifiable, Codable {
     /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
     var incomingLineName: String? = nil
     var incomingLineColorHex: String? = nil
+    /// The platform-to-platform walk a routing provider measured for this change, in metres.
+    ///
+    /// Set on `.transfer` legs by `measuringTransfer(distance:)` and read by Live Go, which showed
+    /// the same figure by asking the provider for the whole trip a second time — a metered call per
+    /// guided journey, for a number the plan was already costed with. `distance` cannot stand in:
+    /// every transfer carries one, modelled or measured, and only this says which. Optional with a
+    /// default, so trips already saved in `ActiveTripStore` decode unchanged.
+    var measuredCorridorMetres: Int? = nil
 
     var formattedDuration: String {
         let minutes = Int(duration / 60)
@@ -413,6 +421,36 @@ struct RouteSegment: Identifiable, Codable {
         case .driving: return .driving
         case .walking, .subway, .transfer: return .walking
         }
+    }
+
+    /// The same leg under different end names, with an identity of its own.
+    ///
+    /// A memoized leg is keyed on its two coordinates, so one answer can serve calls that name the
+    /// ends differently ("Current Location" versus a dropped pin). The id is fresh because two
+    /// routes in one results list would otherwise carry segments that compare equal.
+    func relabelled(from newFromName: String?, to newToName: String?) -> RouteSegment {
+        guard fromStationName != newFromName || toStationName != newToName else { return self }
+        return RouteSegment(
+            id: UUID(),
+            type: type,
+            lineName: lineName,
+            lineColorHex: lineColorHex,
+            fromStationName: newFromName,
+            toStationName: newToName,
+            fromStationID: fromStationID,
+            toStationID: toStationID,
+            duration: duration,
+            distance: distance,
+            stops: stops,
+            stationStops: stationStops,
+            polylineCoordinates: polylineCoordinates,
+            walkingDirections: walkingDirections,
+            accessibilityNotes: accessibilityNotes,
+            transitContext: transitContext,
+            transferContext: transferContext,
+            incomingLineName: incomingLineName,
+            incomingLineColorHex: incomingLineColorHex
+        )
     }
 
     /// The same leg, re-labelled for a different mode. Used only where a mode borrows another's
@@ -486,7 +524,8 @@ struct RouteSegment: Identifiable, Codable {
             transitContext: transitContext,
             transferContext: transferContext,
             incomingLineName: incomingLineName,
-            incomingLineColorHex: incomingLineColorHex
+            incomingLineColorHex: incomingLineColorHex,
+            measuredCorridorMetres: Int(measuredDistance.rounded())
         )
     }
 }

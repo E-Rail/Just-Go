@@ -131,6 +131,22 @@ extension View {
     func sideColumn(max cap: CGFloat, in available: CGFloat) -> some View {
         frame(width: min(cap, available * 0.45))
     }
+
+    /// Starts this row's list separator at the row's own leading edge.
+    ///
+    /// Left alone, a `List` starts the separator at the first text that follows an icon, which is
+    /// right for a row that *leads* with one — a Settings row, where the line should clear the
+    /// glyph — and wrong for a row that leads with a title and carries `Label`s underneath. There
+    /// the line started under the first label's text: 56 pt in, below a title at 16 pt, on every
+    /// trip in the history. Measured on the iOS 27 simulator, which draws the real separator. An
+    /// earlier round reasoned about this instead, fixed one screen, and left the rule wrong here.
+    ///
+    /// `listRowSeparatorLeading` is the system's own guide for this, so the separator stays the
+    /// system's: its colour, its thickness, its trailing inset, and whatever a folding display does
+    /// to it. Hiding it and drawing a `Divider` would give all of that up.
+    func listSeparatorAtRowLeading() -> some View {
+        alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
+    }
 }
 
 /// The app's one card treatment, in whichever material the OS can draw.

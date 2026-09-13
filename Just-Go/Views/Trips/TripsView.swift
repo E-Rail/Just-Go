@@ -145,6 +145,7 @@ struct TripsView: View {
             } else {
                 ForEach(tripMemoryService.tripRecords) { record in
                     tripRow(record)
+                        .listSeparatorAtRowLeading()
                         .swipeActions {
                             Button(role: .destructive) {
                                 tripMemoryService.deleteTripRecord(id: record.id)

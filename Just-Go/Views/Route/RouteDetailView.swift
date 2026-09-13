@@ -1509,15 +1509,8 @@ struct RouteDetailView: View {
             reminderAlert = .denied
             return
         }
-        let scheduled = await container.tripReminderService.scheduleReminder(routeID: routeID, plan: plan, leadMinutes: reminderLeadMinutes)
-        if scheduled {
-            // Enforce a single active reminder: drop the one from a previously-reminded route
-            // so scheduling on route A then route B can't leave two notifications pending.
-            if let previous = scheduledReminderRouteID, previous != routeID {
-                container.tripReminderService.cancelReminder(routeID: previous)
-            }
-            scheduledReminderRouteID = routeID
-        }
+        let scheduled = await container.tripReminderService.scheduleReminder(plan: plan, leadMinutes: reminderLeadMinutes)
+        if scheduled { scheduledReminderRouteID = routeID }
         // Not `.tooLate`: the guard above already ruled that out, so a false here means the
         // system refused the request — most reachably the 64-pending-notification limit.
         if !scheduled { reminderAlert = .notScheduled }

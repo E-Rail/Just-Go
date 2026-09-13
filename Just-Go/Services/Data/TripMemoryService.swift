@@ -34,8 +34,54 @@ final class TripMemoryService {
     }
 
     func recordPlannedTrip(route: Route, cityID: String) -> TripRecord {
-        let record = TripRecord(
-            id: UUID().uuidString,
+        // Choosing between alternatives is one trip, not one per tap. Comparing A, then B, then A
+        // again used to add three rows and three to "Total trips"; the newest still-open record
+        // for the same two ends is replaced instead.
+        if let newest = tripRecords.first, newest.completedAt == nil, isSameTrip(newest, route: route, cityID: cityID) {
+            let record = makeRecord(route: route, cityID: cityID, id: newest.id)
+            tripRecords[0] = record
+            persistTripRecords()
+            return record
+        }
+        let record = makeRecord(route: route, cityID: cityID)
+        tripRecords.insert(record, at: 0)
+        tripRecords = Array(tripRecords.prefix(maxTripRecords))
+        persistTripRecords()
+        return record
+    }
+
+    /// Completes the trip that was already recorded when it was planned, rather than writing a
+    /// second one.
+    ///
+    /// This used to insert unconditionally, so planning a trip and then logging it left two rows
+    /// for one journey — the planned one and a completed twin beside it. The planned row is found by
+    /// its two ends and city among the still-incomplete records, newest first. Pass the route as it
+    /// was planned: a reroute renames the origin "Current Location", which matches nothing.
+    func markTripComplete(route: Route, cityID: String, note: String? = nil) {
+        let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        if let index = tripRecords.firstIndex(where: {
+            $0.completedAt == nil && isSameTrip($0, route: route, cityID: cityID)
+        }) {
+            tripRecords[index].completedAt = .now
+            tripRecords[index].note = trimmedNote
+            persistTripRecords()
+            return
+        }
+        var record = makeRecord(route: route, cityID: cityID)
+        record.completedAt = .now
+        record.note = trimmedNote
+        tripRecords.insert(record, at: 0)
+        tripRecords = Array(tripRecords.prefix(maxTripRecords))
+        persistTripRecords()
+    }
+
+    private func isSameTrip(_ record: TripRecord, route: Route, cityID: String) -> Bool {
+        record.cityID == cityID && record.originName == route.origin && record.destinationName == route.destination
+    }
+
+    private func makeRecord(route: Route, cityID: String, id: String = UUID().uuidString) -> TripRecord {
+        TripRecord(
+            id: id,
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
@@ -51,54 +97,6 @@ final class TripMemoryService {
             originStationID: route.originStationID,
             destinationStationID: route.destinationStationID
         )
-        tripRecords.insert(record, at: 0)
-        tripRecords = Array(tripRecords.prefix(maxTripRecords))
-        persistTripRecords()
-        return record
-    }
-
-    /// Completes the trip that was already recorded when it was planned, rather than writing a
-    /// second one.
-    ///
-    /// This used to insert unconditionally, so planning a trip and then logging it left two rows
-    /// for one journey — the planned one and a completed twin beside it. Nothing showed that until
-    /// the history got a screen of its own. The planned row is found by its two ends and city
-    /// among the still-incomplete records, newest first, which is the same trip by any reading a
-    /// rider would give it.
-    func markTripComplete(route: Route, cityID: String, note: String? = nil) {
-        let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-        if let index = tripRecords.firstIndex(where: {
-            $0.completedAt == nil &&
-                $0.cityID == cityID &&
-                $0.originName == route.origin &&
-                $0.destinationName == route.destination
-        }) {
-            tripRecords[index].completedAt = .now
-            tripRecords[index].note = trimmedNote
-            persistTripRecords()
-            return
-        }
-
-        let record = TripRecord(
-            id: UUID().uuidString,
-            originName: route.origin,
-            destinationName: route.destination,
-            cityID: cityID,
-            routeSummary: route.formattedDuration,
-            plannedDuration: route.totalDuration,
-            walkingDistance: route.walkingDistance,
-            transferCount: route.transferCount,
-            strategy: route.strategy,
-            warningMessages: route.warnings.map(\.message),
-            createdAt: .now,
-            completedAt: .now,
-            note: trimmedNote,
-            originStationID: route.originStationID,
-            destinationStationID: route.destinationStationID
-        )
-        tripRecords.insert(record, at: 0)
-        tripRecords = Array(tripRecords.prefix(maxTripRecords))
-        persistTripRecords()
     }
 
     func deleteTripRecord(id: String) {

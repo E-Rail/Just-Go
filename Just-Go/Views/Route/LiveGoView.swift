@@ -6,11 +6,15 @@ import CoreLocation
 @Observable
 final class LiveGoViewModel {
     private(set) var route: Route
+    /// The route as it was when guidance began. A reroute replaces `route` from "Current
+    /// Location", and the trip history finds its planned row by the original two ends.
+    let plannedRoute: Route
     private(set) var plan: LiveTripPlan
     var currentIndex = 0
 
     init(route: Route) {
         self.route = route
+        self.plannedRoute = route
         self.plan = LiveGoTripBuilder().plan(for: route)
     }
 
@@ -77,6 +81,11 @@ struct LiveGoView: View {
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var showGetOffBanner = false
+    /// When the rider reached the ride step being alerted for. Back, Next and the toggle all
+    /// re-run the scheduling, and each used to count the whole ride again from that moment, so a
+    /// rider who checked the previous step 15 minutes into a 20-minute ride was woken 18 minutes
+    /// later, well past the stop.
+    @State private var alertRideStart: (stepID: TripStep.ID, at: Date)?
     @State private var alertTask: Task<Void, Never>?
     // Accessibility step-change effects (无障碍 sheet): speech, haptics, visual banner.
     @State private var speechSynthesizer = AVSpeechSynthesizer()
@@ -198,7 +207,8 @@ struct LiveGoView: View {
     /// change took; the city packs and the route provider carry those now, and a question the data
     /// already answers only teaches riders their answers do not matter.
     private func exit() {
-        tripMemoryService.markTripComplete(route: viewModel.route, cityID: viewModel.route.networkCityID ?? "")
+        let planned = viewModel.plannedRoute
+        tripMemoryService.markTripComplete(route: planned, cityID: planned.networkCityID ?? "")
         leave()
     }
 
@@ -226,8 +236,8 @@ struct LiveGoView: View {
             rerouteTask?.cancel()
         }
         .onChange(of: viewModel.currentIndex) { _, _ in
-            // Reading ahead is an explicit request to look at that step, not at where you are.
-            followsRider = false
+            // Follow-me is turned off by the Back and Next buttons themselves, not here: a reroute
+            // also resets the index, and the rider did not ask to stop being followed.
             frameCurrentStep(animated: true)
             refreshArrivalAlert()
             announceCurrentStep()
@@ -783,18 +793,29 @@ struct LiveGoView: View {
                     maxWalkingDistance: preference.maxWalkingDistance
                 )
             )
-            guard let newRoute = routes.first else { throw RoutePlanningError.noRouteFound }
+            // Ranked the way the results list ranks them, boardable first. The planner's own order
+            // puts a drive ahead when service is closed, and `first` of that took a rider already
+            // on their way onto a driving handoff or a line that had stopped for the night.
+            let ranked = container.routePlanningService.sortRoutes(routes, by: .fastest, preferences: preference)
+            guard let newRoute = ranked.first else { throw RoutePlanningError.noRouteFound }
             // The plan can outlive the screen: MKLocalSearch ignores task cancellation, so a
             // reroute started just before the rider closed the navigator can still land here.
             // Nothing below should happen to a trip they have left.
             guard !Task.isCancelled else { return }
+            // From any step but the first the index change runs framing, the alert and the
+            // announcement through `onChange`; running them here too spoke the step twice.
+            let indexChanges = viewModel.currentIndex != 0
             viewModel.reroute(with: newRoute)
+            // Step IDs restart with the new plan, so the old ride's start would pass for the new one.
+            alertRideStart = nil
             transferGuidance = nil
             // Keep the resume banner's stored trip in step with what's actually guiding.
             ActiveTripStore.save(newRoute)
-            frameCurrentStep(animated: true)
-            refreshArrivalAlert()
-            announceCurrentStep()
+            if !indexChanges {
+                frameCurrentStep(animated: true)
+                refreshArrivalAlert()
+                announceCurrentStep()
+            }
             showRerouteNotice(AppLocalization.text(
                 english: "Route updated from your location",
                 simplified: "已根据您的位置更新路线",
@@ -1047,6 +1068,8 @@ struct LiveGoView: View {
 
     private var backButton: some View {
         Button {
+            // Reading back is an explicit request to look at that step, not at where you are.
+            followsRider = false
             withAnimation { viewModel.goBack() }
         } label: {
             StepSecondaryButtonLabel(
@@ -1062,6 +1085,7 @@ struct LiveGoView: View {
     private var nextButton: some View {
         Button {
             if viewModel.canAdvance {
+                followsRider = false
                 withAnimation { viewModel.advance() }
             } else {
                 exit()
@@ -1193,9 +1217,11 @@ struct LiveGoView: View {
               step.kind == .ride else { return }
 
         let key = "\(step.id)"
+        if alertRideStart?.stepID != step.id { alertRideStart = (step.id, Date()) }
+        let rideStart = alertRideStart?.at ?? Date()
         let leadSeconds = TimeInterval(arrivalAlertLeadMinutes * 60)
-        let fireInterval = max(0, step.duration - leadSeconds)
-        let fireDate = Date().addingTimeInterval(fireInterval)
+        let fireDate = rideStart.addingTimeInterval(step.duration - leadSeconds)
+        let fireInterval = max(0, fireDate.timeIntervalSinceNow)
         scheduledStationKey = key
 
         let stationName = step.toStationName ?? ""

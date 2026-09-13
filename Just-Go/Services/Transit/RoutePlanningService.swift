@@ -164,6 +164,16 @@ final class RoutePlanningService {
             ) ?? .none
         }
 
+        // The walk was measured against these trains before enrichment knew the clock, so a line
+        // that turns out to be shut could still have beaten it and pushed it off the list. A closed
+        // train is not faster than walking: whenever nothing listed can be boarded, it comes back.
+        func answer(_ routes: [Route]) async -> [Route] {
+            guard let walk, !routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
+                return including(await driveTask.value, beside: routes)
+            }
+            return including(await driveTask.value, beside: routes + [walk])
+        }
+
         let planned = await enrichAll(
             routes,
             origin: origin,
@@ -174,7 +184,7 @@ final class RoutePlanningService {
             observation: observation
         )
         guard !planned.closedServices.isEmpty else {
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
 
         // The graph is time-blind by design — it is a mechanical shortest path and the enrichment
@@ -192,11 +202,11 @@ final class RoutePlanningService {
             )
         } catch {
             // Nothing runs at this hour, which is a real answer and the one already in hand.
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
         let viable = walk.map { walk in alternatives.filter { $0.totalDuration < walk.totalDuration } }
             ?? alternatives
-        guard !viable.isEmpty else { return including(await driveTask.value, beside: planned.routes) }
+        guard !viable.isEmpty else { return await answer(planned.routes) }
 
         let replanned = await enrichAll(
             viable,
@@ -212,14 +222,11 @@ final class RoutePlanningService {
         // had one is noise dressed as helpfulness — so unless something in it runs, the first
         // answer stands.
         guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
         // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
         // better served by seeing a shut line named than by an empty screen.
-        return including(
-            await driveTask.value,
-            beside: merging(running: replanned.routes, with: planned.routes)
-        )
+        return await answer(merging(running: replanned.routes, with: planned.routes))
     }
 
     /// Enriches a set of alternatives together and reports which lines came back definitively shut.
@@ -1223,6 +1230,7 @@ final class RoutePlanningService {
         destinationChoice: ChosenExit?
     ) -> Route {
         var route = route
+        let replacedDuration = route.segments.reduce(0) { $0 + $1.duration }
         var changed = false
         if let index = originIndex, let leg = originChoice?.leg {
             route.segments[index] = leg
@@ -1265,7 +1273,10 @@ final class RoutePlanningService {
                 affectedStationID: nil
             ))
         }
-        return route
+        // The headline follows its legs. Kept from the centroid walks, it disagreed with the door
+        // walks drawn beneath it, and arrive-by, reminders and the fastest sort all read it.
+        let delta = updatedSegments.reduce(0) { $0 + $1.duration } - replacedDuration
+        return route.replacingSegments(updatedSegments, totalDuration: max(60, route.totalDuration + delta))
     }
 
     /// Tags the boarding, transfer, and arrival stations of a route with the best-available

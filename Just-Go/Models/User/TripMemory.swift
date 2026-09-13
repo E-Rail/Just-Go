@@ -59,7 +59,9 @@ struct TripRecord: Identifiable, Codable, Equatable {
     var originStationID: String?
     var destinationStationID: String?
 
-    var canReplan: Bool { originStationID != nil && destinationStationID != nil }
+    // Non-empty, not just present: a walk-only or drive-only trip stores "" for both, and replaying
+    // one found no station and returned silently onto whatever results were already on screen.
+    var canReplan: Bool { originStationID?.isEmpty == false && destinationStationID?.isEmpty == false }
 
     var isCompleted: Bool {
         completedAt != nil

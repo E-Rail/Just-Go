@@ -7,6 +7,11 @@ final class TripMemoryService {
     private let tripRecordsKey = "tripRecords"
     private let stationQuickTagsKey = "stationQuickTags"
     private let obsoleteFavoriteStationsKey = "favoriteStations"
+    /// Answers riders once gave about lifts, exits and how long a change took. The questions were
+    /// retired because the city packs and the route provider now carry those facts; removing the
+    /// answers too keeps the promise the retired "Delete My Answers" control made, since nothing
+    /// is left that could show them or delete them.
+    private let obsoleteRiderAnswerKeys = ["riderAnswers.v1", "transferNotes.v1"]
     private let maxTripRecords = 300
 
     private(set) var tripRecords: [TripRecord]
@@ -22,6 +27,7 @@ final class TripMemoryService {
         )
         stationQuickTags = StationQuickTagPolicy.normalized(storedQuickTags)
         userDefaults.removeObject(forKey: obsoleteFavoriteStationsKey)
+        obsoleteRiderAnswerKeys.forEach { userDefaults.removeObject(forKey: $0) }
         if stationQuickTags != storedQuickTags {
             userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
         }

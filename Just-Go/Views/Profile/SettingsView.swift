@@ -14,8 +14,6 @@ struct SettingsView: View {
     @State private var showTour = false
     @State private var showClearCacheConfirmation = false
     @State private var didClearCache = false
-    @State private var showForgetAnswersConfirmation = false
-    @State private var didForgetAnswers = false
 
     private let leadMinuteOptions = [5, 10, 15, 20, 30]
     private let arrivalLeadMinuteOptions = [1, 2, 3, 5]
@@ -196,47 +194,9 @@ struct SettingsView: View {
                     traditional: "清除：已下載的車站資訊、網頁快取。保留：標籤、行程和設定。"
                 ))
             }
-            // The one thing a rider gives this app that it keeps, and until now there was no way
-            // to take it back. `forgetEverything()` has existed since transfer answers were added,
-            // with a comment saying it was for "whatever delete-my-data control ships"; nothing
-            // ever called it. Deliberately not folded into Clear Cache above, whose alert promises
-            // that records are not affected — these are records, and deleting them belongs to its
-            // own decision.
-            Button(role: .destructive) {
-                showForgetAnswersConfirmation = true
-            } label: {
-                Label {
-                    Text(forgetAnswersTitle)
-                } icon: {
-                    Image(systemName: "person.crop.circle.badge.xmark").foregroundStyle(.red)
-                }
-            }
-            .alert(forgetAnswersTitle, isPresented: $showForgetAnswersConfirmation) {
-                Button(forgetAnswersTitle, role: .destructive) {
-                    // Both stores, or the control lies. Post-trip answers about lifts and exits
-                    // are the same kind of thing as a transfer rating and are kept the same way.
-                    container.transferInsightService.forgetEverything()
-                    container.riderAnswerService.forgetEverything()
-                    didForgetAnswers = true
-                }
-                Button(AppLocalization.localized("Cancel"), role: .cancel) {}
-            } message: {
-                Text(AppLocalization.text(
-                    english: "Your answers live on this phone and nowhere else. This removes them.",
-                    simplified: "您的回答只存在本机。此操作会将其删除。",
-                    traditional: "您的回答只存在本機。此操作會將其刪除。"
-                ))
-            }
         } header: {
             Text(AppLocalization.text(english: "On this device", simplified: "本机数据", traditional: "本機資料"))
         } footer: {
-            if didForgetAnswers {
-                Text(AppLocalization.text(
-                    english: "Your transfer answers were deleted.",
-                    simplified: "您的换乘回答已删除。",
-                    traditional: "您的換乘回答已刪除。"
-                ))
-            }
             if didClearCache {
                 Text(AppLocalization.text(
                     english: "Cache cleared.",
@@ -249,14 +209,6 @@ struct SettingsView: View {
 
     private var clearCacheTitle: String {
         AppLocalization.text(english: "Clear Cache", simplified: "清除缓存", traditional: "清除快取")
-    }
-
-    private var forgetAnswersTitle: String {
-        AppLocalization.text(
-            english: "Delete My Answers",
-            simplified: "删除我的回答",
-            traditional: "刪除我的回答"
-        )
     }
 
 }

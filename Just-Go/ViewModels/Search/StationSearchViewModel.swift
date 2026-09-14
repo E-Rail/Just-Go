@@ -1,10 +1,8 @@
 import Foundation
 import CoreLocation
 
-/// `@MainActor` for the same reason `MapViewModel` is: it publishes SwiftUI-observed state, and
-/// it reads `LocationService`, whose state now lives on the main actor. Without this the
-/// observed properties below were mutated from whatever executor an unstructured `Task` landed
-/// on.
+/// `@MainActor`: it publishes SwiftUI-observed state and reads `LocationService`, which lives on
+/// the main actor.
 @MainActor
 @Observable
 final class StationSearchViewModel {
@@ -26,9 +24,8 @@ final class StationSearchViewModel {
     private let stationSearchService: StationSearchService
     private let locationService: LocationService
 
-    /// Where the rider is, in the frame everything else here measures in. Exposed so the search
-    /// page can rank lines by distance the same way this ranks stations, rather than reaching for
-    /// `LocationService` itself and picking the wrong one of the two coordinate frames.
+    /// Where the rider is, in the map's coordinate frame. Exposed so the search page ranks lines by
+    /// the same position this ranks stations by.
     var riderCoordinate: CLLocationCoordinate2D? { locationService.mapSpaceLocation?.coordinate }
     private let recentSearchesKey = "recentStationSearches"
     private var hasRequestedSearchLocation = false
@@ -51,15 +48,12 @@ final class StationSearchViewModel {
         facilityEnrichmentTask?.cancel()
     }
 
-    /// The no-query list: the stations closest to the rider, wherever they are. There is no city
-    /// to browse any more, so the only question left is "what is near me".
+    /// The no-query list: the stations closest to the rider, wherever they are.
     func loadInitialStations() async {
         let loadID = UUID()
         stationLoadID = loadID
-        // Minting a new token supersedes any in-flight keyword search AND facility
-        // enrichment, whose stale-token guards then (correctly) refuse to publish, so
-        // this mint owns clearing both flags, or a re-appearance mid-work leaves a
-        // spinner stuck true with nothing left to reset it.
+        // A new token supersedes any in-flight keyword search and facility enrichment, whose
+        // stale-token guards then refuse to publish, so this owns clearing both flags.
         isSearching = false
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
@@ -75,8 +69,8 @@ final class StationSearchViewModel {
             unfilteredResults = []
             hasEnrichedUnfilteredResultsForFacilities = false
             searchResults = []
-            // Not a fallback to some city's stations: without a position "nearby" has no
-            // meaning, and typing a name still works. Say which of the two is missing.
+            // Without a position "nearby" means nothing, and typing a name still works; say which
+            // is missing rather than show some city's stations.
             errorMessage = AppLocalization.text(
                 english: "Turn on location to see stations near you, or search by name.",
                 simplified: "开启定位以查看附近车站，或直接搜索名称。",
@@ -111,23 +105,17 @@ final class StationSearchViewModel {
             return
         }
 
-        // Generation token so a superseded query, or one that returns after the field is
-        // cleared: can't stomp the current results. MKLocalSearch ignores Swift task
-        // cancellation, so the in-flight network call still completes; the token discards it.
-        // The token alone isn't enough: after the text changes, the NEXT search doesn't mint
-        // a new token until its 180ms debounce elapses, so a stale search returning inside
-        // that window would still pass, hence the captured-query check on publish too.
+        // Generation token, so a superseded query, or one returning after the field was cleared,
+        // cannot overwrite current results. `MKLocalSearch` ignores task cancellation, so the call
+        // still completes and the token discards it. A stale search can return inside the next
+        // search's 180 ms debounce, before a new token exists, hence the captured-query check too.
         let loadID = UUID()
         stationLoadID = loadID
-        // Minting the token supersedes any in-flight facility enrichment (its stale-token
-        // guard will refuse to publish), so this mint owns clearing its flag, or a search
-        // that errors out leaves "Checking station details…" spinning forever.
+        // The new token supersedes in-flight facility enrichment, so this owns clearing its flag.
         facilityEnrichmentTask?.cancel()
         isEnrichingForFacility = false
         isSearching = true
-        // defer guarantees the spinner clears on EVERY exit, including the stale-token early
-        // returns below: otherwise a cleared/superseded search leaves isSearching stuck true
-        // and the results list spins forever even after loadInitialStations repopulates it.
+        // Clears the spinner on every exit, the stale-token returns included.
         defer {
             if stationLoadID == loadID {
                 isSearching = false
@@ -152,9 +140,8 @@ final class StationSearchViewModel {
         }
     }
 
-    /// Typing. Answers from the bundled station index only, so it costs nothing and can stay as
-    /// responsive as it likes. See `StationSearchService.search(keyword:near:includingPlaces:)`
-    /// for why the network half moved behind an explicit submit.
+    /// Typing: answered from the bundled station index only, so it costs nothing. Place search runs
+    /// on an explicit submit; see `StationSearchService.search(keyword:near:includingPlaces:)`.
     func scheduleSearch() {
         searchTask?.cancel()
         searchTask = Task { [weak self] in
@@ -219,13 +206,9 @@ final class StationSearchViewModel {
         UserDefaults.standard.setCodable(recentSearches, forKey: recentSearchesKey)
     }
 
-    /// The rider moved, or the map told us how far Core Location's frame sits from its own.
-    /// Re-orders what is listed against the new position rather than reloading it.
-    /// The only way a view should change the filter.
-    ///
-    /// Assigning `filter` on its own does nothing visible: filtering is applied when results are
-    /// replaced, and the accessibility and facility fields the filters read are not loaded at all
-    /// until a filter needs them. Both steps have to follow the change, in this order.
+    /// The only way a view should change the filter. Filtering is applied when results are
+    /// replaced, and the fields the filters read are loaded only once a filter needs them, so both
+    /// follow the change, in this order.
     func updateFilter(_ transform: (inout StationFilter) -> Void) {
         transform(&filter)
         applyFilters()
@@ -249,10 +232,9 @@ final class StationSearchViewModel {
                 .map(\.station)
             return
         }
-        // One distance per station, kept, and used for BOTH the order and the printed label.
-        // They used to be measured separately. Order here, label at render time, so the map's
-        // GCJ-02 correction landing between the two produced a list that read 396 m, 1.1 km,
-        // 1.5 km, 620 m, 574 m: sorted by one origin, labelled from another.
+        // One distance per station, kept and used for both the order and the printed label.
+        // Measured twice, a map-space correction landing in between would sort by one origin and
+        // label from another.
         var distances: [String: CLLocationDistance] = [:]
         distances.reserveCapacity(filtered.count)
         searchResults = filtered
@@ -295,9 +277,8 @@ final class StationSearchViewModel {
         facilityEnrichmentTask = Task { [weak self] in
             guard let self else { return }
             let enriched = await stationSearchService.enrichStations(stationsToEnrich)
-            // Identity check (Station is a class): publish only while the list this task
-            // enriched is still the one displayed. The load token alone can't see a
-            // keyword search that replaced the results within the same city epoch.
+            // Identity check (`Station` is a class): publish only while the list this task enriched
+            // is still the one displayed.
             guard !Task.isCancelled, stationLoadID == expectedLoadID,
                   unfilteredResults.elementsEqual(stationsToEnrich, by: ===) else { return }
             unfilteredResults = enriched

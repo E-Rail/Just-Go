@@ -59,13 +59,9 @@ struct CityDataCoverage: Codable, Equatable, Sendable {
         _ = manifestCoverage
     }
 
-    /// Whether a station pack actually carries anything for this city.
-    ///
-    /// `networkStations` is deliberately excluded: it counts the routable OSM network, which every
-    /// city has. The manifest catalogs 58 cities and only 14 carry station data, so a page keyed on
-    /// the catalog advertises 44 packs that hold nothing. `verifiedTransferContexts` is excluded
-    /// too: `validate_indoor_maps.rb` pins it at zero everywhere, so it can never be the reason a
-    /// city has data.
+    /// Whether a station pack carries anything for this city. `networkStations` is excluded because
+    /// every city has a routable network, and `verifiedTransferContexts` because
+    /// `validate_indoor_maps.rb` pins it at zero.
     var hasStationData: Bool {
         [matchedStations, accessibility, staticSchedules, liveArrivals, externalLayouts]
             .contains { $0.covered > 0 }

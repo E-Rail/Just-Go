@@ -1,7 +1,7 @@
 import Foundation
 
-/// `Equatable` so a view can key work on "the rider changed a preference". `MapContainerView`
-/// re-seeds the planner from this, which is the only path by which these settings reach a plan.
+/// `Equatable` so a view can key work on a changed preference. `MapContainerView` re-seeds the
+/// planner from this, the only path by which these settings reach a plan.
 struct AccessibilityPreference: Codable, Equatable {
     // Mobility
     var requiresWheelchairAccess: Bool
@@ -9,13 +9,11 @@ struct AccessibilityPreference: Codable, Equatable {
     var maxWalkingDistance: Double
     var avoidStairs: Bool
 
-    // Vision. VoiceOver / high contrast / large text are SYSTEM features an app can't
-    // toggle: the settings sheet points to the right iOS Settings paths instead of
-    // carrying dead switches for them.
+    // Vision. VoiceOver, high contrast and large text are system features; the settings sheet
+    // points to them instead of carrying switches that do nothing.
     var audioNavigation: Bool
 
-    // Hearing. LED flash-for-alerts is likewise system-level (covers our trip-reminder
-    // notifications); only the in-app behaviors keep preference fields.
+    // Hearing. Flash-for-alerts is system-level too; only in-app behaviours keep fields here.
     var visualAnnouncements: Bool
     var vibrationAlerts: Bool
 

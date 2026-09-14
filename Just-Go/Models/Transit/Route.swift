@@ -5,14 +5,10 @@ struct AccessibilityFilter {
     var requiresWheelchairAccess: Bool
     var requiresElevator: Bool
     var avoidStairs: Bool
-    /// How far the rider is willing to walk to reach a station, from Accessibility Settings.
-    /// Carried on the filter because the route assembler needs it and only ever receives this.
-    /// It is what decides whether the first mile is walked, cycled or driven.
-    ///
-    /// Deliberately has no default. It used to default to 500, and the Live "Go" reroute omitted
-    /// it, so a rider who had set 1000 m was silently re-planned at 500 mid-trip and could be
-    /// handed a different *mode* for the last mile than the one they were planned with. An
-    /// omission this consequential should not compile.
+    /// How far the rider is willing to walk to reach a station, from Accessibility Settings: it
+    /// decides whether the first mile is walked, cycled or driven. No default, so a caller that
+    /// forgets it (a mid-trip reroute, say) does not compile rather than silently planning at
+    /// someone else's limit.
     var maxWalkingDistance: Double
 
     static let none = AccessibilityFilter(
@@ -37,9 +33,8 @@ struct Route: Identifiable, Codable {
     let originStationID: String
     let destinationStationID: String
     let strategy: RoutePreference
-    // Mutable for the same reason `warnings` and `accessGuidance` are: enrichment re-walks the
-    // first and last legs once it knows which door the rider should use, and the distance that
-    // summarises them has to follow.
+    // Mutable like `warnings` and `accessGuidance`: enrichment re-walks the first and last legs to
+    // the chosen door, and the distance has to follow.
     var segments: [RouteSegment]
     let totalDuration: TimeInterval
     var walkingDistance: Double
@@ -56,11 +51,8 @@ struct Route: Identifiable, Codable {
     /// nobody priced it and the screens say nothing, which is the answer for every city outside
     /// Baidu's coverage and for every route whose boarding and alighting stations went unmatched.
     var fare: RouteFare?
-    /// What a taxi over the same ground costs at the hour this trip departs.
-    ///
-    /// Carried only when the trip is against the clock, meaning the last train is close or already
-    /// gone. The app already knew that much and said nothing about what it would cost to be wrong,
-    /// which for a rider on a late shift is the part that decides whether they run for the train.
+    /// What a taxi over the same ground costs at the hour this trip departs. Carried only when the
+    /// last train is close or gone, when that cost decides whether the rider runs for the train.
     var missedTrainTaxiYuan: Double?
 
     /// The two ends of the whole journey on the ground: where the first drawn leg starts and the
@@ -175,19 +167,12 @@ struct Route: Identifiable, Codable {
     }
 }
 
-/// What a journey costs to ride, in yuan.
-///
-/// `RouteDetailView` used to carry a comment stating that a fare would never appear here, because
-/// the only way to produce one would have been to infer it from a stop count. That reasoning still
-/// holds and this is not that: the amount is read from a routing provider that priced the same two
-/// gates, and it is discarded outright unless the boarding and alighting stations match the ones
-/// this route uses. The standard did not move, the available evidence did.
+/// What a journey costs to ride, in yuan. Read from a routing provider that priced the same two
+/// gates and discarded unless the boarding and alighting stations match this route's; never
+/// inferred from a stop count.
 struct RouteFare: Codable, Equatable {
-    /// A bus journey between the same two points, costing less than the fare above.
-    ///
-    /// Just-Go plans rail and only rail. But a ¥2 flat bus fare against a ¥6 metro fare is a real
-    /// choice for a rider counting money, and a route screen that knew about it and stayed quiet
-    /// would be keeping a secret rather than keeping scope.
+    /// A cheaper bus between the same two points. Just-Go plans rail only, but a ¥2 bus against a
+    /// ¥6 metro fare is a real choice for a rider counting money.
     struct BusAlternative: Codable, Equatable {
         let yuan: Double
         let duration: TimeInterval
@@ -245,10 +230,8 @@ struct RouteDataCoverage: Codable, Equatable {
         officialAccessibilityCount > 0 || officialScheduleCount > 0 || officialFacilityCount > 0
     }
 
-    /// How many of the things a rider can actually act on are missing. Station layout used to be
-    /// a third entry here, and `officialStationMapCount` is hardcoded to zero on purpose. Browser
-    /// links are catalog coverage, not route evidence, so every route in every city was docked
-    /// for it, permanently and unearnably. A score nobody can move is not a score.
+    /// How many of the things a rider can act on are missing. Station layout is not counted:
+    /// browser links are catalog coverage, not route evidence.
     var unknownCoreCount: Int {
         guard stationCount > 0 else { return 2 }
         return [
@@ -368,18 +351,12 @@ struct RouteSegment: Identifiable, Codable {
     private(set) var accessibilityNotes: [String]
     var transitContext: TransitLegContext? = nil
     var transferContext: TransferContext? = nil
-    /// The line the rider was just riding, for `.transfer` segments only. `LineName` on a
-    /// transfer segment is the *outgoing* line (correct for "Transfer to X" display text), so
-    /// resolving a real indoor path needs this separate field for where they're coming from.
-    /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
+    /// The line the rider was just riding, for `.transfer` segments only (`lineName` is the
+    /// outgoing line). Optional with a default so trips saved in `ActiveTripStore` still decode.
     var incomingLineName: String? = nil
     /// The platform-to-platform walk a routing provider measured for this change, in metres.
-    ///
-    /// Set on `.transfer` legs by `measuringTransfer(distance:)` and read by Live Go, which showed
-    /// the same figure by asking the provider for the whole trip a second time — a metered call per
-    /// guided journey, for a number the plan was already costed with. `distance` cannot stand in:
-    /// every transfer carries one, modelled or measured, and only this says which. Optional with a
-    /// default, so trips already saved in `ActiveTripStore` decode unchanged.
+    /// `distance` cannot stand in: every transfer has one, modelled or measured, and only this says
+    /// which. Optional with a default so saved trips still decode.
     var measuredCorridorMetres: Int? = nil
 
     var formattedDuration: String {
@@ -393,11 +370,8 @@ struct RouteSegment: Identifiable, Codable {
         fromStationID.flatMap(MetroStationIdentifier.cityID(of:))
     }
 
-    /// What this leg draws on a map, from the one rule every map uses.
-    ///
-    /// Three screens each carried their own copy of it. The trip map, the live-guidance map and
-    /// `previewRegion`, which is how the trip map and the region it framed could disagree about
-    /// where a route went. An in-station change has no shape and correctly draws nothing.
+    /// What this leg draws on a map: its polyline, or the line through its stops. The one rule
+    /// every map and `previewRegion` use. An in-station change draws nothing.
     var drawableCoordinates: [CodableCoordinate] {
         polylineCoordinates.count >= 2 ? polylineCoordinates : stationStops.compactMap(\.coordinate)
     }
@@ -445,25 +419,16 @@ struct RouteSegment: Identifiable, Codable {
     }
 
     /// What a change costs beyond the walking, in seconds: platform to platform, the wait, the
-    /// crowd at the gate. Named here because three places need the same number and two of them had
-    /// it as a literal — which is how the third came to omit it.
+    /// crowd at the gate.
     static let changeoverAllowance: TimeInterval = 300
 
-    /// A transfer leg re-costed from a measured corridor length.
+    /// A transfer leg re-costed from a measured corridor length: a modelled guess replaced by an
+    /// observed distance, walked at the app's own 1.25 m/s (see
+    /// `TransferPace.init(distanceMetres:)` for why not the provider's seconds).
     ///
-    /// Separate from `retyped` because the meaning is different: this does not change what the leg
-    /// *is*, it replaces a modelled guess with an observed distance. The duration is derived here
-    /// at the app's own 1.25 m/s rather than taken from whoever supplied the metres. See
-    /// `TransferPace.init(distanceMetres:)` for why a provider's seconds are not a second source.
-    ///
-    /// The walk is what the measurement replaces; the changeover allowance is not. Both modelled
-    /// forms carry a fixed 300 s — an in-station change is exactly that, and an out-of-station one
-    /// is `distance / 1.25 + 300`, whose own comment says it is "the same fixed allowance an
-    /// in-station change already carries". Dropping it here turned a measured 231 m corridor from
-    /// 300 s into 185 s, so a two-change trip claimed to arrive four minutes early, `.arriveBy`
-    /// back-solved a departure four minutes too late, and — because only routes Baidu returned
-    /// geometry for were ever measured — measured routes were quietly discounted against
-    /// unmeasured ones under `.fastest`.
+    /// The measurement replaces the walk, not the changeover allowance: every change, modelled or
+    /// measured, carries the same fixed 300 s, or measured routes would claim to arrive minutes
+    /// early.
     func measuringTransfer(distance measuredDistance: Double) -> RouteSegment {
         var copy = self
         copy.distance = measuredDistance
@@ -505,14 +470,8 @@ enum RouteAccessKind: String, Codable {
     case destination
 }
 
-/// One rule for naming a station door, shared by every type that holds one.
-///
-/// This lived on `RouteAccessPoint` alone, with a comment saying it was "shared so the detail screen
-/// and the navigator cannot label the same door two different ways" — and the navigator's *other*
-/// half read `StationAccessPoint.name` raw. So one Live Go step said "Get off toward D" and the
-/// next said "Walk to Exit D", about the same door; and for a `.stationPOI` the detail screen
-/// printed nothing while Live Go printed a bare letter. Both types conform now, so there is no
-/// second copy to drift.
+/// One rule for naming a station door, shared by every type that holds one, so two screens cannot
+/// label the same door differently.
 protocol NamedStationDoor {
     var name: String { get }
     var source: RouteAccessPointSource { get }
@@ -572,12 +531,9 @@ struct RouteStationStop: Identifiable, Codable {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"
     }
 
-    /// Which pack this stop belongs to, read off its own identifier.
-    ///
-    /// A trip spans packs now, so `Route.networkCityID` is the *origin's* city and nothing more.
-    /// Handing it to every stop meant a Dongguan station was asked of Guangzhou's pack, which does
-    /// not fail: it finds nothing and reports "unavailable", the one wrong answer this app is
-    /// built not to give.
+    /// Which pack this stop belongs to, read off its own identifier. A trip can span packs, so
+    /// `Route.networkCityID` names only the origin's city, and asking the wrong pack finds nothing
+    /// and reports "unavailable".
     var packCityID: String? {
         MetroStationIdentifier.cityID(of: stationID)
     }
@@ -623,16 +579,10 @@ struct StationAccessPoint: Identifiable, Codable, NamedStationDoor {
     let kind: AccessPointKind
     let coordinate: CodableCoordinate?
     let isAccessible: Bool
-    /// What the survey actually says, which `isAccessible` alone cannot express.
-    ///
-    /// `isAccessible` means "asserted step-free" and keeps that meaning — it is part of the
-    /// published Universal City Data contract. But a `false` used to mean two entirely different
-    /// things: a door somebody stood at and recorded as unusable, and a door nobody has ever
-    /// looked at. Across the bundled packs those are 1,043 and 8,465 doors respectively, and a
-    /// wheelchair user deciding which exit to walk to needs them told apart.
-    ///
-    /// Defaults to `.unknown` so a pack written before this field decodes as silence rather than
-    /// as a claim.
+    /// What the survey says, which `isAccessible` (asserted step-free, part of the published
+    /// Universal City Data contract) cannot: a door recorded as not step-free and a door nobody
+    /// looked at are both `false` there. Defaults to `.unknown` so older packs decode as silence
+    /// rather than a claim.
     var stepFree: StepFreeClaim = .unknown
     let notes: [String]
     let source: RouteAccessPointSource
@@ -657,12 +607,9 @@ enum StepFreeClaim: String, Codable, Equatable, Sendable {
     }
 }
 
-/// The eight-point compass sector an entrance sits in, measured from its station.
-///
-/// OpenStreetMap surveys thousands of entrances as a position and nothing else. No name, no exit
-/// letter, because the sign carries none or nobody recorded it. Those doors are still worth walking
-/// to, so they ship with an empty name and are described by where they are. The direction is
-/// derived from the surveyed coordinate, so it states a fact rather than inventing a sign.
+/// The eight-point compass sector an entrance sits in, measured from its station. OpenStreetMap
+/// surveys thousands of entrances with a position and no name; they are described by where they
+/// are, which states a fact rather than inventing a sign.
 enum StationAccessBearing: CaseIterable {
     case north, northeast, east, southeast, south, southwest, west, northwest
 
@@ -714,10 +661,9 @@ struct StationAccessPointGroup: Identifiable {
     /// if any door carries one, otherwise silence.
     var stepFree: StepFreeClaim = .unknown
 
-    /// Entrances imported from OpenStreetMap are named by the letter on the sign. "C", "A1",
-    /// because that is all the survey records. On a map pin that is exactly right, but a list of
-    /// bare letters does not read as anything, so a row says "Exit C". Names that are already
-    /// sentences ("民權西路站出口1") or directions ("West entrance") are left alone.
+    /// Entrances from OpenStreetMap are named by the letter on the sign ("C", "A1"). Right on a map
+    /// pin, but a list row says "Exit C". Names that are already sentences ("民權西路站出口1") or
+    /// directions are left alone.
     var listName: String {
         guard !name.isEmpty,
               name.count <= 3,
@@ -823,10 +769,7 @@ struct RouteStationGuidance: Identifiable, Codable {
     var id: String { "\(stationID)-\(role.rawValue)" }
 }
 
-/// Render-ready comparison metrics for one route, computed across all alternatives.
-/// What one route row actually renders. Held to exactly that: it previously also carried `rank`,
-/// `transferText`, `walkingText`, `transferEffort` and `exitConfidence`, none of which any view
-/// read: `summaryLine` had absorbed the last two and the row had stopped drawing the rest.
+/// What one route row renders, computed across all alternatives.
 struct RouteComparisonMetrics: Identifiable {
     let id: UUID
     let durationText: String
@@ -835,13 +778,8 @@ struct RouteComparisonMetrics: Identifiable {
     let summaryLine: String
 }
 
-/// Per-station access guidance returned by the city-pack service: best-available exits/entrances
-/// and a confidence describing the data source.
-///
-/// It also used to carry platform hints ("board the third car") and interchange-corridor hints
-/// ("2号线 → 8号线 · 约180米"). Both were authored-only fields that no pack has ever contained, and
-/// `validate_indoor_maps.rb` exists to keep it that way, so every screen built on them rendered a
-/// heading, an `unknown` confidence chip and nothing else.
+/// Per-station access guidance from the city-pack service: best-available exits and entrances, and
+/// a confidence for the source.
 struct StationAccessGuidance {
     let accessPoints: [StationAccessPoint]
     let confidence: DataConfidence
@@ -851,21 +789,14 @@ struct StationAccessGuidance {
         confidence: .unavailable
     )
 
-    /// The entrance to send a rider to, given where they are walking to or from and whether they
-    /// need step-free access.
+    /// The `limit` most promising entrances, nearest in a straight line first, and whether the
+    /// rider's step-free requirement went unmet. Never the pack's first entrance: that order is
+    /// node ID, and at a large interchange the wrong door is several hundred metres and a road
+    /// away.
     ///
-    /// This replaced a `primaryAccessPoint` that returned `accessPoints.first`. Nothing about that
-    /// was tied to the rider: the order is the pack's, which for OpenStreetMap entrances is node
-    /// id. Exits at a large interchange sit several hundred metres and one busy road apart, so the
-    /// arbitrary first exit routinely sent people out of the wrong side of the station. Deleted
-    /// rather than deprecated: leaving it in place is an invitation to reintroduce the bug.
-    /// The `limit` most promising entrances, nearest-in-a-straight-line first, plus whether the
-    /// rider's step-free requirement went unmet.
-    ///
-    /// Straight-line order is a *shortlist*, not an answer. At 西直门 the nearest door by air is a
-    /// 698 m walk because the railway runs between it and the street, while a slightly further one
-    /// is a fraction of that. Callers that can afford to measure real walking distance re-rank these;
-    /// callers that cannot take the first and are no worse off than before.
+    /// Straight-line order is a shortlist, not an answer: at 西直门 the nearest door by air is a 698 m
+    /// walk because the railway is in the way. Callers that can measure real walking distance
+    /// re-rank these.
     func rankedAccessPoints(
         near target: CodableCoordinate?,
         requiresStepFree: Bool,
@@ -952,14 +883,9 @@ enum SegmentType: String, Codable {
         self == .walking
     }
 
-    /// The symbol for this leg, in one place.
-    ///
-    /// There were two copies of this and they disagreed: the journey chain drew `figure.walk` for
-    /// everything that was not a ride, so a 9 km drive and a 6 km cycle both showed a walking
-    /// figure. A leg's icon is the only thing distinguishing the three access modes at a glance.
-    /// Getting it wrong there undoes the whole point of choosing between them.
-    ///
-    /// `.subway` is drawn as a `LineBadge` wherever a line is known; this is its fallback.
+    /// The symbol for this leg, in one place: it is the only thing telling the three access modes
+    /// apart at a glance. `.subway` is drawn as a `LineBadge` wherever a line is known; this is its
+    /// fallback.
     var symbolName: String {
         switch self {
         case .walking: return "figure.walk"
@@ -998,12 +924,9 @@ enum SegmentType: String, Codable {
     }
 }
 
-/// How a rider covers the first or last mile, chosen by how far it is.
-///
-/// One rule in one place, because the choice has to be identical wherever a leg is built or
-/// rebuilt: the route assembler makes these legs and the exit chooser remakes them against a
-/// specific door, and two copies of a distance ladder would disagree about which mode a leg is
-/// the moment either was edited.
+/// How a rider covers the first or last mile, chosen by distance. One rule, because the route
+/// assembler builds these legs and the exit chooser rebuilds them, and two distance ladders would
+/// disagree.
 enum AccessLegMode {
     case walking
     case cycling
@@ -1019,13 +942,9 @@ enum AccessLegMode {
 
     var symbolName: String { segmentType.symbolName }
 
-    /// Beyond a walk, a bike; beyond a bike, a car.
-    ///
-    /// The lower bound is the rider's own limit from Accessibility Settings rather than a constant
-    ///. Someone who has said they will not walk more than 300 m has already answered this
-    /// question, and asking them to walk 900 m to a station ignores the only thing they told us.
-    /// The upper bound is fixed at 8 km: past that a bike stops being plausible as a leg of a
-    /// metro trip, whatever the rider's walking limit is.
+    /// Beyond a walk, a bike; beyond a bike, a car. The lower bound is the rider's own walking
+    /// limit from Accessibility Settings. The upper bound is 8 km, past which a bike is not a
+    /// plausible leg of a metro trip.
     static func forDistance(_ metres: Double, walkingLimit: Double) -> AccessLegMode {
         if metres <= max(walkingLimit, 0) { return .walking }
         if metres <= 8_000 { return .cycling }
@@ -1076,11 +995,8 @@ struct RouteWarning: Identifiable, Codable {
         "\(type.rawValue)-\(affectedStationID ?? "route")-\(message)"
     }
 
-    /// Every case here has a producer. `elevatorOutage`, `escalatorOutage`, `serviceDisruption`
-    /// and `crowding` were removed because none did: nothing in the app has ever constructed them,
-    /// and no source exists to. Live outage and crowding feeds are not available to this app, so
-    /// keeping the cases meant carrying a UI branch that could only ever render a claim we had no
-    /// data for. Add a case back when, and only when. Something can produce it.
+    /// Every case has a producer. There are no outage or crowding cases because no feed for them
+    /// exists; add a case only with something that produces it.
     enum WarningType: String, Codable {
         case stepFreeAccessUnconfirmed
         case stairsDetected

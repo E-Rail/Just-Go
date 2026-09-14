@@ -46,17 +46,10 @@ struct TripTimeContext: Equatable {
     var arrivalDetail: String { approximateArrivalText(arrivalDate) }
 }
 
-/// "Arrive about 14:37" — the only wording an arrival from this app can honestly carry.
-///
-/// Ride time is `distance / 9.7 + 30` per hop (`BundledMetroRouteProvider.trainCost`) and every
-/// change is a flat five minutes. Nothing in the model waits for a train: no headway, no first-train
-/// wait, no variation by time of day, because no bundled pack carries a timetable and inventing one
-/// from station spacing is the inference this project exists to refuse. A total built that way is
-/// honest as a duration and dishonest as a clock time, so the clock time says "about".
-///
-/// One function because two screens each hand-rolled the unhedged version while building the very
-/// `TripTimeContext` that already knew how to word it, and the Chinese strings had carried 约/約 the
-/// whole time — only the English had quietly dropped the hedge.
+/// "Arrive about 14:37": the only wording an arrival from this app can honestly carry. Ride time is
+/// modelled per hop and every change is a flat five minutes; nothing waits for a train, because no
+/// bundled pack carries a timetable. Honest as a duration, so the clock time says "about" (约/約) in
+/// every language.
 func approximateArrivalText(_ date: Date) -> String {
     let clock = ChinaClock.clockText(date)
     return AppLocalization.text(
@@ -211,20 +204,10 @@ extension RouteServiceStatus {
     }
 }
 
-/// Whether the rider can still catch the last train given the planned departure.
-/// The note a rider needs when nobody could answer for the last train, shown only in the window
-/// where not knowing changes what they do.
-///
-/// Silent by day on purpose. Only 4 of 58 cities publish first/last train at all, and only while
-/// online; everywhere else the answer comes from one routing-provider response or from nowhere. A
-/// permanent "we could not check" on every card in every other city would be noise attached to
-/// every trip, and noise attached to everything is read as attached to nothing. Late in the
-/// evening, or before the network opens, it is the difference between catching a train and
-/// standing at a locked entrance.
-///
-/// The window is the service day's own edges rather than the calendar's: Chinese metros close
-/// between roughly 22:30 and 00:30 and open between 05:00 and 06:30, so a trip departing inside
-/// those hours is one where the answer matters and we do not have it.
+/// The note a rider needs when nobody could answer for the last train, shown only where not knowing
+/// changes what they do: departing between roughly 22:30 and 00:30, or before the network opens at
+/// 05:00–06:30. Silent by day, because a permanent "could not check" on every card is read as
+/// attached to nothing.
 func unverifiedServiceHoursNotice(status: RouteServiceStatus, departing departure: Date) -> String? {
     guard status == .unknown else { return nil }
     let minutes = ChinaClock.minutesOfDay(of: departure)

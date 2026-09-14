@@ -59,8 +59,8 @@ final class StationDetailViewModel {
             buildHongKongStationInformation()
             return
         }
-        // Train times and the official online lookup are independent; awaiting them
-        // in sequence made every station open wait for both round-trips end to end.
+        // Train times and the official online lookup are independent, so neither waits for the
+        // other.
         let onlineInformationLoad = Task { await loadOnlineStationInformation() }
         await loadTrainTimes()
         await onlineInformationLoad.value
@@ -191,9 +191,9 @@ final class StationDetailViewModel {
         let stationID = station.id
         let generation = officialInformationGeneration
         isLoadingOfficialStationInformation = true
-        // Keep any snapshot already on screen: `loadStation` clears it on a station change,
-        // so anything still here is this station's own data. Blanking it during a refresh
-        // just swaps real content for a spinner.
+        // Keep a snapshot already on screen: `loadStation` clears it on a station change, so
+        // anything still here belongs to this station, and blanking it swaps real content for a
+        // spinner.
         officialStationInformationError = nil
         defer {
             if isCurrentOfficialInformationLoad(stationID: stationID, generation: generation) {
@@ -228,12 +228,10 @@ final class StationDetailViewModel {
         }
     }
 
-    /// The first station opened after launch fails intermittently: the cold DNS/TLS handshake to
-    /// the official service, racing the app's own launch work, times out or resets while the
-    /// endpoint is reachable: leaving a blank "unavailable" card that loads on a manual retry.
-    /// Retry transient failures a couple of times (short, growing backoff) before surfacing the
-    /// error, so the first load succeeds on its own. Non-transient failures throw immediately, and
-    /// a superseded load bails as cancelled rather than overwriting a newer station's data.
+    /// Retries transient failures a couple of times with a growing backoff before surfacing an
+    /// error. The first station opened after launch can time out on a cold DNS/TLS handshake while
+    /// the endpoint is reachable. Permanent failures throw at once, and a superseded load stops
+    /// rather than overwrite a newer station's data.
     private func requestOfficialInformation(
         _ request: OfficialStationInformationRequest,
         stationID: String,
@@ -262,8 +260,6 @@ final class StationDetailViewModel {
         }
     }
 
-    /// Builds the source-specific reference from a bundled directory entry. The directory says
-    /// which source and key; this maps that to the provider's typed request.
     var usesCategorizedStationInformation: Bool {
         guard let station else { return false }
         if station.cityID == "8100" {
@@ -382,10 +378,9 @@ final class StationDetailViewModel {
                 items: facilityItems
             ))
         }
-        // Both service times are nil here, so a row's identity collapses to direction|arrival.
-        // Two trains on the same line and destination showing the same countdown produce
-        // duplicate ForEach ids, which is undefined behavior in SwiftUI. Uniquing happens within
-        // a line, since the line name is no longer part of the row's identity.
+        // Both service times are nil here, so a row's identity is direction|arrival, and two trains
+        // with the same destination and countdown would be duplicate `ForEach` ids. Uniqued within
+        // a line, since the line name is not part of a row's identity.
         var lineOrder: [String] = []
         var colorsByLine: [String: String?] = [:]
         var servicesByLine: [String: [OfficialStationServiceInformation]] = [:]
@@ -513,9 +508,8 @@ final class StationDetailViewModel {
         }) {
             return .official
         }
-        // The official online surface carries first/last train times for every live-fetch city.
-        // While it is showing them, the chip must agree instead of reporting that this station
-        // has no schedule data at all.
+        // The official online surface carries first and last trains for every live-fetch city;
+        // while it shows them, the chip must not report no schedule data.
         if officialStationInformation?.lines.isEmpty == false {
             return .official
         }
@@ -526,11 +520,9 @@ final class StationDetailViewModel {
         if station?.accessibility?.hasVerifiedAccessibilityData == true {
             return .official
         }
-        // Accessibility facts for the live-fetch cities come from the official online surface,
-        // not the bundled pack: Beijing publishes them as facility groups, Shanghai and
-        // Guangzhou as per-exit accessibility flags. While that surface is showing either (live
-        // or cached), the "Before You Go" chip must agree with it instead of claiming nothing
-        // exists.
+        // For live-fetch cities, accessibility comes from the official online surface (Beijing's
+        // facility groups, Shanghai's and Guangzhou's per-exit flags); while that is showing, live
+        // or cached, the "Before You Go" chip must agree with it.
         if let information = officialStationInformation,
            !information.facilityGroups.isEmpty ||
             information.exits.contains(where: { $0.isAccessible == true }) {
@@ -546,10 +538,8 @@ final class StationDetailViewModel {
         return .unavailable
     }
 
-    /// Whether live arrivals are a thing this station could have at all. Hong Kong publishes them;
-    /// no mainland operator here does, so the chip was a permanent "Not available" telling the
-    /// rider nothing about the station they are standing in. A row of dead chips is not honesty,
-    /// it is furniture: the ones that remain are the ones that can change.
+    /// Whether this station could have live arrivals at all: Hong Kong publishes them, no mainland
+    /// operator here does. A chip that can never change is not shown.
     var showsLiveArrivalConfidence: Bool {
         realtimeAvailability != .notConfigured
     }

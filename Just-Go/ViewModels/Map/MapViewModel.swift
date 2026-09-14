@@ -21,12 +21,8 @@ struct MapVisibleRegion {
 }
 
 extension MapVisibleRegion {
-    /// The smallest region that frames every one of these coordinates, with room around them.
-    ///
-    /// Lifted out of `Route.previewRegion`, where it had been the only fit-bounds arithmetic in the
-    /// app and was reachable only from a planned trip. A line has the same need and no route to
-    /// borrow it from. The padding factor and the minimum span are the route map's own numbers,
-    /// kept because they are what has been looked at on a screen.
+    /// The smallest region that frames every one of these coordinates, with room around them. The
+    /// padding and minimum span are the route map's.
     init?(fitting coordinates: [CLLocationCoordinate2D], minimumSpan: CLLocationDegrees = 0.02) {
         guard !coordinates.isEmpty else { return nil }
         let latitudes = coordinates.map(\.latitude)
@@ -46,12 +42,8 @@ extension MapVisibleRegion {
     }
 }
 
-/// The three scales the map is ever asked to sit at.
-///
-/// These were four hardcoded literals. 0.22 For a city load, 0.1 for locate-me, 0.02 for a search
-/// result, 0.01 for a station: covering what a rider experiences as one action: "show me this".
-/// The same intent therefore landed at a different scale depending on which code path served it,
-/// and pressing locate answered "where am I" with an 11km-wide view of the whole city.
+/// The three scales the map is ever asked to sit at, so one intent ("show me this") lands at one
+/// zoom whichever code path serves it.
 enum MapCameraSpan {
     /// Whole metro area. For a first launch with no fix to centre on, and as the bias region
     /// for a place search.
@@ -64,30 +56,17 @@ enum MapCameraSpan {
     static let station: CLLocationDegrees = 0.008
 }
 
-/// `@MainActor` because it publishes SwiftUI-observed state.
-///
-/// It was `@Observable` with no isolation, while its sibling `StationDetailViewModel` has always
-/// been `@MainActor`. `scheduleVisibleStationsRefresh` spawns an unstructured `Task` from a
-/// nonisolated context, so `refreshVisibleStations()`, and its assignment to the observed
-/// `stations` property: ran on the cooperative pool. Mutating observed state off the main actor
-/// is the kind of bug that works until the day it does not.
-///
-/// The reason this was not simply annotated before is the O(N) filter in `refreshVisibleStations`,
-/// whose own comment called it "the dominant map-interaction CPU cost". Moving that to the main
-/// thread would have traded a latent race for a visible stutter. Measured on device (Release,
-/// 6,718 stations, a Beijing-sized viewport): **0.07 ms per refresh**. The 50 ms debounce added
-/// since that comment was written is what made it cheap. It is safe on the main actor now.
+/// `@MainActor` because it publishes SwiftUI-observed state, including from the unstructured task
+/// `scheduleVisibleStationsRefresh` spawns. The visible-station filter is cheap enough for the main
+/// actor: 0.07 ms per refresh for 6,718 stations, behind a 50 ms debounce.
 @MainActor
 @Observable
 final class MapViewModel {
     var stations: [Station] = []
     var visibleRegion: MapVisibleRegion?
-    /// The span the last camera move asked for, which is not what `visibleRegion` then holds.
-    /// See `mapUserLocationChanged`, the one place the difference matters.
-    ///
-    /// Written by **every** writer of `visibleRegion`, not only `updateCamera`. Three of the
-    /// four set the camera without going through it, and a stale value here is a camera jump
-    /// to a zoom nobody asked for.
+    /// The span the last camera move asked for, which is not what `visibleRegion` then holds (see
+    /// `mapUserLocationChanged`). Every writer of `visibleRegion` sets it, or a stale value becomes
+    /// a jump to a zoom nobody asked for.
     private var requestedSpanDelta: CLLocationDegrees = MapCameraSpan.city
     var metroNetworks: [MetroNetwork] = []
     var isLocationAuthorized: Bool {
@@ -126,11 +105,7 @@ final class MapViewModel {
         await stationSearchService.station(matching: place)
     }
 
-    /// The only thing that decides what the map has loaded: what the map is looking at.
-    ///
-    /// There was a second, competing loader keyed on a selected city, and the two disagreed.
-    /// A city load reset the camera to a centroid the rider had not asked for, and a viewport
-    /// load could be cancelled by it mid-flight. The camera is now the single input.
+    /// What the map has loaded is decided by what the map is looking at, and nothing else.
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
         requestedSpanDelta = region.maxDelta
@@ -145,17 +120,14 @@ final class MapViewModel {
         viewportLoadTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(350))
             guard !Task.isCancelled, let self else { return }
-            // Which packs the viewport touches, by their own bounding boxes. This used to ask
-            // which *city centroids* were in view, which is only ever true zoomed out to a whole
-            // metro area, so at any useful zoom the answer was "none". A second, city-keyed
-            // loader was covering for that; with it gone the map drew nothing at all.
+            // Which packs the viewport touches, by their own bounding boxes. City centroids are
+            // only in view when zoomed out to a whole metro area.
             let visibleCityIDs = await metroNetworkProvider.networkSummaries()
                 .filter { $0.bounds.intersects(region) }
                 .map(\.cityID)
             guard !Task.isCancelled else { return }
-            // Claim the token only now, once this load is actually starting, during the
-            // debounce window a still-running earlier load is the freshest thing there is
-            // and must be allowed to publish.
+            // Claim the token only once this load starts: during the debounce, a still-running
+            // earlier load is the freshest data there is and may publish.
             networkLoadGeneration += 1
             await loadNetworks(cityIDs: visibleCityIDs, generation: networkLoadGeneration)
         }
@@ -179,38 +151,23 @@ final class MapViewModel {
         updateCamera(to: coordinate, spanDelta: MapCameraSpan.focused)
     }
 
-    /// MapKit has told us where it draws the rider. Corrects a camera that was placed before we
-    /// knew how far Core Location's frame sits from the map's.
+    /// MapKit has reported where it draws the rider: correct a camera placed on the uncorrected
+    /// Core Location fix, ~540 m southwest of the dot. The launch centring usually runs before this
+    /// report arrives.
     ///
-    /// The launch centring races the first user-location report and usually wins, so it runs off an
-    /// uncorrected fix and lands ~540 m southwest of the dot. The reported bug. This is the first
-    /// moment the right answer exists, so it is taken.
-    ///
-    /// Deliberately stateless. The guard *is* the question being asked. "Is the camera sitting on
-    /// the uncorrected fix, and is that not where the rider is?", so it can only fire on a camera
-    /// this bug actually misplaced. Once corrected the camera is 540 m from the raw fix and the
-    /// first condition can never hold again; if the rider has panned away it never held at all; if
-    /// their phone needs no correction the second condition never holds. No follow-mode, no flag to
-    /// get out of sync.
+    /// Stateless on purpose: the guard asks "is the camera on the uncorrected fix, and is that not
+    /// where the rider is?", which can only be true of a camera placed that way. After one
+    /// correction, a pan, or on a phone that needs none, it never holds.
     func mapUserLocationChanged(_ coordinate: CLLocationCoordinate2D) {
         guard let raw = locationService.currentLocation?.coordinate,
               let region = visibleRegion,
               region.center.distance(to: raw) < 50,
               region.center.distance(to: coordinate) > 50 else { return }
-        // The span this camera was *asked* for, not the one MapKit reports back. `visibleRegion`
-        // holds what MapKit settled on after widening the requested square to the screen's aspect,
-        // so re-applying `region.maxDelta` fed that widening back in as both deltas and MapKit
-        // widened it again. Measured on an iPhone 17 Pro: locate-me asked for 0.014, MapKit
-        // reported 0.0195, and this correction turned that into 0.0271 — a rider who pressed
-        // "where am I" ended up looking at nearly twice the ground they asked for, once, silently,
-        // and only on the phones this correction fires on at all.
+        // The span this camera was *asked* for. `visibleRegion` holds what MapKit settled on after
+        // widening the square to the screen's aspect; re-applying that widens it again (0.014
+        // asked, 0.0271 shown).
         updateCamera(to: coordinate, spanDelta: requestedSpanDelta)
     }
-
-    // The browse map used to draw the chosen trip underneath everything else, with `showRoute`,
-    // `clearRoute` and an `activeRoute` to hold it. Removed: riders read a line they had not asked
-    // for and could not obviously get rid of as a bug, and reported it as one. A trip is drawn on
-    // the route screen's own map, which is the screen that is about the trip.
 
     func updateCamera(to coordinate: CLLocationCoordinate2D, spanDelta: CLLocationDegrees) {
         requestedSpanDelta = spanDelta
@@ -223,11 +180,7 @@ final class MapViewModel {
         }
     }
 
-    /// Whether the camera actually reached the rider, and why not when it did not.
-    ///
-    /// It used to also answer "which city should the app switch to", because putting the camera
-    /// on the rider meant changing what the whole app was looking at. Panning the map to another
-    /// city is now just panning the map, so locating is just moving the camera.
+    /// Whether the camera reached the rider, and why not when it did not.
     struct UserCameraOutcome {
         let didCenter: Bool
         /// Why the camera did not move, when the reason is one a rider should hear about.
@@ -240,26 +193,22 @@ final class MapViewModel {
             let fix = try await locationService.requestCurrentLocation()
             // A superseded locate-me must not drag the camera off wherever the rider went next.
             guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false) }
-            // Not `fix.coordinate`. Core Location reports WGS-84 and the map is GCJ-02. Measured
-            // at 540.2 m apart in Beijing, which put the camera half a station southwest of the
-            // rider's own dot while both were "correct". See LocationService.mapSpaceCorrection.
+            // Map space, not `fix.coordinate`: Core Location reports WGS-84 and the map is GCJ-02,
+            // about 540 m apart in Beijing. See `LocationService.mapSpaceCorrection`.
             updateCamera(to: locationService.mapSpaceLocation(from: fix).coordinate)
             return UserCameraOutcome(didCenter: true)
         } catch is CancellationError {
             // Superseded, not failed. The rider asked for something else; say nothing.
             return UserCameraOutcome(didCenter: false)
         } catch {
-            // A fix that never arrives takes the request's full 15 s timeout and then this path,
-            // which used to be silent: the map simply stayed where it was and the rider was left
-            // to conclude the app ignores their location. Missing is shown as missing.
+            // A fix that never arrives ends here after the 15 s timeout. Say so, rather than leave
+            // the map silently where it was.
             return UserCameraOutcome(didCenter: false, failureMessage: error.localizedDescription)
         }
     }
 
-    /// Two stages on purpose. Line geometry is published the moment the networks decode, so the
-    /// map draws its lines without waiting on `stations(in:)`, which builds a `Station` object
-    /// per station (444 for Beijing) on the same actor and so runs strictly after the decode.
-    /// Markers then fill in behind the lines.
+    /// Two stages: line geometry publishes as soon as the networks decode, then station markers,
+    /// which `stations(in:)` builds one `Station` per station on the same actor.
     private func loadNetworks(cityIDs: [String], generation: Int) async {
         let requested = Set(cityIDs)
         let retained = metroNetworks.filter { requested.contains($0.cityID) }
@@ -309,9 +258,7 @@ final class MapViewModel {
         refreshVisibleStations()
     }
 
-    /// Debounce the viewport-driven refresh so it runs once panning briefly settles instead of
-    /// on every 30–60 Hz region-change frame (the O(N) flatMap/filter over all stations was the
-    /// dominant map-interaction CPU cost).
+    /// Debounced so the refresh runs once panning settles, not on every region-change frame.
     private func scheduleVisibleStationsRefresh() {
         markerRefreshTask?.cancel()
         markerRefreshTask = Task { [weak self] in

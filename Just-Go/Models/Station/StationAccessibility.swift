@@ -77,22 +77,14 @@ final class StationAccessibility {
             accessibleRestroomAvailability
         ]
 
-        // `accessibleEntrances` is deliberately *not* here. For 484 of the 582 bundled records it
-        // holds an OpenStreetMap entrance letter and nothing else — hasElevator null,
-        // hasWheelchairRamp null — and counting it made `summary` report "Partial Accessibility —
-        // Some accessibility features are verified" on the strength of a door existing. A mapped
-        // door is not a verified step-free route, and this is the one section where saying so
-        // wrongly has a physical cost. `elevatorLocations` stays: a named lift is a lift.
+        // Not `accessibleEntrances`: for most records it is an OpenStreetMap entrance letter with
+        // nothing else, and a mapped door is not a verified step-free route. A named lift in
+        // `elevatorLocations` is a lift.
         return stationSpecificStates.contains { $0 != .unknown } || !elevatorLocations.isEmpty
     }
 
-    /// Whether anything a rider would look for here is still unrecorded.
-    ///
-    /// The three fields no source populates — escalator (null in all 582 records) and the audio and
-    /// visual announcement states, which have no backing field on `OfficialAccessibility` at all —
-    /// used to be in this list, so it was true for *every* station that carried any accessibility
-    /// data, Hong Kong's fully surveyed ones included. A caveat that is always on carries no
-    /// information and teaches riders to ignore the one time it matters.
+    /// Whether anything a rider would look for here is still unrecorded. Only fields some source
+    /// can populate count; a caveat that is always on carries no information.
     var hasUnverifiedCoreAccessibilityData: Bool {
         let stationSpecificStates = [
             elevatorLocations.isEmpty ? elevatorAvailability : .available,

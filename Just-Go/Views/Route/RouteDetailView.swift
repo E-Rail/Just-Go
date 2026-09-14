@@ -105,7 +105,8 @@ struct RouteDetailView: View {
     @State private var boardingServiceHours: BoardingServiceHours = .none
     /// Which of the three stops the trip sheet is resting at.
     @State private var tripCardDetent: PresentationDetent = .medium
-    @State private var showsTripCard = false
+    /// The page is on screen and not being popped. Set on arrival, cleared as a pop starts.
+    @State private var isOnScreen = false
     /// Where the header map is looking. Seeded from the trip's own bounds and then left to the
     /// rider: it used to be `.constant(route.previewRegion)`, which made the one map on this screen
     /// something to look at rather than something to use.
@@ -147,21 +148,16 @@ struct RouteDetailView: View {
         // per body evaluation).
         let feasibility = currentFeasibility()
         let confidence = currentConfidence(feasibility: feasibility)
-        // Map on top, trip underneath, the boundary draggable. The shape every transit app the
-        // rider already uses has. The map used to be a 200pt card buried between the journey and
-        // the details, which is a strange place to put the only thing on the screen that shows
-        // where the trip actually goes.
-        return Group {
+        // Map on top, trip in a sheet over it. A ZStack, not a Group: modifiers on a Group attach
+        // to each branch, so swapping out of guidance fired the page observer's `onLeaving` and
+        // closed the trip card the moment it came back.
+        return ZStack {
             if isGuiding {
                 // The page becomes the navigator rather than presenting a second one over itself.
-                // Same implementation as the full-screen entries below. The off-route recovery,
-                // the arrival alert and the transfer surface all live in there, and a second
-                // navigator built to sit inline would drift from this one.
                 LiveGoView(route: route, embedded: true) {
-                    isGuiding = false
+                    withAnimation(.easeInOut(duration: 0.25)) { isGuiding = false }
                     ActiveTripStore.clear()
                 }
-                .safeAreaInset(edge: .bottom) { EmptyView() }
             } else if isRegularWidth {
                 splitLayout(feasibility: feasibility, confidence: confidence)
             } else {
@@ -169,35 +165,23 @@ struct RouteDetailView: View {
             }
         }
         .background(Color.appBackground)
-        // The trip rides in a real sheet with real detents, which is the system's own three-stop
-        // slider: it snaps, it rubber-bands, it has the standard grabber, and VoiceOver and
-        // Dynamic Type already know what it is. The hand-rolled drag handle this replaces had to
-        // reimplement every one of those and got the snapping wrong.
-        .sheet(isPresented: $showsTripCard) {
+        // Derived, not stored: guiding, a wide layout and a pop in progress each hide the card, and
+        // one expression cannot be left disagreeing with any of them. The card is never dismissed
+        // any other way (`interactiveDismissDisabled`), so the setter has nothing to record.
+        .sheet(isPresented: Binding(get: { isOnScreen && !isGuiding && !isRegularWidth }, set: { _ in })) {
             tripCard(feasibility: feasibility, confidence: confidence)
         }
-        // Presented from `.task` rather than inline so the sheet goes up after the push has
-        // settled: a presentation raised during a navigation transition is the one that fails
+        // From `.task`, after the push settles: a sheet raised during a navigation transition fails
         // with "whose view is not in the window hierarchy".
-        .task { showsTripCard = !isGuiding && !isRegularWidth }
-        .onChange(of: isGuiding) { _, _ in showsTripCard = !isGuiding && !isRegularWidth }
-        // A rotation or a Split View resize can cross the boundary while this screen is up, and a
-        // sheet left behind on the wide side would sit on top of the column showing the same trip.
-        .onChange(of: isRegularWidth) { _, wide in showsTripCard = !isGuiding && !wide }
-        // A sheet presented from a *pushed* view is presented on the navigation controller, not on
-        // the view, so popping this screen does not reliably take the sheet with it, and the trip
-        // card was left sitting on top of the route list.
-        //
-        // `onDisappear` is the backstop, but on its own it arrives when the page has already slid
-        // away, so the card sat there through the whole transition and then blinked out.
-        // `PageTransitionObserver` reports the pop *starting*, for a tapped back button as well as
-        // a swipe, so the card slides down while the page slides right, which is the one motion
-        // this should be.
-        .onDisappear { showsTripCard = false }
+        .task { isOnScreen = true }
+        // A sheet presented from a pushed view belongs to the navigation controller, so a pop does
+        // not take it along. `PageTransitionObserver` reports the pop starting, for the back button
+        // and a swipe alike, so the card slides down with the page; `onDisappear` is the backstop.
+        .onDisappear { isOnScreen = false }
         .background(
             PageTransitionObserver(
-                onLeaving: { showsTripCard = false },
-                onReturned: { showsTripCard = !isGuiding && !isRegularWidth }
+                onLeaving: { isOnScreen = false },
+                onReturned: { isOnScreen = true }
             )
             .frame(width: 0, height: 0)
         )
@@ -540,6 +524,9 @@ struct RouteDetailView: View {
         // back. Nothing outside the sheet moves now, so there is nothing left to flash.
         NavigationStack {
             tripCardContent(feasibility: feasibility, confidence: confidence)
+            // Here, on the sheet's own stack: in the wide layout the same content sits in the page,
+            // where hiding the bar took the back button with it.
+            .toolbar(.hidden, for: .navigationBar)
             // A single destination registration: two navigationDestination(item:) modifiers on
             // the same node is a historically unreliable SwiftUI pattern (one registration can
             // shadow the other), and both pushes share this screen anyway.
@@ -596,7 +583,6 @@ struct RouteDetailView: View {
         // that makes the legs read as one journey rather than five separate rows.
         .background(Color.appBackground)
         .safeAreaInset(edge: .bottom) { navigateBar }
-        .toolbar(.hidden, for: .navigationBar)
         // Here, not on `body`. On a phone `body` is already presenting this card, and a
         // node can only present one sheet — so a second registration up there never fired.
         // `tripCardContent` is the one view both the phone sheet and the iPad column render.

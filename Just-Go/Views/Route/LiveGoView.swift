@@ -66,10 +66,9 @@ struct LiveGoView: View {
     /// implementation, two containers: a second navigator would drift from this one, and this is
     /// where the off-route recovery, the arrival alert and the transfer surface all live.
     var embedded = false
-    var onExit: (() -> Void)?
+    let onExit: () -> Void
 
     @State private var viewModel: LiveGoViewModel
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
@@ -122,7 +121,7 @@ struct LiveGoView: View {
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
-    init(route: Route, embedded: Bool = false, onExit: (() -> Void)? = nil) {
+    init(route: Route, embedded: Bool = false, onExit: @escaping () -> Void) {
         self.embedded = embedded
         self.onExit = onExit
         _viewModel = State(initialValue: LiveGoViewModel(route: route))
@@ -193,12 +192,6 @@ struct LiveGoView: View {
             }
     }
 
-    /// Leaving guidance. Presented, that is a dismissal; embedded, the host decides what the page
-    /// becomes next, so it is told rather than dismissed out from under.
-    private func leave() {
-        if let onExit { onExit() } else { dismiss() }
-    }
-
     /// Ending a trip finishes it in the rider's history.
     ///
     /// The history used to depend on the rider separately remembering to open the trip card and
@@ -212,7 +205,7 @@ struct LiveGoView: View {
     private func exit() {
         let planned = viewModel.plannedRoute
         tripMemoryService.markTripComplete(route: planned, cityID: planned.networkCityID ?? "")
-        leave()
+        onExit()
     }
 
     var body: some View {

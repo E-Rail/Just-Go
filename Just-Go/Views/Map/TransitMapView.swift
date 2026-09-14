@@ -132,7 +132,7 @@ struct TransitMapView: UIViewRepresentable {
         private var stationAnnotationsByID: [String: StationAnnotation] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
         private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
-        private var overlayDashes: [ObjectIdentifier: [NSNumber]] = [:]
+        private var overlayDashes: [ObjectIdentifier: [CGFloat]] = [:]
         private var networkOverlays: [MKOverlay] = []
         /// Held apart from the rest of the network because these come and go with zoom.
         private var interchangeOverlays: [MKOverlay] = []
@@ -343,23 +343,14 @@ struct TransitMapView: UIViewRepresentable {
                       let to = coordinatesByID[link.toStationID] else { continue }
                 addPolyline(
                     [from, to],
-                    colorHex: "#8E8E93",
+                    colorHex: SegmentType.transfer.colorHex(line: nil),
                     lineWidth: 5,
-                    dashPattern: Self.transferDashPattern,
+                    dashPattern: SegmentType.transfer.dash(width: 5),
                     simplify: false,
                     collection: &interchangeOverlays
                 )
             }
         }
-
-        /// A dash means "you change here", everywhere, on both maps.
-        ///
-        /// This used to be dashed only for a change that leaves the paid area and solid for one
-        /// inside the station. Two marks for one idea is a legend the rider has to learn, and the
-        /// difference between them is already stated in words on the leg. "Leave the station and
-        /// walk to X" versus "connected inside the station", where it cannot be misread. One mark
-        /// for every change, and the words carry the distinction.
-        static let transferDashPattern: [NSNumber] = [2, 6]
 
         private func addRoute(_ route: Route) {
             for segment in route.segments {
@@ -367,29 +358,12 @@ struct TransitMapView: UIViewRepresentable {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                 }
                 guard coordinates.count >= 2 else { continue }
-                let isAccessLeg = segment.type.isAccessLeg
-                // Round dots, the convention every map app uses for a leg on foot, and the thing
-                // that makes a walk legible at all: solid grey at this width is the same mark the
-                // basemap draws roads with, so a walking-only route read as no route. A bike leg
-                // gets a longer dash: near enough to read as the same family of "you cover this
-                // yourself", far enough apart to tell at a glance. A drive is solid: it is a road
-                // route, and it earns its own colour below rather than a grey the basemap owns.
-                let dashPattern: [NSNumber]?
-                switch segment.type {
-                case .walking: dashPattern = Self.selfPoweredDashPattern
-                case .transfer: dashPattern = Self.transferDashPattern
-                case .cycling: dashPattern = [7, 6]
-                case .driving: dashPattern = nil
-                case .subway: dashPattern = nil
-                }
-                // A casing under every ride, because a line's colour is data and some of it is
-                // grey. The Pearl River Delta intercity services publish no colour in OSM, so the
-                // importer's fallback gives them #8E8E93. The same grey the basemap draws roads
-                // with, which made a real leg of a real route look like nothing was drawn at all.
-                // Widening and darkening what sits underneath fixes it for every line at once,
-                // rather than inventing a colour for the ones that don't state theirs. Solid legs
-                // only: a casing behind a dashed one fills the gaps back in.
-                if dashPattern == nil {
+                let width: CGFloat = segment.type.isAccessLeg ? 7 : 6
+                let dash = segment.type.dash(width: width)
+                // A dark casing under every solid leg, because a line's colour is data and some of
+                // it is the same grey the basemap draws roads with. Solid legs only: behind a
+                // dashed one it fills the gaps back in.
+                if dash.isEmpty {
                     addPolyline(
                         coordinates,
                         colorHex: "#0B0B0F",
@@ -401,9 +375,9 @@ struct TransitMapView: UIViewRepresentable {
                 }
                 addPolyline(
                     coordinates,
-                    colorHex: routeColorHex(for: segment),
-                    lineWidth: isAccessLeg ? 7 : 6,
-                    dashPattern: dashPattern,
+                    colorHex: segment.colorHex,
+                    lineWidth: width,
+                    dashPattern: dash,
                     simplify: true,
                     collection: &routeOverlays
                 )
@@ -439,43 +413,12 @@ struct TransitMapView: UIViewRepresentable {
                 guard station.distance(to: track) >= 15 else { continue }
                 addPolyline(
                     [station, track],
-                    colorHex: Self.selfPoweredColorHex,
+                    colorHex: SegmentType.transfer.colorHex(line: nil),
                     lineWidth: 7,
-                    // Dashed, like every other change: this stub is the rider getting between the
-                    // station and the platform the train actually stops at, which is part of the
-                    // same movement, not a street walk.
-                    dashPattern: Self.transferDashPattern,
+                    dashPattern: SegmentType.transfer.dash(width: 7),
                     simplify: false,
                     collection: &routeOverlays
                 )
-            }
-        }
-
-        /// Grey round dots: every part of a trip the rider covers under their own power. The walk
-        /// at each end, the change between platforms, and the hop between a station and the track
-        /// that serves it. One colour and one pattern for all of them, so the map has exactly two
-        /// vocabularies: coloured means a train carries you, grey means you move yourself.
-        static let selfPoweredColorHex = "#8E8E93"
-        static let selfPoweredDashPattern: [NSNumber] = [0.1, 11]
-
-        private func routeColorHex(for segment: RouteSegment) -> String {
-            switch segment.type {
-            case .walking:
-                return Self.selfPoweredColorHex
-            case .cycling:
-                return "#34C759"
-            // Not grey. A drive is drawn solid, and solid grey at this width is indistinguishable
-            // from the roads underneath it: the same trap the walking dots exist to avoid.
-            case .driving:
-                return "#5856D6"
-            case .subway:
-                return segment.lineColorHex ?? "#007AFF"
-            // Grey, not the orange it used to be. A change is the rider walking between two
-            // platforms: the same thing as the walk at either end of the trip and the hop from a
-            // platform to its track, so it gets the same mark. Orange read as a third mode of
-            // travel on a map whose colours otherwise mean "which line".
-            case .transfer:
-                return Self.selfPoweredColorHex
             }
         }
 
@@ -488,7 +431,7 @@ struct TransitMapView: UIViewRepresentable {
             _ coordinates: [CLLocationCoordinate2D],
             colorHex: String,
             lineWidth: CGFloat,
-            dashPattern: [NSNumber]? = nil,
+            dashPattern: [CGFloat] = [],
             alpha: CGFloat = 1,
             simplify: Bool,
             collection: inout [MKOverlay]
@@ -497,7 +440,7 @@ struct TransitMapView: UIViewRepresentable {
             let polyline = MKPolyline(coordinates: displayCoordinates, count: displayCoordinates.count)
             overlayColors[ObjectIdentifier(polyline)] = UIColor(Color(hex: colorHex)).withAlphaComponent(alpha)
             overlayWidths[ObjectIdentifier(polyline)] = lineWidth
-            overlayDashes[ObjectIdentifier(polyline)] = dashPattern
+            overlayDashes[ObjectIdentifier(polyline)] = dashPattern.isEmpty ? nil : dashPattern
             collection.append(polyline)
         }
 
@@ -633,9 +576,7 @@ struct TransitMapView: UIViewRepresentable {
             let scale = strokeScale(for: currentMaxDelta)
             // Floored so a hairline never disappears entirely at the widest zooms.
             renderer.lineWidth = max(1.5, (overlayWidths[key] ?? 5) * scale)
-            renderer.lineDashPattern = overlayDashes[key]?.map {
-                NSNumber(value: max(0.1, $0.doubleValue * Double(scale)))
-            }
+            renderer.lineDashPattern = overlayDashes[key]?.map { NSNumber(value: Double(max(0.1, $0 * scale))) }
         }
 
         /// Re-strokes the overlays already on screen. Cheap: MapKit hands back the renderer it

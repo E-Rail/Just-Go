@@ -63,17 +63,32 @@ struct Route: Identifiable, Codable {
     /// which for a rider on a late shift is the part that decides whether they run for the train.
     var missedTrainTaxiYuan: Double?
 
-    /// The two ends of the whole journey on the ground, for handing it to an app that drives it.
-    ///
-    /// Taken from the drawn geometry rather than from a station record, because the rider's origin
-    /// is wherever the first leg starts — a doorstep, a dropped pin — and not necessarily a station
-    /// at all. `nil` when nothing was drawn, in which case no handoff is offered.
+    /// The two ends of the whole journey on the ground: where the first drawn leg starts and the
+    /// last one ends, which is the rider's doorstep or dropped pin rather than a station record.
+    /// `nil` when nothing was drawn.
     var groundOrigin: CodableCoordinate? {
-        segments.first { !$0.polylineCoordinates.isEmpty }?.polylineCoordinates.first
+        segments.lazy.compactMap(\.drawableCoordinates.first).first
     }
 
     var groundDestination: CodableCoordinate? {
-        segments.last { !$0.polylineCoordinates.isEmpty }?.polylineCoordinates.last
+        segments.reversed().lazy.compactMap(\.drawableCoordinates.last).first
+    }
+
+    /// The stops this route calls at, as station pins for a route map.
+    var mapStations: [Station] {
+        stationTimelineStops.compactMap { stop in
+            guard let coordinate = stop.coordinate else { return nil }
+            return Station(
+                stationID: stop.stationID,
+                name: stop.name,
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                cityID: stop.packCityID ?? networkCityID ?? "",
+                // Interchanges get the larger symbol and win label collisions against the stops
+                // between them: on a route map they are where the rider has to act.
+                isTransferStation: stop.isTransfer
+            )
+        }
     }
 
     var boardingTransitSegment: RouteSegment? {
@@ -411,6 +426,8 @@ struct RouteSegment: Identifiable, Codable {
     var drawableCoordinates: [CodableCoordinate] {
         polylineCoordinates.count >= 2 ? polylineCoordinates : stationStops.compactMap(\.coordinate)
     }
+
+    var colorHex: String { type.colorHex(line: lineColorHex) }
 
     /// Which access mode this leg is, for callers that must rebuild it without changing it.
     /// A transit or transfer leg is not an access leg at all; walking is the honest default for
@@ -1027,6 +1044,33 @@ enum SegmentType: String, Codable {
         case .subway: return "tram.fill"
         }
     }
+
+    /// The colour this leg is drawn in wherever it is drawn: the result card, the trip rail,
+    /// guidance and both maps. A ride takes its line's colour, and grey when the line has none.
+    ///
+    /// A walk and a change share one grey, since both are the rider moving themselves. A drive is
+    /// not grey: solid grey at map width reads as one of the roads underneath it.
+    func colorHex(line lineColorHex: String?) -> String {
+        switch self {
+        case .walking, .transfer: return "#8E8E93"
+        case .cycling: return "#34C759"
+        case .driving: return "#5856D6"
+        case .subway: return lineColorHex ?? "#8E8E93"
+        }
+    }
+
+    /// The dash for a round-capped stroke `width` wide, in the same proportions on every surface.
+    /// Empty is solid: round dots on foot, a long dash by bike, a short one for a change, and solid
+    /// for anything that carries the rider.
+    func dash(width: CGFloat) -> [CGFloat] {
+        let unit = width / 7
+        switch self {
+        case .walking: return [0.1, 11 * unit]
+        case .cycling: return [7 * unit, 6 * unit]
+        case .transfer: return [2 * unit, 6 * unit]
+        case .driving, .subway: return []
+        }
+    }
 }
 
 /// How a rider covers the first or last mile, chosen by how far it is.
@@ -1040,14 +1084,15 @@ enum AccessLegMode {
     case cycling
     case driving
 
-    /// The icon for this mode, from the same table the segments use. One place, always.
-    var symbolName: String {
+    var segmentType: SegmentType {
         switch self {
-        case .walking: return SegmentType.walking.symbolName
-        case .cycling: return SegmentType.cycling.symbolName
-        case .driving: return SegmentType.driving.symbolName
+        case .walking: return .walking
+        case .cycling: return .cycling
+        case .driving: return .driving
         }
     }
+
+    var symbolName: String { segmentType.symbolName }
 
     /// Beyond a walk, a bike; beyond a bike, a car.
     ///

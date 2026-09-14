@@ -145,10 +145,10 @@ struct JourneyBadgeChain: View {
                 .font(.system(size: scaled * 0.46, weight: .semibold))
                 .monospacedDigit()
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(Color(hex: segment.colorHex))
         .padding(.horizontal, scaled * 0.26)
         .frame(height: scaled)
-        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: scaled * 0.3, style: .continuous))
+        .background(Color(hex: segment.colorHex).opacity(0.16), in: RoundedRectangle(cornerRadius: scaled * 0.3, style: .continuous))
     }
 
     /// Rounded, and never zero: a 40-second walk is still a leg of the trip, and a badge reading
@@ -160,26 +160,20 @@ struct JourneyBadgeChain: View {
     private var shown: [RouteSegment] { segments.filter { $0.type != .transfer } }
 }
 
-/// The continuous vertical line that ties a journey's legs into one path.
-///
-/// Solid in the leg's own colour while riding, dashed while on foot. The convention every printed
-/// transit map and every well-regarded transit app already uses, so it needs no legend. Drawn as a
-/// single stroked path rather than a stack of capsules so that adjacent legs actually touch: the
-/// spine has to be unbroken or the trip reads as a list of unrelated errands.
+/// The continuous vertical line that ties a journey's legs into one path, drawn in the leg's own
+/// colour and dash (`SegmentType.colorHex(line:)`, `dash(width:)`) so it matches the maps. One
+/// stroked path rather than a stack of capsules, so adjacent legs actually touch.
 struct JourneyRail: View {
-    let color: Color
-    var dashed = false
+    let segment: RouteSegment?
     var width: CGFloat = 6
 
     var body: some View {
+        let dash = segment?.type.dash(width: width) ?? []
         RailPath()
             .stroke(
-                color,
-                style: StrokeStyle(
-                    lineWidth: width,
-                    lineCap: dashed ? .round : .butt,
-                    dash: dashed ? [0.1, width * 1.15] : []
-                )
+                Color(hex: segment?.colorHex ?? SegmentType.walking.colorHex(line: nil)),
+                // Butt caps on a solid rail, so it ends flush against the next leg's.
+                style: StrokeStyle(lineWidth: width, lineCap: dash.isEmpty ? .butt : .round, dash: dash)
             )
             .frame(width: width)
             .accessibilityHidden(true)

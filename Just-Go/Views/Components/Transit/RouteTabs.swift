@@ -75,13 +75,9 @@ struct RouteTabs: View {
 
     private func routeColorBar(_ route: Route) -> some View {
         HStack(spacing: 1) {
-            let subwaySegments = route.segments.filter { $0.type.isTransit }
-            ForEach(subwaySegments) { segment in
-                Color(hex: segment.lineColorHex ?? "#007AFF")
+            ForEach(route.segments.filter { $0.type != .transfer }) { segment in
+                Color(hex: segment.colorHex)
                     .frame(minWidth: 20)
-            }
-            if subwaySegments.isEmpty {
-                Color.gray.frame(minWidth: 20)
             }
         }
     }

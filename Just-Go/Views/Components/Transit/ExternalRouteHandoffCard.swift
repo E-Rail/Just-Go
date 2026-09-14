@@ -29,7 +29,7 @@ struct ExternalRouteHandoffCard: View {
                 HStack(alignment: .center, spacing: Metrics.m) {
                     Image(systemName: mode.symbolName)
                         .font(.largeTitle)
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(Color(hex: mode.segmentType.colorHex(line: nil)))
                         .frame(width: Metrics.minimumTapTarget)
                     Text(AppLocalization.text(
                         english: "To give a better experience, please open in:",

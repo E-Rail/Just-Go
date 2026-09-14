@@ -94,7 +94,7 @@ struct LiveGoView: View {
     @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
     // Live-navigation map + off-route recovery.
-    @State private var camera: MapCameraPosition = .automatic
+    @State private var mapRegion: MapVisibleRegion?
     @State private var isRerouting = false
     @State private var offRouteStrikes = 0
     @State private var lastRerouteAt = Date.distantPast
@@ -225,7 +225,7 @@ struct LiveGoView: View {
             // Audio Navigation gets it, whatever the mute button was last left at.
             if appState.accessibilityPreference.audioNavigation { voiceEnabled = true }
             followsRider = true
-            frameCurrentStep(animated: false)
+            frameCurrentStep()
             refreshArrivalAlert()
             announceCurrentStep()
         }
@@ -241,7 +241,7 @@ struct LiveGoView: View {
         .onChange(of: viewModel.currentIndex) { _, _ in
             // Follow-me is turned off by the Back and Next buttons themselves, not here: a reroute
             // also resets the index, and the rider did not ask to stop being followed.
-            frameCurrentStep(animated: true)
+            frameCurrentStep()
             refreshArrivalAlert()
             announceCurrentStep()
         }
@@ -375,9 +375,9 @@ struct LiveGoView: View {
             .accessibilityElement(children: .combine)
         } else if let guidance = activeTransferGuidance {
             VStack(spacing: 12) {
-                Image(systemName: "arrow.triangle.2.circlepath")
+                Image(systemName: SegmentType.transfer.symbolName)
                     .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color(hex: SegmentType.transfer.colorHex(line: nil)))
                     .accessibilityHidden(true)
                 Text(guidance.stationTitle)
                     .font(.title2)
@@ -507,172 +507,37 @@ struct LiveGoView: View {
 
     // MARK: - Map
 
-    private struct RouteOverlay: Identifiable {
-        let id: Int
-        let coordinates: [CLLocationCoordinate2D]
-        let color: Color
-        let isWalking: Bool
-        let isCurrent: Bool
-    }
-
-    private struct StopMarker: Identifiable {
-        let id: String
-        let name: String
-        let coordinate: CLLocationCoordinate2D
-    }
-
+    /// The same map, drawn by the same code, as the route detail: a leg looks identical on both.
     private var liveMap: some View {
-        Map(position: $camera) {
-            UserAnnotation()
-
-            ForEach(routeOverlays) { overlay in
-                MapPolyline(coordinates: overlay.coordinates)
-                    .stroke(
-                        overlay.color.opacity(overlay.isCurrent ? 1 : 0.55),
-                        style: StrokeStyle(
-                            lineWidth: overlay.isCurrent ? 7 : 4.5,
-                            lineCap: .round,
-                            lineJoin: .round,
-                            dash: overlay.isWalking ? [7, 7] : []
-                        )
-                    )
-            }
-
-            ForEach(stopMarkers) { stop in
-                Annotation(stop.name, coordinate: stop.coordinate) {
-                    Circle()
-                        .fill(.white)
-                        .stroke(.black, lineWidth: 1.5)
-                        .frame(width: 10, height: 10)
-                }
-                .annotationTitles(.hidden)
-            }
-
-            if let destination = destinationCoordinate {
-                Marker(
-                    viewModel.plan.destination,
-                    systemImage: "flag.checkered",
-                    coordinate: destination
-                )
-                .tint(.green)
-            }
-        }
-        .mapControls {
-            MapUserLocationButton()
-            MapCompass()
-            MapScaleView()
-        }
+        TransitMapView(
+            visibleRegion: $mapRegion,
+            stations: viewModel.route.mapStations,
+            alwaysShowsStations: true,
+            metroNetworks: [],
+            route: viewModel.route,
+            showsUserLocation: true,
+            onUserLocationChanged: { container.locationService.observeMapSpaceUserLocation($0) },
+            onRegionChanged: { mapRegion = $0 },
+            onStationSelected: { _ in }
+        )
     }
 
-    /// One drawable per route segment, with the current step's segment emphasized.
-    /// Transfers have no geometry and draw nothing; segments without a polyline fall back
-    /// to their station-to-station straight line (same rule as TransitMapView).
-    private var routeOverlays: [RouteOverlay] {
-        let currentSegmentIndex = viewModel.currentStep?.segmentIndex
-        return viewModel.route.segments.enumerated().compactMap { index, segment in
-            let coordinates = segment.drawableCoordinates.map {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-            }
-            guard coordinates.count >= 2 else { return nil }
-            let isWalking = segment.type.isAccessLeg
-            return RouteOverlay(
-                id: index,
-                coordinates: coordinates,
-                color: isWalking ? .gray : Color(hex: segment.lineColorHex ?? "#007AFF"),
-                isWalking: isWalking,
-                isCurrent: index == currentSegmentIndex
-            )
-        }
-    }
-
-    private var stopMarkers: [StopMarker] {
-        var seen = Set<String>()
-        var markers: [StopMarker] = []
-        for segment in viewModel.route.segments where segment.type.isTransit {
-            for stop in segment.stationStops {
-                guard let coordinate = stop.coordinate,
-                      seen.insert("\(stop.stationID)|\(coordinate.latitude)").inserted else { continue }
-                markers.append(StopMarker(
-                    id: "\(stop.stationID)|\(coordinate.latitude)|\(coordinate.longitude)",
-                    name: stop.name,
-                    coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                ))
-            }
-        }
-        return markers
-    }
-
-    /// The trip's real end point: the last segment that carries geometry, walking back
-    /// from the end of the route.
-    private var destinationCoordinate: CLLocationCoordinate2D? {
-        for segment in viewModel.route.segments.reversed() {
-            if let last = segment.polylineCoordinates.last {
-                return CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
-            }
-            if let stop = segment.stationStops.last?.coordinate {
-                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
-            }
-        }
-        return nil
-    }
-
-    /// Re-frame the camera on the current step's geometry. The rider stays free to pan and
-    /// zoom afterwards (and can follow their own position via the map's location button).
-    /// Only a step change or a reroute moves the camera.
-    private func frameCurrentStep(animated: Bool) {
-        guard let region = region(for: viewModel.currentStep) else { return }
-        if animated {
-            withAnimation(.easeInOut(duration: 0.6)) { camera = .region(region) }
-        } else {
-            camera = .region(region)
-        }
-    }
-
-    private func region(for step: TripStep?) -> MKCoordinateRegion? {
-        guard let step else { return nil }
-        var coordinates: [CLLocationCoordinate2D] = []
+    /// Frames the current step's geometry. The rider stays free to pan and zoom afterwards; only a
+    /// step change, a reroute or turning follow-me off moves the camera.
+    private func frameCurrentStep() {
+        guard let step = viewModel.currentStep else { return }
+        let segment = step.segmentIndex.flatMap { viewModel.route.segments.indices.contains($0) ? viewModel.route.segments[$0] : nil }
+        var coordinates: [CodableCoordinate]
         switch step.kind {
-        case .walkToStation, .walkToDestination:
-            coordinates = step.walkingPathCLCoordinates
-        case .transfer:
-            if let coordinate = step.transferCLCoordinate { coordinates = [coordinate] }
-        case .ride:
-            if let index = step.segmentIndex, viewModel.route.segments.indices.contains(index) {
-                let segment = viewModel.route.segments[index]
-                coordinates = segment.polylineCoordinates.map {
-                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                }
-                if coordinates.count < 2 {
-                    coordinates = segment.stationStops.compactMap(\.coordinate).map {
-                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                    }
-                }
-            }
-        case .arrive:
-            if let destination = destinationCoordinate { coordinates = [destination] }
+        case .walkToStation, .walkToDestination: coordinates = step.walkingPathCoordinates
+        case .transfer: coordinates = step.transferCoordinate.map { [$0] } ?? []
+        case .ride: coordinates = segment?.drawableCoordinates ?? []
+        case .arrive: coordinates = viewModel.route.groundDestination.map { [$0] } ?? []
         }
-        guard let first = coordinates.first else { return nil }
-        guard coordinates.count > 1 else {
-            return MKCoordinateRegion(
-                center: first,
-                span: MKCoordinateSpan(latitudeDelta: 0.006, longitudeDelta: 0.006)
-            )
+        let points = coordinates.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        if let region = MapVisibleRegion(fitting: points, minimumSpan: 0.006) {
+            mapRegion = region
         }
-        let latitudes = coordinates.map(\.latitude)
-        let longitudes = coordinates.map(\.longitude)
-        let center = CLLocationCoordinate2D(
-            latitude: (latitudes.min()! + latitudes.max()!) / 2,
-            longitude: (longitudes.min()! + longitudes.max()!) / 2
-        )
-        // 1.45× padding so the step never touches the screen edges; floor keeps very short
-        // steps from zooming in to building level.
-        return MKCoordinateRegion(
-            center: center,
-            span: MKCoordinateSpan(
-                latitudeDelta: max(0.006, (latitudes.max()! - latitudes.min()!) * 1.45),
-                longitudeDelta: max(0.006, (longitudes.max()! - longitudes.min()!) * 1.45)
-            )
-        )
     }
 
     // MARK: - Off-route recovery
@@ -685,15 +550,11 @@ struct LiveGoView: View {
         // ahead. `MapCameraSpan.station` is the app's existing tightest scale. The same number the
         // map uses for one station and its exits, so guidance does not introduce a fifth zoom.
         if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
-            withAnimation(.easeInOut(duration: 0.35)) {
-                camera = .region(MKCoordinateRegion(
-                    center: location.coordinate,
-                    span: MKCoordinateSpan(
-                        latitudeDelta: MapCameraSpan.station,
-                        longitudeDelta: MapCameraSpan.station
-                    )
-                ))
-            }
+            mapRegion = MapVisibleRegion(
+                center: location.coordinate,
+                latitudeDelta: MapCameraSpan.station,
+                longitudeDelta: MapCameraSpan.station
+            )
         }
         guard let location,
               location.horizontalAccuracy >= 0,
@@ -729,7 +590,8 @@ struct LiveGoView: View {
 
     @MainActor
     private func reroute(from coordinate: CLLocationCoordinate2D) async {
-        guard let destination = destinationCoordinate else { return }
+        guard let ground = viewModel.route.groundDestination else { return }
+        let destination = CLLocationCoordinate2D(latitude: ground.latitude, longitude: ground.longitude)
         isRerouting = true
         lastRerouteAt = Date()
         rerouteInterval = min(rerouteInterval * 2, 480)
@@ -772,7 +634,7 @@ struct LiveGoView: View {
             // Keep the resume banner's stored trip in step with what's actually guiding.
             ActiveTripStore.save(newRoute)
             if !indexChanges {
-                frameCurrentStep(animated: true)
+                frameCurrentStep()
                 refreshArrivalAlert()
                 announceCurrentStep()
             }
@@ -986,7 +848,7 @@ struct LiveGoView: View {
                     if followsRider {
                         handleLocationUpdate(container.locationService.mapSpaceLocation)
                     } else {
-                        frameCurrentStep(animated: true)
+                        frameCurrentStep()
                     }
                 }
 
@@ -1130,19 +992,15 @@ struct LiveGoView: View {
     private func icon(for step: TripStep) -> String {
         switch step.kind {
         case .walkToStation, .walkToDestination: return step.accessMode.symbolName
-        case .ride: return "tram.fill"
-        case .transfer: return "arrow.triangle.2.circlepath"
+        case .ride: return SegmentType.subway.symbolName
+        case .transfer: return SegmentType.transfer.symbolName
         case .arrive: return "flag.checkered"
         }
     }
 
+    /// The leg's own colour, as the rail and the map draw it. Arrival is not a leg.
     private func color(for step: TripStep) -> Color {
-        switch step.kind {
-        case .walkToStation, .walkToDestination: return .gray
-        case .ride: return Color(hex: step.lineColorHex ?? "#007AFF")
-        case .transfer: return .orange
-        case .arrive: return .green
-        }
+        step.colorHex.map { Color(hex: $0) } ?? .green
     }
 
     private var getOffBanner: some View {

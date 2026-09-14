@@ -15,7 +15,8 @@ struct TripStep: Identifiable, Equatable {
     let id: Int
     let kind: LiveStepKind
     let lineName: String?
-    let lineColorHex: String?
+    /// The leg's drawn colour (`RouteSegment.colorHex`); nil for arrival, which is not a leg.
+    let colorHex: String?
     let fromStationName: String?
     let toStationName: String?
     let stopCount: Int

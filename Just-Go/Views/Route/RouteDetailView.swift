@@ -753,30 +753,10 @@ struct RouteDetailView: View {
     /// way back to the route list. The top stop deliberately leaves the bar showing.
     static let tripCardDetents: Set<PresentationDetent> = [.fraction(0.3), .medium, .fraction(0.92)]
 
-    /// The stops this route actually calls at, as map pins. The map used to draw the line and
-    /// nothing else, so a rider could see the shape of the trip but not a single station on it.
-    /// Including the one they board at.
-    private var routeStations: [Station] {
-        route.stationTimelineStops.compactMap { stop in
-            guard let coordinate = stop.coordinate else { return nil }
-            return Station(
-                stationID: stop.stationID,
-                name: stop.name,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                cityID: stop.packCityID ?? route.networkCityID ?? "",
-                // Carried through so interchanges get the larger symbol and win label collisions
-                // against the ordinary stops between them, on a route map they are the stations
-                // the rider has to act at.
-                isTransferStation: stop.isTransfer
-            )
-        }
-    }
-
     private func mapHeader() -> some View {
         TransitMapView(
             visibleRegion: $headerRegion,
-            stations: routeStations,
+            stations: route.mapStations,
             alwaysShowsStations: true,
             metroNetworks: [],
             route: route,
@@ -1058,11 +1038,10 @@ struct RouteDetailView: View {
     private static let markerInset: CGFloat = 13
 
     private func legRow(_ segment: RouteSegment, index: Int) -> some View {
-        let isWalk = segment.type.isAccessLeg
         let isExpanded = expandedLegs.contains(segment.id)
         return HStack(alignment: .top, spacing: 0) {
             ZStack(alignment: .top) {
-                JourneyRail(color: journeyColor(segment), dashed: isWalk)
+                JourneyRail(segment: segment)
                     // The first leg's rail starts at its own marker; drawn full height it would
                     // stick out of the top of the card like a trip that began somewhere else.
                     .padding(.top, index == 0 ? Self.markerInset + Self.markerSize / 2 : 0)
@@ -1176,7 +1155,7 @@ struct RouteDetailView: View {
                 Button { detailDestination = .station(stop) } label: {
                     HStack(spacing: 10) {
                         Circle()
-                            .strokeBorder(journeyColor(segment), lineWidth: 2)
+                            .strokeBorder(Color(hex: segment.colorHex), lineWidth: 2)
                             .frame(width: 7, height: 7)
                         Text(stop.name)
                             .font(.subheadline)
@@ -1199,7 +1178,7 @@ struct RouteDetailView: View {
     private var arrivalRow: some View {
         HStack(alignment: .top, spacing: 0) {
             ZStack(alignment: .top) {
-                JourneyRail(color: journeyColor(route.segments.last))
+                JourneyRail(segment: route.segments.last)
                     .frame(height: Self.markerInset + Self.markerSize / 2)
                 Image(systemName: "mappin.circle.fill")
                     .font(.system(size: Self.markerSize))
@@ -1242,17 +1221,7 @@ struct RouteDetailView: View {
                 .font(.system(size: Self.markerSize * 0.45, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: Self.markerSize, height: Self.markerSize)
-                .background(journeyColor(segment), in: Circle())
-        }
-    }
-
-    private func journeyColor(_ segment: RouteSegment?) -> Color {
-        switch segment?.type {
-        case .subway: return Color(hex: segment?.lineColorHex ?? "#007AFF")
-        case .transfer: return .orange
-        // The first and last mile share one colour on purpose: they are the same kind of thing to
-        // a rider reading the strip, and the icon already says which of the three it is.
-        case .walking, .cycling, .driving, nil: return .gray
+                .background(Color(hex: segment.colorHex), in: Circle())
         }
     }
 

@@ -2,11 +2,9 @@ import Foundation
 import CoreLocation
 import MapKit
 
-/// The operator's service hours for one boarding station, and which service day they describe.
-///
-/// A pair rather than a bare array because the note qualifies every window in it: Hangzhou publishes
-/// a weekday-only timetable, and a first and last train shown on a Saturday without that caveat is
-/// an assertion the operator never made.
+/// The operator's service hours for one boarding station, and which service day they describe. The
+/// note qualifies every window: Hangzhou publishes a weekday-only timetable, and those times shown
+/// on a Saturday without it are a claim the operator never made.
 struct BoardingServiceHours {
     let windows: [StationServiceWindow]
     let serviceDayNote: String?
@@ -14,12 +12,10 @@ struct BoardingServiceHours {
     static let none = BoardingServiceHours(windows: [], serviceDayNote: nil)
 }
 
-/// One trip's whole verdict on whether it can actually be ridden at the time it departs.
-///
-/// `closedServices` is the part that is new and the part that is acted on: the lines an operator
-/// definitively says are not running when this rider would board them. It is deliberately not a
-/// field on `Route` — it is search state, and `ActiveTripStore` persists routes to disk, where a
-/// stale "10号线 was shut" from last night would be worse than no answer at all.
+/// One trip's verdict on whether it can be ridden when it departs. `closedServices` are the line
+/// directions an operator definitively says are not running when this rider would board them.
+/// Search state, not a field on `Route`: `ActiveTripStore` persists routes, and a stale "10号线 was
+/// shut" from last night is worse than no answer.
 struct ServiceReading {
     let status: RouteServiceStatus
     let warning: RouteWarning?
@@ -63,15 +59,10 @@ final class RoutePlanningService {
         accessibilityFilter: AccessibilityFilter = .none,
         tripAnchor: TripTimeAnchor = .now
     ) async throws -> [Route] {
-        // Walking is a real answer, and until now it was one the app could not give: every result
-        // had to contain a train. Asking for a route to your nearest station therefore produced a
-        // ride one stop out and back, because that was the cheapest thing the graph was allowed to
-        // return. Built alongside the search rather than after it. It costs one MKDirections call
-        // and the two are independent.
+        // Walking is a real answer, so a trip to a nearby station need not be a train ride out and
+        // back. Started beside the search: one MKDirections call, independent of it.
         async let directWalk = directWalkingRoute(from: origin, to: destination)
-        // Started alongside the search for the same reason the walk is: it is a MapKit call the
-        // graph does not wait on, and on a trip where driving wins the rider should not have to
-        // guess that it does.
+        // Started beside the search for the same reason: a MapKit call the graph does not wait on.
         let driveTask = Task { [weak self] in
             await self?.directDrivingRoute(from: origin, to: destination) ?? nil
         }
@@ -85,16 +76,15 @@ final class RoutePlanningService {
                 excludingServices: []
             )
         } catch {
-            // No train answer at all. If the two ends are within walking distance that is not a
-            // failure, it is the answer; otherwise the original error is still the honest reply.
+            // No train answer at all. Within walking distance that is the answer; otherwise the
+            // original error is the honest reply.
             if let walk = await directWalk { return including(await driveTask.value, beside: [walk]) }
             if let drive = await driveTask.value { return [drive] }
             throw error
         }
 
-        // Anything the rider could beat on foot is not worth showing. This is also the backstop for
-        // the out-and-back above: even if some future cost change makes such a path legal again, it
-        // cannot survive a comparison with simply walking there.
+        // Anything the rider could beat on foot is not worth showing, which also rules out any
+        // out-and-back path.
         let walk = await directWalk
         let routes = walk.map { walk in metroRoutes.filter { $0.totalDuration < walk.totalDuration } }
             ?? metroRoutes
@@ -104,12 +94,9 @@ final class RoutePlanningService {
             throw RoutePlanningError.noRouteFound
         }
 
-        // Started here rather than awaited here, and hoisted out of enrichment so that **both**
-        // passes below share it. It is the plan's only Baidu call, it carries the first/last train
-        // for five or six lines at once — not just the ones this pass happened to pick — and
-        // re-requesting it for the re-plan would double the cost of the one endpoint the app
-        // genuinely depends on. Held as a `Task` so it still overlaps enrichment: awaiting it up
-        // front would put its whole 3-second budget in front of every plan instead of beside it.
+        // Started here, not awaited, and shared by both passes below: the plan's only Baidu call,
+        // carrying first and last trains for every line in the response, not only those this pass
+        // picked. A `Task`, so its 3-second budget overlaps enrichment rather than preceding it.
         let observation = Task { [weak self] in
             await self?.observations(
                 from: origin.routeCoordinate,
@@ -117,9 +104,9 @@ final class RoutePlanningService {
             ) ?? .none
         }
 
-        // The walk was measured against these trains before enrichment knew the clock, so a line
-        // that turns out to be shut could still have beaten it and pushed it off the list. A closed
-        // train is not faster than walking: whenever nothing listed can be boarded, it comes back.
+        // The walk was compared against these trains before enrichment knew the clock. A shut train
+        // is not faster than walking, so whenever nothing listed can be boarded, the walk comes
+        // back.
         func answer(_ routes: [Route]) async -> [Route] {
             guard let walk, !routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
                 return including(await driveTask.value, beside: routes)
@@ -139,11 +126,9 @@ final class RoutePlanningService {
             return await answer(planned.routes)
         }
 
-        // The graph is time-blind by design — it is a mechanical shortest path and the enrichment
-        // above is what knows the clock. So rather than teach the search a timetable it has no
-        // access to, tell it which lines the timetable has just ruled out and let it answer again.
-        // Costs no network at all: the graph is already built and cached, and the observation is
-        // the one fetched above.
+        // The graph is time-blind by design; enrichment knows the clock. Rather than teach the
+        // search a timetable, tell it which line directions the timetable just ruled out and search
+        // again. No network: the graph is cached and the observation already fetched.
         let alternatives: [Route]
         do {
             alternatives = try await routeProvider.routes(
@@ -168,15 +153,13 @@ final class RoutePlanningService {
             tripAnchor: tripAnchor,
             observation: observation
         )
-        // The re-plan exists to find a train the rider can actually catch. Late enough and there is
-        // no such train on any line, and adding two more shut itineraries to a list that already
-        // had one is noise dressed as helpfulness — so unless something in it runs, the first
-        // answer stands.
+        // The re-plan exists to find a train the rider can catch. If nothing in it runs either, the
+        // first answer stands.
         guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
             return await answer(planned.routes)
         }
-        // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
-        // better served by seeing a shut line named than by an empty screen.
+        // One pass only: a second could ban its way to nothing, and a named shut line serves the
+        // rider better than an empty screen.
         return await answer(merging(running: replanned.routes, with: planned.routes))
     }
 
@@ -189,19 +172,15 @@ final class RoutePlanningService {
         tripAnchor: TripTimeAnchor,
         observation: Task<TripObservations, Never>
     ) async -> (routes: [Route], closedServices: Set<ClosedServiceDirection>) {
-        // Each route's enrichment below is a handful of officialStationData lookups that don't
-        // touch any shared mutable state: running them one route after another multiplied
-        // enrichment latency by the number of alternatives. They're independent, so enrich
-        // concurrently instead (same fix already applied to the analogous per-alternative
-        // fetch in BundledMetroRouteProvider.routes).
+        // Each route's enrichment is independent lookups with no shared mutable state, so the
+        // alternatives enrich concurrently.
         let enriched = await withTaskGroup(of: (Int, Route, Set<ClosedServiceDirection>).self) { group in
             for (index, route) in routes.enumerated() {
                 group.addTask {
                     let result = await self.enrichedRoute(
                         route,
-                        // A POI's own entrance beats its centroid when MapKit knows one. It is
-                        // the door the rider actually walks to, so it is the right thing to
-                        // measure the station's exits against.
+                        // A POI's own entrance beats its centroid when MapKit knows one: it is the
+                        // door the rider walks to.
                         originTarget: CodableCoordinate(
                             origin.entranceCoordinate ?? origin.coordinate
                         ),
@@ -222,18 +201,14 @@ final class RoutePlanningService {
         }
 
         var closed = enriched.reduce(into: Set<ClosedServiceDirection>()) { $0.formUnion($1.2) }
-        // Awaited only now that enrichment is done, so the two ran side by side. On the second
-        // pass this is already resolved and costs nothing.
+        // Awaited only now, so it ran beside enrichment. On the second pass it is already resolved.
         let applied = applying(await observation.value, to: enriched.map(\.1), tripAnchor: tripAnchor)
         closed.formUnion(applied.closedServices)
         return (applied.routes, closed)
     }
 
-    /// Puts the trains a rider can actually board above the ones they cannot, keeping both.
-    ///
-    /// Both halves matter. Leading with a route that runs is the whole point of re-planning; and
-    /// keeping the shut one, named and badged, is what tells a rider *why* they are being offered
-    /// something slower — without it the app looks like it simply found a worse answer.
+    /// Puts the trains a rider can board above the ones they cannot, keeping both: the shut one,
+    /// named and badged, is what explains why something slower is offered.
     private func merging(running: [Route], with original: [Route]) -> [Route] {
         var seen = Set(running.map(Self.itinerarySignature))
         var merged = running
@@ -243,9 +218,9 @@ final class RoutePlanningService {
         return merged
     }
 
-    /// The rides that make this trip what it is, so two passes that rediscover the same journey
-    /// list it once. Deliberately ignores duration and walking: the same itinerary re-measured
-    /// against a different door is still the same itinerary.
+    /// The rides that make this trip what it is, so two passes that rediscover one journey list it
+    /// once. Duration and walking are ignored: the same itinerary measured against a different door
+    /// is still the same itinerary.
     private static func itinerarySignature(_ route: Route) -> String {
         route.segments
             .filter { $0.type.isTransit }
@@ -253,35 +228,21 @@ final class RoutePlanningService {
             .joined(separator: "|")
     }
 
-    /// Applies everything one trip-observation call answers: measured corridor lengths, and the
-    /// fare for the gate-to-gate journey.
+    /// Applies everything one trip-observation call answers: measured corridor lengths and the
+    /// gate-to-gate fare. Re-costed changes feed `totalDuration`, which the sorters already order
+    /// by, so a 231 m interchange beats a 689 m one without a separate ranking rule.
     ///
-    /// Re-costing the changes is what makes a transfer's real cost visible to ranking rather than
-    /// only to the eye. Until `1421763` every change cost the same modelled penalty, so a route
-    /// through a 231 m interchange and one through a 689 m interchange were priced identically and
-    /// the shorter walk won nothing. Correcting the segment durations feeds `totalDuration`, which
-    /// the strategy sorters already order by, so there is no separate ranking rule and no caller
-    /// changes.
-    ///
-    /// Bounded and entirely optional, for the same reason the official-station lookup above is.
-    /// This is an *upgrade* to an answer the app already has offline. No key, no network or a slow
-    /// network all mean the modelled cost stands and no fare is shown, never a failed or delayed
+    /// Optional and bounded: an upgrade to an answer the app already has offline. No key, no
+    /// network or a slow network leaves the modelled cost and no fare, never a failed or delayed
     /// plan.
     private func observations(
         from origin: CLLocationCoordinate2D,
         to destination: CLLocationCoordinate2D
     ) async -> TripObservations {
         guard let tripObservations else { return .none }
-        // `withDeadline` rather than a hand-rolled race. The race that was here returned the first
-        // of the two children but could not return *before* the other finished: `withTaskGroup`
-        // drains its children on exit and `cancelAll()` only marks them, so the three seconds this
-        // comment promised were really `timeoutIntervalForRequest` — twelve — with the whole plan
-        // waiting behind it. The client's request is genuinely cancellable now, which is what makes
-        // any deadline here mean anything.
-        // Started outside the deadline on purpose, so the deadline stops the *waiting* and not the
-        // request. Cancelled mid-flight, the call still spends its budget unit and caches nothing,
-        // so a re-plan on a slow network paid for the same answer again; left to finish, it lands
-        // in the service's cache and the next plan reads it for free.
+        // Started outside the deadline, so the deadline stops the waiting and not the request: left
+        // to finish, the answer lands in the service's cache and the next plan reads it free.
+        // `withDeadline` returns on time because the client's request is genuinely cancellable.
         let request = Task { await tripObservations.observations(from: origin, to: destination) }
         let observed = try? await withDeadline(seconds: 3) {
             CancellationError()
@@ -291,22 +252,18 @@ final class RoutePlanningService {
         return observed ?? .none
     }
 
-    /// Applies one already-fetched observation to a set of alternatives.
-    ///
-    /// Pure and synchronous, which is what lets the re-plan reuse the same response instead of
-    /// spending a second call on it.
+    /// Applies one already-fetched observation to a set of alternatives. Pure and synchronous, so
+    /// the re-plan reuses the response.
     private func applying(
         _ observed: TripObservations,
         to routes: [Route],
         tripAnchor: TripTimeAnchor
     ) -> (routes: [Route], closedServices: Set<ClosedServiceDirection>) {
-        // A direct ride has no change to measure but still has a fare, so this no longer skips on
-        // transfer count alone.
+        // A direct ride has no change to measure but still has a fare.
         guard !observed.isEmpty, !routes.isEmpty else { return (routes, []) }
 
-        // Transfers first, then everything that only annotates. Re-costing rebuilds the route
-        // through `replacingSegments`, which copies field by field, so the annotations go last and
-        // stay out of reach of anything that could drop them on the way past.
+        // Transfers first, then annotations: re-costing rebuilds the route through
+        // `replacingSegments`, so annotations go last where nothing can drop them.
         var closed: Set<ClosedServiceDirection> = []
         let applied = routes.map { route -> Route in
             let measured = measuringTransfers(in: route, with: observed.transfers)
@@ -317,17 +274,10 @@ final class RoutePlanningService {
         return (applied, closed)
     }
 
-    /// Answers "can I still get home?" for the cities no operator answers for, and prices the
-    /// consequence of the answer being no.
-    ///
-    /// Only routes still reading `.unknown` are touched, so an operator that published its own
-    /// timetable keeps the last word on it. That leaves this as the source for the cities where
-    /// nothing else replies at all, which is most of them: no bundled pack carries a timetable,
-    /// because operator schedule content must not be committed.
-    ///
-    /// The taxi price rides along because it is the same question. The app has warned about the
-    /// last train for a long time without saying what missing it costs, and the two facts arrive
-    /// in the same response.
+    /// Answers "can I still get home?" for cities no operator answers for, and prices the
+    /// consequence of no. Only routes still reading `.unknown` are touched, so an operator's own
+    /// timetable keeps the last word. No bundled pack carries a timetable, because operator
+    /// schedule content must not be committed. The taxi price arrives in the same response.
     private func upgradingServiceHours(
         of route: Route,
         with observed: TripObservations,
@@ -348,10 +298,9 @@ final class RoutePlanningService {
                     .map {
                         StationServiceWindow(
                             lineName: $0.lineName,
-                            // `direct_text` ("潞阳方向"), which names the service Baidu costed. It
-                            // is what makes these hours attributable: Baidu quotes the window for
-                            // the exact ride it planned, so 花园桥 → 潞城 comes back 05:27-22:45,
-                            // the full run, rather than the 23:56 short-turn that turns back first.
+                            // `direct_text` ("潞阳方向") names the service Baidu costed, which is what
+                            // makes these hours attributable: 花园桥 → 潞城 comes back 05:27–22:45, the
+                            // full run, not the 23:56 short-turn.
                             direction: $0.directionText,
                             firstTime: $0.firstTrain,
                             lastTime: $0.lastTrain
@@ -365,12 +314,12 @@ final class RoutePlanningService {
             }
         }
 
-        // Only where the rider is actually against the clock. Quoting a taxi beside a trip that is
-        // running normally would be noise, and beside one nobody could time it would be a guess.
+        // Only when the rider is against the clock: a taxi price beside a normal trip is noise, and
+        // beside one nobody could time it is a guess.
         switch upgraded.serviceStatus {
         case .lastTrainSoon, .serviceEndedToday:
-            // China Standard Time, because the tariff windows are the city's own local hours and a
-            // rider planning this trip from another timezone still pays the Chinese night rate.
+            // China Standard Time: the tariff windows are the city's local hours, whatever timezone
+            // the trip is planned from.
             upgraded.missedTrainTaxiYuan = observed.taxi?.yuan(
                 atHour: ChinaClock.minutesOfDay(of: departure) / 60
             )
@@ -405,13 +354,10 @@ final class RoutePlanningService {
         return route.replacingSegments(segments, totalDuration: max(60, corrected))
     }
 
-    /// Attaches a fare, but only to a route that boards and alights where the priced journey did.
-    ///
-    /// The station pair is the whole justification. A Chinese metro tariff is charged on the entry
-    /// and exit gates rather than the path between them, which is why a fare observed on someone
-    /// else's route is still this route's fare when the gates agree, and is a different number the
-    /// moment they do not. No match leaves `fare` nil and the screens print nothing, which is the
-    /// same rule the exit names and corridor lengths already follow.
+    /// Attaches a fare only to a route that boards and alights where the priced journey did. A
+    /// Chinese metro fare is charged on the entry and exit gates, not the path between them, so an
+    /// observed fare is this route's when the gates agree and a different number when they do not.
+    /// No match leaves `fare` nil and the screens print nothing.
     private func pricing(_ route: Route, with observed: TripObservations) -> Route {
         let rides = route.segments.filter { $0.type.isTransit }
         guard let boarding = rides.first?.fromStationName,
@@ -434,21 +380,9 @@ final class RoutePlanningService {
 
     // MARK: - Official station information
 
-    /// The operator's own page for each stop the trip calls at, keyed by station name.
-    ///
-    /// Best effort in every direction: no source for the city, no directory entry, a timeout or a
-    /// refusal all mean "no official answer", never a failed plan. Bounded at four seconds because
-    /// this is an *upgrade* to an answer that already exists. A rider waiting on a route must not
-    /// wait on an operator's website.
-    /// The operator's own first/last train at one boarding station, one row per direction and per
-    /// service, for the trip screen to display.
-    ///
-    /// It exists because the screen was reading `officialStationData.serviceWindows`, which is the
-    /// city pack and nothing else — and every bundled pack ships `schedules: []`, because operator
-    /// timetables must not be committed. So the row it fed rendered nothing in all 58 cities. This
-    /// is the same operator lookup the planner already makes for the same station on the same
-    /// screen, so it costs no extra request; the pack stays as the fallback for whichever city
-    /// eventually ships redistributable times.
+    /// The operator's own first and last train at one boarding station, one row per direction and
+    /// service, for the trip screen. Same lookup the planner makes for the same station, so no
+    /// extra request; the pack is the fallback for a city that ships redistributable times.
     func boardingServiceWindows(
         stationID: String,
         stationName: String,
@@ -474,9 +408,8 @@ final class RoutePlanningService {
             fullTransitLineName($0.lineName) == fullTransitLineName(lineName) ||
                 !transitLineReferences($0.lineName).isDisjoint(with: transitLineReferences(lineName))
         }
-        // No line match is no answer. Falling back to every window at the station published another
-        // line's first and last train under this ride's heading — see `ServiceHoursResolver.verdict`,
-        // which stopped doing the same thing for the same reason.
+        // No line match is no answer: another line's first and last train under this ride's heading
+        // would be wrong.
         return BoardingServiceHours(windows: matched, serviceDayNote: snapshot?.serviceDayNote)
     }
 
@@ -515,11 +448,8 @@ final class RoutePlanningService {
     }
 
     /// Counts a stop as having official accessibility when the operator publishes a lift for it.
-    ///
-    /// The pack's count comes from OpenStreetMap `wheelchair` tags, which cover 20% of the bundled
-    /// network, so a Beijing trip reported "accessibility source pending" for stations whose
-    /// operator page lists a 直梯 and where it is. Taken as the larger of the two rather than a
-    /// replacement: the pack still speaks for cities with no official source.
+    /// The pack's count comes from OpenStreetMap `wheelchair` tags (about 20% of the network); the
+    /// larger of the two stands, so the pack still speaks for cities with no official source.
     private func coverage(
         _ coverage: RouteDataCoverage,
         upgradedWith snapshots: [String: OfficialStationInformationSnapshot]
@@ -531,9 +461,8 @@ final class RoutePlanningService {
                     group.items.contains { Self.describesStepFreeFacility($0.name) }
                 }
         }.count
-        // Same argument for the timetable: the operator publishes first and last train per line
-        // per direction, and the app was reading only the pack, so a Beijing trip was docked for
-        // an "incomplete official schedule" while bjsubway.com was answering with one.
+        // The same for timetables: the operator publishes first and last trains per line and
+        // direction.
         let scheduleCount = snapshots.values.filter { snapshot in
             snapshot.lines.contains { line in
                 line.services.contains { $0.firstTrain != nil || $0.lastTrain != nil }
@@ -547,22 +476,10 @@ final class RoutePlanningService {
         )
     }
 
-    /// Whether the subway is running for this trip. Resolved for **every** ride it makes, at the
-    /// moment each one departs, rather than only for the first.
-    ///
-    /// Two holes met here. `serviceWindows` reads the city pack and no pack carries a timetable:
-    /// operator schedule content must not be committed, so `schedules` is empty for all 2,849
-    /// bundled stations and this resolved to `.unknown` for every route in every city while the
-    /// machinery below it: the banner, the confidence reason, the feasibility level. Looked
-    /// finished. The operator's own page does publish first and last train, and
-    /// `officialStationSnapshots` has already fetched it; reading it here redistributes nothing
-    /// that the accessibility upgrade above does not already read the same way, on the rider's
-    /// device and cached device-only.
-    ///
-    /// And only the boarding leg was ever checked. The train a rider actually misses is rarely the
-    /// first one: it is the connection, which departs later in the evening and stops earlier. A
-    /// definite failure on any leg beats "fine" on the others; a leg nobody can answer for keeps
-    /// the whole trip `.unknown` rather than letting a verified leg speak for it.
+    /// Whether the subway is running for this trip, resolved for every ride at the moment it
+    /// departs. Operator pages are the source (read on the device and cached device-only): no
+    /// bundled pack carries a timetable. The train a rider misses is usually the connection, later
+    /// and closer to closing, so every leg is checked.
     private func serviceStatus(
         for route: Route,
         cityID: String,
@@ -575,15 +492,13 @@ final class RoutePlanningService {
         ).departureDate
 
         // Gathered first so the verdict below is a pure reduction, shared with the fallback path
-        // that has no operator to await. Without that split the leg walk existed twice and the two
-        // copies could disagree about which failing ride a trip should be judged by.
+        // that has no operator to await.
         var windowsBySegment: [UUID: [StationServiceWindow]] = [:]
         for segment in route.segments {
             guard segment.type.isTransit, let stationName = segment.fromStationName else { continue }
 
-            // The operator first: it is the authority on its own timetable and the only source that
-            // answers at all today. The pack remains the fallback so a city that later ships
-            // redistributable times keeps working with no change here.
+            // The operator first, the authority on its own timetable; the pack as fallback for a
+            // city that later ships redistributable times.
             let official = Self.serviceWindows(from: snapshots[stationName])
             windowsBySegment[segment.id] = official.isEmpty
                 ? await officialStationData.serviceWindows(
@@ -596,13 +511,9 @@ final class RoutePlanningService {
         return serviceVerdict(for: route, departure: departure) { windowsBySegment[$0.id] ?? [] }
     }
 
-    /// Reduces a route's rides to the one service verdict the whole trip deserves.
-    ///
-    /// Every ride is checked at the moment it departs rather than only the first. The train a rider
-    /// actually misses is rarely the first one, it is the connection, which departs later in the
-    /// evening and stops earlier. A definite failure on any leg beats "fine" on the others, and a
-    /// leg nobody can answer for keeps the whole trip `.unknown` rather than letting a verified leg
-    /// speak for it.
+    /// Reduces a route's rides to one verdict: a definite failure on any leg beats "fine" on the
+    /// others, and a leg nobody can answer for keeps the trip `.unknown` rather than borrowing a
+    /// verified leg's answer.
     private func serviceVerdict(
         for route: Route,
         departure: Date,
@@ -630,15 +541,12 @@ final class RoutePlanningService {
                 continue
             }
             sawAnswer = true
-            // Only a definitive closure may take a line out of the search — see
-            // `ServiceHoursVerdict.isDefinitive`. A merged window that still reads as running may
-            // be another direction's train, and banning a line on the strength of one that was
-            // never this rider's is the same error in the other direction.
-            // The direction, not the line. The verdict was reached from this rider's own onward
-            // stations, so it speaks for the way they are travelling and for nothing else: at
-            // 天通苑南 on 5号线 southbound has finished at 22:51 while northbound runs to 23:57.
-            // `directionNextStationID` names that direction as an oriented hop, and until now was
-            // computed on every plan and read by nothing.
+            // Only a definitive closure takes something out of the search
+            // (`ServiceHoursVerdict.isDefinitive`): a merged window that reads as running may be
+            // another direction's train. And the direction, not the line: the verdict came from
+            // this rider's onward stations, and at 天通苑南 on 5号线 southbound ends at 22:51 while
+            // northbound runs to 23:57. `directionNextStationID` names the direction as an oriented
+            // hop.
             if verdict.isDefinitive,
                let context = segment.transitContext,
                let next = context.directionNextStationID,
@@ -655,8 +563,8 @@ final class RoutePlanningService {
         }
 
         guard let worst else {
-            // Nothing to report: either every leg is inside its service hours, or nobody could
-            // answer for one of them and saying "running" would be borrowing another leg's answer.
+            // Nothing to report: every leg is inside its hours, or nobody could answer for one and
+            // "running" would borrow another leg's answer.
             return ServiceReading(
                 status: sawAnswer && !sawUnknown ? .running : .unknown,
                 warning: nil,
@@ -664,9 +572,8 @@ final class RoutePlanningService {
             )
         }
 
-        // Name the leg. On a one-ride trip the station adds nothing the rider does not already
-        // know; on a trip with a change it is the whole point. The ride that fails is usually not
-        // the one they are standing at the entrance of.
+        // Name the leg on a trip with a change: the ride that fails is usually not the one the
+        // rider is standing at.
         let banner = worst.verdict.status.bannerText
         let message: String? = {
             guard let banner else { return nil }
@@ -693,9 +600,8 @@ final class RoutePlanningService {
         )
     }
 
-    /// The operator's published first/last train, in the shape the resolver reads. Rows with
-    /// neither time are dropped rather than passed through as blanks. The resolver treats an
-    /// empty pool as "no answer", which is what a row with no times actually is.
+    /// The operator's first and last trains in the shape the resolver reads. Rows with neither time
+    /// are dropped: an empty pool is "no answer", which is what they are.
     private static func serviceWindows(
         from snapshot: OfficialStationInformationSnapshot?
     ) -> [StationServiceWindow] {
@@ -714,22 +620,17 @@ final class RoutePlanningService {
         }
     }
 
-    /// A lift, by the words the operators actually use. Escalators are deliberately absent: an
-    /// escalator is not step-free access, and counting one as though it were is the difference
-    /// between a wheelchair user reaching the platform and being stranded at the concourse.
+    /// A lift, in the words operators use. Escalators are not step-free access, and counting one
+    /// could strand a wheelchair user at the concourse.
     private static func describesStepFreeFacility(_ name: String) -> Bool {
         let stepFree = ["直梯", "垂直电梯", "电梯", "升降平台", "无障碍电梯", "轮椅", "無障礙", "升降機"]
         return stepFree.contains { name.contains($0) }
     }
 
-    /// The operator's exit list laid over the pack's.
-    ///
-    /// Beijing signs its exits `A`, `B`, `D2`. OpenStreetMap surveyed 1,095 doors for Beijing and
-    /// left 200 of them unnamed, calling another 246 things like 东南口, so the app sent riders to
-    /// a door whose sign says something else, or to one with no name at all. Where the two agree on
-    /// a name the surveyed coordinate is kept and the point is marked official; where the operator
-    /// lists an exit nobody surveyed it is added without a coordinate, which is the honest shape.
-    /// The exit exists and is called `A`, and where exactly it stands is not known.
+    /// The operator's exit list laid over the pack's. Beijing signs exits `A`, `B`, `D2`, while
+    /// OpenStreetMap leaves many doors unnamed or calls them 东南口. Where the names agree the
+    /// surveyed coordinate is kept and the point marked official; an exit nobody surveyed is added
+    /// without a coordinate: it exists and is called `A`, and where exactly it stands is not known.
     private func merged(
         _ guidance: [String: StationAccessGuidance],
         with snapshots: [String: OfficialStationInformationSnapshot]
@@ -746,11 +647,9 @@ final class RoutePlanningService {
                 matchedOfficialNames.insert(exit.name)
                 return Self.surveyed(point, namedBy: exit)
             }
-            // One door, one exit: the operator says this station has exactly one exit and exactly
-            // one was surveyed, so they are the same door and it is called what the sign says. Any
-            // looser pairing would be a guess, with two surveyed doors and exits A and B there is
-            // nothing in either dataset that says which is which, and a wrong exit letter sends a
-            // rider up the wrong staircase with full confidence.
+            // One door, one exit: the operator lists exactly one exit and exactly one door was
+            // surveyed, so they are the same door. Any looser pairing is a guess, and a wrong exit
+            // letter sends a rider up the wrong staircase with full confidence.
             var bound = upgraded
             let unnamed = upgraded.enumerated().filter { $0.element.name.trimmingCharacters(in: .whitespaces).isEmpty }
             let unmatched = snapshot.exits.filter { !matchedOfficialNames.contains($0.name) && !$0.name.isEmpty }
@@ -803,13 +702,8 @@ final class RoutePlanningService {
         return !left.isEmpty && !right.isEmpty && left == right
     }
 
-    /// The trip on foot, when that is a thing a person would actually do.
-    ///
-    /// Bounded at 3 km straight-line: past that walking stops being an answer and starts being a
-    /// way to make `MKDirections` slow for nothing. Deliberately carries no station IDs. It calls
-    /// at none, which leaves `networkCityID` nil, the value every reader of it already handles.
-    /// `strategy` is `.fastest` because when walking wins it *is* the fastest option, so this needs
-    /// no new strategy case, no new localized strings, and no change to the sort chips.
+    /// The trip on foot, within 3 km in a straight line; past that walking is not an answer and
+    /// only makes `MKDirections` slow.
     private func directWalkingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
         let from = origin.routeCoordinate
         let to = destination.routeCoordinate
@@ -862,15 +756,9 @@ final class RoutePlanningService {
         )
     }
 
-    /// The whole journey by car, with no station in it.
-    ///
-    /// The sibling of `directWalkingRoute` and built the same way: a single access leg, no
-    /// enrichment, no fare, no service hours, because none of those mean anything without a train.
-    /// MapKit's `.automobile` router, so it costs no provider quota at all.
-    ///
-    /// No distance ceiling, unlike the walk. A walk stops being an answer past a few kilometres; a
-    /// drive is exactly the answer that gets better the further it goes, and further is where the
-    /// metro's own transfers start to cost more than the ride.
+    /// The whole journey by car: one access leg from MapKit's `.automobile` router, no enrichment,
+    /// no fare, no provider quota. No distance ceiling: a drive gets better the further it goes,
+    /// which is where the metro's transfers start to cost more than the ride.
     private func directDrivingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
         let from = origin.routeCoordinate
         let to = destination.routeCoordinate
@@ -889,12 +777,8 @@ final class RoutePlanningService {
         return Self.singleLegRoute(segment, from: origin, to: destination, walkingDistance: 0, stepFreeAssessment: .unknown)
     }
 
-    /// Adds the drive only where it answers something the trains do not.
-    ///
-    /// Two cases, and no others. It is faster than every train plan, which is the comparison a
-    /// rider is entitled to make; or nothing on rail can be boarded at all, which is the honest
-    /// answer at 01:00 and the one the app has never been able to give. Beside a metro plan that
-    /// wins on both counts it is noise, and this screen is a list a rider chooses from.
+    /// Adds the drive only where it answers something the trains do not: it is faster than every
+    /// train plan, or nothing on rail can be boarded (the honest answer at 01:00).
     private func including(_ drive: Route?, beside routes: [Route]) -> [Route] {
         guard let drive, !routes.isEmpty else { return routes }
         let nothingRuns = routes.allSatisfy { $0.serviceStatus.blocksBoarding }
@@ -911,15 +795,13 @@ final class RoutePlanningService {
         tripAnchor: TripTimeAnchor,
     ) async -> (route: Route, closedServices: Set<ClosedServiceDirection>) {
         var route = route
-        // The pack that actually produced the route. A walking-only plan has none, and every
-        // official-data lookup below then finds nothing and reports unavailable, which is the
-        // truth: no station was involved, so there is nothing to say about one.
+        // The pack that produced the route. A walking-only plan has none, so the official lookups
+        // below find nothing, which is right: no station was involved.
         let routeCityID = route.networkCityID ?? ""
         let criticalStops = criticalStops(for: route)
         let criticalStopNames = criticalStops.map(\.name)
 
-        // These three official-data lookups are independent of one another. Kick them
-        // off concurrently and await results in the order their side effects are applied.
+        // Independent lookups, started together and awaited in the order their results are applied.
         async let dataCoverage = officialStationData.routeCoverage(
             cityID: routeCityID,
             stationNames: criticalStopNames
@@ -932,15 +814,14 @@ final class RoutePlanningService {
                     name: stop.name,
                     latitude: coordinate.latitude,
                     longitude: coordinate.longitude,
-                    // The stop's own pack, not the trip's. On a Dongguan → Guangzhou trip the two
-                    // ends are in different packs, and every lookup keyed to the origin's city
-                    // came back empty for the far half of the journey.
+                    // The stop's own pack, not the trip's: on a Dongguan → Guangzhou trip the ends
+                    // are in different packs.
                     cityID: stop.packCityID ?? routeCityID
                 )
             }
         )
-        // The operator's own station pages, for the stops this trip actually calls at. Started
-        // here so the network time overlaps the pack lookups above rather than adding to them.
+        // The operator's own pages for the stops this trip calls at, started here so the network
+        // time overlaps the pack lookups.
         async let officialSnapshotsResult = officialStationSnapshots(for: criticalStops)
         route.dataCoverage = await dataCoverage
         let officialSnapshots = await officialSnapshotsResult
@@ -972,11 +853,9 @@ final class RoutePlanningService {
             route.warnings.append(warning)
         }
 
-        // Being in the routable network does not make a station one a rider can use. The reviewed
-        // catalog marks eight that do not take passengers. 福寿岭 is still a building site, 黄土店
-        // is open track with no passenger stop, and every one of them can be routed to today. The
-        // status was only ever read by the station's own screen, so a plan could send someone to a
-        // door that does not open and say nothing.
+        // Being routable does not make a station usable: the reviewed catalog marks eight that take
+        // no passengers (福寿岭 is a building site, 黄土店 is track with no passenger stop). A plan must
+        // not send a rider to a door that does not open without saying so.
         route.warnings.append(contentsOf: await passengerServiceWarnings(
             stops: criticalStops,
             cityID: routeCityID
@@ -991,18 +870,15 @@ final class RoutePlanningService {
         let stationPositions = criticalStops.reduce(into: [String: CodableCoordinate]()) { index, stop in
             if let coordinate = stop.coordinate { index[stop.name] = coordinate }
         }
-        // Choose each end's door ONCE, by measured walking distance, and let every surface read
-        // that one answer. When the timeline picked its own exit and the guide card picked another,
-        // the same trip named two different doors on two screens.
-        // Any access leg, not just a walked one. The door-measuring below is what turns a
-        // straight-line exit guess into a measured one, and a cycled or driven first mile needs it
-        // just as much.
+        // Choose each end's door once, by measured walking distance, and let every surface read
+        // that answer, or the timeline and the guide card name different doors. Any access leg, not
+        // only a walk: a cycled or driven first mile needs a measured door just as much.
         let originIndex = route.segments.first?.type.isAccessLeg == true ? 0 : nil
         let destinationIndex = route.segments.count > 1 && route.segments.last?.type.isAccessLeg == true
             ? route.segments.count - 1
             : nil
-        // Read what the two lookups need before starting them: an `async let` body may not capture
-        // the mutable `route` they are about to update.
+        // Read what the lookups need before starting them: an `async let` body may not capture the
+        // mutable `route`.
         let originGuide = route.originAccessGuide
         let destinationGuide = route.destinationAccessGuide
         let originSegment = originIndex.map { route.segments[$0] }
@@ -1060,9 +936,8 @@ final class RoutePlanningService {
     /// round trip: the door is essentially where the graph already sent the rider.
     private static let exitRerouteThresholdMetres: Double = 40
 
-    /// How many of the nearest doors get their walk actually measured. Three covers the case this
-    /// exists for: one door on the wrong side of a barrier, without turning every plan into a
-    /// dozen routing calls.
+    /// How many of the nearest doors get their walk measured: enough for one door on the wrong side
+    /// of a barrier, without a dozen routing calls per plan.
     private static let exitCandidateLimit = 3
 
     /// The end of a trip, resolved: which door, and the real walk to it.
@@ -1073,16 +948,13 @@ final class RoutePlanningService {
         let leg: RouteSegment?
     }
 
-    /// Picks the door for one end of the trip and measures the walk to it.
+    /// Picks the door for one end of the trip and measures the walk to it. The graph walks to a
+    /// station's centre, the only point a node has; left there, the text says "Exit D" while the
+    /// map and duration describe a walk to the middle of the station (at 西单, 265 m to a door 34 m
+    /// away).
     ///
-    /// The graph walks the rider to the station's centre, because a centre is all a graph node has,
-    /// and enrichment then names a specific door. Left there, the two halves of the screen disagree:
-    /// the text says "Exit D" while the map draws, and the duration counts. A walk to the middle
-    /// of the station. At 西单 that read as a 265 m walk to a door 34 m away.
-    ///
-    /// Straight-line distance alone is not enough to choose with, either. At 西直门 the nearest door
-    /// by air is a 698 m walk, because the railway runs between it and the street. So the nearest
-    /// few are measured for real and the shortest actual walk wins.
+    /// Straight-line distance alone cannot choose: at 西直门 the nearest door by air is a 698 m walk
+    /// because the railway is in the way. The nearest few are measured and the shortest walk wins.
     private func chooseExit(
         guide: RouteAccessGuide?,
         guidance: [String: StationAccessGuidance],
@@ -1102,8 +974,8 @@ final class RoutePlanningService {
         guard let nearest = ranked.points.first else { return nil }
         let fallback = ChosenExit(point: nearest, stepFreeUnavailable: ranked.stepFreeUnavailable, leg: nil)
 
-        // Nothing to replace, or no station centre to judge against: keep the straight-line pick and
-        // spend no calls on a difference that cannot be established.
+        // Nothing to replace, or no station centre to judge against: keep the straight-line pick
+        // and spend no calls.
         guard let existing, let centre = stationPositions[guide.stationName] else { return fallback }
         let mode = existing.accessLegMode
 
@@ -1111,15 +983,10 @@ final class RoutePlanningService {
             guard let coordinate = point.coordinate else { return false }
             return centre.metres(to: coordinate) > Self.exitRerouteThresholdMetres
         }
-        // Comparing doors is free on foot and expensive on a bike.
-        //
-        // MapKit draws walking and driving legs for nothing, so all three candidates are measured
-        // and the shortest wins. A cycling leg has no MapKit equivalent and goes to Baidu, and this
-        // runs per route, per end — three routes, two ends, three doors is eighteen riding calls to
-        // settle one question, plus six from the assembler. Against a 3 km ride the difference
-        // between two doors of the same station is noise, and `rankedAccessPoints` has already put
-        // the nearest one first by straight-line distance, so on a bike that pick stands and one
-        // call confirms it.
+        // Comparing doors is free on foot and expensive by bike. MapKit walking and driving legs
+        // cost nothing, so every candidate is measured; a cycling leg is a Baidu call per route,
+        // per end, per door, and against a 3 km ride the gap between two doors is noise, so the
+        // straight-line nearest stands.
         let measurable = mode == .cycling ? Array(candidates.prefix(1)) : candidates
         guard !measurable.isEmpty else { return fallback }
 
@@ -1141,9 +1008,8 @@ final class RoutePlanningService {
                         to: isArrival ? riderCoordinate : doorCoordinate,
                         fromName: fromName,
                         toName: toName,
-                        // The assembler already decided how this end is covered. Re-measuring it
-                        // against a specific door must not silently turn a 6 km drive back into
-                        // a walk: the door moves, the mode does not.
+                        // The assembler decided how this end is covered. A new door must not turn a
+                        // 6 km drive back into a walk: the door moves, the mode does not.
                         mode: mode
                     )
                     return (point, leg)
@@ -1188,8 +1054,7 @@ final class RoutePlanningService {
         }
         guard changed else { return route }
 
-        // The guides quote the walk they belong to, so they have to be restated from the new legs
-        // rather than left holding the centroid's numbers.
+        // The guides quote the walk they belong to, so they are restated from the new legs.
         let updatedSegments = route.segments
         route.accessGuidance = route.accessGuidance.map { guide in
             guard let index = guide.kind == .origin ? originIndex : destinationIndex else { return guide }
@@ -1207,8 +1072,8 @@ final class RoutePlanningService {
             )
         }
 
-        // `longWalk` was judged against the centroid walk in the assembler; a door can be several
-        // hundred metres from a station's centre, so the verdict can genuinely flip either way.
+        // `longWalk` was judged against the centroid walk; a door can be hundreds of metres from a
+        // station's centre, so the verdict can flip either way.
         let walkingDistance = updatedSegments.filter { $0.type.isOnFoot }.reduce(0) { $0 + $1.distance }
         route.walkingDistance = walkingDistance
         route.warnings.removeAll { $0.type == .longWalk }
@@ -1219,14 +1084,13 @@ final class RoutePlanningService {
                 affectedStationID: nil
             ))
         }
-        // The headline follows its legs. Kept from the centroid walks, it disagreed with the door
-        // walks drawn beneath it, and arrive-by, reminders and the fastest sort all read it.
+        // The headline follows its legs: arrive-by, reminders and the fastest sort all read it.
         let delta = updatedSegments.reduce(0) { $0 + $1.duration } - replacedDuration
         return route.replacingSegments(updatedSegments, totalDuration: max(60, route.totalDuration + delta))
     }
 
-    /// Tags the boarding, transfer, and arrival stations of a route with the best-available
-    /// access-point + confidence (and a transfer-corridor hint, when one is authored).
+    /// Tags the boarding, transfer and arrival stations of a route with the best-available access
+    /// point and its confidence.
     private func buildStationGuidance(
         route: Route,
         guidance: [String: StationAccessGuidance],
@@ -1244,20 +1108,17 @@ final class RoutePlanningService {
         func add(_ stop: RouteStationStop, role: RouteStationGuidance.Role) {
             guard seen.insert("\(stop.stationID)-\(role.rawValue)").inserted else { return }
             let access = guidance[stop.name] ?? .empty
-            // The boarding and arrival doors were already chosen, by measured walking distance,
-            // so take those rather than re-deciding here. Deciding twice is how the timeline and
-            // the guide card came to name two different exits for the same trip.
-            //
-            // A transfer never leaves the station, so it has no entrance to recommend at all.
+            // The boarding and arrival doors were already chosen by measured walking distance; take
+            // those, so the timeline and the guide card name the same exit. A transfer never leaves
+            // the station, so it has no entrance to recommend.
             let chosen: StationAccessPoint?
             switch role {
             case .boarding: chosen = originExit
             case .arrival: chosen = destinationExit
             case .transfer: chosen = nil
             }
-            // Downstream: the trip timeline, the arrival notification, only ever sees this point,
-            // so an unlabeled entrance has its direction resolved here, while the station it is
-            // measured from is still in hand.
+            // Downstream (the timeline, the arrival notification) only sees this point, so an
+            // unlabeled entrance gets its direction resolved here, while the station is in hand.
             let exit = chosen?.labeled(relativeTo: stop.coordinate)
             result.append(RouteStationGuidance(
                 stationID: stop.stationID,
@@ -1282,8 +1143,8 @@ final class RoutePlanningService {
         return result
     }
 
-    /// Replaces the placeholder origin/destination access guides with a specific exit + confidence
-    /// when station data provides one; otherwise leaves the honest "unavailable" guide untouched.
+    /// Replaces the placeholder origin and destination guides with a specific exit and confidence
+    /// when station data has one; otherwise the honest "unavailable" guide stays.
     private func upgradeAccessGuidance(
         _ guides: [RouteAccessGuide],
         guidance: [String: StationAccessGuidance],
@@ -1316,9 +1177,9 @@ final class RoutePlanningService {
                     traditional: "出入口 \(point.name) 根據車站資料估算，請到現場確認。"
                 )]
             }
-            // The rider asked for step-free access and this station has no entrance recorded as
-            // step-free. Say that, rather than let the nearest exit read as an accessible one.
-            // Most entrances are simply unsurveyed, which is not the same as being accessible.
+            // The rider needs step-free access and no entrance here is recorded as step-free. Say
+            // so rather than let the nearest exit read as accessible; most entrances are
+            // unsurveyed, which is not accessible.
             if recommendation.stepFreeUnavailable {
                 notes.append(AppLocalization.text(
                     english: "No step-free entrance is recorded at \(guide.stationName). This is the nearest one.",
@@ -1340,9 +1201,8 @@ final class RoutePlanningService {
         }
     }
 
-    /// One warning per boarding, transfer or arrival station the operator does not serve. Transfers
-    /// count: a transfer is a place the rider gets off one train and onto another, on foot, which
-    /// is exactly what a station closed to passengers does not allow.
+    /// One warning per boarding, transfer or arrival station the operator does not serve. A
+    /// transfer counts: it means getting off one train and onto another, on foot.
     private func passengerServiceWarnings(
         stops: [RouteStationStop],
         cityID: String
@@ -1408,20 +1268,15 @@ final class RoutePlanningService {
         preferences: AccessibilityPreference,
         tripAnchor: TripTimeAnchor = .now
     ) -> [Route] {
-        // Boardable first, whatever the chip says. `tripAnchor` has been a parameter of this call
-        // since the depart-at control was built and was read by nothing, so the fastest route won
-        // the list at 23:50 even when the operator had already said its line was shut. A sort is
-        // the right place for it: the route stays listed, badged, one position down, rather than
-        // vanishing and leaving the rider to wonder whether the app or the metro had failed.
+        // Boardable first, whatever the chip says: a shut line's route stays listed and badged, one
+        // position down, rather than vanishing or winning the list at 23:50.
         let byStrategy = rankedRoutes(routes, by: strategy, preferences: preferences, tripAnchor: tripAnchor)
         let ranked = byStrategy.filter { !$0.serviceStatus.blocksBoarding }
             + byStrategy.filter { $0.serviceStatus.blocksBoarding }
-        // A hard accessibility requirement demotes routes with a DETECTED barrier under
-        // every strategy, not just the step-free sort. Otherwise the toggles have no
-        // visible effect on the default orderings. Demoted, not removed: hiding every
-        // option behind an unmet requirement helps no one, and the route cards carry the
-        // barrier warning explaining the ordering. (Path-level avoidance would need
-        // accessibility data inside the routing graph. Not available there today.)
+        // A hard accessibility requirement demotes routes with a detected barrier under every
+        // strategy, or the toggles would do nothing visible on the default orderings. Demoted, not
+        // removed; the card carries the barrier warning. Avoiding barriers in the path would need
+        // accessibility data in the routing graph, which it does not have.
         guard preferences.requiresStepFreeEntrance else { return ranked }
         let clear = ranked.filter { $0.stepFreeAssessment != .barrierDetected }
         let barriers = ranked.filter { $0.stepFreeAssessment == .barrierDetected }
@@ -1436,20 +1291,9 @@ final class RoutePlanningService {
     ) -> [Route] {
         switch strategy {
         case .metroFirst:
-            // Ranks on what the chip says: a trip that rides something comes before one that does
-            // not, then the quicker of the two.
-            //
-            // This compared `$0.strategy == .metroFirst`, and **no route is ever built with that
-            // strategy**: `MetroSearchPreference.strategy` yields only the other three, and the
-            // walking and driving routes hardcode `.fastest`. The branch was therefore always
-            // false, two routes with differing strategies compared equal in both directions, and
-            // the duration line below was never reached — under this app's own default chip a
-            // 40-minute route could be listed above a 25-minute one.
-            //
-            // The `strategy ==` tie-break is gone from every case for a second reason: it made
-            // equivalence non-transitive (X < Y, X ~ Z, Y ~ Z), which is not the strict weak
-            // ordering `sorted(by:)` requires, so the resulting order was formally unspecified.
-            // Ranking on the metric each chip names needs no reference to which search built it.
+            // Ranks on what the chip says: a trip that rides something before one that does not,
+            // then the quicker. Only the metric each chip names is compared, so the ordering stays
+            // a strict weak ordering `sorted(by:)` requires.
             return routes.sorted {
                 let lhsRides = $0.boardingTransitSegment != nil
                 let rhsRides = $1.boardingTransitSegment != nil
@@ -1477,8 +1321,8 @@ final class RoutePlanningService {
 }
 
 extension Route {
-    /// The pack the trip *starts* in, and nothing more. A trip spans packs now, so anything about
-    /// one particular station has to ask that station. See `RouteStationStop.packCityID`.
+    /// The pack the trip starts in, and nothing more: a trip can span packs, so anything about one
+    /// station asks that station (`RouteStationStop.packCityID`).
     var networkCityID: String? {
         MetroStationIdentifier.cityID(of: originStationID)
     }

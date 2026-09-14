@@ -10,23 +10,19 @@ enum StationInformationCacheLocation {
     }
 }
 
-/// Device-only persistence for the last good official station-information snapshot per
-/// station, so riders keep access to exits, facilities, and first/last trains offline.
+/// Device-only persistence for the last good official station-information snapshot per station, so
+/// exits, facilities and first/last trains stay available offline.
 ///
-/// Policy (enforced by validate_runtime_data_policy.rb): storage only. No network code in
-/// this file; lives under Application Support excluded from iCloud/iTunes backup; never
-/// bundled into the app or exported; wiped by both Settings → Clear Cache and the
-/// data-rights epoch cleanup at launch.
+/// Policy, enforced by validate_runtime_data_policy.rb: storage only, no network code; under
+/// Application Support, excluded from backup; never bundled or exported; wiped by Settings → Clear
+/// Cache and by the data-rights epoch cleanup at launch.
 actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
-    /// v2 nests services under their line and gives every enum a stable string wire value; v3 adds
-    /// `destination`, which separates a short-turn from the full run under a shared direction
-    /// marker. See `DataPacks/STATION_INFORMATION_SCHEMA.md`. A stored older entry fails the version
-    /// check in `storedSnapshot` and is simply refetched, so no migration is needed — and for v3
-    /// that refetch is the point: an entry written before this field existed would keep serving the
-    /// merged last train offline, which is the answer this version exists to stop giving.
+    /// v2 nests services under their line with stable string wire values; v3 adds `destination`,
+    /// separating a short-turn from the full run under one direction marker. See
+    /// `DataPacks/STATION_INFORMATION_SCHEMA.md`. An older entry fails the version check and is
+    /// refetched, which for v3 is the point: it would keep serving the merged last train offline.
     static let schemaVersion = 3
-    // Mirrors the provider's network response cap: anything larger than a legitimate
-    // response has no business being read back either.
+    // The provider's own response cap: anything larger has no business being read back either.
     private static let maximumEntryBytes = 1_048_576
 
     private struct StoredEnvelope: Codable {
@@ -91,8 +87,8 @@ actor OfficialStationInformationDiskCache: OfficialStationInformationCaching {
         try? fileManager.removeItem(at: rootURL)
     }
 
-    /// One subdirectory per city, so a station key that repeats across operators cannot collide.
-    /// Beijing keeps the historical `1100` path, so entries cached before this change stay valid.
+    /// One subdirectory per city, so a station key repeated across operators cannot collide.
+    /// Beijing keeps its `1100` path.
     private func directoryURL(cityID: String) -> URL {
         let safeCity = cityID.unicodeScalars
             .filter(CharacterSet.alphanumerics.contains)

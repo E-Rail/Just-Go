@@ -1,8 +1,7 @@
 import Foundation
 
-/// Routes a station-information request to the provider for its source. The app looks a station
-/// up in the bundled directory, builds the matching reference, and this dispatches it, so adding
-/// a city is a new provider plus a directory entry, with no change to the call sites.
+/// Routes a station-information request to its source's provider. Which source a station uses comes
+/// from the bundled directory, so adding a city is a provider plus a directory entry.
 actor OfficialStationInformationRouter: OfficialStationInformationProviding {
     private let beijing: BeijingStationInformationProvider
     private let shanghai: ShanghaiStationInformationProvider
@@ -44,11 +43,10 @@ actor OfficialStationInformationRouter: OfficialStationInformationProviding {
     }
 }
 
-/// Fetches Shanghai Metro station information from the operator's own JSON endpoints, on the
-/// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
-/// in `StationInfoAPI/sources/sources.json` under `shanghaiMetroOnline`; the two quirks that recipe
-/// warns about are handled here: the `--` no-data placeholder for train times, and exit ids that
-/// arrive as a JSON number at some stations and a string at others.
+/// Fetches Shanghai Metro station information from the operator's JSON endpoints on the rider's
+/// device. The recipe is in `StationInfoAPI/sources/sources.json` under `shanghaiMetroOnline`; its
+/// two quirks are handled here: the `--` placeholder for train times, and exit ids that are a JSON
+/// number at some stations and a string at others.
 actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     static let cityID = "3100"
     static let host = "m.shmetro.com"
@@ -112,10 +110,9 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         return PreparedRequest(stationID: identity.stationID, lineStationIDs: keys, expectedNames: identity.expectedNames)
     }
 
-    /// One station's live first/last-train picture, in two phases: the line colours and the
-    /// station record together, then every line's table together. Each request carries its own
-    /// deadline; a serial chain under one request's budget timed out at interchanges served by
-    /// four lines, exactly where first and last trains matter most.
+    /// One station's live first and last trains, in two phases: line colours and the station record
+    /// together, then every line's table together. Each request has its own deadline, so an
+    /// interchange served by four lines does not time out on a shared budget.
     private static func fetch(
         _ request: PreparedRequest,
         lineResponses: OperatorAnswerCache<String, Data>,
@@ -133,8 +130,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             throw OfficialStationInformationProviderError.contractViolation("station name does not match the reviewed catalog")
         }
 
-        // Indexed so the result keeps the catalog's line order: a task group finishes in whatever
-        // order the network answers, and the order these are listed in is the order the rider reads.
+        // Indexed, so results keep the catalog's line order whatever order the network answers in.
         let keys = request.lineStationIDs
         let rowsByIndex = try await withThrowingTaskGroup(
             of: (Int, Int, [FirstLastRow]).self
@@ -249,9 +245,9 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             for entrance in (line["entrance"] as? [[String: Any]]) ?? [] {
                 // The exit id is a JSON number at some stations and a string at others.
                 guard let name = stringValue(entrance["id"]) else { continue }
-                // Shanghai packs every road an exit reaches into one space-separated string
-                // ("西藏南路 复兴东路 盐城路"). Split it so `details` means one place per element,
-                // the way Beijing's `nearby` array already does. The exits view groups on that.
+                // Shanghai packs every road an exit reaches into one space-separated string ("西藏南路
+                // 复兴东路 盐城路"); split so `details` is one place per element, as Beijing's `nearby`
+                // is.
                 let details = OperatorFieldParsing.trimmed(entrance["description"] as? String)
                     .map { $0.split(whereSeparator: \.isWhitespace).map(String.init) }?
                     .uniqued() ?? []
@@ -283,8 +279,8 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         return items.isEmpty ? [] : [OfficialStationFacilityGroup(name: name, items: items)]
     }
 
-    /// Group `func=fltime` rows by direction, keeping the earliest first train and latest last
-    /// train across a direction's short-turn runs. The same service-day merge the recipe requires.
+    /// Groups `func=fltime` rows by direction, keeping the earliest first and latest last train
+    /// across a direction's short-turn runs, as the recipe requires.
     private static func mergedServices(
         _ rows: [FirstLastRow]
     ) -> [OfficialStationServiceInformation] {

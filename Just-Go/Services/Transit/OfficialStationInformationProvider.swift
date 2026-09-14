@@ -99,15 +99,9 @@ struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Cod
     /// where this particular train ends.
     let direction: String
     /// Where this individual service terminates, when the operator distinguishes it from the
-    /// direction marker.
-    ///
-    /// Beijing publishes both, and at 国贸 every northbound 10号线 row shares
-    /// `terminalStationName = 双井` while `destStationName` separates them into 车道沟, 成寿寺 and
-    /// 巴沟 — three services, three last trains. Folding them together published one 23:36 window,
-    /// which belongs to a train that turns back seventeen stops before 车道沟.
-    ///
-    /// Optional and defaulted: most sources publish one name for both, and a device cache written
-    /// before this field existed must still decode.
+    /// direction marker. At 国贸 every northbound 10号线 row shares `terminalStationName = 双井` while
+    /// `destStationName` separates 车道沟, 成寿寺 and 巴沟: three services, three last trains. Optional so
+    /// sources with one name, and older device caches, decode.
     let destination: String?
     let firstTrain: String?
     let lastTrain: String?
@@ -127,19 +121,16 @@ struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Cod
         self.liveTime = liveTime
     }
 
-    /// Positional, not `compactMap`-ed: dropping nils before joining made
-    /// `(first: "5:27", last: nil)` and `(first: nil, last: "5:27")` collide on one id, and the
-    /// `uniqued(by:)` at the call sites then silently deleted the second row.
+    /// Positional, not `compactMap`-ed, so `(first: "5:27", last: nil)` and `(first: nil, last:
+    /// "5:27")` stay distinct ids and `uniqued(by:)` keeps both rows.
     var id: String {
         [direction, destination ?? "", firstTrain ?? "", lastTrain ?? "", liveTime ?? ""]
             .joined(separator: "|")
     }
 }
 
-/// Services grouped under the line that runs them. Nesting rather than repeating `lineName` on
-/// every row is what makes the payload usable by anyone other than this app: a consumer reads one
-/// line's whole service picture without regrouping a flat list, and the line's colour is stated
-/// once instead of once per direction.
+/// Services grouped under the line that runs them, so a consumer of the published payload reads one
+/// line's whole picture without regrouping, and the line's colour is stated once.
 struct OfficialStationLineInformation: Identifiable, Sendable, Equatable, Codable {
     let lineName: String
     let lineColorHex: String?
@@ -176,12 +167,10 @@ struct OfficialStationFacilityGroup: Identifiable, Sendable, Equatable, Codable 
     var id: String { name }
 }
 
-/// Whether a snapshot came straight from the official service or from this device's own
-/// last-good copy served while the service was unreachable.
-/// Encoded as `{"state": "live"}` / `{"state": "cached", "fetchedAt": "…"}` rather than the
-/// synthesised `{"live": {}}` / `{"cached": {"fetchedAt": …}}`: this type is part of a published
-/// interchange contract (`DataPacks/STATION_INFORMATION_SCHEMA.md`), and a payload keyed by its
-/// own case name is not something another implementation can reasonably produce.
+/// Whether a snapshot came from the official service or from this device's last-good copy while the
+/// service was unreachable. Encoded as `{"state": "live"}` / `{"state": "cached", "fetchedAt":
+/// "…"}`, not Swift's synthesised shape: this type is part of a published interchange contract
+/// (`DataPacks/STATION_INFORMATION_SCHEMA.md`).
 enum OfficialStationInformationFreshness: Sendable, Equatable, Codable {
     case live
     case cached(fetchedAt: Date)
@@ -223,12 +212,9 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
     let stationName: String
     let source: OfficialStationInformationSource
     let freshness: OfficialStationInformationFreshness
-    /// Which service day these times describe, in the source's own words, when it says.
-    ///
-    /// Hangzhou's payload is titled `工作日时刻表` — the *weekday* timetable — and the app has been
-    /// showing it on Saturdays as though it were today's. `StationInfoAPI/sources/sources.json`
-    /// recorded that the title existed; nothing read it. Optional because only Hangzhou publishes
-    /// one, and because a cache written before this existed must still decode.
+    /// Which service day these times describe, in the source's own words, when it says: Hangzhou's
+    /// payload is titled `工作日时刻表`, the weekday timetable. Optional because only Hangzhou publishes
+    /// one and older caches must decode.
     let serviceDayNote: String?
     let lines: [OfficialStationLineInformation]
     let exits: [OfficialStationExitInformation]
@@ -293,9 +279,9 @@ enum OfficialStationInformationReference: Hashable, Sendable {
     /// Guangzhou's serviceTime endpoint returns every line for a physical station from any one of
     /// its per-line codes, so the reference carries a single representative stationShowCode.
     case guangzhou(stationShowCode: String, expectedNames: [String])
-    /// Hangzhou returns the whole network in one response, so the reference carries every station
-    /// code the operator publishes for this physical station. Usually one, but 火车东站 is split
-    /// upstream into a main-hall and an east-plaza record that have to be read together.
+    /// Hangzhou returns the whole network at once, so the reference carries every code the operator
+    /// publishes for this station: usually one, but 火车东站 is split into a main-hall and an
+    /// east-plaza record.
     case hangzhou(stationCodes: [String], expectedNames: [String])
 }
 
@@ -321,11 +307,10 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
     case serviceUnavailable(String?)
     case contractViolation(String)
 
-    /// Transient failures worth another attempt before the rider sees an error. A cold first
-    /// request after launch: the initial DNS/TLS handshake, racing the app's own launch work.
-    /// Can time out or have its connection reset while the endpoint is perfectly reachable, then
-    /// load on a retry. Permanent failures (bad request, contract mismatch, oversize response)
-    /// and rate limiting (which carries its own backoff) are never retried.
+    /// Transient failures worth another attempt before the rider sees an error: a cold first
+    /// request after launch can time out or reset on the DNS/TLS handshake while the endpoint is
+    /// reachable. Permanent failures and rate limiting, which carries its own backoff, are never
+    /// retried.
     var isRetryable: Bool {
         switch self {
         case .timedOut, .transport, .serviceUnavailable:
@@ -337,13 +322,10 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
         }
     }
 
-    /// Whether a failure may be answered from the copy this device stored earlier.
-    ///
-    /// On the error rather than in each provider, which all four had their own copy of: an
-    /// availability failure is worth a cached answer labelled as cached, a caller or contract
-    /// error never is — a stored copy must not paper over a request the operator rejected or a
-    /// response that no longer means what the app thinks. Non-provider errors, cancellation above
-    /// all, propagate untouched.
+    /// Whether a failure may be answered from the copy this device stored earlier. An availability
+    /// failure gets the cached answer, labelled as cached; a rejected request or a contract
+    /// violation never does, because a stored copy must not paper over a response that no longer
+    /// means what the app thinks. Non-provider errors, cancellation above all, propagate untouched.
     var allowsStoredFallback: Bool {
         switch self {
         case .timedOut, .transport, .invalidResponse, .responseTooLarge,
@@ -797,26 +779,16 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         )
     }
 
-    /// The upstream returns one record per *service*, not per direction: `terminalStationName`
-    /// is a direction marker (the next station toward that end of the line) while
-    /// `destStationName` is that individual service's terminus.
-    ///
-    /// Both are kept, and the grouping key is the pair. Keying on the direction marker alone —
-    /// which is what this did — folded every short-turn in a direction into one row spanning the
-    /// earliest first train and the **latest** last train. At 国贸, live, the three northbound
-    /// 10号线 records all read `terminalStationName = 双井` and differ only in `destStationName`:
+    /// Beijing returns one record per *service*: `terminalStationName` is a direction marker (the
+    /// next station that way), `destStationName` the service's terminus. The group key is the pair.
+    /// At 国贸 the three northbound 10号线 records share `terminalStationName = 双井`:
     ///
     ///     → 车道沟  5:18 – 21:28      → 成寿寺  5:18 – 23:36      → 巴沟  5:18 – 23:12
     ///
-    /// Folded, that published 5:18 – 23:36. But the 23:36 train turns back at 成寿寺, seventeen
-    /// stops before 车道沟, so a rider heading further round the ring was given a last train that
-    /// was never going to carry them. `ServiceHoursResolver.servingWindows` exists precisely to
-    /// pick the service that reaches a rider's own stop, and until now it was handed a single
-    /// pre-merged row and nothing to choose between.
-    ///
-    /// Records that genuinely describe the same service — same direction, same terminus, differing
-    /// only in the last-train digits — still collapse to one window, which is what platform signage
-    /// shows and what the duplicate-row problem this originally solved was about.
+    /// Grouped by direction alone that is 5:18 – 23:36, a last train that turns back seventeen
+    /// stops before 车道沟. `ServiceHoursResolver.servingWindows` picks the service that reaches the
+    /// rider's stop, and needs the services apart. Records with the same direction and terminus
+    /// still collapse into one window.
     private static func groupedLines(_ lines: [BeijingLine]) -> [OfficialStationLineInformation] {
         struct ServiceKey: Hashable {
             let direction: String
@@ -1011,31 +983,23 @@ struct FlexibleString: Decodable {
     }
 }
 
-/// One operating notice as the operator published it: their headline, their date, their page.
-///
-/// Nothing here is summarised, ranked or reworded. A notice is the operator speaking, and the only
-/// value this app adds is putting it in front of a rider who is about to ride the line it is about.
+/// One operating notice as the operator published it: headline, date, page. Nothing summarised,
+/// ranked or reworded.
 struct OperatorServiceNotice: Identifiable, Sendable, Equatable {
     let title: String
-    /// As published, `YYYY-MM-DD`. Shown verbatim so a stale feed is visibly stale rather than
-    /// quietly presented as today's news.
+    /// As published, `YYYY-MM-DD`, shown verbatim so a stale feed is visibly stale.
     let publishedOn: String
     let url: URL
 
     var id: String { url.absoluteString }
 }
 
-/// Fetches Beijing Subway's 运营信息 notices from the operator's own site, on the rider's device.
+/// Fetches Beijing Subway's 运营信息 notices from the operator's site, on the rider's device. The
+/// content is `LicenseRef-External-Link-Only`: fetched at runtime, held in memory only, never
+/// committed or redistributed.
 ///
-/// The operator's content is `LicenseRef-External-Link-Only`: it may not be committed to this
-/// repository, and it is not: this fetches at runtime, holds the result in memory only, and
-/// redistributes it to nobody. That is the same arrangement the station-information providers in
-/// this file already operate under.
-///
-/// **This is not a live advisory feed and must not be presented as one.** Beijing publishes here
-/// irregularly: at the time this was written the newest notice was 2026-05-16, so every notice
-/// carries its own publication date and the UI shows it. A rider needs to know they are reading
-/// something from May.
+/// **Not a live advisory feed, and must not be presented as one.** Beijing publishes here
+/// irregularly, so every notice carries its publication date and the UI shows it.
 actor BeijingServiceNoticeProvider {
     static let cityID = "1100"
     private static let host = "www.bjsubway.com"
@@ -1091,8 +1055,7 @@ actor BeijingServiceNoticeProvider {
     }
 
     /// Pulls `<a href="/news/qyxw/yyzd/2026-05-16/129685.html">标题2026-05-16</a>` rows out of the
-    /// listing page. The date is taken from the *path*, not the link text, because the text runs
-    /// the title and date together with no separator.
+    /// listing. The date comes from the path: the link text runs title and date together.
     nonisolated static func parse(html: String) -> [OperatorServiceNotice] {
         let pattern = #"<a[^>]+href="(/news/qyxw/yyzd/(\d{4}-\d{2}-\d{2})/\d+\.html)"[^>]*>(.*?)</a>"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {

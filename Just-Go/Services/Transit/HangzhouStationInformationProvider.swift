@@ -1,15 +1,11 @@
 import Foundation
 
-/// Fetches Hangzhou Metro station information from the operator's own JSON endpoint, on the
-/// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
-/// in `StationInfoAPI/sources/sources.json` under `hangzhouMetroOnline`.
+/// Fetches Hangzhou Metro station information from the operator's JSON endpoint on the rider's
+/// device. The recipe is in `StationInfoAPI/sources/sources.json` under `hangzhouMetroOnline`.
 ///
-/// The shape differs from the other mainland sources in one way that drives this whole file:
-/// there is no per-station endpoint. `/api/operation/all` returns the entire network. Every line,
-/// every station, every direction's first and last train, in a single ~350 KB response, so the
-/// network payload is fetched once and shared by every station lookup in the session, and the
-/// per-station work is slicing that payload by station code. That makes the first station open
-/// pay for the whole city and every subsequent one free, rather than one request per station.
+/// There is no per-station endpoint: `/api/operation/all` returns every line, station and
+/// first/last train in one ~350 KB response. It is fetched once and shared, and each station slices
+/// it by code.
 actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
     static let cityID = "3301"
     fileprivate static let host = "www.hzmetro.com"
@@ -141,18 +137,16 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             )
         }
 
-        // Identity is checked against the station list, which is what the reviewed catalog was
-        // built from. `subwaySiteDetail` disagrees with it on the 站 suffix for four stations, so
-        // it is matched on code only and never on name.
+        // Identity is checked against the station list the reviewed catalog was built from.
+        // `subwaySiteDetail` disagrees with it on the 站 suffix for four stations, so there it is
+        // matched by code only.
         guard listed.contains(where: { OperatorFieldParsing.isReviewedName($0.stationName, in: request.expectedNames) }) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
         }
-        // Title with the record the catalog pinned as representative, not merely the first listed
-        // one: 火车东站's two records are 火车东站 (code 76) and 火车东站（东广场） (code 150), and the
-        // payload happens to list the east plaza first, which would title the whole station with
-        // what the catalog only holds as an alias.
+        // Titled with the record the catalog pinned as representative: 火车东站's records are 火车东站 (76)
+        // and 火车东站（东广场） (150), and the payload lists the east plaza first.
         let representative = listed.first { $0.stationCode == request.stationCodes.first }
         let stationName = representative?.stationName
             ?? listed.first { OperatorFieldParsing.isReviewedName($0.stationName, in: request.expectedNames) }?.stationName
@@ -201,16 +195,16 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             source: .hangzhouMetroOnline,
             freshness: .live,
             serviceDayNote: OperatorFieldParsing.trimmed(network.title),
-            // The payload carries neither exits nor facilities for Hangzhou; the station detail
-            // view falls back to the bundled sections for those categories.
+            // The payload carries neither exits nor facilities; the station page falls back to the
+            // bundled sections.
             lines: lines,
             exits: [],
             facilityGroups: []
         )
     }
 
-    /// Line keys are names such as "1号线" and "6号线（枸桔弄-双浦）". Sort by the leading line
-    /// number so the rider sees 1, 2, 3 … 19 rather than dictionary order putting 10 before 2.
+    /// Line keys are names like "1号线" and "6号线（枸桔弄-双浦）": sorted by leading number, so 2 comes
+    /// before 10.
     private static func lineOrdering(_ lhs: String, _ rhs: String) -> Bool {
         let left = leadingNumber(lhs)
         let right = leadingNumber(rhs)
@@ -242,11 +236,7 @@ private struct HangzhouPayload: Decodable {
 struct HangzhouNetwork: Decodable, Sendable {
     let stationlist: [HangzhouListedStation]
     let subwaySiteDetail: [String: [HangzhouDirection]]
-    /// The payload's own heading — live, `工作日时刻表`: the **weekday** timetable.
-    ///
-    /// One field, and until now nobody read it, so every Saturday and Sunday the app presented
-    /// weekday first and last trains as if they were today's. `sources.json` has recorded that this
-    /// title exists and states the service day for as long as the source has been wired up.
+    /// The payload's own heading, `工作日时刻表`: the **weekday** timetable, shown with the times.
     let title: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -266,8 +256,8 @@ struct HangzhouNetwork: Decodable, Sendable {
     }
 }
 
-/// Only the identity fields are read. `description`. The operator's own prose about the station.
-/// Is deliberately not decoded: it is licensed content this app neither stores nor displays.
+/// Only identity fields are decoded. `description`, the operator's prose about the station, is
+/// licensed content this app neither stores nor displays.
 struct HangzhouListedStation: Decodable, Sendable {
     let stationCode: String
     let stationName: String

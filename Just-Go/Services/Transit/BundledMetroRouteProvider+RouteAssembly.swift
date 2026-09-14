@@ -13,9 +13,8 @@ extension BundledMetroRouteProvider {
     ) async -> Route {
         let originStation = path.origin.station
         let destinationStation = path.destination.station
-        // How the rider covers each end is decided by how far that end is, once, here, and the
-        // straight line is what decides it rather than the routed distance, because the mode has
-        // to be chosen before there is a route to measure.
+        // How each end is covered is decided once, here, by straight-line distance: the mode must
+        // be chosen before there is a route to measure.
         let limit = accessibilityFilter.maxWalkingDistance
         let originMode = AccessLegMode.forDistance(
             origin.routeCoordinate.distance(to: originStation.coordinate),
@@ -69,18 +68,16 @@ extension BundledMetroRouteProvider {
             totalDuration: segments.reduce(0) { $0 + $1.duration },
             walkingDistance: walkingDistance,
             totalStops: path.edges.count,
-            // Count line changes, which is what a transfer is. The interchange link's synthetic
-            // line ID is dropped first: it sits between two different real lines by construction
-            // (the importer rejects a pair that shares one), so the change is already counted.
-            // Adding the link itself priced one change as two.
+            // Count line changes. The interchange link's synthetic line ID is dropped first: it
+            // sits between two different real lines by construction, so counting it prices one
+            // change as two.
             transferCount: max(0, path.edges.map(\.lineID).filter { $0 != metroInterchangeLineID }.consecutiveUnique.count - 1),
             isFullyAccessible: false,
             stepFreeAssessment: hasStairs ? .barrierDetected : .unknown,
             warnings: warnings,
             accessGuidance: [
-                // `isAccessLeg`, not `== .walking`: a first mile long enough to be cycled or
-                // driven is exactly the one where naming the right door matters most, and testing
-                // for walking alone silently dropped the guide on those routes.
+                // `isAccessLeg`, not `== .walking`: a first mile long enough to cycle or drive is
+                // where naming the right door matters most.
                 accessGuide(kind: .origin, place: origin, station: originStation, walk: segments.first?.type.isAccessLeg == true ? segments.first : nil),
                 accessGuide(kind: .destination, place: destination, station: destinationStation, walk: segments.last?.type.isAccessLeg == true ? segments.last : nil)
             ],
@@ -93,8 +90,7 @@ extension BundledMetroRouteProvider {
         graph: MetroRoutingGraph
     ) -> [RouteSegment] {
         var segments: [RouteSegment] = []
-        // Also split on `interchange`, so two interchange links that happen to sit next to each
-        // other stay two legs rather than being folded into one by their shared synthetic line.
+        // Also split on `interchange`, so two adjacent interchange links stay two legs.
         let groups = edges.chunked { $0.lineID == $1.lineID && $0.interchange == $1.interchange }
         for (index, group) in groups.enumerated() {
             if group.first?.interchange != nil {
@@ -115,9 +111,8 @@ extension BundledMetroRouteProvider {
                 line: line,
                 graph: graph
             )
-            // `index > 0`, but not straight after an interchange link: that link *is* the
-            // change, and appending a second zero-length transfer on top of it listed the same
-            // change twice: "walk 广安门内 → 牛街" followed by "transfer at 牛街".
+            // Not straight after an interchange link: that link is the change, and a transfer on
+            // top of it lists one change twice.
             let followsInterchange = index > 0 && groups[index - 1].first?.interchange != nil
             if index > 0, !followsInterchange {
                 // `lineName` below is the outgoing line; the incoming one is the previous group's,
@@ -136,11 +131,9 @@ extension BundledMetroRouteProvider {
                     distance: 0,
                     stops: 0,
                     stationStops: [],
-                    // An in-station change draws nothing of its own. The map already joins the two
-                    // rides through this station: each ride's track is tied back to the station
-                    // node by a grey connector, so the path reads platform -> concourse -> platform
-                    //, which is the way a rider actually makes the change. A direct line between
-                    // the two tracks would cut a corner nobody walks.
+                    // An in-station change draws nothing: each ride's track is tied to the station
+                    // node by a grey connector, so the path reads platform → concourse → platform.
+                    // A direct line between tracks would cut a corner nobody walks.
                     polylineCoordinates: [],
                     walkingDirections: nil,
                     accessibilityNotes: [],
@@ -192,14 +185,10 @@ extension BundledMetroRouteProvider {
         return segments
     }
 
-    /// The leg where the rider walks from one station to the other one riders treat as the same
-    /// interchange. A `.transfer` either way. It is a change of train, not a journey.
-    ///
-    /// The notes say what the walk is and, separately, what the fare does *only where that has
-    /// been checked*. Both used to be read off `kind`, which was wrong in both directions: an
-    /// out-of-station walk was announced as costing a second fare, when Beijing's two are 虚拟换乘
-    /// and bill as one trip, and a shared concourse was announced as needing no tap-out, when
-    /// Guangzhou's halves are metro and intercity rail on separate tickets.
+    /// The walk from one station to the other that riders treat as the same interchange: a
+    /// `.transfer`, a change of train, not a journey. The notes say what the walk is, and what the
+    /// fare does only where that has been checked; neither follows from `kind` (Beijing's
+    /// out-of-station 虚拟换乘 bills as one trip, Guangzhou's shared concourse needs two tickets).
     private func interchangeSegment(
         _ edge: MetroGraphEdge,
         link: MetroInterchange,
@@ -220,8 +209,8 @@ extension BundledMetroRouteProvider {
                     traditional: "站內通道直接連通"
                 )
         ]
-        // Silence where it is unknown. Saying nothing about the fare is the honest answer; the
-        // rider can read the gates. Saying the wrong thing sends them through the wrong one.
+        // Silence where the fare is unknown: the rider can read the gates, and a wrong statement
+        // sends them through the wrong one.
         if link.fare == .continuous {
             notes.append(AppLocalization.text(
                 english: "Counts as one trip, with no second fare",
@@ -232,11 +221,8 @@ extension BundledMetroRouteProvider {
         return RouteSegment(
             id: UUID(),
             type: .transfer,
-            // No line: this leg is a walk between two stations, not a train. It used to carry the
-            // destination *station's* name here, which `TripStep.title` renders as
-            // "Transfer to \(lineName)" — so Live Go read "换乘牛街", "transfer to [station]",
-            // naming no line at all while the actual instruction (leave the gates and cross the
-            // road) sat in `accessibilityNotes` where that step does not look.
+            // No line: this leg is a walk between stations, and `TripStep.title` renders a line
+            // name as "Transfer to …".
             lineName: nil,
             lineColorHex: nil,
             fromStationName: from.name,
@@ -277,20 +263,13 @@ extension BundledMetroRouteProvider {
         )
     }
 
-    /// The stations ahead of the rider on the train they board, from where they get on to the end
-    /// of its run, in travel order. The last of them is the terminus the platform sign names.
+    /// The stations ahead of the rider on the train they board, to the end of its run, in travel
+    /// order; the last is the terminus the platform sign names.
     ///
-    /// Resolved from the whole leg rather than its first hop, and required to be unambiguous. The
-    /// first-hop version matched any pattern containing that one pair, which on a branching line is
-    /// every branch, because they all share the trunk the rider boards on. Whichever branch happened
-    /// to sit at index 0 won, so a trip down one arm could be labelled with the other arm's
-    /// terminus. 24 bundled lines genuinely branch, so this was not hypothetical.
-    ///
-    /// Requiring the pattern to contain the boarding *and* alighting stations, in that order, picks
-    /// the branch the rider is actually riding. Where several patterns still qualify and disagree —
-    /// the trip ends before the divergence, so both branches would serve it — the honest answer is
-    /// no answer: the rider must read the platform sign, and naming one branch would be a guess
-    /// dressed as instruction.
+    /// The pattern must contain the boarding and alighting stations in that order, which picks the
+    /// branch the rider rides (24 bundled lines branch, and a first-hop match fits every branch
+    /// sharing the trunk). Where qualifying patterns still disagree, the answer is none: naming one
+    /// branch would be a guess dressed as instruction.
     private func onwardStationIDs(for group: [MetroGraphEdge], line: MetroLine) -> [String]? {
         guard let boarding = group.first?.fromStationID, let alighting = group.last?.toStationID else { return nil }
 
@@ -299,15 +278,15 @@ extension BundledMetroRouteProvider {
             guard let start = pattern.firstIndex(of: boarding),
                   let end = pattern.firstIndex(of: alighting),
                   start != end else { continue }
-            // Riding with the pattern's own order means the far end is ahead; against it, the near
-            // end is. A pattern is stored in one arbitrary direction and trains run both ways.
+            // A pattern is stored in one arbitrary direction and trains run both ways: with its
+            // order the far end is ahead, against it the near end is.
             let onward = start < end
                 ? Array(pattern[start...])
                 : Array(pattern[...start].reversed())
             if !candidates.contains(onward) { candidates.append(onward) }
         }
-        // Two branches that disagree about where this train ends up cannot both be right, and
-        // picking one would hand the rider the other arm's terminus and the other arm's last train.
+        // Branches that disagree about where this train ends cannot both be right, and picking one
+        // would hand the rider the other arm's terminus and last train.
         guard candidates.count == 1 else { return nil }
         return candidates.first
     }

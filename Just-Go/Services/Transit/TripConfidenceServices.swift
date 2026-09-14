@@ -1,7 +1,6 @@
 import Foundation
 
-/// Stateless builder that turns a `Route` into an ordered Live "Go" plan using
-/// only `route.segments` (no schedule/time data needed).
+/// Turns a `Route` into an ordered Live Go plan from `route.segments` alone.
 struct LiveGoTripBuilder {
     func plan(for route: Route) -> LiveTripPlan {
         var steps: [TripStep] = []
@@ -9,8 +8,8 @@ struct LiveGoTripBuilder {
             switch segment.type {
             case .walking, .cycling, .driving:
                 let isOrigin = index == 0
-                // The same door the plan routed to, so the screen the rider actually follows on
-                // foot names the entrance the detail screen promised instead of just the station.
+                // The door the plan routed to, so the step the rider follows names the entrance the
+                // detail screen promised.
                 let guide = isOrigin ? route.originAccessGuide : route.destinationAccessGuide
                 steps.append(TripStep(
                     id: steps.count,
@@ -28,10 +27,8 @@ struct LiveGoTripBuilder {
                     accessMode: segment.accessLegMode
                 ))
             case .transfer:
-                // The transfer segment's own stationStops is always empty by construction.
-                // The transfer station's coordinate instead lives on stationStops.first of the
-                // ride segment that immediately follows it (same station, since a transfer and
-                // the ride after it always share the same starting station).
+                // A transfer segment has no stops; the transfer station's coordinate is the first
+                // stop of the ride that follows it, which starts at the same station.
                 let nextRide = route.segments.indices.contains(index + 1) ? route.segments[index + 1] : nil
                 let transferStop = nextRide?.stationStops.first { $0.stationID == segment.toStationID }
                     ?? nextRide?.stationStops.first

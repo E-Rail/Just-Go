@@ -3,16 +3,10 @@ import CoreLocation
 import MapKit
 
 final class StationSearchService {
-    /// One place lookup per query, shared by the two callers that both want it.
-    ///
-    /// The search page asks twice for a single tap on Search: once to list places, and once inside
-    /// `search(keyword:near:)`, which uses them to find stations Apple knows about and the bundled
-    /// index does not. Measured, that was 2 MKLocalSearch and 2 Baidu `/place/v2/search` per tap —
-    /// against an allowance of 100 a day for the whole account. The two callers run concurrently on
-    /// purpose, so the later one joins the in-flight task rather than starting its own.
-    ///
-    /// Only the newest query is held. Riders search forwards, and a stale entry would answer the
-    /// query before last with the results before that.
+    /// One place lookup per query, shared by the two callers that want it: the search page's place
+    /// list and `search(keyword:near:)`, which uses the places to find stations the bundled index
+    /// lacks. They run concurrently, so the later one joins the in-flight task. Place search allows
+    /// 100 a day for the whole account. Only the newest query is held: riders search forwards.
     @MainActor private static var placeLookup: (key: String, task: Task<[TransitPlace], Error>)?
 
     private let placeSearchProvider: PlaceSearchProviding
@@ -29,19 +23,12 @@ final class StationSearchService {
         self.metroNetworkProvider = metroNetworkProvider
     }
 
-    /// Every bundled station whose name matches, nearest first, plus anything Apple knows about
-    /// that resolves to a station.
-    ///
-    /// There is no city argument because there is no selected city: the rider's own position
-    /// orders the answers instead of gating them. Searching 人民广场 from Beijing therefore lists
-    /// Shanghai's: last, but listed, which is what "distance-ranked" means and what a city filter
-    /// could never do.
-    /// - Parameter includingPlaces: whether to ask the place-search provider as well as the
-    ///   bundled network. `false` answers entirely from data already on the device, which is what
-    ///   every keystroke gets: the provider's free allowance is **100 searches a day for the whole
-    ///   account**, about five riders, and this used to spend one on every typing pause. The
-    ///   bundled index is the reason that costs nothing to give up — it holds every station in
-    ///   every supported city and is what a rider searching a station name is looking for anyway.
+    /// Every bundled station whose name matches, nearest first, plus any Apple place that resolves
+    /// to a station. No city argument: the rider's position orders the answers rather than gating
+    /// them, so 人民广场 searched from Beijing lists Shanghai's, last. - Parameter includingPlaces:
+    /// whether to ask the place-search provider too. `false` answers from the device alone, which
+    /// is what every keystroke gets: the bundled index holds every station in every supported city,
+    /// and the provider allows 100 searches a day for the whole account.
     func search(
         keyword: String,
         near coordinate: CLLocationCoordinate2D?,
@@ -62,18 +49,13 @@ final class StationSearchService {
             guard bundledMatches.isEmpty else { return bundledMatches }
             throw error
         }
-        // Resolve all places to stations concurrently, preserving input order by index.
-        //
-        // A place that does NOT resolve to a station is dropped. It used to be wrapped in a
-        // synthesised `Station` and returned anyway, which is how a noodle shop ended up listed
-        // under "Stations" with line dots and a distance. The app asserting something it had no
-        // basis for. The search page already lists Apple's places in their own section, so
-        // nothing is lost by refusing to relabel them.
+        // Resolve every place to a station concurrently, keeping input order. A place that is not a
+        // station is dropped rather than dressed up as one; the search page lists places in their
+        // own section.
         let mapKitMatches = await withTaskGroup(of: (Int, Station?).self) { group in
             for (index, place) in places.enumerated() {
-                // Each place carries its own city now. The network whose bounds it falls in.
-                // A nationwide search returns places in several, so one shared cityID would have
-                // matched most of them against the wrong pack.
+                // Each place carries its own city: the network whose bounds it falls in. A
+                // nationwide search spans several.
                 let cityID = await cityID(covering: place.coordinate)
                 group.addTask { [officialStationData] in
                     guard let cityID else { return (index, nil) }
@@ -87,8 +69,8 @@ final class StationSearchService {
             return indexed.sorted { $0.0 < $1.0 }.map(\.1)
         }
         // `oneEntryPerPlace` before `uniqued`: the first collapses one station shipped by several
-        // packs (科韵路 is in Guangzhou's, Foshan's and Dongguan's, and a nationwide search now
-        // reaches all three), the second drops a MapKit hit that repeats a bundled one.
+        // packs (科韵路 is in Guangzhou's, Foshan's and Dongguan's), the second drops a MapKit hit
+        // that repeats a bundled one.
         return (bundledMatches + mapKitMatches).oneEntryPerPlace().uniqued {
             "\($0.cityID)|\(normalizedStationName($0.name))"
         }
@@ -108,16 +90,8 @@ final class StationSearchService {
         var id: String { "\(cityID)|\(lineID)" }
     }
 
-    /// Lines whose name matches, nearest first.
-    ///
-    /// Typing "18号线" used to match nothing at all. `Station.searchKey` is station names only, so
-    /// the query fell through to Apple Maps and landed on "No Results" for a line that ships in the
-    /// app. Lines are now findable, and kept in their own section rather than mixed into the
-    /// stations: a line is not a station, and the last time this app relabelled one thing as
-    /// another a noodle shop appeared under "Stations" with line dots and a distance.
-    ///
-    /// Built from the station list that is already cached rather than by decoding the packs again,
-    /// so a line's stations are the stations that name it, and the count comes free.
+    /// Lines whose name matches, nearest first, in their own section: a line is not a station.
+    /// Built from the cached station list, so a line's stations are the stations that name it.
     func searchLines(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [LineResult] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 1 else { return [] }
@@ -175,13 +149,12 @@ final class StationSearchService {
         }
     }
 
-    /// The stations closest to the rider, whichever cities they happen to be in. Empty when the
-    /// device has no position: there is no centroid left to guess from, and a list of arbitrary
-    /// stations claiming to be "nearby" would be a worse answer than none.
+    /// The stations closest to the rider, whichever cities they are in. Empty without a position:
+    /// arbitrary stations claiming to be "nearby" are worse than none.
     func nearestStations(to coordinate: CLLocationCoordinate2D?, limit: Int) async -> [Station] {
         guard let coordinate else { return [] }
-        // Collapse after ranking but before the limit: the duplicates sit next to each other once
-        // sorted, so taking the limit first would spend rows on the same station twice.
+        // Collapse after ranking and before the limit: duplicates sit together once sorted, and
+        // would otherwise take two rows.
         let ranked = rankedByDistance(await metroNetworkProvider.allStations(), from: coordinate)
         return Array(Array(ranked.prefix(limit * 2)).oneEntryPerPlace().prefix(limit))
     }
@@ -205,9 +178,8 @@ final class StationSearchService {
         await officialStationData.enrichStation(station)
     }
 
-    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps. Not just metro stations.
-    /// Biased to `region` (the visible map area, or the rider) when one is known; unbiased
-    /// otherwise, which is honest about having nowhere to bias it to.
+    /// Search anywhere (POIs, addresses, landmarks) via Apple Maps, biased to `region` when one is
+    /// known and unbiased otherwise.
     func searchPlaces(keyword: String, near coordinate: CLLocationCoordinate2D?) async throws -> [TransitPlace] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return [] }
@@ -247,13 +219,8 @@ final class StationSearchService {
         }
     }
 
-    /// The programmed metro station a place corresponds to, if any. Matched by name against the
-    /// bundled network covering that place, then the official city pack. Returns nil for
-    /// non-station places (e.g. a shop), so only true stations resolve to a station.
-    ///
-    /// The pack is chosen by where the place *is*, not by what the app was set to: a Foshan
-    /// station tapped while the map sat over Guangzhou used to be matched against Guangzhou's
-    /// network and so resolved to nothing.
+    /// The metro station a place corresponds to, matched by name against the bundled network
+    /// covering where the place is, then the official pack. nil for a place that is not a station.
     func station(matching place: TransitPlace) async -> Station? {
         guard let cityID = await cityID(covering: place.coordinate) else { return nil }
         if let network = await metroNetworkProvider.network(for: cityID),

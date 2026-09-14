@@ -2,9 +2,8 @@ import CoreLocation
 import MapKit
 
 struct MetroRouteContext {
-    /// Every pack the trip can use, not the single closest one. A trip from Foshan's metro to
-    /// Guangzhou's crosses two packs and calls at an intercity corridor carried by both; picking
-    /// one network made that trip unplannable rather than merely badly planned.
+    /// Every pack the trip can use, not the single closest: Foshan's metro to Guangzhou's crosses
+    /// two packs and an intercity corridor carried by both.
     let networks: [MetroNetwork]
     let originStations: [MetroStationCandidate]
     let destinationStations: [MetroStationCandidate]
@@ -19,13 +18,12 @@ struct MetroRoutingGraph {
     let linesByID: [String: MetroLine]
     let adjacency: [String: [MetroGraphEdge]]
     let edgeGeometries: [MetroGraphEdgeKey: [CodableCoordinate]]
-    /// Which pack each station came from. The graph spans several, and every rider-facing station
-    /// ID is `network-<city>-<station>`, so the city is a property of the station now, not of the
-    /// search.
+    /// Which pack each station came from: the graph spans several, and a rider-facing station ID is
+    /// `network-<city>-<station>`.
     let cityIDByStationID: [String: String]
-    /// Duplicate copies of one line, mapped onto the copy that survived. A station's own `lineIDs`
-    /// name its pack's copies, so anything counting a station's lines has to come through here or
-    /// it undercounts: an interchange onto a shared intercity corridor would read as one line.
+    /// Duplicate copies of one line, mapped onto the surviving copy. A station's `lineIDs` name its
+    /// own pack's copies, so counting a station's lines goes through here or an interchange onto a
+    /// shared corridor reads as one line.
     let canonicalLineIDs: [String: String]
 
     func cityID(for stationID: String) -> String {
@@ -78,9 +76,8 @@ struct MetroGraphEdgeKey: Hashable {
     let lineID: String
 }
 
-/// The synthetic line an interchange link rides on. Interchange links belong to no real line, and
-/// the route assembly chunks by line. Giving them their own identifier is what keeps them from
-/// being folded into the ride on either side of them.
+/// The synthetic line an interchange link rides on. Links belong to no real line, and route
+/// assembly chunks by line, so their own identifier keeps them out of the rides on either side.
 let metroInterchangeLineID = "__interchange__"
 
 
@@ -161,41 +158,24 @@ struct MetroMinHeap {
     }
 }
 
-/// Where the ride between two adjacent stations is drawn.
-///
-/// One resolver, used wherever track is drawn, because the alternative is what shipped: the route
-/// map sliced OSM ways per edge while the browse map drew the raw way, so the same corridor could
-/// be continuous on one screen and broken on the other.
+/// Where the ride between two adjacent stations is drawn: one resolver for every map, so a corridor
+/// cannot be continuous on one screen and broken on another.
 enum MetroTrackGeometry {
-    /// Every hop of one service pattern, chosen together rather than one at a time.
+    /// Every hop of one service pattern, solved together. Resolving hop by hop can land a shared
+    /// station on two different OSM ways, and concatenated per-hop geometry then jumps in a
+    /// straight line; a greedy chain commits to hop *i* before seeing what *i+1* needs.
     ///
-    /// Resolving hop by hop is what produced the bug this replaces. Each hop independently picked
-    /// whichever of the line's OSM ways fitted it best, so two consecutive hops could land their
-    /// **shared** station on two different ways — and `transitSegments` concatenates per-hop
-    /// geometry into one polyline, so the join became a straight jump. The comment that used to sit
-    /// here asserted the opposite ("consecutive hops on one leg share a station projected onto the
-    /// same path, so they meet exactly"); that has never held for a line whose relation splits into
-    /// several ways.
+    /// Each hop offers every way-and-projection pair it could be drawn from, and a shortest-path
+    /// pass picks the chain with the lowest total of track length, distance from the stations, and
+    /// `seamWeight` per metre of join gap. Across the 53 bundled packs no join is over 50 m (worst
+    /// 13.5 m).
     ///
-    /// Carrying an anchor forward greedily was the first attempt and it is not enough, because a
-    /// greedy chain has to commit to hop *i* before it can see what hop *i+1* needs. Where the way
-    /// carrying one hop stops short of the shared station, the greedy chain ends that hop at a
-    /// projection hundreds of metres off — 大橋頭 on 台北捷運中和新蘆線 came out 771.8 m from the
-    /// station — and every later hop then either inherits the error or breaks away from it.
-    ///
-    /// So the whole pattern is solved at once: each hop offers every way-and-projection pair it
-    /// could be drawn from, and a shortest-path pass over those choices picks the chain whose total
-    /// cost — track length, distance from the stations, and `seamWeight` per metre of join gap — is
-    /// lowest. Nothing is committed until the whole chain is known. Measured across the 53 bundled
-    /// packs, that takes the joins over 50 m from 17 to **zero** (worst 13.5 m, and 19 of 7,612
-    /// joins measurable at all), and the hops with no usable track from 9 to 6.
-    ///
-    /// Returns one geometry per hop: `stations.count - 1` entries, empty where a station is
+    /// Returns one geometry per hop, `stations.count - 1` entries, empty where a station is
     /// unknown.
     static func pattern(stations: [MetroStation?], line: MetroLine) -> [[CodableCoordinate]] {
         guard stations.count >= 2 else { return [] }
-        // Prepared once for the whole pattern rather than once per hop. The cumulative-distance
-        // table is O(points) and a long line's way runs to thousands of them.
+        // Prepared once for the whole pattern: the cumulative-distance table is O(points), and a
+        // long way runs to thousands.
         let prepared: [PreparedPath] = line.paths.compactMap { path in
             guard path.count >= 2 else { return nil }
             let points = path.map(\.coordinate)
@@ -208,8 +188,8 @@ enum MetroTrackGeometry {
         }
 
         var result = [[CodableCoordinate]](repeating: [], count: stations.count - 1)
-        // An unknown station breaks the chain rather than the pattern: the runs either side of it
-        // are still each continuous, and are still worth solving.
+        // An unknown station breaks the chain, not the pattern: the runs on either side are each
+        // still continuous.
         var index = 0
         while index < stations.count {
             guard stations[index] != nil else {
@@ -253,28 +233,21 @@ enum MetroTrackGeometry {
         let previous: Int
     }
 
-    /// What a metre of join gap costs against a metre of track.
-    ///
-    /// Deliberately steep. A seam is a straight line drawn through a station the train does not
-    /// travel through, so almost any amount of extra track is preferable to any amount of seam; the
-    /// weight only has to stop short of buying continuity with geometry that is plainly wrong,
-    /// which the arc ceiling already refuses. Measured from 30 to 400 the visible-join count is
-    /// zero throughout, and only the sub-metre rounding count moves.
+    /// What a metre of join gap costs against a metre of track. Steep: a seam is a straight line
+    /// through a station the train does not pass through, so almost any extra track is better.
+    /// Joins stay at zero anywhere from 30 to 400.
     private static let seamWeight: Double = 120
     /// Two candidate points closer together than this are the same place.
     private static let seedSeparation: Double = 25
     /// How many places one station may be considered to sit at on a single way.
     private static let stationCandidateLimit = 6
-    /// How many chains to carry forward between hops. Measured across all 53 packs, 16 already
-    /// gives the same answer as 160 — the beam exists to bound the worst case, not to shape it.
+    /// How many chains to carry between hops. 16 already gives the same answer as 160 across all
+    /// packs; the beam bounds the worst case.
     private static let chainBeam = 48
 
-    /// Picks the chain of hop geometries with the lowest total cost.
-    ///
-    /// A shortest path through a layered graph: one layer per hop, one node per way this hop could
-    /// be drawn along, and an edge between consecutive layers weighted by the gap it would leave at
-    /// the station they share. The per-hop candidate lists are built once and are the expensive
-    /// part; the pass over them is arithmetic.
+    /// Picks the chain of hop geometries with the lowest total cost: a shortest path through a
+    /// layered graph, one layer per hop, one node per way the hop could be drawn along, edges
+    /// weighted by the gap left at the shared station.
     private static func resolve(
         coordinates: [CLLocationCoordinate2D],
         paths: [PreparedPath]
@@ -340,13 +313,10 @@ enum MetroTrackGeometry {
         return chain
     }
 
-    /// Where one station could sit on each of the line's ways.
-    ///
-    /// A station's own projections are not enough. Where two ways of one line meet, the way that
-    /// carries the next hop may pass the station further off than the way that carried the last
-    /// one, and the point the two share is a projection *of a projection* — so every way's view of
-    /// the station seeds every other way's list. Without that the chain has no continuous choice to
-    /// make and the solver picks the least discontinuous one instead.
+    /// Where one station could sit on each of the line's ways. Where two ways meet, the way
+    /// carrying the next hop may pass the station further off than the last one, so every way's
+    /// view of the station seeds every other way's list; otherwise the chain has no continuous
+    /// choice to make.
     private static func stationCandidates(
         of coordinate: CLLocationCoordinate2D,
         paths: [PreparedPath]
@@ -366,21 +336,18 @@ enum MetroTrackGeometry {
             var candidates = perPath[pathIndex]
             for seed in seeds {
                 for carried in projections(of: seed, onto: path.points, cumulative: path.cumulative) {
-                    // Two tests, both required. Offset alone throws away exactly the candidate this
-                    // seeding exists to find: at a branch the seam point and the station's own
-                    // projection sit on the same stretch of way, well inside `candidateSeparation`
-                    // of offset and still up to that far apart on the ground — which left 红庄 on
-                    // 苏州4号线 with a 67 m join. Position alone merges a ring's start and end,
-                    // which are one point at opposite ends of the offset scale, and loses the wrap.
+                    // Two tests, both required. Offset alone discards the candidate this seeding
+                    // exists to find (at a branch the seam and the station's projection sit close
+                    // in offset but apart on the ground). Position alone merges a ring's start and
+                    // end, one point at opposite ends of the offset scale.
                     let duplicate = candidates.contains {
                         abs($0.pathOffset - carried.pathOffset) < candidateSeparation
                             && $0.point.distance(to: carried.point) < 5
                     }
                     guard !duplicate else { continue }
-                    // A seeded candidate is still a claim about where *this* station sits, so it
-                    // answers to the same cap. Without it the chain station → seed → reprojection
-                    // compounds two 900 m allowances and put 馬場 1.7 km down the East Rail main
-                    // line.
+                    // A seeded candidate is still a claim about where this station sits, so the
+                    // same cap applies; otherwise station → seed → reprojection compounds two 900 m
+                    // allowances.
                     let distance = coordinate.distance(to: carried.point)
                     guard distance <= candidateDistanceCap else { continue }
                     candidates.append(PathProjection(
@@ -407,21 +374,15 @@ enum MetroTrackGeometry {
         paths: [PreparedPath]
     ) -> [HopCandidate] {
         let separation = from.distance(to: to)
-        // A slice grossly longer than the stations' straight-line separation is a bad match (wrong
-        // path variant, self-approaching geometry). 广州东环-琶莲-佛莞城际 ships as one 187.5 km way
-        // whose point order does not follow the service order, which puts 琶洲 and 深井 59.3 km
-        // apart along a hop that is 5.5 km across.
+        // A slice far longer than the stations' straight-line separation is a bad match: a wrong
+        // path variant or self-approaching geometry (广州东环-琶莲-佛莞城际 ships as one 187.5 km way whose
+        // point order does not follow the service).
         let ceiling = max(2.5 * separation, separation + 1_500)
-        // And a floor, because two projections that landed on the same short stretch of a way
-        // which passes the pair twice are not the track either.
-        //
-        // Measured against `arc + fromDistance + toDistance`, not `arc` alone. `separation` is
-        // between the two **station nodes** while `arc` is between their **projections onto the
-        // track**, and a station may sit up to `candidateDistanceCap` off its own line — so
-        // `arc < 0.75 × separation` is a perfectly ordinary outcome, not evidence of a bad match.
-        // Comparing the bare arc threw away six real hops, among them 金鐘 → 中環, the busiest
-        // pair in Hong Kong. The sum below is a lower bound on any route from one station to the
-        // other via the track, so it is the like-for-like comparison.
+        // And a floor, because two projections on one short stretch of a way that passes the pair
+        // twice are not the track either. Compared against `arc + fromDistance + toDistance`, not
+        // `arc` alone: `separation` is between the station nodes, `arc` between their projections,
+        // and a station may sit up to `candidateDistanceCap` off its line (金鐘 → 中環 needs this). The
+        // sum is a lower bound on any route between the stations via the track.
         let floor = 0.75 * separation
 
         var track: [HopCandidate] = []
@@ -454,14 +415,10 @@ enum MetroTrackGeometry {
         }
         if !track.isEmpty { return track }
 
-        // No way on this line reaches both stations, so this hop is drawn as a straight line and
-        // the only question left is where to draw it from. Not "the from-station's projection onto
-        // some way that happens to hold the to-station too" — that way need not be the one the
-        // previous hop ran along, and starting the chord anywhere else leaves a second break beside
-        // the one already being admitted. Offering every point either station could sit at, the
-        // station itself included, lets the chain begin the chord exactly where its known track ran
-        // out. 馬場 → 沙田 on 港鐵東鐵綫 is the case: a racecourse spur no through way covers, which
-        // used to tear a 639 m hole in the East Rail line either side of it.
+        // No way on this line reaches both stations, so the hop is a straight line; the question is
+        // where it starts. Offering every point either station could sit at, the station included,
+        // lets the chain start the chord exactly where known track ran out, rather than leave a
+        // second break beside the first (馬場 → 沙田 on 東鐵綫, a spur no through way covers).
         var chords: [HopCandidate] = []
         let heads = chordEnds(of: from, candidates: fromCandidates)
         let tails = chordEnds(of: to, candidates: toCandidates)
@@ -559,23 +516,16 @@ enum MetroTrackGeometry {
 
     /// How far off its own track a station may sit and still be considered on it.
     private static let candidateDistanceCap: Double = 900
-    /// How many passes of one way to consider per station. Measured across all 53 bundled packs:
-    /// three is already enough to resolve every hop that four does.
+    /// How many passes of one way to consider per station; three already resolves every hop four
+    /// does.
     private static let candidateLimit = 4
     /// Two candidates closer together than this along the way are the same pass.
     private static let candidateSeparation: Double = 100
 
-    /// **Every** local minimum of the station-to-track distance, nearest first — not just the
-    /// global one.
-    ///
-    /// The global minimum is what shipped, and it is wrong wherever a relation concatenates the
-    /// outbound and return runs into one way: the way then passes each station twice, each station
-    /// picks whichever pass happens to be a metre nearer, and a pair that picks *different* passes
-    /// gets sliced the long way round the whole line. 荃灣 → 大窩口 is 812 m apart and was sliced at
-    /// 30.1 km, so the arc-length guard rejected it and the hop was drawn as a straight line
-    /// between the two stations. 166 of 8,015 bundled hops drew that way, 67 of them in Hong Kong
-    /// alone, where a fifth of the network was straight lines. Offering the caller each pass and
-    /// letting it take the shortest plausible slice fixes 154 of the 166.
+    /// **Every** local minimum of the station-to-track distance, nearest first, not only the global
+    /// one. A relation that concatenates outbound and return runs into one way passes each station
+    /// twice, and two stations picking different passes get sliced the long way round the line (荃灣
+    /// → 大窩口, 812 m apart, sliced at 30.1 km). The caller takes the shortest plausible slice.
     private static func projections(
         of coordinate: CLLocationCoordinate2D,
         onto points: [CLLocationCoordinate2D],
@@ -616,16 +566,15 @@ enum MetroTrackGeometry {
                 minima.append(perSegment[index])
             }
         }
-        // A way whose distance profile never dips — a single straight run past the station — has
-        // no interior minimum at all, so fall back to its nearest point.
+        // A way whose distance profile never dips (a straight run past the station) has no interior
+        // minimum; use its nearest point.
         if minima.isEmpty, let nearest = perSegment.min(by: { $0.distance < $1.distance }),
            nearest.distance <= candidateDistanceCap {
             minima = [nearest]
         }
 
-        // Distinct passes only. A plateau of equal distances yields a run of neighbouring
-        // "minima" that are all the same place, and keeping four of those would crowd out the
-        // second pass this exists to find.
+        // Distinct passes only: a plateau of equal distances yields neighbouring "minima" at one
+        // place, which would crowd out the second pass.
         var kept: [PathProjection] = []
         for candidate in minima.sorted(by: { $0.distance < $1.distance }) {
             guard !kept.contains(where: { abs($0.pathOffset - candidate.pathOffset) < candidateSeparation }) else { continue }

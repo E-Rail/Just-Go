@@ -1,12 +1,10 @@
 import Foundation
 
-/// The app consumes its own published Station Information API instead of reaching into DataPacks:
-/// it bundles a mirror of `directory.json` (which source covers each station, and with which key)
-/// and `sources.json` (which cities are served, and how), and routes from those. Adding a city is
-/// then a data change: regenerate the directory, with no routing code to touch.
-///
-/// See `StationInfoAPI/API.md`. The bundled copies are written by
-/// `Scripts/generate_station_info_api.rb` and CI diff-checks them against the published contract.
+/// The app consumes its own published Station Information API rather than reaching into DataPacks:
+/// a bundled mirror of `directory.json` (which source covers each station, with which key) and
+/// `sources.json` (which cities are served, and how). Adding a city is a data change. See
+/// `StationInfoAPI/API.md`; the copies are written by `Scripts/generate_station_info_api.rb` and
+/// diff-checked in CI.
 struct StationDirectoryEntry: Sendable, Equatable {
     let stationID: String
     let name: String
@@ -33,18 +31,9 @@ final class StationInformationDirectory: Sendable {
         let entriesByStationID: [String: StationDirectoryEntry]
     }
 
-    /// Parsed on first use, not on construction.
-    ///
-    /// `directory.json` is **455 KB / 1,603 entries**, and this type was built inside
-    /// `DIContainer.configure()`, which runs in `JustGoApp.init()`, so the whole file was read,
-    /// deserialised and walked on the main thread before the app had drawn anything. The comment
-    /// on the very next line of `configure()` explains that the bundled catalog was handed a lazy
-    /// loader for exactly this reason; the directory beside it was missed.
-    ///
-    /// Nothing on the launch path asks a station-information question. The first caller is a
-    /// route plan or a station sheet, both already off the main actor, so the work simply moves
-    /// to where it is needed. The lock is uncontended in practice and makes the type honestly
-    /// `Sendable` rather than relying on the callers happening to be serialised.
+    /// Parsed on first use, not on construction: `directory.json` is 455 KB and 1,603 entries, and
+    /// this type is built at launch on the main thread. The first caller is a route plan or a
+    /// station sheet, both off the main actor. The lock makes the type honestly `Sendable`.
     private let bundle: Bundle
     private let lock = NSLock()
     nonisolated(unsafe) private var loaded: Contents?
@@ -126,12 +115,9 @@ final class StationInformationDirectory: Sendable {
         return entry
     }
 
-    /// Stations resolved from the bundled metro network carry a synthesised
-    /// `network-<cityID>-<canonicalID>` identifier, while the directory, like the city packs. Is
-    /// keyed by the bare canonical ID. Every station opened from the map arrives in that
-    /// synthesised form, so without this the lookup missed for all of them and the live
-    /// first/last surface silently fell back to the "official page available" placeholder.
-    /// Anything else is already canonical.
+    /// Stations from the bundled metro network carry `network-<cityID>-<canonicalID>`, while the
+    /// directory is keyed by the bare canonical ID, as the packs are. Anything else is already
+    /// canonical.
     private static func canonicalStationID(_ value: String) -> String {
         MetroStationIdentifier.canonical(value)
     }
@@ -141,14 +127,8 @@ final class StationInformationDirectory: Sendable {
         servedCityIDs.contains(cityID)
     }
 
-    /// How to ask the operator about this station, or nil when none of them covers it.
-    ///
-    /// Lived privately on the station screen while that screen was the only thing that fetched
-    /// official data. The route needs the same answer. The operator names Beijing's exits `A`,
-    /// `B`, `D2`, which is what the signs say, while OpenStreetMap leaves 200 of Beijing's 1,095
-    /// surveyed doors unnamed and calls another 246 things like 东南口. Two copies of this mapping
-    /// would drift, and a station the route resolves differently from its own page is worse than
-    /// one neither can resolve.
+    /// How to ask the operator about this station, or nil when none covers it. One mapping for the
+    /// route and the station page, so a station cannot resolve differently on the two.
     func officialReference(
         forStationID stationID: String,
         name: String,

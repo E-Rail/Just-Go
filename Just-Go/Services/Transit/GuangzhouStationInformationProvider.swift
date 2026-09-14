@@ -1,13 +1,9 @@
 import Foundation
 
-/// Fetches Guangzhou Metro station information from the operator's own JSON endpoints, on the
-/// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
-/// in `StationInfoAPI/sources/sources.json` under `guangzhouMetroOnline`.
-///
-/// Unlike Shanghai, one `serviceTime/list/{stationShowCode}` call returns every line serving the
-/// physical station, so a single representative code is enough. The operator's colours are not on
-/// that response, so the line list (`metroweb/linestation`) is fetched once per session and cached
-/// to colour the lines; a colour fetch that fails is non-fatal. The lines still render.
+/// Fetches Guangzhou Metro station information from the operator's JSON endpoints on the rider's
+/// device. The recipe is in `StationInfoAPI/sources/sources.json` under `guangzhouMetroOnline`. One
+/// `serviceTime/list/{stationShowCode}` call returns every line at the station; colours come from
+/// the line list (`metroweb/linestation`).
 actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
     static let cityID = "4401"
     static let host = "apis.gzmtr.com"
@@ -79,8 +75,8 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
               let rows = root["businessObject"] as? [[String: Any]] else {
             throw OfficialStationInformationProviderError.contractViolation("serviceTime response invalid")
         }
-        // An empty listing carries no station name to verify identity against; treat it as the
-        // service being unavailable so a cached snapshot can stand in rather than erroring hard.
+        // An empty listing has no station name to verify against: treat it as the service being
+        // unavailable, so a stored snapshot can stand in.
         guard let name = rows.compactMap({ OperatorFieldParsing.trimmed($0["stationName"] as? String) }).first else {
             throw OfficialStationInformationProviderError.serviceUnavailable("no service times")
         }

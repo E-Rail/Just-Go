@@ -83,8 +83,8 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     private static let cacheLifetime: TimeInterval = 10
     private static let requestTimeout: TimeInterval = 5
     private static let defaultRetryDelay: TimeInterval = 30
-    // Monotonic, not wall-clock: a device clock change/NTP resync must not make a 10s cache
-    // entry or a 30s rate-limit backoff appear valid for far longer than intended.
+    // Monotonic: a clock change or NTP resync must not stretch a 10 s cache entry or a 30 s
+    // backoff.
     private static let clock = ContinuousClock()
 
     private let session: URLSession
@@ -232,9 +232,8 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         let data: Data
         let response: URLResponse
         do {
-            // `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
-            // connection that trickles data indefinitely never trips it, so an unguarded fetch
-            // could hang well past `requestTimeout`. Race the fetch against an explicit deadline.
+            // The session timeout only fires when no bytes arrive, so a trickling connection needs
+            // an explicit deadline.
             (data, response) = try await withDeadline(
                 seconds: requestTimeout,
                 onTimeout: { RealtimeArrivalProviderError.timedOut }
@@ -383,9 +382,8 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         var arrivals: [RealTimeArrival] = []
         for platform in platforms {
             for route in platform.routeList {
-                // A single unexpected `stop`/`special` value or empty destination on one entry
-                // (plausible during unusual service states) should drop just that entry, not
-                // discard every other valid platform/route already parsed in this response.
+                // One unexpected `stop`/`special` value or empty destination drops that entry, not
+                // every other entry already parsed.
                 do {
                     guard route.stop.value == 0 || route.stop.value == 1 else {
                         throw RealtimeArrivalProviderError.contractViolation(

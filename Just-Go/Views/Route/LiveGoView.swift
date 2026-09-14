@@ -178,8 +178,7 @@ struct LiveGoView: View {
     }
 
     /// Ending a trip completes it in the rider's history, whichever way guidance was entered. It
-    /// asks nothing on the way out: the packs and the route provider carry what riders used to be
-    /// asked.
+    /// asks the rider nothing: the packs and the route provider already carry those facts.
     private func exit() {
         let planned = viewModel.plannedRoute
         tripMemoryService.markTripComplete(route: planned, cityID: planned.networkCityID ?? "")

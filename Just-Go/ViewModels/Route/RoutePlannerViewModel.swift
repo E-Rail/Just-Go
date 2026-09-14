@@ -24,7 +24,6 @@ final class RoutePlannerViewModel {
     var originPlace: TransitPlace?
     var destinationPlace: TransitPlace?
     var routes: [Route] = []
-    var recentRoutes: [RecentRoute] = []
     var isLoading = false
     var errorMessage: String?
     var sortStrategy: RoutePreference = UserDefaults.standard.codableValue(forKey: "sortStrategy", as: RoutePreference.self, default: .metroFirst) {
@@ -64,7 +63,6 @@ final class RoutePlannerViewModel {
     private let routePlanningService: RoutePlanningService
     private let placeSearchProvider: PlaceSearchProviding
     private let locationService: LocationService
-    private let recentRoutesKey = "recentRoutes"
     private var isSyncingAccessibilityPreference = false
     private var syncedDefaultAccessibilitySignature: RouteAffectingAccessibilitySignature?
 
@@ -76,7 +74,6 @@ final class RoutePlannerViewModel {
         self.routePlanningService = routePlanningService
         self.placeSearchProvider = placeSearchProvider
         self.locationService = locationService
-        recentRoutes = UserDefaults.standard.codableValue(forKey: recentRoutesKey, as: [RecentRoute].self, default: [])
     }
 
     var accessibilityFilter: AccessibilityFilter {
@@ -310,12 +307,6 @@ final class RoutePlannerViewModel {
             hasPlannedForCurrentInputs = true
             routes = planned.map(withMaxWalkWarning)
             sortRoutes()
-            if let firstRoute = routes.first {
-                // The network that actually planned it, so replaying the recent resolves its
-                // station names in the right pack. A walking-only route has no network and
-                // stores none: `resolvedCityID` recovers one from the station ID when it can.
-                saveRecentRoute(firstRoute, cityID: firstRoute.networkCityID)
-            }
             return !routes.isEmpty
         } catch is CancellationError {
             return false
@@ -416,29 +407,6 @@ final class RoutePlannerViewModel {
         field == .origin ? originPlace : destinationPlace
     }
 
-    private func saveRecentRoute(_ route: Route, cityID: String?) {
-        // A recent's only action is replaying it by station ID. A walk or a drive has none, so it
-        // could only land the rider on stale results, and every one collapsed into a single "" row.
-        guard !route.originStationID.isEmpty, !route.destinationStationID.isEmpty else { return }
-        let recentRoute = RecentRoute(
-            originStationID: route.originStationID,
-            originStationName: route.origin,
-            destinationStationID: route.destinationStationID,
-            destinationStationName: route.destination,
-            lineName: route.segments.first(where: { $0.type.isTransit })?.lineName,
-            duration: route.formattedDuration,
-            plannedDuration: route.totalDuration,
-            cityID: cityID
-        )
-
-        var routes = recentRoutes.filter {
-            !($0.originStationID == recentRoute.originStationID && $0.destinationStationID == recentRoute.destinationStationID)
-        }
-        routes.insert(recentRoute, at: 0)
-        recentRoutes = Array(routes.prefix(10))
-        UserDefaults.standard.setCodable(recentRoutes, forKey: recentRoutesKey)
-    }
-
     private func userFacingErrorMessage(for error: Error) -> String {
         if let routeError = error as? RoutePlanningError {
             return routeError.localizedDescription
@@ -450,31 +418,5 @@ final class RoutePlannerViewModel {
 
         return (error as? LocalizedError)?.errorDescription ??
             AppLocalization.localized("Network connection failed. Try again later.")
-    }
-}
-
-struct RecentRoute: Identifiable, Codable {
-    var id: String {
-        "\(originStationID)-\(destinationStationID)"
-    }
-
-    let originStationID: String
-    let originStationName: String
-    let destinationStationID: String
-    let destinationStationName: String
-    let lineName: String?
-    let duration: String
-    let plannedDuration: TimeInterval?
-    /// City the route was planned in; nil on rows saved before this field existed.
-    let cityID: String?
-
-    /// The stored city, or one recovered from the station ID for legacy rows. Every route
-    /// producer builds IDs as "network-<cityID>-<station>", so the middle component is the
-    /// city. Returns nil (caller keeps the selected city) when neither source is usable.
-    var resolvedCityID: String? {
-        if let cityID { return cityID }
-        let parts = originStationID.split(separator: "-")
-        guard parts.count >= 3, parts[0] == "network" else { return nil }
-        return String(parts[1])
     }
 }

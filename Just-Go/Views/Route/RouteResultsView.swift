@@ -352,7 +352,7 @@ struct RouteResultsView: View {
         let confidence = routeConfidence(for: route, feasibility: feasibility)
         return Button {
             selectedRouteID = route.id
-            _ = tripMemoryService.recordPlannedTrip(
+            tripMemoryService.recordPlannedTrip(
                 route: route,
                 cityID: route.networkCityID ?? ""
             )

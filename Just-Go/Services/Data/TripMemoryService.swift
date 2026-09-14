@@ -6,12 +6,8 @@ final class TripMemoryService {
     private let userDefaults: UserDefaults
     private let tripRecordsKey = "tripRecords"
     private let stationQuickTagsKey = "stationQuickTags"
-    private let obsoleteFavoriteStationsKey = "favoriteStations"
-    /// Answers riders once gave about lifts, exits and how long a change took. The questions were
-    /// retired because the city packs and the route provider now carry those facts; removing the
-    /// answers too keeps the promise the retired "Delete My Answers" control made, since nothing
-    /// is left that could show them or delete them.
-    private let obsoleteRiderAnswerKeys = ["riderAnswers.v1", "transferNotes.v1"]
+    /// Stores nothing reads any more, cleared so they do not sit on the device indefinitely.
+    private let obsoleteKeys = ["favoriteStations", "riderAnswers.v1", "transferNotes.v1", "recentRoutes"]
     private let maxTripRecords = 300
 
     private(set) var tripRecords: [TripRecord]
@@ -26,37 +22,28 @@ final class TripMemoryService {
             default: []
         )
         stationQuickTags = StationQuickTagPolicy.normalized(storedQuickTags)
-        userDefaults.removeObject(forKey: obsoleteFavoriteStationsKey)
-        obsoleteRiderAnswerKeys.forEach { userDefaults.removeObject(forKey: $0) }
+        obsoleteKeys.forEach { userDefaults.removeObject(forKey: $0) }
         if stationQuickTags != storedQuickTags {
             userDefaults.setCodable(stationQuickTags, forKey: stationQuickTagsKey)
         }
     }
 
-    func recordPlannedTrip(route: Route, cityID: String) -> TripRecord {
-        // Choosing between alternatives is one trip, not one per tap. Comparing A, then B, then A
-        // again used to add three rows and three to "Total trips"; the newest still-open record
-        // for the same two ends is replaced instead.
+    /// Choosing between alternatives is one trip, not one per tap: the newest still-open record for
+    /// the same two ends is replaced rather than added to.
+    func recordPlannedTrip(route: Route, cityID: String) {
         if let newest = tripRecords.first, newest.completedAt == nil, isSameTrip(newest, route: route, cityID: cityID) {
-            let record = makeRecord(route: route, cityID: cityID, id: newest.id)
-            tripRecords[0] = record
+            tripRecords[0] = makeRecord(route: route, cityID: cityID, id: newest.id)
             persistTripRecords()
-            return record
+            return
         }
-        let record = makeRecord(route: route, cityID: cityID)
-        tripRecords.insert(record, at: 0)
+        tripRecords.insert(makeRecord(route: route, cityID: cityID), at: 0)
         tripRecords = Array(tripRecords.prefix(maxTripRecords))
         persistTripRecords()
-        return record
     }
 
-    /// Completes the trip that was already recorded when it was planned, rather than writing a
-    /// second one.
-    ///
-    /// This used to insert unconditionally, so planning a trip and then logging it left two rows
-    /// for one journey — the planned one and a completed twin beside it. The planned row is found by
-    /// its two ends and city among the still-incomplete records, newest first. Pass the route as it
-    /// was planned: a reroute renames the origin "Current Location", which matches nothing.
+    /// Completes the record written when the trip was planned, found by its two ends and city among
+    /// the still-open records, and inserts one only when there is none. Pass the route as it was
+    /// planned: a reroute renames the origin "Current Location", which matches nothing.
     func markTripComplete(route: Route, cityID: String, note: String? = nil) {
         let trimmedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         if let index = tripRecords.firstIndex(where: {
@@ -85,7 +72,6 @@ final class TripMemoryService {
             originName: route.origin,
             destinationName: route.destination,
             cityID: cityID,
-            routeSummary: route.formattedDuration,
             plannedDuration: route.totalDuration,
             walkingDistance: route.walkingDistance,
             transferCount: route.transferCount,
@@ -94,8 +80,8 @@ final class TripMemoryService {
             createdAt: .now,
             completedAt: nil,
             note: nil,
-            originStationID: route.originStationID,
-            destinationStationID: route.destinationStationID
+            originCoordinate: route.groundOrigin,
+            destinationCoordinate: route.groundDestination
         )
     }
 

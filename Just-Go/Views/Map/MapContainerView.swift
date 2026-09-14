@@ -145,11 +145,10 @@ struct MapContainerView: View {
             guard let pending else { return }
             beginPlan(to: pending)
         }
-        // Same shape, from the Trips tab, which has both ends of a journey and no way to plan one.
-        .onChange(of: appState.pendingTripReplay) { _, replay in
-            guard let replay else { return }
+        .onChange(of: appState.pendingTripReplay, initial: true) { _, record in
+            guard let record else { return }
             appState.pendingTripReplay = nil
-            replayTrip(replay)
+            replay(record)
         }
         // The planner's `basePreference` had no writer, so everything set in Accessibility
         // Settings: step-free requirement, lift preference, avoid-stairs, and the walking-distance
@@ -163,50 +162,35 @@ struct MapContainerView: View {
         }
     }
 
-    /// Fills both ends of a saved journey and plans it.
+    /// Plans a trip from the rider's history again, from the Trips tab or search's recent trips.
     ///
-    /// Deliberately not routed through `appState.pendingRouteInput`: that channel starts a plan
-    /// from *one* place and seeds the origin from GPS, which would overwrite the origin this row
-    /// just supplied.
-    ///
-    /// If a station no longer resolves — a pack changed, a legacy row has no recoverable city — the
-    /// end that did resolve is still filled and the plan is *not* run. The results header then
-    /// shows which end is missing, which is a truthful half-answer rather than a journey planned
-    /// from a guessed endpoint.
-    /// Plans a trip the rider picked out of their own history, from the Trips tab.
-    ///
-    /// Deliberately the same resolution as `replayRecentTrip`: both ends are looked up among the
-    /// city's own stations by ID, and nothing is planned unless both are found. A history row that
-    /// predates the stored IDs never offers this, so there is no name matching anywhere in it.
-    private func replayTrip(_ replay: AppState.PendingTripReplay) {
-        let planner = self.planner
-        path = [.results]
-        planTask?.cancel()
-        planTask = Task {
-            let stations = await container.stationSearchService.stations(in: replay.cityID)
-            let origin = stations.first { $0.stationID == replay.originStationID }
-            let destination = stations.first { $0.stationID == replay.destinationStationID }
-            guard !Task.isCancelled else { return }
-            if let origin { planner.selectPlace(origin.asTransitPlace, for: .origin) }
-            if let destination { planner.selectPlace(destination.asTransitPlace, for: .destination) }
-            guard origin != nil, destination != nil else { return }
-            _ = await planner.searchRoutes()
+    /// Each end is the place the trip started or ended on the ground. An end named "Current
+    /// Location" starts from where the rider is now. A row saved before coordinates were kept has
+    /// only names, and those are filled in as if typed: the planner resolves them the same way, and
+    /// the results header shows what each became, where it can be changed.
+    private func replay(_ record: TripRecord) {
+        let ends: [(RouteInputField, String, CodableCoordinate?)] = [
+            (.origin, record.originName, record.originCoordinate),
+            (.destination, record.destinationName, record.destinationCoordinate)
+        ]
+        var fromHere: [RouteInputField] = []
+        for (field, name, coordinate) in ends {
+            if name == AppLocalization.localized("Current Location") {
+                planner.updateName("", for: field)
+                fromHere.append(field)
+            } else if let coordinate {
+                let location = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                planner.selectPlace(TransitPlace(name: name, coordinate: location), for: field)
+            } else {
+                planner.updateName(name, for: field)
+            }
         }
-    }
-
-    private func replayRecentTrip(_ trip: RecentRoute) {
-        let planner = self.planner
         path = [.results]
+        let planner = self.planner
         planTask?.cancel()
         planTask = Task {
-            guard let cityID = trip.resolvedCityID else { return }
-            let stations = await container.stationSearchService.stations(in: cityID)
-            let origin = stations.first { $0.stationID == trip.originStationID }
-            let destination = stations.first { $0.stationID == trip.destinationStationID }
+            for field in fromHere { await planner.useCurrentLocation(for: field) }
             guard !Task.isCancelled else { return }
-            if let origin { planner.selectPlace(origin.asTransitPlace, for: .origin) }
-            if let destination { planner.selectPlace(destination.asTransitPlace, for: .destination) }
-            guard origin != nil, destination != nil else { return }
             _ = await planner.searchRoutes()
         }
     }
@@ -787,7 +771,7 @@ struct MapContainerView: View {
                 onSelectStation: { openStation($0) },
                 onSelectPlace: { selectSearchResult($0) },
                 onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) },
-                onSelectRecentTrip: { replayRecentTrip($0) }
+                onSelectRecentTrip: { replay($0) }
             )
         case .editEndpoint(let field):
             SearchPageView(

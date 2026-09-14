@@ -18,7 +18,7 @@ struct SearchPageView: View {
     /// Replaying a whole journey, both ends at once. Supplied by the host for the same reason as
     /// `onSelectLine`: filling two endpoints and planning is the map stack's job, not this page's.
     /// The endpoint-editing presentation passes nothing, because that page exists to return one end.
-    var onSelectRecentTrip: ((RecentRoute) -> Void)?
+    var onSelectRecentTrip: ((TripRecord) -> Void)?
     /// True when this page exists to return one answer (endpoint editing) rather than to be
     /// browsed. Station rows then close the page like place rows already do.
     var dismissesOnSelection = false
@@ -678,17 +678,12 @@ struct SearchPageView: View {
         schedulePlaceSearch(viewModel?.searchText ?? "")
     }
 
-    /// The last few journeys, newest first.
-    ///
-    /// `RoutePlannerViewModel.recentRoutes` has been saved on every search and capped at ten since
-    /// it was written, and had no reader in any view: a rider who makes the same trip twice a day
-    /// re-entered both ends every time. Read from the shared planner instance so this is the same
-    /// array that wrote it.
-    ///
-    /// Three, because this sits above the recent *stations* and the nearby list, and a screen that
-    /// opens on ten of anything is a screen you scroll past.
-    private var recentTrips: [RecentRoute] {
-        Array(container.sharedRoutePlannerViewModel().recentRoutes.prefix(3))
+    /// The last three journeys with distinct ends, newest first, from the rider's trip history.
+    private var recentTrips: [TripRecord] {
+        var seen = Set<String>()
+        return Array(tripMemoryService.tripRecords.filter {
+            seen.insert($0.originName + "\u{1F}" + $0.destinationName).inserted
+        }.prefix(3))
     }
 
     private var recentTripsSection: some View {
@@ -707,9 +702,9 @@ struct SearchPageView: View {
                         Image(systemName: "arrow.triangle.turn.up.right.circle")
                             .foregroundStyle(Color.accentColor)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: "\(trip.originStationName) → \(trip.destinationStationName)")
+                            Text(verbatim: "\(trip.originName) → \(trip.destinationName)")
                                 .lineLimit(1)
-                            Text(trip.duration)
+                            Text(AppLocalization.minutes(Int(trip.plannedDuration / 60)))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

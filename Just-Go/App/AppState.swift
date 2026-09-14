@@ -100,18 +100,9 @@ final class AppState {
     }
     var pendingRouteInput: PendingRouteInput?
 
-    /// A trip the rider asked to plan again, from a tab that cannot plan.
-    ///
-    /// Same one-shot shape as `pendingRouteInput` and consumed the same way: the Trips tab writes
-    /// it and switches tabs, the map reads it once and clears it. Station IDs rather than names,
-    /// because the map re-resolves both ends against the city's own stations and a name is not
-    /// enough to do that with.
-    struct PendingTripReplay: Equatable {
-        let cityID: String
-        let originStationID: String
-        let destinationStationID: String
-    }
-    var pendingTripReplay: PendingTripReplay?
+    /// A trip the rider asked to plan again from the Trips tab, which cannot plan. One-shot, like
+    /// `pendingRouteInput`: the map reads it once and clears it.
+    var pendingTripReplay: TripRecord?
 
     var accessibilityPreference: AccessibilityPreference {
         didSet {

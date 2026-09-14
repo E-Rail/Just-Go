@@ -1,16 +1,9 @@
 import CoreLocation
 import SwiftUI
 
-/// One metro line: where it runs, and every station it calls at.
-///
-/// The app drew lines on the browse map and named them on route steps, and a line was never
-/// something a rider could open. That is a strange gap for a metro app: "which stations are on
-/// 18号线" is one of the first questions anyone asks, and until now the only way to answer it was
-/// to plan a trip along the line and read the legs.
-///
-/// Everything here comes from the bundled OSM network, so it works offline, spends no quota, and
-/// is the same data the router plans on. The one thing the pack cannot tell a rider is whether it
-/// is still current, and that is what the operator check at the bottom is for.
+/// One metro line: where it runs, and every station it calls at. All from the bundled OSM network,
+/// so it works offline, spends no quota and is the data the router plans on. The operator check at
+/// the bottom answers what the pack cannot: whether it is still current.
 struct LineDetailView: View {
     let cityID: String
     let lineID: String
@@ -29,9 +22,9 @@ struct LineDetailView: View {
     private enum ObservationState: Equatable {
         case idle
         case checking
-        /// The operator's routing had nothing to say about this line, which a ring line and a very
-        /// short line both produce. Distinguished from `.idle` so the button does not invite a
-        /// second call that will fail the same way.
+        /// The operator's routing had nothing to say about this line (a ring or a very short line
+        /// does that). Distinct from `.idle` so the button does not invite a second call that fails
+        /// the same way.
         case unavailable
         case answered
     }
@@ -54,14 +47,13 @@ struct LineDetailView: View {
 
     // MARK: - Layout
 
-    /// Side by side once there is width for it, stacked otherwise. On an iPad the map and the stop
-    /// list are both large enough to be worth reading at the same time, and stacking them puts the
-    /// stops a full screen below the line they belong to.
+    /// Side by side when there is width, stacked otherwise, so an iPad does not put the stops a
+    /// screen below their line.
     @ViewBuilder
     private func content(for line: MetroLine) -> some View {
         if horizontalSizeClass == .regular {
-            // See `sideColumn(max:in:)`: the stop list is given a measured width rather than left
-            // to infer one, which rendered as nothing at all.
+            // The stop list gets a measured width (see `sideColumn(max:in:)`); left to infer one,
+            // it renders as nothing.
             GeometryReader { geo in
                 HStack(spacing: 0) {
                     map(for: line)
@@ -96,9 +88,8 @@ struct LineDetailView: View {
         }
     }
 
-    /// `TransitMapView` draws whatever networks it is handed, so one line becomes a network of one
-    /// line. That needs no change to the map layer at all, and it means this page draws with the
-    /// exact same renderer, stroke widths and station markers as the browse map.
+    /// One line becomes a network of one line, so this page draws with the browse map's renderer,
+    /// strokes and markers.
     private func map(for line: MetroLine) -> some View {
         TransitMapView(
             visibleRegion: $visibleRegion,
@@ -107,8 +98,7 @@ struct LineDetailView: View {
             metroNetworks: [singleLineNetwork(for: line)],
             route: nil,
             showsUserLocation: false,
-            // Heavier than the browse map's. That weight is set so a dozen lines crossing a city
-            // stay separable; this page draws exactly one, and at 6 pt it read as a thread.
+            // Heavier than the browse map's, which is set so a dozen crossing lines stay separable.
             networkLineWidth: 9,
             onRegionChanged: nil,
             onStationSelected: { _ in }
@@ -120,13 +110,9 @@ struct LineDetailView: View {
         }
     }
 
-    /// The other kinds of train that run on this line: an express that skips stops, a short-turn
-    /// that ends part way along.
-    ///
-    /// Shown, and never routed on. OpenStreetMap publishes each as its own relation and not one of
-    /// them carries `opening_hours`, `interval` or `frequency` — it says the train exists and never
-    /// says when it runs. Planning a rider onto a service that may not be running at all is exactly
-    /// what this project refuses to do, so the stop count is stated and the timing is not.
+    /// Other trains on this line: an express that skips stops, a short-turn that ends part way.
+    /// Shown, never routed on: OpenStreetMap publishes each as a relation with no `opening_hours`,
+    /// `interval` or `frequency`, so the stop count is stated and the timing is not.
     @ViewBuilder
     private func serviceVariants(for line: MetroLine) -> some View {
         let variants = line.serviceVariants ?? []
@@ -181,8 +167,8 @@ struct LineDetailView: View {
                 .font(.title3.weight(.semibold))
 
             if patterns.count > 1 {
-                // A line with more than one pattern is branched or split, and 35 of the 372
-                // bundled lines are. Naming the branches beats silently showing one of them.
+                // A line with more than one pattern is branched or split (35 of the 372 bundled
+                // lines); name the branches rather than silently show one.
                 Picker("", selection: $selectedPatternIndex) {
                     ForEach(patterns.indices, id: \.self) { index in
                         Text(branchLabel(for: patterns[index])).tag(index)
@@ -190,11 +176,9 @@ struct LineDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
-                // The operator answer was asked about one branch and is only true of that branch.
-                // `observedSummary` kept printing branch A's first and last train after a switch to
-                // B, while the stop-count comparison beside it had already moved to B's count — so
-                // the two halves of the same card described different trains. First and last train
-                // attributed to the wrong arm of a branching line is a missed-last-train error.
+                // The operator answer is true only of the branch it was asked about, so switching
+                // branches clears it: first and last trains attributed to the wrong arm are a
+                // missed-last-train error.
                 .onChange(of: selectedPatternIndex) { _, _ in
                     observed = nil
                     observationState = .idle
@@ -332,8 +316,8 @@ struct LineDetailView: View {
         guard let first = pattern.first.flatMap({ stationsByID[$0] }),
               let last = pattern.last.flatMap({ stationsByID[$0] }),
               first.id != last.id else {
-            // `first == last` is how a ring closes in a service pattern, and routing a station to
-            // itself asks nothing. Refused here rather than spending a call to be told so.
+            // `first == last` is how a ring closes in a pattern, and routing a station to itself
+            // asks nothing.
             observationState = .unavailable
             return
         }
@@ -357,13 +341,9 @@ struct LineDetailView: View {
             isLoading = false
             return
         }
-        // Keyed by the raw network station id, which is what `servicePatterns` holds. A displayed
-        // `Station.id` is that id qualified with the city ("1100-…", via `MetroStationIdentifier`),
-        // so keying by it looks entirely correct, compiles, and silently matches nothing: the stop
-        // list rendered eleven hex ids where eleven station names belong.
-        // The cached copies, not a fresh `displayStations`: that rebuilds a `Station` for every
-        // station in the city (449 in Beijing) each time a line page opens, beside the identical
-        // set the service is already holding.
+        // Keyed by the raw network station id, which `servicePatterns` holds; a displayed
+        // `Station.id` is qualified with the city and would silently match nothing. From the cached
+        // stations, not a fresh `displayStations`, which rebuilds every station in the city.
         stationsByID = Dictionary(
             zip(network.stations.map(\.id), await container.metroNetworkProvider.stations(in: cityID)),
             uniquingKeysWith: { first, _ in first }
@@ -451,8 +431,7 @@ struct LineDetailView: View {
     }
 }
 
-/// One rule for what a line is called on screen, so a line page, a badge and a route step cannot
-/// drift apart the way the station sheet and the transfer sheet once did.
+/// One rule for what a line is called on screen, shared by the line page, badges and route steps.
 enum LineNaming {
     /// The same rule `Station.localizedName` follows, so a line and the stations on it cannot end
     /// up labelled in two different languages on one screen.

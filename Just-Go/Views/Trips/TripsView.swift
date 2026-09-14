@@ -1,14 +1,10 @@
 import SwiftUI
 
-/// What the rider has put into this app, in one place.
+/// What the rider has put into the app: trips and saved places. How the app behaves lives in
+/// Profile.
 ///
-/// Split out of Profile, which had become two unrelated things under one label: what the rider
-/// owns and how the app behaves. Trips and saved places are the first of those; appearance, language, accessibility and data sources are the second. Only
-/// the second is a profile.
-///
-/// One `NavigationStack` at the root and stack-free content underneath it. A `NavigationStack`
-/// inside a pushed destination fails silently on iOS 18, which is why `QuickTagsView` takes an
-/// `embedded` flag rather than carrying its own.
+/// One `NavigationStack` at the root and stack-free content beneath it: a `NavigationStack` inside
+/// a pushed destination fails silently, which is why `QuickTagsView` takes an `embedded` flag.
 struct TripsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(AppState.self) private var appState

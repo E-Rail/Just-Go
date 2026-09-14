@@ -5,11 +5,8 @@ struct MetroGeometryAttributionView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        // A `Button` with `.buttonStyle(.plain)`, not a `Link`. A `Link` tints its whole label with
-        // the accent and a `.foregroundStyle(.secondary)` inside it is inert — so this licence
-        // credit rendered in the theme colour on all three maps that show it, where the design is a
-        // quiet grey caption. `.buttonStyle(.plain)` is not a `Link` modifier either; it was doing
-        // nothing here. Same swap `ProfileView.linkRow` makes for the same reason.
+        // A plain-styled `Button`, not a `Link`: a `Link` tints its whole label with the accent,
+        // and `.foregroundStyle(.secondary)` inside it is ignored.
         Button {
             openURL(URL(string: "https://www.openstreetmap.org/copyright")!)
         } label: {
@@ -21,9 +18,8 @@ struct MetroGeometryAttributionView: View {
                 .padding(.horizontal, 7)
                 .padding(.vertical, 4)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
-                // ODbL attribution is licence-mandatory, so it has to stay readable and stay
-                // tappable. The pill itself is ~21 pt tall; this gives it a real target without
-                // growing the visible chrome over the map.
+                // ODbL attribution is mandatory, so it stays readable and tappable: a 44 pt target
+                // around a ~21 pt pill.
                 .frame(minHeight: Metrics.minimumTapTarget)
                 .contentShape(Rectangle())
         }
@@ -35,31 +31,23 @@ struct MetroGeometryAttributionView: View {
 struct TransitMapView: UIViewRepresentable {
     @Binding var visibleRegion: MapVisibleRegion?
     let stations: [Station]
-    /// Draws every supplied station regardless of zoom. The browse map hides non-transfer
-    /// stations above a 0.1° span, because a city's worth of them at that scale is a smear, but a
-    /// route map is handed only the ~30 stops the trip actually calls at, and hiding those is
-    /// hiding the answer. Whole-trip spans are wider than 0.1° almost by definition, which is why
-    /// the route map drew a line through an empty city.
+    /// Draws every supplied station regardless of zoom. The browse map hides ordinary stations
+    /// above a 0.1° span, but a route map is handed only the stops the trip calls at, and
+    /// whole-trip spans are usually wider than that.
     var alwaysShowsStations = false
     let metroNetworks: [MetroNetwork]
     let route: Route?
     let showsUserLocation: Bool
-    /// How much of the map's own top edge this app's floating chrome covers — the search pill and
-    /// the attribution/locate row — measured rather than assumed, so Dynamic Type moves it too.
-    /// Everything MapKit centres is centred inside the layout margins, so without this a rider
-    /// centred on themselves is centred behind the search bar. See `ChromeInsetMapView`.
+    /// How much of the map's top edge the app's floating chrome covers, measured so Dynamic Type
+    /// moves it too. MapKit centres inside the layout margins, so without this a rider is centred
+    /// behind the search bar. See `ChromeInsetMapView`.
     var topChromeHeight: CGFloat = 0
-    /// How heavily to draw the network's own lines. Heavier on a page about a single line, where
-    /// the browse map's weight — chosen so a dozen lines can cross without becoming a mat — reads
-    /// as a hairline on the one line the page is about.
+    /// How heavily to draw the network's lines: heavier on a page about one line, where the browse
+    /// map's weight reads as a hairline.
     var networkLineWidth: CGFloat = 6
-    /// Where *MapKit* thinks the rider is, which is not always what Core Location said.
-    ///
-    /// Everything this app draws and measures against is GCJ-02 (`coordinateSystem` in every
-    /// bundled network, and Apple's basemap across Greater China). A `CLLocation` is the one input
-    /// that nothing converts, so on a device that reports WGS-84 the rider's own position is the
-    /// only coordinate in the app in the wrong frame, ~540 m out in Beijing. This is the map's
-    /// answer, in the map's frame, by definition: see `LocationService.mapSpaceCorrection`.
+    /// Where *MapKit* draws the rider, in the map's GCJ-02 frame, which is not always what Core
+    /// Location said (~540 m off in Beijing on a device reporting WGS-84). See
+    /// `LocationService.mapSpaceCorrection`.
     var onUserLocationChanged: ((CLLocationCoordinate2D) -> Void)?
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
@@ -68,9 +56,8 @@ struct TransitMapView: UIViewRepresentable {
     // (slow, server-side) MKMapItemRequest has produced the full place card item.
     var onPlaceTapped: ((_ name: String?, _ coordinate: CLLocationCoordinate2D) -> Void)?
     var onPlaceResolved: ((MKMapItem) -> Void)?
-    /// A press on ground that is not a POI and not a station. `selectableMapFeatures` only makes
-    /// Apple's own points of interest tappable, so a park entrance, a street corner or a friend's
-    /// building could not become an endpoint at all — the one interaction every mainstream map has.
+    /// A press on ground that is not a POI or a station, so a street corner or a friend's building
+    /// can become an endpoint: `selectableMapFeatures` makes only Apple's POIs tappable.
     var onMapLongPressed: ((CLLocationCoordinate2D) -> Void)?
 
     func makeCoordinator() -> Coordinator {
@@ -86,10 +73,7 @@ struct TransitMapView: UIViewRepresentable {
         mapView.pointOfInterestFilter = .includingAll
         mapView.selectableMapFeatures = [.pointsOfInterest]
         mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat)
-        // On the map view itself, never on the window. ContentView's keyboard dismisser is
-        // window-level and its comment records what that cost: an always-live window recogniser
-        // sees every touch in the app and stopped Profile → Settings from opening. A recogniser
-        // owned by this map sees only this map.
+        // On the map view, never the window: a window recogniser sees every touch in the app.
         let longPress = UILongPressGestureRecognizer(
             target: context.coordinator,
             action: #selector(Coordinator.handleLongPress(_:))
@@ -125,8 +109,8 @@ struct TransitMapView: UIViewRepresentable {
         private var stationSignature = ""
         private var routeSignature = ""
         private var markerVisibilityBand = -1
-        /// Drives `strokeScale`. Seeded wide so the first stroke of a freshly-built map is sized
-        /// for the zoom it is actually at, rather than for a street-level view it may never show.
+        /// Drives `strokeScale`. Seeded wide so a new map's first stroke suits the zoom it is
+        /// actually at.
         private var currentMaxDelta: CLLocationDegrees = 0.05
         private var annotationStations: [ObjectIdentifier: Station] = [:]
         private var stationAnnotationsByID: [String: StationAnnotation] = [:]
@@ -148,8 +132,8 @@ struct TransitMapView: UIViewRepresentable {
             poiTask?.cancel()
         }
 
-        /// `.began` only. A long press keeps reporting through `.changed` and `.ended`, and acting
-        /// on those would drop a second pin for the same press.
+        /// `.began` only: acting on `.changed` and `.ended` too would drop a second pin for the
+        /// same press.
         @objc
         func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
             guard recognizer.state == .began, let mapView = recognizer.view as? MKMapView else { return }
@@ -200,13 +184,9 @@ struct TransitMapView: UIViewRepresentable {
             syncInterchangeVisibility(on: mapView)
         }
 
-        /// Interchange links are drawn exactly while the stations they join are.
-        ///
-        /// They were drawn at every zoom, and 广安门内 ↔ 牛街 is 498 m: viewed across a whole city
-        /// that is a grey lozenge a few points long, sitting on a map where neither of its two
-        /// endpoints is drawn at all. A link is an instruction to walk somewhere, and it can only
-        /// mean something when the rider can see both ends of the walk, which is the same
-        /// threshold `StationAnnotationStyle` already uses for an ordinary station.
+        /// Interchange links are drawn exactly while the stations they join are: a link is an
+        /// instruction to walk somewhere, meaningful only when both ends are visible. The same
+        /// threshold as an ordinary station.
         private func syncInterchangeVisibility(on mapView: MKMapView) {
             guard !interchangeOverlays.isEmpty else { return }
             let maxDelta = max(mapView.region.span.latitudeDelta, mapView.region.span.longitudeDelta)
@@ -280,13 +260,10 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        /// Every loaded pack's lines, with each stretch of track drawn once.
-        ///
-        /// Adjacent cities each ship the intercity corridors they share, byte for byte. 234 Paths
-        /// across the Guangzhou / Foshan / Dongguan packs, 130 of them distinct. Drawn per pack,
-        /// the shared corridors were laid down two and three times over. Identity is the path's own
-        /// points, so this can only ever collapse a way onto a copy of itself; it is the drawing
-        /// half of the same rule `canonicalStationIDs` and `canonicalLineIDs` apply to the graph.
+        /// Every loaded pack's lines, each stretch of track drawn once. Neighbouring packs ship
+        /// their shared corridors byte for byte, and identity is the path's own points, so this
+        /// collapses a way only onto a copy of itself: the drawing half of `canonicalStationIDs`
+        /// and `canonicalLineIDs`.
         private func addNetworks(_ networks: [MetroNetwork]) {
             var drawn = Set<Int>()
             for network in networks {
@@ -312,15 +289,10 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        /// The links between two stations riders treat as one interchange.
-        ///
-        /// Drawn on the network, not only inside a planned route: the rider needs to see that
-        /// 广安门内 and 牛街 are connected *before* deciding to plan through them. Solid when the
-        /// walk stays inside the building, dashed when it goes out to the street.
-        ///
-        /// Resolved across every loaded network rather than within each one, because a link's two
-        /// halves can live in different packs. Shenzhen's 罗湖 and Hong Kong's 羅湖 are one
-        /// crossing in two networks, and neither pack can draw it alone.
+        /// The links between two stations riders treat as one interchange, drawn on the network so
+        /// a rider sees 广安门内 and 牛街 connected before planning through them. Resolved across every
+        /// loaded network, because a link's halves can be in different packs (Shenzhen's 罗湖 and
+        /// Hong Kong's 羅湖).
         private func addInterchanges(across networks: [MetroNetwork]) {
             var coordinatesByID: [String: CLLocationCoordinate2D] = [:]
             for network in networks {
@@ -378,20 +350,11 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        /// Joins a ride's drawn track back to the stations it calls at, in grey dots, never in
-        /// the line's colour.
-        ///
-        /// A station node can sit a few hundred metres from the rail that serves it (顺义 is 272 m
-        /// from 15号线's track and 366 m from 市郊铁路通密线's; 339 of 8,108 station-on-line pairs
-        /// across the bundled networks are more than 60 m off). The ride itself draws the track and
-        /// only the track, because that is where the train goes. Bending the coloured line out to
-        /// the platform and back drew a right-angled spike per station, which is what made a trip
-        /// through 顺义 look like a rectangle bolted to the route.
-        ///
-        /// But leaving the gap open read as a broken route. So the gap is drawn as what it
-        /// actually is: the bit the rider covers themselves, getting between the entrance and the
-        /// platform. Same grey, same round dots as a walk, because it is the same kind of thing.
-        /// Colour on this map means "the train runs here", and this is not track.
+        /// Joins a ride's drawn track to the stations it calls at, in the transfer grey and dash,
+        /// never the line's colour. A station node can sit hundreds of metres from its rail (顺义 is
+        /// 272 m from 15号线's track). The ride draws only the track; bending it out to the platform
+        /// would spike, and leaving the gap looks broken. Colour means "the train runs here", and
+        /// this is not track.
         private func addStationConnectors(for segment: RouteSegment, drawn: [CLLocationCoordinate2D]) {
             guard segment.type.isTransit,
                   let first = segment.stationStops.first?.coordinate,
@@ -401,8 +364,8 @@ struct TransitMapView: UIViewRepresentable {
             let boarding = CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
             let alighting = CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
             for (station, track) in [(boarding, trackStart), (alighting, trackEnd)] {
-                // Below this the two are the same place at any zoom the rider can reach, and a
-                // two-point overlay per station per leg is not free.
+                // Below this they are the same place at any zoom, and an overlay per station per
+                // leg is not free.
                 guard station.distance(to: track) >= 15 else { continue }
                 addPolyline(
                     [station, track],
@@ -415,11 +378,9 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        // Builds the polyline and records it for a single batched `addOverlays(_:level:)` call
-        // by the caller (`addNetwork`/`addRoute`) once their loop finishes. Adding overlays
-        // one at a time triggers MapKit's per-insertion layout/renderer bookkeeping for every
-        // line segment, which is a visible hitch the first time a large city (e.g. Beijing's
-        // 33 lines) syncs.
+        // Builds a polyline and records it for the caller's single batched `addOverlays(_:level:)`:
+        // adding overlays one at a time costs MapKit per-insertion bookkeeping, a visible hitch for
+        // a large city.
         private func addPolyline(
             _ coordinates: [CLLocationCoordinate2D],
             colorHex: String,
@@ -489,25 +450,24 @@ struct TransitMapView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard let annotation = view.annotation else { return }
             if let station = annotationStations[ObjectIdentifier(annotation)] {
-                // A station tap supersedes any in-flight POI resolve. Stop the request
-                // instead of letting it run to completion for a result nobody will show.
+                // A station tap supersedes any in-flight POI resolve; stop it.
                 cancelPOIResolution()
                 parent.onStationSelected(station)
                 mapView.deselectAnnotation(annotation, animated: false)
             } else if let feature = annotation as? MKMapFeatureAnnotation,
                       feature.featureType == .pointOfInterest {
-                // Surface the tap immediately from the feature's synchronous title/coordinate so
-                // the UI can present (or open a station) without waiting on the network resolve.
+                // Surface the tap at once from the feature's title and coordinate, without waiting
+                // on the resolve.
                 parent.onPlaceTapped?(feature.title, feature.coordinate)
-                // Resolve the tapped Apple POI to a full MKMapItem in the background, then surface
-                // it. Deselect only after the async resolve so the feature stays valid.
+                // Resolve the POI to a full `MKMapItem` in the background. Deselect only after, so
+                // the feature stays valid.
                 poiTask?.cancel()
                 poiTask = Task { @MainActor [weak self, weak mapView] in
                     let mapItem = try? await MKMapItemRequest(mapFeatureAnnotation: feature).mapItem
                     mapView?.deselectAnnotation(feature, animated: false)
-                    // MKMapItemRequest, like MKLocalSearch, ignores task cancellation, so guard
-                    // explicitly to avoid a superseded tap firing onPlaceResolved with a stale
-                    // item; weak self prevents the cancelled task from retaining the Coordinator.
+                    // `MKMapItemRequest` ignores task cancellation, so guard explicitly against a
+                    // superseded tap; `weak self` keeps a cancelled task from retaining the
+                    // coordinator.
                     guard !Task.isCancelled, let self, let mapItem else { return }
                     self.parent.onPlaceResolved?(mapItem)
                 }
@@ -528,9 +488,8 @@ struct TransitMapView: UIViewRepresentable {
                 longitudeDelta: region.span.longitudeDelta
             )
             regionSignature = visibleRegion.signature
-            // Marker size/visibility only changes when maxDelta crosses one of the style or
-            // visibility thresholds; within a band every annotation reconfigures identically, so
-            // skip the O(N) sweep while panning at a fixed zoom.
+            // Marker size and visibility only change when `maxDelta` crosses a threshold, so skip
+            // the sweep while panning at a fixed zoom.
             let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
             let band = markerBand(for: maxDelta)
             if band != markerVisibilityBand {
@@ -538,23 +497,16 @@ struct TransitMapView: UIViewRepresentable {
                 currentMaxDelta = maxDelta
                 refreshMarkerVisibility(on: mapView)
                 syncInterchangeVisibility(on: mapView)
-                // Safe to hang off the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) are a
-                // superset of strokeScale's (0.055, 0.18, 0.8), so no stroke change can happen
-                // without a band change. Keep that true if either set moves.
+                // Safe on the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) include
+                // `strokeScale`'s (0.055, 0.18, 0.8). Keep that true if either set moves.
                 refreshOverlayWidths(on: mapView)
             }
             parent.onRegionChanged?(visibleRegion)
         }
 
-        /// How much to shrink every stroke at the current zoom, and why there has to be a factor
-        /// at all.
-        ///
-        /// `MKPolylineRenderer.lineWidth` is in screen points, so it does not change as the map
-        /// zooms: a 7pt line is 7pt whether it spans a street or a province. Zoom out to fit a
-        /// whole trip and the route collapses toward a point while its stroke stays put, so the
-        /// round dots of a walk stop reading as a dotted line and merge into one fat grey blob.
-        /// The dash pattern is scaled by the same factor so the dot-to-gap rhythm is preserved
-        /// rather than turning into sparse specks.
+        /// How much to shrink every stroke at the current zoom. `MKPolylineRenderer.lineWidth` is
+        /// in screen points, so zoomed out to a whole trip a walk's round dots merge into one blob.
+        /// The dash pattern scales by the same factor to keep its rhythm.
         private func strokeScale(for maxDelta: CLLocationDegrees) -> CGFloat {
             switch maxDelta {
             case ..<0.055: return 1
@@ -572,8 +524,8 @@ struct TransitMapView: UIViewRepresentable {
             renderer.lineDashPattern = overlayDashes[key]?.map { NSNumber(value: Double(max(0.1, $0 * scale))) }
         }
 
-        /// Re-strokes the overlays already on screen. Cheap: MapKit hands back the renderer it
-        /// already made, so this touches two numbers per overlay and asks for a redraw.
+        /// Re-strokes overlays already on screen: MapKit hands back its existing renderers, so this
+        /// sets two numbers each and redraws.
         private func refreshOverlayWidths(on mapView: MKMapView) {
             for overlay in mapView.overlays {
                 guard let polyline = overlay as? MKPolyline,
@@ -586,8 +538,8 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         private func markerBand(for maxDelta: CLLocationDegrees) -> Int {
-            // Breakpoints = union of StationAnnotationStyle size buckets (0.055, 0.18) and the
-            // visibility thresholds (normal ≤ 0.1, transfer ≤ 0.8).
+            // Breakpoints: `StationAnnotationStyle`'s size buckets (0.055, 0.18) and visibility
+            // thresholds (ordinary ≤ 0.1, transfer ≤ 0.8).
             if maxDelta <= 0.055 { return 0 }
             if maxDelta <= 0.1 { return 1 }
             if maxDelta <= 0.18 { return 2 }
@@ -683,8 +635,8 @@ struct TransitMapView: UIViewRepresentable {
 
 private final class StationAnnotation: NSObject, MKAnnotation {
     let station: Station
-    // Localized strings resolved once at creation (each involves a Hans→Hant StringTransform in
-    // zh-Hant); MapKit reads title/subtitle repeatedly for accessibility and search.
+    // Resolved once (zh-Hant involves a Hans→Hant transform); MapKit reads title and subtitle
+    // repeatedly.
     let title: String?
     let subtitle: String?
 
@@ -713,12 +665,8 @@ private final class StationAnnotationView: MKAnnotationView {
         tagView.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.9)
         tagView.layer.borderWidth = 0.5
         applyBorderColor()
-        // `UIView.backgroundColor` above re-resolves itself when the appearance changes; a
-        // `.cgColor` does not — it is resolved once, against whatever trait collection was current
-        // when it was read, and then frozen. That was invisible while the only way to change
-        // appearance was to leave the app; the in-app Light/Dark picker made it reachable in one
-        // tap, and every station pill kept the previous appearance's hairline until MapKit
-        // happened to rebuild its annotation views.
+        // `UIView.backgroundColor` re-resolves with the appearance; a `.cgColor` is resolved once
+        // and frozen, so it is refreshed here when the in-app Light/Dark setting changes.
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: StationAnnotationView, _) in
             view.applyBorderColor()
         }
@@ -780,8 +728,8 @@ private final class StationAnnotationView: MKAnnotationView {
 }
 
 private struct StationAnnotationStyle {
-    /// Above this span an ordinary station is a dot in a smear of dots, so it is not drawn. Shared
-    /// with the interchange links, which join two ordinary stations and mean nothing without them.
+    /// Above this span an ordinary station is a dot in a smear, so it is not drawn. Interchange
+    /// links share it.
     static let ordinaryStationMaxDelta: CLLocationDegrees = 0.1
 
     let isVisible: Bool
@@ -823,25 +771,16 @@ extension MapVisibleRegion {
     }
 }
 
-/// An `MKMapView` that knows how much of itself the app is drawing on top of.
+/// An `MKMapView` that knows how much of itself the app draws over.
 ///
-/// `setRegion` does not centre a coordinate in the view's *bounds*: it centres it in the view's
-/// **layout margins** rect, which by default is the system safe area. Measured on an iPhone 17 Pro
-/// (402 x 874, safe area t62 b83): a locate-me landed the rider at y = 426.5, the middle of that
-/// safe-area band. Setting `layoutMargins.top` to 300 moved them to y = 587 — exactly the middle of
-/// the remaining band — which is how this class knows layout margins are the lever and the bounds
-/// are not.
+/// `setRegion` centres a coordinate in the view's **layout margins**, by default the system safe
+/// area, not its bounds (measured: raising `layoutMargins.top` by 300 moved the centred rider to
+/// the middle of the remaining band). This map is full-bleed under chrome the system does not know
+/// about, a search pill and attribution row over its top ~120 points, so the safe-area band would
+/// centre the rider under the search bar.
 ///
-/// The system safe area is the wrong band here, because this map is full-bleed under chrome the
-/// system knows nothing about: a search pill and an attribution/locate row floating over its top
-/// ~120 points. Centring in the safe-area band therefore put the rider's own dot *under the search
-/// bar* on a phone. An iPad has neither the floating tab bar nor as much of the screen given to
-/// that chrome, which is why this only ever looked wrong on a phone.
-///
-/// The tab bar needs no addition of its own: it is already in `safeAreaInsets`. Which edge it
-/// arrives on is not fixed, though — on a foldable the system moves the bar to the trailing edge,
-/// so it lands in `left`/`right` rather than `bottom`. `applyLayoutMargins` adds all four edges
-/// separately for that reason; do not collapse it back to a bottom-only addition.
+/// The tab bar is already in `safeAreaInsets`, but on a foldable it can arrive on the trailing
+/// edge; `applyLayoutMargins` adds all four edges separately for that reason.
 private final class ChromeInsetMapView: MKMapView {
     /// Added to the safe area, not replacing it.
     var chromeInsets: UIEdgeInsets = .zero {
@@ -857,8 +796,8 @@ private final class ChromeInsetMapView: MKMapView {
     }
 
     private func applyLayoutMargins() {
-        // Taking the safe area over by hand, because `layoutMargins` is otherwise recomputed from
-        // it and would drop the chrome back off on the next layout pass.
+        // Takes the safe area over by hand: `layoutMargins` is otherwise recomputed from it and
+        // would lose the chrome on the next layout pass.
         insetsLayoutMarginsFromSafeArea = false
         let safeArea = safeAreaInsets
         layoutMargins = UIEdgeInsets(

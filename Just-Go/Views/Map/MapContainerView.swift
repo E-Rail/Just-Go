@@ -15,28 +15,24 @@ private struct TappedPlace: Identifiable {
     var isDroppedPin = false
 }
 
-/// Everything the map can push. One path enum rather than a `navigationDestination` per screen:
-/// five separate `isPresented` registrations on one node is the pattern that shadowed a sheet and
-/// cost this app its Settings screen, and a path is also the only thing a headless launch can seed
-/// to reach a screen it cannot tap its way to.
+/// Everything the map can push, as one path enum rather than a `navigationDestination` per screen:
+/// several `isPresented` registrations on one node shadow each other, and a path is what a headless
+/// launch can seed.
 enum MapRoute: Hashable {
     case search
     /// The search page again, opened from the results header to refill one end of the trip.
     /// Picking a result fills that field and returns; it does not open a place card.
     case editEndpoint(RouteInputField)
-    /// The destination, if the rider came from a place card, travels in
-    /// `AppState.pendingRouteInput`: `TransitPlace` is not `Hashable` and a navigation value is
-    /// the wrong place to carry it anyway.
+    /// The destination, when the rider came from a place card, travels in
+    /// `AppState.pendingRouteInput`: `TransitPlace` is not `Hashable`.
     case results
     case detail(UUID)
-    /// The station's **id**, not the object. A navigation path value should be a small value type:
-    /// `Station` is a `final class`, and a reference type in the path is the kind of thing that
-    /// resolves fine on one iOS version and silently fails to resolve on another, and a value the
-    /// stack cannot resolve renders as a pushed screen with no title and no content, which is what
-    /// a blank page is. The object itself is held beside the path in `openedStations`.
+    /// The station's **id**, not the object: a reference type in a navigation path can fail to
+    /// resolve, and an unresolved value renders as a blank pushed screen. The object is held beside
+    /// the path in `openedStations`.
     case station(id: String)
-    /// A line, keyed the same way and for the same reason as `.station`: `MetroLine` is a struct
-    /// but is not `Hashable`, and the pair of ids is enough to fetch it from the cached network.
+    /// A line, keyed the same way: `MetroLine` is not `Hashable`, and the ids fetch it from the
+    /// cached network.
     case line(cityID: String, lineID: String)
 }
 
@@ -53,8 +49,8 @@ struct MapContainerView: View {
     @State private var placeMatchTask: Task<Void, Never>?
     @State private var stationOpenTask: Task<Void, Never>?
     @State private var centerOnUserTask: Task<Void, Never>?
-    /// How tall the floating chrome over the map's top edge actually is. Handed to the map so it
-    /// centres the rider in the part of itself they can see rather than behind the search pill.
+    /// How tall the floating chrome over the map's top edge is, so the map centres the rider in the
+    /// part they can see.
     @State private var topChromeHeight: CGFloat = 0
     @State private var planTask: Task<Void, Never>?
     @State private var didCenterOnUser = false
@@ -67,9 +63,8 @@ struct MapContainerView: View {
     @State private var pendingResolvedItem: MKMapItem?
     /// Stations that have been pushed, keyed by the id carried in the path.
     @State private var openedStations: [String: Station] = [:]
-    /// A trip that was still running when the app was last killed. `pendingResumableTrip` is the
-    /// one being asked about; `resumableTrip` is the one the rider said yes to. See
-    /// `offerToResumeTrip`.
+    /// A trip still running when the app was last killed: `pendingResumableTrip` is being asked
+    /// about, `resumableTrip` is the one the rider accepted. See `offerToResumeTrip`.
     @State private var pendingResumableTrip: Route?
     @State private var resumableTrip: Route?
     @State private var isResumingTrip = false
@@ -79,9 +74,8 @@ struct MapContainerView: View {
             mapContent
                 .navigationDestination(for: MapRoute.self) { destination(for: $0) }
         }
-        // The map tab lives as long as the app, and this dictionary held an enriched copy of every
-        // station the rider had ever opened. Popping a station is the moment its copy stops being
-        // reachable, so it is the moment to let it go.
+        // The map tab lives as long as the app: a popped station's enriched copy is released when
+        // it leaves the path.
         .onChange(of: path) { _, newPath in
             let stillOpen = Set(newPath.compactMap { route -> String? in
                 if case .station(let id) = route { return id }
@@ -95,20 +89,18 @@ struct MapContainerView: View {
             }
             restoreCamera()
             #if DEBUG
-            // Ahead of the centring guard below, which returns early once a fix has landed. The
-            // seeding used to sit after it and so silently did nothing on any second run of this
-            // task, which reads as "the harness is flaky" rather than "the harness never ran".
+            // Before the centring guard below, which returns once a fix has landed and would skip
+            // the seed on a second run of this task.
             seedDebugScreen()
             #endif
-            // Open on the rider. Retried until it actually lands, not merely until it has been
-            // attempted; when location is unavailable. Denied, restricted, or the fix times out
-            //. This is a no-op and the restored camera is what stays on screen.
+            // Open on the rider, retried until it lands. With location unavailable (denied,
+            // restricted, or timed out) this does nothing and the restored camera stays.
             guard !didCenterOnUser else { return }
             centerOnUser()
         }
         .task { offerToResumeTrip() }
-        // Full screen rather than a push: a resumed trip is not a place in this stack's history,
-        // and a rider who came back to the app underground wants the navigator, not a map.
+        // Full screen rather than a push: a rider back in the app underground wants the navigator,
+        // not a map.
         .fullScreenCover(item: $resumableTrip) { trip in
             LiveGoView(route: trip) {
                 resumableTrip = nil
@@ -138,9 +130,9 @@ struct MapContainerView: View {
         } message: { trip in
             Text(verbatim: "\(trip.origin) → \(trip.destination)")
         }
-        // A place card's "Route here" only records the place; the push happens here, so every
-        // sender: map POI, search result, station detail. Reaches the entry page the same way
-        // and none of them has to know what the navigation stack looks like.
+        // A place card's "Route here" only records the place and the push happens here, so every
+        // sender (map POI, search result, station page) starts a plan the same way without knowing
+        // the navigation stack.
         .onChange(of: appState.pendingRouteInput) { _, pending in
             guard let pending else { return }
             beginPlan(to: pending)
@@ -150,11 +142,8 @@ struct MapContainerView: View {
             appState.pendingTripReplay = nil
             replay(record)
         }
-        // The planner's `basePreference` had no writer, so everything set in Accessibility
-        // Settings: step-free requirement, lift preference, avoid-stairs, and the walking-distance
-        // limit the long-walk warning is measured against. Stopped at the settings screen and
-        // never reached a plan. Seeded here on appear, and re-seeded on change so a preference
-        // switched mid-session drops results planned under the old one.
+        // Accessibility Settings reach the planner here: seeded on appear and re-seeded on change,
+        // so results planned under an old preference are dropped.
         .task(id: appState.accessibilityPreference) {
             if planner.syncAccessibilityPreference(appState.accessibilityPreference) {
                 path.removeAll()
@@ -215,10 +204,9 @@ struct MapContainerView: View {
         .padding(Metrics.l)
     }
 
-    /// Drops a pin wherever the rider pressed, so somewhere that is not one of Apple's points of
-    /// interest can still become an endpoint. The state resets copy `handlePlaceTapped` exactly:
-    /// every new interaction has to cancel the last one, or a resolve already in flight lands on
-    /// top of this pin and replaces it with a place the rider is no longer looking at.
+    /// Drops a pin wherever the rider pressed, so a place that is not an Apple POI can become an
+    /// endpoint. Resets the same state `handlePlaceTapped` does: a resolve in flight must not
+    /// replace this pin.
     private func handleMapLongPressed(_ coordinate: CLLocationCoordinate2D) {
         placeCardDetent = .fraction(0.3)
         placeMatchTask?.cancel()
@@ -240,8 +228,8 @@ struct MapContainerView: View {
                 name: nil
             )
             guard !Task.isCancelled, let named else { return }
-            // Only if this is still the pin on screen. A second press while the first was resolving
-            // would otherwise rename the new pin with the old one's answer.
+            // Only if this is still the pin on screen: a second press while the first resolves must
+            // not get the old name.
             guard let current = tappedPlace, current.isDroppedPin,
                   current.coordinate.latitude == coordinate.latitude,
                   current.coordinate.longitude == coordinate.longitude else { return }
@@ -253,15 +241,8 @@ struct MapContainerView: View {
         }
     }
 
-    /// A trip Live "Go" was running when iOS terminated the app, most likely underground, which is
-    /// exactly the case the store was written for.
-    ///
-    /// `ActiveTripStore` had no reader at all: it was saved on every start and cleared on every
-    /// normal exit, so a route only survived when the app was killed mid-trip, and nothing ever
-    /// looked. The rider was asked to plan the journey again, offline, from a platform.
-    ///
-    /// Asked rather than resumed outright. A saved trip can be hours stale, and dropping someone
-    /// into a navigator they did not open is worse than one extra tap.
+    /// A trip Live Go was running when iOS terminated the app, most likely underground. Asked
+    /// rather than resumed: a saved trip can be hours stale.
     private func offerToResumeTrip() {
         guard pendingResumableTrip == nil, resumableTrip == nil, path.isEmpty else { return }
         guard let saved = ActiveTripStore.load() else { return }
@@ -269,13 +250,13 @@ struct MapContainerView: View {
         isResumingTrip = true
     }
 
-    /// Opens the map where the rider left it. Nothing is loaded from this. The viewport decides
-    /// that, so a stale camera costs a pan, not a wrong network.
+    /// Opens the map where the rider left it. Nothing is loaded from this: the viewport decides
+    /// that.
     private func restoreCamera() {
         guard viewModel?.visibleRegion == nil else { return }
         guard let camera = appState.lastMapCamera else {
-            // First launch, before any pan and before any fix. Somewhere with a network rather
-            // than the whole globe; `centerOnUser` replaces it the moment a fix arrives.
+            // First launch, before any pan or fix: somewhere with a network, replaced by
+            // `centerOnUser` once a fix arrives.
             viewModel?.updateCamera(to: Self.firstLaunchCenter, spanDelta: MapCameraSpan.city)
             return
         }
@@ -285,12 +266,12 @@ struct MapContainerView: View {
         )
     }
 
-    /// Tiananmen, only ever seen on a first launch with location off. The largest bundled
-    /// network, so the opening screen has something drawn on it.
+    /// Tiananmen, seen only on a first launch with location off: the largest bundled network, so
+    /// the first screen has something drawn.
     private static let firstLaunchCenter = CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
 
-    /// Debounced: a pan reports its region every frame, and each save is a JSON encode plus a
-    /// `UserDefaults` write on the main thread. Only where the pan *stopped* is worth keeping.
+    /// Debounced: a pan reports its region every frame, and each save is a JSON encode and a
+    /// `UserDefaults` write on the main thread.
     private func rememberCamera(_ region: MapVisibleRegion) {
         cameraSaveTask?.cancel()
         cameraSaveTask = Task {
@@ -336,8 +317,8 @@ struct MapContainerView: View {
             .padding(.top, 14)
             .padding(.bottom, 10)
             .zIndex(2)
-            // Measured, not a constant: this stack is a search pill plus an attribution row that
-            // both grow with Dynamic Type, and it gains a third row whenever a locate fails.
+            // Measured, not constant: the pill and attribution row grow with Dynamic Type, and a
+            // failed locate adds a third row.
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.height
             } action: { height in
@@ -348,15 +329,11 @@ struct MapContainerView: View {
         .navigationTitle(AppLocalization.localized("Map"))
         .toolbar(.hidden, for: .navigationBar)
         .toolbarBackground(.visible, for: .tabBar)
-        // No keyboard-height tracking here any more: the map's search field moved to its own
-        // page, so this screen has no text input to make room for.
-        // No onDismiss here: sheet(item:) already nils the binding on dismissal, and an
-        // explicit `tappedPlace = nil` closure would fire for the OLD sheet's dismissal.
-        // Clobbering a new tap's sheet presented while the old one was still animating out.
+        // No `onDismiss`: `sheet(item:)` already nils the binding, and an explicit `tappedPlace =
+        // nil` would fire for the old sheet's dismissal and clobber a new tap's sheet.
         .sheet(item: $tappedPlace) { place in
-            // Keep the tag identity anchored to the tapped annotation's name/coordinate, not
-            // the resolved MKMapItem's: resolution can shift both slightly, and a tag saved
-            // before resolution must keep matching the same place afterward.
+            // The tag identity stays anchored to the tapped name and coordinate, not the resolved
+            // item's, which can shift slightly; a tag saved before resolution must still match.
             let taggedPlace = TransitPlace(
                 name: place.name,
                 coordinate: place.coordinate,
@@ -384,8 +361,8 @@ struct MapContainerView: View {
                     placeTagButton(for: taggedPlace)
                 }
                 .padding(.horizontal)
-                // Before the background, not after: the buttons move clear of a trailing tab bar
-                // while the material still runs the full width of the sheet.
+                // Before the background: the buttons clear a trailing tab bar while the material
+                // spans the sheet.
                 .safeAreaPadding(.horizontal)
                 .padding(.vertical, 10)
                 .background(.regularMaterial)
@@ -401,13 +378,10 @@ struct MapContainerView: View {
                     }
                 }
             )
-            // No selection binding here defaults to the SMALLEST detent (.medium, half
-            // screen) on every presentation and requires a manual drag to reach .large,
-            // that drag can get eaten by the embedded MKMapItemDetailViewController's own
-            // scroll content. Binding + resetting to .large in handlePlaceTapped makes the
-            // card open already expanded instead of relying on that drag succeeding.
-            // A dropped pin is a name and a coordinate. At `.medium` that is two lines of text over
-            // half a screen of nothing, and it hides the map the rider is pointing at.
+            // A selection binding, reset in the tap handlers: without one the sheet opens at the
+            // smallest detent, and the drag to expand can be eaten by Apple's embedded card's
+            // scroll view. A dropped pin opens lower: a name and a coordinate need little room, and
+            // the rider is pointing at the map.
             .presentationDetents(
                 place.isDroppedPin ? [.fraction(0.3), .medium, .large] : [.medium, .large],
                 selection: $placeCardDetent
@@ -431,10 +405,7 @@ struct MapContainerView: View {
                 set: { viewModel?.visibleRegion = $0 }
             ),
             stations: viewModel?.stations ?? [],
-            // Both `false` and `nil` because the browse map draws no trip at all now. It used to
-            // keep the chosen route underneath everything, and `alwaysShowsStations` existed to
-            // stop that trip's own stops thinning out at the zoom that showed the whole journey.
-            // With no trip there are no stops to protect, and ordinary browsing keeps its thinning.
+            // The browse map draws no trip, so ordinary browsing keeps its station thinning.
             alwaysShowsStations: false,
             metroNetworks: viewModel?.metroNetworks ?? [],
             route: nil,
@@ -491,10 +462,8 @@ struct MapContainerView: View {
         )
     }
 
-    /// A pill that *looks* like a search field but is a button to the search page. Typing used to
-    /// happen here, over the map, with the results hanging below in a dropdown whose height had to
-    /// be measured against the keyboard on every frame. Searching deserves the whole screen, and
-    /// the map underneath deserves not to be half-covered while you do it.
+    /// A pill that looks like a search field and opens the search page: searching gets the whole
+    /// screen.
     private var topControls: some View {
         HStack(spacing: 10) {
             HStack {
@@ -533,19 +502,16 @@ struct MapContainerView: View {
         .zIndex(20)
     }
 
-    /// The one way this screen ever puts the camera on the rider. Used by the locate button and
-    /// by the map's first appearance, so the two cannot land at different zooms. That
-    /// inconsistency was the complaint: the same intent behaved differently depending on which
-    /// path ran it.
+    /// The one way this screen puts the camera on the rider, for the locate button and the first
+    /// appearance alike, so they cannot land at different zooms.
     private func centerOnUser() {
         centerOnUserTask?.cancel()
         locateFailure = nil
         centerOnUserTask = Task {
             guard let outcome = await viewModel?.centerOnUser() else { return }
             if outcome.didCenter { didCenterOnUser = true }
-            // Say why nothing moved. A fix that never arrives burns the location request's full
-            // 15 s timeout and then did nothing at all. No camera move, no message, which reads
-            // as the button being broken rather than the fix being missing.
+            // Say why nothing moved: a fix that never arrives takes the full 15 s timeout, and
+            // silence reads as a broken button.
             guard let failure = outcome.failureMessage else { return }
             locateFailure = failure
             try? await Task.sleep(for: .seconds(5))
@@ -569,11 +535,10 @@ struct MapContainerView: View {
     }
 
     private func openStation(_ station: Station) {
-        // Opening a station always wins over a place card. Dismiss any place sheet AND cancel a
-        // prior POI tap's still-running station match, which would otherwise present a place
-        // sheet over/after this station navigation when it eventually completes. (Self-cancel is
-        // fine on the paths where placeMatchTask itself calls openStation: nothing runs after
-        // that call, and stationOpenTask below is a fresh Task that doesn't inherit cancellation.)
+        // Opening a station wins over a place card: dismiss any place sheet and cancel a prior POI
+        // tap's station match, which would otherwise present its sheet afterwards. Self-cancel is
+        // fine where `placeMatchTask` itself calls this: nothing runs after the call, and
+        // `stationOpenTask` is a fresh task.
         placeMatchTask?.cancel()
         pendingResolvedItem = nil
         tappedPlace = nil
@@ -595,17 +560,16 @@ struct MapContainerView: View {
         }
     }
 
-    /// A place chosen on the search page. One that *is* a programmed station opens the station
-    /// detail; anything else recentres the map on it and presents its card, so "Route here" is one
-    /// tap away whether the rider found the place by pointing at it or by typing its name.
+    /// A place chosen on the search page: a station opens its detail; anything else recentres the
+    /// map and presents its card, so "Route here" is one tap away however the place was found.
     private func selectSearchResult(_ place: TransitPlace) {
-        // Track + cancel so rapidly tapping results can't stack matchingStation calls whose
-        // out-of-order completion would open the wrong station detail.
+        // Tracked and cancelled, so rapid taps cannot stack station matches that complete out of
+        // order.
         placeMatchTask?.cancel()
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
-        // Same entry-point invariant as handlePlaceTapped/openStation: every new interaction
-        // resets the POI-tap state, so a cancelled match's buffered resolve can't linger.
+        // Every new interaction resets the POI-tap state, so a cancelled match's buffered resolve
+        // cannot linger.
         pendingResolvedItem = nil
         tappedPlace = nil
         placeCardDetent = .medium
@@ -625,10 +589,9 @@ struct MapContainerView: View {
         }
     }
 
-    /// Phase 1 of a POI tap: fires synchronously with the feature's name + coordinate. Runs the
-    /// fast in-memory station match: a tapped POI that *is* a programmed station opens the
-    /// station detail with no network wait; anything else immediately presents the place sheet in
-    /// a loading state, which `handlePlaceResolved` fills once Apple's resolve completes.
+    /// Phase 1 of a POI tap, synchronous with the feature's name and coordinate: the in-memory
+    /// station match opens a station with no network wait; anything else presents the place sheet
+    /// loading, filled by `handlePlaceResolved`.
     private func handlePlaceTapped(_ name: String?, _ coordinate: CLLocationCoordinate2D) {
         let displayName = name ?? AppLocalization.text(english: "Selected place", simplified: "所选地点", traditional: "所選地點")
         let place = TransitPlace(name: displayName, coordinate: coordinate, source: .mapKit)
@@ -637,10 +600,8 @@ struct MapContainerView: View {
         stationOpenTask?.cancel()
         isLoadingStationDetail = false
         pendingResolvedItem = nil
-        // Dismiss any prior tap's sheet up front so "tappedPlace != nil" always means THIS
-        // tap's sheet in handlePlaceResolved. Enforced here rather than relying on sheets
-        // blocking background map taps (true today, but a detent/background-interaction
-        // change would silently route the new resolve into the old sheet).
+        // Dismiss any prior tap's sheet first, so a non-nil `tappedPlace` in `handlePlaceResolved`
+        // always means this tap's.
         tappedPlace = nil
         placeMatchTask = Task {
             let station = await viewModel?.matchingStation(for: place)
@@ -650,20 +611,17 @@ struct MapContainerView: View {
                 tappedPlace = nil
                 openStation(station)
             } else {
-                // Apple's resolve may have finished while station matching was still running
-                // (it can block on a cold city-pack load). Present the sheet already filled
-                // instead of dropping the item and spinning forever.
+                // Apple's resolve may finish while station matching runs (a cold pack load can
+                // block it); present the sheet already filled.
                 tappedPlace = TappedPlace(name: displayName, coordinate: coordinate, resolvedItem: pendingResolvedItem)
                 pendingResolvedItem = nil
             }
         }
     }
 
-    /// Phase 2 of a POI tap: the background MKMapItemRequest resolved. Both `poiTask` (in the map
-    /// coordinator) and `placeMatchTask` are cancelled on every new tap, so this only ever fires
-    /// for the latest tap. When the sheet is already presented, fill it in place; when station
-    /// matching is still deciding (slower than the resolve on a cold city-pack load), buffer the
-    /// item for `handlePlaceTapped` to attach at presentation time.
+    /// Phase 2 of a POI tap: the background `MKMapItemRequest` resolved. Both tasks are cancelled
+    /// on every new tap, so this is always the latest tap. Fill the presented sheet in place, or
+    /// buffer the item while station matching is still deciding.
     private func handlePlaceResolved(_ mapItem: MKMapItem) {
         if tappedPlace != nil {
             tappedPlace?.resolvedItem = mapItem
@@ -674,27 +632,22 @@ struct MapContainerView: View {
 
     // MARK: - Pushed screens
 
-    /// Never optional, so a push can never resolve to nothing. See
+    /// Never optional, so a push always resolves to a screen. See
     /// `DIContainer.sharedRoutePlannerViewModel()`.
     private var planner: RoutePlannerViewModel {
         container.sharedRoutePlannerViewModel()
     }
 
-    /// "Route here": the one action every place card offers, from anywhere in the app.
-    ///
-    /// Goes straight to the results, which carry their own From/To header. There is no form in
-    /// between: it asked the rider to confirm a destination they had just tapped and a start the
-    /// app already knew, so it existed only to be dismissed. When an end is genuinely missing the
-    /// results say so in that header, which is also where it gets filled in.
+    /// "Route here", from anywhere in the app: straight to the results, whose From/To header shows
+    /// a missing end and is where it is filled.
     private func beginPlan(to pending: AppState.PendingRouteInput) {
-        // Consumed here rather than by the pushed screen: this is the only handler, and leaving it
-        // set would re-fire the moment anything else observed it.
+        // Consumed here, the only handler; left set it would re-fire.
         appState.pendingRouteInput = nil
         let planner = self.planner
         planner.selectPlace(pending.place, for: pending.role)
 
-        // One assignment: see the note on MapRoute.station about a pop and a push in one frame.
-        // The station card the rider pressed the button on is replaced, not stacked under.
+        // One assignment: the station card the rider pressed the button on is replaced, not stacked
+        // under.
         var next = path
         if case .station = next.last { next.removeLast() }
         next.append(.results)
@@ -704,17 +657,13 @@ struct MapContainerView: View {
 
         planTask?.cancel()
         planTask = Task {
-            // "The start defaults to where you are." This used to be a form's job; the rider no
-            // longer sees that form, so the seeding happens here instead. A fix can take up to
-            // 15 s, which the results page spends saying it is loading. A better wait than an
-            // empty field on a page whose only purpose is to be dismissed.
+            // The start defaults to where the rider is. A fix can take up to 15 s, which the
+            // results page spends loading.
             if planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 await planner.useCurrentLocation(for: .origin)
                 // A rider in Beijing tapping a place in Guangzhou is not starting from where they
-                // are standing, and silently seeding it produces nonsense. Judged in metres rather
-                // than by city, because "different city" was never the question: Foshan→Guangzhou
-                // is two cities and one perfectly plannable journey. 150 km is past the span of
-                // the widest bundled network, intercity corridors included.
+                // stand. Judged in metres, not by city (Foshan → Guangzhou is two cities and one
+                // journey): 150 km is past the widest bundled network, corridors included.
                 if let seeded = planner.place(for: .origin),
                    seeded.coordinate.distance(to: target) > 150_000 {
                     planner.updateName("", for: .origin)
@@ -722,8 +671,8 @@ struct MapContainerView: View {
             }
             guard !Task.isCancelled else { return }
             guard !planner.name(for: .origin).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                // No fix and nothing typed. Say which end is missing rather than running a search
-                // that can only fail: the header above is where the rider fixes it.
+                // No fix and nothing typed: say which end is missing rather than run a search that
+                // can only fail.
                 planner.errorMessage = AppLocalization.text(
                     english: "Choose a start above to see routes.",
                     simplified: "请在上方选择起点后查看路线。",
@@ -735,16 +684,14 @@ struct MapContainerView: View {
         }
     }
 
-    /// Fills one end of the trip from the search page and re-plans. Deliberately not routed
-    /// through `pendingRouteInput`: that channel *starts* a plan, and starting one from here would
-    /// push a second results screen on top of the one the rider is editing.
+    /// Fills one end from the search page and re-plans. Not through `pendingRouteInput`, which
+    /// starts a plan and would push a second results screen.
     private func fillEndpoint(_ field: RouteInputField, with place: TransitPlace) {
         planner.selectPlace(place, for: field)
         replan()
     }
 
-    /// Re-runs the current plan. Shared by the endpoint editor and the header's swap button so the
-    /// two cannot disagree about what a changed endpoint means.
+    /// Re-runs the current plan, for the endpoint editor and the swap button alike.
     private func replan() {
         planTask?.cancel()
         planTask = Task { _ = await planner.searchRoutes() }
@@ -797,23 +744,22 @@ struct MapContainerView: View {
                     accessibilityFilter: planner.accessibilityFilter
                 )
             } else {
-                // The routes were cleared while this was pushed. Say so. A screen that
-                // explains itself beats a screen that is simply empty.
+                // The routes were cleared while this was pushed: say so.
                 StaleRoutesNotice()
                     .background(Color.appBackground)
             }
         case .station(let stationID):
             if let station = openedStations[stationID] {
-                // The map replaces this screen with the entry page itself. See the
-                // pendingRouteInput handler above.
+                // The map replaces this screen with the results itself; see the `pendingRouteInput`
+                // handler.
                 StationDetailView(
                     station: station,
                     dismissesOnRouteSelection: false,
                     onSelectLine: { path.append(.line(cityID: $0.cityID, lineID: $0.lineID)) }
                 )
             } else {
-                // Cannot happen by construction: the station is stored before the push, but a
-                // screen that says something is strictly better than one that says nothing.
+                // Unreachable by construction (the station is stored before the push), but a screen
+                // that says something beats an empty one.
                 ContentUnavailableView {
                     Label(
                         AppLocalization.text(
@@ -838,13 +784,10 @@ struct MapContainerView: View {
     }
 
     #if DEBUG
-    /// Lands a headless launch on a pushed screen. There is no tap injection in this environment.
-    /// This Xcode install ships no Simulator.app at all, so without a way to seed the path, every
-    /// screen above the map root is unreachable and therefore unverifiable.
+    /// Lands a headless launch on a pushed screen: this environment has no tap injection, so a
+    /// seeded path is the only way to see anything above the map root.
     private func seedDebugScreen() {
-        // Puts the camera somewhere specific without a pan gesture. The sibling of
-        // JUST_GO_DEBUG_SCREEN, and the only way to screenshot a named station in this
-        // environment, which has no gesture injection at all.
+        // Puts the camera somewhere specific without a pan gesture.
         if let camera = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_CAMERA"] {
             let parts = camera.split(separator: ",").compactMap { Double($0) }
             if parts.count >= 3 {
@@ -855,8 +798,7 @@ struct MapContainerView: View {
                 )
             }
         }
-        // A named line, landed on its own page. Same reason as the two above: this environment has
-        // no tap injection, so the only way to look at a pushed screen is to seed the path.
+        // A named line, landed on its own page.
         if let line = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_LINE"] {
             let parts = line.split(separator: ",").map(String.init)
             if parts.count >= 2 {
@@ -865,8 +807,8 @@ struct MapContainerView: View {
                 return
             }
         }
-        // The card a long press opens. The press itself cannot be injected in this environment, so
-        // the handler is driven directly: everything after the gesture is the same code path.
+        // The card a long press opens: the press cannot be injected, so the handler is driven
+        // directly.
         if let pin = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_PIN"] {
             let parts = pin.split(separator: ",").compactMap { Double($0) }
             if parts.count >= 2 {
@@ -879,21 +821,17 @@ struct MapContainerView: View {
                 return
             }
         }
-        // A named station's own sheet. Every other seed reaches a screen the *planner* produces;
-        // this is the only route to the station page, whose accessibility section is the one place
-        // in the app where a wrong claim has a physical cost and so is the one most worth looking
-        // at. The station is named rather than derived, because which station it is decides which
-        // data source answers — an OpenStreetMap entrance record and Hong Kong's surveyed
-        // barrier-free record render entirely different sections.
+        // A named station's page, the one screen the planner does not produce, and the one where a
+        // wrong accessibility claim has a physical cost. Named rather than derived, because the
+        // station decides which data source answers.
         if let station = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_STATION"] {
             Task {
                 guard await waitForNetwork() else { return }
                 guard let match = viewModel?.stations.first(where: {
                     $0.localizedName == station || $0.name == station || $0.stationID == station
                 }) else { return }
-                // Through `openStation`, not by pushing `.station` directly: the destination reads
-                // the station out of `openedStations`, which only that path fills, so a direct push
-                // lands on "Station unavailable".
+                // Through `openStation`, not a direct push: the destination reads `openedStations`,
+                // which only that path fills.
                 openStation(match)
             }
         }
@@ -909,17 +847,9 @@ struct MapContainerView: View {
         }
     }
 
-    /// Plans a real trip between the two most widely separated stations the map has loaded for
-    /// this city, through the same `selectPlace` + `searchRoutes` path a rider drives, so what
-    /// gets screenshotted is the real screen and not a fixture. Widest separation rather than a
-    /// hardcoded pair so this works in any city, and so the route has transfers in it.
-    /// Waits for the viewport loader to actually deliver, rather than reading whatever happened to
-    /// be there when `.task` fired.
-    ///
-    /// Both seeds below plan a real trip, and planning needs a loaded pack. The loader is debounced
-    /// and asynchronous, so on a slower or larger device the seed ran against an empty station list,
-    /// returned silently, and left the harness sitting on the browse map. That reads as "the app is
-    /// broken" or "the harness is flaky" when it is neither.
+    /// Waits for the viewport loader to deliver stations, bounded. The route seeds need a loaded
+    /// pack, and the loader is debounced and asynchronous, so reading `stations` at `.task` time
+    /// can find it empty.
     private func waitForNetwork(seconds: Double = 20) async -> Bool {
         let deadline = Date().addingTimeInterval(seconds)
         while Date() < deadline {
@@ -933,9 +863,8 @@ struct MapContainerView: View {
         guard await waitForNetwork() else { return }
         guard let stations = viewModel?.stations, stations.count >= 2 else { return }
         let plannerViewModel = planner
-        // "departBy+90" / "arriveBy+90": minutes from now. The trip's time has a control now, but
-        // controls need taps and this environment has none, and the "Leave by …" banner it exists
-        // to reveal had never rendered in any build. Seeded here so it can actually be looked at.
+        // "departBy+90" / "arriveBy+90": minutes from now, the only way to see the "Leave by …"
+        // banner without a tap.
         if let anchor = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ANCHOR"] {
             let parts = anchor.split(separator: "+")
             let minutes = parts.count > 1 ? Double(parts[1]) ?? 60 : 60
@@ -946,9 +875,8 @@ struct MapContainerView: View {
             default: break
             }
         }
-        // A named pair beats the widest one whenever the thing being looked at depends on *which*
-        // lines the trip rides — a service-hours check is only interesting where one line has
-        // stopped and another has not, and the widest pair in the viewport is whatever it is.
+        // A named pair, for when which lines the trip rides matters (a service-hours check needs
+        // one line stopped and another running).
         if let endpoints = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ENDPOINTS"] {
             let parts = endpoints.split(separator: ",").compactMap { Double($0) }
             guard parts.count >= 4 else { return }
@@ -977,8 +905,8 @@ struct MapContainerView: View {
         }
     }
 
-    /// A bare coordinate as an endpoint. The planner walks to the nearest station from it, which
-    /// is what a rider dropping a pin gets, so a named pair still exercises the real path.
+    /// A bare coordinate as an endpoint: the planner walks to the nearest station, as for a dropped
+    /// pin.
     private func debugPlace(at coordinate: CLLocationCoordinate2D) -> TransitPlace {
         TransitPlace(
             name: String(format: "%.4f, %.4f", coordinate.latitude, coordinate.longitude),
@@ -989,8 +917,8 @@ struct MapContainerView: View {
     #endif
 }
 
-/// The place sheet's loading state: shows the tapped POI's name + a spinner immediately, before
-/// Apple's native card (which needs a fully-resolved MKMapItem) is ready.
+/// The place sheet's loading state: the tapped POI's name and a spinner, until Apple's card has a
+/// resolved item.
 private struct PlaceLoadingView: View {
     let name: String
     var body: some View {

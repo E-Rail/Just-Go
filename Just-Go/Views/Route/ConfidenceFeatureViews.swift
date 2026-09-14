@@ -41,22 +41,19 @@ extension RouteServiceStatus {
 struct ServiceStatusBanner: View {
     let status: RouteServiceStatus
     var compact = false
-    /// What a taxi over the same ground costs at this hour, when the trip is against the clock.
-    ///
-    /// The warning above it is a fact about the trains. This is the fact about the rider's wallet,
-    /// and for someone finishing a late shift it is the one that decides whether they run.
+    /// What a taxi over the same ground costs at this hour, when the trip is against the clock:
+    /// beside the fact about the trains, the fact about the rider's wallet.
     var missedTrainTaxiYuan: Double?
-    /// Where a car would have to go, when one is worth offering. `nil` leaves the price as a fact
-    /// with nothing attached to it, which is what shipped.
+    /// Where a car would have to go, when one is worth offering. nil leaves the price with nothing
+    /// attached.
     var hail: Hail?
 
     /// The two ends of the journey, for handing to a hailing app.
     struct Hail: Equatable {
         let origin: CLLocationCoordinate2D
         let destination: CLLocationCoordinate2D
-        /// Both ends are named. DiDi itself never reads the start's name, but
-        /// `ExternalRouteHandoff.open` asks every destination for one — Apple Maps drops a start it
-        /// cannot label — and a parameter only half the call sites fill is how they drift apart.
+        /// Both ends named: DiDi ignores the start's name, but `ExternalRouteHandoff.open` asks
+        /// every destination for one (Apple Maps drops a start it cannot label).
         let originName: String
         let destinationName: String
 
@@ -91,17 +88,9 @@ struct ServiceStatusBanner: View {
         }
     }
 
-    /// Offered only when the app is actually installed, and only beside a price.
-    ///
-    /// The app has already decided a taxi is the answer here — it checked the last train, found it
-    /// gone or nearly gone, and priced the drive. Stopping at the number and making the rider
-    /// retype their destination into another app is where it stopped being useful. DiDi has been
-    /// in `ExternalRouteHandoff` and in `LSApplicationQueriesSchemes` since the bike and car legs
-    /// shipped; this is the same handoff for the one case that most deserves it.
-    ///
-    /// No web fallback here on purpose. Elsewhere a fallback opens a map page that is still worth
-    /// reading; a rider who does not have the hailing app cannot hail from this button, and a link
-    /// pretending otherwise is worse than no button.
+    /// Offered only when the hailing app is installed, and only beside a price: the app has already
+    /// checked the last train and priced the drive, so this saves retyping the destination. No web
+    /// fallback: a rider without the app cannot hail from a link.
     @ViewBuilder
     private var hailButton: some View {
         if let hail, ExternalRouteHandoff.destinations(for: .driving).contains(.didi) {
@@ -129,8 +118,7 @@ struct ServiceStatusBanner: View {
         }
     }
 
-    /// "About" throughout, because it is a tariff estimate over a driving route rather than a
-    /// metered ride anyone has taken.
+    /// "About" throughout: a tariff estimate over a driving route, not a metered ride.
     private func taxiText(_ yuan: Double) -> String {
         let fare = RouteFare.formatted(yuan)
         return AppLocalization.text(

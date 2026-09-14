@@ -20,10 +20,8 @@ struct JustGoApp: App {
         Self.applyDataRightsEpochIfNeeded()
         let container = DIContainer.configure()
         _container = State(initialValue: container)
-        // The sweep walks a directory whose size the app doesn't control, and nothing waits
-        // on its result: keep it off the main thread, which is otherwise blocked here
-        // until the first frame. Measured at 8ms on an empty container but 82ms with 4,200
-        // temp entries, i.e. bounded only by how much junk has accumulated.
+        // Off the main thread and not awaited: the sweep's cost grows with whatever has accumulated
+        // in the directory.
         Task.detached(priority: .utility) {
             Self.removeObsoleteRouteCaches()
         }
@@ -40,16 +38,13 @@ struct JustGoApp: App {
                         .transition(.opacity)
                 }
             }
-            // On a fast device the essentials finish in a few hundred ms; dissolve rather than
-            // snap so that reads as a handoff instead of a flash.
+            // Dissolve rather than snap, so a fast launch reads as a handoff instead of a flash.
             .animation(.easeInOut(duration: 0.28), value: appState.isLaunching)
             .environment(appState)
             .environment(container)
             .environment(container.tripMemoryService)
-            // On the window's root rather than in `ContentView`, so it also covers the launch
-            // screen above and every sheet and full-screen cover presented from inside the tabs.
-            // A rider who set the app to dark and then opened Settings would otherwise have got a
-            // white sheet over a dark app.
+            // On the window's root, so the appearance also covers the launch screen and every sheet
+            // and full-screen cover.
             .preferredColorScheme(AppAppearance(rawValue: appearance)?.colorScheme)
             .task { await runLaunchStages() }
         }
@@ -61,22 +56,19 @@ struct JustGoApp: App {
     private func runLaunchStages() async {
         guard appState.isLaunching else { return }
 
-        // Stage 1: services. `DIContainer.configure()` already ran in `init`; the city
-        // capabilities manifest is the remaining piece, and it is what the city rows render from.
+        // Stage 1: the coverage manifest the city rows render from. `DIContainer.configure()`
+        // already ran in `init`.
         appState.advanceLaunch(to: .loadingCities)
-        // Starts a fix so the map's opening centre-on-user has something to land on quickly.
-        // A no-op (and no permission prompt) when location has not been granted; the Map tab
-        // asks for that at the moment it can explain why.
+        // Starts a fix so the map's first centre-on-user lands quickly. A no-op, with no permission
+        // prompt, when location has not been granted.
         container.locationService.prewarmLocation()
         await Task.detached(priority: .userInitiated) {
             CityDataCoverage.prewarm()
         }.value
 
-        // Stage 2: decode the network the map is about to open on, so its geometry is already
-        // in memory instead of being paid for on first appearance. Which one that is comes from
-        // the camera the rider left behind, not from a city they were made to pick.
-        // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
-        // is a warmup, if it overruns, hand off and let it land in the actor's cache behind us.
+        // Stage 2: decode the network under the camera the rider left, so the map's geometry is
+        // already in memory. Bounded: a warmup that overruns lands in the actor's cache after the
+        // handoff.
         appState.advanceLaunch(to: .loadingMapData)
         if let camera = appState.lastMapCamera,
            let city = container.cityService.findNearestCity(
@@ -93,12 +85,8 @@ struct JustGoApp: App {
         // Essentials done: hand off.
         appState.advanceLaunch(to: .ready)
 
-        // Stage 3: runs after the handoff, so it never holds the first screen.
-        //
-        // The nationwide station index is 53 packs' worth of decoding and search is the only
-        // thing that needs it, several taps away; quick-tag repair touches a network decode and
-        // a city-pack load per tag. Neither blocks anything on screen, and they share nothing,
-        // so they run beside each other.
+        // Stage 3, after the handoff: the nationwide station index (only search needs it) and
+        // quick-tag repair. Independent, so they run side by side.
         async let quickTagRepair: Void = repairQuickTags()
         async let stationIndex: Void = warmStationIndex()
 

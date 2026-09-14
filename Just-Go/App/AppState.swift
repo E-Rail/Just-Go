@@ -55,12 +55,8 @@ final class AppState {
     private let accessibilityPreferenceKey = "accessibilityPreference"
     private let lastMapCameraKey = "lastMapCamera"
 
-    /// Where the map was last looking.
-    ///
-    /// This is what is left of "the selected city". The app used to hold one city as a mode.
-    /// Gating what was loaded, searched, drawn and routed, and every screen had to agree about
-    /// it. What a rider actually wants on relaunch is the view they left, so that is the only
-    /// thing kept: a camera, not a mode. Nothing is gated on it.
+    /// Where the map was last looking. The only thing restored on relaunch: a camera, not a city
+    /// mode, and nothing is gated on it.
     var lastMapCamera: MapCamera? {
         didSet { userDefaults.setCodable(lastMapCamera, forKey: lastMapCameraKey) }
     }
@@ -71,8 +67,8 @@ final class AppState {
         let spanDelta: Double
     }
 
-    /// Named rather than an Int, because the tags moved when the Route and Search tabs folded into
-    /// the map and a bare `selectedTab = 1` silently means something different afterwards.
+    /// Named rather than an Int, so a tag that moves cannot silently change what `selectedTab = 1`
+    /// means.
     enum Tab: Hashable {
         case map
         case trips
@@ -80,9 +76,7 @@ final class AppState {
     }
 
     #if DEBUG
-    // Lets a headless diagnostic launch open straight onto a given tab, since this environment has
-    // no way to inject a tap: confirmed, not assumed: this Xcode install ships no Simulator.app,
-    // so the device is booted headlessly and there is no GUI to click.
+    // Lets a headless diagnostic launch open on a given tab: this environment has no tap injection.
     var selectedTab: Tab = {
         switch ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] {
         case "profile": return .profile

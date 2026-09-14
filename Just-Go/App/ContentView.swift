@@ -1,23 +1,12 @@
 import SwiftUI
 import UIKit
 
-/// Puts the keyboard away when the rider taps anywhere outside the field they were typing in.
+/// Puts the keyboard away when the rider taps outside the field they were typing in. One recogniser
+/// on the window, so every screen with a text field inherits it.
 ///
-/// One recogniser on the window rather than a modifier repeated on every screen with a text
-/// field: the planner's From/To, the map and station search bars, the city picker and the
-/// save-trip sheet all inherit it, and a screen added later cannot forget it.
-///
-/// **The recogniser is disabled unless a keyboard is actually on screen.** The first version of
-/// this was always live, and Profile → Settings stopped opening: a tap on that row no longer
-/// reached the button. `cancelsTouchesInView = false` and simultaneous recognition are supposed to
-/// make a window recogniser harmless, and mostly they do, but "mostly" is not a property you want
-/// on the one object that sees every touch in the app. Keying it to the keyboard's own
-/// notifications means that on a screen with no text field it is not in the touch pipeline at all,
-/// so it cannot compete for a tap it would have nothing to do with anyway. It is live only in the
-/// window between the keyboard appearing and it going away, which is exactly its whole job.
-///
-/// `shouldReceive` is the second guard, for screens that *do* have a keyboard up: a tap that lands
-/// on a control is that control's, and this gesture declines it rather than racing for it.
+/// **Enabled only while a keyboard is on screen.** An always-live window recogniser competes for
+/// every touch in the app and can swallow a tap on a list row. `shouldReceive` is the second guard:
+/// a tap on a control belongs to that control.
 @MainActor
 final class KeyboardDismissGesture: NSObject, UIGestureRecognizerDelegate {
     static let shared = KeyboardDismissGesture()
@@ -101,22 +90,15 @@ final class KeyboardDismissGesture: NSObject, UIGestureRecognizerDelegate {
 struct ContentView: View {
     @Environment(AppState.self) private var appState
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
-    // Same key the old one-shot welcome card used, so existing users never see the tour
-    // uninvited; it stays replayable from Settings → App Tour.
+    // The key the tour has always been gated on; it stays replayable from Settings → App Tour.
     @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
     @State private var showTour = false
 
     var body: some View {
         @Bindable var appState = appState
-        // The map is still the app: planning a trip and searching for a place are things you do
-        // *to* somewhere on the map, not separate destinations to walk to, and both stay on the
-        // map's own navigation stack (see `MapRoute`). A rider looking at a place must never have
-        // to leave it, switch tabs and type its name back in.
-        //
-        // Trips is a third tab rather than a fourth row inside Profile because it is not a
-        // setting. Profile had become two unrelated things wearing one label — what the rider owns
-        // (their trips, their saved places, the answers they have given) and how the app behaves
-        // (appearance, language, accessibility, data) — and only the second of those is a profile.
+        // The map is the app: planning and searching happen on the map's own navigation stack (see
+        // `MapRoute`), so a rider looking at a place never has to switch tabs to route to it. Trips
+        // is its own tab because it is what the rider owns, not a setting.
         TabView(selection: $appState.selectedTab) {
             Tab(AppLocalization.localized("Map"), systemImage: "map.fill", value: AppState.Tab.map) {
                 MapContainerView()
@@ -132,8 +114,7 @@ struct ContentView: View {
                 ProfileView()
             }
         }
-        // On a phone this is the tab bar it has always been. On an iPad it becomes a sidebar, which
-        // is the one line that stops the app rendering as a phone screen stretched to 1024 points.
+        // A tab bar on a phone, a sidebar on an iPad.
         .tabViewStyle(.sidebarAdaptable)
         .tint(Color.adaptive(hex: selectedThemeHex))
         .onAppear {

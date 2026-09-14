@@ -7,9 +7,9 @@ extension UserDefaults {
             return try JSONDecoder().decode(type, from: data)
         } catch {
             AppLog.persistence.error("Failed to decode value for key \(key, privacy: .public): \(error)")
-            // Kept aside before anything can write over it. Every caller saves its in-memory value
-            // back under the same key, so returning the default and moving on turned one record
-            // this version cannot read into an empty history: all 300 trips, gone on the next save.
+            // Kept aside before anything can overwrite it: every caller saves its in-memory value
+            // back under the same key, so returning the default would turn one unreadable record
+            // into an empty history on the next save.
             let backupKey = "\(key).unreadable"
             if object(forKey: backupKey) == nil { set(data, forKey: backupKey) }
             return defaultValue

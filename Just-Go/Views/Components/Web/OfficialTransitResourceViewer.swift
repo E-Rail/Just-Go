@@ -422,9 +422,8 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
 
                 switch resource.format {
                 case .pdf:
-                    // Decoding a near-50MB PDF/image is real CPU work; keep it off the main
-                    // actor so it can't stall the UI, matching the pattern already used for
-                    // heavy decode work elsewhere in this codebase.
+                    // Decoding a PDF or image of up to ~50 MB is real CPU work, kept off the main
+                    // actor.
                     guard let document = await Task.detached(priority: .userInitiated, operation: {
                         PDFDocument(data: data)
                     }).value, document.pageCount > 0 else {
@@ -461,8 +460,7 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
         loadTask?.cancel()
         loadTask = nil
         isLoading = false
-        // Release the decoded binary immediately on dismiss instead of leaving a near-50MB
-        // PDF/image referenced until this object itself deallocates.
+        // Release the decoded binary on dismiss rather than when this object deallocates.
         pdfDocument = nil
         image = nil
     }
@@ -612,11 +610,9 @@ private final class OfficialTransitResourceWebState: ObservableObject {
     private var initialRequest: URLRequest?
     private var loadWatchdog: Task<Void, Never>?
 
-    /// Nothing else here has a time limit. WebKit reports a failed load through its delegate, but
-    /// a DNS lookup that never answers produces no delegate call at all. The operator hosts this
-    /// app links to are exactly the ones that do that on a restricted network, and the result was
-    /// a screen showing a spinner and nothing else, forever. Every load now ends one way or the
-    /// other within this window.
+    /// A hard limit on every load: WebKit reports failures through its delegate, but a DNS lookup
+    /// that never answers produces no call at all, and operator hosts on restricted networks do
+    /// exactly that.
     private static let loadTimeout: TimeInterval = 20
 
     func attach(_ webView: WKWebView, initialRequest: URLRequest) {
@@ -659,8 +655,7 @@ private final class OfficialTransitResourceWebState: ObservableObject {
             guard let self, !Task.isCancelled, self.isLoading else { return }
             self.webView?.stopLoading()
             self.isLoading = false
-            // Says what happened and leaves Reload and "Open in Safari" reachable, rather than
-            // implying the page is still on its way.
+            // Say what happened and keep Reload and "Open in Safari" reachable.
             self.errorMessage = AppLocalization.text(
                 english: "This official page did not respond. It may be unavailable on your network.",
                 simplified: "该官方页面没有响应，可能在当前网络下无法访问。",

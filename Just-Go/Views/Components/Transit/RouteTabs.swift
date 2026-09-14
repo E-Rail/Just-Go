@@ -3,9 +3,9 @@ import SwiftUI
 struct RouteTabs: View {
     let routes: [Route]
     @Binding var selection: UUID
-    /// Drawn over the map rather than on a page background. `Color.appSurface` and a 15% accent
-    /// tint are both partly transparent, which is fine against a solid page and unreadable against
-    /// moving cartography, so the floating form swaps in a material and an opaque selected fill.
+    /// Drawn over the map: `Color.appSurface` and a 15% accent tint are partly transparent and
+    /// unreadable over cartography, so the floating form uses a material and an opaque selected
+    /// fill.
     var floating = false
 
     var body: some View {
@@ -25,9 +25,8 @@ struct RouteTabs: View {
                                 .frame(height: 3)
                                 .clipShape(Capsule())
 
-                            // Only on the floating card, which is the one a rider compares
-                            // alternatives on. The inline row sits under a list that already
-                            // says this.
+                            // Only on the floating card, where a rider compares alternatives; the
+                            // inline row sits under a list that says it.
                             if floating {
                                 Text(route.formattedTransfers)
                                     .font(.caption2)
@@ -84,9 +83,8 @@ struct RouteTabs: View {
 }
 
 /// A capsule that is on or off: the results' sort order and the search page's station filters.
-///
-/// Tinted rather than filled when on. `Color.accentColor` is the theme lightened for *foreground*
-/// legibility in dark mode, and as a fill under white text it measured 2.6:1 where 4.5:1 is the floor.
+/// Tinted rather than filled when on: `Color.accentColor` is lightened for foreground use in dark
+/// mode, and as a fill under white text it measured 2.6:1.
 struct Chip: View {
     let title: String
     let icon: String

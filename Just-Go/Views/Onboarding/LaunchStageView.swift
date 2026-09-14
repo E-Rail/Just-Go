@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Shown instead of the tab UI while the essential launch stages run, so the wait reads as the
-/// app preparing itself rather than as a stall. The caption names the stage in progress, which
-/// is also how a slow launch on a real device gets attributed to a specific stage.
+/// Shown instead of the tab UI while the essential launch stages run, naming the stage in progress,
+/// so a wait reads as preparation and a slow launch is attributable to a stage.
 struct LaunchStageView: View {
     let stage: LaunchStage
     let progress: Double
@@ -10,7 +9,7 @@ struct LaunchStageView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
-    // Not a `Text("…")` literal on purpose: the app name is a wordmark, never translated, and
+    // Not a `Text("…")` literal: the wordmark is never translated, and
     // Scripts/validate_localizations.rb rejects bare English literals in `Text(...)`.
     private let wordmark = "Just-Go"
 
@@ -21,10 +20,7 @@ struct LaunchStageView: View {
     var body: some View {
         VStack(spacing: 22) {
             Text(wordmark)
-                // San Francisco, at the weight the system uses for a large title. The wordmark was
-                // set in New York (`design: .serif`), which is also an Apple face but reads as a
-                // reading typeface: the first thing the app shows should look like the platform
-                // it is part of, and every other screen is already SF.
+                // San Francisco at the system's large-title weight, like every other screen.
                 .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 52 : 44, weight: .semibold))
                 .foregroundStyle(themeColor)
                 .accessibilityHidden(true)
@@ -44,9 +40,8 @@ struct LaunchStageView: View {
         .background(Color.appBackground)
     }
 
-    /// Drawn rather than a `ProgressView(value:)` so the fill is exactly the theme colour at
-    /// exactly this weight: the system bar renders its own track styling and cannot be pinned
-    /// to a 3pt capsule.
+    /// Drawn rather than a `ProgressView(value:)`, whose track styling cannot be pinned to a 3 pt
+    /// capsule in the theme colour.
     private var progressBar: some View {
         GeometryReader { geometry in
             let width = geometry.size.width

@@ -2,8 +2,8 @@ import SwiftUI
 import UIKit
 
 struct AccessibilitySettingsView: View {
-    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
-    /// in a column, so a Done button there is a control that looks live and does nothing.
+    /// False in a detail column, where `dismiss()` has nothing to dismiss and a Done button would
+    /// do nothing.
     var showsDoneButton = true
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
@@ -64,12 +64,9 @@ struct AccessibilitySettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Moved here from Settings, where it was a one-toggle section under its own "Getting
-            // around" header. It answers the same question as the slider directly above it — how
-            // the rider covers a first or last mile too long to walk — so it belongs beside it
-            // rather than on a different screen. The distance ladder that picks walking, cycling
-            // or driving is unchanged; this only says which kind of bike the cycling answer means,
-            // and it changes both the route drawn and the time quoted.
+            // Beside the walking-distance slider, which answers the same question: how the rider
+            // covers a first or last mile too long to walk. This says which kind of bike the
+            // cycling answer means, changing both the route drawn and the time quoted.
             Toggle(
                 AppLocalization.text(
                     english: "I ride an electric bike",
@@ -81,8 +78,7 @@ struct AccessibilitySettingsView: View {
         } header: {
             Text(AppLocalization.localized("Mobility"))
         } footer: {
-            // Scoped deliberately. This footer sits under the whole section but describes only
-            // the two rows above it; the wheelchair, lift and stairs toggles say what they do.
+            // This footer describes only the two rows above it; the other toggles say what they do.
             Text(AppLocalization.text(
                 english: "Walking distance and bike type apply to getting to and from the station.",
                 simplified: "步行距离和车辆类型用于往返车站的接驳路段。",
@@ -91,10 +87,9 @@ struct AccessibilitySettingsView: View {
         }
     }
 
-    // VoiceOver / high contrast / large text / LED flash are SYSTEM features: an app
-    // cannot toggle them (and there is no public deep-link to Settings > Accessibility),
-    // so these rows show the real state where readable and the exact Settings path.
-    // Honest guidance instead of switches that silently do nothing.
+    // VoiceOver, high contrast, large text and LED flash are system features an app cannot toggle
+    // (and there is no public deep link to Settings > Accessibility), so these rows show the real
+    // state where readable and the exact Settings path.
     private var visionSection: some View {
         Section {
             systemFeatureRow(
@@ -164,10 +159,6 @@ struct AccessibilitySettingsView: View {
 
     private var cognitiveSection: some View {
         Section {
-            // "Simplified UI" used to sit here. Nothing in the app ever read `simplifiedUI`. No
-            // view hid anything, so a rider with a cognitive-accessibility need flipped a switch
-            // that did nothing, on the one screen that exists to serve them. A control that lies
-            // is worse than a control that is absent.
             Toggle(AppLocalization.localized("Step-by-Step Guidance"), isOn: preferenceBinding(\.stepByStepGuidance))
         } header: {
             Text(AppLocalization.localized("Cognitive"))

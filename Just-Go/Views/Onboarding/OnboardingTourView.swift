@@ -7,17 +7,15 @@ struct OnboardingTourView: View {
     let onFinish: () -> Void
     @State private var pageIndex = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    // Raw theme hex for the Continue/Get Started button's solid fill. See
-    // RouteEntryView's identical declaration for why `Color.accentColor`
-    // (dark-mode-lightened for foreground use) isn't used as a fill under white text.
+    // Raw theme hex for the button's solid fill: `Color.accentColor` is lightened for foreground
+    // use in dark mode and loses contrast under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
     private struct TourPage {
         let icon: String
         let title: String
         let points: [(icon: String, text: String)]
-        /// The last page offers the colour choice. Once, here, at the moment it means something.
-        /// The alternative is a preference the rider only discovers by going looking in Settings.
+        /// The last page offers the colour choice, at the moment it means something.
         var showsThemePicker = false
     }
 
@@ -124,9 +122,8 @@ struct OnboardingTourView: View {
                         .tag(index)
                 }
             }
-            // Dots off, drawn below instead. As an overlay they float *over* the page's content,
-            // so at accessibility text sizes a line of copy scrolled underneath them and the dots
-            // sat on top of the words. Content and chrome do not share space here.
+            // Page dots drawn below the page, not over it, so at accessibility sizes they never sit
+            // on the copy.
             .tabViewStyle(.page(indexDisplayMode: .never))
 
             HStack(spacing: 7) {
@@ -162,15 +159,8 @@ struct OnboardingTourView: View {
         .background(Color.appBackground)
     }
 
-    /// Scrolls, because it has to.
-    ///
-    /// This page had no `ScrollView` and no Dynamic Type handling at all, with bullets over 150
-    /// characters, so at accessibility text sizes the first screen a new rider ever sees simply
-    /// clipped, and the people most likely to be running those sizes are the ones this app is for.
-    /// `LaunchStageView`, in this same folder, has adapted to `dynamicTypeSize` all along.
-    ///
-    /// Only the content scrolls: the page dots and the Continue button live outside this view, so
-    /// the way forward can never be the thing that scrolled off the bottom.
+    /// Scrolls: at accessibility text sizes the tour's longer bullets do not fit. Only the content
+    /// scrolls; the dots and the Continue button stay outside it.
     private func tourPageView(_ page: TourPage) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {

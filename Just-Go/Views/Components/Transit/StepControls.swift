@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// The Back / Next pair at the foot of the step-by-step guidance screens (Live Go and the
-/// indoor navigator). Stacks vertically at accessibility text sizes, where two full-width
-/// buttons side by side stop fitting.
+/// The Back / Next pair at the foot of guidance. Stacks vertically at accessibility sizes, where
+/// two full-width buttons side by side stop fitting.
 struct StepControlPair<Back: View, Next: View>: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ViewBuilder var back: Back
@@ -40,9 +39,8 @@ struct StepSecondaryButtonLabel: View {
 struct StepPrimaryButtonLabel: View {
     let title: String
     let systemImage: String
-    /// Raw hex, not `themeColor`: this is a solid fill under white text, and
-    /// `Color.adaptive` lightens toward white in dark mode specifically for *foreground*
-    /// legibility: used as a fill it collapses contrast instead.
+    /// Raw hex, not `themeColor`: a solid fill under white text, which `Color.adaptive` would
+    /// lighten in dark mode.
     let fillHex: String
 
     var body: some View {
@@ -54,11 +52,8 @@ struct StepPrimaryButtonLabel: View {
     }
 }
 
-/// An `HStack` that becomes a `VStack` when the rider's text size makes two columns untenable.
-///
-/// Extracted because a second copy of this decision was about to be written for the route card.
-/// `StepControlPair` below is its first caller and the reason it exists: two buttons squeezed
-/// side by side at accessibility sizes are two buttons nobody can read.
+/// An `HStack` that becomes a `VStack` when the rider's text size makes two columns unreadable;
+/// used by `StepControlPair` and the route card.
 struct AdaptiveStack<Content: View>: View {
     let isVertical: Bool
     var spacing: CGFloat

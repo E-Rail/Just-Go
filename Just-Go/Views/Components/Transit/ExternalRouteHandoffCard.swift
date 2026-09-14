@@ -1,20 +1,12 @@
 import CoreLocation
 import SwiftUI
 
-/// The whole content of a bike or car leg: an invitation to finish it somewhere better.
+/// The content of a bike or car leg: the apps that route it properly. Just-Go does no live road
+/// navigation (a cycling leg without a key is the re-timed pedestrian route; a driving leg is
+/// MapKit's road route with no traffic or parking), so on these legs that app is the answer.
 ///
-/// Just-Go does not do live road navigation and will not pretend to. A cycling leg here is the
-/// pedestrian route re-timed, and a driving leg is MapKit's road route with no traffic, no
-/// restrictions and no parking — so on those legs an app that routes them properly is not a
-/// footnote under a line this app drew. It *is* the answer, and it is presented as one.
-///
-/// Worded as an upgrade rather than an apology. "Just-Go can't guide you" tells the rider they
-/// picked the wrong app; naming what will do it better is the same fact pointed forwards.
-///
-/// The destinations are **stacked**, one full-width row each, rather than crammed onto a single
-/// line: each row is then a real target for a thumb, and the group reads as a choice rather than a
-/// toolbar. Only installed apps appear — `destinations(for:)` drops the rest, so nothing here
-/// offers a rider an app they do not have.
+/// Worded as an upgrade, not an apology. One full-width row per installed app, so each is a real
+/// thumb target; `destinations(for:)` drops apps that are not installed.
 struct ExternalRouteHandoffCard: View {
     let mode: AccessLegMode
     let origin: CLLocationCoordinate2D
@@ -38,8 +30,8 @@ struct ExternalRouteHandoffCard: View {
                     ))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    // Wraps rather than truncating: at an accessibility text size this sentence is
-                    // several lines, and it is the line that explains why the buttons are there.
+                    // Wraps rather than truncating: at accessibility sizes this sentence explains
+                    // why the buttons are there.
                     .fixedSize(horizontal: false, vertical: true)
                 }
 

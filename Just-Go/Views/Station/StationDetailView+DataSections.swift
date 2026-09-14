@@ -10,9 +10,8 @@ struct OfficialStationExitStreet: Identifiable {
 }
 
 extension StationDetailView {
-    /// The categories the loaded snapshot actually has data for, so a lines-only source
-    /// (Guangzhou) shows just its trains with no empty Exits/Facilities tabs, and the segmented
-    /// control appears only when there is more than one thing to switch between.
+    /// The categories the loaded snapshot has data for, so a lines-only source (Guangzhou) has no
+    /// empty tabs, and the control appears only with more than one thing to switch between.
     private var officialInformationCategories: [OfficialStationInformationCategory] {
         guard let snapshot = viewModel?.officialStationInformation else { return [] }
         var categories: [OfficialStationInformationCategory] = []
@@ -233,11 +232,10 @@ extension StationDetailView {
                 }
             }
         } else {
-            // One block per line holding every direction it serves, rather than a flat list that
-            // repeated the line name and its colour on each direction.
+            // One block per line holding every direction it serves.
             VStack(alignment: .leading, spacing: 0) {
-                // Hangzhou's payload is headed 工作日时刻表 and these are weekday times. Shown
-                // unlabelled every Saturday and Sunday until now.
+                // Hangzhou's payload is headed 工作日时刻表: these are weekday times, and the caveat says
+                // so on other days.
                 if let caveat = serviceDayCaveat(
                     viewModel?.officialStationInformation?.serviceDayNote,
                     on: Date()
@@ -263,12 +261,11 @@ extension StationDetailView {
                             let serviceLabels = distinguishedServiceLabels(line.services)
                             ForEach(Array(line.services.enumerated()), id: \.element.id) { serviceIndex, service in
                                 VStack(alignment: .leading, spacing: 5) {
-                                    // The terminus where it differs from the direction marker: at
-                                    // 国贸 all three northbound 10号线 services read 双井 and end at
-                                    // 车道沟, 成寿寺 and 巴沟, hours apart. And on a ring the terminus
-                                    // alone repeats — both ways round 2号线 end at 积水潭 — so a
-                                    // repeated label falls back to naming the next station along.
-                                    // Same rule as the route sheet, which renders the same fact.
+                                    // The terminus where it differs from the direction marker (at
+                                    // 国贸 the three northbound 10号线 services read 双井 and end at 车道沟,
+                                    // 成寿寺 and 巴沟). On a ring the terminus repeats (both ways round
+                                    // 2号线 end at 积水潭), so a repeated label names the next station
+                                    // instead. Same rule as the route sheet.
                                     let label = serviceLabels[serviceIndex] ?? service.direction
                                     Text(AppLocalization.text(
                                         english: "Toward \(label)",
@@ -322,16 +319,14 @@ extension StationDetailView {
         }
     }
 
-    /// Exits keyed by the street each one opens onto. Operators publish exits as a number plus
-    /// the roads it reaches ("1, 西藏南路 复兴东路") and nothing positional, so this inverts that
-    /// same text into "which exit do I take for this street" without inventing any geometry. An
-    /// exit reaching two streets is listed under both, which is what its own record says.
+    /// Exits keyed by the street each opens onto. Operators publish an exit as a number plus the
+    /// roads it reaches ("1, 西藏南路 复兴东路") and nothing positional, so this inverts that text without
+    /// inventing geometry; an exit reaching two streets is listed under both.
     private func officialExitsByStreet(
         _ exits: [OfficialStationExitInformation]
     ) -> [OfficialStationExitStreet] {
-        // Beijing and Shanghai list the roads an exit reaches, one per element. Hong Kong's
-        // details are descriptive phrases ("Lift access"), which are not places to group by, so
-        // it keeps the plain list.
+        // Beijing and Shanghai list the roads an exit reaches; Hong Kong's details are descriptive
+        // phrases ("Lift access"), not places, so it keeps the plain list.
         guard viewModel?.officialStationInformation?.source != .hongKongGovernment else { return [] }
         var order: [String] = []
         var grouped: [String: [OfficialStationExitInformation]] = [:]
@@ -396,9 +391,8 @@ extension StationDetailView {
         }
     }
 
-    /// Entrances the bundled pack gives a real position for. Only Taipei publishes these today;
-    /// Beijing, Shanghai, Guangzhou and Hong Kong give street text and nothing positional, so
-    /// there is nothing to place and the street grouping is the only honest form for them.
+    /// Entrances the bundled pack gives a real position for; only Taipei publishes these today.
+    /// Street text is the only honest form for the others.
     private var mappableAccessPoints: [StationAccessPoint] {
         (viewModel?.accessPoints ?? []).filter { $0.coordinate != nil }
     }
@@ -407,10 +401,8 @@ extension StationDetailView {
         CodableCoordinate(latitude: displayedStation.latitude, longitude: displayedStation.longitude)
     }
 
-    /// Just the part of an entrance name that tells exits apart. Packs name them in full
-    /// ("民權西路站出口1"), which at pin size is a row of identical overlapping labels, on the map
-    /// the station is already the centre pin, so only the number carries information. The full
-    /// name stays in the accessibility label and in the list below.
+    /// The part of an entrance name that tells exits apart: full names ("民權西路站出口1") at pin size are
+    /// identical overlapping labels. The full name stays in the accessibility label and the list.
     private func shortAccessPointLabel(_ point: StationAccessPoint) -> String {
         var label = point.name
         for stationName in [displayedStation.name, displayedStation.nameEn].compactMap({ $0 }) {
@@ -423,8 +415,7 @@ extension StationDetailView {
         return label.isEmpty ? point.name : label
     }
 
-    /// The station and its entrances at their published coordinates. Read-only: it orients the
-    /// rider, and the full-screen map is a tab away.
+    /// The station and its entrances at their published coordinates, to orient the rider.
     private func stationAccessPointMap(_ points: [StationAccessPoint]) -> some View {
         let station = displayedStation
         let center = CLLocationCoordinate2D(
@@ -439,9 +430,8 @@ extension StationDetailView {
                     longitudinalMeters: 420
                 )
             ),
-            // Pan and zoom were disabled to stop the map swallowing the enclosing ScrollView's
-            // drag. Inside its own tab that conflict is gone, and a station map you cannot move
-            // is a picture: the entrance you want is routinely just outside a 420 m box.
+            // Pan and zoom enabled: inside its own tab there is no scroll view to compete with, and
+            // the entrance a rider wants is often just outside the initial box.
             interactionModes: [.pan, .zoom]
         ) {
             Annotation(station.localizedName, coordinate: center) {
@@ -477,10 +467,9 @@ extension StationDetailView {
         ))
     }
 
-    /// A named entrance wears its letter; one OpenStreetMap surveyed without a name is a plain dot,
-    /// because four doors on the west side would otherwise all read "West" and tell a rider
-    /// nothing. Where the door is on the map is the whole point for those, and the direction is
-    /// still spoken to VoiceOver and printed in the list summary below.
+    /// A named entrance wears its letter; one surveyed without a name is a plain dot, since four
+    /// west-side doors reading "West" tell a rider nothing. The direction is still spoken to
+    /// VoiceOver and printed in the list.
     @ViewBuilder
     private func accessPointMarker(_ point: StationAccessPoint) -> some View {
         let spokenName = point.displayName(relativeTo: stationCoordinate)
@@ -516,9 +505,8 @@ extension StationDetailView {
     }
 
     private func officialExitChip(_ exit: OfficialStationExitInformation) -> some View {
-        // `isAccessible` here is already a `Bool?` — three states — and this collapsed it with
-        // `== true`, so Shanghai's `w_n.png`, the only genuinely surveyed per-exit negative in any
-        // live source, rendered exactly like an exit nobody had checked.
+        // `isAccessible` has three states; `== true` here marks only surveyed step-free exits, and
+        // Shanghai's surveyed negatives are rendered from the same value below.
         let isAccessible = exit.isAccessible == true
         let surveyedUnusable = exit.isAccessible == false
         return HStack(spacing: 4) {
@@ -683,9 +671,8 @@ extension StationDetailView {
         case .notOpenForPassengerService, .noCurrentPassengerService:
             return .unavailable
         case nil:
-            // A loaded live snapshot is itself official data. The reviewed-resource record only
-            // covers the operator's *page*, and Shanghai/Guangzhou stations carry no review row,
-            // so without this the chip read "No data" directly above verified first/last times.
+            // A loaded live snapshot is official data in itself; the reviewed-resource record
+            // covers only the operator's page, and Shanghai and Guangzhou have none.
             return viewModel?.officialStationInformation == nil ? .unknown : .official
         }
     }
@@ -733,15 +720,13 @@ extension StationDetailView {
             viewModel?.officialStationInformation?.exits.isEmpty == false
     }
 
-    /// Whether `stationGuideSection` would draw anything, which is also what decides whether the
-    /// Map tab is offered. One property, so the tab and its content cannot disagree. It stays true
-    /// while the pack is loading: the tab should appear with a spinner rather than pop in late.
+    /// Whether `stationGuideSection` would draw anything, which also decides whether the Map tab is
+    /// offered. True while the pack loads, so the tab appears with a spinner rather than late.
     var hasStationGuideContent: Bool {
         viewModel?.isLoadingCityPack == true || !(viewModel?.accessPoints ?? []).isEmpty
     }
 
-    /// "Station Guide": the specific entrance/exit guidance riders ask for, labeled with a
-    /// confidence chip.
+    /// "Station Guide": the specific entrance and exit guidance, labelled with a confidence chip.
     @ViewBuilder
     var stationGuideSection: some View {
         let exits = viewModel?.accessPoints ?? []
@@ -762,17 +747,16 @@ extension StationDetailView {
                             .font(.subheadline)
                             .fontWeight(.medium)
 
-                        // Drawn only where the pack publishes real entrance coordinates, so the
-                        // pins are surveyed positions rather than a guess.
+                        // Only where the pack publishes real entrance coordinates, so pins are
+                        // surveyed positions.
                         let mappable = mappableAccessPoints
                         if !mappable.isEmpty {
                             stationAccessPointMap(mappable)
                         }
 
-                        // The official online surface lists this station's *named* exits already,
-                        // with the streets each one reaches. Richer than a bare name. Repeating
-                        // those would print the same list twice on one screen. It never covers the
-                        // unlabeled entrances, so those stay either way.
+                        // The official online surface already lists this station's named exits with
+                        // their streets, so only the unlabeled entrances, which it never covers,
+                        // are listed here as well.
                         let listed = officialSurfaceListsExits ? exits.filter(\.isUnlabeled) : exits
                         ForEach(listed.presentationGroups(relativeTo: stationCoordinate)) { group in
                             StationAccessPointRow(group: group)

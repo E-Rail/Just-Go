@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// The station sheet's top-level sections. Everything used to stack in one column. Ten cards, two
-/// of them tall, so reaching the entrance map meant scrolling past the whole page. These group the
-/// same content by the question a rider arrived with, and only the tabs that have something to show
-/// are offered.
+/// The station sheet's sections, grouped by the question a rider arrived with. Only tabs with
+/// something to show are offered.
 enum StationDetailTab: String, CaseIterable, Identifiable {
     case trains
     case map
@@ -33,20 +31,13 @@ enum StationDetailTab: String, CaseIterable, Identifiable {
 
 struct StationDetailView: View {
     let station: Station
-    /// False only when this screen is a destination on the map's own navigation stack: there,
-    /// "Route here" is a *replacement* of this screen by the entry page, and the map performs
-    /// both halves in a single write to its path. Popping ourselves as well would make that two
-    /// stack mutations in one update, which is what rendered a blank pushed screen on iOS 18.
-    /// Everywhere else this view is presented in a sheet, where dismissing is the sheet's own
-    /// business and touches no navigation path.
+    /// False only on the map's own navigation stack, where "Route here" replaces this screen with
+    /// the results in one write to the path. Popping as well would make two stack mutations in one
+    /// update, which renders a blank pushed screen. In a sheet, dismissing touches no path.
     var dismissesOnRouteSelection = true
-    /// How to open one of this station's lines, supplied by whoever is hosting this screen.
-    ///
-    /// Injected rather than pushed from here, because this view is hosted by three different
-    /// navigation stacks (the map's, the route detail's, and the Quick Tags sheet's) and
-    /// registering a destination on each of them is the pattern that shadowed a sheet and cost this
-    /// app its Settings screen. A host that cannot show a line simply passes nothing, and the rows
-    /// stay the plain labels they have always been.
+    /// How to open one of this station's lines, supplied by the host: this view lives on three
+    /// navigation stacks, and registering a destination on each shadows presentations. A host that
+    /// cannot show a line passes nothing, and the rows stay plain labels.
     var onSelectLine: ((SubwayLine) -> Void)?
     @Environment(DIContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
@@ -57,13 +48,12 @@ struct StationDetailView: View {
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
     @State var selectedTab: StationDetailTab = .trains
 
-    /// Tall, because the map is the whole point of the Map tab, but fixed. This shows one
-    /// station's doors; there is nothing further to reveal by making it taller, and a resize
-    /// handle on a card inside a scroll view is a gesture competing with the scroll for no gain.
+    /// Tall, because the map is the Map tab's point, but fixed: one station's doors need no more,
+    /// and a resize handle inside a scroll view competes with the scroll.
     static let entranceMapHeight: Double = 380
 
-    /// Only tabs with something behind them are offered. An empty tab is worse than no tab. The
-    /// station tab is always present: lines and the data-confidence chips do not depend on a pack.
+    /// Only tabs with something behind them. The station tab is always present: lines and the
+    /// data-confidence chips need no pack.
     var availableTabs: [StationDetailTab] {
         StationDetailTab.allCases.filter { tab in
             switch tab {
@@ -74,9 +64,8 @@ struct StationDetailView: View {
         }
     }
 
-    /// The tab to render: the picked one while it still has content, otherwise the first that does.
-    /// Content arrives asynchronously, so the selection has to survive a tab appearing or vanishing
-    /// under it: the entrance map in particular only exists once the city pack has loaded.
+    /// The tab to render: the picked one while it has content, else the first that does. Content
+    /// arrives asynchronously, so the selection must survive a tab appearing or vanishing.
     var effectiveTab: StationDetailTab {
         let tabs = availableTabs
         return tabs.contains(selectedTab) ? selectedTab : (tabs.first ?? .station)
@@ -89,8 +78,8 @@ struct StationDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Identity and the one action worth taking from here stay above the tabs: they are
-                // what every visit needs, whichever question brought the rider.
+                // Identity and the one action worth taking stay above the tabs: every visit needs
+                // them.
                 stationHeader
                 planRouteSection
 
@@ -119,8 +108,8 @@ struct StationDetailView: View {
                     }
                 case .map:
                     // Entrance geometry answers a different question from the operator's exit text
-                    //. The operator says which streets an exit reaches, the bundled OSM entrances
-                    // say where it physically is, so this sits outside the bundled-sections gate.
+                    // (where a door physically is, not which streets it reaches), so it sits
+                    // outside the bundled-sections gate.
                     stationGuideSection
                 case .station:
                     linesSection
@@ -152,10 +141,8 @@ struct StationDetailView: View {
             }
         }
         .task {
-            // Only once. `.task` runs again whenever this page reappears — coming back from a line
-            // page, for instance — and rebuilding here threw away everything already loaded, left
-            // the old view model's fetches running, and asked the operator for the same station
-            // again.
+            // Only once: `.task` runs again when this page reappears, and rebuilding would discard
+            // what loaded and fetch the same station again.
             guard viewModel == nil else { return }
             viewModel = container.makeStationDetailViewModel()
             viewModel?.loadStation(station)
@@ -189,11 +176,10 @@ struct StationDetailView: View {
     }
 
     var usesNativeStationInformationSurface: Bool {
-        // Hong Kong ships its station data in the bundle, so it is always native. Every other
-        // city is native exactly when the bundled Station Information directory routes the station
-        // to an online source: Beijing, Shanghai, Guangzhou, Hangzhou today, and any city added with
-        // no code change here. The directory is synchronous, so this is stable once the view model
-        // exists; before that, ask the directory directly to avoid a first-frame flash.
+        // Hong Kong ships its station data in the bundle, so it is always native. Elsewhere a
+        // station is native when the bundled Station Information directory routes it to an online
+        // source; the directory is synchronous, so asking it directly before the view model exists
+        // avoids a first-frame flash.
         if displayedStation.cityID == "8100" {
             return true
         }
@@ -203,14 +189,9 @@ struct StationDetailView: View {
         return container.stationInformationDirectory.onlineEntry(forStationID: displayedStation.id) != nil
     }
 
-    /// The bundled sections (schedules, accessibility, essentials, guide) return whenever
-    /// the native online surface has nothing to serve. The fetch failed and no snapshot is
-    /// cached, so a blocked or offline network still gets the offline official data instead
-    /// of only an error card.
-    /// Applies to every live-fetch city, not just Beijing: the directory lookup used to miss for
-    /// map-opened stations, so Shanghai and Guangzhou always fell into the non-native branch above
-    /// and kept their bundled sections by accident. Now that they reach the native surface too,
-    /// they need the same offline fallback Beijing had.
+    /// The bundled sections return whenever the native online surface has nothing to serve (the
+    /// fetch failed and nothing is cached), so an offline rider still gets the official data in the
+    /// bundle.
     var showsBundledStationSections: Bool {
         guard usesNativeStationInformationSurface else { return true }
         return viewModel?.officialStationInformation == nil &&
@@ -270,12 +251,10 @@ struct StationDetailView: View {
         let station = displayedStation
         return GlassCard {
             VStack(spacing: 12) {
-                // At accessibility text sizes a name and two chips cannot share one row: the
-                // chips get squeezed into single-character columns and the station name breaks
-                // mid-syllable. Stack them instead once the type is that large.
+                // At accessibility sizes a name and two chips cannot share a row, so they stack.
                 if dynamicTypeSize.isAccessibilitySize {
-                    // One chip per row, not two side by side: at this type size a pair still
-                    // squeezes the wider label into a four-line stack inside its own capsule.
+                    // One chip per row: at this size two side by side squeeze the wider label into
+                    // a tall stack.
                     VStack(alignment: .leading, spacing: 8) {
                         headerNames(station)
                         headerChips(station)
@@ -293,13 +272,9 @@ struct StationDetailView: View {
                     HStack {
                         Image(systemName: "figure.roll")
                             .foregroundStyle(.green)
-                        // Not "Fully Accessible Station". Nothing publishes that; it was inferred
-                        // from a lift and a ramp both being listed somewhere at this station,
-                        // which is not the same as a step-free way from the street to the
-                        // platform: the exact inference `validate_indoor_maps.rb` exists to
-                        // prevent elsewhere. The two facts are worth showing; the conclusion is
-                        // not ours to draw, least of all for the riders who cannot absorb it
-                        // being wrong.
+                        // Not "Fully Accessible Station": nothing publishes that, and a lift and a
+                        // ramp listed somewhere at a station are not a step-free route from street
+                        // to platform. The two facts are shown; the conclusion is not ours to draw.
                         Text(AppLocalization.text(
                             english: "Lift and step-free entrance listed",
                             simplified: "已列出电梯与无障碍入口",
@@ -332,8 +307,7 @@ struct StationDetailView: View {
 
     @ViewBuilder
     private func headerChips(_ station: Station) -> some View {
-        // Service status sits before the transfer chip: whether the station takes passengers at
-        // all outranks how you change trains there.
+        // Whether the station takes passengers outranks how you change trains there.
         if let serviceStatus = stationServiceStatusLabel {
             Label(serviceStatus.text, systemImage: serviceStatus.icon)
                 .font(.caption)
@@ -353,11 +327,8 @@ struct StationDetailView: View {
         }
     }
 
-    /// A station the network draws but riders cannot yet use. The reviewed operator state already
-    /// existed: it was only spelled out in prose far down the official-information section, so a
-    /// rider planning a trip to 福寿岭 had no way to see it was still a building site. The wording
-    /// lives on the status itself, so this header and the route planner's warning can never
-    /// disagree about what the same reviewed fact means.
+    /// A station the network draws but riders cannot use (福寿岭 is still a building site). The
+    /// wording lives on the status, so this header and the planner's warning cannot disagree.
     private var stationServiceStatusLabel: (text: String, icon: String)? {
         viewModel?.officialResourceReview?.stationInformationStatus?.serviceStatusLabel
     }
@@ -374,9 +345,8 @@ struct StationDetailView: View {
         })
     }
 
-    /// Renders nothing when the station carries no resolved lines, rather than a headed card with
-    /// an empty grid under it: a card that says only "Lines" costs a screenful of scrolling and
-    /// tells a rider nothing.
+    /// Nothing when the station has no resolved lines, rather than a headed card with an empty
+    /// grid.
     @ViewBuilder
     private var linesSection: some View {
         let station = displayedStation
@@ -436,20 +406,12 @@ struct StationDetailView: View {
 }
 
 
-/// The one route button shown on a station or place card. It records the place as the trip's
-/// *destination* and calls `onSelected` so the presenting card can dismiss itself; the map's
-/// navigation stack watches for that record and pushes the entry page.
+/// The route button on a station or place card: records the place as the trip's destination and
+/// calls `onSelected` so the card can dismiss; the map's stack pushes the results, with the start
+/// defaulted to where the rider is.
 ///
-/// This was a pair: "From here" and "To here", which asked the rider to answer a question they
-/// had not been asked yet. Standing in front of a place on a map, "route here" is what you mean
-/// essentially always; the entry page then opens with this end filled and the other end defaulted
-/// to where you are, and swapping them is one button away if that guess was wrong.
-///
-/// Colors use `Color.adaptive(hex: selectedThemeHex)` directly rather than the semantic
-/// `Color.accentColor`: the latter resolves from the environment `.tint`, which hasn't propagated
-/// on a freshly-presented sheet's first frame and momentarily flashes system blue. The adaptive
-/// color is a concrete dynamic color with no environment dependency, so it never flashes and still
-/// matches the app accent (and lifts for legibility in dark mode).
+/// Colours come from `Color.adaptive(hex:)` rather than `Color.accentColor`, which reads the
+/// environment `.tint` and flashes system blue on a new sheet's first frame.
 struct PlanRouteButtons: View {
     let place: TransitPlace
     var onSelected: () -> Void = {}
@@ -471,9 +433,8 @@ struct PlanRouteButtons: View {
             .fontWeight(.semibold)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            // Raw hex, not `themeColor`: this is a solid fill under white text, and
-            // `Color.adaptive` lightens toward white in dark mode specifically for
-            // *foreground* legibility: used as a fill it collapses contrast instead.
+            // Raw hex, not `themeColor`: a solid fill under white text, which `Color.adaptive`
+            // would lighten in dark mode.
             .background(Color(hex: selectedThemeHex), in: Capsule())
             .foregroundStyle(.white)
         }

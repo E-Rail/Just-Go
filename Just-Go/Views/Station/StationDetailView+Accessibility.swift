@@ -57,16 +57,10 @@ extension StationDetailView {
                         status: AccessibilityStatus(accessibility.wheelchairRampAvailability)
                     )
                 } else if !accessibility.accessibleEntrances.isEmpty {
-                    // An exit letter, under its own heading, claiming nothing.
-                    //
-                    // 484 of the 582 bundled accessibility records are OpenStreetMap entrance data:
-                    // hasElevator null, hasWheelchairRamp null, accessibleEntrances ["D"]. That was
-                    // rendered as "♿ Wheelchair Ramp / D" under a "Partial Accessibility — Some
-                    // accessibility features are verified" header, above a note saying the data was
-                    // not available. OSM says a door exists there. It does not say it is step-free,
-                    // and for the rider this section is written for, the difference between those
-                    // two is the difference between reaching the platform and being stranded at the
-                    // concourse. The letter is still worth showing; the wheelchair claim is not.
+                    // An exit letter under its own heading, claiming nothing. Most bundled
+                    // accessibility records are OpenStreetMap entrance data (`hasElevator` and
+                    // `hasWheelchairRamp` null, `accessibleEntrances ["D"]`): OSM says a door
+                    // exists, not that it is step-free.
                     accessibilityRow(
                         icon: "door.left.hand.open",
                         title: AppLocalization.text(
@@ -161,14 +155,9 @@ extension StationDetailView {
         }
     }
 
-    /// Where this station's accessibility data actually came from.
-    ///
-    /// The branches here were `dataSource == "beijing_official"` and `contains("official")`, and no
-    /// pack has ever shipped either. The only three values that exist are
-    /// `openstreetmap/subway-entrances` (366 stations), `data.taipei/taipei-metro-station-exits`
-    /// (118) and `data.gov.hk/mtr-barrier-free-facilities` (98) — none containing the substring
-    /// "official" — so every station fell through to "not available yet", including Hong Kong's
-    /// fully surveyed barrier-free records. Matched against the values that ship.
+    /// Where this station's accessibility data came from, matched against the source values the
+    /// packs ship: `openstreetmap/subway-entrances`, `data.taipei/taipei-metro-station-exits` and
+    /// `data.gov.hk/mtr-barrier-free-facilities`.
     private func accessibilitySourceNote(_ accessibility: StationAccessibility) -> some View {
         let source = accessibility.dataSource ?? ""
         let message: String

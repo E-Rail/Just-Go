@@ -1,15 +1,8 @@
 import SwiftUI
 
-/// The app's colour choice, as one horizontal row of swatches.
-///
-/// Extracted from `SettingsView` when onboarding gained the same control. One implementation for
-/// both on purpose: the station sheet and the transfer sheet each grew their own copy of an
-/// access-point row once, drifted, and shipped blank rows. A picker that disagrees with itself
-/// about which colour is selected is the same class of bug.
-///
-/// Writes `selectedThemeHex` directly rather than taking a binding: every screen that reads the
-/// theme reads that one `@AppStorage` key, so a binding would just be a second path to the same
-/// value and a chance for the two to disagree.
+/// The app's colour choice as one row of swatches, shared by Settings and onboarding so the two
+/// cannot disagree about the selection. Writes the `selectedThemeHex` key directly: every screen
+/// reads that one key.
 struct ThemePickerRow: View {
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
 
@@ -25,8 +18,8 @@ struct ThemePickerRow: View {
             .padding(.vertical, 10)
             .padding(.horizontal, 4)
         }
-        // Four swatches fit on the narrowest phone, so the row only scrolls if Dynamic Type makes
-        // the labels wide. Bouncing an already-fitting row reads as broken.
+        // Four swatches fit the narrowest phone, so the row scrolls only when Dynamic Type widens
+        // the labels.
         .scrollBounceBehavior(.basedOnSize)
     }
 
@@ -59,8 +52,7 @@ struct ThemePickerRow: View {
             }
         }
         .buttonStyle(.plain)
-        // The checkmark is the only thing distinguishing the selected swatch, and it is inside the
-        // fill where VoiceOver cannot see it.
+        // The checkmark is inside the fill, where VoiceOver cannot see it.
         .accessibilityLabel(theme.name)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }

@@ -11,8 +11,8 @@ private final class TransitDataState: ObservableObject {
 }
 
 struct TransitDataView: View {
-    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
-    /// in a column, so a Done button there is a control that looks live and does nothing.
+    /// False in a detail column, where `dismiss()` has nothing to dismiss and a Done button would
+    /// do nothing.
     var showsDoneButton = true
     @Environment(DIContainer.self) private var container
     @Environment(\.openURL) private var openURL
@@ -22,13 +22,9 @@ struct TransitDataView: View {
     /// Empty when no key is configured, which is a normal state.
     @State private var providerUsage: [BaiduEndpointDiagnostics] = []
 
-    /// Only the cities whose pack actually holds station data. 14 Of the 53, not all 53.
-    ///
-    /// Routing is untouched: every city keeps its bundled OSM network and stays searchable and
-    /// plannable. This page is about the *station* layer, and listing a city with an empty pack
-    /// put a download control in front of nothing. There are no remote packs at all, since none
-    /// of the `CityPack*URL` Info.plist keys is set. Advertising 39 packs that cannot arrive is
-    /// the same failure as claiming a transfer nobody surveyed.
+    /// Only the cities whose pack holds station data (14 of 53). Every city keeps its bundled
+    /// network for routing and search; this page is about the station layer, and listing an empty
+    /// pack would put a download control in front of nothing.
     private var cities: [City] {
         container.cityService.getAllCities().filter { city in
             (state.coverage[city.id] ?? city.dataCoverage).hasStationData
@@ -115,10 +111,9 @@ struct TransitDataView: View {
                         dataCapabilityRow(
                             icon: "clock.fill",
                             title: AppLocalization.localized("Train times"),
-                            // No bundled pack carries a timetable. Operator schedule content must
-                            // not be committed, so `schedules` is empty for all 2,849 stations.
-                            // First and last trains exist only as a device-side fetch, in the
-                            // cities that publish one.
+                            // No bundled pack carries a timetable: operator schedule content must
+                            // not be committed. First and last trains exist only as a device-side
+                            // fetch, in the cities that publish one.
                             detail: AppLocalization.text(
                                 english: "First and last trains fetched from the operator, in cities that publish them",
                                 simplified: "在公布数据的城市，首末班车信息从运营方获取",
@@ -149,7 +144,7 @@ struct TransitDataView: View {
                             url: URL(string: "https://data.gov.hk/en/terms-and-conditions")!
                         )
                         // The Open Government Data License requires naming the providing agency and
-                        // linking the licence; the grant is void without it, so this row is not optional.
+                        // linking the licence; the grant is void without it.
                         attributionLink(
                             title: "臺北大眾捷運股份有限公司 · data.taipei",
                             detail: AppLocalization.text(
@@ -187,9 +182,8 @@ struct TransitDataView: View {
                                 Spacer()
                                 cityPackControl(for: city)
                             }
-                            // Leads with the city's name but carries icon-and-text chips and a
-                            // badge-and-label control. Unguided, the separator started under
-                            // "Included", 340 pt across a 402 pt screen: a stub, not a rule.
+                            // The row leads with the city's name but carries icon-and-text chips;
+                            // unguided, its separator would start under a chip.
                             .listSeparatorAtRowLeading()
                             .swipeActions {
                                 if isDownloadedStatus(state.packStatus[city.id]),
@@ -335,8 +329,8 @@ struct TransitDataView: View {
         state.didLoadOfficialResources = true
         let statuses = await statusLoad
         let coverage = await coverageLoad
-        // Merge per city, skipping any the user operated on while this snapshot was in
-        // flight (completed ops wrote fresher statuses; in-flight ones will).
+        // Merge per city, skipping any the rider operated on while this snapshot was in flight:
+        // completed operations wrote fresher statuses, and in-flight ones will.
         var updatedStatuses = state.packStatus
         for (cityID, status) in statuses
             where !state.opCompletedCityIDs.contains(cityID) &&
@@ -396,11 +390,8 @@ struct TransitDataView: View {
         .padding(.vertical, 3)
     }
 
-    /// A `Button` with `.buttonStyle(.plain)` rather than a `Link`, for the reason
-    /// `ProfileView.linkRow` records: a `Link` tints its entire label with the accent, and the
-    /// `.foregroundStyle(.primary)` / `.secondary` below are inert inside one. These three rows —
-    /// the licence-mandatory OpenStreetMap, DATA.GOV.HK and 臺北大眾捷運 attributions — rendered
-    /// fully accent-coloured beside ordinary rows in the same list.
+    /// A plain-styled `Button`, not a `Link`, for the reason in `ProfileView.linkRow`: these
+    /// licence-mandatory attributions must look like the rows around them.
     private func attributionLink(title: String, detail: String, url: URL) -> some View {
         Button {
             openURL(url)
@@ -494,7 +485,7 @@ struct OfficialResourcesDirectoryView: View {
                     .padding(.vertical, 3)
                 }
                 // A name over a row of icon-and-count badges: the city-pack row's shape, and the
-                // same separator fault.
+                // same separator guide.
                 .listSeparatorAtRowLeading()
             }
         }
@@ -611,9 +602,8 @@ private struct OfficialResourceCityView: View {
 
 struct CityCapabilityTags: View, Equatable {
     let coverage: CityDataCoverage
-    /// True for cities whose accessibility/facility facts are served live from the official
-    /// operator (Beijing): the bundled coverage metric honestly reads 0 there, but showing
-    /// "0" would contradict the online facilities every station page renders.
+    /// True where accessibility and facility facts come live from the operator (Beijing): the
+    /// bundled metric reads 0 there, which would contradict every station page.
     var hasOfficialOnlineStationInformation: Bool = false
 
     private struct Tag: Identifiable {

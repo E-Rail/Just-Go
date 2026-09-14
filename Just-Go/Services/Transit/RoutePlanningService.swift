@@ -744,16 +744,7 @@ final class RoutePlanningService {
                     Self.exitNamesMatch($0.name, point.name)
                 }) else { return point }
                 matchedOfficialNames.insert(exit.name)
-                return StationAccessPoint(
-                    id: point.id,
-                    name: exit.name,
-                    kind: point.kind,
-                    coordinate: point.coordinate,
-                    isAccessible: exit.isAccessible ?? point.isAccessible,
-                    notes: (point.notes + exit.details).uniqued(),
-                    source: point.source,
-                    confidence: .official
-                )
+                return Self.surveyed(point, namedBy: exit)
             }
             // One door, one exit: the operator says this station has exactly one exit and exactly
             // one was surveyed, so they are the same door and it is called what the sign says. Any
@@ -765,17 +756,7 @@ final class RoutePlanningService {
             let unmatched = snapshot.exits.filter { !matchedOfficialNames.contains($0.name) && !$0.name.isEmpty }
             if unnamed.count == 1, unmatched.count == 1, let exit = unmatched.first, let slot = unnamed.first {
                 matchedOfficialNames.insert(exit.name)
-                let point = slot.element
-                bound[slot.offset] = StationAccessPoint(
-                    id: point.id,
-                    name: exit.name,
-                    kind: point.kind,
-                    coordinate: point.coordinate,
-                    isAccessible: exit.isAccessible ?? point.isAccessible,
-                    notes: (point.notes + exit.details).uniqued(),
-                    source: point.source,
-                    confidence: .official
-                )
+                bound[slot.offset] = Self.surveyed(slot.element, namedBy: exit)
             }
             let unsurveyed = snapshot.exits
                 .filter { !matchedOfficialNames.contains($0.name) && !$0.name.isEmpty }
@@ -797,6 +778,21 @@ final class RoutePlanningService {
             )
         }
         return merged
+    }
+
+    /// A surveyed door, called what the operator's sign says: the survey keeps the coordinate, the
+    /// operator supplies the name and details, and the point becomes official.
+    private static func surveyed(_ point: StationAccessPoint, namedBy exit: OfficialStationExitInformation) -> StationAccessPoint {
+        StationAccessPoint(
+            id: point.id,
+            name: exit.name,
+            kind: point.kind,
+            coordinate: point.coordinate,
+            isAccessible: exit.isAccessible ?? point.isAccessible,
+            notes: (point.notes + exit.details).uniqued(),
+            source: point.source,
+            confidence: .official
+        )
     }
 
     /// Exit names match when they name the same sign. Compared case- and whitespace-insensitively
@@ -827,7 +823,26 @@ final class RoutePlanningService {
             return nil
         }
 
-        return Route(
+        return Self.singleLegRoute(
+            segment,
+            from: origin,
+            to: destination,
+            walkingDistance: segment.distance,
+            stepFreeAssessment: segment.walkingDirections?.contains(where: \.hasStairs) == true ? .barrierDetected : .unknown
+        )
+    }
+
+    /// A journey that is one access leg and nothing else: no station, so no IDs and no
+    /// `networkCityID`, which every reader already handles. `.fastest`, because when it is offered it
+    /// is the fastest option.
+    private static func singleLegRoute(
+        _ segment: RouteSegment,
+        from origin: TransitPlace,
+        to destination: TransitPlace,
+        walkingDistance: Double,
+        stepFreeAssessment: RouteStepFreeAssessment
+    ) -> Route {
+        Route(
             id: UUID(),
             origin: origin.name,
             destination: destination.name,
@@ -836,13 +851,11 @@ final class RoutePlanningService {
             strategy: .fastest,
             segments: [segment],
             totalDuration: segment.duration,
-            walkingDistance: segment.distance,
+            walkingDistance: walkingDistance,
             totalStops: 0,
             transferCount: 0,
             isFullyAccessible: false,
-            stepFreeAssessment: segment.walkingDirections?.contains(where: \.hasStairs) == true
-                ? .barrierDetected
-                : .unknown,
+            stepFreeAssessment: stepFreeAssessment,
             warnings: [],
             accessGuidance: [],
             dataCoverage: .unknown
@@ -872,26 +885,8 @@ final class RoutePlanningService {
             return nil
         }
 
-        return Route(
-            id: UUID(),
-            origin: origin.name,
-            destination: destination.name,
-            originStationID: "",
-            destinationStationID: "",
-            strategy: .fastest,
-            segments: [segment],
-            totalDuration: segment.duration,
-            // Not one metre of this is walked, and `walkingDistance` is what the card prints as
-            // "N m walk". `SegmentType.isOnFoot` draws the same line for the same reason.
-            walkingDistance: 0,
-            totalStops: 0,
-            transferCount: 0,
-            isFullyAccessible: false,
-            stepFreeAssessment: .unknown,
-            warnings: [],
-            accessGuidance: [],
-            dataCoverage: .unknown
-        )
+        // Not one metre of this is walked, and `walkingDistance` is what the card prints as "N m walk".
+        return Self.singleLegRoute(segment, from: origin, to: destination, walkingDistance: 0, stepFreeAssessment: .unknown)
     }
 
     /// Adds the drive only where it answers something the trains do not.

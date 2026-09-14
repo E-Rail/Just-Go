@@ -750,19 +750,6 @@ struct MapContainerView: View {
         planTask = Task { _ = await planner.searchRoutes() }
     }
 
-    private var staleRouteNotice: some View {
-        ContentUnavailableView {
-            Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
-        } description: {
-            Text(AppLocalization.text(
-                english: "This search is no longer current. Go back and search again.",
-                simplified: "此次搜索已失效，请返回重新搜索。",
-                traditional: "此次搜尋已失效，請返回重新搜尋。"
-            ))
-        }
-        .background(Color.appBackground)
-    }
-
     @ViewBuilder
     private func destination(for route: MapRoute) -> some View {
         switch route {
@@ -812,7 +799,8 @@ struct MapContainerView: View {
             } else {
                 // The routes were cleared while this was pushed. Say so. A screen that
                 // explains itself beats a screen that is simply empty.
-                staleRouteNotice
+                StaleRoutesNotice()
+                    .background(Color.appBackground)
             }
         case .station(let stationID):
             if let station = openedStations[stationID] {

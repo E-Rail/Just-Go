@@ -161,7 +161,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     }
 
     private static func prepare(_ request: RealtimeArrivalRequest) throws -> PreparedRequest {
-        let stationID = trimmed(request.stationID)
+        let stationID = OperatorFieldParsing.trimmed(request.stationID)
         guard let stationID else {
             throw RealtimeArrivalProviderError.invalidRequest("stationID is empty")
         }
@@ -179,7 +179,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
             reference = .hongKongHeavyRail(lineCode: lineCode, stationCode: stationCode)
             endpoint = .heavyRail
         case .hongKongLightRail(let officialStationID):
-            guard let officialStationID = trimmed(officialStationID) else {
+            guard let officialStationID = OperatorFieldParsing.trimmed(officialStationID) else {
                 throw RealtimeArrivalProviderError.invalidRequest(
                     "Light Rail station_id is required"
                 )
@@ -188,17 +188,17 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
             endpoint = .lightRail
         }
 
-        guard let lineName = trimmed(request.lineName.localized) else {
+        guard let lineName = OperatorFieldParsing.trimmed(request.lineName.localized) else {
             throw RealtimeArrivalProviderError.invalidRequest("line name is empty")
         }
-        guard let lineColorHex = trimmed(request.lineColorHex) else {
+        guard let lineColorHex = OperatorFieldParsing.trimmed(request.lineColorHex) else {
             throw RealtimeArrivalProviderError.invalidRequest("line color is empty")
         }
 
         var destinationNamesByCode: [String: String] = [:]
         for (rawCode, name) in request.destinationNamesByCode {
             guard let code = normalizedCode(rawCode),
-                  let localizedName = trimmed(name.localized) else { continue }
+                  let localizedName = OperatorFieldParsing.trimmed(name.localized) else { continue }
             destinationNamesByCode[code] = destinationNamesByCode[code] ?? localizedName
         }
         var destinations: [DestinationKey] = destinationNamesByCode.map {
@@ -324,7 +324,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     ) throws -> [RealTimeArrival] {
         let payload = try JSONDecoder().decode(HeavyRailPayload.self, from: data)
         guard payload.status.value == 1 else {
-            throw RealtimeArrivalProviderError.serviceUnavailable(trimmed(payload.message))
+            throw RealtimeArrivalProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.message))
         }
         guard let schedules = payload.data else {
             throw RealtimeArrivalProviderError.contractViolation("heavy rail data is missing")
@@ -346,7 +346,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         var arrivals: [RealTimeArrival] = []
         for (direction, trains) in directions {
             for train in trains {
-                if let valid = trimmed(train.valid?.value), valid.uppercased() != "Y" {
+                if let valid = OperatorFieldParsing.trimmed(train.valid?.value), valid.uppercased() != "Y" {
                     continue
                 }
                 guard let destinationCode = normalizedCode(train.destination.value) else {
@@ -374,7 +374,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     ) throws -> [RealTimeArrival] {
         let payload = try JSONDecoder().decode(LightRailPayload.self, from: data)
         guard payload.status.value == 1 else {
-            throw RealtimeArrivalProviderError.serviceUnavailable(trimmed(payload.message))
+            throw RealtimeArrivalProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.message))
         }
         guard let platforms = payload.platformList else {
             throw RealtimeArrivalProviderError.contractViolation("Light Rail platform_list is missing")
@@ -410,9 +410,9 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
                     }
                     let serviceName: String
                     if route.special.value == 1 {
-                        serviceName = trimmed(route.additionalInfo1?.value) ?? request.lineName
+                        serviceName = OperatorFieldParsing.trimmed(route.additionalInfo1?.value) ?? request.lineName
                     } else {
-                        serviceName = trimmed(route.routeNumber.value) ?? request.lineName
+                        serviceName = OperatorFieldParsing.trimmed(route.routeNumber.value) ?? request.lineName
                     }
                     let time = lightRailTime(
                         english: route.timeEnglish.value,
@@ -447,7 +447,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
         if let chineseKey = normalizedCode(traditionalChinese), let destination = lookup[chineseKey] {
             return destination
         }
-        return trimmed(RealtimeArrivalName(
+        return OperatorFieldParsing.trimmed(RealtimeArrivalName(
             english: english,
             traditionalChinese: traditionalChinese
         ).localized)
@@ -512,7 +512,7 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
                 english: english,
                 traditionalChinese: traditionalChinese == "-" ? nil : traditionalChinese
             ).localized
-            return ParsedLightRailTime(minutes: nil, text: trimmed(localized))
+            return ParsedLightRailTime(minutes: nil, text: OperatorFieldParsing.trimmed(localized))
         }
     }
 
@@ -546,34 +546,13 @@ actor HongKongRealtimeArrivalProvider: RealtimeArrivalProviding {
     }
 
     private static func retryDelay(from response: HTTPURLResponse) -> TimeInterval {
-        guard let rawValue = response.value(forHTTPHeaderField: "Retry-After")?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-              !rawValue.isEmpty else {
-            return defaultRetryDelay
-        }
-        if let seconds = UInt64(rawValue) {
-            return TimeInterval(seconds)
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
-        guard let retryDate = formatter.date(from: rawValue) else {
-            return defaultRetryDelay
-        }
-        return max(0, retryDate.timeIntervalSinceNow)
+        OperatorHTTP.retryAfterDelay(from: response) ?? defaultRetryDelay
     }
 
     private static func normalizedCode(_ value: String) -> String? {
-        trimmed(value)?.uppercased()
+        OperatorFieldParsing.trimmed(value)?.uppercased()
     }
 
-    private static func trimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
 }
 
 private enum HeavyRailDirection: String, Sendable {
@@ -650,55 +629,5 @@ private struct LightRailRoute: Decodable {
         case stop
         case special
         case additionalInfo1
-    }
-}
-
-private struct FlexibleInt: Decodable {
-    let value: Int
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(Int.self) {
-            self.value = value
-            return
-        }
-        if let value = try? container.decode(Double.self),
-           let integer = Int(exactly: value) {
-            self.value = integer
-            return
-        }
-        if let rawValue = try? container.decode(String.self),
-           let value = Int(rawValue.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            self.value = value
-            return
-        }
-        throw DecodingError.dataCorruptedError(
-            in: container,
-            debugDescription: "Expected an integer or integer string"
-        )
-    }
-}
-
-private struct FlexibleString: Decodable {
-    let value: String
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(String.self) {
-            self.value = value
-            return
-        }
-        if let value = try? container.decode(Int.self) {
-            self.value = String(value)
-            return
-        }
-        if let value = try? container.decode(Double.self) {
-            self.value = Int(exactly: value).map(String.init) ?? String(value)
-            return
-        }
-        throw DecodingError.dataCorruptedError(
-            in: container,
-            debugDescription: "Expected a string or number"
-        )
     }
 }

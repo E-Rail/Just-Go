@@ -11,219 +11,87 @@ import Foundation
 /// per-station work is slicing that payload by station code. That makes the first station open
 /// pay for the whole city and every subsequent one free, rather than one request per station.
 actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
-    /// Cities whose station accessibility/facility facts come from this official online surface
-    /// rather than the bundled pack. Hangzhou's payload carries neither, so this is false. The
-    /// coverage UI must keep reporting the bundled state for those categories.
-    static func servesStationInformation(forCityID cityID: String) -> Bool {
-        false
-    }
-
     static let cityID = "3301"
     fileprivate static let host = "www.hzmetro.com"
     private static let endpointPath = "/api/operation/all"
     private static let origin = "https://www.hzmetro.com"
     private static let referer = "https://www.hzmetro.com/operation/siteInquiry"
-    /// The whole-network payload is ~350 KB; the ceiling is generous enough for the network to
-    /// grow by lines without becoming a way to make the app read an unbounded response.
+    /// The whole-network payload is ~350 KB; the ceiling leaves room for new lines without letting
+    /// the app read an unbounded response.
     private static let maximumResponseBytes = 4_194_304
-    /// Higher than the per-station providers' 5 s: this single request carries the entire city,
-    /// and it is paid once per session rather than once per station.
+    /// Higher than the per-station providers' 5 s: this one request carries the entire city.
     private static let requestTimeout: TimeInterval = 10
-    private static let cacheLifetime: TimeInterval = 1800
-    private static let defaultRateLimitBackoff: TimeInterval = 30
-    private static let clock = ContinuousClock()
 
     private struct PreparedRequest: Hashable, Sendable {
         let stationID: String
         let stationCodes: [String]
         let expectedNames: [String]
 
-        /// The disk cache is keyed by one external ID; the pinned representative is the first
-        /// code, matching the directory's `externalStationID`.
+        /// The disk cache is keyed by one external ID: the directory's representative, listed first.
         var externalStationID: String { stationCodes.first ?? "" }
-    }
-
-    private struct NetworkCacheEntry: Sendable {
-        let payload: HangzhouNetwork
-        let expiresAt: ContinuousClock.Instant
     }
 
     private let session: URLSession
     private let diskCache: (any OfficialStationInformationCaching)?
-    private var networkCache: NetworkCacheEntry?
-    private var inFlight: Task<HangzhouNetwork, Error>?
-    private var rateLimitedUntil: ContinuousClock.Instant?
+    private let network = OperatorAnswerCache<String, HangzhouNetwork>()
 
     init(session: URLSession? = nil, diskCache: (any OfficialStationInformationCaching)? = nil) {
+        self.session = session ?? OperatorHTTP.session(timeout: Self.requestTimeout)
         self.diskCache = diskCache
-        if let session {
-            self.session = session
-        } else {
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.urlCache = nil
-            configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            configuration.httpCookieStorage = nil
-            configuration.httpShouldSetCookies = false
-            configuration.timeoutIntervalForRequest = Self.requestTimeout
-            configuration.timeoutIntervalForResource = Self.requestTimeout
-            self.session = URLSession(configuration: configuration)
-        }
     }
 
     func information(
         for request: OfficialStationInformationRequest
     ) async throws -> OfficialStationInformationSnapshot {
         let prepared = try Self.prepare(request)
+        let session = self.session
         do {
-            let network = try await networkPayload()
-            let snapshot = try Self.snapshot(for: prepared, from: network)
-            store(snapshot, for: prepared)
+            let payload = try await network.value(for: Self.endpointPath) { try await Self.fetch(using: session) }
+            let snapshot = try Self.snapshot(for: prepared, from: payload)
+            if let diskCache {
+                Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: prepared.externalStationID) }
+            }
             return snapshot
         } catch {
-            return try await servingStoredSnapshot(for: prepared, insteadOf: error)
-        }
-    }
-
-    func releaseMemory() {
-        networkCache = nil
-    }
-
-    private func networkPayload() async throws -> HangzhouNetwork {
-        let now = Self.clock.now
-        if let cached = networkCache {
-            if cached.expiresAt > now {
-                return cached.payload
-            }
-            networkCache = nil
-        }
-
-        if let rateLimitedUntil {
-            guard rateLimitedUntil <= now else {
-                throw OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
-            }
-            self.rateLimitedUntil = nil
-        }
-
-        // One request serves the whole city, so concurrent station opens must share it rather
-        // than each firing their own copy of a 350 KB fetch.
-        if let inFlight {
-            return try await inFlight.value
-        }
-
-        let session = self.session
-        let task = Task<HangzhouNetwork, Error> {
-            try await Self.fetch(using: session)
-        }
-        inFlight = task
-        do {
-            let payload = try await task.value
-            inFlight = nil
-            networkCache = NetworkCacheEntry(
-                payload: payload,
-                expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
+            return try await storedSnapshot(
+                replacing: error,
+                from: diskCache,
+                cityID: Self.cityID,
+                stationID: prepared.stationID,
+                externalStationID: prepared.externalStationID
             )
-            return payload
-        } catch {
-            inFlight = nil
-            if let providerError = error as? OfficialStationInformationProviderError,
-               case .rateLimited(let retryAfter) = providerError {
-                let duration = max(retryAfter ?? Self.defaultRateLimitBackoff, 1)
-                let candidate = Self.clock.now.advanced(by: .seconds(duration))
-                rateLimitedUntil = max(rateLimitedUntil ?? candidate, candidate)
-            }
-            throw error
         }
     }
 
-    /// Availability failures fall back to the last snapshot this device stored, labeled as
-    /// cached. Caller and contract errors never do. A stored copy must not paper over a
-    /// station-identity mismatch or a malformed request.
-    private func servingStoredSnapshot(
-        for request: PreparedRequest,
-        insteadOf error: Error
-    ) async throws -> OfficialStationInformationSnapshot {
-        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
-              let diskCache,
-              let stored = await diskCache.storedSnapshot(
-                  cityID: Self.cityID,
-                  stationID: request.stationID,
-                  externalStationID: request.externalStationID
-              ) else {
-            throw error
-        }
-        return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
+    func releaseMemory() async {
+        await network.releaseMemory()
     }
 
-
-    private func store(_ snapshot: OfficialStationInformationSnapshot, for request: PreparedRequest) {
-        guard let diskCache else { return }
-        let externalStationID = request.externalStationID
-        Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: externalStationID) }
-    }
-
-    private static func prepare(
-        _ request: OfficialStationInformationRequest
-    ) throws -> PreparedRequest {
-        let stationID = request.stationID.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !stationID.isEmpty else {
-            throw OfficialStationInformationProviderError.invalidRequest("stationID is empty")
+    private static func prepare(_ request: OfficialStationInformationRequest) throws -> PreparedRequest {
+        guard case .hangzhou(let stationCodes, let names) = request.reference else {
+            throw OfficialStationInformationProviderError.invalidRequest("Non-Hangzhou references are handled by their own provider")
         }
-
-        switch request.reference {
-        case .hangzhou(let stationCodes, let expectedNames):
-            let codes = stationCodes
-                .compactMap(OperatorFieldParsing.trimmed)
-                .filter { $0.range(of: #"^\d{1,6}$"#, options: .regularExpression) != nil }
-                .uniqued()
-            guard !codes.isEmpty else {
-                throw OfficialStationInformationProviderError.invalidRequest(
-                    "Hangzhou station reference carries no reviewed numeric station code"
-                )
-            }
-            let names = expectedNames.compactMap(OperatorFieldParsing.trimmed).uniqued().sorted()
-            guard !names.isEmpty else {
-                throw OfficialStationInformationProviderError.invalidRequest(
-                    "expected station names are empty"
-                )
-            }
-            return PreparedRequest(stationID: stationID, stationCodes: codes, expectedNames: names)
-        case .beijing, .shanghai, .guangzhou:
+        let codes = stationCodes
+            .compactMap(OperatorFieldParsing.trimmed)
+            .filter { $0.range(of: #"^\d{1,6}$"#, options: .regularExpression) != nil }
+            .uniqued()
+        guard !codes.isEmpty else {
             throw OfficialStationInformationProviderError.invalidRequest(
-                "Non-Hangzhou references are handled by their own provider"
+                "Hangzhou station reference carries no reviewed numeric station code"
             )
         }
+        let identity = try OperatorFieldParsing.reviewedIdentity(of: request, names: names)
+        return PreparedRequest(stationID: identity.stationID, stationCodes: codes, expectedNames: identity.expectedNames)
     }
 
-    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
-    /// connection that trickles data indefinitely never triggers it, so the byte-by-byte read
-    /// below could hang well past `requestTimeout`. Race the whole fetch against an explicit
-    /// deadline so it is always bounded.
     private static func fetch(using session: URLSession) async throws -> HangzhouNetwork {
-        try await withThrowingTaskGroup(of: HangzhouNetwork.self) { group in
-            group.addTask { try await performFetch(using: session) }
-            group.addTask {
-                try await Task.sleep(for: .seconds(requestTimeout))
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            defer { group.cancelAll() }
-            guard let result = try await group.next() else {
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            return result
-        }
-    }
-
-    private static func performFetch(using session: URLSession) async throws -> HangzhouNetwork {
         var components = URLComponents()
         components.scheme = "https"
         components.host = host
         components.path = endpointPath
         guard let url = components.url else {
-            throw OfficialStationInformationProviderError.invalidRequest(
-                "official station reference is invalid"
-            )
+            throw OfficialStationInformationProviderError.invalidRequest("official station reference is invalid")
         }
-
         var urlRequest = URLRequest(
             url: url,
             cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
@@ -236,73 +104,27 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         urlRequest.setValue(origin, forHTTPHeaderField: "Origin")
         urlRequest.setValue(referer, forHTTPHeaderField: "Referer")
         urlRequest.httpBody = Data()
-
-        // `data(for:)`, not `bytes(for:)`. `URLSession.AsyncBytes` yields one `UInt8` per async
-        // iteration; measured over loopback with no latency, that loop moved 5 MB in 56.3 s
-        // (0.09 MB/s) against 0.012 s for `data(for:)`. This endpoint returns the whole network
-        // listing under a 10-second budget, so the read itself was the thing that timed out.
-        // The `expectedContentLength` guard below still rejects an honestly-declared oversize
-        // body, and the count check catches a server that lies about it.
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await session.data(
-                for: urlRequest,
-                delegate: OperatorRedirectDelegate(host: Self.host)
-            )
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch let error as URLError where error.code == .timedOut {
-            throw OfficialStationInformationProviderError.timedOut
-        } catch let error as URLError where error.code == .cancelled && Task.isCancelled {
-            throw CancellationError()
-        } catch {
-            throw OfficialStationInformationProviderError.transport(error.localizedDescription)
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.url?.scheme?.lowercased() == "https",
-              httpResponse.url?.host?.lowercased() == host,
-              httpResponse.url?.path == endpointPath else {
-            throw OfficialStationInformationProviderError.invalidResponse
-        }
-        if httpResponse.statusCode == 429 {
-            throw OfficialStationInformationProviderError.rateLimited(
-                retryAfter: retryAfterDelay(from: httpResponse)
-            )
-        }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            throw OfficialStationInformationProviderError.httpStatus(httpResponse.statusCode)
-        }
-        guard httpResponse.expectedContentLength <= 0 ||
-                httpResponse.expectedContentLength <= Int64(maximumResponseBytes) else {
-            throw OfficialStationInformationProviderError.responseTooLarge
-        }
-        let contentType = httpResponse.value(forHTTPHeaderField: "Content-Type")?
-            .lowercased() ?? ""
-        guard contentType.hasPrefix("application/json") else {
-            throw OfficialStationInformationProviderError.invalidResponse
-        }
-
-        guard data.count <= maximumResponseBytes else {
-            throw OfficialStationInformationProviderError.responseTooLarge
-        }
+        let data = try await OperatorHTTP.data(
+            for: urlRequest,
+            host: host,
+            path: endpointPath,
+            maximumBytes: maximumResponseBytes,
+            requiresJSON: true,
+            timeout: requestTimeout,
+            using: session
+        )
 
         let payload: HangzhouPayload
         do {
             payload = try JSONDecoder().decode(HangzhouPayload.self, from: data)
         } catch {
-            throw OfficialStationInformationProviderError.contractViolation(
-                "response is not valid network JSON"
-            )
+            throw OfficialStationInformationProviderError.contractViolation("response is not valid network JSON")
         }
         guard payload.ok == true, let network = payload.data else {
             throw OfficialStationInformationProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.msg))
         }
         guard !network.stationlist.isEmpty, !network.subwaySiteDetail.isEmpty else {
-            throw OfficialStationInformationProviderError.contractViolation(
-                "network payload carries no stations"
-            )
+            throw OfficialStationInformationProviderError.contractViolation("network payload carries no stations")
         }
         return network
     }
@@ -322,8 +144,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         // Identity is checked against the station list, which is what the reviewed catalog was
         // built from. `subwaySiteDetail` disagrees with it on the 站 suffix for four stations, so
         // it is matched on code only and never on name.
-        let expected = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
-        guard listed.contains(where: { expected.contains(OperatorFieldParsing.normalizedName($0.stationName)) }) else {
+        guard listed.contains(where: { OperatorFieldParsing.isReviewedName($0.stationName, in: request.expectedNames) }) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
@@ -334,7 +155,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         // what the catalog only holds as an alias.
         let representative = listed.first { $0.stationCode == request.stationCodes.first }
         let stationName = representative?.stationName
-            ?? listed.first { expected.contains(OperatorFieldParsing.normalizedName($0.stationName)) }?.stationName
+            ?? listed.first { OperatorFieldParsing.isReviewedName($0.stationName, in: request.expectedNames) }?.stationName
             ?? listed[0].stationName
 
         var lines: [OfficialStationLineInformation] = []
@@ -404,37 +225,11 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         return digits.isEmpty ? nil : Int(digits)
     }
 
-    /// The operator writes "终点站" where a direction terminates at this station and ".. " Where
-    /// it publishes nothing. Both mean there is no departure to show, so neither is copied
-    /// through as if it were a time.
+    /// A departure time, or nil where the operator wrote a placeholder or anything that is not one.
     private static func serviceTime(_ value: String?) -> String? {
-        guard let value = OperatorFieldParsing.trimmed(value) else { return nil }
-        guard !placeholderTimes.contains(value) else { return nil }
-        guard value.range(of: #"^\d{1,2}:\d{2}$"#, options: .regularExpression) != nil else {
-            return nil
-        }
+        guard let value = OperatorFieldParsing.placeholderAware(value),
+              value.range(of: #"^\d{1,2}:\d{2}$"#, options: .regularExpression) != nil else { return nil }
         return value
-    }
-
-    private static let placeholderTimes: Set<String> = [
-        "/", "-", "--", "—", "——", "n/a", "na", "none", "null",
-        "无", "沒有", "没有", "暫無", "暂无", "终点站", "終點站"
-    ]
-
-    private static func retryAfterDelay(from response: HTTPURLResponse) -> TimeInterval? {
-        guard let rawValue = OperatorFieldParsing.trimmed(response.value(forHTTPHeaderField: "Retry-After")) else {
-            return nil
-        }
-        if let seconds = TimeInterval(rawValue), seconds >= 0 {
-            return seconds
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
-        guard let date = formatter.date(from: rawValue) else { return nil }
-        return max(date.timeIntervalSinceNow, 0)
     }
 }
 

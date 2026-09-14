@@ -383,7 +383,7 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
             forHTTPHeaderField: "Accept"
         )
 
-        loadTask = Task { [weak self] in
+        loadTask = Task { [weak self, request] in
             guard let self else { return }
             let configuration = URLSessionConfiguration.ephemeral
             configuration.urlCache = nil
@@ -396,22 +396,13 @@ private final class OfficialTransitBinaryResourceState: ObservableObject {
             defer { session.invalidateAndCancel() }
 
             do {
-                // `timeoutIntervalForRequest`/`timeoutIntervalForResource` only fire when no
-                // bytes arrive for the interval: a connection that trickles data indefinitely
-                // never trips them, so a buffered `session.data(for:)` can hang well past the
-                // declared 30s and leave the viewer looking frozen. Race it against an explicit
-                // deadline, mirroring the fix in OfficialStationInformationProvider.swift.
-                let (data, response) = try await withThrowingTaskGroup(of: (Data, URLResponse).self) { group in
-                    group.addTask { try await session.data(for: request) }
-                    group.addTask {
-                        try await Task.sleep(for: .seconds(30))
-                        throw OfficialTransitBinaryLoadError.timedOut
-                    }
-                    defer { group.cancelAll() }
-                    guard let result = try await group.next() else {
-                        throw OfficialTransitBinaryLoadError.timedOut
-                    }
-                    return result
+                // The session's timeouts only fire when no bytes arrive, so a trickling connection
+                // needs an explicit deadline or the viewer looks frozen.
+                let (data, response) = try await withDeadline(
+                    seconds: 30,
+                    onTimeout: { OfficialTransitBinaryLoadError.timedOut }
+                ) {
+                    try await session.data(for: request)
                 }
                 try Task.checkCancellation()
                 guard loadGeneration == generation else { return }

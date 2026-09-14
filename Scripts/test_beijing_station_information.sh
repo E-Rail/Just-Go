@@ -23,6 +23,8 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -sdk "$SDKROOT" \
     -module-cache-path "$BUILD_DIR/module-cache" \
     -o "$BUILD_DIR/test-beijing-station-information" \
+    "$ROOT/Just-Go/Core/Concurrency/Deadline.swift" \
+    "$ROOT/Just-Go/Core/Extensions/Sequence+Uniqued.swift" \
     "$ROOT/Just-Go/Services/Transit/OfficialStationInformationProvider.swift" \
     "$ROOT/Scripts/test_beijing_station_information.swift"
 

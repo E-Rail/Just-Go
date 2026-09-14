@@ -68,18 +68,9 @@ struct RouteResultsView: View {
                         Text(error)
                     }
                 } else if viewModel.routes.isEmpty {
-                    // Reachable even though the entry page only pushes on a successful search: a
-                    // city change while this screen is up clears the routes underneath it, and the
-                    // result was a completely blank page with no explanation and nothing to do.
-                    ContentUnavailableView {
-                        Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
-                    } description: {
-                        Text(AppLocalization.text(
-                            english: "This search is no longer current. Go back and search again.",
-                            simplified: "此次搜索已失效，请返回重新搜索。",
-                            traditional: "此次搜尋已失效，請返回重新搜尋。"
-                        ))
-                    }
+                    // A change underneath this screen (an accessibility setting, a city) clears the
+                    // routes; say so rather than showing a blank page.
+                    StaleRoutesNotice()
                 } else {
                     routesSection
                 }
@@ -301,7 +292,7 @@ struct RouteResultsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(RoutePreference.allCases) { strategy in
-                        SortChip(
+                        Chip(
                             title: strategy.title,
                             icon: strategy.icon,
                             isSelected: viewModel.sortStrategy == strategy
@@ -620,6 +611,21 @@ struct RouteResultsView: View {
         }
         if !viewModel.routes.contains(where: { $0.id == selectedRouteID }) {
             selectedRouteID = viewModel.routes[0].id
+        }
+    }
+}
+
+/// Routes that were cleared while a screen showing them was up.
+struct StaleRoutesNotice: View {
+    var body: some View {
+        ContentUnavailableView {
+            Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
+        } description: {
+            Text(AppLocalization.text(
+                english: "This search is no longer current. Go back and search again.",
+                simplified: "此次搜索已失效，请返回重新搜索。",
+                traditional: "此次搜尋已失效，請返回重新搜尋。"
+            ))
         }
     }
 }

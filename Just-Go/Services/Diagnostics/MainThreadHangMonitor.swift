@@ -37,19 +37,5 @@ enum MainThreadHangMonitor {
             }
         }
     }
-
-    /// Logs how long a synchronous main-thread block took, so a measured hang can be
-    /// attributed to a specific stage instead of inferred.
-    @discardableResult
-    static func measure<T>(_ label: String, _ work: () throws -> T) rethrows -> T {
-        let start = CFAbsoluteTimeGetCurrent()
-        defer {
-            let elapsed = (CFAbsoluteTimeGetCurrent() - start) * 1000
-            if elapsed > 8 {
-                log.error("JUST_GO_STAGE \(label, privacy: .public) \(Int(elapsed))ms")
-            }
-        }
-        return try work()
-    }
 }
 #endif

@@ -220,20 +220,7 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let response: BaiduTransitResponse
         do {
-            response = try await client.get(
-                BaiduTransitResponse.self,
-                path: "/direction/v2/transit",
-                parameters: [
-                    (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
-                    (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
-                    (name: "coord_type", value: "gcj02"),
-                    (name: "ret_coordtype", value: "gcj02"),
-                    // 地铁优先. The default policy is 推荐, which mixes buses freely into results this
-                    // app cannot use. Asking for the rail-first plan costs nothing and returns more
-                    // rail-only routes, which are the only ones a fare can be attributed from.
-                    (name: "tactics_incity", value: "5")
-                ]
-            )
+            response = try await transit(from: origin, to: destination)
         } catch {
             AppLog.routing.info("Baidu trip observations unavailable: \(error)")
             return .none
@@ -241,13 +228,37 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let observations = Self.observations(in: response)
         cache[cacheKey] = observations
-        cacheOrder.removeAll { $0 == cacheKey }
-        cacheOrder.append(cacheKey)
-        while cacheOrder.count > Self.maximumCachedEntries {
-            let evicted = cacheOrder.removeFirst()
-            cache[evicted] = nil
-        }
+        Self.remember(cacheKey, in: &cacheOrder) { cache[$0] = nil }
         return observations
+    }
+
+    /// The transit plan both lookups read: 地铁优先 (`tactics_incity=5`), because the default 推荐
+    /// mixes buses freely into results this app cannot use, and only rail-only routes can have a
+    /// fare attributed to them.
+    private func transit(
+        from origin: CLLocationCoordinate2D,
+        to destination: CLLocationCoordinate2D
+    ) async throws -> BaiduTransitResponse {
+        try await client.get(
+            BaiduTransitResponse.self,
+            path: "/direction/v2/transit",
+            parameters: [
+                (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
+                (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
+                (name: "coord_type", value: "gcj02"),
+                (name: "ret_coordtype", value: "gcj02"),
+                (name: "tactics_incity", value: "5")
+            ]
+        )
+    }
+
+    /// Marks `key` newest and evicts the oldest past `maximumCachedEntries`.
+    private static func remember(_ key: String, in order: inout [String], evict: (String) -> Void) {
+        order.removeAll { $0 == key }
+        order.append(key)
+        while order.count > maximumCachedEntries {
+            evict(order.removeFirst())
+        }
     }
 
     // MARK: - One line
@@ -265,17 +276,7 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let response: BaiduTransitResponse
         do {
-            response = try await client.get(
-                BaiduTransitResponse.self,
-                path: "/direction/v2/transit",
-                parameters: [
-                    (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
-                    (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
-                    (name: "coord_type", value: "gcj02"),
-                    (name: "ret_coordtype", value: "gcj02"),
-                    (name: "tactics_incity", value: "5")
-                ]
-            )
+            response = try await transit(from: origin, to: destination)
         } catch {
             AppLog.routing.info("Baidu line observation unavailable: \(error)")
             return nil
@@ -283,12 +284,7 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let line = Self.observedLine(in: response, named: expectedName)
         lineCache[cacheKey] = line
-        lineCacheOrder.removeAll { $0 == cacheKey }
-        lineCacheOrder.append(cacheKey)
-        while lineCacheOrder.count > Self.maximumCachedEntries {
-            let evicted = lineCacheOrder.removeFirst()
-            lineCache[evicted] = nil
-        }
+        Self.remember(cacheKey, in: &lineCacheOrder) { lineCache[$0] = nil }
         return line
     }
 

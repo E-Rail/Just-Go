@@ -55,8 +55,6 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     private static let basePath = "/interface/metromap/metromap.aspx"
     private static let maximumResponseBytes = 1_048_576
     private static let requestTimeout: TimeInterval = 5
-    private static let cacheLifetime: TimeInterval = 1800
-    private static let clock = ContinuousClock()
 
     private struct PreparedRequest: Hashable, Sendable {
         let stationID: String
@@ -65,176 +63,65 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         var primaryKey: String { lineStationIDs.first ?? "" }
     }
 
-    private struct CacheEntry: Sendable {
-        let snapshot: OfficialStationInformationSnapshot
-        let expiresAt: ContinuousClock.Instant
-    }
-
     private let session: URLSession
     private let diskCache: (any OfficialStationInformationCaching)?
-    private var cache: [PreparedRequest: CacheEntry] = [:]
-    private var inFlight: [PreparedRequest: InFlightRequest] = [:]
-
-    private struct InFlightRequest: Sendable {
-        let token: UUID
-        let task: Task<OfficialStationInformationSnapshot, Error>
-    }
+    private let answers = OperatorAnswerCache<PreparedRequest, OfficialStationInformationSnapshot>()
+    /// The line list and each line's first/last-train table describe the whole line, not one
+    /// station, so every station on a line shares one fetch of each.
+    private let lineResponses = OperatorAnswerCache<String, Data>()
 
     init(session: URLSession? = nil, diskCache: (any OfficialStationInformationCaching)? = nil) {
+        self.session = session ?? OperatorHTTP.session(timeout: Self.requestTimeout)
         self.diskCache = diskCache
-        if let session {
-            self.session = session
-        } else {
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.urlCache = nil
-            configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            configuration.httpCookieStorage = nil
-            configuration.httpShouldSetCookies = false
-            configuration.timeoutIntervalForRequest = Self.requestTimeout
-            configuration.timeoutIntervalForResource = Self.requestTimeout
-            self.session = URLSession(configuration: configuration)
-        }
     }
 
-    func releaseMemory() {
-        cache.removeAll(keepingCapacity: false)
+    func releaseMemory() async {
+        await answers.releaseMemory()
+        await lineResponses.releaseMemory()
     }
 
     func information(
         for request: OfficialStationInformationRequest
     ) async throws -> OfficialStationInformationSnapshot {
         let prepared = try Self.prepare(request)
-        let now = Self.clock.now
-        cache = cache.filter { $0.value.expiresAt > now }
-        if let cached = cache[prepared], cached.expiresAt > now {
-            return cached.snapshot
-        }
-
-        // Shared, not started again, the way Beijing's provider already did it. The planner
-        // enriches every alternative at once and the station page asks for the same station on
-        // top, so one station cost as many round trips as there were callers. And the fetch is
-        // an unstructured task, so the planner's deadline stops the waiting rather than the
-        // request: whoever asks next gets the cached answer instead of paying for it again.
-        if let active = inFlight[prepared] {
-            return try await finish(active, for: prepared)
-        }
         let session = self.session
-        let active = InFlightRequest(
-            token: UUID(),
-            task: Task { try await Self.fetch(prepared, using: session) }
-        )
-        inFlight[prepared] = active
-        return try await finish(active, for: prepared)
-    }
-
-    private func finish(
-        _ active: InFlightRequest,
-        for prepared: PreparedRequest
-    ) async throws -> OfficialStationInformationSnapshot {
-        do {
-            let snapshot = try await active.task.value
-            if inFlight[prepared]?.token == active.token {
-                inFlight.removeValue(forKey: prepared)
-                cache[prepared] = CacheEntry(
-                    snapshot: snapshot,
-                    expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
-                )
-                if let diskCache {
-                    let key = prepared.primaryKey
-                    Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: key) }
-                }
-            }
-            return snapshot
-        } catch {
-            if inFlight[prepared]?.token == active.token {
-                inFlight.removeValue(forKey: prepared)
-            }
-            return try await servingStoredSnapshot(for: prepared, insteadOf: error)
+        let lineResponses = self.lineResponses
+        return try await answers.snapshot(
+            for: prepared,
+            cityID: Self.cityID,
+            stationID: prepared.stationID,
+            externalStationID: prepared.primaryKey,
+            diskCache: diskCache
+        ) {
+            try await Self.fetch(prepared, lineResponses: lineResponses, using: session)
         }
     }
 
-    private func servingStoredSnapshot(
-        for request: PreparedRequest,
-        insteadOf error: Error
-    ) async throws -> OfficialStationInformationSnapshot {
-        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
-              let diskCache,
-              let stored = await diskCache.storedSnapshot(
-                  cityID: Self.cityID,
-                  stationID: request.stationID,
-                  externalStationID: request.primaryKey
-              ) else {
-            throw error
+    private static func prepare(_ request: OfficialStationInformationRequest) throws -> PreparedRequest {
+        guard case .shanghai(let lineStationIDs, let names) = request.reference else {
+            throw OfficialStationInformationProviderError.invalidRequest("Non-Shanghai references are handled by their own provider")
         }
-        return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
+        let keys = lineStationIDs
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { $0.range(of: #"^\d{4}$"#, options: .regularExpression) != nil }
+            .uniqued()
+        guard !keys.isEmpty else {
+            throw OfficialStationInformationProviderError.invalidRequest("Shanghai station reference has no reviewed four-digit key")
+        }
+        let identity = try OperatorFieldParsing.reviewedIdentity(of: request, names: names)
+        return PreparedRequest(stationID: identity.stationID, lineStationIDs: keys, expectedNames: identity.expectedNames)
     }
 
-
-    private static func prepare(
-        _ request: OfficialStationInformationRequest
-    ) throws -> PreparedRequest {
-        let stationID = request.stationID.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !stationID.isEmpty else {
-            throw OfficialStationInformationProviderError.invalidRequest("stationID is empty")
-        }
-        switch request.reference {
-        case .shanghai(let lineStationIDs, let expectedNames):
-            let keys = lineStationIDs
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { $0.range(of: #"^\d{4}$"#, options: .regularExpression) != nil }
-                .uniqued()
-            guard !keys.isEmpty else {
-                throw OfficialStationInformationProviderError.invalidRequest(
-                    "Shanghai station reference has no reviewed four-digit key"
-                )
-            }
-            let names = expectedNames.compactMap(OperatorFieldParsing.trimmed).uniqued().sorted()
-            guard !names.isEmpty else {
-                throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
-            }
-            return PreparedRequest(stationID: stationID, lineStationIDs: keys, expectedNames: names)
-        case .beijing, .guangzhou, .hangzhou:
-            throw OfficialStationInformationProviderError.invalidRequest(
-                "Non-Shanghai references are handled by their own provider"
-            )
-        }
-    }
-
+    /// One station's live first/last-train picture, in two phases: the line colours and the
+    /// station record together, then every line's table together. Each request carries its own
+    /// deadline; a serial chain under one request's budget timed out at interchanges served by
+    /// four lines, exactly where first and last trains matter most.
     private static func fetch(
         _ request: PreparedRequest,
+        lineResponses: OperatorAnswerCache<String, Data>,
         using session: URLSession
     ) async throws -> OfficialStationInformationSnapshot {
-        try await withThrowingTaskGroup(of: OfficialStationInformationSnapshot.self) { group in
-            group.addTask { try await performFetch(request, using: session) }
-            group.addTask {
-                try await Task.sleep(for: .seconds(requestTimeout))
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            defer { group.cancelAll() }
-            guard let result = try await group.next() else {
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            return result
-        }
-    }
-
-    /// One station's live first/last-train picture.
-    ///
-    /// The request shape matters as much as the parsing here. This used to be strictly serial —
-    /// colours, then the station, then one first/last call **per line serving it** — and the whole
-    /// chain was raced against `requestTimeout`, the budget of a *single* request. 世纪大道 is
-    /// served by lines 2, 4, 6 and 9, so it was six round trips inside the time allowed for one:
-    /// at a perfectly healthy 900 ms each that is 5.4 s and the answer was thrown away as
-    /// `.timedOut` even though every request had succeeded. The interchanges where first and last
-    /// train matter most are precisely the ones with the most lines to ask about.
-    ///
-    /// Two phases now instead of 2 + N. Colours and the station record are independent, and the
-    /// per-line calls are independent of each other.
-    private static func performFetch(
-        _ request: PreparedRequest,
-        using session: URLSession
-    ) async throws -> OfficialStationInformationSnapshot {
-        async let colorsTask = lineColors(using: session)
+        async let colorsTask = lineColors(lineResponses: lineResponses, using: session)
         async let stationTask = stationInfo(statID: request.primaryKey, using: session)
         let colors = try await colorsTask
         let station = try await stationTask
@@ -242,11 +129,8 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         guard let name = OperatorFieldParsing.trimmed(station.nameCn) else {
             throw OfficialStationInformationProviderError.contractViolation("station name missing")
         }
-        let expected = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
-        guard expected.contains(OperatorFieldParsing.normalizedName(name)) else {
-            throw OfficialStationInformationProviderError.contractViolation(
-                "station name does not match the reviewed catalog"
-            )
+        guard OperatorFieldParsing.isReviewedName(name, in: request.expectedNames) else {
+            throw OfficialStationInformationProviderError.contractViolation("station name does not match the reviewed catalog")
         }
 
         // Indexed so the result keeps the catalog's line order: a task group finishes in whatever
@@ -258,7 +142,7 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
             for (index, key) in keys.enumerated() {
                 guard let lineNumber = Int(key.prefix(2)) else { continue }
                 group.addTask {
-                    (index, lineNumber, try await firstLast(line: lineNumber, statID: key, using: session))
+                    (index, lineNumber, try await firstLast(line: lineNumber, statID: key, lineResponses: lineResponses, using: session))
                 }
             }
             var collected: [Int: (Int, [FirstLastRow])] = [:]
@@ -293,15 +177,18 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
 
     // MARK: - Endpoints
 
-    private static func lineColors(using session: URLSession) async throws -> [Int: String] {
-        let data = try await get(query: "func=lines", using: session)
+    private static func lineColors(
+        lineResponses: OperatorAnswerCache<String, Data>,
+        using session: URLSession
+    ) async throws -> [Int: String] {
+        let data = try await lineResponses.value(for: "func=lines") { try await get(query: "func=lines", using: session) }
         guard let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else {
             throw OfficialStationInformationProviderError.contractViolation("lines response invalid")
         }
         var colors: [Int: String] = [:]
         for row in rows {
             guard let lineNumber = intValue(row["line_no"]),
-                  let color = normalizedColor(row["color"] as? String) else { continue }
+                  let color = OperatorFieldParsing.hexColor(row["color"] as? String) else { continue }
             colors[lineNumber] = color
         }
         return colors
@@ -313,9 +200,11 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
     private static func firstLast(
         line: Int,
         statID: String,
+        lineResponses: OperatorAnswerCache<String, Data>,
         using session: URLSession
     ) async throws -> [FirstLastRow] {
-        let data = try await get(query: "func=fltime&line=\(line)", using: session)
+        let query = "func=fltime&line=\(line)"
+        let data = try await lineResponses.value(for: query) { try await get(query: query, using: session) }
         guard let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else {
             throw OfficialStationInformationProviderError.contractViolation("fltime response invalid")
         }
@@ -442,39 +331,16 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         urlRequest.httpMethod = "GET"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
         urlRequest.setValue("https://service.shmetro.com/", forHTTPHeaderField: "Referer")
-
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await session.data(for: urlRequest, delegate: OperatorRedirectDelegate(host: Self.host))
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch let error as URLError where error.code == .timedOut {
-            throw OfficialStationInformationProviderError.timedOut
-        } catch let error as URLError where error.code == .cancelled && Task.isCancelled {
-            throw CancellationError()
-        } catch {
-            throw OfficialStationInformationProviderError.transport(error.localizedDescription)
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.url?.host?.lowercased() == host else {
-            throw OfficialStationInformationProviderError.invalidResponse
-        }
-        if httpResponse.statusCode == 429 {
-            throw OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
-        }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            throw OfficialStationInformationProviderError.httpStatus(httpResponse.statusCode)
-        }
-        guard data.count <= maximumResponseBytes else {
-            throw OfficialStationInformationProviderError.responseTooLarge
-        }
-        return data
+        return try await OperatorHTTP.data(
+            for: urlRequest,
+            host: host,
+            maximumBytes: maximumResponseBytes,
+            timeout: requestTimeout,
+            using: session
+        )
     }
 
     // MARK: - Helpers
-
 
     private static func stringValue(_ value: Any?) -> String? {
         if let string = value as? String { return OperatorFieldParsing.trimmed(string) }
@@ -487,11 +353,4 @@ actor ShanghaiStationInformationProvider: OfficialStationInformationProviding {
         if let string = value as? String { return Int(string.trimmingCharacters(in: .whitespaces)) }
         return nil
     }
-
-    private static func normalizedColor(_ value: String?) -> String? {
-        guard let value = OperatorFieldParsing.trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")),
-              value.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else { return nil }
-        return "#\(value.uppercased())"
-    }
-
 }

@@ -37,10 +37,10 @@ struct QuickTagAddView: View {
                                     title: station.localizedName,
                                     caption: station.lines.map(\.localizedName).joined(separator: " • "),
                                     icon: "tram.fill",
-                                    isTagged: tripMemoryService.isQuickTagged(
+                                    isTagged: tripMemoryService.quickTag(
                                         stationID: station.stationID,
                                         cityID: station.cityID
-                                    )
+                                    ) != nil
                                 ) {
                                     pendingTarget = .station(station)
                                     showEditor = true
@@ -68,7 +68,7 @@ struct QuickTagAddView: View {
                         }
                     }
                     if canSearchOnline {
-                        searchOnlineRow
+                        SearchOnlineRow(isSearching: isSearchingOnline, action: searchOnline)
                     }
                     if stationResults.isEmpty && placeResults.isEmpty && !canSearchOnline {
                         Section {
@@ -183,43 +183,6 @@ struct QuickTagAddView: View {
     /// and is the query most likely to be a rider still typing.
     private var canSearchOnline: Bool {
         searchText.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
-    }
-
-    /// A capability that only responds to the return key is one most riders never find, so it gets
-    /// a row. The wording names what it does rather than what it costs: the daily allowance is our
-    /// problem, not the rider's.
-    private var searchOnlineRow: some View {
-        Section {
-            Button {
-                searchOnline()
-            } label: {
-                HStack(spacing: 10) {
-                    if isSearchingOnline {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Image(systemName: "magnifyingglass.circle.fill")
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    Text(AppLocalization.text(
-                        english: "Search online for places",
-                        simplified: "在线搜索地点",
-                        traditional: "線上搜尋地點"
-                    ))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    Spacer(minLength: 4)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .disabled(isSearchingOnline)
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Stations above come from the offline network and are already complete.",
-                simplified: "以上车站来自离线线网，已经完整。",
-                traditional: "以上車站來自離線線網，已經完整。"
-            ))
-        }
     }
 
     private func runSearch(keyword: String) {

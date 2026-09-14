@@ -186,25 +186,22 @@ extension StationDetailView {
                 Label(error, systemImage: "wifi.exclamationmark")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Button {
-                    viewModel?.retryRiderInformation()
-                } label: {
-                    Label(
-                        AppLocalization.text(
-                            english: "Retry",
-                            simplified: "重试",
-                            traditional: "重試"
-                        ),
-                        systemImage: "arrow.clockwise"
-                    )
-                }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
+                retryRiderInformationButton
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
             officialCategoryEmptyState
         }
+    }
+
+    private var retryRiderInformationButton: some View {
+        Button {
+            viewModel?.retryRiderInformation()
+        } label: {
+            Label(AppLocalization.text(english: "Retry", simplified: "重试", traditional: "重試"), systemImage: "arrow.clockwise")
+        }
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.capsule)
     }
 
     @ViewBuilder
@@ -232,20 +229,7 @@ extension StationDetailView {
                     Text(message)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Button {
-                        viewModel?.retryRiderInformation()
-                    } label: {
-                        Label(
-                            AppLocalization.text(
-                                english: "Retry",
-                                simplified: "重试",
-                                traditional: "重試"
-                            ),
-                            systemImage: "arrow.clockwise"
-                        )
-                    }
-                    .buttonStyle(.bordered)
-                    .buttonBorderShape(.capsule)
+                    retryRiderInformationButton
                 }
             }
         } else {

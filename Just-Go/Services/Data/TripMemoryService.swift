@@ -104,14 +104,7 @@ final class TripMemoryService {
         cityNameEn: String? = nil,
         kind: StationQuickTagKind
     ) {
-        var quickTag = StationQuickTag(station: station, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
-        if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
-            quickTag = existing
-                .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
-                .withKind(kind)
-        }
-        stationQuickTags = StationQuickTagPolicy.inserting(quickTag, into: stationQuickTags)
-        persistStationQuickTags()
+        save(StationQuickTag(station: station, cityName: cityName, cityNameEn: cityNameEn, kind: kind))
     }
 
     func setQuickTag(
@@ -121,11 +114,16 @@ final class TripMemoryService {
         cityNameEn: String? = nil,
         kind: StationQuickTagKind
     ) {
-        var quickTag = StationQuickTag(place: place, cityID: cityID, cityName: cityName, cityNameEn: cityNameEn, kind: kind)
+        save(StationQuickTag(place: place, cityID: cityID, cityName: cityName, cityNameEn: cityNameEn, kind: kind))
+    }
+
+    /// A tag already saved for the same target keeps its identity and takes the new kind and city.
+    private func save(_ quickTag: StationQuickTag) {
+        var quickTag = quickTag
         if let existing = stationQuickTags.first(where: { $0.id == quickTag.id }) {
             quickTag = existing
-                .withCityMetadata(cityName: cityName, cityNameEn: cityNameEn)
-                .withKind(kind)
+                .withCityMetadata(cityName: quickTag.cityName, cityNameEn: quickTag.cityNameEn)
+                .withKind(quickTag.kind)
         }
         stationQuickTags = StationQuickTagPolicy.inserting(quickTag, into: stationQuickTags)
         persistStationQuickTags()
@@ -146,21 +144,12 @@ final class TripMemoryService {
 
     func updateQuickTag(id: String, kind: StationQuickTagKind) {
         guard let existing = stationQuickTags.first(where: { $0.id == id }) else { return }
-        let updatedTag = existing.withKind(kind)
-        var updated = stationQuickTags.filter { quickTag in
-            quickTag.id != id && !(kind.isExclusive && quickTag.kind == kind)
-        }
-        updated.insert(updatedTag, at: 0)
-        stationQuickTags = StationQuickTagPolicy.normalized(updated)
+        stationQuickTags = StationQuickTagPolicy.inserting(existing.withKind(kind), into: stationQuickTags)
         persistStationQuickTags()
     }
 
     func quickTag(stationID: String, cityID: String) -> StationQuickTag? {
         stationQuickTags.first { $0.stationID == stationID && $0.cityID == cityID }
-    }
-
-    func isQuickTagged(stationID: String, cityID: String) -> Bool {
-        quickTag(stationID: stationID, cityID: cityID) != nil
     }
 
     /// Re-syncs each tag's frozen station snapshot (station ID, coordinates, line

@@ -227,32 +227,10 @@ struct SearchPageView: View {
         isOn: Bool,
         toggle: @escaping (inout StationFilter) -> Void
     ) -> some View {
-        Button {
+        Chip(title: title, icon: icon, isSelected: isOn) {
             isSearchFocused = false
             viewModel?.updateFilter(toggle)
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.caption)
-                Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .lineLimit(1)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            // Tinted, not filled, matching `SortChip`. `Color.accentColor` is the theme lifted to
-            // 0.62 luminance *for foreground legibility on a dark background*
-            // (`legibleOnDarkBackground`), so using it as a fill under white text collapses the
-            // contrast it exists to protect — this chip measured near 2.6:1 in dark mode, where
-            // 4.5:1 is the floor. Same mistake, same fix, as the sort chip on the results screen.
-            .foregroundStyle(isOn ? Color.accentColor : Color.primary)
-            .background(isOn ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
-            .overlay(Capsule().stroke(isOn ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isOn ? [.isSelected] : [])
     }
 
     private var quickTagBar: some View {
@@ -622,7 +600,7 @@ struct SearchPageView: View {
                 placesSection
                     .listRowBackground(Color.clear)
             } else if canSearchOnline {
-                searchOnlineRow
+                SearchOnlineRow(isSearching: false, action: searchOnline)
                     .listRowBackground(Color.clear)
             }
         }
@@ -634,40 +612,6 @@ struct SearchPageView: View {
     private var canSearchOnline: Bool {
         guard !isSearchingPlaces, placeResults.isEmpty else { return false }
         return (viewModel?.searchText ?? "").trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
-    }
-
-    /// The searches that used to happen on every keystroke, made deliberate and visible.
-    ///
-    /// A capability that only responds to the return key is a capability most riders never find,
-    /// so it gets a row. The wording names what it does rather than what it costs: "100 a day for
-    /// the whole account" is our problem, not the rider's.
-    private var searchOnlineRow: some View {
-        Section {
-            Button {
-                searchOnline()
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "magnifyingglass.circle.fill")
-                        .foregroundStyle(Color.accentColor)
-                    Text(AppLocalization.text(
-                        english: "Search online for places",
-                        simplified: "在线搜索地点",
-                        traditional: "線上搜尋地點"
-                    ))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    Spacer(minLength: 4)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Stations above come from the offline network and are already complete.",
-                simplified: "以上车站来自离线线网，已经完整。",
-                traditional: "以上車站來自離線線網，已經完整。"
-            ))
-        }
     }
 
     /// Both halves of the online answer, together and once. They ask the same provider the same
@@ -764,6 +708,45 @@ struct SearchPageView: View {
             .onDelete { offsets in
                 viewModel?.deleteRecentSearches(at: offsets)
             }
+        }
+    }
+}
+
+/// "Search online for places", as a row rather than only the return key, which most riders never
+/// find. Place search is metered, so it runs when asked and not on every keystroke.
+struct SearchOnlineRow: View {
+    let isSearching: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Section {
+            Button(action: action) {
+                HStack(spacing: 10) {
+                    if isSearching {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "magnifyingglass.circle.fill")
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    Text(AppLocalization.text(
+                        english: "Search online for places",
+                        simplified: "在线搜索地点",
+                        traditional: "線上搜尋地點"
+                    ))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    Spacer(minLength: 4)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(isSearching)
+        } footer: {
+            Text(AppLocalization.text(
+                english: "Stations above come from the offline network and are already complete.",
+                simplified: "以上车站来自离线线网，已经完整。",
+                traditional: "以上車站來自離線線網，已經完整。"
+            ))
         }
     }
 }

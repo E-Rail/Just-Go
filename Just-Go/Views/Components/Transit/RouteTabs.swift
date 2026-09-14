@@ -83,7 +83,11 @@ struct RouteTabs: View {
     }
 }
 
-struct SortChip: View {
+/// A capsule that is on or off: the results' sort order and the search page's station filters.
+///
+/// Tinted rather than filled when on. `Color.accentColor` is the theme lightened for *foreground*
+/// legibility in dark mode, and as a fill under white text it measured 2.6:1 where 4.5:1 is the floor.
+struct Chip: View {
     let title: String
     let icon: String
     let isSelected: Bool
@@ -96,16 +100,16 @@ struct SortChip: View {
                     .font(.caption)
                 Text(title)
                     .font(.caption)
+                    .lineLimit(1)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
-            // Tinted rather than filled. `Color.accentColor` is the theme lightened for *foreground*
-            // legibility in dark mode, so using it as a fill under white text collapses the contrast
-            // it exists to protect: the selected chip was pale green with white text on it.
             .background(isSelected ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
             .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
             .overlay(Capsule().stroke(isSelected ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

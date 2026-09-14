@@ -48,40 +48,6 @@ enum CityPackLoadStatus: Equatable {
     case failed
 }
 
-enum LicensedStationMediaKind: String, Codable, Sendable {
-    case stationPhoto
-}
-
-struct LicensedStationMedia: Codable, Equatable, Identifiable, Sendable {
-    let kind: LicensedStationMediaKind
-    let title: String
-    let relativePath: String
-    let mimeType: String
-    let sizeBytes: Int
-    let sha256: String
-    let sourcePageURL: String
-    let creator: String
-    let licenseSPDX: String
-    let licenseURL: String
-    let attribution: String
-    let modifications: String
-
-    var id: String { relativePath }
-
-    var bundledURL: URL? {
-        guard URL(string: relativePath)?.scheme == nil,
-              !relativePath.isEmpty,
-              !relativePath.hasPrefix("/"),
-              !relativePath.contains("\\"),
-              !relativePath.split(separator: "/").contains(where: { $0 == "." || $0 == ".." }),
-              let root = Bundle.main.resourceURL else { return nil }
-        let candidate = root.appendingPathComponent(relativePath).standardizedFileURL
-        guard candidate.path.hasPrefix(root.standardizedFileURL.path + "/"),
-              FileManager.default.isReadableFile(atPath: candidate.path) else { return nil }
-        return candidate
-    }
-}
-
 protocol OfficialStationDataProviding {
     func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func cityDataCoverage(for cityIDs: [String]) async -> [String: CityDataCoverage]
@@ -94,7 +60,6 @@ protocol OfficialStationDataProviding {
     func enrichStations(_ stations: [Station]) async -> [Station]
     func externalResources(for station: Station) async -> [ExternalTransitResource]
     func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation?
-    func licensedMedia(for station: Station) async -> [LicensedStationMedia]
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot
     func serviceWindows(cityID: String, stationName: String) async -> [StationServiceWindow]
     func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage
@@ -460,7 +425,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                     continue
                 }
                 guard let data = diskStore.packData(for: entry),
-                      let decoded = try? Self.decodeValidatedPack(data, matching: entry, origin: .downloaded),
+                      let decoded = try? Self.decodeValidatedPack(data, matching: entry),
                       await validatesCanonicalMembership(decoded) else { continue }
                 guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
                 do {
@@ -501,7 +466,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                         // No size/SHA guard here: `decodeValidatedPack` checks both before it
                         // parses anything, so the downloaded bytes are still verified ahead of
                         // the decode: hashing here too meant a second full pass over them.
-                        let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry, origin: .downloaded)
+                        let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry)
                         guard await validatesCanonicalMembership(decoded) else {
                             throw CityPackCandidateFailed()
                         }
@@ -615,17 +580,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     /// keyed by the bare canonical station ID. Anything else is already canonical.
     private func networkStationID(_ value: String) -> String {
         MetroStationIdentifier.canonical(value)
-    }
-
-    func licensedMedia(for station: Station) async -> [LicensedStationMedia] {
-        _ = await loadCityPack(for: station.cityID)
-        guard let baseline = bundledBaselinePack(for: station.cityID) else { return [] }
-        let canonicalStationID = networkStationID(station.stationID)
-        return (baseline.stationsByID[canonicalStationID]
-            ?? baseline.uniqueStation(exactName: station.name)
-            ?? baseline.uniqueStation(normalizedName: normalizedStationName(station.name)))?
-            .licensedMedia
-            .filter(Self.validatesBundledMedia) ?? []
     }
 
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot {
@@ -1084,11 +1038,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               Self.isAllowedRemoteDataURL(installed.manifestURL),
               Self.validatesManifestEntry(installed.entry),
               installed.entry.hasValidDownloadContract,
-              let pack = try? Self.decodeValidatedPack(
-                installed.data,
-                matching: installed.entry,
-                origin: .downloaded
-              ),
+              let pack = try? Self.decodeValidatedPack(installed.data, matching: installed.entry),
               await validatesCanonicalMembership(pack) else {
             return nil
         }
@@ -1185,8 +1135,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     nonisolated private static func decodeValidatedPack(
         _ data: Data,
-        matching entry: OfficialManifestCity,
-        origin: LoadedPackOrigin
+        matching entry: OfficialManifestCity
     ) throws -> OfficialPack {
         guard entry.validatesPackData(data) else { throw CityPackDiskError.validationFailed }
         let pack = try JSONDecoder().decode(OfficialPack.self, from: data)
@@ -1204,7 +1153,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               stationIDs.allSatisfy({ !$0.isEmpty }),
               Set(stationIDs).count == stationIDs.count,
               validatesPackCoverage(pack),
-              pack.stations.allSatisfy({ validatesStation($0, cityID: pack.cityID, origin: origin) }),
+              pack.stations.allSatisfy({ validatesStation($0, cityID: pack.cityID) }),
               pack.destinationNames.allSatisfy({
                   !$0.key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                       !$0.value.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -1223,7 +1172,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             coverage.staticSchedules,
             coverage.liveArrivals,
             coverage.externalLayouts,
-            coverage.licensedMedia,
             coverage.verifiedTransferContexts
         ]
         return metrics.allSatisfy {
@@ -1239,8 +1187,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               coverage.accessibility.covered == stations.filter({ $0.accessibility != nil }).count,
               coverage.staticSchedules.covered == stations.filter({ !$0.schedules.isEmpty }).count,
               coverage.liveArrivals.covered == stations.filter({ !$0.liveArrivalReferences.isEmpty }).count,
-              coverage.externalLayouts.covered == 0,
-              coverage.licensedMedia.covered == stations.filter({ !$0.licensedMedia.isEmpty }).count else {
+              coverage.externalLayouts.covered == 0 else {
             return false
         }
         return true
@@ -1248,33 +1195,14 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     nonisolated private static func validatesStation(
         _ station: OfficialStation,
-        cityID: String,
-        origin: LoadedPackOrigin
+        cityID: String
     ) -> Bool {
-        guard !station.stationName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              station.stationNameEn?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != true,
-              station.aliases == Array(Set(station.aliases)).sorted(),
-              station.aliases.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }),
-              station.externalResources.allSatisfy({ isAllowedExternalResource($0, cityID: cityID) }),
-              station.liveArrivalReferences.allSatisfy({ validatesLiveReference($0, cityID: cityID) }) else {
-            return false
-        }
-        switch origin {
-        case .bundled:
-            return station.licensedMedia.allSatisfy(validatesBundledMedia)
-        case .downloaded:
-            // `stationAccessPoints` used to be rejected here, and that made the download path
-            // useless the moment it was reachable: 13 of the 14 packs carry the operator's own
-            // entrance coordinates for almost every station, so the only city a mirror could
-            // deliver was Macau, which has none. The entrances *are* the reason to update a pack.
-            //
-            // What a downloaded pack still cannot introduce is licensed media, whose files live in
-            // the app bundle and cannot arrive over the wire at all. And it is not unchecked: the
-            // manifest names a size and a SHA-256, the bytes are verified against both before
-            // anything is parsed, every station is validated the same way a bundled one is, and a
-            // pack that fails is discarded in favour of the bundled copy.
-            return station.licensedMedia.isEmpty
-        }
+        !station.stationName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            station.stationNameEn?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != true &&
+            station.aliases == Array(Set(station.aliases)).sorted() &&
+            station.aliases.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) &&
+            station.externalResources.allSatisfy({ isAllowedExternalResource($0, cityID: cityID) }) &&
+            station.liveArrivalReferences.allSatisfy({ validatesLiveReference($0, cityID: cityID) })
     }
 
     nonisolated private static func validatesLiveReference(
@@ -1308,7 +1236,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let url = root.appendingPathComponent(relativePath).standardizedFileURL
         guard url.path.hasPrefix(root.standardizedFileURL.path + "/"),
               let data = try? Data(contentsOf: url),
-              let pack = try? Self.decodeValidatedPack(data, matching: entry, origin: .bundled) else { return nil }
+              let pack = try? Self.decodeValidatedPack(data, matching: entry) else { return nil }
         return (pack, url)
     }
 
@@ -1327,34 +1255,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               allowedExternalLandingPages[cityID, default: []].contains(resource.landingPageURL) else {
             return false
         }
-        return true
-    }
-
-    nonisolated private static func validatesBundledMedia(_ media: LicensedStationMedia) -> Bool {
-        guard ["CC0-1.0", "CC-BY-2.0"].contains(media.licenseSPDX),
-              ["image/jpeg", "image/png", "image/webp"].contains(media.mimeType.lowercased()),
-              !media.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !media.creator.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !media.attribution.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !media.modifications.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              media.sizeBytes > 0,
-              media.sha256.count == 64,
-              media.sha256.allSatisfy(\.isHexDigit),
-              isSafeMetadataURL(media.sourcePageURL),
-              isSafeMetadataURL(media.licenseURL),
-              let url = media.bundledURL,
-              let data = try? Data(contentsOf: url),
-              data.count == media.sizeBytes else { return false }
-        return data.sha256Hex.caseInsensitiveCompare(media.sha256) == .orderedSame
-    }
-
-    nonisolated private static func isSafeMetadataURL(_ value: String) -> Bool {
-        guard let url = URL(string: value),
-              url.scheme?.lowercased() == "https",
-              url.host?.isEmpty == false,
-              url.port == nil || url.port == 443,
-              url.user == nil,
-              url.password == nil else { return false }
         return true
     }
 
@@ -1740,12 +1640,11 @@ private struct OfficialStation: Decodable {
     // Optional, backward-compatible transit-guidance fields (absent in current packs).
     let stationAccessPoints: [OfficialAccessPoint]?
     let externalResources: [ExternalTransitResource]
-    let licensedMedia: [LicensedStationMedia]
     let liveArrivalReferences: [OfficialLiveArrivalReference]
 
     enum CodingKeys: String, CodingKey {
         case stationName, stationNameEn, stationID, aliases, accessibility, schedules,
-             stationFacilities, stationAccessPoints, externalResources, licensedMedia,
+             stationFacilities, stationAccessPoints, externalResources,
              liveArrivalReferences
     }
 
@@ -1762,10 +1661,6 @@ private struct OfficialStation: Decodable {
         externalResources = try values.decodeIfPresent(
             [ExternalTransitResource].self,
             forKey: .externalResources
-        ) ?? []
-        licensedMedia = try values.decodeIfPresent(
-            [LicensedStationMedia].self,
-            forKey: .licensedMedia
         ) ?? []
         liveArrivalReferences = try values.decodeIfPresent(
             [OfficialLiveArrivalReference].self,

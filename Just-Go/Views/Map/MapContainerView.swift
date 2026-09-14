@@ -867,17 +867,6 @@ struct MapContainerView: View {
                 )
             }
         }
-        // A named trip, planned through the real planner and landed on its detail page. The
-        // station-derived seeding below cannot reach a specific route, and this environment has no
-        // way to type two endpoints into a form.
-        if let trip = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ROUTE"] {
-            let parts = trip.split(separator: ",").compactMap { Double($0) }
-            if parts.count >= 4 {
-                didCenterOnUser = true
-                Task { await seedDebugTrip(parts) }
-                return
-            }
-        }
         // A named line, landed on its own page. Same reason as the two above: this environment has
         // no tap injection, so the only way to look at a pushed screen is to seed the path.
         if let line = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_LINE"] {
@@ -986,8 +975,8 @@ struct MapContainerView: View {
         } else {
             let sortedByLatitude = stations.sorted { $0.latitude < $1.latitude }
             guard let south = sortedByLatitude.first, let north = sortedByLatitude.last else { return }
-            plannerViewModel.selectPlace(debugPlace(for: south), for: .origin)
-            plannerViewModel.selectPlace(debugPlace(for: north), for: .destination)
+            plannerViewModel.selectPlace(debugPlace(at: south.coordinate), for: .origin)
+            plannerViewModel.selectPlace(debugPlace(at: north.coordinate), for: .destination)
         }
         guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
         switch screen {
@@ -1000,35 +989,12 @@ struct MapContainerView: View {
         }
     }
 
-    private func seedDebugTrip(_ parts: [Double]) async {
-        _ = await waitForNetwork()
-        let plannerViewModel = planner
-        plannerViewModel.selectPlace(
-            TransitPlace(name: "A", coordinate: CLLocationCoordinate2D(latitude: parts[0], longitude: parts[1]), source: .localStationData),
-            for: .origin
-        )
-        plannerViewModel.selectPlace(
-            TransitPlace(name: "B", coordinate: CLLocationCoordinate2D(latitude: parts[2], longitude: parts[3]), source: .localStationData),
-            for: .destination
-        )
-        guard await plannerViewModel.searchRoutes(), let first = plannerViewModel.routes.first else { return }
-        path = [.results, .detail(first.id)]
-    }
-
     /// A bare coordinate as an endpoint. The planner walks to the nearest station from it, which
     /// is what a rider dropping a pin gets, so a named pair still exercises the real path.
     private func debugPlace(at coordinate: CLLocationCoordinate2D) -> TransitPlace {
         TransitPlace(
             name: String(format: "%.4f, %.4f", coordinate.latitude, coordinate.longitude),
             coordinate: coordinate,
-            source: .localStationData
-        )
-    }
-
-    private func debugPlace(for station: Station) -> TransitPlace {
-        TransitPlace(
-            name: station.localizedName,
-            coordinate: CLLocationCoordinate2D(latitude: station.latitude, longitude: station.longitude),
             source: .localStationData
         )
     }

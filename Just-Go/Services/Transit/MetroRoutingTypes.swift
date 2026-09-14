@@ -113,7 +113,7 @@ enum MetroSearchPreference {
         self == .leastWalking ? 3 : 1
     }
 
-    var strategy: RouteStrategy {
+    var strategy: RoutePreference {
         switch self {
         case .fastest: return .fastest
         case .fewestTransfers: return .fewestTransfers

@@ -181,7 +181,7 @@ struct TripsView: View {
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    Text(record.strategy.localizedName)
+                    Text(record.strategy.title)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if !record.warningMessages.isEmpty {

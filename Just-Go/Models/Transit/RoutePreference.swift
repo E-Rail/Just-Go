@@ -56,17 +56,4 @@ enum RoutePreference: String, Codable, CaseIterable, Identifiable {
             return "figure.walk"
         }
     }
-
-    init(routeStrategy: RouteStrategy) {
-        switch routeStrategy {
-        case .metroFirst:
-            self = .metroFirst
-        case .fastest:
-            self = .fastest
-        case .fewestTransfers:
-            self = .fewestTransfers
-        case .leastWalking:
-            self = .leastWalking
-        }
-    }
 }

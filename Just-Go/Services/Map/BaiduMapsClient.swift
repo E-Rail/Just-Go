@@ -30,11 +30,6 @@ struct BaiduMapsConfiguration: Sendable, Equatable {
     /// must build and run without one: a missing key is a normal state, not an error.
     var isConfigured: Bool { !accessKey.isEmpty }
 
-    /// Signing turns itself on when an SK exists. With the console set to IP 白名单 there is no SK
-    /// and requests go unsigned; switching the console to SN 校验 and pasting an SK into
-    /// Secrets.xcconfig is the whole migration.
-    var signsRequests: Bool { secretKey != nil }
-
     static func fromBundle(_ bundle: Bundle = .main) -> BaiduMapsConfiguration {
         BaiduMapsConfiguration(
             accessKey: bundle.object(forInfoDictionaryKey: "BaiduMapsAK") as? String ?? "",

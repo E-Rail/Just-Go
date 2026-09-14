@@ -36,7 +36,7 @@ struct Route: Identifiable, Codable {
     let destination: String
     let originStationID: String
     let destinationStationID: String
-    let strategy: RouteStrategy
+    let strategy: RoutePreference
     // Mutable for the same reason `warnings` and `accessGuidance` are: enrichment re-walks the
     // first and last legs once it knows which door the rider should use, and the distance that
     // summarises them has to follow.
@@ -319,36 +319,13 @@ enum RouteConfidenceLevel: Equatable {
     }
 }
 
-enum RouteStrategy: String, Codable, CaseIterable {
-    case metroFirst
-    case fastest
-    case fewestTransfers
-    case leastWalking
-
-    var localizedName: String {
-        switch self {
-        case .metroFirst:
-            return AppLocalization.localized("Transit First")
-        case .fastest:
-            return AppLocalization.localized("Fastest")
-        case .fewestTransfers:
-            return AppLocalization.localized("Fewest Transfers")
-        case .leastWalking:
-            return AppLocalization.localized("Least Walking")
-        }
-    }
-}
-
 struct TransitLegContext: Codable, Equatable {
     let lineID: String
     let lineName: String
     let boardingStationID: String
-    let alightingStationID: String
     let directionNextStationID: String?
     let directionNextStationName: String?
-    let arrivalPreviousStationID: String?
     let arrivalPreviousStationName: String?
-    let directionTerminalStationID: String?
     let directionTerminalStationName: String?
     /// Every station this train calls at from the boarding station to the end of its run, in
     /// travel order.
@@ -370,26 +347,25 @@ struct TransferContext: Codable, Equatable {
     let cityID: String
     let stationID: String
     let stationName: String
-    let incoming: TransitLegContext
-    let outgoing: TransitLegContext
 }
 
 struct RouteSegment: Identifiable, Codable {
-    let id: UUID
-    let type: SegmentType
+    // `var` where a copy below changes it; everything else about a leg is fixed once built.
+    private(set) var id: UUID
+    private(set) var type: SegmentType
     let lineName: String?
     let lineColorHex: String?
-    let fromStationName: String?
-    let toStationName: String?
+    private(set) var fromStationName: String?
+    private(set) var toStationName: String?
     let fromStationID: String?
     let toStationID: String?
-    let duration: TimeInterval
-    let distance: Double
+    private(set) var duration: TimeInterval
+    private(set) var distance: Double
     let stops: Int
     let stationStops: [RouteStationStop]
     let polylineCoordinates: [CodableCoordinate]
     let walkingDirections: [WalkingStep]?
-    let accessibilityNotes: [String]
+    private(set) var accessibilityNotes: [String]
     var transitContext: TransitLegContext? = nil
     var transferContext: TransferContext? = nil
     /// The line the rider was just riding, for `.transfer` segments only. `LineName` on a
@@ -397,7 +373,6 @@ struct RouteSegment: Identifiable, Codable {
     /// resolving a real indoor path needs this separate field for where they're coming from.
     /// Optional with a default so old persisted trips (`ActiveTripStore`) decode unchanged.
     var incomingLineName: String? = nil
-    var incomingLineColorHex: String? = nil
     /// The platform-to-platform walk a routing provider measured for this change, in metres.
     ///
     /// Set on `.transfer` legs by `measuringTransfer(distance:)` and read by Live Go, which showed
@@ -447,27 +422,11 @@ struct RouteSegment: Identifiable, Codable {
     /// routes in one results list would otherwise carry segments that compare equal.
     func relabelled(from newFromName: String?, to newToName: String?) -> RouteSegment {
         guard fromStationName != newFromName || toStationName != newToName else { return self }
-        return RouteSegment(
-            id: UUID(),
-            type: type,
-            lineName: lineName,
-            lineColorHex: lineColorHex,
-            fromStationName: newFromName,
-            toStationName: newToName,
-            fromStationID: fromStationID,
-            toStationID: toStationID,
-            duration: duration,
-            distance: distance,
-            stops: stops,
-            stationStops: stationStops,
-            polylineCoordinates: polylineCoordinates,
-            walkingDirections: walkingDirections,
-            accessibilityNotes: accessibilityNotes,
-            transitContext: transitContext,
-            transferContext: transferContext,
-            incomingLineName: incomingLineName,
-            incomingLineColorHex: incomingLineColorHex
-        )
+        var copy = self
+        copy.id = UUID()
+        copy.fromStationName = newFromName
+        copy.toStationName = newToName
+        return copy
     }
 
     /// The same leg, re-labelled for a different mode. Used only where a mode borrows another's
@@ -478,27 +437,11 @@ struct RouteSegment: Identifiable, Codable {
         duration: TimeInterval,
         accessibilityNotes: [String]
     ) -> RouteSegment {
-        RouteSegment(
-            id: id,
-            type: type,
-            lineName: lineName,
-            lineColorHex: lineColorHex,
-            fromStationName: fromStationName,
-            toStationName: toStationName,
-            fromStationID: fromStationID,
-            toStationID: toStationID,
-            duration: duration,
-            distance: distance,
-            stops: stops,
-            stationStops: stationStops,
-            polylineCoordinates: polylineCoordinates,
-            walkingDirections: walkingDirections,
-            accessibilityNotes: accessibilityNotes,
-            transitContext: transitContext,
-            transferContext: transferContext,
-            incomingLineName: incomingLineName,
-            incomingLineColorHex: incomingLineColorHex
-        )
+        var copy = self
+        copy.type = type
+        copy.duration = duration
+        copy.accessibilityNotes = accessibilityNotes
+        return copy
     }
 
     /// What a change costs beyond the walking, in seconds: platform to platform, the wait, the
@@ -522,28 +465,11 @@ struct RouteSegment: Identifiable, Codable {
     /// geometry for were ever measured — measured routes were quietly discounted against
     /// unmeasured ones under `.fastest`.
     func measuringTransfer(distance measuredDistance: Double) -> RouteSegment {
-        RouteSegment(
-            id: id,
-            type: type,
-            lineName: lineName,
-            lineColorHex: lineColorHex,
-            fromStationName: fromStationName,
-            toStationName: toStationName,
-            fromStationID: fromStationID,
-            toStationID: toStationID,
-            duration: measuredDistance / 1.25 + RouteSegment.changeoverAllowance,
-            distance: measuredDistance,
-            stops: stops,
-            stationStops: stationStops,
-            polylineCoordinates: polylineCoordinates,
-            walkingDirections: walkingDirections,
-            accessibilityNotes: accessibilityNotes,
-            transitContext: transitContext,
-            transferContext: transferContext,
-            incomingLineName: incomingLineName,
-            incomingLineColorHex: incomingLineColorHex,
-            measuredCorridorMetres: Int(measuredDistance.rounded())
-        )
+        var copy = self
+        copy.distance = measuredDistance
+        copy.duration = measuredDistance / 1.25 + RouteSegment.changeoverAllowance
+        copy.measuredCorridorMetres = Int(measuredDistance.rounded())
+        return copy
     }
 }
 
@@ -994,7 +920,6 @@ struct CodableCoordinate: Codable, Equatable {
 }
 
 enum TransitPlaceSource: String, Codable {
-    case inputTip
     case poiSearch
     case mapKit
     case reverseGeocode

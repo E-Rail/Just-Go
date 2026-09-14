@@ -120,14 +120,9 @@ extension BundledMetroRouteProvider {
             // change twice: "walk 广安门内 → 牛街" followed by "transfer at 牛街".
             let followsInterchange = index > 0 && groups[index - 1].first?.interchange != nil
             if index > 0, !followsInterchange {
-                // `lineName` below is the outgoing line (correct for "Transfer to X" display
-                // text): the incoming line, for resolving a real indoor transfer path, is the
-                // *previous* group's line, only available here, not reconstructable later.
-                let previousGroup = groups[index - 1]
-                let previousLine = previousGroup.last.flatMap { graph.linesByID[$0.lineID] }
-                let incomingContext = previousLine.map {
-                    transitLegContext(group: previousGroup, line: $0, graph: graph)
-                }
+                // `lineName` below is the outgoing line; the incoming one is the previous group's,
+                // which only this loop still knows.
+                let previousLine = groups[index - 1].last.flatMap { graph.linesByID[$0.lineID] }
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .transfer,
@@ -149,17 +144,14 @@ extension BundledMetroRouteProvider {
                     polylineCoordinates: [],
                     walkingDirections: nil,
                     accessibilityNotes: [],
-                    transferContext: incomingContext.map {
+                    transferContext: previousLine.map { _ in
                         TransferContext(
                             cityID: graph.cityID(for: from.id),
                             stationID: graph.qualifiedID(for: from.id),
-                            stationName: from.name,
-                            incoming: $0,
-                            outgoing: currentContext
+                            stationName: from.name
                         )
                     },
-                    incomingLineName: previousLine?.name,
-                    incomingLineColorHex: previousLine?.colorHex
+                    incomingLineName: previousLine?.name
                 ))
             }
             let stationIDs = [first.fromStationID] + group.map(\.toStationID)
@@ -277,12 +269,9 @@ extension BundledMetroRouteProvider {
             lineID: line.id,
             lineName: line.name,
             boardingStationID: graph.qualifiedID(for: first.fromStationID),
-            alightingStationID: graph.qualifiedID(for: last.toStationID),
             directionNextStationID: next.map { graph.qualifiedID(for: $0.id) },
             directionNextStationName: next?.name,
-            arrivalPreviousStationID: previous.map { graph.qualifiedID(for: $0.id) },
             arrivalPreviousStationName: previous?.name,
-            directionTerminalStationID: terminal.map { graph.qualifiedID(for: $0.id) },
             directionTerminalStationName: terminal?.name,
             onwardStationNames: onward?.compactMap { graph.stationsByID[$0]?.name }
         )

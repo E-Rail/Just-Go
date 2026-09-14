@@ -15,60 +15,10 @@ struct City: Identifiable, Codable {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    var dataCapabilities: CityDataCapabilities {
-        CityDataCapabilities.forCity(id)
+    /// What the bundled manifest says this city's pack covers.
+    var dataCoverage: CityDataCoverage {
+        CityDataCoverage.manifestCoverage[id] ?? .empty
     }
-}
-
-struct CityDataCapabilities: Equatable {
-    let accessibility: CityDataCapabilityStatus
-    let stationEssentials: CityDataCapabilityStatus
-    let stationMap: CityDataCapabilityStatus
-    let coverage: CityDataCoverage
-
-    static func forCity(_ cityID: String) -> CityDataCapabilities {
-        manifestCapabilities[cityID] ?? CityDataCapabilities(
-            accessibility: .pending,
-            stationEssentials: .pending,
-            stationMap: .pending,
-            coverage: .empty
-        )
-    }
-
-    /// `manifestCapabilities` is a lazily-computed `static let`. Its first touch decodes
-    /// `manifest.json` synchronously. `forCity` is called directly from SwiftUI view bodies
-    /// (city list rows), so an un-prewarmed first access blocks the main thread mid-render.
-    /// Call this once, off the main thread, during app launch so the lazy static is already
-    /// populated (a cheap dictionary lookup) by the time any view needs it.
-    static func prewarm() {
-        _ = manifestCapabilities
-    }
-
-    private static let manifestCapabilities: [String: CityDataCapabilities] = {
-        guard let url = Bundle.main.url(forResource: "manifest", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let manifest = try? JSONDecoder().decode(PackManifest.self, from: data) else {
-            return [:]
-        }
-        return Dictionary(
-            manifest.cities.map { city in
-                let coverage = city.coverage ?? .empty
-                return (city.cityID, CityDataCapabilities(
-                    accessibility: coverage.accessibility.status(
-                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.accessibility)
-                    ),
-                    stationEssentials: coverage.bestTimesStatus(
-                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.schedules)
-                    ),
-                    stationMap: coverage.externalLayouts.status(
-                        fallback: CityDataCapabilityStatus(manifestValue: city.capabilities.stationMaps)
-                    ),
-                    coverage: coverage
-                ))
-            },
-            uniquingKeysWith: { first, _ in first }
-        )
-    }()
 }
 
 struct CityDataCoverage: Codable, Equatable, Sendable {
@@ -78,7 +28,6 @@ struct CityDataCoverage: Codable, Equatable, Sendable {
     let staticSchedules: CityCoverageMetric
     let liveArrivals: CityCoverageMetric
     let externalLayouts: CityCoverageMetric
-    let licensedMedia: CityCoverageMetric
     let verifiedTransferContexts: CityCoverageMetric
 
     static let empty = CityDataCoverage(
@@ -88,13 +37,26 @@ struct CityDataCoverage: Codable, Equatable, Sendable {
         staticSchedules: .zero,
         liveArrivals: .zero,
         externalLayouts: .zero,
-        licensedMedia: .zero,
         verifiedTransferContexts: .zero
     )
 
-    func bestTimesStatus(fallback: CityDataCapabilityStatus) -> CityDataCapabilityStatus {
-        let best = liveArrivals.covered >= staticSchedules.covered ? liveArrivals : staticSchedules
-        return best.status(fallback: fallback)
+    /// Decoded from the bundled `manifest.json` on first touch, which is synchronous and reached
+    /// from view bodies: `JustGoApp` calls `prewarm()` off the main thread at launch so a city list
+    /// never pays for it mid-render.
+    fileprivate static let manifestCoverage: [String: CityDataCoverage] = {
+        guard let url = Bundle.main.url(forResource: "manifest", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let manifest = try? JSONDecoder().decode(PackManifest.self, from: data) else {
+            return [:]
+        }
+        return Dictionary(
+            manifest.cities.compactMap { city in city.coverage.map { (city.cityID, $0) } },
+            uniquingKeysWith: { first, _ in first }
+        )
+    }()
+
+    static func prewarm() {
+        _ = manifestCoverage
     }
 
     /// Whether a station pack actually carries anything for this city.
@@ -105,7 +67,7 @@ struct CityDataCoverage: Codable, Equatable, Sendable {
     /// too: `validate_indoor_maps.rb` pins it at zero everywhere, so it can never be the reason a
     /// city has data.
     var hasStationData: Bool {
-        [matchedStations, accessibility, staticSchedules, liveArrivals, externalLayouts, licensedMedia]
+        [matchedStations, accessibility, staticSchedules, liveArrivals, externalLayouts]
             .contains { $0.covered > 0 }
     }
 }
@@ -142,14 +104,6 @@ enum CityDataCapabilityStatus: String, Codable, Sendable {
             return "clock"
         }
     }
-
-    fileprivate init(manifestValue: String) {
-        switch manifestValue {
-        case "official_static": self = .available
-        case "partial_static": self = .partial
-        default: self = .pending
-        }
-    }
 }
 
 private struct PackManifest: Decodable {
@@ -158,14 +112,7 @@ private struct PackManifest: Decodable {
 
 private struct PackManifestCity: Decodable {
     let cityID: String
-    let capabilities: PackCapabilities
     let coverage: CityDataCoverage?
-}
-
-private struct PackCapabilities: Decodable {
-    let accessibility: String
-    let schedules: String
-    let stationMaps: String
 }
 
 struct AccessibilityData: Codable {

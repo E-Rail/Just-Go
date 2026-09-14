@@ -874,8 +874,7 @@ extension StationDetailView {
         let resources = (viewModel?.externalResources ?? []).filter {
             $0.kind != .stationInformation
         }
-        let media = viewModel?.licensedMedia ?? []
-        if viewModel?.isLoadingCityPack == true || !resources.isEmpty || !media.isEmpty || viewModel?.stationLayoutStatusMessage != nil {
+        if viewModel?.isLoadingCityPack == true || !resources.isEmpty || viewModel?.stationLayoutStatusMessage != nil {
             GlassCard {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(AppLocalization.text(
@@ -891,10 +890,6 @@ extension StationDetailView {
                         ForEach(resources) { resource in
                             OfficialTransitResourceButton(resource: resource, compact: true)
                         }
-
-                        ForEach(media) { item in
-                            licensedMediaContent(item)
-                        }
                     }
 
                     if let statusMessage = viewModel?.stationLayoutStatusMessage {
@@ -906,90 +901,6 @@ extension StationDetailView {
             }
         }
     }
-
-    @ViewBuilder
-    private func licensedMediaContent(_ media: LicensedStationMedia) -> some View {
-        if let url = media.bundledURL {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(media.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                localStationImage(
-                    url: url,
-                    title: media.title
-                )
-                Text("\(media.attribution) · \(media.licenseSPDX)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(media.modifications)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 16) {
-                    if let sourceURL = URL(string: media.sourcePageURL) {
-                        Link(destination: sourceURL) {
-                            Label(
-                                AppLocalization.text(
-                                    english: "Source page",
-                                    simplified: "来源页面",
-                                    traditional: "來源頁面"
-                                ),
-                                systemImage: "arrow.up.right.square"
-                            )
-                        }
-                    }
-                    if let licenseURL = URL(string: media.licenseURL) {
-                        Link(destination: licenseURL) {
-                            Label(media.licenseSPDX, systemImage: "doc.text")
-                        }
-                    }
-                }
-                .font(.caption)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func localStationImage(url: URL, title: String) -> some View {
-        StationAssetImage(url: url) { image in
-            Button {
-                selectedStationImage = FullScreenStationImage(url: url, title: title)
-            } label: {
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 160)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
-                    .clipShape(RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: "arrow.up.left.and.arrow.down.right")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
-                            .padding(8)
-                            .background(.black.opacity(0.55), in: Circle())
-                            .padding(8)
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: Radius.small, style: .continuous)
-                            .strokeBorder(Color.secondary.opacity(0.18), lineWidth: 1)
-                    }
-                }
-            .buttonStyle(.plain)
-            .accessibilityLabel(AppLocalization.localized("Open station image full screen"))
-        } failure: {
-            Text(AppLocalization.text(
-                english: "Station media could not be loaded",
-                simplified: "车站媒体无法加载",
-                traditional: "車站媒體無法載入"
-            ))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-    }
-
 }
 
 private extension Array where Element == StationFacility {

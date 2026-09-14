@@ -31,7 +31,7 @@ struct TransitDataView: View {
     /// the same failure as claiming a transfer nobody surveyed.
     private var cities: [City] {
         container.cityService.getAllCities().filter { city in
-            (state.coverage[city.id] ?? city.dataCapabilities.coverage).hasStationData
+            (state.coverage[city.id] ?? city.dataCoverage).hasStationData
         }
     }
 
@@ -178,7 +178,7 @@ struct TransitDataView: View {
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                     CityCapabilityTags(
-                                        coverage: state.coverage[city.id] ?? city.dataCapabilities.coverage,
+                                        coverage: state.coverage[city.id] ?? city.dataCoverage,
                                         hasOfficialOnlineStationInformation:
                                             container.stationInformationDirectory.servesStationInformation(cityID: city.id)
                                     )
@@ -616,19 +616,26 @@ struct CityCapabilityTags: View, Equatable {
     /// "0" would contradict the online facilities every station page renders.
     var hasOfficialOnlineStationInformation: Bool = false
 
-    /// Cap held to 3: a city row is a compact summary, not the full coverage table (that
-    /// detail lives on the city's own page). More than a handful of chips just wraps and
-    /// crowds every other row in the list.
-    private static let maximumTagCount = 3
-
     private struct Tag: Identifiable {
         let id: String
         let title: String
         let status: CityDataCapabilityStatus
     }
 
+    /// Three tags: a city row is a compact summary, and the full table lives on the city's page.
     private var tags: [Tag] {
-        var result: [Tag] = [
+        let access = hasOfficialOnlineStationInformation
+            ? Tag(
+                id: "access",
+                title: AppLocalization.text(english: "Access · Online", simplified: "无障碍 · 在线", traditional: "無障礙 · 線上"),
+                status: .available
+            )
+            : Tag(
+                id: "access",
+                title: coverageTitle(AppLocalization.localized("Access"), metric: coverage.accessibility),
+                status: coverage.accessibility.status()
+            )
+        return [
             Tag(
                 id: "matched",
                 title: coverageTitle(
@@ -636,58 +643,17 @@ struct CityCapabilityTags: View, Equatable {
                     metric: coverage.matchedStations
                 ),
                 status: coverage.matchedStations.status()
+            ),
+            access,
+            Tag(
+                id: "live",
+                title: coverageTitle(
+                    AppLocalization.text(english: "Live", simplified: "实时", traditional: "即時"),
+                    metric: coverage.liveArrivals
+                ),
+                status: coverage.liveArrivals.status()
             )
         ]
-        if hasOfficialOnlineStationInformation {
-            result.append(Tag(
-                id: "access",
-                title: AppLocalization.text(
-                    english: "Access · Online",
-                    simplified: "无障碍 · 在线",
-                    traditional: "無障礙 · 線上"
-                ),
-                status: .available
-            ))
-        } else {
-            result.append(Tag(
-                id: "access",
-                title: coverageTitle(AppLocalization.localized("Access"), metric: coverage.accessibility),
-                status: coverage.accessibility.status()
-            ))
-        }
-        result.append(Tag(
-            id: "live",
-            title: coverageTitle(
-                AppLocalization.text(english: "Live", simplified: "实时", traditional: "即時"),
-                metric: coverage.liveArrivals
-            ),
-            status: coverage.liveArrivals.status()
-        ))
-        result.append(Tag(
-            id: "offlineMaps",
-            title: coverageTitle(
-                AppLocalization.text(english: "Offline maps", simplified: "离线地图", traditional: "離線地圖"),
-                metric: coverage.externalLayouts
-            ),
-            status: coverage.externalLayouts.status()
-        ))
-        result.append(Tag(
-            id: "media",
-            title: coverageTitle(
-                AppLocalization.text(english: "Media", simplified: "媒体", traditional: "媒體"),
-                metric: coverage.licensedMedia
-            ),
-            status: coverage.licensedMedia.status()
-        ))
-        result.append(Tag(
-            id: "indoor",
-            title: coverageTitle(
-                AppLocalization.text(english: "Indoor", simplified: "站内", traditional: "站內"),
-                metric: coverage.verifiedTransferContexts
-            ),
-            status: coverage.verifiedTransferContexts.status()
-        ))
-        return result
     }
 
     var body: some View {
@@ -696,7 +662,7 @@ struct CityCapabilityTags: View, Equatable {
             alignment: .leading,
             spacing: 6
         ) {
-            ForEach(tags.prefix(Self.maximumTagCount)) { tag in
+            ForEach(tags) { tag in
                 capabilityTag(title: tag.title, status: tag.status)
             }
         }

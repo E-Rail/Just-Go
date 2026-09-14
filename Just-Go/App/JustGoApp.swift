@@ -16,16 +16,9 @@ struct JustGoApp: App {
     init() {
         #if DEBUG
         MainThreadHangMonitor.start()
-        LaunchClock.mark("app.init")
         #endif
         Self.applyDataRightsEpochIfNeeded()
-        #if DEBUG
-        LaunchClock.mark("dataRightsEpoch.done")
-        #endif
         let container = DIContainer.configure()
-        #if DEBUG
-        LaunchClock.mark("container.ready")
-        #endif
         _container = State(initialValue: container)
         // The sweep walks a directory whose size the app doesn't control, and nothing waits
         // on its result: keep it off the main thread, which is otherwise blocked here
@@ -42,11 +35,6 @@ struct JustGoApp: App {
                 if appState.isLaunching {
                     LaunchStageView(stage: appState.launchStage, progress: appState.launchProgress)
                         .transition(.opacity)
-                        .onAppear {
-                            #if DEBUG
-                            LaunchClock.mark("firstFrame")
-                            #endif
-                        }
                 } else {
                     ContentView()
                         .transition(.opacity)
@@ -81,7 +69,7 @@ struct JustGoApp: App {
         // asks for that at the moment it can explain why.
         container.locationService.prewarmLocation()
         await Task.detached(priority: .userInitiated) {
-            CityDataCapabilities.prewarm()
+            CityDataCoverage.prewarm()
         }.value
 
         // Stage 2: decode the network the map is about to open on, so its geometry is already
@@ -89,9 +77,6 @@ struct JustGoApp: App {
         // the camera the rider left behind, not from a city they were made to pick.
         // Bounded: a launch screen that never finishes is worse than a slow one, and the decode
         // is a warmup, if it overruns, hand off and let it land in the actor's cache behind us.
-        #if DEBUG
-        LaunchClock.mark("stage1.capabilities.done")
-        #endif
         appState.advanceLaunch(to: .loadingMapData)
         if let camera = appState.lastMapCamera,
            let city = container.cityService.findNearestCity(
@@ -105,9 +90,6 @@ struct JustGoApp: App {
             }
         }
 
-        #if DEBUG
-        LaunchClock.mark("stage2.networkDecode.done")
-        #endif
         // Essentials done: hand off.
         appState.advanceLaunch(to: .ready)
 
@@ -122,9 +104,6 @@ struct JustGoApp: App {
 
         await quickTagRepair
         await stationIndex
-        #if DEBUG
-        LaunchClock.mark("stage3.background.done")
-        #endif
     }
 
     /// Builds the nationwide station list behind the live UI, so the first search does not wait

@@ -743,7 +743,6 @@ struct BaiduStep: Decodable, Sendable {
             /// "天通苑东方向" — the terminal this service runs towards, which is how every station
             /// sign in China names a direction.
             let directText: String?
-            let stopNum: Int?
 
             struct Stop: Decodable, Sendable {
                 let stopName: String?
@@ -764,7 +763,6 @@ struct BaiduStep: Decodable, Sendable {
                 case stopInfo = "stop_info"
                 case lineColor = "line_color"
                 case directText = "direct_text"
-                case stopNum = "stop_num"
             }
         }
     }

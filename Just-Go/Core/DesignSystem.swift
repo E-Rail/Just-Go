@@ -15,12 +15,9 @@ import SwiftUI
 enum Metrics {
     /// A four-point rhythm. Everything the app spaces should land on one of these.
     static let hairline: CGFloat = 2
-    static let xs: CGFloat = 4
     static let s: CGFloat = 8
     static let m: CGFloat = 12
     static let l: CGFloat = 16
-    static let xl: CGFloat = 24
-    static let xxl: CGFloat = 32
 
     /// The smallest square a finger can reliably hit. Apple's own floor, and the app had several
     /// controls at 34 and 36.

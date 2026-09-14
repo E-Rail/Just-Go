@@ -53,7 +53,6 @@ struct StationDetailView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State var viewModel: StationDetailViewModel?
-    @State var selectedStationImage: FullScreenStationImage?
     @State var showQuickTagDialog = false
     @State var selectedOfficialInformationCategory: OfficialStationInformationCategory = .firstLast
     @State var selectedTab: StationDetailTab = .trains
@@ -162,9 +161,6 @@ struct StationDetailView: View {
             viewModel?.loadStation(station)
             await viewModel?.loadCityPack()
             await viewModel?.loadRiderInformation()
-        }
-        .fullScreenCover(item: $selectedStationImage) { image in
-            FullScreenStationImageView(image: image)
         }
         .quickTagEditor(
             isPresented: $showQuickTagDialog,

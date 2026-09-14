@@ -8,7 +8,7 @@ struct TripRecord: Identifiable, Codable, Equatable {
     let plannedDuration: TimeInterval
     let walkingDistance: Double
     let transferCount: Int
-    let strategy: RouteStrategy
+    let strategy: RoutePreference
     let warningMessages: [String]
     let createdAt: Date
     var completedAt: Date?

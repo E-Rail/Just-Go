@@ -12,7 +12,6 @@ final class StationDetailViewModel {
     var stationLayoutStatusMessage: String?
     var externalResources: [ExternalTransitResource] = []
     var officialResourceReview: OfficialTransitResourceStation?
-    var licensedMedia: [LicensedStationMedia] = []
     var cityPackLoadStatus: CityPackLoadStatus?
     var accessGuidance: StationAccessGuidance?
     var officialStationInformation: OfficialStationInformationSnapshot?
@@ -119,7 +118,6 @@ final class StationDetailViewModel {
         stationLayoutStatusMessage = nil
         externalResources = []
         officialResourceReview = nil
-        licensedMedia = []
         accessGuidance = nil
         defer {
             if isCurrentCityPackLoad(stationID: stationID, generation: generation) {
@@ -150,10 +148,6 @@ final class StationDetailViewModel {
             let enrichedStation = await officialStationData.enrichStation(station)
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             self.station = enrichedStation
-
-            let loadedLicensedMedia = await officialStationData.licensedMedia(for: station)
-            guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
-            licensedMedia = loadedLicensedMedia
 
             let loadedGuidance = (await officialStationData.stationGuidance(
                 cityID: station.cityID,

@@ -132,8 +132,7 @@ struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
     var url: URL? { URL(string: targetURL) }
     var sourceURL: URL? { URL(string: sourcePageURL) }
 
-    // Schema-v2 city packs used this name. Keep decoding compatibility while runtime trust now
-    // comes exclusively from OfficialTransitResourceCatalog.
+    // The name schema-v2 packs used; trust now comes only from this catalog.
     var landingPageURL: String { targetURL }
 
     private enum CodingKeys: String, CodingKey {
@@ -149,9 +148,8 @@ struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
         case stationID
     }
 
-    /// Explicit because the custom `init(from:)` below suppresses the memberwise one. Used to
-    /// wrap a notice fetched at runtime so it can be opened through the same viewer as a
-    /// catalogued resource, rather than growing a second web surface beside it.
+    /// Explicit because the custom `init(from:)` suppresses the memberwise one. Wraps a notice
+    /// fetched at runtime so it opens in the same viewer as a catalogued resource.
     init(
         kind: ExternalTransitResourceKind,
         title: String,
@@ -221,12 +219,8 @@ enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
     case notOpenForPassengerService
     case noCurrentPassengerService
 
-    /// Whether a rider can board or alight here at all.
-    ///
-    /// The reviewed catalog marks eight stations that riders cannot use, and every one of them is
-    /// in the routable network: a trip can be planned to 福寿岭 or 黄土店 today. This is the single
-    /// definition the station header, the route planner and anything added later all read, so a
-    /// station's usability can never again be true on one screen and unmentioned on the next.
+    /// Whether a rider can board or alight here at all. The catalog marks eight stations riders
+    /// cannot use, all of them in the routable network, so every screen reads this one definition.
     var servesPassengers: Bool {
         switch self {
         case .exactPage, .officialContextOnly:

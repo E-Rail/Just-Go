@@ -2,10 +2,9 @@
 import Foundation
 import os
 
-/// DEBUG-only main-thread responsiveness probe. A main-runloop timer stamps a heartbeat; a
-/// background thread watches how stale that stamp gets. Staleness == the main thread is not
-/// servicing its runloop == the UI is frozen, which is exactly what we need to measure (and
-/// what wall-clock timing around individual functions cannot tell us on its own).
+/// DEBUG-only main-thread responsiveness probe: a main-runloop timer stamps a heartbeat and a
+/// background thread logs how stale it gets. A stale heartbeat means the UI was frozen, which
+/// timing individual functions cannot show.
 enum MainThreadHangMonitor {
     private static let log = Logger(subsystem: "com.erail.just-go.diag", category: "hang")
     nonisolated(unsafe) private static var lastBeat = CFAbsoluteTimeGetCurrent()

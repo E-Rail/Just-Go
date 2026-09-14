@@ -152,11 +152,9 @@ final class TripMemoryService {
         stationQuickTags.first { $0.stationID == stationID && $0.cityID == cityID }
     }
 
-    /// Re-syncs each tag's frozen station snapshot (station ID, coordinates, line
-    /// names/colors, English names) against the current bundled network data. Tags capture
-    /// this data at save time, and data refreshes regenerate the content-hash station IDs.
-    /// Without this pass, tags saved before a refresh drift out of sync with what the rest
-    /// of the app shows for the same station.
+    /// Re-syncs each tag's saved station snapshot (ID, coordinates, lines, English names) with the
+    /// current bundled network. Tags capture this when saved, and a data refresh regenerates the
+    /// content-hash station IDs.
     func repairQuickTagStationData(stationLookup: @MainActor (StationQuickTag) async -> Station?) async {
         let original = stationQuickTags
         var repaired = original

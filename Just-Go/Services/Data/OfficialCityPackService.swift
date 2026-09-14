@@ -2,8 +2,7 @@ import Foundation
 import CryptoKit
 import CoreLocation
 
-// Pre-compiled once instead of recompiling on every exitTokens(in:) call. StationGuidance
-// calls it per station per route, so this pattern was being rebuilt dozens of times per search.
+// Compiled once: station guidance calls `exitTokens(in:)` per station per route.
 private let exitTokenExpression = try! NSRegularExpression(pattern: "([A-Za-z0-9]+(?:[、，,/\\s][A-Za-z0-9]+)*)\\s*[出入]?口")
 
 private func exactOfficialStationNameKey(_ value: String) -> String {
@@ -99,19 +98,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         "data-gov-hk-mtr",
         "beijing-official-landing-links",
         "macau-official-landing-link",
-        // Registered in DataPacks/rights_inventory.json under LicenseRef-OGDL-TW-1.0, which
-        // permits redistribution and derivative works with mandatory attribution. Without it
-        // here the bundled Taipei pack failed the rights subset check and was discarded whole,
-        // so its official station entrances never reached the app.
+        // Registered in DataPacks/rights_inventory.json under LicenseRef-OGDL-TW-1.0
+        // (redistribution and derivatives, attribution mandatory). A pack whose rights are not all
+        // listed here is discarded whole.
         "taipei-open-data"
     ]
     private let session: URLSession
     private let metroNetworks: MetroNetworkProviding
     private let realtimeArrivals: any RealtimeArrivalProviding
-    // Loaded lazily on the actor: the bundled catalog is ~600KB of JSON whose decode +
-    // integrity validation is far too heavy for DIContainer.configure() on the main
-    // thread at launch. First use pays the cost off-main; a failed load degrades to
-    // `.empty` (no official links) rather than crashing.
+    // Loaded lazily on the actor: the ~600 KB catalog's decode and validation is too heavy for the
+    // main thread at launch. A failed load degrades to `.empty`, no official links.
     private let officialResourceCatalogLoader: @Sendable () throws -> OfficialTransitResourceCatalog
     private var cachedOfficialResourceCatalog: OfficialTransitResourceCatalog?
     private let diskStore = CityPackDiskStore()
@@ -119,23 +115,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
     private var failedManifestCooldownUntil: [URL: Date] = [:]
     private var packs: [String: LoadedPack] = [:]
-    /// Bundled packs decoded to answer a question about them, newest use last.
-    ///
-    /// Bounded, because the question is often asked about every city at once: opening Transit Data
-    /// asks for the status and coverage of all 14, and each answer decodes that city's pack and
-    /// builds three name indexes over its stations. Held for the session, that was the whole 4.9 MB
-    /// of bundled JSON plus its indexes, for a screen the rider is reading rather than routing from.
-    /// The decode is deliberate and stays — a pack that will not load must not report "Included" —
-    /// but the result no longer has to be kept.
-    ///
-    /// Four, so a rider moving between neighbouring cities keeps theirs, and the packs actually in
-    /// use live in `packs` and are not evicted by this at all.
+    /// Bundled packs decoded to answer a question about them, newest use last. Bounded to four
+    /// because Transit Data asks about all 14 at once, and each answer decodes a pack and builds
+    /// three name indexes. The decode stays (a pack that will not load must not report "Included");
+    /// keeping every result does not. Packs in use live in `packs` and are never evicted by this.
     private var bundledBaselinePacks: [String: LoadedPack] = [:]
     private var bundledBaselineOrder: [String] = []
     private static let maximumBundledBaselinePacks = 4
     private var loadStatuses: [String: CityPackLoadStatus] = [:]
-    // Explicit update attempts cache failures briefly. Normal station enrichment only opens
-    // installed or bundled data and never contacts a remote pack origin.
+    // Explicit update attempts cache failures briefly. Ordinary station enrichment opens only
+    // installed or bundled data and never contacts a remote origin.
     private var failedCooldownUntil: [String: Date] = [:]
     private static let failureCooldown: TimeInterval = 45
     private var loadGenerations: [String: Int] = [:]
@@ -322,8 +311,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         // Coalesce only explicit update requests. Ordinary station reads never enter this path.
         if let existing = inFlightLoads[cityID] {
             let status = await existing.task.value
-            // A delete can invalidate the load we coalesced onto (its cancelled task yields
-            // .failed): mirror the creator path and report the current truth instead.
+            // A delete can invalidate the load this joined (its cancelled task yields `.failed`):
+            // report the current state instead.
             guard loadGenerationMatches(for: cityID, generation: existing.generation) else {
                 return await cityPackStatus(for: cityID)
             }
@@ -358,11 +347,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return await cityPackStatus(for: cityID)
     }
 
-    /// Settings → Clear Cache: drop every disk and memory tier at once. Bundled baselines
-    /// reload lazily from the app bundle, so included cities keep working; downloaded packs
-    /// return to their not-downloaded state until the user downloads them again.
-    /// Bumped by every cache wipe, so work that was in flight across one cannot write its
-    /// result onto the table the wipe just cleared.
+    /// Bumped by every cache wipe, so work in flight across one cannot write its result onto the
+    /// table the wipe cleared.
     private var cacheWipeGeneration = 0
 
     func clearAllCaches() async {
@@ -397,10 +383,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         var pendingStatus: CityPackLoadStatus?
         let remoteManifests = await loadRemoteManifests()
 
-        // Same-version candidates (e.g. the international base URL vs. a mainland mirror) are
-        // interchangeable, so they're raced together; remoteEntries already sorts newest-version
-        // first, and groups are only tried in that order, so a real update is never skipped in
-        // favor of a faster old one.
+        // Candidates with the same version are interchangeable, so they race; groups run newest
+        // version first, so a real update is never skipped for a faster old copy.
         var groups: [[RemoteManifestEntry]] = []
         for candidate in remoteEntries(for: cityID, in: remoteManifests) {
             if groups.last?.first?.entry.version == candidate.entry.version {
@@ -413,8 +397,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         for group in groups {
             guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
 
-            // Disk-cache short-circuit first, in priority order across the whole group. Cheap,
-            // local, and exactly as fresh from any candidate sharing this version.
+            // Disk cache first, across the whole group: local, and as fresh as any candidate at
+            // this version.
             for candidate in group {
                 let manifestURL = candidate.url
                 let entry = candidate.entry
@@ -443,9 +427,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 return loaded.loadStatus
             }
 
-            // No cached hit for this version: race the real downloads, so a stalled or
-            // black-holed source (an international base URL is a known offender on some
-            // mainland networks) can't force a healthy mirror to wait behind it.
+            // No cached copy of this version: race the downloads, so a source that stalls cannot
+            // make a healthy mirror wait.
             let downloadable: [(manifestURL: URL, entry: OfficialManifestCity, downloadURL: URL, maximumBytes: Int)] =
                 group.compactMap { candidate in
                     let entry = candidate.entry
@@ -463,9 +446,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
                 for candidate in downloadable {
                     taskGroup.addTask { [self] in
                         let data = try await download(from: candidate.downloadURL, maximumBytes: candidate.maximumBytes)
-                        // No size/SHA guard here: `decodeValidatedPack` checks both before it
-                        // parses anything, so the downloaded bytes are still verified ahead of
-                        // the decode: hashing here too meant a second full pass over them.
+                        // No size or SHA check here: `decodeValidatedPack` checks both before it
+                        // parses anything.
                         let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry)
                         guard await validatesCanonicalMembership(decoded) else {
                             throw CityPackCandidateFailed()
@@ -532,9 +514,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
 
     private func enrichLoadedStation(_ station: Station) -> Station {
         guard let item = stationRecord(for: station) else { return station }
-        // Station is a reference type, and callers pass in instances the main thread may
-        // already be rendering: mutating those here (on the actor's executor) races the UI.
-        // Enrich a copy instead; every caller consumes the returned station.
+        // `Station` is a reference type and callers pass instances the main thread may be
+        // rendering; mutating them on the actor races the UI. Enrich a copy, which every caller
+        // uses.
         let enriched = Station(
             stationID: station.stationID,
             name: item.stationName,
@@ -802,10 +784,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         let stations = names.compactMap { stationRecord(cityID: cityID, normalizedName: $0) }
         return RouteDataCoverage(
             stationCount: names.count,
-            // A record exists for 582 stations; 484 of them are an OpenStreetMap entrance letter
-            // with hasElevator and hasWheelchairRamp both null. Counting those awarded the route
-            // "Official accessibility information available" on the strength of a mapped door, so
-            // the count asks for something actually stated.
+            // Only stations whose record states a lift or ramp count. Most records are an
+            // OpenStreetMap entrance letter with both null, and a mapped door is not accessibility
+            // information.
             officialAccessibilityCount: stations.filter { station in
                 guard let accessibility = station.accessibility else { return false }
                 return accessibility.hasElevator != nil
@@ -875,8 +856,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     /// Warms the city packs a route's transfer stations belong to, so the transfer sheet opens
-    /// against loaded data. External operator pages and licensed station photos are deliberately
-    /// excluded: links open only after a tap, and photos never drive route overlays.
+    /// against loaded data. Operator pages are not fetched: links open only on a tap.
     func prefetchTransferAssets(for route: Route) async {
         var seen = Set<String>()
         let requests: [(cityID: String, stationName: String)] = route.segments.compactMap { segment in
@@ -955,13 +935,10 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
         inFlightManifests[url] = task
 
-        // Which wipe this fetch belongs to. `clearAllCaches` cancels in-flight manifest fetches
-        // and then clears the cooldown table, and every statement in it is synchronous — so the
-        // cancelled fetch can only resume *after* the wipe has finished, and it then wrote a fresh
-        // 45-second cooldown on top of the clean table. `loadRemoteManifests` returned nothing for
-        // that window and `cityPackStatus` reported every non-bundled city as `.failed` for 45
-        // seconds after a cache clear that had actually succeeded. Results that belong to a
-        // superseded generation are discarded rather than published.
+        // Which wipe this fetch belongs to. `clearAllCaches` cancels in-flight manifest fetches and
+        // clears the cooldowns synchronously, so a cancelled fetch resumes only after the wipe; its
+        // result belongs to a superseded generation and is discarded, or it would write a fresh
+        // cooldown onto the clean table.
         let generation = cacheWipeGeneration
 
         let decoded: OfficialManifest
@@ -980,12 +957,9 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return decoded
     }
 
-    /// The first configured origin that answers, not all of them.
-    ///
-    /// They are mirrors of one another — the same repository, the same files — so asking all three
-    /// at once spent three requests to learn the same thing, and the two that are unreachable from
-    /// wherever the rider is each had to time out first. In order, stopping at the first success;
-    /// the rest are only tried when it fails.
+    /// The first configured origin that answers, in order. The origins mirror one repository, so
+    /// asking all at once spends requests to learn one thing, and the unreachable ones each have to
+    /// time out.
     private func loadRemoteManifests() async -> [(url: URL, manifest: OfficialManifest)] {
         for url in Self.manifestURLs {
             do {
@@ -1268,40 +1242,26 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     ]
 
     private func download(from url: URL, maximumBytes: Int) async throws -> Data {
-        // Cap how long a single fetch can sit with no response. URLSession's default is 60s,
-        // and the pack CDNs are black-holed (stall, not refuse) on some mainland networks.
-        // With several fallback URLs tried serially, a cold load could pin the city-pack
-        // spinners for minutes before the .failed cooldown ever got a chance to cache.
-        // This is an idle timeout, so a slow-but-flowing pack download is not cut off.
+        // An idle timeout on a single fetch: the pack origins can stall rather than refuse on some
+        // mainland networks, and URLSession's default is 60 s. A slow but flowing download is not
+        // cut off.
         guard maximumBytes > 0,
               maximumBytes <= Self.maximumPackBytes,
               Self.isAllowedRemoteDataURL(url) else { throw RoutePlanningError.networkError }
         let session = self.session
-        // `timeoutInterval` above only fires when no bytes arrive for the interval. A
-        // connection that trickles data indefinitely never trips it, so the read below could hang
-        // well past 15s. Race the whole fetch against an explicit deadline.
+        // The session timeout only fires when no bytes arrive, so a trickling connection needs an
+        // explicit deadline.
         return try await withDeadline(
             seconds: 15,
             onTimeout: { RoutePlanningError.networkError }
         ) {
             let request = URLRequest(url: url, timeoutInterval: 15)
             let redirectDelegate = SameOriginRedirectDelegate(originURL: url)
-            // `data(for:)`, not `bytes(for:)`.
-            //
-            // `URLSession.AsyncBytes` yields one `UInt8` per async iteration, and the loop that
-            // was here — `for try await byte in bytes { data.append(byte) }` — is bounded by that
-            // machinery rather than by the network. Measured on this machine over loopback, with
-            // no latency at all: **5 MB took 56.3 seconds (0.09 MB/s)**, against 0.012 s for
-            // `data(for:)`. A city pack could therefore never finish inside the 15-second deadline
-            // below, and `performDownload` reported the result as a network failure —
-            // indistinguishable from an outage, so every retry hit the same wall. Remote packs
-            // could not be downloaded at all.
-            //
-            // The size cap survives the change. The `expectedContentLength` check above rejects a
-            // server that honestly declares an oversized body before a byte is read; the check
-            // below catches one that lies about it. What is given up is aborting mid-stream on a
-            // lying server, which the deadline and URLSession's own buffering already bound, and
-            // which for packs is followed by a sha256 check regardless.
+            // `data(for:)`, not `bytes(for:)`: `URLSession.AsyncBytes` yields one byte per async
+            // iteration and measured 0.09 MB/s over loopback, so a pack could not finish inside the
+            // deadline. The size cap holds: `expectedContentLength` rejects an honest oversize body
+            // before reading, the count check below catches a lying one, and the SHA-256 check
+            // follows regardless.
             let (data, response) = try await session.data(for: request, delegate: redirectDelegate)
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200,
@@ -1328,18 +1288,10 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         }
     }
 
-    /// Hosts a city pack may never be fetched from.
-    ///
-    /// Wikimedia stays out: its files are not this project's to redistribute, and a pack that
-    /// pulled from it would make the app a redistributor of media under someone else's terms.
-    ///
-    /// GitHub and jsDelivr used to be here too, which left the download path unreachable — no
-    /// origin was configured in any build, so every rider had exactly the packs their app version
-    /// shipped with until the next App Store release. They serve this repository's own reviewed
-    /// files, byte for byte, so they are where the packs now come from. What still protects the
-    /// rider is unchanged and is what actually matters: the manifest names a size and a SHA-256,
-    /// `decodeValidatedPack` checks both and validates every station, and a pack that fails any of
-    /// that is discarded in favour of the bundled one.
+    /// Hosts a city pack may never be fetched from. Wikimedia's files are not this project's to
+    /// redistribute. The mirrors that do serve packs carry this repository's reviewed files, and
+    /// what protects the rider is the manifest's size and SHA-256, checked by `decodeValidatedPack`
+    /// along with every station, with the bundled pack kept on any failure.
     nonisolated private static let forbiddenRuntimeDataHostSuffixes = [
         "wikimedia.org",
         "wikipedia.org"
@@ -1383,8 +1335,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private static var manifestURLs: [URL] {
-        // Mainland first: most riders are there, and the other two are usually unreachable from
-        // it. Tried in this order and stopped at the first that answers, so the rest cost nothing.
+        // Mainland mirror first: most riders are there, where the other two are usually
+        // unreachable. Tried in order, stopping at the first that answers.
         let configuredValues = [
             Bundle.main.object(forInfoDictionaryKey: "CityPackMainlandMirrorURL") as? String,
             Bundle.main.object(forInfoDictionaryKey: "CityPackManifestURL") as? String,
@@ -1637,7 +1589,7 @@ private struct OfficialStation: Decodable {
     let accessibility: OfficialAccessibility?
     let schedules: [OfficialSchedule]
     let stationFacilities: [OfficialFacility]
-    // Optional, backward-compatible transit-guidance fields (absent in current packs).
+    // Optional; absent in packs without surveyed entrances.
     let stationAccessPoints: [OfficialAccessPoint]?
     let externalResources: [ExternalTransitResource]
     let liveArrivalReferences: [OfficialLiveArrivalReference]
@@ -1762,8 +1714,7 @@ private struct OfficialAccessPoint: Decodable {
     let latitude: Double?
     let longitude: Double?
     let isAccessible: Bool?
-    /// Absent in a pack written before the three-state claim existed, which decodes as `.unknown`
-    /// — silence, which is what such a pack was actually recording.
+    /// Absent in older packs, which decode as `.unknown`: silence, which is what they recorded.
     let stepFree: String?
     let notes: [String]?
     let source: String?
@@ -1807,9 +1758,9 @@ enum CityPackStorageLocation {
     }
 }
 
-/// Persistent, version-scoped storage for city packs and the exact transfer assets a rider
-/// has opened or prefetched. Everything is checksum-validated before use where the manifest
-/// provides a digest; relative asset paths are constrained beneath the version directory.
+/// Persistent, version-scoped storage for city packs and the transfer assets a rider has opened or
+/// prefetched. Checksum-validated before use where the manifest gives a digest; asset paths are
+/// constrained beneath the version directory.
 private struct CityPackDiskStore {
     private let rootURL: URL
     private let fileManager = FileManager.default
@@ -1818,10 +1769,8 @@ private struct CityPackDiskStore {
         rootURL = CityPackStorageLocation.rootURL(fileManager: fileManager)
     }
 
-    /// Deliberately does not hash. Every caller hands the bytes straight to
-    /// `decodeValidatedPack`, whose first act is the size + SHA-256 check, so the bytes are
-    /// still verified before anything parses them, just once instead of twice. Hashing here as
-    /// well cost a second full pass over the file (741 KB for Hong Kong, 383 KB for Beijing).
+    /// Does not hash: every caller hands the bytes to `decodeValidatedPack`, whose first act is the
+    /// size and SHA-256 check.
     func packData(for entry: OfficialManifestCity) -> Data? {
         try? Data(contentsOf: versionDirectory(for: entry).appendingPathComponent("city_pack.json"))
     }

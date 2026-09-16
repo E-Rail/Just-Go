@@ -41,40 +41,61 @@ struct LineBadge: View {
             .accessibilityHidden(true)
     }
 
-    /// What a rider would call the line: "2" from "2号线", "S1" from "S1线", "TW" from "Tsuen Wan
-    /// Line". The shortest unambiguous form, not a truncation.
+    /// What a rider would call the line: "2" from "2号线" or "长沙地铁二号线", "S1" from "S1线", "荃灣"
+    /// from "港鐵荃灣綫". The shortest unambiguous form, not a truncation.
     static func shortLabel(for name: String) -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespaces)
-        if let digits = trimmed.range(of: "[0-9]+", options: .regularExpression) {
+        // A bracketed qualifier ("(下)") and the system's own name — the operator or mode word and
+        // any city before it, which every line in the network shares — say nothing about which line
+        // this is.
+        let trimmed = name
+            .replacingOccurrences(of: "[（(][^）)]*[）)]", with: "", options: .regularExpression)
+            .replacingOccurrences(
+                of: "^.*?(地铁|地鐵|捷运系统|捷运|捷運|轨道交通|軌道交通|港铁|港鐵|轻轨|輕軌|城际|城際|市郊铁路)\\s*(?=.*[线綫線0-9])",
+                with: "",
+                options: .regularExpression
+            )
+            .trimmingCharacters(in: .whitespaces)
+        let numbered = arabicNumeral(trimmed)
+        if let digits = numbered.range(of: "[0-9]+[A-Z]?", options: .regularExpression) {
             // A letter glued to the front of the number is part of the designation ("S1", "M2");
             // one merely nearby is not, which is what separates "S1线" from "Line 2".
-            let before = trimmed[..<digits.lowerBound]
-            let prefix = before.suffix(while: { $0.isLetter && $0.isASCII })
+            let before = numbered[..<digits.lowerBound]
+            let prefix = String(before.reversed().prefix(while: { $0.isLetter && $0.isASCII }).reversed())
             // The preceding character disqualifies a designation only when it is an *ASCII* letter
             // (the tail of a Latin word): `isLetter` is also true for CJK, which would badge
             // 成都市域铁路S3资阳线 as "3" beside 成都地铁3号线.
             let isDesignation = prefix.count <= 2 && !prefix.isEmpty
-                && !before.dropLast(prefix.count).last.map { $0.isLetter && $0.isASCII }.orFalse
-            return (isDesignation ? prefix.uppercased() : "") + trimmed[digits]
+                && before.dropLast(prefix.count).last.map { !($0.isLetter && $0.isASCII) } ?? true
+            return (isDesignation ? prefix.uppercased() : "") + numbered[digits]
         }
-        // No number: Latin names reduce to initials, CJK to the leading characters with the
-        // "line" suffix dropped, since every line shares it and it distinguishes nothing.
+        // No number: Latin names reduce to initials, CJK to the name without the "line" (and
+        // "express") suffix every such line shares, cut to two characters past three.
         let words = trimmed.split(separator: " ").filter { $0.lowercased() != "line" }
         if words.count > 1, words.allSatisfy({ $0.first?.isASCII == true }) {
             return words.prefix(2).compactMap { $0.first }.map(String.init).joined().uppercased()
         }
-        let stripped = trimmed.filter { !"线綫線 ".contains($0) }
-        return String((stripped.isEmpty ? trimmed : stripped).prefix(2))
+        let stripped = trimmed.replacingOccurrences(of: "快?[线綫線]|\\s", with: "", options: .regularExpression)
+        let label = stripped.isEmpty ? trimmed : stripped
+        return label.count <= 3 ? label : String(label.prefix(2))
     }
-}
 
-private extension Optional where Wrapped == Bool {
-    var orFalse: Bool { self ?? false }
-}
-
-private extension StringProtocol {
-    func suffix(while predicate: (Character) -> Bool) -> String {
-        String(reversed().prefix(while: predicate).reversed())
+    /// "二号线" → "2号线", so a line numbered in Chinese badges like one numbered in digits.
+    private static func arabicNumeral(_ name: String) -> String {
+        guard let range = name.range(of: "[一二三四五六七八九十]+(?=[号號])", options: .regularExpression) else {
+            return name
+        }
+        let units = Array("一二三四五六七八九")
+        var tens = 0
+        var unit = 0
+        for character in name[range] {
+            if character == "十" {
+                tens = max(unit, 1)
+                unit = 0
+            } else {
+                unit = (units.firstIndex(of: character) ?? 0) + 1
+            }
+        }
+        return name.replacingCharacters(in: range, with: String(tens * 10 + unit))
     }
 }
 

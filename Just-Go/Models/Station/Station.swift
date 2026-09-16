@@ -12,6 +12,9 @@ final class Station: Identifiable, Hashable {
     var latitude: Double
     var longitude: Double
     var cityID: String
+    /// Where the station is, localized. Not always `cityID`'s city: a pack carries stations its lines
+    /// reach in neighbouring cities.
+    var city: String?
     var isTransferStation: Bool
     var lines: [SubwayLine]
     var accessibility: StationAccessibility?

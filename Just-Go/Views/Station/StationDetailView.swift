@@ -131,13 +131,12 @@ struct StationDetailView: View {
                 Button {
                     showQuickTagDialog = true
                 } label: {
-                    Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
-                        .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
+                    Label(
+                        AppLocalization.localized(currentQuickTag == nil ? "Add Quick Tag" : "Edit Quick Tag"),
+                        systemImage: currentQuickTag == nil ? "tag" : "tag.fill"
+                    )
+                    .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
                 }
-                .accessibilityLabel(currentQuickTag == nil
-                    ? AppLocalization.localized("Add Quick Tag")
-                    : AppLocalization.localized("Edit Quick Tag")
-                )
             }
         }
         .task {
@@ -297,8 +296,8 @@ struct StationDetailView: View {
             Text(station.localizedName)
                 .font(.title)
                 .fontWeight(.bold)
-            if let alternateName = station.alternateLocalizedName {
-                Text(alternateName)
+            if let subtitle = station.subtitle {
+                Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

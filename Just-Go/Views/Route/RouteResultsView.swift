@@ -374,6 +374,13 @@ struct RouteResultsView: View {
                     }
                 }
 
+                // A ride's own caveat (a premium fare), said where routes are compared.
+                ForEach(route.segments.filter { $0.type == .subway }.flatMap(\.accessibilityNotes).uniqued(), id: \.self) { note in
+                    Label(note, systemImage: "info.circle")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 // The app does not plan buses, but names a cheaper one it knows about.
                 if let bus = route.fare?.cheaperBus {
                     Label(

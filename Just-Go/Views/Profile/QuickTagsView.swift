@@ -122,13 +122,13 @@ struct QuickTagsView: View {
         .navigationTitle(AppLocalization.localized("Quick Tags"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            // A title with the symbol: the system shows it when the bar overflows into a menu.
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     showAddTag = true
                 } label: {
-                    Image(systemName: "plus")
+                    Label(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"), systemImage: "plus")
                 }
-                .accessibilityLabel(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
             }
             ToolbarItem(placement: .confirmationAction) {
                 if showsDoneButton {

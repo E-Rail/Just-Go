@@ -967,6 +967,11 @@ struct RouteDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                ForEach(route.cityCrossings(by: index), id: \.self) { crossing in
+                    Label(crossing, systemImage: "arrow.right.to.line")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
                 // What is not known about this door (an estimated exit, nothing recorded step-free)
                 // and the leg's own disclosures: an out-of-station change leaves the gates,
                 // Beijing's 虚拟换乘 counts as one fare, a bike leg follows the pedestrian route or has
@@ -1004,7 +1009,15 @@ struct RouteDetailView: View {
 
     private func stationStops(_ segment: RouteSegment) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(segment.stationStops) { stop in
+            ForEach(Array(segment.stationStops.enumerated()), id: \.element.id) { offset, stop in
+                // Where the ride crosses into another city, that city heads the stops within it.
+                if offset > 0, let city = stop.city, city != segment.stationStops[offset - 1].city {
+                    Text(city)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 6)
+                }
                 Button { detailDestination = .station(stop) } label: {
                     HStack(spacing: 10) {
                         Circle()

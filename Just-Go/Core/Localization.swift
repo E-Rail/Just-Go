@@ -187,9 +187,17 @@ extension Station {
         return alternate == localizedName ? nil : alternate
     }
 
+    /// The line under a station's name everywhere it is listed: its other name and its city, since
+    /// search spans every bundled city and 中山公园 is in several.
+    var subtitle: String? {
+        let parts = [alternateLocalizedName, city].compactMap { $0 }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     var accessibilityLabel: String {
         var label = localizedName
         if let alternateName = alternateLocalizedName { label += ", \(alternateName)" }
+        if let city { label += ", \(city)" }
         if isTransferStation {
             label += AppLocalization.text(english: ", transfer station", chinese: "，换乘站")
         }

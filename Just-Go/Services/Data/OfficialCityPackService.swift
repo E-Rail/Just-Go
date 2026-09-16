@@ -528,6 +528,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             isTransferStation: station.isTransferStation
         )
         enriched.lines = station.lines
+        enriched.city = station.city
         if let data = item.accessibility?.data {
             enriched.accessibility = StationAccessibility(stationID: station.stationID, data: data)
         } else {

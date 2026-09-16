@@ -135,6 +135,31 @@ struct Route: Identifiable, Codable {
         }
     }
 
+    /// "Into 香港" for each city leg `index` takes the rider into: a transfer across 罗湖's border
+    /// hall, or 广佛线 past 菊树 into Foshan. A transfer counts the city its next ride boards in, so
+    /// that ride does not announce it again.
+    func cityCrossings(by index: Int) -> [String] {
+        func cities(_ index: Int) -> [String] {
+            let stops = segments[index].type == .transfer
+                ? segments.dropFirst(index + 1).first { $0.type == .subway }?.stationStops.prefix(1) ?? []
+                : segments[index].stationStops[...]
+            return stops.compactMap(\.city)
+        }
+        var previous = (0..<index).reversed().lazy.compactMap { cities($0).last }.first
+        var crossings: [String] = []
+        for city in cities(index) where city != previous {
+            if previous != nil {
+                crossings.append(AppLocalization.text(
+                    english: "Into \(city)",
+                    simplified: "进入\(city)",
+                    traditional: "進入\(city)"
+                ))
+            }
+            previous = city
+        }
+        return crossings
+    }
+
     var originAccessGuide: RouteAccessGuide? {
         accessGuidance.first { $0.kind == .origin }
     }
@@ -486,10 +511,12 @@ extension NamedStationDoor {
         guard !name.lowercased().contains("exit"), !name.contains("出口"), !name.contains("入口") else {
             return name
         }
+        // "E口" is the letter with "exit" already attached, which would print as "Exit E口".
+        let door = name.replacingOccurrences(of: "(?<=[A-Za-z0-9])口$", with: "", options: .regularExpression)
         return AppLocalization.text(
-            english: "Exit \(name)",
-            simplified: "\(name) 出口",
-            traditional: "\(name) 出口"
+            english: "Exit \(door)",
+            simplified: "\(door) 出口",
+            traditional: "\(door) 出口"
         )
     }
 
@@ -526,6 +553,8 @@ struct RouteStationStop: Identifiable, Codable {
     let arrivalTimeText: String?
     let isTransfer: Bool
     var lineID: String? = nil
+    /// Localized; see `MetroStation.city`.
+    var city: String? = nil
 
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"
@@ -549,7 +578,7 @@ extension RouteStationStop {
     /// a resolve-failure fallback) that need a `Station` but only have route-stop data, not a
     /// full city-pack lookup.
     func asStation(cityID: String) -> Station {
-        Station(
+        let station = Station(
             stationID: stationID,
             name: name,
             latitude: coordinate?.latitude ?? 0,
@@ -557,6 +586,8 @@ extension RouteStationStop {
             cityID: cityID,
             isTransferStation: isTransfer
         )
+        station.city = city
+        return station
     }
 }
 

@@ -77,22 +77,29 @@ CITIES = {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
     networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
     own_unknown_lines: ["前门大街有轨电车"],
-    # Beijing's two street interchanges (出站换乘): the rider leaves the paid area, walks a block
-    # and re-enters. Riders make both every day and the app could not plan either, because two
-    # named stations with no shared line are two unconnected nodes in the graph.
-    # Both are 虚拟换乘: the rider taps out, walks, taps back in, and the two halves bill as one
-    # trip. That is a fare rule, not something the geometry implies — an out-of-station walk
-    # charges again in plenty of networks — so it is declared per pair and stays unsaid where
-    # it is not known.
+    # Beijing's street interchanges (出站换乘): the rider leaves the paid area, walks a block and
+    # re-enters. `from`/`to` are two named stations with no shared line; `at` is one name whose
+    # two lines' stations are separate buildings (大钟寺 12/13 until its passage opens with Line
+    # 13's rebuild, 木樨地 1/16 until its passage opens, both announced for 2027 or later).
+    # All are 虚拟换乘: a card or QR tap-out, walk and tap-in within 30 minutes bills as one trip.
+    # That is a fare rule, not something the geometry implies — an out-of-station walk charges
+    # again in plenty of networks — so it is declared per link and stays unsaid where it is not
+    # known.
     interchanges: [
       { from: "广安门内", to: "牛街", kind: "outOfStation", fare: "continuous" },
-      { from: "太平桥", to: "复兴门", kind: "outOfStation", fare: "continuous" }
-    ]
+      { from: "太平桥", to: "复兴门", kind: "outOfStation", fare: "continuous" },
+      { at: "大钟寺", kind: "outOfStation", fare: "continuous" },
+      { at: "木樨地", kind: "outOfStation", fare: "continuous" }
+    ],
+    # Priced on their own tariff, not the metro's distance fare: ¥25 flat, and up to ¥35.
+    premium_fare_lines: ["首都机场线", "大兴机场线"]
   },
   "3100" => {
     name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20],
     networks: ["上海地铁", "上海浦东机场旅客捷运系统", "松江有轨电车", "上海市域铁路", "上海市域轨道交通"],
-    own_unknown_lines: ["磁浮线"]
+    own_unknown_lines: ["磁浮线"],
+    # ¥50 one way, on its own ticket.
+    premium_fare_lines: ["磁浮线"]
   },
   "4401" => {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
@@ -177,7 +184,11 @@ CITIES = {
   "3402" => { name: "Wuhu", bbox: [31.20, 118.25, 31.45, 118.55], networks: ["芜湖轨道交通", "芜湖地铁"], allow_unknown: true, own_unknown_lines: [] },
   "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
   "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"], own_unknown_lines: [] },
-  "8100" => { name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [] },
+  "8100" => {
+    name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [],
+    # Its own fare table, several times the 東涌綫 fare over the same track.
+    premium_fare_lines: ["機場快綫"]
+  },
   "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] },
   # Taipei's three busiest lines (板南, 文湖, 淡水信義) carry no network/operator tag in OSM and
   # exist *only* as untagged relations — without naming them here the city would import with its
@@ -654,24 +665,102 @@ def fetch_source(city_id, city, refresh:)
   return JSON.parse(File.read(path)) if File.file?(path) && !refresh
   fail_with("#{city[:name]} cache missing; rerun with --refresh") unless refresh
 
-  response = OVERPASS_URLS.lazy.map do |url|
-    request = Net::HTTP::Post.new(url)
+  body = overpass_post(overpass_query(city[:bbox]), city)
+  File.write(path, body)
+  JSON.parse(body)
+end
+
+# Retried with a growing pause: the public servers hand out two query slots per client and refuse
+# a burst of queries with 429 or 504 rather than queueing them.
+def overpass_post(query, city)
+  4.times do |attempt|
+    sleep(30 * attempt)
+    response = OVERPASS_URLS.lazy.map do |url|
+      request = Net::HTTP::Post.new(url)
+      request["User-Agent"] = "Just-Go metro geometry importer"
+      request.set_form_data("data" => query)
+      Net::HTTP.start(
+        url.host,
+        url.port,
+        use_ssl: true,
+        read_timeout: 240,
+        open_timeout: 30
+      ) { |http| http.request(request) }
+    rescue StandardError => error
+      warn "#{city[:name]} Overpass request failed: #{error.message}"
+      nil
+    end.find { |candidate| candidate.is_a?(Net::HTTPSuccess) }
+    return response.body if response
+  end
+  fail_with("#{city[:name]} could not fetch a successful Overpass response")
+end
+
+# The city each station is in, from OpenStreetMap's administrative boundaries. Not the pack's city:
+# a pack carries every station its lines reach, so Guangzhou's pack holds 广佛线's 祖庙, which is in
+# Foshan, and 罗湖 is Shenzhen's while 羅湖, 574 m away, is Hong Kong's.
+#
+# The city is a municipality or SAR (CN-BJ, CN-HK, …), a Taiwanese city or county (TW-*), and
+# otherwise the prefecture (admin_level 5). The ISO code is checked first because Hong Kong's own
+# level 5 is a region (新界), not a city.
+#
+# Which boundaries surround a pack's stations comes from Overpass, and each one's rings from
+# polygons.openstreetmap.fr, which assembles them from the relation: the public Overpass server
+# times out returning that geometry for a city and its neighbours, and one `is_in` per station
+# measured about three seconds. Both are cached. Containment is an even-odd ray test over every
+# ring, so holes count themselves. Both sides are WGS-84: the station's point is its average before
+# the GCJ-02 conversion, and a converted point sits ~600 m off, the wrong side of a border station.
+CITY_ISO_CODE = /\A(?:CN-(?:BJ|SH|TJ|CQ|HK|MO)|TW-[A-Z]+)\z/.freeze
+
+def station_cities(city_id, city, points)
+  path = File.join(CACHE_DIR, "boundaries-#{city_id}.json")
+  unless File.file?(path)
+    latitudes, longitudes = points.values.transpose
+    box = "(#{latitudes.min - 0.05},#{longitudes.min - 0.05},#{latitudes.max + 0.05},#{longitudes.max + 0.05})"
+    File.write(path, overpass_post(<<~QUERY, city))
+      [out:json][timeout:120];
+      (
+        relation["boundary"="administrative"]["admin_level"="5"]#{box};
+        relation["boundary"="administrative"]["ISO3166-2"~"^(CN-(BJ|SH|TJ|CQ|HK|MO)|TW-[A-Z]+)$"]#{box};
+      );
+      out tags bb;
+    QUERY
+  end
+  areas = JSON.parse(File.read(path)).fetch("elements").map do |relation|
+    [relation.fetch("tags"), relation.fetch("bounds"), boundary_edges(relation.fetch("id"), city)]
+  end
+  points.transform_values do |(latitude, longitude)|
+    containing = areas.select do |_tags, bounds, edges|
+      next false unless latitude.between?(bounds["minlat"], bounds["maxlat"]) && longitude.between?(bounds["minlon"], bounds["maxlon"])
+
+      edges.count do |(lat_a, lon_a), (lat_b, lon_b)|
+        (lat_a > latitude) != (lat_b > latitude) &&
+          longitude < lon_a + (latitude - lat_a) * (lon_b - lon_a) / (lat_b - lat_a)
+      end.odd?
+    end.map(&:first)
+    tags = containing.find { |candidate| candidate["ISO3166-2"].to_s.match?(CITY_ISO_CODE) } ||
+      containing.find { |candidate| candidate["admin_level"] == "5" }
+    fail_with("#{city[:name]} has a station inside no city boundary at #{latitude},#{longitude}") if tags.nil?
+    {
+      "name" => (tags["name:zh-Hans"] || tags["name"]).sub(/(?<=..)市\z/, ""),
+      "nameEn" => tags["name:en"].to_s.sub(/ City\z/, "")
+    }
+  end
+end
+
+# Every ring of one boundary relation as [latitude, longitude] edges.
+def boundary_edges(relation_id, city)
+  path = File.join(CACHE_DIR, "boundary-#{relation_id}.json")
+  unless File.file?(path)
+    uri = URI("https://polygons.openstreetmap.fr/get_geojson.py?id=#{relation_id}&params=0")
+    request = Net::HTTP::Get.new(uri)
     request["User-Agent"] = "Just-Go metro geometry importer"
-    request.set_form_data("data" => overpass_query(city[:bbox]))
-    Net::HTTP.start(
-      url.host,
-      url.port,
-      use_ssl: true,
-      read_timeout: 240,
-      open_timeout: 30
-    ) { |http| http.request(request) }
-  rescue StandardError => error
-    warn "#{city[:name]} Overpass request failed: #{error.message}"
-    nil
-  end.find { |candidate| candidate.is_a?(Net::HTTPSuccess) }
-  fail_with("#{city[:name]} could not fetch a successful Overpass response") unless response
-  File.write(path, response.body)
-  JSON.parse(response.body)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 240) { |http| http.request(request) }
+    fail_with("#{city[:name]} boundary #{relation_id} unavailable: HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+    File.write(path, response.body)
+  end
+  geometry = JSON.parse(File.read(path))
+  polygons = geometry.fetch("type") == "Polygon" ? [geometry.fetch("coordinates")] : geometry.fetch("coordinates")
+  polygons.flatten(1).flat_map { |ring| ring.map { |longitude, latitude| [latitude, longitude] }.each_cons(2).to_a }
 end
 
 def wgs84_to_gcj02(latitude, longitude)
@@ -686,47 +775,54 @@ def average_coordinate(station)
   ]
 end
 
-# Two named stations riders treat as one interchange.
+# Two named stations riders treat as one interchange, or (`at`) one named station whose two lines
+# riders change between through the street. The second is written with the same station at both
+# ends, and the app charges its walk whenever a route changes lines there.
 #
-# Two cases, one mechanism, differing only in `kind`, which describes the *walk* and nothing else.
+# One mechanism, differing only in `kind`, which describes the *walk* and nothing else.
 # `inStation` means the two are connected inside the building, as at Guangzhou's metro/intercity
 # concourses; `outOfStation` means the rider goes out to the street, as at Beijing's 广安门内/牛街.
 # The app draws the first solid and the second dashed. What the fare does is a separate, declared
 # fact — see `INTERCHANGE_FARES`.
 #
-# Declared per pair rather than inferred from distance, because distance cannot separate an
+# Declared per link rather than inferred from distance, because distance cannot separate an
 # interchange from two nearby stations that are not one. Measured over Guangzhou's 414 stations,
 # the real concourse pairs run out to 350m (汉溪长隆/广州长隆) while 体育西路 and 天河南 — different
 # stations, no interchange — are 281m apart. In Beijing 南礼士路 and 复兴门 are 372m apart and are
 # *not* an interchange, while 太平桥 and 复兴门 at 625m are. No threshold separates those, so a
 # threshold would invent transfers between the busiest stations in both cities. A wrong transfer
 # is worse than a missing one.
-#
-# These used to be merges: the two nodes were fused into one at the mean of their coordinates.
-# That put the marker in the gap between two platforms, undercounted the city's stations by one
-# per pair, and could only ever express the in-station case.
 def build_interchanges(city, city_id, station_groups)
   (city[:interchanges] || []).map do |link|
-    from_key = normalized_station_name(link.fetch(:from))
-    to_key = normalized_station_name(link.fetch(:to))
+    from_key = normalized_station_name(link[:at] || link.fetch(:from))
+    to_key = normalized_station_name(link[:at] || link.fetch(:to))
     from = station_groups[from_key]
     to = station_groups[to_key]
+    label = link[:at] || "#{link[:from]}/#{link[:to]}"
     # Loud, not skipped: a typo or a renamed station would otherwise silently drop the link and
     # the interchange would quietly stop being plannable again.
-    fail_with("#{city[:name]} interchange names an absent station: #{link[:from]}") if from.nil?
+    fail_with("#{city[:name]} interchange names an absent station: #{link[:at] || link[:from]}") if from.nil?
     fail_with("#{city[:name]} interchange names an absent station: #{link[:to]}") if to.nil?
-    unless (from["lineIDs"] & to["lineIDs"]).empty?
-      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} already share a line")
-    end
     limit = MAX_INTERCHANGE_METERS[link.fetch(:kind)]
-    fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown kind #{link[:kind]}") if limit.nil?
-    separation = meters_between(average_coordinate(from), average_coordinate(to))
+    fail_with("#{city[:name]} interchange #{label} has unknown kind #{link[:kind]}") if limit.nil?
+    if link[:at]
+      # Measured between the two lines' own platforms. A third line would leave open which pair
+      # the street walk is between, so it is refused rather than guessed.
+      platforms = from["lineCoordinates"].values
+      fail_with("#{city[:name]} interchange at #{label} needs exactly two lines") unless platforms.length == 2
+      separation = meters_between(*platforms.map { |points| average_coordinate("coordinates" => points) })
+    else
+      unless (from["lineIDs"] & to["lineIDs"]).empty?
+        fail_with("#{city[:name]} interchange #{label} already share a line")
+      end
+      separation = meters_between(average_coordinate(from), average_coordinate(to))
+    end
     if separation > limit
-      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} is #{separation.round}m apart")
+      fail_with("#{city[:name]} interchange #{label} is #{separation.round}m apart")
     end
     fare = link[:fare]
     if fare && !INTERCHANGE_FARES.include?(fare)
-      fail_with("#{city[:name]} interchange #{link[:from]}/#{link[:to]} has unknown fare #{fare}")
+      fail_with("#{city[:name]} interchange #{label} has unknown fare #{fare}")
     end
     record = {
       "fromStationID" => station_id(city_id, from_key),
@@ -1372,9 +1468,11 @@ def build_network(city_id, city, source)
           "name" => name,
           "nameEn" => element.dig("tags", "name:en"),
           "coordinates" => [],
+          "lineCoordinates" => {},
           "lineIDs" => Set.new
         }
         station["coordinates"] << coordinate
+        (station["lineCoordinates"][id] ||= []) << coordinate
         station["lineIDs"] << id
       end
     end
@@ -1386,9 +1484,11 @@ def build_network(city_id, city, source)
         "name" => name,
         "nameEn" => element.dig("tags", "name:en"),
         "coordinates" => [],
+        "lineCoordinates" => {},
         "lineIDs" => Set.new
       }
       station["coordinates"] << [element["lat"], element["lon"]]
+      (station["lineCoordinates"][id] ||= []) << [element["lat"], element["lon"]]
       station["lineIDs"] << id
     end
 
@@ -1462,22 +1562,36 @@ def build_network(city_id, city, source)
     base
   end
 
+  # Lines on their own, higher tariff. The app rides one only where it saves real time, and says
+  # so where it does.
+  (city[:premium_fare_lines] || []).each do |name|
+    line = lines.find { |candidate| candidate["name"] == name }
+    fail_with("#{city[:name]} premium fare line is absent: #{name}") if line.nil?
+    line["fare"] = "premium"
+  end
+
   interchanges = build_interchanges(city, city_id, station_groups)
 
-  stations = station_groups.map do |name_key, station|
-    next if station["lineIDs"].empty?
-    latitude = station["coordinates"].sum { |coordinate| coordinate[0] } / station["coordinates"].length
-    longitude = station["coordinates"].sum { |coordinate| coordinate[1] } / station["coordinates"].length
-    latitude, longitude = wgs84_to_gcj02(latitude, longitude)
+  routed_groups = station_groups.reject { |_name_key, station| station["lineIDs"].empty? }
+  cities = station_cities(
+    city_id,
+    city,
+    routed_groups.to_h { |name_key, station| [station_id(city_id, name_key), average_coordinate(station)] }
+  )
+  stations = routed_groups.map do |name_key, station|
+    latitude, longitude = wgs84_to_gcj02(*average_coordinate(station))
+    id = station_id(city_id, name_key)
     {
-      "id" => station_id(city_id, name_key),
+      "id" => id,
       "name" => station["name"],
       "nameEn" => station["nameEn"],
       "latitude" => latitude.round(6),
       "longitude" => longitude.round(6),
-      "lineIDs" => station["lineIDs"].to_a.sort
+      "lineIDs" => station["lineIDs"].to_a.sort,
+      "city" => cities.fetch(id).fetch("name"),
+      "cityEn" => cities.fetch(id).fetch("nameEn")
     }
-  end.compact
+  end
   station_ids_by_line = Hash.new { |hash, key| hash[key] = [] }
   stations.each { |station| station["lineIDs"].each { |id| station_ids_by_line[id] << station["id"] } }
   lines.each { |line| line["stationIDs"] = station_ids_by_line[line["id"]] }
@@ -1923,6 +2037,18 @@ def self_test
   # A ring closes on its first station by definition and must not be mistaken for one.
   ring = unique_service_patterns([%w[a b c d a]])
   fail_with("a ring was truncated as a return journey") unless ring == [%w[a b c d a]]
+  fail_with("Hong Kong's region was taken for a city") if "CN-GD".match?(CITY_ISO_CODE) || !"CN-HK".match?(CITY_ISO_CODE)
+  street = build_interchanges(
+    { name: "Test", interchanges: [{ at: "甲", kind: "outOfStation", fare: "continuous" }] },
+    "0000",
+    normalized_station_name("甲") => {
+      "lineIDs" => Set["a", "b"],
+      "lineCoordinates" => { "a" => [[39.9, 116.3]], "b" => [[39.9, 116.304]] }
+    }
+  ).first
+  unless street["fromStationID"] == street["toStationID"] && street["walkingDistanceMeters"] == 341
+    fail_with("a street transfer was not measured between its two lines' platforms: #{street.inspect}")
+  end
 
   puts "OSM metro importer self-test ok"
 end

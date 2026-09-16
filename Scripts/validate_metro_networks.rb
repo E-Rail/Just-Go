@@ -10,6 +10,13 @@ EARTH_RADIUS = 6_371_000.0
 # rights declarations are triplicated: a validator that imports the thing it validates cannot
 # catch the thing it validates changing.
 SERVICE_VARIANT_KINDS = %w[大站快车 直达快车 大站车 直达车 区间车 快车].freeze
+# The lines on their own higher tariff, which the planner charges extra to board. Anything else
+# marked premium would steer routes away from an ordinary line.
+PREMIUM_FARE_LINES = {
+  "1100" => %w[大兴机场线 首都机场线],
+  "3100" => %w[磁浮线],
+  "8100" => %w[機場快綫]
+}.freeze
 paths = Dir.glob(File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort
 abort "metro network validation failed: no assets" if paths.empty?
 city_service_source = File.read(File.join(ROOT, "Just-Go", "Services", "Data", "CityService.swift"))
@@ -90,7 +97,18 @@ paths.each do |path|
   abort "#{city}: duplicate structured logical-line identity" unless structured_line_keys.uniq.length == structured_line_keys.length
   source_relation_ids = network.fetch("lines").flat_map { |line| line.fetch("sourceRelationIDs") }
   abort "#{city}: raw source relation belongs to multiple logical lines" unless source_relation_ids.uniq.length == source_relation_ids.length
+  premium = network.fetch("lines").select { |line| line["fare"] }.map { |line| [line["fare"], line["name"]] }
+  unless premium.sort == PREMIUM_FARE_LINES.fetch(city, []).map { |name| ["premium", name] }.sort
+    abort "#{city}: premium fare lines are #{premium.inspect}"
+  end
+  # A street transfer inside one named station is charged on every change of line there, so it
+  # must be a station of exactly the two lines it separates.
+  network.fetch("interchanges").select { |link| link["fromStationID"] == link["toStationID"] }.each do |link|
+    station = stations.find { |candidate| candidate["id"] == link["fromStationID"] }
+    abort "#{city}: street transfer is not at a two-line station" unless station && station["lineIDs"].length == 2
+  end
   stations.each do |station|
+    abort "#{city}: station has no city" if station["city"].to_s.empty? || station["cityEn"].to_s.empty?
     abort "#{city}: station has no canonical line membership" if station.fetch("lineIDs").empty?
     abort "#{city}: station references unknown line" unless station.fetch("lineIDs").all? { |id| line_ids.include?(id) }
     abort "#{city}: station has duplicate canonical line membership" unless station.fetch("lineIDs").uniq.length == station.fetch("lineIDs").length

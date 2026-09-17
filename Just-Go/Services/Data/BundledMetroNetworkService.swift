@@ -283,7 +283,10 @@ extension MetroNetworkProviding {
 }
 
 actor BundledMetroNetworkService: MetroNetworkProviding {
-    private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301", "1200", "5000", "4201", "3201", "6101", "3205", "4101", "4301", "2101", "3702", "2102", "3302", "3202", "5301", "3601", "3501", "3502", "3401", "1301", "5201", "2301", "2201", "4501", "6201", "6501", "1501", "1401", "4419", "4406", "3303", "3306", "3203", "3204", "3701", "4103", "3402", "3206", "3310", "3307", "4110", "3411", "8100", "8200", "7101", "7102", "7106", "7104"]
+    /// Every network the bundle carries, read off the `MetroNetworks` folder, so adding a city is a
+    /// data change.
+    private static let supportedCityIDs = (Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: "MetroNetworks") ?? [])
+        .map { $0.deletingPathExtension().lastPathComponent }
     private var networks: [String: MetroNetwork] = [:]
     private var stationsByCity: [String: [Station]] = [:]
     private var summaries: [String: MetroNetworkSummary] = [:]

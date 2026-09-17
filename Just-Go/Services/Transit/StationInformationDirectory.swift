@@ -22,9 +22,13 @@ struct StationDirectoryEntry: Sendable, Equatable {
 
 final class StationInformationDirectory: Sendable {
     private struct Contents: Sendable {
-        /// Sources whose data is fetched live on the rider's device. `bundledDataset` sources (Hong
-        /// Kong) are served from the city pack and are intentionally excluded from the online path.
+        /// Sources whose data is fetched live on the rider's device.
         let onDeviceFetchSources: Set<String>
+        /// `bundledDataset` sources, served from the city pack and never fetched.
+        let bundledSources: Set<String>
+        /// Sources that populate live arrivals, so a station's train section shows trains rather
+        /// than first and last times.
+        let liveArrivalSources: Set<String>
         /// City IDs a `stable` source covers. Used to answer "does this city have station info"
         /// the same way the API's `sources.json` declares it, rather than hard-coding city IDs.
         let servedCityIDs: Set<String>
@@ -60,13 +64,20 @@ final class StationInformationDirectory: Sendable {
         let sources = Self.loadJSONObject(named: "sources", bundle: bundle)
 
         var onDeviceFetch: Set<String> = []
+        var bundled: Set<String> = []
+        var liveArrivals: Set<String> = []
         var servedCities: Set<String> = []
         if let registry = sources?["sources"] as? [String: Any] {
             for (sourceID, value) in registry {
                 guard let source = value as? [String: Any] else { continue }
                 let stable = (source["status"] as? String) == "stable"
-                if (source["access"] as? [String: Any])?["kind"] as? String == "onDeviceFetch" {
-                    onDeviceFetch.insert(sourceID)
+                switch (source["access"] as? [String: Any])?["kind"] as? String {
+                case "onDeviceFetch": onDeviceFetch.insert(sourceID)
+                case "bundledDataset": bundled.insert(sourceID)
+                default: break
+                }
+                if (source["populates"] as? [String])?.contains("liveArrivals") == true {
+                    liveArrivals.insert(sourceID)
                 }
                 if stable, let cityID = source["cityID"] as? String {
                     servedCities.insert(cityID)
@@ -102,6 +113,8 @@ final class StationInformationDirectory: Sendable {
         }
         return Contents(
             onDeviceFetchSources: onDeviceFetch,
+            bundledSources: bundled,
+            liveArrivalSources: liveArrivals,
             servedCityIDs: servedCities,
             entriesByStationID: entries
         )
@@ -113,6 +126,20 @@ final class StationInformationDirectory: Sendable {
               onDeviceFetchSources.contains(entry.source),
               !entry.externalStationID.isEmpty else { return nil }
         return entry
+    }
+
+    /// Whether a station's information ships in its city pack rather than being fetched. Asked of
+    /// the source, never the city, so a second bundled city needs only its `sources.json` entry.
+    func servesBundledInformation(forStationID stationID: String) -> Bool {
+        source(forStationID: stationID).map(contents.bundledSources.contains) ?? false
+    }
+
+    func servesLiveArrivals(forStationID stationID: String) -> Bool {
+        source(forStationID: stationID).map(contents.liveArrivalSources.contains) ?? false
+    }
+
+    private func source(forStationID stationID: String) -> String? {
+        entriesByStationID[Self.canonicalStationID(stationID)]?.source
     }
 
     /// Stations from the bundled metro network carry `network-<cityID>-<canonicalID>`, while the

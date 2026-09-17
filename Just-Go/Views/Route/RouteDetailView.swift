@@ -219,11 +219,9 @@ struct RouteDetailView: View {
             if let cityID = route.networkCityID {
                 cityResources = await container.officialStationData
                     .cityExternalResources(for: [cityID])[cityID] ?? []
-                if cityID == BeijingServiceNoticeProvider.cityID {
-                    // Best effort by design: a failed or slow fetch leaves the card showing what
-                    // is already verifiable. Operator notices are never a blocker.
-                    serviceNotices = (try? await container.serviceNoticeProvider.notices()) ?? []
-                }
+                // Best effort by design: a failed or slow fetch leaves the card showing what is
+                // already verifiable. Operator notices are never a blocker.
+                serviceNotices = (try? await container.serviceNoticeProvider.notices(cityID: cityID)) ?? []
                 await loadServiceHours(cityID: cityID)
                 await loadBoardingArrivals(cityID: cityID)
             }

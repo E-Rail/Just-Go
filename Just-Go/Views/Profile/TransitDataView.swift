@@ -187,6 +187,10 @@ struct TransitDataView: View {
                                 Spacer()
                                 cityPackControl(for: city)
                             }
+                            // Leads with the city's name but carries icon-and-text chips and a
+                            // badge-and-label control. Unguided, the separator started under
+                            // "Included", 340 pt across a 402 pt screen: a stub, not a rule.
+                            .listSeparatorAtRowLeading()
                             .swipeActions {
                                 if isDownloadedStatus(state.packStatus[city.id]),
                                    !state.downloading.contains(city.id) {
@@ -489,6 +493,9 @@ struct OfficialResourcesDirectoryView: View {
                     }
                     .padding(.vertical, 3)
                 }
+                // A name over a row of icon-and-count badges: the city-pack row's shape, and the
+                // same separator fault.
+                .listSeparatorAtRowLeading()
             }
         }
         .overlay {

@@ -30,9 +30,6 @@ final class DIContainer {
     let stationSearchService: StationSearchService
     let cityService: CityService
     let tripMemoryService: TripMemoryService
-    let transferInsightService: TransferInsightService
-    /// What the rider answered after a trip. Device-local, volunteered, never derived.
-    let riderAnswerService: RiderAnswerService
     /// Measured transfer corridor lengths, when a provider can supply them. Optional because the
     /// app must build, launch and route with no Baidu key at all.
     let tripObservationProvider: TripObservationProviding?
@@ -61,8 +58,6 @@ final class DIContainer {
         stationSearchService: StationSearchService,
         cityService: CityService,
         tripMemoryService: TripMemoryService,
-        transferInsightService: TransferInsightService,
-        riderAnswerService: RiderAnswerService,
         tripObservationProvider: TripObservationProviding? = nil,
         lineObservationProvider: LineObservationProviding? = nil,
         routeFeasibilityService: RouteFeasibilityService,
@@ -85,8 +80,6 @@ final class DIContainer {
         self.stationSearchService = stationSearchService
         self.cityService = cityService
         self.tripMemoryService = tripMemoryService
-        self.transferInsightService = transferInsightService
-        self.riderAnswerService = riderAnswerService
         self.tripObservationProvider = tripObservationProvider
         self.lineObservationProvider = lineObservationProvider
         self.routeFeasibilityService = routeFeasibilityService
@@ -253,8 +246,6 @@ final class DIContainer {
             tripObservations: tripObservationProvider
         )
         let tripMemoryService = TripMemoryService()
-        let transferInsightService = TransferInsightService()
-        let riderAnswerService = RiderAnswerService()
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
@@ -271,8 +262,6 @@ final class DIContainer {
             stationSearchService: stationSearchService,
             cityService: cityService,
             tripMemoryService: tripMemoryService,
-            transferInsightService: transferInsightService,
-            riderAnswerService: riderAnswerService,
             tripObservationProvider: tripObservationProvider,
             lineObservationProvider: tripObservationProvider,
             routeFeasibilityService: routeFeasibilityService,

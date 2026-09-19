@@ -27,8 +27,8 @@ struct StationRow: View {
                         }
                     }
 
-                    if let alternateName = station.alternateLocalizedName {
-                        Text(alternateName)
+                    if let subtitle = station.subtitle {
+                        Text(subtitle)
                             .rowMeta()
                     }
 
@@ -48,6 +48,8 @@ struct StationRow: View {
                     .rowMeta()
             }
             .padding(.vertical, 4)
+            // The whole row, not only its text and glyphs: a plain button hit-tests what it draws.
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

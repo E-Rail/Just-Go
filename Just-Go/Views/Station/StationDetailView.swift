@@ -131,13 +131,12 @@ struct StationDetailView: View {
                 Button {
                     showQuickTagDialog = true
                 } label: {
-                    Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
-                        .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
+                    Label(
+                        AppLocalization.localized(currentQuickTag == nil ? "Add Quick Tag" : "Edit Quick Tag"),
+                        systemImage: currentQuickTag == nil ? "tag" : "tag.fill"
+                    )
+                    .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
                 }
-                .accessibilityLabel(currentQuickTag == nil
-                    ? AppLocalization.localized("Add Quick Tag")
-                    : AppLocalization.localized("Edit Quick Tag")
-                )
             }
         }
         .task {
@@ -175,12 +174,22 @@ struct StationDetailView: View {
         viewModel?.station ?? station
     }
 
+    /// Whether this station's information ships in its city pack (a `bundledDataset` source): it is
+    /// then always native and loads with the pack. Asked of the directory, never the city ID.
+    var servesBundledStationInformation: Bool {
+        container.stationInformationDirectory.servesBundledInformation(forStationID: displayedStation.id)
+    }
+
+    /// Whether the train section shows live trains rather than first and last times.
+    var servesLiveTrains: Bool {
+        container.stationInformationDirectory.servesLiveArrivals(forStationID: displayedStation.id)
+    }
+
     var usesNativeStationInformationSurface: Bool {
-        // Hong Kong ships its station data in the bundle, so it is always native. Elsewhere a
-        // station is native when the bundled Station Information directory routes it to an online
-        // source; the directory is synchronous, so asking it directly before the view model exists
-        // avoids a first-frame flash.
-        if displayedStation.cityID == "8100" {
+        // A station is native when the bundled Station Information directory has a source for it;
+        // the directory is synchronous, so asking it directly before the view model exists avoids a
+        // first-frame flash.
+        if servesBundledStationInformation {
             return true
         }
         if let viewModel {
@@ -297,8 +306,8 @@ struct StationDetailView: View {
             Text(station.localizedName)
                 .font(.title)
                 .fontWeight(.bold)
-            if let alternateName = station.alternateLocalizedName {
-                Text(alternateName)
+            if let subtitle = station.subtitle {
+                Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

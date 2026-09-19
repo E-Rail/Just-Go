@@ -219,11 +219,9 @@ struct RouteDetailView: View {
             if let cityID = route.networkCityID {
                 cityResources = await container.officialStationData
                     .cityExternalResources(for: [cityID])[cityID] ?? []
-                if cityID == BeijingServiceNoticeProvider.cityID {
-                    // Best effort by design: a failed or slow fetch leaves the card showing what
-                    // is already verifiable. Operator notices are never a blocker.
-                    serviceNotices = (try? await container.serviceNoticeProvider.notices()) ?? []
-                }
+                // Best effort by design: a failed or slow fetch leaves the card showing what is
+                // already verifiable. Operator notices are never a blocker.
+                serviceNotices = (try? await container.serviceNoticeProvider.notices(cityID: cityID)) ?? []
                 await loadServiceHours(cityID: cityID)
                 await loadBoardingArrivals(cityID: cityID)
             }
@@ -884,8 +882,9 @@ struct RouteDetailView: View {
         boardingServiceHours = hours
     }
 
-    /// The journey as one continuous path: an unbroken vertical rail in each leg's colour and dash,
-    /// with the line's badge where the rider boards. Ride legs expand to the stations they pass.
+    /// The journey as one continuous path: an unbroken vertical rail, each stretch in the colour and
+    /// dash of the leg travelled along it, with the line's badge where the rider boards. Ride legs
+    /// expand to the stations they pass.
     private var journeyCard: some View {
         VStack(spacing: 0) {
             ForEach(Array(route.segments.enumerated()), id: \.element.id) { index, segment in
@@ -907,10 +906,18 @@ struct RouteDetailView: View {
         let isExpanded = expandedLegs.contains(segment.id)
         return HStack(alignment: .top, spacing: 0) {
             ZStack(alignment: .top) {
-                JourneyRail(segment: segment)
-                    // The first leg's rail starts at its own marker; drawn full height it would
-                    // stick out of the top of the card like a trip that began somewhere else.
-                    .padding(.top, index == 0 ? Self.markerInset + Self.markerSize / 2 : 0)
+                VStack(spacing: 0) {
+                    // Above the marker the rider is still on the leg before, so a leg's colour and
+                    // dash run from its own marker to the next one. Nothing above the first marker:
+                    // drawn there, the rail would stick out of the top of the card like a trip that
+                    // began somewhere else.
+                    JourneyRail(segment: index == 0 ? nil : route.segments[index - 1])
+                        .frame(height: Self.markerInset + Self.markerSize / 2)
+                        // Drawn a point into the row above, so one leg's rail crosses the row
+                        // boundary under a covered pixel instead of leaving an antialiased seam.
+                        .padding(.top, -1)
+                    JourneyRail(segment: segment)
+                }
                 legMarker(segment)
                     .padding(.top, Self.markerInset)
             }
@@ -967,6 +974,11 @@ struct RouteDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                ForEach(route.cityCrossings(by: index), id: \.self) { crossing in
+                    Label(crossing, systemImage: "arrow.right.to.line")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
                 // What is not known about this door (an estimated exit, nothing recorded step-free)
                 // and the leg's own disclosures: an out-of-station change leaves the gates,
                 // Beijing's 虚拟换乘 counts as one fare, a bike leg follows the pedestrian route or has
@@ -1004,7 +1016,15 @@ struct RouteDetailView: View {
 
     private func stationStops(_ segment: RouteSegment) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(segment.stationStops) { stop in
+            ForEach(Array(segment.stationStops.enumerated()), id: \.element.id) { offset, stop in
+                // Where the ride crosses into another city, that city heads the stops within it.
+                if offset > 0, let city = stop.city, city != segment.stationStops[offset - 1].city {
+                    Text(city)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 6)
+                }
                 Button { detailDestination = .station(stop) } label: {
                     HStack(spacing: 10) {
                         Circle()
@@ -1032,6 +1052,7 @@ struct RouteDetailView: View {
             ZStack(alignment: .top) {
                 JourneyRail(segment: route.segments.last)
                     .frame(height: Self.markerInset + Self.markerSize / 2)
+                    .padding(.top, -1)
                 Image(systemName: "mappin.circle.fill")
                     .font(.system(size: Self.markerSize))
                     .foregroundStyle(.white, Color.accentColor)

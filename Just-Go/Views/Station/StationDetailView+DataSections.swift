@@ -66,10 +66,7 @@ extension StationDetailView {
                         }
                         Spacer(minLength: 8)
                         DataConfidenceChip(
-                            confidence: officialStationInformationConfidence(
-                                review?.stationInformationStatus,
-                                cityID: displayedStation.cityID
-                            ),
+                            confidence: officialStationInformationConfidence(review?.stationInformationStatus),
                             compact: true
                         )
                     }
@@ -86,7 +83,7 @@ extension StationDetailView {
                                 selection: $selectedOfficialInformationCategory
                             ) {
                                 ForEach(categories) { category in
-                                    Text(category.title(for: displayedStation.cityID))
+                                    Text(category.title(showsLiveTrains: servesLiveTrains))
                                         .tag(category)
                                 }
                             }
@@ -156,7 +153,7 @@ extension StationDetailView {
         if viewModel == nil ||
             (viewModel?.isLoadingOfficialStationInformation == true &&
                 viewModel?.officialStationInformation == nil) ||
-            (displayedStation.cityID == "8100" &&
+            (servesBundledStationInformation &&
                 viewModel?.officialStationInformation == nil &&
                 viewModel?.isLoading == true) {
             HStack(spacing: 10) {
@@ -205,7 +202,7 @@ extension StationDetailView {
 
     @ViewBuilder
     private func officialLineRows(_ lines: [OfficialStationLineInformation]) -> some View {
-        if displayedStation.cityID == "8100",
+        if servesLiveTrains,
            viewModel?.isLoading == true,
            lines.isEmpty {
             HStack(spacing: 10) {
@@ -223,7 +220,7 @@ extension StationDetailView {
         } else if lines.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 officialCategoryEmptyState
-                if displayedStation.cityID == "8100",
+                if servesLiveTrains,
                    let message = viewModel?.errorMessage {
                     Text(message)
                         .font(.caption)
@@ -616,7 +613,7 @@ extension StationDetailView {
 
     private var officialCategoryEmptyState: some View {
         let category = effectiveOfficialInformationCategory
-        let categoryTitle = category.title(for: displayedStation.cityID)
+        let categoryTitle = category.title(showsLiveTrains: servesLiveTrains)
         return Label {
             Text(AppLocalization.text(
                 english: "No \(categoryTitle.lowercased()) for this station.",
@@ -634,7 +631,7 @@ extension StationDetailView {
     }
 
     private var officialStationInformationProvenance: String {
-        if displayedStation.cityID == "8100" {
+        if servesBundledStationInformation {
             return AppLocalization.text(
                 english: "Live trains online · accessibility data included offline",
                 simplified: "列车信息在线获取 · 无障碍数据已离线内置",
@@ -657,10 +654,9 @@ extension StationDetailView {
     }
 
     private func officialStationInformationConfidence(
-        _ status: OfficialTransitStationInformationStatus?,
-        cityID: String
+        _ status: OfficialTransitStationInformationStatus?
     ) -> DataConfidence {
-        if cityID == "8100" {
+        if servesBundledStationInformation {
             return viewModel == nil || viewModel?.isLoadingCityPack == true
                 ? .unknown
                 : .official

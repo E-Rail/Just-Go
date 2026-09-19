@@ -45,6 +45,13 @@ struct MetroLine: Codable, Equatable, Identifiable {
     /// from `servicePatterns`, the only thing the graph reads, and optional so older packs decode.
     let serviceVariants: [MetroServiceVariant]?
     let paths: [[MetroCoordinate]]
+    /// `premium` where the line charges its own tariff above the metro's (機場快綫, 首都机场线,
+    /// 磁浮线). Declared in the importer where checked; nil is the network's ordinary fare.
+    let fare: Fare?
+
+    enum Fare: String, Codable {
+        case premium
+    }
 }
 
 /// One kind of train on a line that is not the ordinary all-stops service.
@@ -62,6 +69,9 @@ struct MetroServiceVariant: Codable, Equatable, Identifiable {
 /// lines meet at one node, so without this 广安门内 ↔ 牛街 could not be planned. Declared per pair in the
 /// importer, never inferred from distance: 南礼士路 and 复兴门 are 372 m apart and are not an interchange,
 /// 太平桥 and 复兴门 at 625 m are.
+///
+/// The same station at both ends is one name whose lines meet through the street (大钟寺 12/13): not
+/// an edge, but the walk every change of line there makes.
 struct MetroInterchange: Codable, Equatable {
     /// What the walk is: `inStation`, connected inside the building (Guangzhou's metro/intercity
     /// concourses); `outOfStation`, out to the street (Beijing's 广安门内/牛街).
@@ -93,6 +103,14 @@ struct MetroStation: Codable, Equatable, Identifiable {
     let latitude: Double
     let longitude: Double
     let lineIDs: [String]
+    /// The city the station is in, from OpenStreetMap's boundaries rather than the pack: Guangzhou's
+    /// pack carries 广佛线 into Foshan. Optional so packs from before the field decode.
+    let city: String?
+    let cityEn: String?
+
+    var localizedCity: String? {
+        AppLocalization.isChinese ? city.map(AppLocalization.chinese) : cityEn ?? city
+    }
 }
 
 /// Just enough of a network file to match a coordinate to a city by bounds, without allocating
@@ -148,6 +166,7 @@ private func makeDisplayStation(
         isTransferStation: Set(displayLines.map(\.lineID)).count > 1
     )
     station.lines = displayLines
+    station.city = item.localizedCity
     return station
 }
 
@@ -264,7 +283,10 @@ extension MetroNetworkProviding {
 }
 
 actor BundledMetroNetworkService: MetroNetworkProviding {
-    private static let supportedCityIDs = ["1100", "3100", "4401", "4403", "5101", "3301", "1200", "5000", "4201", "3201", "6101", "3205", "4101", "4301", "2101", "3702", "2102", "3302", "3202", "5301", "3601", "3501", "3502", "3401", "1301", "5201", "2301", "2201", "4501", "6201", "6501", "1501", "1401", "4419", "4406", "3303", "3306", "3203", "3204", "3701", "4103", "3402", "3206", "3310", "3307", "4110", "3411", "8100", "8200", "7101", "7102", "7106", "7104"]
+    /// Every network the bundle carries, read off the `MetroNetworks` folder, so adding a city is a
+    /// data change.
+    private static let supportedCityIDs = (Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: "MetroNetworks") ?? [])
+        .map { $0.deletingPathExtension().lastPathComponent }
     private var networks: [String: MetroNetwork] = [:]
     private var stationsByCity: [String: [Station]] = [:]
     private var summaries: [String: MetroNetworkSummary] = [:]

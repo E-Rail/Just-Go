@@ -30,8 +30,8 @@ enum OfficialStationInformationCategory: String, CaseIterable, Identifiable, Sen
         }
     }
 
-    func title(for cityID: String) -> String {
-        guard self == .firstLast, cityID == "8100" else { return title }
+    func title(showsLiveTrains: Bool) -> String {
+        guard self == .firstLast, showsLiveTrains else { return title }
         return AppLocalization.text(
             english: "Trains",
             simplified: "列车",
@@ -1017,7 +1017,9 @@ actor BeijingServiceNoticeProvider {
         self.session = session
     }
 
-    func notices(limit: Int = 3) async throws -> [OperatorServiceNotice] {
+    /// Empty for any other city: callers ask by city and never name the operator.
+    func notices(cityID: String, limit: Int = 3) async throws -> [OperatorServiceNotice] {
+        guard cityID == Self.cityID else { return [] }
         if let cachedAt, Self.clock.now - cachedAt < .seconds(Self.cacheLifetime) {
             return Array(cached.prefix(limit))
         }

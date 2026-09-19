@@ -295,11 +295,17 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         }
         // Interchange links, both kinds: `outOfStation` is two gated stations and a street walk,
         // `inStation` two stations in one paid area. Either needs an edge, or the two are
-        // unreachable however close they sit.
+        // unreachable however close they sit. A link from a station to itself is not an edge but
+        // the walk its line changes make.
+        var streetTransfers: [String: MetroInterchange] = [:]
         for network in networks {
             for link in network.interchanges {
                 let fromID = resolve(link.fromStationID)
                 let toID = resolve(link.toStationID)
+                if link.fromStationID == link.toStationID {
+                    streetTransfers[fromID] = link
+                    continue
+                }
                 guard let from = stationsByID[fromID], let to = stationsByID[toID], from.id != to.id else { continue }
                 let edge = MetroGraphEdge(
                     fromStationID: from.id,
@@ -327,7 +333,8 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
             adjacency: adjacency,
             edgeGeometries: edgeGeometries,
             cityIDByStationID: cityIDByStationID,
-            canonicalLineIDs: canonicalLine
+            canonicalLineIDs: canonicalLine,
+            streetTransfers: streetTransfers
         )
         graphs[key] = graph
         graphOrder.removeAll { $0 == key }
@@ -421,9 +428,15 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
                     item.state.lineID != nil &&
                     item.state.lineID != edge.lineID
                 let next = MetroSearchState(stationID: edge.toStationID, lineID: edge.lineID)
-                let step = edge.interchange == nil
+                // A change of line through the street walks it; boarding a premium-fare line pays
+                // for it.
+                let street = transfer && edge.interchange == nil ? graph.streetTransfers[edge.fromStationID] : nil
+                let boardsPremium = item.state.lineID != edge.lineID && graph.linesByID[edge.lineID]?.fare == .premium
+                let step = (edge.interchange == nil
                     ? trainCost(edge.distance) + (transfer ? preference.transferPenalty : 0)
-                    : walkingCost(edge.distance, preference: preference) + preference.transferPenalty
+                    : walkingCost(edge.distance, preference: preference) + preference.transferPenalty)
+                    + walkingCost(street?.walkingDistanceMeters ?? 0, preference: preference)
+                    + (boardsPremium ? Self.premiumFarePenalty : 0)
                 let cost = item.cost + step
                 if cost < distances[next, default: .infinity] {
                     distances[next] = cost
@@ -477,6 +490,11 @@ actor BundledMetroRouteProvider: TransitRouteProviding {
         }
         return false
     }
+
+    /// Charged once per boarding of a premium-fare line, so a route rides one only where it saves
+    /// 20 minutes: 機場快綫 to Tsing Yi saves 3 on 東涌綫 and costs several times the fare, while to the
+    /// airport it is the only line there.
+    private static let premiumFarePenalty: Double = 1_200
 
     private func walkingCost(_ distance: Double, preference: MetroSearchPreference) -> Double {
         distance / 1.25 * preference.walkingWeight

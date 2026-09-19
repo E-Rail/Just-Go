@@ -46,17 +46,16 @@ final class StationDetailViewModel {
     }
 
     func loadRiderInformation() async {
-        guard let stationID = station?.id,
-              let cityID = station?.cityID else { return }
+        guard let stationID = station?.id else { return }
         let generation = officialInformationGeneration
-        if cityID == "8100" {
-            buildHongKongStationInformation()
+        if stationInformationDirectory.servesBundledInformation(forStationID: stationID) {
+            buildBundledStationInformation()
             await loadTrainTimes()
             guard isCurrentOfficialInformationLoad(
                 stationID: stationID,
                 generation: generation
             ) else { return }
-            buildHongKongStationInformation()
+            buildBundledStationInformation()
             return
         }
         // Train times and the official online lookup are independent, so neither waits for the
@@ -262,10 +261,8 @@ final class StationDetailViewModel {
 
     var usesCategorizedStationInformation: Bool {
         guard let station else { return false }
-        if station.cityID == "8100" {
-            return true
-        }
-        return stationInformationDirectory.onlineEntry(forStationID: station.id) != nil
+        return stationInformationDirectory.servesBundledInformation(forStationID: station.id)
+            || stationInformationDirectory.onlineEntry(forStationID: station.id) != nil
     }
 
     var officialStationInformationSourceResource: ExternalTransitResource? {
@@ -274,8 +271,8 @@ final class StationDetailViewModel {
         }
     }
 
-    private func buildHongKongStationInformation() {
-        guard let station, station.cityID == "8100" else { return }
+    private func buildBundledStationInformation() {
+        guard let station, stationInformationDirectory.servesBundledInformation(forStationID: station.id) else { return }
         let stationID = station.id
         let accessibility = station.accessibility
         let accessibleEntrances = accessibility?.accessibleEntrances ?? []

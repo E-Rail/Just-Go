@@ -25,6 +25,9 @@ struct MetroRoutingGraph {
     /// own pack's copies, so counting a station's lines goes through here or an interchange onto a
     /// shared corridor reads as one line.
     let canonicalLineIDs: [String: String]
+    /// Stations whose lines meet through the street (大钟寺 12/13), keyed by station ID: every change
+    /// of line there walks this far outside.
+    let streetTransfers: [String: MetroInterchange]
 
     func cityID(for stationID: String) -> String {
         cityIDByStationID[stationID] ?? ""

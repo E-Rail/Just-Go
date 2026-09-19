@@ -528,6 +528,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             isTransferStation: station.isTransferStation
         )
         enriched.lines = station.lines
+        enriched.city = station.city
         if let data = item.accessibility?.data {
             enriched.accessibility = StationAccessibility(stationID: station.stationID, data: data)
         } else {
@@ -570,7 +571,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
               let item = stationRecord(for: station) else { return .unavailable }
 
         var realtimeAvailability: RealtimeArrivalAvailability = .notConfigured
-        if station.cityID == "8100", !item.liveArrivalReferences.isEmpty {
+        // Only a pack whose references passed `validatesLiveReference` carries any.
+        if !item.liveArrivalReferences.isEmpty {
             let liveSnapshot = await hongKongLiveArrivals(
                 for: station,
                 record: item,
@@ -1183,6 +1185,7 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         _ reference: OfficialLiveArrivalReference,
         cityID: String
     ) -> Bool {
+        // References name data.gov.hk's MTR codes, the one live-arrival source, which is Hong Kong's.
         guard cityID == "8100",
               ["heavyRail", "lightRail"].contains(reference.mode),
               !reference.stationCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,

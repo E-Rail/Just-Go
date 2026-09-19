@@ -42,7 +42,7 @@ struct LiveGoTripBuilder {
                     stopCount: 0,
                     walkingDistance: 0,
                     duration: segment.duration,
-                    notes: segment.accessibilityNotes,
+                    notes: route.cityCrossings(by: index) + segment.accessibilityNotes,
                     transferCoordinate: transferStop?.coordinate,
                     segmentIndex: index,
                     transferContext: segment.transferContext

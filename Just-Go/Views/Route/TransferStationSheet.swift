@@ -104,8 +104,11 @@ struct TransferStationSheet: View {
                     LineBadge(name: lineName, colorHex: nextSegment.lineColorHex, size: 34)
                 }
                 VStack(alignment: .leading, spacing: 6) {
+                    // Toward the terminus the platform sign names, not where this rider alights;
+                    // absent where the branch is ambiguous, as on the leg row.
                     if let nextSegment = nextTransitSegment,
-                       let lineName = nextSegment.lineName, let toward = nextSegment.toStationName {
+                       let lineName = nextSegment.lineName,
+                       let toward = nextSegment.transitContext?.directionTerminalStationName {
                         Text(AppLocalization.text(
                             english: "Board \(lineName) toward \(toward)",
                             simplified: "乘\(lineName)方向 \(toward)",
@@ -125,6 +128,12 @@ struct TransferStationSheet: View {
                         Image(systemName: "figure.walk")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                    }
+                    // An out-of-station change and its fare, as the leg row says them.
+                    ForEach(transferSegment.accessibilityNotes, id: \.self) { note in
+                        Label(note, systemImage: "info.circle")
+                            .font(.footnote)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
             }

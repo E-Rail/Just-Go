@@ -118,6 +118,7 @@ extension BundledMetroRouteProvider {
                 // `lineName` below is the outgoing line; the incoming one is the previous group's,
                 // which only this loop still knows.
                 let previousLine = groups[index - 1].last.flatMap { graph.linesByID[$0.lineID] }
+                let street = graph.streetTransfers[from.id]
                 segments.append(RouteSegment(
                     id: UUID(),
                     type: .transfer,
@@ -127,16 +128,16 @@ extension BundledMetroRouteProvider {
                     toStationName: from.name,
                     fromStationID: graph.qualifiedID(for: from.id),
                     toStationID: graph.qualifiedID(for: from.id),
-                    duration: RouteSegment.changeoverAllowance,
-                    distance: 0,
+                    duration: RouteSegment.changeoverAllowance + (street?.walkingDistanceMeters ?? 0) / 1.25,
+                    distance: street?.walkingDistanceMeters ?? 0,
                     stops: 0,
                     stationStops: [],
-                    // An in-station change draws nothing: each ride's track is tied to the station
-                    // node by a grey connector, so the path reads platform → concourse → platform.
-                    // A direct line between tracks would cut a corner nobody walks.
+                    // A change at one station draws nothing: each ride's track is tied to the
+                    // station node by a grey connector, so the path reads platform → concourse →
+                    // platform. A direct line between tracks would cut a corner nobody walks.
                     polylineCoordinates: [],
                     walkingDirections: nil,
-                    accessibilityNotes: [],
+                    accessibilityNotes: street.map { interchangeNotes($0, walkingTo: nil) } ?? [],
                     transferContext: previousLine.map { _ in
                         TransferContext(
                             cityID: graph.cityID(for: from.id),
@@ -159,7 +160,8 @@ extension BundledMetroRouteProvider {
                     coordinate: CodableCoordinate(latitude: station.latitude, longitude: station.longitude),
                     arrivalTimeText: nil,
                     isTransfer: lineCount > 1,
-                    lineID: line.id
+                    lineID: line.id,
+                    city: station.localizedCity
                 )
             }
             let coordinates = group.flatMap { graph.edgeGeometries[$0.key] ?? [] }.consecutiveUnique
@@ -178,35 +180,39 @@ extension BundledMetroRouteProvider {
                 stationStops: stops,
                 polylineCoordinates: coordinates,
                 walkingDirections: nil,
-                accessibilityNotes: [],
+                // Named, because the results card lists it away from the leg.
+                accessibilityNotes: line.fare == .premium ? [AppLocalization.text(
+                    english: "\(line.localizedName) charges its own, higher fare",
+                    simplified: "\(line.localizedName)单独计费，票价高于普通地铁",
+                    traditional: "\(line.localizedName)單獨計費，票價高於普通地鐵"
+                )] : [],
                 transitContext: currentContext
             ))
         }
         return segments
     }
 
-    /// The walk from one station to the other that riders treat as the same interchange: a
-    /// `.transfer`, a change of train, not a journey. The notes say what the walk is, and what the
-    /// fare does only where that has been checked; neither follows from `kind` (Beijing's
-    /// out-of-station 虚拟换乘 bills as one trip, Guangzhou's shared concourse needs two tickets).
-    private func interchangeSegment(
-        _ edge: MetroGraphEdge,
-        link: MetroInterchange,
-        graph: MetroRoutingGraph
-    ) -> RouteSegment? {
-        guard let from = graph.stationsByID[edge.fromStationID],
-              let to = graph.stationsByID[edge.toStationID] else { return nil }
+    /// What an interchange walk is, and what the fare does only where that has been checked;
+    /// neither follows from `kind` (Beijing's out-of-station 虚拟换乘 bills as one trip, Guangzhou's
+    /// shared concourse needs two tickets). `walkingTo` is nil for a change of line at one station.
+    private func interchangeNotes(_ link: MetroInterchange, walkingTo destination: String?) -> [String] {
         var notes = [
-            link.kind == .outOfStation
+            link.kind == .inStation
                 ? AppLocalization.text(
-                    english: "Leave the station and walk to \(to.name)",
-                    simplified: "需出站步行至\(to.name)",
-                    traditional: "需出站步行至\(to.name)"
-                )
-                : AppLocalization.text(
                     english: "Connected inside the station",
                     simplified: "站内通道直接连通",
                     traditional: "站內通道直接連通"
+                )
+                : destination.map {
+                    AppLocalization.text(
+                        english: "Leave the station and walk to \($0)",
+                        simplified: "需出站步行至\($0)",
+                        traditional: "需出站步行至\($0)"
+                    )
+                } ?? AppLocalization.text(
+                    english: "Out-of-station transfer: leave through the gates and re-enter",
+                    simplified: "出站换乘：需出闸后步行，再进站",
+                    traditional: "出站換乘：需出閘後步行，再進站"
                 )
         ]
         // Silence where the fare is unknown: the rider can read the gates, and a wrong statement
@@ -218,6 +224,18 @@ extension BundledMetroRouteProvider {
                 traditional: "虛擬換乘，計為一次行程，不重複計費"
             ))
         }
+        return notes
+    }
+
+    /// The walk from one station to the other that riders treat as the same interchange: a
+    /// `.transfer`, a change of train, not a journey.
+    private func interchangeSegment(
+        _ edge: MetroGraphEdge,
+        link: MetroInterchange,
+        graph: MetroRoutingGraph
+    ) -> RouteSegment? {
+        guard let from = graph.stationsByID[edge.fromStationID],
+              let to = graph.stationsByID[edge.toStationID] else { return nil }
         return RouteSegment(
             id: UUID(),
             type: .transfer,
@@ -236,7 +254,7 @@ extension BundledMetroRouteProvider {
             stationStops: [],
             polylineCoordinates: graph.edgeGeometries[edge.key] ?? [],
             walkingDirections: nil,
-            accessibilityNotes: notes
+            accessibilityNotes: interchangeNotes(link, walkingTo: to.name)
         )
     }
 

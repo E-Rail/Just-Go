@@ -1,22 +1,5 @@
 import Foundation
 
-private final class GuangzhouRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        willPerformHTTPRedirection response: HTTPURLResponse,
-        newRequest request: URLRequest,
-        completionHandler: @escaping (URLRequest?) -> Void
-    ) {
-        guard request.url?.scheme?.lowercased() == "https",
-              request.url?.host?.lowercased() == GuangzhouStationInformationProvider.host else {
-            completionHandler(nil)
-            return
-        }
-        completionHandler(request)
-    }
-}
-
 /// Fetches Guangzhou Metro station information from the operator's own JSON endpoints, on the
 /// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
 /// in `StationInfoAPI/sources/sources.json` under `guangzhouMetroOnline`.
@@ -49,6 +32,12 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
     private let session: URLSession
     private let diskCache: (any OfficialStationInformationCaching)?
     private var cache: [PreparedRequest: CacheEntry] = [:]
+    private var inFlight: [PreparedRequest: InFlightRequest] = [:]
+
+    private struct InFlightRequest: Sendable {
+        let token: UUID
+        let task: Task<OfficialStationInformationSnapshot, Error>
+    }
     /// Line name → hex colour, fetched once from the network listing. `nil` until first fetched;
     /// a best-effort empty map after a failed fetch, so a later request retries it.
     private var lineColors: [String: String]?
@@ -84,19 +73,45 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
             return cached.snapshot
         }
 
+        // Shared for the station fetch too, not only for the line colours below. The planner
+        // enriches every alternative at once and the station page asks again on top, so the same
+        // station was fetched once per caller. Unstructured, so a caller that gives up waiting
+        // leaves the answer in the cache rather than cancelling it away.
+        if let active = inFlight[prepared] {
+            return try await finish(active, for: prepared)
+        }
+        let session = self.session
+        let colors = await colorsForLines()
+        let active = InFlightRequest(
+            token: UUID(),
+            task: Task { try await Self.fetch(prepared, colors: colors, using: session) }
+        )
+        inFlight[prepared] = active
+        return try await finish(active, for: prepared)
+    }
+
+    private func finish(
+        _ active: InFlightRequest,
+        for prepared: PreparedRequest
+    ) async throws -> OfficialStationInformationSnapshot {
         do {
-            let colors = await colorsForLines()
-            let snapshot = try await Self.fetch(prepared, colors: colors, using: session)
-            cache[prepared] = CacheEntry(
-                snapshot: snapshot,
-                expiresAt: now.advanced(by: .seconds(Self.cacheLifetime))
-            )
-            if let diskCache {
-                let key = prepared.stationShowCode
-                Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: key) }
+            let snapshot = try await active.task.value
+            if inFlight[prepared]?.token == active.token {
+                inFlight.removeValue(forKey: prepared)
+                cache[prepared] = CacheEntry(
+                    snapshot: snapshot,
+                    expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
+                )
+                if let diskCache {
+                    let key = prepared.stationShowCode
+                    Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: key) }
+                }
             }
             return snapshot
         } catch {
+            if inFlight[prepared]?.token == active.token {
+                inFlight.removeValue(forKey: prepared)
+            }
             return try await servingStoredSnapshot(for: prepared, insteadOf: error)
         }
     }
@@ -127,7 +142,7 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
         for request: PreparedRequest,
         insteadOf error: Error
     ) async throws -> OfficialStationInformationSnapshot {
-        guard Self.allowsStoredFallback(error),
+        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
               let diskCache,
               let stored = await diskCache.storedSnapshot(
                   cityID: Self.cityID,
@@ -139,16 +154,6 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
         return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
     }
 
-    private static func allowsStoredFallback(_ error: Error) -> Bool {
-        guard let providerError = error as? OfficialStationInformationProviderError else { return false }
-        switch providerError {
-        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
-             .rateLimited, .httpStatus, .serviceUnavailable:
-            return true
-        case .invalidRequest, .contractViolation:
-            return false
-        }
-    }
 
     private static func prepare(
         _ request: OfficialStationInformationRequest
@@ -165,7 +170,7 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
                     "Guangzhou station reference is not a reviewed show code"
                 )
             }
-            let names = expectedNames.compactMap(trimmed).uniqued().sorted()
+            let names = expectedNames.compactMap(OperatorFieldParsing.trimmed).uniqued().sorted()
             guard !names.isEmpty else {
                 throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
             }
@@ -208,11 +213,11 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
         }
         // An empty listing carries no station name to verify identity against; treat it as the
         // service being unavailable so a cached snapshot can stand in rather than erroring hard.
-        guard let name = rows.compactMap({ trimmed($0["stationName"] as? String) }).first else {
+        guard let name = rows.compactMap({ OperatorFieldParsing.trimmed($0["stationName"] as? String) }).first else {
             throw OfficialStationInformationProviderError.serviceUnavailable("no service times")
         }
-        let expected = Set(request.expectedNames.map(normalizedName))
-        guard expected.contains(normalizedName(name)) else {
+        let expected = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
+        guard expected.contains(OperatorFieldParsing.normalizedName(name)) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
@@ -239,7 +244,7 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
                 }
                 var colors: [String: String] = [:]
                 for line in lines {
-                    guard let name = trimmed(line["lineName"] as? String),
+                    guard let name = OperatorFieldParsing.trimmed(line["lineName"] as? String),
                           let color = normalizedColor(line["lineColor"] as? String) else { continue }
                     colors[name] = color
                 }
@@ -270,10 +275,10 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
         var services: [String: [String: OfficialStationServiceInformation]] = [:]
 
         for row in rows {
-            guard let lineName = trimmed(row["lineCn"] as? String),
-                  let direction = trimmed(row["toStationName"] as? String) else { continue }
-            let first = placeholderAware(row["startTime"] as? String)
-            let last = placeholderAware(row["endTime"] as? String)
+            guard let lineName = OperatorFieldParsing.trimmed(row["lineCn"] as? String),
+                  let direction = OperatorFieldParsing.trimmed(row["toStationName"] as? String) else { continue }
+            let first = OperatorFieldParsing.placeholderAware(row["startTime"] as? String)
+            let last = OperatorFieldParsing.placeholderAware(row["endTime"] as? String)
             guard first != nil || last != nil else { continue }
 
             if services[lineName] == nil {
@@ -284,8 +289,8 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
             if let existing = services[lineName]?[direction] {
                 services[lineName]?[direction] = OfficialStationServiceInformation(
                     direction: direction,
-                    firstTrain: preferredServiceTime(existing.firstTrain, first, earliest: true),
-                    lastTrain: preferredServiceTime(existing.lastTrain, last, earliest: false),
+                    firstTrain: OperatorFieldParsing.preferredServiceTime(existing.firstTrain, first, earliest: true),
+                    lastTrain: OperatorFieldParsing.preferredServiceTime(existing.lastTrain, last, earliest: false),
                     liveTime: nil
                 )
             } else {
@@ -331,7 +336,7 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(for: urlRequest, delegate: GuangzhouRedirectDelegate())
+            (data, response) = try await session.data(for: urlRequest, delegate: OperatorRedirectDelegate(host: Self.host))
         } catch is CancellationError {
             throw CancellationError()
         } catch let error as URLError where error.code == .timedOut {
@@ -360,55 +365,13 @@ actor GuangzhouStationInformationProvider: OfficialStationInformationProviding {
 
     // MARK: - Helpers
 
-    private static func placeholderAware(_ value: String?) -> String? {
-        guard let value = trimmed(value) else { return nil }
-        return placeholders.contains(value.lowercased()) ? nil : value
-    }
-
-    private static let placeholders: Set<String> = ["/", "-", "--", "—", "n/a", "na", "none", "无", "暂无"]
-
-    private static func serviceMinutes(_ value: String) -> Int? {
-        let parts = value.split(separator: ":")
-        guard parts.count == 2, let hour = Int(parts[0]), let minute = Int(parts[1]),
-              (0..<24).contains(hour), (0..<60).contains(minute) else { return nil }
-        return (hour < 4 ? hour + 24 : hour) * 60 + minute
-    }
-
-    private static func preferredServiceTime(_ lhs: String?, _ rhs: String?, earliest: Bool) -> String? {
-        guard let lhs else { return rhs }
-        guard let rhs else { return lhs }
-        guard let lhsMinutes = serviceMinutes(lhs) else { return rhs }
-        guard let rhsMinutes = serviceMinutes(rhs) else { return lhs }
-        let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
-        return preferLhs ? lhs : rhs
-    }
-
-    private static func trimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let result = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result.isEmpty ? nil : result
-    }
 
     private static func normalizedColor(_ value: String?) -> String? {
         // Guangzhou colours are 8-digit RRGGBBAA; drop the alpha byte before validating.
-        guard let raw = trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")) else { return nil }
+        guard let raw = OperatorFieldParsing.trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")) else { return nil }
         let hex = raw.count == 8 ? String(raw.prefix(6)) : raw
         guard hex.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else { return nil }
         return "#\(hex.uppercased())"
     }
 
-    private static func normalizedName(_ value: String) -> String {
-        value.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
-            .unicodeScalars
-            .filter(CharacterSet.alphanumerics.contains)
-            .map(String.init)
-            .joined()
-    }
-}
-
-private extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
-    }
 }

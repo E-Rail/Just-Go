@@ -174,6 +174,9 @@ struct RouteResultsView: View {
                     Text(timingMode.title)
                 }
                 .datePickerStyle(.compact)
+                // The clock the answer is given in. Every time the results print is China time, so a
+                // phone set to Tokyo picked "18:00" and was told about 17:00.
+                .environment(\.timeZone, ChinaClock.calendar.timeZone)
             }
         }
         .padding(.horizontal, Metrics.l)

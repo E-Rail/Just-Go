@@ -1,22 +1,5 @@
 import Foundation
 
-private final class HangzhouRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        willPerformHTTPRedirection response: HTTPURLResponse,
-        newRequest request: URLRequest,
-        completionHandler: @escaping (URLRequest?) -> Void
-    ) {
-        guard request.url?.scheme?.lowercased() == "https",
-              request.url?.host?.lowercased() == HangzhouStationInformationProvider.host else {
-            completionHandler(nil)
-            return
-        }
-        completionHandler(request)
-    }
-}
-
 /// Fetches Hangzhou Metro station information from the operator's own JSON endpoint, on the
 /// rider's device, and normalizes it into the shared snapshot. The fetch/map recipe is documented
 /// in `StationInfoAPI/sources/sources.json` under `hangzhouMetroOnline`.
@@ -159,7 +142,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         for request: PreparedRequest,
         insteadOf error: Error
     ) async throws -> OfficialStationInformationSnapshot {
-        guard Self.allowsStoredFallback(error),
+        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
               let diskCache,
               let stored = await diskCache.storedSnapshot(
                   cityID: Self.cityID,
@@ -171,18 +154,6 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
     }
 
-    private static func allowsStoredFallback(_ error: Error) -> Bool {
-        guard let providerError = error as? OfficialStationInformationProviderError else {
-            return false
-        }
-        switch providerError {
-        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
-             .rateLimited, .httpStatus, .serviceUnavailable:
-            return true
-        case .invalidRequest, .contractViolation:
-            return false
-        }
-    }
 
     private func store(_ snapshot: OfficialStationInformationSnapshot, for request: PreparedRequest) {
         guard let diskCache else { return }
@@ -201,7 +172,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         switch request.reference {
         case .hangzhou(let stationCodes, let expectedNames):
             let codes = stationCodes
-                .compactMap(trimmed)
+                .compactMap(OperatorFieldParsing.trimmed)
                 .filter { $0.range(of: #"^\d{1,6}$"#, options: .regularExpression) != nil }
                 .uniqued()
             guard !codes.isEmpty else {
@@ -209,7 +180,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
                     "Hangzhou station reference carries no reviewed numeric station code"
                 )
             }
-            let names = expectedNames.compactMap(trimmed).uniqued().sorted()
+            let names = expectedNames.compactMap(OperatorFieldParsing.trimmed).uniqued().sorted()
             guard !names.isEmpty else {
                 throw OfficialStationInformationProviderError.invalidRequest(
                     "expected station names are empty"
@@ -277,7 +248,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         do {
             (data, response) = try await session.data(
                 for: urlRequest,
-                delegate: HangzhouRedirectDelegate()
+                delegate: OperatorRedirectDelegate(host: Self.host)
             )
         } catch is CancellationError {
             throw CancellationError()
@@ -326,7 +297,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             )
         }
         guard payload.ok == true, let network = payload.data else {
-            throw OfficialStationInformationProviderError.serviceUnavailable(trimmed(payload.msg))
+            throw OfficialStationInformationProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.msg))
         }
         guard !network.stationlist.isEmpty, !network.subwaySiteDetail.isEmpty else {
             throw OfficialStationInformationProviderError.contractViolation(
@@ -351,8 +322,8 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         // Identity is checked against the station list, which is what the reviewed catalog was
         // built from. `subwaySiteDetail` disagrees with it on the 站 suffix for four stations, so
         // it is matched on code only and never on name.
-        let expected = Set(request.expectedNames.map(normalizedName))
-        guard listed.contains(where: { expected.contains(normalizedName($0.stationName)) }) else {
+        let expected = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
+        guard listed.contains(where: { expected.contains(OperatorFieldParsing.normalizedName($0.stationName)) }) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
@@ -363,7 +334,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         // what the catalog only holds as an alias.
         let representative = listed.first { $0.stationCode == request.stationCodes.first }
         let stationName = representative?.stationName
-            ?? listed.first { expected.contains(normalizedName($0.stationName)) }?.stationName
+            ?? listed.first { expected.contains(OperatorFieldParsing.normalizedName($0.stationName)) }?.stationName
             ?? listed[0].stationName
 
         var lines: [OfficialStationLineInformation] = []
@@ -371,7 +342,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             guard let directions = network.subwaySiteDetail[lineName] else { continue }
             var services: [OfficialStationServiceInformation] = []
             for direction in directions {
-                guard let title = trimmed(direction.title) else { continue }
+                guard let title = OperatorFieldParsing.trimmed(direction.title) else { continue }
                 for stop in direction.allStation where codes.contains(stop.stationCode) {
                     let first = serviceTime(stop.startTime)
                     let last = serviceTime(stop.endTime)
@@ -408,7 +379,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
             stationName: stationName,
             source: .hangzhouMetroOnline,
             freshness: .live,
-            serviceDayNote: trimmed(network.title),
+            serviceDayNote: OperatorFieldParsing.trimmed(network.title),
             // The payload carries neither exits nor facilities for Hangzhou; the station detail
             // view falls back to the bundled sections for those categories.
             lines: lines,
@@ -437,7 +408,7 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
     /// it publishes nothing. Both mean there is no departure to show, so neither is copied
     /// through as if it were a time.
     private static func serviceTime(_ value: String?) -> String? {
-        guard let value = trimmed(value) else { return nil }
+        guard let value = OperatorFieldParsing.trimmed(value) else { return nil }
         guard !placeholderTimes.contains(value) else { return nil }
         guard value.range(of: #"^\d{1,2}:\d{2}$"#, options: .regularExpression) != nil else {
             return nil
@@ -450,25 +421,8 @@ actor HangzhouStationInformationProvider: OfficialStationInformationProviding {
         "无", "沒有", "没有", "暫無", "暂无", "终点站", "終點站"
     ]
 
-    private static func trimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let result = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result.isEmpty ? nil : result
-    }
-
-    private static func normalizedName(_ value: String) -> String {
-        value.folding(
-            options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
-            locale: nil
-        )
-        .unicodeScalars
-        .filter(CharacterSet.alphanumerics.contains)
-        .map(String.init)
-        .joined()
-    }
-
     private static func retryAfterDelay(from response: HTTPURLResponse) -> TimeInterval? {
-        guard let rawValue = trimmed(response.value(forHTTPHeaderField: "Retry-After")) else {
+        guard let rawValue = OperatorFieldParsing.trimmed(response.value(forHTTPHeaderField: "Retry-After")) else {
             return nil
         }
         if let seconds = TimeInterval(rawValue), seconds >= 0 {
@@ -544,18 +498,4 @@ struct HangzhouStop: Decodable, Sendable {
     let stationCode: String
     let startTime: String?
     let endTime: String?
-}
-
-private extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
-    }
-}
-
-private extension Array {
-    func uniqued<Key: Hashable>(by keyPath: KeyPath<Element, Key>) -> [Element] {
-        var seen = Set<Key>()
-        return filter { seen.insert($0[keyPath: keyPath]).inserted }
-    }
 }

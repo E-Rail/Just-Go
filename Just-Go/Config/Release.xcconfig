@@ -1,8 +1,21 @@
 #include? "Secrets.xcconfig"
 
-CITY_PACK_BASE_URL = $(CITY_PACK_SECRET_BASE_URL)
-CITY_PACK_MAINLAND_MIRROR_URL = $(CITY_PACK_SECRET_MAINLAND_MIRROR_URL)
-CITY_PACK_MANIFEST_URL = $(CITY_PACK_SECRET_MANIFEST_URL)
+// Where city packs come from, in the order they are tried. All three serve this repository's own
+// files, byte for byte, from the default branch, so a pack update reaches riders without an App
+// Store release. Public URLs, not secrets, which is why they are tracked here.
+//
+// The mainland jsDelivr mirror is first because most riders are in mainland China, where
+// raw.githubusercontent.com is usually unreachable and jsDelivr lost its ICP licence in 2021;
+// the other two are the fallbacks for everyone else. Only the first origin that answers is used.
+//
+// `https:/$()/` is not a typo. An xcconfig treats `//` as the start of a comment, and `$()`
+// expands to nothing, so this is the only way to write a URL here at all.
+//
+// A download still happens only when a rider asks Transit Data to update a city and the mirror's
+// version and SHA-256 differ from what is installed. Nothing here is contacted on launch.
+CITY_PACK_MAINLAND_MIRROR_URL = https:/$()/cdn.jsdmirror.com/gh/E-Rail/Just-Go@main/DataPacks/manifest.json
+CITY_PACK_MANIFEST_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/Just-Go@main/DataPacks/manifest.json
+CITY_PACK_BASE_URL = https:/$()/raw.githubusercontent.com/E-Rail/Just-Go/main/DataPacks/manifest.json
 CITY_PACK_FALLBACK_BASE_URL =
 
 // Baidu Maps 服务端 credentials. Values live in the git-ignored Secrets.xcconfig; an absent key is

@@ -79,6 +79,16 @@ struct MapContainerView: View {
             mapContent
                 .navigationDestination(for: MapRoute.self) { destination(for: $0) }
         }
+        // The map tab lives as long as the app, and this dictionary held an enriched copy of every
+        // station the rider had ever opened. Popping a station is the moment its copy stops being
+        // reachable, so it is the moment to let it go.
+        .onChange(of: path) { _, newPath in
+            let stillOpen = Set(newPath.compactMap { route -> String? in
+                if case .station(let id) = route { return id }
+                return nil
+            })
+            openedStations = openedStations.filter { stillOpen.contains($0.key) }
+        }
         .task {
             if viewModel == nil {
                 viewModel = container.makeMapViewModel()

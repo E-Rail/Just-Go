@@ -185,13 +185,27 @@ protocol TripObservationProviding: Sendable {
 actor BaiduTripObservationService: TripObservationProviding, LineObservationProviding {
     private let client: BaiduMapsClient
     /// Session-scoped, in memory only. See the note above on why this is not a disk cache.
+    ///
+    /// Capped, newest use last. Keys round the trip's two ends to about ten metres, so a guided
+    /// journey that reroutes from the rider's moving position added an entry each time — every one
+    /// holding a whole trip's fares, service hours and corridors — and nothing removed them.
     private var cache: [String: TripObservations] = [:]
+    private var cacheOrder: [String] = []
+    private var lineCacheOrder: [String] = []
+    private static let maximumCachedEntries = 32
     /// Line lookups are cached separately and just as briefly: same session-only rule, and a
     /// negative result is cached too so a ring line does not spend a call every time it is opened.
     private var lineCache: [String: ObservedLine?] = [:]
 
     init(client: BaiduMapsClient) {
         self.client = client
+    }
+
+    func releaseMemory() {
+        cache.removeAll()
+        cacheOrder.removeAll()
+        lineCache.removeAll()
+        lineCacheOrder.removeAll()
     }
 
     func observations(
@@ -227,6 +241,12 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let observations = Self.observations(in: response)
         cache[cacheKey] = observations
+        cacheOrder.removeAll { $0 == cacheKey }
+        cacheOrder.append(cacheKey)
+        while cacheOrder.count > Self.maximumCachedEntries {
+            let evicted = cacheOrder.removeFirst()
+            cache[evicted] = nil
+        }
         return observations
     }
 
@@ -263,6 +283,12 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let line = Self.observedLine(in: response, named: expectedName)
         lineCache[cacheKey] = line
+        lineCacheOrder.removeAll { $0 == cacheKey }
+        lineCacheOrder.append(cacheKey)
+        while lineCacheOrder.count > Self.maximumCachedEntries {
+            let evicted = lineCacheOrder.removeFirst()
+            lineCache[evicted] = nil
+        }
         return line
     }
 

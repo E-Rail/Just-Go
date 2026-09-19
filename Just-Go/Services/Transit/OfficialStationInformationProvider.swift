@@ -336,13 +336,97 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
             return false
         }
     }
+
+    /// Whether a failure may be answered from the copy this device stored earlier.
+    ///
+    /// On the error rather than in each provider, which all four had their own copy of: an
+    /// availability failure is worth a cached answer labelled as cached, a caller or contract
+    /// error never is — a stored copy must not paper over a request the operator rejected or a
+    /// response that no longer means what the app thinks. Non-provider errors, cancellation above
+    /// all, propagate untouched.
+    var allowsStoredFallback: Bool {
+        switch self {
+        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
+             .rateLimited, .httpStatus, .serviceUnavailable:
+            return true
+        case .invalidRequest, .contractViolation:
+            return false
+        }
+    }
 }
 
-private final class BeijingStationInformationRedirectDelegate:
-    NSObject,
-    URLSessionTaskDelegate,
-    @unchecked Sendable
-{
+/// The small parsers every operator provider needs, in one place.
+///
+/// Four providers each carried their own copy of these — identical but for line breaks — and a
+/// rule changed in one was a rule the other three still had the old version of. They are pure
+/// string handling: what an operator's field means, not how any one operator's API is shaped,
+/// which is what stays in each provider.
+enum OperatorFieldParsing {
+    static func trimmed(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let result = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return result.isEmpty ? nil : result
+    }
+
+    /// The placeholders operators write where they have no value. A merged set: Shanghai listed
+    /// the fullwidth slash and Guangzhou did not, so Guangzhou used to print "／" at a rider as
+    /// though it were a time.
+    static let placeholders: Set<String> = ["--", "-", "/", "／", "—", "n/a", "na", "none", "无", "暂无"]
+
+    /// Nil for a value that only looks like data.
+    static func placeholderAware(_ value: String?) -> String? {
+        guard let value = OperatorFieldParsing.trimmed(value) else { return nil }
+        return placeholders.contains(value.lowercased()) ? nil : value
+    }
+
+    /// "23:45" as minutes from midnight, with after-midnight hours carried past 24:00 so a last
+    /// train at 00:30 sorts after one at 23:50 rather than before it.
+    static func serviceMinutes(_ value: String) -> Int? {
+        let parts = value.split(separator: ":")
+        guard parts.count == 2,
+              let hour = Int(parts[0]),
+              let minute = Int(parts[1]),
+              (0..<24).contains(hour),
+              (0..<60).contains(minute) else { return nil }
+        return (hour < 4 ? hour + 24 : hour) * 60 + minute
+    }
+
+    static func preferredServiceTime(_ lhs: String?, _ rhs: String?, earliest: Bool) -> String? {
+        guard let lhs else { return rhs }
+        guard let rhs else { return lhs }
+        // An unparseable time keeps the side we can reason about rather than winning by accident.
+        guard let lhsMinutes = OperatorFieldParsing.serviceMinutes(lhs) else { return rhs }
+        guard let rhsMinutes = OperatorFieldParsing.serviceMinutes(rhs) else { return lhs }
+        let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
+        return preferLhs ? lhs : rhs
+    }
+
+    /// A station name reduced to what two spellings of it have in common: case, width and accents
+    /// folded away, everything that is not a letter or digit dropped.
+    static func normalizedName(_ value: String) -> String {
+        value.folding(
+            options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
+            locale: nil
+        )
+        .unicodeScalars
+        .filter(CharacterSet.alphanumerics.contains)
+        .map(String.init)
+        .joined()
+    }
+}
+
+/// Follows a redirect only back to the same operator, over https.
+///
+/// One class for all four operator providers. Each had its own, identical but for the host it
+/// named, and the rule they enforce is the point: an operator endpoint that redirects off its own
+/// host is not answering for that operator any more, and the app must not follow it there.
+final class OperatorRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let host: String
+
+    init(host: String) {
+        self.host = host.lowercased()
+    }
+
     func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
@@ -351,7 +435,7 @@ private final class BeijingStationInformationRedirectDelegate:
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         guard request.url?.scheme?.lowercased() == "https",
-              request.url?.host?.lowercased() == BeijingStationInformationProvider.host else {
+              request.url?.host?.lowercased() == host else {
             completionHandler(nil)
             return
         }
@@ -511,7 +595,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         for request: PreparedRequest,
         insteadOf error: Error
     ) async throws -> OfficialStationInformationSnapshot {
-        guard Self.allowsStoredFallback(error),
+        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
               let diskCache,
               let stored = await diskCache.storedSnapshot(
                   cityID: Self.cityID,
@@ -523,19 +607,6 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
     }
 
-    private static func allowsStoredFallback(_ error: Error) -> Bool {
-        guard let providerError = error as? OfficialStationInformationProviderError else {
-            // Cancellation (and anything else non-provider) propagates untouched.
-            return false
-        }
-        switch providerError {
-        case .timedOut, .transport, .invalidResponse, .responseTooLarge,
-             .rateLimited, .httpStatus, .serviceUnavailable:
-            return true
-        case .invalidRequest, .contractViolation:
-            return false
-        }
-    }
 
     private static func prepare(
         _ request: OfficialStationInformationRequest
@@ -554,7 +625,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 )
             }
             let names = expectedNames
-                .compactMap(trimmed)
+                .compactMap(OperatorFieldParsing.trimmed)
                 .uniqued()
                 .sorted()
             guard !names.isEmpty else {
@@ -633,7 +704,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         do {
             (data, response) = try await session.data(
                 for: urlRequest,
-                delegate: BeijingStationInformationRedirectDelegate()
+                delegate: OperatorRedirectDelegate(host: Self.host)
             )
         } catch is CancellationError {
             throw CancellationError()
@@ -683,19 +754,19 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         }
 
         guard payload.status == 200 else {
-            throw OfficialStationInformationProviderError.serviceUnavailable(trimmed(payload.message))
+            throw OfficialStationInformationProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.message))
         }
         guard let responseData = payload.data,
               let station = responseData.station,
               station.stationDeviceLocation == request.externalStationID,
-              let stationName = trimmed(station.stationName) else {
+              let stationName = OperatorFieldParsing.trimmed(station.stationName) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station identity is missing or does not match the reviewed reference"
             )
         }
 
-        let expectedNames = Set(request.expectedNames.map(normalizedName))
-        guard expectedNames.contains(normalizedName(stationName)) else {
+        let expectedNames = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
+        guard expectedNames.contains(OperatorFieldParsing.normalizedName(stationName)) else {
             throw OfficialStationInformationProviderError.contractViolation(
                 "station name does not match the reviewed catalog"
             )
@@ -704,19 +775,19 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         let serviceLines = groupedLines(responseData.lines ?? [])
 
         let exits = (station.exits ?? []).compactMap { exit in
-            guard let name = trimmed(exit.name) else { return nil }
+            guard let name = OperatorFieldParsing.trimmed(exit.name) else { return nil }
             return OfficialStationExitInformation(
                 name: name,
-                details: (exit.nearby ?? []).compactMap(trimmed).uniqued(),
+                details: (exit.nearby ?? []).compactMap(OperatorFieldParsing.trimmed).uniqued(),
                 isAccessible: nil
             )
         }.uniqued(by: \OfficialStationExitInformation.id)
 
         let facilityGroups = (station.facilitys ?? []).compactMap { group in
-            guard let groupName = trimmed(group.name) else { return nil }
+            guard let groupName = OperatorFieldParsing.trimmed(group.name) else { return nil }
             let items = (group.data ?? []).compactMap { item in
-                guard let name = trimmed(item.name),
-                      let rawDetail = trimmed(item.contentDesc) else { return nil }
+                guard let name = OperatorFieldParsing.trimmed(item.name),
+                      let rawDetail = OperatorFieldParsing.trimmed(item.contentDesc) else { return nil }
                 let unavailable = unavailableFacilityMarkers.contains(
                     rawDetail.lowercased()
                 )
@@ -772,13 +843,13 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         var services: [String: [ServiceKey: OfficialStationServiceInformation]] = [:]
 
         for line in lines {
-            guard let lineName = trimmed(line.lineName),
-                  let direction = trimmed(line.terminalStationName)
-                    ?? trimmed(line.destStationName) else { continue }
-            let first = trimmed(line.firstTime)
-            let last = trimmed(line.lastTime)
+            guard let lineName = OperatorFieldParsing.trimmed(line.lineName),
+                  let direction = OperatorFieldParsing.trimmed(line.terminalStationName)
+                    ?? OperatorFieldParsing.trimmed(line.destStationName) else { continue }
+            let first = OperatorFieldParsing.trimmed(line.firstTime)
+            let last = OperatorFieldParsing.trimmed(line.lastTime)
             guard first != nil || last != nil else { continue }
-            let destination = trimmed(line.destStationName) ?? direction
+            let destination = OperatorFieldParsing.trimmed(line.destStationName) ?? direction
             let key = ServiceKey(direction: direction, destination: destination)
 
             if services[lineName] == nil {
@@ -804,8 +875,8 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             services[lineName]?[key] = OfficialStationServiceInformation(
                 direction: existing.direction,
                 destination: existing.destination,
-                firstTrain: preferredServiceTime(existing.firstTrain, first, earliest: true),
-                lastTrain: preferredServiceTime(existing.lastTrain, last, earliest: false),
+                firstTrain: OperatorFieldParsing.preferredServiceTime(existing.firstTrain, first, earliest: true),
+                lastTrain: OperatorFieldParsing.preferredServiceTime(existing.lastTrain, last, earliest: false),
                 liveTime: nil
             )
         }
@@ -822,49 +893,8 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     /// Minutes into the *service* day. A metro service day runs past midnight, so a last train
     /// at "0:21" is later than one at "23:39". Comparing the raw strings, or a plain clock
     /// time, would rank it as the earliest of the day and discard the real last train.
-    private static func serviceMinutes(_ value: String) -> Int? {
-        let parts = value.split(separator: ":")
-        guard parts.count == 2,
-              let hour = Int(parts[0]),
-              let minute = Int(parts[1]),
-              (0..<24).contains(hour),
-              (0..<60).contains(minute) else { return nil }
-        return (hour < 4 ? hour + 24 : hour) * 60 + minute
-    }
-
-    private static func preferredServiceTime(
-        _ lhs: String?,
-        _ rhs: String?,
-        earliest: Bool
-    ) -> String? {
-        guard let lhs else { return rhs }
-        guard let rhs else { return lhs }
-        // An unparseable time keeps the side we can reason about rather than winning by accident.
-        guard let lhsMinutes = serviceMinutes(lhs) else { return rhs }
-        guard let rhsMinutes = serviceMinutes(rhs) else { return lhs }
-        let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
-        return preferLhs ? lhs : rhs
-    }
-
-    private static func trimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let result = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result.isEmpty ? nil : result
-    }
-
-    private static func normalizedName(_ value: String) -> String {
-        value.folding(
-            options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
-            locale: nil
-        )
-        .unicodeScalars
-        .filter(CharacterSet.alphanumerics.contains)
-        .map(String.init)
-        .joined()
-    }
-
     private static func normalizedColor(_ value: String?) -> String? {
-        guard let value = trimmed(value)?
+        guard let value = OperatorFieldParsing.trimmed(value)?
             .trimmingCharacters(in: CharacterSet(charactersIn: "#")),
               value.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else {
             return nil
@@ -892,7 +922,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     private static func retryAfterDelay(
         from response: HTTPURLResponse
     ) -> TimeInterval? {
-        guard let rawValue = trimmed(
+        guard let rawValue = OperatorFieldParsing.trimmed(
             response.value(forHTTPHeaderField: "Retry-After")
         ) else { return nil }
         if let seconds = TimeInterval(rawValue), seconds >= 0 {
@@ -1024,14 +1054,15 @@ private struct FlexibleString: Decodable {
     }
 }
 
-private extension Array where Element: Hashable {
+// One copy for all four operator providers, which each carried an identical private one.
+extension Array where Element: Hashable {
     func uniqued() -> [Element] {
         var seen = Set<Element>()
         return filter { seen.insert($0).inserted }
     }
 }
 
-private extension Array {
+extension Array {
     func uniqued<Key: Hashable>(by keyPath: KeyPath<Element, Key>) -> [Element] {
         var seen = Set<Key>()
         return filter { seen.insert($0[keyPath: keyPath]).inserted }

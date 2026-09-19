@@ -372,6 +372,11 @@ actor BaiduMapsClient {
                 }
                 await self.leaveGate()
                 return data
+            } catch let error as BaiduMapsError {
+                // Passed through as it is. Rewrapped, an HTTP failure arrived as `.service(-1)` and
+                // `record` never held the endpoint off, so a captive portal spent the whole budget.
+                await self.leaveGate()
+                throw error
             } catch {
                 await self.leaveGate()
                 throw BaiduMapsError.service(status: -1, message: error.localizedDescription)

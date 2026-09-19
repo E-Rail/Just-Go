@@ -2,50 +2,6 @@ import Foundation
 import CoreLocation
 import MapKit
 
-/// Memoises walking legs for the span of one plan.
-///
-/// Alternatives are enriched concurrently and mostly share their endpoints, so without this the
-/// same door-to-destination walk is requested once per alternative per candidate door. Enough
-/// duplicate `MKDirections` traffic to get throttled. In-flight calls are shared, not just
-/// finished ones, because the concurrent callers arrive together.
-private actor WalkingLegMemo {
-    private let provider: WalkingRouteProviding
-    private var inFlight: [String: Task<RouteSegment?, Never>] = [:]
-
-    init(provider: WalkingRouteProviding) {
-        self.provider = provider
-    }
-
-    func leg(
-        from: CLLocationCoordinate2D,
-        to: CLLocationCoordinate2D,
-        fromName: String,
-        toName: String,
-        mode: AccessLegMode
-    ) async -> RouteSegment? {
-        // ~1 m precision: finer than the coordinates differ by, coarser than float noise.
-        // The mode is part of the key: the same two points cycled and driven are different legs.
-        let key = String(
-            format: "%.5f,%.5f>%.5f,%.5f|%@",
-            from.latitude, from.longitude, to.latitude, to.longitude,
-            String(describing: mode)
-        )
-        if let existing = inFlight[key] { return await existing.value }
-        let provider = provider
-        let task = Task {
-            await provider.accessSegment(
-                from: from,
-                to: to,
-                fromName: fromName,
-                toName: toName,
-                mode: mode
-            )
-        }
-        inFlight[key] = task
-        return await task.value
-    }
-}
-
 /// The operator's service hours for one boarding station, and which service day they describe.
 ///
 /// A pair rather than a bare array because the note qualifies every window in it: Hangzhou publishes
@@ -148,9 +104,6 @@ final class RoutePlanningService {
             throw RoutePlanningError.noRouteFound
         }
 
-        // Alternatives overwhelmingly share their first and last stations, so one memo across the
-        // whole plan collapses their duplicate door-walk lookups into a single call each.
-        let legs = WalkingLegMemo(provider: walkingRoutes)
         // Started here rather than awaited here, and hoisted out of enrichment so that **both**
         // passes below share it. It is the plan's only Baidu call, it carries the first/last train
         // for five or six lines at once — not just the ones this pass happened to pick — and
@@ -164,17 +117,26 @@ final class RoutePlanningService {
             ) ?? .none
         }
 
+        // The walk was measured against these trains before enrichment knew the clock, so a line
+        // that turns out to be shut could still have beaten it and pushed it off the list. A closed
+        // train is not faster than walking: whenever nothing listed can be boarded, it comes back.
+        func answer(_ routes: [Route]) async -> [Route] {
+            guard let walk, !routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
+                return including(await driveTask.value, beside: routes)
+            }
+            return including(await driveTask.value, beside: routes + [walk])
+        }
+
         let planned = await enrichAll(
             routes,
             origin: origin,
             destination: destination,
             accessibilityFilter: accessibilityFilter,
             tripAnchor: tripAnchor,
-            legs: legs,
             observation: observation
         )
         guard !planned.closedServices.isEmpty else {
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
 
         // The graph is time-blind by design — it is a mechanical shortest path and the enrichment
@@ -192,11 +154,11 @@ final class RoutePlanningService {
             )
         } catch {
             // Nothing runs at this hour, which is a real answer and the one already in hand.
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
         let viable = walk.map { walk in alternatives.filter { $0.totalDuration < walk.totalDuration } }
             ?? alternatives
-        guard !viable.isEmpty else { return including(await driveTask.value, beside: planned.routes) }
+        guard !viable.isEmpty else { return await answer(planned.routes) }
 
         let replanned = await enrichAll(
             viable,
@@ -204,7 +166,6 @@ final class RoutePlanningService {
             destination: destination,
             accessibilityFilter: accessibilityFilter,
             tripAnchor: tripAnchor,
-            legs: legs,
             observation: observation
         )
         // The re-plan exists to find a train the rider can actually catch. Late enough and there is
@@ -212,14 +173,11 @@ final class RoutePlanningService {
         // had one is noise dressed as helpfulness — so unless something in it runs, the first
         // answer stands.
         guard replanned.routes.contains(where: { !$0.serviceStatus.blocksBoarding }) else {
-            return including(await driveTask.value, beside: planned.routes)
+            return await answer(planned.routes)
         }
         // One pass only. A second re-plan could ban its way to nothing at all, and a rider is
         // better served by seeing a shut line named than by an empty screen.
-        return including(
-            await driveTask.value,
-            beside: merging(running: replanned.routes, with: planned.routes)
-        )
+        return await answer(merging(running: replanned.routes, with: planned.routes))
     }
 
     /// Enriches a set of alternatives together and reports which lines came back definitively shut.
@@ -229,7 +187,6 @@ final class RoutePlanningService {
         destination: TransitPlace,
         accessibilityFilter: AccessibilityFilter,
         tripAnchor: TripTimeAnchor,
-        legs: WalkingLegMemo,
         observation: Task<TripObservations, Never>
     ) async -> (routes: [Route], closedServices: Set<ClosedServiceDirection>) {
         // Each route's enrichment below is a handful of officialStationData lookups that don't
@@ -253,7 +210,6 @@ final class RoutePlanningService {
                         ),
                         accessibilityFilter: accessibilityFilter,
                         tripAnchor: tripAnchor,
-                        legs: legs
                     )
                     return (index, result.route, result.closedServices)
                 }
@@ -322,10 +278,15 @@ final class RoutePlanningService {
         // comment promised were really `timeoutIntervalForRequest` — twelve — with the whole plan
         // waiting behind it. The client's request is genuinely cancellable now, which is what makes
         // any deadline here mean anything.
+        // Started outside the deadline on purpose, so the deadline stops the *waiting* and not the
+        // request. Cancelled mid-flight, the call still spends its budget unit and caches nothing,
+        // so a re-plan on a slow network paid for the same answer again; left to finish, it lands
+        // in the service's cache and the next plan reads it for free.
+        let request = Task { await tripObservations.observations(from: origin, to: destination) }
         let observed = try? await withDeadline(seconds: 3) {
             CancellationError()
         } operation: {
-            await tripObservations.observations(from: origin, to: destination)
+            await request.value
         }
         return observed ?? .none
     }
@@ -953,7 +914,6 @@ final class RoutePlanningService {
         destinationTarget: CodableCoordinate,
         accessibilityFilter: AccessibilityFilter,
         tripAnchor: TripTimeAnchor,
-        legs: WalkingLegMemo
     ) async -> (route: Route, closedServices: Set<ClosedServiceDirection>) {
         var route = route
         // The pack that actually produced the route. A walking-only plan has none, and every
@@ -1061,7 +1021,6 @@ final class RoutePlanningService {
             existing: originSegment,
             isArrival: false,
             requiresStepFree: accessibilityFilter.requiresStepFreeEntrance,
-            legs: legs
         )
         async let destinationChoiceTask = chooseExit(
             guide: destinationGuide,
@@ -1071,7 +1030,6 @@ final class RoutePlanningService {
             existing: destinationSegment,
             isArrival: true,
             requiresStepFree: accessibilityFilter.requiresStepFreeEntrance,
-            legs: legs
         )
         let originChoice = await originChoiceTask
         let destinationChoice = await destinationChoiceTask
@@ -1138,7 +1096,6 @@ final class RoutePlanningService {
         existing: RouteSegment?,
         isArrival: Bool,
         requiresStepFree: Bool,
-        legs: WalkingLegMemo
     ) async -> ChosenExit? {
         guard let guide else { return nil }
         let access = guidance[guide.stationName] ?? .empty
@@ -1175,6 +1132,7 @@ final class RoutePlanningService {
         let fromName = existing.fromStationName ?? ""
         let toName = existing.toStationName ?? ""
 
+        let legs = walkingRoutes
         let walked = await withTaskGroup(of: (StationAccessPoint, RouteSegment?).self) { group in
             for point in measurable {
                 guard let door = point.coordinate else { continue }
@@ -1183,7 +1141,7 @@ final class RoutePlanningService {
                         latitude: door.latitude,
                         longitude: door.longitude
                     )
-                    let leg = await legs.leg(
+                    let leg = await legs.accessSegment(
                         from: isArrival ? doorCoordinate : riderCoordinate,
                         to: isArrival ? riderCoordinate : doorCoordinate,
                         fromName: fromName,
@@ -1223,6 +1181,7 @@ final class RoutePlanningService {
         destinationChoice: ChosenExit?
     ) -> Route {
         var route = route
+        let replacedDuration = route.segments.reduce(0) { $0 + $1.duration }
         var changed = false
         if let index = originIndex, let leg = originChoice?.leg {
             route.segments[index] = leg
@@ -1265,7 +1224,10 @@ final class RoutePlanningService {
                 affectedStationID: nil
             ))
         }
-        return route
+        // The headline follows its legs. Kept from the centroid walks, it disagreed with the door
+        // walks drawn beneath it, and arrive-by, reminders and the fastest sort all read it.
+        let delta = updatedSegments.reduce(0) { $0 + $1.duration } - replacedDuration
+        return route.replacingSegments(updatedSegments, totalDuration: max(60, route.totalDuration + delta))
     }
 
     /// Tags the boarding, transfer, and arrival stations of a route with the best-available

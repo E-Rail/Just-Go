@@ -15,7 +15,10 @@ final class TripReminderService {
         center.delegate = foregroundPresenter
     }
 
-    private func identifier(for routeID: UUID) -> String { "trip-leave-\(routeID.uuidString)" }
+    /// One identifier for every leave reminder, so the system itself keeps a single one. Keyed by
+    /// route it was one per plan, and the only thing cancelling the previous was the detail page's
+    /// memory of it, which ended when the page closed: re-plan the same trip later and both fired.
+    private let leaveIdentifier = "trip-leave"
     private func arrivalIdentifier(for stationID: String) -> String { "station-arrive-\(stationID)" }
 
     func authorizationStatus() async -> UNAuthorizationStatus {
@@ -29,8 +32,9 @@ final class TripReminderService {
     /// Schedules the reminder `leadMinutes` before leave-by. Returns false when nothing was
     /// scheduled: the fire time is already past, or `add` refused the request.
     @discardableResult
-    func scheduleReminder(routeID: UUID, plan: DeparturePlan, leadMinutes: Int) async -> Bool {
-        cancelReminder(routeID: routeID)
+    func scheduleReminder(plan: DeparturePlan, leadMinutes: Int) async -> Bool {
+        // Cleared first, so a refused `add` leaves no reminder for an older plan behind it.
+        center.removePendingNotificationRequests(withIdentifiers: [leaveIdentifier])
         let fireDate = plan.leaveByDate.addingTimeInterval(TimeInterval(-leadMinutes * 60))
         guard fireDate > Date() else { return false }
 
@@ -51,21 +55,16 @@ final class TripReminderService {
         // and the reminder simply never fires.
         components.calendar = ChinaClock.calendar
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier(for: routeID), content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: leaveIdentifier, content: content, trigger: trigger)
         // `add` throws — the 64-pending-notification limit is the reachable one — and the
-        // caller acts on this answer: `RouteDetailView` cancels the *previous* route's
-        // reminder and paints the row as set. Swallowing the throw and returning true
-        // destroyed two reminders and created none, while telling the rider it worked.
+        // caller paints the row as set on this answer, so a swallowed throw would claim a
+        // reminder that does not exist.
         do {
             try await center.add(request)
             return true
         } catch {
             return false
         }
-    }
-
-    func cancelReminder(routeID: UUID) {
-        center.removePendingNotificationRequests(withIdentifiers: [identifier(for: routeID)])
     }
 
     /// Schedules an estimated "get off" alert to fire at `fireDate`. Timing is derived from the

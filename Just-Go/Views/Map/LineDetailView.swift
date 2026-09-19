@@ -361,8 +361,11 @@ struct LineDetailView: View {
         // `Station.id` is that id qualified with the city ("1100-…", via `MetroStationIdentifier`),
         // so keying by it looks entirely correct, compiles, and silently matches nothing: the stop
         // list rendered eleven hex ids where eleven station names belong.
+        // The cached copies, not a fresh `displayStations`: that rebuilds a `Station` for every
+        // station in the city (449 in Beijing) each time a line page opens, beside the identical
+        // set the service is already holding.
         stationsByID = Dictionary(
-            zip(network.stations.map(\.id), network.displayStations),
+            zip(network.stations.map(\.id), await container.metroNetworkProvider.stations(in: cityID)),
             uniquingKeysWith: { first, _ in first }
         )
         visibleRegion = MapVisibleRegion(

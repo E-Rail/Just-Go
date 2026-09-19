@@ -8,7 +8,7 @@
       "sizeBytes": 720712,
       "sha256": "fbba6d0fd77df8ea5150affa2a2c4d0f728d4957b3925630af871f34f11ab171",
       "bundledResource": "BundledCityPacks/1100.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/1100.json",
       "rightsIDs": [
         "beijing-official-landing-links",
         "osm-metro-networks"
@@ -62,7 +62,7 @@
       "sizeBytes": 516965,
       "sha256": "5e691c7554133e16a59bf6cea9bb7f0399e76b5d8403047971a1e8abe1dd96e8",
       "bundledResource": "BundledCityPacks/4401.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/4401.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -115,7 +115,7 @@
       "sizeBytes": 568599,
       "sha256": "b7a375838e876e9368a3aa0f7cbaaa1bcfc9e1d2930c288e4da2621c848e4cbc",
       "bundledResource": "BundledCityPacks/3100.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/3100.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -168,7 +168,7 @@
       "sizeBytes": 147712,
       "sha256": "1c38d5a633415b30d68cdc2662d887b2754d10447289ad759ac896df8f3e6a94",
       "bundledResource": "BundledCityPacks/1200.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/1200.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -221,7 +221,7 @@
       "sizeBytes": 118841,
       "sha256": "619b393e88ee6738283617fef07eced63f24b399fed3fd3616a646594558975f",
       "bundledResource": "BundledCityPacks/5000.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/5000.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -327,7 +327,7 @@
       "sizeBytes": 153525,
       "sha256": "b7ea634c167921e85db49081f4638a477e323ad1cfe8e0e90d31cafcef9ab3e1",
       "bundledResource": "BundledCityPacks/3201.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/3201.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -380,7 +380,7 @@
       "sizeBytes": 129774,
       "sha256": "7f3bd23e864729e2bff22307cf9fd7b52343d64709c1d875e09eada5bd2d0013",
       "bundledResource": "BundledCityPacks/4201.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/4201.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -433,7 +433,7 @@
       "sizeBytes": 293979,
       "sha256": "1030078a3c5c6b9eacd2dd339e16ae6555b5f5a90dbfd92fb769a799523b60a5",
       "bundledResource": "BundledCityPacks/5101.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/5101.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -486,7 +486,7 @@
       "sizeBytes": 423482,
       "sha256": "748d11fea76dde0b88d87ba84866c88e667d91d9b3fc06b7ce242325ee1eff25",
       "bundledResource": "BundledCityPacks/6101.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/6101.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -1122,7 +1122,7 @@
       "sizeBytes": 87498,
       "sha256": "8e1e61d3023779a6248a4fb4da4481cd620381845a180f90f32bae45be212149",
       "bundledResource": "BundledCityPacks/3205.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/3205.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -1546,7 +1546,7 @@
       "sizeBytes": 481930,
       "sha256": "85e570dd40bb4885907541c4094e8e6ad48bb6ab2e8eae2cf2ce05bdfd8a9d7b",
       "bundledResource": "BundledCityPacks/3301.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/3301.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -2129,7 +2129,7 @@
       "sizeBytes": 557468,
       "sha256": "6ca60b7e6d6a8b3d1c0a377516150b51ad3c3bc4c87b96837343cbdca4b71eb1",
       "bundledResource": "BundledCityPacks/4403.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/4403.json",
       "rightsIDs": [
         "osm-metro-networks"
       ],
@@ -2659,7 +2659,7 @@
       "sizeBytes": 740292,
       "sha256": "c735260173285e5f269d0fd6c0f0e07a4657878ad8e2bac7030f7c41eae54c0d",
       "bundledResource": "BundledCityPacks/8100.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/8100.json",
       "rightsIDs": [
         "data-gov-hk-mtr",
         "osm-metro-networks"
@@ -2878,7 +2878,7 @@
       "sizeBytes": 211132,
       "sha256": "3a1225911d183862ed94a8e3462d47520a6e619918817eff9448a1a3a5eb001d",
       "bundledResource": "BundledCityPacks/7101.json",
-      "downloadURL": null,
+      "downloadURL": "../Just-Go/Resources/BundledCityPacks/7101.json",
       "rightsIDs": [
         "osm-metro-networks",
         "taipei-open-data"

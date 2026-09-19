@@ -144,12 +144,16 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     /// Called by the map every time MapKit reports the rider's position. Paired against the fix
     /// Core Location delivered for the same moment, the difference *is* the correction.
     func observeMapSpaceUserLocation(_ coordinate: CLLocationCoordinate2D) {
-        guard let raw = currentLocation?.coordinate else {
+        // Only a fix from the same moment. Core Location stops once a one-shot request resolves,
+        // while MapKit keeps reporting the dot as the rider walks; pairing with that stale fix
+        // saved "how far they walked" as the frame offset, and every later trip began that far
+        // off. The same five seconds the other direction already demands.
+        guard let fix = currentLocation, abs(fix.timestamp.timeIntervalSinceNow) <= 5 else {
             // Held rather than dropped. See `unpairedMapSpaceSample`.
             unpairedMapSpaceSample = (coordinate, Date())
             return
         }
-        pairMapSpaceSample(mapSpace: coordinate, raw: raw)
+        pairMapSpaceSample(mapSpace: coordinate, raw: fix.coordinate)
     }
 
     /// The measurement itself: MapKit's frame minus Core Location's, for the same instant.

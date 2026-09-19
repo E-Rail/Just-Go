@@ -10,10 +10,14 @@ read = lambda do |relative_path|
   File.read(File.join(ROOT, relative_path), encoding: "UTF-8")
 end
 
+# The exact origins city packs may be fetched from, in the order the app tries them. Pinned by
+# value rather than by "no URLs here": these are public mirrors of this repository's own reviewed
+# files, and naming them is what makes an unreviewed origin a validation failure instead of a diff
+# nobody reads. `https:/$()/` is how a URL is written in an xcconfig, where `//` starts a comment.
 expected_settings = {
-  "CITY_PACK_BASE_URL" => "$(CITY_PACK_SECRET_BASE_URL)",
-  "CITY_PACK_MAINLAND_MIRROR_URL" => "$(CITY_PACK_SECRET_MAINLAND_MIRROR_URL)",
-  "CITY_PACK_MANIFEST_URL" => "$(CITY_PACK_SECRET_MANIFEST_URL)",
+  "CITY_PACK_MAINLAND_MIRROR_URL" => "https:/$()/cdn.jsdmirror.com/gh/E-Rail/Just-Go@main/DataPacks/manifest.json",
+  "CITY_PACK_MANIFEST_URL" => "https:/$()/cdn.jsdelivr.net/gh/E-Rail/Just-Go@main/DataPacks/manifest.json",
+  "CITY_PACK_BASE_URL" => "https:/$()/raw.githubusercontent.com/E-Rail/Just-Go/main/DataPacks/manifest.json",
   "CITY_PACK_FALLBACK_BASE_URL" => ""
 }.freeze
 
@@ -26,7 +30,9 @@ expected_settings = {
   end
 
   errors << "#{relative_path} must optionally include Secrets.xcconfig" unless source.include?('#include? "Secrets.xcconfig"')
-  errors << "#{relative_path} must not contain a literal web URL" if source.match?(%r{https?://}i)
+  # A real `//` would start a comment, so any match here is a URL written the wrong way — which
+  # would silently expand to nothing and leave the app with no origin at all.
+  errors << "#{relative_path} contains a URL an xcconfig will read as a comment" if source.match?(%r{^[A-Z0-9_]+\s*=.*https?://}i)
   expected_settings.each do |key, value|
     errors << "#{relative_path} has an unsafe #{key} value" unless settings[key] == value
   end
@@ -131,7 +137,10 @@ errors.concat(missing_urls.map { |path, url| "required attribution/legal URL mis
 
 policy_path = File.join(ROOT, "Just-Go/Services/Data/OfficialCityPackService.swift")
 policy_source = swift_sources.fetch(policy_path)
-%w[github.com github.io githubusercontent.com jsdelivr.net wikimedia.org wikipedia.org].each do |host|
+# Wikimedia only. GitHub and jsDelivr were here until city packs were served from this
+# repository's own mirrors; what protects the rider is the size, the SHA-256 and the per-station
+# validation the manifest and `decodeValidatedPack` enforce, not the host name.
+%w[wikimedia.org wikipedia.org].each do |host|
   errors << "city-pack runtime policy is missing forbidden host #{host}" unless policy_source.include?(%Q{"#{host}"})
 end
 # `session.bytes` used to be pinned here, as the marker for "the body is read under a cap". The
@@ -176,7 +185,9 @@ swift_sources.each do |absolute_path, source|
     source = source.sub(defensive_guard, "")
   end
 
-  %w[jsdelivr.net wikimedia.org wikipedia.org githubusercontent.com].each do |host|
+  # Media hosts only. A city-pack origin is configured in the xcconfigs and checked above; what
+  # must never appear in a Swift source is a media host whose files are not ours to redistribute.
+  %w[wikimedia.org wikipedia.org].each do |host|
     errors << "runtime source references forbidden media/data host #{host}: #{absolute_path.delete_prefix("#{ROOT}/")}" if source.include?(host)
   end
 end
@@ -342,7 +353,7 @@ station_information_source = read.call(
   reloadIgnoringLocalAndRemoteCacheData
   httpCookieStorage
   httpShouldSetCookies
-  BeijingStationInformationRedirectDelegate
+  OperatorRedirectDelegate
   maximumResponseBytes
   cacheLifetime
   defaultRateLimitBackoff
@@ -510,4 +521,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=0 runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=cached_device_only quick_tags=unlimited_custom"
+puts "runtime-data-policy validation ok: configured_origins=#{expected_settings.count { |_, value| !value.empty? }} runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=cached_device_only quick_tags=unlimited_custom"

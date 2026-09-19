@@ -417,6 +417,9 @@ final class RoutePlannerViewModel {
     }
 
     private func saveRecentRoute(_ route: Route, cityID: String?) {
+        // A recent's only action is replaying it by station ID. A walk or a drive has none, so it
+        // could only land the rider on stale results, and every one collapsed into a single "" row.
+        guard !route.originStationID.isEmpty, !route.destinationStationID.isEmpty else { return }
         let recentRoute = RecentRoute(
             originStationID: route.originStationID,
             originStationName: route.origin,

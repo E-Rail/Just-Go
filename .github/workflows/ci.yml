@@ -39,28 +39,14 @@ jobs:
           else
             git diff --check HEAD^
           fi
-          ruby Scripts/test_oss_city_pack_pipeline.rb
-          ruby Scripts/test_oss_data_validators.rb
-          ruby Scripts/test_official_transit_resource_importer.rb
-          ruby Scripts/test_beijing_station_information_importer.rb
-          ruby Scripts/test_shanghai_station_information_importer.rb
-          ruby Scripts/test_guangzhou_station_information_importer.rb
-          ruby Scripts/test_official_transit_resource_catalog.rb
-          ruby Scripts/import_osm_metro_geometry.rb --self-test
+          # Every suite, by glob. The list this replaces named 7 of the 16 Ruby suites and 3 of
+          # the 5 shell suites, and what it left out included the one pinning the Apple Maps
+          # handoff and all five Baidu suites — so a change could break them and still merge.
+          for validator in Scripts/validate_*.rb; do ruby "$validator"; done
           ruby Scripts/validate_data_rights.rb --history
-          ruby Scripts/validate_runtime_data_policy.rb
-          ruby Scripts/validate_official_transit_resources.rb
-          ruby Scripts/validate_city_packs.rb
-          ruby Scripts/validate_schedule_colors.rb
-          ruby Scripts/validate_localizations.rb
-          ruby Scripts/validate_metro_networks.rb
-          ruby Scripts/validate_indoor_maps.rb
-          ruby Scripts/validate_universal_city_data.rb
-          ruby Scripts/validate_station_info_api.rb
+          ruby Scripts/import_osm_metro_geometry.rb --self-test
+          for suite in Scripts/test_*.rb; do ruby "$suite"; done
           bash Scripts/check_no_legacy_map_provider.sh
-          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_beijing_station_information.sh
-          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_hong_kong_realtime.sh
-          DEVELOPER_DIR="$(xcode-select -p)" ./Scripts/test_quick_tag_policy.sh
 
       - name: Verify deterministic generated data
         run: |
@@ -95,6 +81,12 @@ jobs:
           xcodebuild -version
           echo "iOS Simulator SDK $(xcrun --sdk iphonesimulator --show-sdk-version)"
 
+      # After the Xcode selection above, not before: these compile app sources with `swiftc` at
+      # -swift-version 6, and the runner's default Xcode is older than this app can be built with.
+      - name: Run Swift suites
+        run: |
+          for suite in Scripts/test_*.sh; do bash "$suite"; done
+
       - name: Build for iOS Simulator
         run: |
           xcodebuild clean build \
@@ -104,7 +96,9 @@ jobs:
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES
 
       - name: Build Release policy configuration
         run: |
@@ -115,4 +109,6 @@ jobs:
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData-Release" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES

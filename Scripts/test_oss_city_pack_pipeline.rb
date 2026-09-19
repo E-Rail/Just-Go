@@ -40,7 +40,9 @@ class OSSCityPackPipelineTest < Minitest::Test
     end.compact
     # Manifest order follows the catalog, not the pack build order.
     assert_equal OSSDataValidators::BUNDLED_CITY_IDS, bundled_city_ids.sort
-    assert manifest.fetch("cities").all? { |city| city["downloadURL"].nil? }
+    assert manifest.fetch("cities").all? { |city|
+      city["downloadURL"] == (city["bundledResource"] ? "../Just-Go/Resources/BundledCityPacks/#{city.fetch("cityID")}.json" : nil)
+    }
     assert_equal 53, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").positive? }
     assert_equal 5, manifest.fetch("cities").count { |city| city.dig("coverage", "networkStations").zero? }
 

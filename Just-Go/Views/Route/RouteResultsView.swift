@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Now / Depart at / Arrive by. Local to this screen because `TripTimeAnchor` carries a date and a
-/// segmented control needs a case that does not, and because nothing else in the app picks a time.
+/// Now / Depart at / Arrive by: a segmented control needs a case without a date, which
+/// `TripTimeAnchor` does not have.
 private enum TripTimingMode: CaseIterable {
     case now
     case departAt
@@ -21,20 +21,17 @@ private enum TripTimingMode: CaseIterable {
 
 struct RouteResultsView: View {
     @Bindable var viewModel: RoutePlannerViewModel
-    /// Pushing is the map stack's job, not this screen's. It owns the whole plan → results →
-    /// detail chain, so a route chosen here is handed back rather than presented from inside.
+    /// Pushing is the map stack's job: it owns plan → results → detail, so a chosen route is handed
+    /// back.
     let onSelect: (Route) -> Void
     /// Open the search page to refill one end. Handed back for the same reason as `onSelect`.
     let onEditEndpoint: (RouteInputField) -> Void
-    /// Refill the start from the device. Its own control rather than a row in the search page,
-    /// because "start from where I am" is the single most common correction to make here and
-    /// sending it through a search screen to answer a question the phone already knows is silly.
+    /// Refill the start from the device: its own control, since "start from where I am" is the most
+    /// common correction here.
     let onUseCurrentLocation: () -> Void
     let onSwap: () -> Void
-    /// Re-run the plan. Changing the trip's *time* has to re-search, and setting `tripAnchor`
-    /// alone will not: its `didSet` invalidates the in-flight search and clears the spinner but
-    /// deliberately leaves `routes` standing, so without this the screen would re-time the old
-    /// results against a new clock and show a plan nobody made.
+    /// Re-run the plan. Setting `tripAnchor` alone invalidates the in-flight search but leaves
+    /// `routes` standing, which would re-time old results against a new clock.
     let onReplan: () -> Void
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -68,36 +65,23 @@ struct RouteResultsView: View {
                         Text(error)
                     }
                 } else if viewModel.routes.isEmpty {
-                    // Reachable even though the entry page only pushes on a successful search: a
-                    // city change while this screen is up clears the routes underneath it, and the
-                    // result was a completely blank page with no explanation and nothing to do.
-                    ContentUnavailableView {
-                        Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
-                    } description: {
-                        Text(AppLocalization.text(
-                            english: "This search is no longer current. Go back and search again.",
-                            simplified: "此次搜索已失效，请返回重新搜索。",
-                            traditional: "此次搜尋已失效，請返回重新搜尋。"
-                        ))
-                    }
+                    // A change underneath this screen (an accessibility setting, a city) clears the
+                    // routes; say so rather than showing a blank page.
+                    StaleRoutesNotice()
                 } else {
                     routesSection
                 }
             }
             .listRowBackground(Color.clear)
-            // `.plain` draws a hairline above and below every row, which under the sort chips read
-            // as two stray rules floating in the middle of the screen with nothing between them.
+            // `.plain` would draw a hairline above and below every row.
             .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
-        // Stock spacing put a third of a screen of nothing between the sort chips and the first
-        // result: the chips sort the list directly below them and belong next to it.
+        // The chips sort the list directly below them, so no stock gap between them.
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
-        // Pinned, not the first row of the list. Where the trip starts and ends is the thing the
-        // rider checks first and changes most; scrolling it away to compare the fourth alternative
-        // means scrolling back up to fix a wrong start.
+        // Pinned: where the trip starts and ends is what the rider checks first and changes most.
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 0) {
                 endpointHeader
@@ -114,13 +98,9 @@ struct RouteResultsView: View {
         }
     }
 
-    /// From and To, always visible, both editable in place. This is the whole reason the entry
-    /// page is no longer in the way: everything it existed to collect is here, on the screen that
-    /// shows the consequence of changing it.
-    ///
-    /// Two one-line fields sit stacked on a phone because that is all the width there is. Given
-    /// more, they sit side by side with the swap control between them, which is both what they
-    /// mean and what the control does.
+    /// From and To, always visible and editable in place, on the screen that shows the consequence
+    /// of changing them. Stacked on a phone; side by side, with the swap control between them, when
+    /// there is width.
     private var endpointHeader: some View {
         HStack(spacing: Metrics.m) {
             if isWide {
@@ -138,8 +118,8 @@ struct RouteResultsView: View {
         }
         .padding(.horizontal, Metrics.l)
         .padding(.vertical, Metrics.s)
-        // A trailing tab bar runs the full height of the screen, so a header clears it the same way
-        // a bottom bar does. Inside the material, so the band still spans the width.
+        // A trailing tab bar runs the screen's full height, so the header clears it too; inside the
+        // material, so the band still spans the width.
         .safeAreaPadding(.horizontal)
         .readableColumn()
         .background(.regularMaterial)
@@ -148,13 +128,7 @@ struct RouteResultsView: View {
         }
     }
 
-    /// When, alongside where. The third input to a trip, and until now the only one with no
-    /// control: `tripAnchor` had no writer anywhere in the app, so every last-train check ran
-    /// against "now" and the "Leave by …" banner never appeared once.
-    ///
-    /// It belongs here rather than on an entry screen because the entry screen was deliberately
-    /// removed; this header is where the other two inputs already live, and it shows the
-    /// consequence of changing one immediately below.
+    /// When, beside where: the trip's third input, shown with its consequence immediately below.
     private var timingHeader: some View {
         VStack(spacing: Metrics.s) {
             Picker(selection: $timingMode) {
@@ -174,8 +148,8 @@ struct RouteResultsView: View {
                     Text(timingMode.title)
                 }
                 .datePickerStyle(.compact)
-                // The clock the answer is given in. Every time the results print is China time, so a
-                // phone set to Tokyo picked "18:00" and was told about 17:00.
+                // The picker's clock is China time, like every time the results print; a phone set
+                // to Tokyo would pick the wrong hour.
                 .environment(\.timeZone, ChinaClock.calendar.timeZone)
             }
         }
@@ -186,16 +160,15 @@ struct RouteResultsView: View {
         .background(.regularMaterial)
         .overlay(alignment: .bottom) { Divider() }
         .onChange(of: timingMode) { _, mode in
-            // A stale time is worse than no time: coming back to "Depart at" an hour later must
-            // not silently offer the moment the screen was first opened.
+            // A stale time is worse than none: returning to "Depart at" later must not offer the
+            // moment the screen first opened.
             if mode == .now { chosenDate = Date() }
             applyTiming()
         }
         .onChange(of: chosenDate) { _, _ in applyTiming() }
-        // The control is local state, so it starts at "Now" whatever the trip is actually anchored
-        // to. `tripAnchor` has another writer — the `route/plan` deep link — and without this the
-        // screen reads "Now" while planning for 23:40 and arriving at 00:11. Assigning what is
-        // already there is a no-op: `applyTiming` compares before it re-plans.
+        // The control is local state, so adopt whatever the trip is anchored to (a deep link can
+        // set it). Assigning the current anchor is a no-op: `applyTiming` compares before
+        // re-planning.
         .onAppear { adoptAnchor(viewModel.tripAnchor) }
         .onChange(of: viewModel.tripAnchor) { _, anchor in adoptAnchor(anchor) }
     }
@@ -240,17 +213,15 @@ struct RouteResultsView: View {
         ))
     }
 
-    /// Wide enough to stop being one tall column. Read from the size class rather than a raw width
-    /// so a split-screen iPad window, which is genuinely narrow, keeps the phone layout.
+    /// From the size class, not a raw width, so a narrow split-screen iPad window keeps the phone
+    /// layout.
     private var isWide: Bool { horizontalSizeClass == .regular }
 
     private func endpointRow(_ field: RouteInputField) -> some View {
         let name = viewModel.name(for: field).trimmingCharacters(in: .whitespacesAndNewlines)
         let showsLocate = field == .origin && container.locationService.isAuthorized
-        // The locate button is a sibling, not an `.overlay`. As an overlay it was painted on top
-        // of a `Text` that was free to grow to the row's full width, so a long name — which in
-        // Chinese is the normal case, 广州白云国际机场T2航站楼 — ran its truncation tail underneath
-        // the 44 pt glyph, in a header that is pinned on screen the whole time.
+        // The locate button is a sibling, not an overlay, so a long name (广州白云国际机场T2航站楼) truncates
+        // before it rather than under it.
         return HStack(spacing: 0) {
             Button {
                 onEditEndpoint(field)
@@ -259,8 +230,8 @@ struct RouteResultsView: View {
                     Circle()
                         .fill(field == .origin ? Color.green : Color.red)
                         .frame(width: 9, height: 9)
-                    // An unfilled end says what to do about it rather than sitting blank. This
-                    // header is the only place the trip's ends can be corrected now.
+                    // An unfilled end says what to do; this header is where the trip's ends are
+                    // corrected.
                     Text(name.isEmpty ? placeholder(for: field) : name)
                         .font(.subheadline)
                         .fontWeight(name.isEmpty ? .regular : .medium)
@@ -301,7 +272,7 @@ struct RouteResultsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(RoutePreference.allCases) { strategy in
-                        SortChip(
+                        Chip(
                             title: strategy.title,
                             icon: strategy.icon,
                             isSelected: viewModel.sortStrategy == strategy
@@ -321,14 +292,8 @@ struct RouteResultsView: View {
     private var routesSection: some View {
         Section {
             ForEach(viewModel.routes) { route in
-                // No `.scrollTransition` here. It was a settle-in effect for cards entering from
-                // the edge, and inside a `List` its phase never reaches `.identity` at all: every
-                // card sat permanently in the non-identity branch, so the whole results list
-                // rendered at 60% opacity and read as unloaded placeholder content. Measured off
-                // a screenshot: the accent on a card sampled rgb(205,160,111) against
-                // rgb(175,100,17) for the identical accent on the sort chip a few points above it,
-                // which is exactly #AF6411 at alpha 0.6 over the card surface. These cards are the
-                // one thing on this screen a rider reads; decoration does not get to dim them.
+                // No `.scrollTransition`: inside a `List` its phase never reaches `.identity`, and
+                // every card rendered at 60% opacity.
                 comparisonRow(route)
             }
         } header: {
@@ -342,9 +307,8 @@ struct RouteResultsView: View {
         }
     }
 
-    /// One comparison row per alternative. The lines it rides, how long it takes, when it lands,
-    /// and the single thing wrong with it if there is one. Tapping records the planned trip and
-    /// opens the detail.
+    /// One row per alternative: the lines it rides, how long, when it lands, and the single thing
+    /// wrong with it. Tapping records the planned trip and opens the detail.
     private func comparisonRow(_ route: Route) -> some View {
         let isSelected = route.id == selectedRouteID
         let metrics = comparisonMetrics(for: route)
@@ -352,16 +316,14 @@ struct RouteResultsView: View {
         let confidence = routeConfidence(for: route, feasibility: feasibility)
         return Button {
             selectedRouteID = route.id
-            _ = tripMemoryService.recordPlannedTrip(
+            tripMemoryService.recordPlannedTrip(
                 route: route,
                 cityID: route.networkCityID ?? ""
             )
             onSelect(route)
         } label: {
             VStack(alignment: .leading, spacing: 8) {
-                // Why this route is in the list at all, but only when there is something to
-                // compare it against. With a single result it said "Recommended", which is a
-                // label for a choice the rider was never offered.
+                // Why this route is listed, but only when there is something to compare it against.
                 if viewModel.routes.count > 1 {
                     Text(metrics.bestForReason)
                         .font(.caption)
@@ -370,15 +332,12 @@ struct RouteResultsView: View {
                         .foregroundStyle(Color.accentColor)
                 }
 
-                // Two columns need two columns' worth of width. At accessibility text sizes each
-                // side is several words wide and the arrival time rendered as "Arrive…", dropping
-                // the time itself, which is the one thing that line exists to say. Above those
-                // sizes the card stacks instead, the way `StepControlPair` already does.
+                // At accessibility text sizes two columns truncate the arrival time, so the card
+                // stacks, as `StepControlPair` does.
                 AdaptiveStack(isVertical: dynamicTypeSize.isAccessibilitySize, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
-                        // The lines this route rides, in order, in their own colours. A rider
-                        // comparing alternatives is choosing between *shapes* of journey, and three
-                        // chips of grey text made every row look the same until you read all of them.
+                        // The lines this route rides, in order and in their colours: alternatives
+                        // are compared by the shape of the journey.
                         JourneyBadgeChain(segments: route.segments)
 
                         Text(metrics.summaryLine)
@@ -390,9 +349,8 @@ struct RouteResultsView: View {
 
                     VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .trailing,
                            spacing: Metrics.hairline) {
-                        // Re-sorting the list swaps these numbers in place. Animating the digits
-                        // rather than cross-fading whole labels is the difference between the row
-                        // visibly updating and the row appearing to have always said that.
+                        // Re-sorting swaps these numbers in place; animated digits read as the row
+                        // updating.
                         Text(metrics.durationText)
                             .font(.title2)
                             .fontWeight(.bold)
@@ -403,8 +361,8 @@ struct RouteResultsView: View {
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                             .contentTransition(.numericText())
-                        // Absent for every unpriced route, which is every city outside the
-                        // provider's coverage. A blank is the honest rendering of "nobody told us".
+                        // Absent for every unpriced route: a blank is the honest rendering of
+                        // "nobody told us".
                         if let fare = route.fare {
                             Text(fare.formatted)
                                 .font(.subheadline)
@@ -416,8 +374,7 @@ struct RouteResultsView: View {
                     }
                 }
 
-                // The app does not plan bus routes and is not about to start. Naming the cheaper
-                // one is what an honest app does with a fact it happens to hold.
+                // The app does not plan buses, but names a cheaper one it knows about.
                 if let bus = route.fare?.cheaperBus {
                     Label(
                         cheaperBusLine(bus, against: route),
@@ -427,19 +384,12 @@ struct RouteResultsView: View {
                     .foregroundStyle(.secondary)
                 }
 
-                // Whether this trip can actually be ridden at the hour it departs. The banner has
-                // existed for a long time and lived only on the detail screen, so the list — the
-                // screen a rider actually chooses from — showed a shut line as a perfectly ordinary
-                // "28 min · 1 change". Naming it here is the whole point of checking it.
-                // Both of these are about trains, so neither belongs on a route with none. A drive
-                // showing "the last train could not be checked" is answering a question nobody
-                // asked, and a confidence grade on it is a verdict about station data it never
-                // touches. `RouteDetailView` already gates its own copies on the same test.
+                // Whether this trip can be ridden at the hour it departs, shown on the screen the
+                // rider chooses from. Only on routes that ride trains: a drive has no last train
+                // and no station data to grade.
                 if route.boardingTransitSegment != nil, route.serviceStatus.bannerText != nil {
-                    // The shared banner rather than a bare `Label`, which is what this drew and
-                    // which silently dropped the taxi price. This is the screen where the rider
-                    // *chooses*; being told the last train has gone without being told what the
-                    // alternative costs is exactly half an answer.
+                    // The shared banner, which carries the taxi price: being told the last train
+                    // has gone without what the alternative costs is half an answer.
                     ServiceStatusBanner(
                         status: route.serviceStatus,
                         compact: true,
@@ -458,10 +408,7 @@ struct RouteResultsView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                // Full width, below everything: sharing a line with the duration column squeezed
-                // "Walking-heavy route" into a two-line stub. Only what is wrong, and only in
-                // words: this row used to lead with a 50 pt red "38", an unexplained score on a
-                // scale the rider had never been shown.
+                // Full width, below everything, and only in words: only what is wrong.
                 if let concern = RouteConcern.worst(
                     feasibility: feasibility,
                     confidence: confidence,
@@ -476,11 +423,8 @@ struct RouteResultsView: View {
             .padding(Metrics.l)
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardSurface()
-            // The row the rider last opened, marked. `selectedRouteID` has been computed, kept
-            // current across a re-sort and a re-plan, and read by nothing — so coming back from a
-            // route detail, the card you just opened was indistinguishable from the others, and
-            // VoiceOver was told nothing either. Tinted stroke rather than a filled card, for the
-            // reason `SortChip` records: the accent is lifted for foreground use.
+            // The row the rider last opened, marked, and announced to VoiceOver. A tinted stroke
+            // rather than a fill: the accent is lifted for foreground use.
             .overlay {
                 if isSelected {
                     RoundedRectangle(cornerRadius: Radius.large, style: .continuous)
@@ -490,8 +434,7 @@ struct RouteResultsView: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-        // A route card stretched across a 1366-point iPad is a phone layout that got wider, not a
-        // design. Capped and centred; on a phone the cap is larger than the screen and does nothing.
+        // Capped and centred on a wide screen; on a phone the cap is wider than the screen.
         .readableColumn()
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
@@ -515,9 +458,8 @@ struct RouteResultsView: View {
         )
     }
 
-    /// The route's 0-100 confidence, computed from the identical comfort → feasibility →
-    /// confidence chain the detail screen uses (all synchronous), so a route flagged here is
-    /// flagged the same way after tapping in.
+    /// The route's 0–100 confidence from the same comfort → feasibility → confidence chain as the
+    /// detail screen, so a route is flagged the same way after tapping in.
     private func routeConfidence(for route: Route, feasibility: RouteFeasibility) -> RouteConfidence {
         container.routeConfidenceService.confidence(
             for: route,
@@ -527,11 +469,8 @@ struct RouteResultsView: View {
         )
     }
 
-    /// One line naming a cheaper bus, and saying plainly that this app will not plan it.
-    ///
-    /// The time difference is stated in whichever direction it actually runs. A bus that is both
-    /// cheaper and faster is unusual and not impossible, and printing "slower" over it would be a
-    /// small lie in service of a tidier sentence.
+    /// One line naming a cheaper bus and saying this app will not plan it, with the time difference
+    /// stated in whichever direction it runs.
     private func cheaperBusLine(_ bus: RouteFare.BusAlternative, against route: Route) -> String {
         let fare = RouteFare.formatted(bus.yuan)
         let deltaMinutes = Int((bus.duration - route.totalDuration) / 60)
@@ -568,20 +507,15 @@ struct RouteResultsView: View {
         guard routes.count > 1 else {
             return AppLocalization.text(english: "Recommended", simplified: "推荐", traditional: "推薦")
         }
-        // A drive or a walk is not one of the train plans being compared, it is the alternative to
-        // all of them. Every label below answers "why this train rather than that one", and none
-        // of them means anything here — least of all "Balanced", which is a comparison against
-        // nothing. The mode badge on the card already says what it is.
+        // A drive or a walk is the alternative to every train plan, not one of them, so none of
+        // these labels applies; the mode badge says what it is.
         guard route.boardingTransitSegment != nil else {
             return route.segments.first?.type == .driving
                 ? AppLocalization.text(english: "By car", simplified: "驾车", traditional: "駕車")
                 : AppLocalization.text(english: "On foot", simplified: "步行", traditional: "步行")
         }
-        // Every test below is *strictly* better than every alternative, never equal-best. Two ¥5
-        // routes are not one cheap route and one expensive one, and two routes that both walk 0 m
-        // do not have a winner. Badging either claims a difference the rider will not get, and the
-        // label is the one line on the card that says why this route is here at all. Seen on a
-        // real Beijing pair: identical fares and identical walking, one of them badged for both.
+        // Every test is strictly better than every alternative, never equal-best: two ¥5 routes are
+        // not one cheap and one expensive.
         func onlyOne(_ isBetter: (Route) -> Bool) -> Bool {
             routes.allSatisfy { $0.id == route.id || isBetter($0) }
         }
@@ -589,10 +523,8 @@ struct RouteResultsView: View {
         if onlyOne({ $0.totalDuration > route.totalDuration }) {
             return AppLocalization.localized("Fastest")
         }
-        // Cost needs *every* alternative priced, not merely one other. An unpriced route is not an
-        // expensive route, and treating it as one would let the app claim a saving over a number it
-        // never saw. `?? false` is what makes an unpriced alternative block the claim, and it also
-        // covers the single-priced-route case with no separate count guard.
+        // Cost needs every alternative priced: an unpriced route is not an expensive one. `??
+        // false` blocks the claim and covers a single priced route.
         if let fare = route.fare?.yuan,
            onlyOne({ ($0.fare?.yuan).map { $0 > fare } ?? false }) {
             return AppLocalization.text(english: "Cheapest", simplified: "最便宜", traditional: "最便宜")
@@ -620,6 +552,21 @@ struct RouteResultsView: View {
         }
         if !viewModel.routes.contains(where: { $0.id == selectedRouteID }) {
             selectedRouteID = viewModel.routes[0].id
+        }
+    }
+}
+
+/// Routes that were cleared while a screen showing them was up.
+struct StaleRoutesNotice: View {
+    var body: some View {
+        ContentUnavailableView {
+            Label(AppLocalization.localized("No Routes Found"), systemImage: "map")
+        } description: {
+            Text(AppLocalization.text(
+                english: "This search is no longer current. Go back and search again.",
+                simplified: "此次搜索已失效，请返回重新搜索。",
+                traditional: "此次搜尋已失效，請返回重新搜尋。"
+            ))
         }
     }
 }

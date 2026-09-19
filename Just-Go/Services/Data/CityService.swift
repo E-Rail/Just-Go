@@ -4,9 +4,9 @@ import CoreLocation
 final class CityService {
     private let cities = CityService.seedCities
 
-    // Generated from the bundled OSM MetroNetworks (station/line counts reflect the
-    // operator-filtered, own-city-only data). Cities are listed only when they have a
-    // drawable network. Regenerate via Scripts/import_osm_metro_geometry.rb.
+    // Generated from the bundled OpenStreetMap networks (operator-filtered, own-city-only counts);
+    // only cities with a drawable network are listed. Regenerate with
+    // Scripts/import_osm_metro_geometry.rb.
     private static let seedCities: [City] = [
         City(id: "1100", name: "北京", nameEn: "Beijing", namePinyin: "beijing", latitude: 39.9042, longitude: 116.4074, stationCount: 449, lineCount: 33),
         City(id: "3100", name: "上海", nameEn: "Shanghai", namePinyin: "shanghai", latitude: 31.2304, longitude: 121.4737, stationCount: 471, lineCount: 26),
@@ -71,9 +71,8 @@ final class CityService {
         cities.first { $0.id == id }
     }
 
-    /// The city a coordinate belongs to. Used to *label* things, which pack a quick tag files
-    /// under, which network to warm on launch. Never to gate what the app will load, search,
-    /// draw or route. That gate is gone: the map is one network you pan.
+    /// The city a coordinate belongs to, for labelling: which pack a quick tag files under, which
+    /// network to warm at launch. Never a gate on what the app loads, searches, draws or routes.
     func findNearestCity(to location: CLLocation) -> City? {
         cities.min { city1, city2 in
             let loc1 = CLLocation(latitude: city1.latitude, longitude: city1.longitude)

@@ -1,14 +1,8 @@
 import SwiftUI
 
-/// The app's type ramp, as three names instead of 180 hand-picked `.font()` calls.
-///
-/// Better than half the text in this app was `.caption` or smaller, and rows routinely drew the
-/// *label* larger than the value it introduced. "Exit" at `.subheadline` semibold over the exit's
-/// actual name at `.caption` secondary. Naming the three roles makes that inversion impossible to
-/// write by accident and makes a later sweep mechanical.
-///
-/// `.rowTitle` names a thing. `.rowValue` is the thing. Never smaller than its title. `.rowMeta`
-/// is genuine metadata (a count, a source, a timestamp) and is the only one allowed to be small.
+/// The app's type ramp as three roles. `.rowTitle` names a thing; `.rowValue` is the thing, never
+/// smaller than its title; `.rowMeta` is genuine metadata (a count, a source, a timestamp) and the
+/// only one allowed to be small.
 extension View {
     func rowTitle() -> some View {
         font(.subheadline).fontWeight(.medium).foregroundStyle(.secondary)
@@ -23,13 +17,8 @@ extension View {
     }
 }
 
-/// A metro line's own designation, drawn the way the network draws it: the number in its line
-/// colour.
-///
-/// Line names were previously plain text. "2号线" In the same weight and colour as everything
-/// around it. Riders do not navigate by reading line names, they navigate by matching colours and
-/// numbers to the signs overhead, so a badge is both the faster read and the one that matches what
-/// they are looking at in the station.
+/// A metro line's designation drawn the way the network draws it: the number in its line colour,
+/// matching the signs riders look for.
 struct LineBadge: View {
     let name: String
     let colorHex: String?
@@ -46,18 +35,14 @@ struct LineBadge: View {
             .padding(.horizontal, size * 0.18)
             .frame(minWidth: size, minHeight: size)
             .background(Color(hex: hex), in: RoundedRectangle(cornerRadius: size * 0.3, style: .continuous))
-            // Real line branding runs from pale yellow to near-black, so the label colour has to be
-            // measured against the fill rather than fixed. Beijing's 13号线 is a yellow that white
-            // text disappears into.
+            // Line branding runs from pale yellow to near-black, so the label colour is measured
+            // against the fill (white disappears into Beijing's 13号线 yellow).
             .foregroundStyle(Color.legibleText(onHex: hex))
             .accessibilityHidden(true)
     }
 
-    /// What a rider would call the line out loud: "2" from "2号线", "13" from "13号线", "S1" from
-    /// "S1线", "TW" from "Tsuen Wan Line".
-    ///
-    /// A badge has room for two or three characters, so the goal is the shortest unambiguous form,
-    /// not a truncation: "Tsuen…" identifies nothing.
+    /// What a rider would call the line: "2" from "2号线", "S1" from "S1线", "TW" from "Tsuen Wan
+    /// Line". The shortest unambiguous form, not a truncation.
     static func shortLabel(for name: String) -> String {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         if let digits = trimmed.range(of: "[0-9]+", options: .regularExpression) {
@@ -65,11 +50,9 @@ struct LineBadge: View {
             // one merely nearby is not, which is what separates "S1线" from "Line 2".
             let before = trimmed[..<digits.lowerBound]
             let prefix = before.suffix(while: { $0.isLetter && $0.isASCII })
-            // The character before the designation disqualifies it only when it is an *ASCII*
-            // letter: i.e. the designation is really the tail of a Latin word. `isLetter` alone
-            // is true for CJK, so every Chinese-prefixed line lost its designation: 成都市域铁路S3
-            // 资阳线 badged as "3", colliding with 成都地铁3号线 in the same city, and Nanjing
-            // rendered S1/S2/S6/S7/S8/S9 as bare numbers against its own 1–9号线.
+            // The preceding character disqualifies a designation only when it is an *ASCII* letter
+            // (the tail of a Latin word): `isLetter` is also true for CJK, which would badge
+            // 成都市域铁路S3资阳线 as "3" beside 成都地铁3号线.
             let isDesignation = prefix.count <= 2 && !prefix.isEmpty
                 && !before.dropLast(prefix.count).last.map { $0.isLetter && $0.isASCII }.orFalse
             return (isDesignation ? prefix.uppercased() : "") + trimmed[digits]
@@ -95,26 +78,14 @@ private extension StringProtocol {
     }
 }
 
-/// A whole journey compressed to one line of badges. Walk, line, line, walk, so two routes can be
-/// told apart at a glance by their shape rather than by reading three lines of grey text each.
-///
-/// Each access leg carries its own icon and its own minutes, because those are the two things that
-/// separate otherwise identical-looking routes: "🚶 21" and "🚲 7" describe very different trips
-/// and used to render as the same grey walking square. A ride's badge stays the line number. Its
-/// duration is implied by the stops, and a number beside a line number reads as a second line.
-///
-/// Transfer legs are left out on purpose: two adjacent line badges already say a transfer happens,
-/// and drawing it a third time crowded the chain past the width of a phone.
+/// A whole journey as one line of badges (walk, line, line, walk), so routes are told apart by
+/// shape. Access legs carry their icon and minutes ("🚶 21" and "🚲 7" are different trips); a ride's
+/// badge is its line number. Transfers are left out: two adjacent line badges already say it.
 struct JourneyBadgeChain: View {
     let segments: [RouteSegment]
     var size: CGFloat = 26
-    /// Every dimension here is a point size rather than a `Font.TextStyle`, so none of it grew
-    /// with the rider's text setting. Rendered at the largest accessibility size the badges came
-    /// out identical to their default size while every label around them tripled, leaving the
-    /// primary visual of a route row as the one microscopic thing on the card.
-    ///
-    /// Capped at 2x. A chain of five badges is laid out horizontally in a fixed-width card, and
-    /// the full 3.1x accessibility scale pushes it off the edge; two is enough to read.
+    /// Scales with the rider's text size, capped at 2×: at the full 3.1× a five-badge chain runs
+    /// off a fixed-width card.
     @ScaledMetric(relativeTo: .subheadline) private var typeScale: CGFloat = 1
 
     private var scaled: CGFloat { size * min(typeScale, 2) }
@@ -145,14 +116,13 @@ struct JourneyBadgeChain: View {
                 .font(.system(size: scaled * 0.46, weight: .semibold))
                 .monospacedDigit()
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(Color(hex: segment.colorHex))
         .padding(.horizontal, scaled * 0.26)
         .frame(height: scaled)
-        .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: scaled * 0.3, style: .continuous))
+        .background(Color(hex: segment.colorHex).opacity(0.16), in: RoundedRectangle(cornerRadius: scaled * 0.3, style: .continuous))
     }
 
-    /// Rounded, and never zero: a 40-second walk is still a leg of the trip, and a badge reading
-    /// "0" says the app could not work it out rather than "this is quick".
+    /// Rounded, and never zero: a 40-second walk is still a leg, and "0" reads as unknown.
     private static func minutes(_ duration: TimeInterval) -> Int {
         max(1, Int((duration / 60).rounded()))
     }
@@ -160,26 +130,20 @@ struct JourneyBadgeChain: View {
     private var shown: [RouteSegment] { segments.filter { $0.type != .transfer } }
 }
 
-/// The continuous vertical line that ties a journey's legs into one path.
-///
-/// Solid in the leg's own colour while riding, dashed while on foot. The convention every printed
-/// transit map and every well-regarded transit app already uses, so it needs no legend. Drawn as a
-/// single stroked path rather than a stack of capsules so that adjacent legs actually touch: the
-/// spine has to be unbroken or the trip reads as a list of unrelated errands.
+/// The continuous vertical line that ties a journey's legs into one path, drawn in the leg's own
+/// colour and dash (`SegmentType.colorHex(line:)`, `dash(width:)`) so it matches the maps. One
+/// stroked path rather than a stack of capsules, so adjacent legs actually touch.
 struct JourneyRail: View {
-    let color: Color
-    var dashed = false
+    let segment: RouteSegment?
     var width: CGFloat = 6
 
     var body: some View {
+        let dash = segment?.type.dash(width: width) ?? []
         RailPath()
             .stroke(
-                color,
-                style: StrokeStyle(
-                    lineWidth: width,
-                    lineCap: dashed ? .round : .butt,
-                    dash: dashed ? [0.1, width * 1.15] : []
-                )
+                Color(hex: segment?.colorHex ?? SegmentType.walking.colorHex(line: nil)),
+                // Butt caps on a solid rail, so it ends flush against the next leg's.
+                style: StrokeStyle(lineWidth: width, lineCap: dash.isEmpty ? .butt : .round, dash: dash)
             )
             .frame(width: width)
             .accessibilityHidden(true)
@@ -195,17 +159,8 @@ struct JourneyRail: View {
     }
 }
 
-/// The card, and at last the glass its file is named after.
-///
-/// Cards were previously drawn five different ways depending on which file you were in:
-/// `systemGray6` at radius 10, `.ultraThinMaterial` at 14, `.regularMaterial` at 10, `appSurface`
-/// at 12, `GlassCard` at 18, often two of them stacked on one screen. No single one of those looks
-/// wrong. Seeing three at once is what makes a screen look assembled rather than designed, because
-/// the eye reads differing radii as a differing *kind* of thing and goes looking for the meaning.
-///
-/// The treatment itself now lives in `Core/DesignSystem.swift` as `.cardSurface(radius:elevation:)`,
-/// alongside the spacing and elevation tokens, so a card, a chip and a floating panel are all
-/// measured from one place.
+/// The card, in the one treatment from `Core/DesignSystem.swift`
+/// (`.cardSurface(radius:elevation:)`), so every card on a screen reads as the same kind of thing.
 struct GlassCard<Content: View>: View {
     let content: Content
     /// Set on cards drawn over the map, where glass has something to refract and a shadow is the

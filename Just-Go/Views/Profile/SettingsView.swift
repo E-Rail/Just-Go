@@ -2,8 +2,8 @@ import SwiftUI
 import UIKit
 
 struct SettingsView: View {
-    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
-    /// in a column, so a Done button there is a control that looks live and does nothing.
+    /// False in a detail column, where `dismiss()` has nothing to dismiss and a Done button would
+    /// do nothing.
     var showsDoneButton = true
     @Environment(\.dismiss) private var dismiss
     @Environment(DIContainer.self) private var container
@@ -24,9 +24,8 @@ struct SettingsView: View {
                 appearanceSection
                 notificationsSection
                 helpSection
-                // Last on purpose. Two red rows sat in the middle of this screen, between the
-                // e-bike toggle and Help, so scrolling past an ordinary preference meant scrolling
-                // through a pair of delete buttons. Nothing below them any more.
+                // Last, so scrolling past an ordinary preference never means scrolling through the
+                // delete buttons.
                 dataSection
             }
             .navigationTitle(AppLocalization.localized("Settings"))
@@ -50,8 +49,8 @@ struct SettingsView: View {
         Section {
             ThemePickerRow()
                 .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
-            // Applies immediately and everywhere. Unlike the language row below it, this needs no
-            // relaunch: `preferredColorScheme` at the window root re-renders the live view tree.
+            // Applies immediately: `preferredColorScheme` at the window root re-renders the live
+            // view tree, unlike the language row, which needs a relaunch.
             Picker(
                 AppLocalization.text(english: "Light & Dark", simplified: "浅色与深色", traditional: "淺色與深色"),
                 selection: $appearance
@@ -105,10 +104,8 @@ struct SettingsView: View {
         } header: {
             Text(AppLocalization.localized("Notifications"))
         } footer: {
-            // Three sentences before, two of which explained which alert was which — a caption
-            // that has to name the rows above it means the rows are named wrongly, so they say
-            // "before you leave" and "before your stop" now and the footer says the one thing
-            // neither row can: iOS will ask permission.
+            // The rows say "before you leave" and "before your stop"; the footer says the one thing
+            // neither can: iOS will ask permission.
             Text(AppLocalization.text(
                 english: "iOS asks for notification permission the first time you use either.",
                 simplified: "首次使用时，系统会询问通知权限。",
@@ -121,10 +118,8 @@ struct SettingsView: View {
 
     private var helpSection: some View {
         Section {
-            // `.buttonStyle(.plain)` with the icon tinted by hand, not a bare `Button`. A Button's
-            // label inherits the accent colour, so this row read orange while the `NavigationLink`
-            // directly below it read black — two rows that open a screen, styled as two different
-            // kinds of control. The icon is tinted explicitly because plain takes that too.
+            // A plain-styled button with the icon tinted by hand, so this row looks like the
+            // `NavigationLink` below it rather than a different kind of control.
             Button {
                 showTour = true
             } label: {
@@ -136,9 +131,8 @@ struct SettingsView: View {
                             .foregroundStyle(Color.accentColor)
                     }
                     Spacer()
-                    // The `NavigationLink` below draws one of these for free. Without it here, two
-                    // rows that both open a screen sat in one card and only one of them looked
-                    // like it led anywhere.
+                    // The `NavigationLink` below draws a chevron for free; this row needs one to
+                    // look like it leads somewhere too.
                     Image(systemName: "chevron.right")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -166,9 +160,8 @@ struct SettingsView: View {
             Button(role: .destructive) {
                 showClearCacheConfirmation = true
             } label: {
-                // Tinted by hand. A destructive `Button` colours its *title* red and leaves the
-                // `Label`'s icon on the accent, so both rows here rendered an orange glyph beside
-                // red text — the same split that made App Tour orange next to a black FAQ.
+                // Tinted by hand: a destructive `Button` colours its title red but leaves the
+                // `Label`'s icon on the accent.
                 Label {
                     Text(clearCacheTitle)
                 } icon: {
@@ -184,10 +177,7 @@ struct SettingsView: View {
                 }
                 Button(AppLocalization.localized("Cancel"), role: .cancel) {}
             } message: {
-                // Two lists, no promises. This read "…will be deleted, and fetched again when
-                // needed. Your tags, trips, records and settings are not affected." — the app
-                // narrating its own future behaviour, which is exactly the voice this screen was
-                // swept clean of. What goes, what stays.
+                // What goes and what stays, with no promises about the app's future behaviour.
                 Text(AppLocalization.text(
                     english: "Goes: downloaded station information, cached pages. Stays: your tags, trips and settings.",
                     simplified: "清除：已下载的车站信息、网页缓存。保留：标签、行程和设置。",

@@ -1,21 +1,16 @@
 import Foundation
 
-/// The Sendable slice of an official schedule row that crosses the
-/// `OfficialCityPackService` actor boundary. Shared by time-aware-confidence
-/// and departure-planner.
+/// The Sendable slice of an official schedule row that crosses the `OfficialCityPackService` actor
+/// boundary.
 struct StationServiceWindow: Sendable, Codable, Equatable, Hashable {
     let lineName: String
     /// The direction marker a rider reads on the platform sign — Beijing's `terminalStationName`,
     /// Shanghai's `往滴水湖`, Baidu's `潞阳方向`. Names *a* way, not necessarily where this train ends.
     let direction: String?
-    /// Where this individual service actually terminates, when the operator distinguishes it.
-    ///
-    /// Beijing publishes both and they are not the same field: at 国贸 every northbound 10号线 row
-    /// carries `terminalStationName = 双井` while `destStationName` is 车道沟, 成寿寺 or 巴沟 — three
-    /// services, three different last trains, 21:28 / 23:36 / 23:12. Keying only on the direction
-    /// marker collapsed them into one 23:36 window, which is what told a rider bound for 车道沟 that
-    /// they had two hours they did not have. Optional because most sources publish only one name,
-    /// and because a cache written before this existed must still decode.
+    /// Where this individual service terminates, when the operator distinguishes it from the
+    /// direction marker: at 国贸 every northbound 10号线 row carries `terminalStationName = 双井` while
+    /// `destStationName` is 车道沟, 成寿寺 or 巴沟, with last trains 21:28, 23:36 and 23:12. Optional
+    /// because most sources publish one name, and older caches must decode.
     let destination: String?
 
     let firstTime: String?
@@ -40,45 +35,35 @@ struct StationServiceWindow: Sendable, Codable, Equatable, Hashable {
 /// the rider's own train.
 struct ServiceHoursVerdict: Equatable {
     let status: RouteServiceStatus
-    /// Whether this verdict is sound enough to re-plan on, as opposed to merely worth showing.
+    /// Whether this verdict is sound enough to re-plan on, not merely to show. Either the window
+    /// was pinned to the rider's own direction and service, or the merged window (earliest first
+    /// train, latest last train across every direction) already says the line is shut. The merge is
+    /// an upper bound: "still running" from it may be another direction's train and never demotes a
+    /// route, but "ended" from it means every direction has ended.
     ///
-    /// Two ways to earn it. Either the window was pinned to the rider's own direction and service,
-    /// or the merged window — the earliest first train and the latest last train across every
-    /// direction — *already* says the line is shut. The merge is an upper bound by construction, so
-    /// it can only ever over-state how long a line runs: "still running" out of it may be another
-    /// direction's train and must never demote a route, while "ended" out of it means every
-    /// direction has ended and is as certain as an attributed one.
-    ///
-    /// That second case is not a technicality. Ring lines have no terminus to order stations
-    /// against, so nothing on 北京 2号线 or 10号线 can ever be attributed — and without this they
-    /// would be the two lines a re-plan never fired for.
+    /// Ring lines need the second case: they have no terminus to order stations against, so nothing
+    /// on 北京 2号线 or 10号线 can ever be attributed.
     let isDefinitive: Bool
 
     static let unanswered = ServiceHoursVerdict(status: .unknown, isDefinitive: false)
 }
 
-/// Pure, synchronous resolver that turns first/last-train rows into a `RouteServiceStatus` for a
-/// given departure moment. Owns all the midnight-wrap, direction and service matching so it lives
-/// in exactly one place.
+/// Pure, synchronous resolver that turns first and last train rows into a `RouteServiceStatus` for
+/// a departure moment. Owns all midnight-wrap, direction and service matching.
 struct ServiceHoursResolver {
     /// "Last train soon" fires when the last train departs within this many minutes.
     var lastTrainSoonThresholdMinutes = 20
 
-    /// The last train out of this station, for this rider, in the direction they are going and on a
-    /// train that gets them where they are going.
+    /// The last train out of this station for this rider: in the direction they are going, on a
+    /// service that reaches their stop.
     ///
-    /// All three qualifiers are load-bearing, and until recently only the first was applied.
+    /// **Direction.** The two directions are not close: across 60 Beijing stations, 92% of
+    /// station/line pairs differ by more than 15 minutes (石门 on 15号线 by 110). 天通苑南 on 5号线 runs
+    /// southbound until 22:51 and northbound until 23:57.
     ///
-    /// **Direction.** An operator publishes one window per direction and they are not close. Across
-    /// a 60-station sample of Beijing, 92 % of station/line pairs had their two directions more than
-    /// 15 minutes apart and 81 % more than 30; 石门 on 15号线 differs by 110. Merging them reported
-    /// 天通苑南 on 5号线 as running until 23:57 when the southbound last train goes at 22:51.
-    ///
-    /// **Service.** Directions subdivide again into full runs and short-turns. 花园桥 eastbound on
-    /// 6号线 has a full run to 潞阳 (last 22:45) and a short-turn to 草房 (last 23:56), so the answer
-    /// depends on where the rider gets off: before 草房 it is 23:56, beyond it 22:45. That is why
-    /// this takes the onward stations rather than just a terminus — a terminus alone cannot tell
-    /// you whether a short-turn reaches you.
+    /// **Service.** Directions split into full runs and short-turns: 花园桥 eastbound on 6号线 has a
+    /// full run to 潞阳 (last 22:45) and a short-turn to 草房 (last 23:56). Before 草房 the answer is
+    /// 23:56, beyond it 22:45, which is why this takes the onward stations rather than a terminus.
     func verdict(
         boardingLineName: String?,
         onwardStationNames: [String]?,
@@ -88,12 +73,9 @@ struct ServiceHoursResolver {
     ) -> ServiceHoursVerdict {
         guard !windows.isEmpty else { return .unanswered }
 
-        // No line match is no answer, not somebody else's answer. `pool` used to fall back to every
-        // window at the station, so a station whose operator spells the line differently from the
-        // pack — 首都机场线 against 机场线, which share no `transitLineReferences` — was judged by
-        // whatever other lines call there. At 西直门 that is 2号线, 4号线 and 13号线 together, and a
-        // single-row fallback was even marked definitive and could ban the rider's line on the
-        // strength of a different line's last train.
+        // No line match is no answer, not another line's: a station whose operator spells the line
+        // differently from the pack (首都机场线 against 机场线) must not be judged by whatever else calls
+        // there.
         let pool = matchingWindows(lineName: boardingLineName, windows: windows)
         guard !pool.isEmpty else { return .unanswered }
 
@@ -101,8 +83,8 @@ struct ServiceHoursResolver {
            !serving.isEmpty {
             return ServiceHoursVerdict(status: status(from: serving, at: departure), isDefinitive: true)
         }
-        // One window is not a merge, so there is nothing to be optimistic about; and a merge that
-        // already reads as shut is an upper bound that has passed. See `isDefinitive`.
+        // One window is not a merge, so nothing about it is optimistic; a merge that already reads
+        // as shut is an upper bound that has passed. See `isDefinitive`.
         let merged = status(from: pool, at: departure)
         return ServiceHoursVerdict(
             status: merged,
@@ -110,11 +92,9 @@ struct ServiceHoursResolver {
         )
     }
 
-    /// The services out of this station that both go the rider's way and reach their stop.
-    ///
-    /// `nil` when the question cannot be asked at all — a ring, an ambiguous branch, or a station
-    /// list that does not contain the alighting stop — which is different from asking it and
-    /// finding nothing.
+    /// The services out of this station that go the rider's way and reach their stop. nil when the
+    /// question cannot be asked (a ring, an ambiguous branch, a station list without the alighting
+    /// stop), which differs from asking and finding nothing.
     private func servingWindows(
         in pool: [StationServiceWindow],
         onward: [String]?,
@@ -131,22 +111,14 @@ struct ServiceHoursResolver {
     }
 
     /// Where a window's service ends, as a position in the stations ahead of the rider.
+    /// `destination` first; the direction marker answers only for sources that publish one name for
+    /// both.
     ///
-    /// `destination` first, because where a service terminates is exactly this question; the
-    /// direction marker only answers it for sources that publish one name for both.
-    ///
-    /// Matching is **exact, after stripping the wrapper words**, and deliberately has no substring
-    /// fallback. Operators name a service plainly — Beijing `环球度假区`, Shanghai `往滴水湖`,
-    /// Guangzhou `toStationName`, Baidu `潞阳方向` — so containment bought nothing and cost a great
-    /// deal: `"苹果园".contains("果园")` is true, and 苹果园 and 果园 are 29 stops apart at opposite
-    /// ends of Beijing's fused 1号线/八通线. An eastbound rider at 国贸 therefore had the *westbound*
-    /// window admitted as their own service, and marked definitive. There are 158 such same-line
-    /// pairs across 107 lines in 34 packs — `西安北站`⊃`西安站`, `火车东站`⊃`火车站`,
-    /// `天通苑北`⊃`天通苑` — and `normalizedStationName` strips every `站`, which manufactures more.
-    ///
-    /// A name that does not resolve returns nil, which `servingWindows` reads as "not this rider's
-    /// train". That is the safe direction: the trip falls back to the merged upper bound, which is
-    /// shown but never acted on.
+    /// Matching is **exact after stripping wrapper words**, with no substring fallback:
+    /// `"苹果园".contains("果园")` is true, and they are 29 stops apart on Beijing's 1号线/八通线. There are
+    /// 158 such same-line pairs across 34 packs (`西安北站`⊃`西安站`, `天通苑北`⊃`天通苑`). An unresolved name
+    /// returns nil, "not this rider's train", which falls back to the merged upper bound: shown,
+    /// never acted on.
     private func destinationIndex(of window: StationServiceWindow, along onward: [String]) -> Int? {
         for text in [window.destination, window.direction] {
             guard let text else { continue }
@@ -157,11 +129,9 @@ struct ServiceHoursResolver {
         return nil
     }
 
-    /// A service's destination text reduced to the bare station name it contains.
-    ///
-    /// The wrapper words are the only variation across the five sources, so removing them and
-    /// comparing exactly is enough. Anything else — a full sentence, an unrecognised grammar —
-    /// simply fails to match, which is the honest outcome.
+    /// A service's destination text reduced to the bare station name. The wrapper words are the
+    /// only variation across the five sources, so stripping them and comparing exactly is enough;
+    /// anything else fails to match.
     private func serviceDestinationName(_ text: String) -> String {
         var value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         for prefix in ["开往", "驶往", "往", "至", "终点站", "终点"] where value.hasPrefix(prefix) {
@@ -183,8 +153,8 @@ struct ServiceHoursResolver {
 
     /// The service window these rows describe together, folded onto one service day.
     private func status(from pool: [StationServiceWindow], at departure: Date) -> RouteServiceStatus {
-        // City packs pack multiple branch/direction times into one string with " / ",
-        // e.g. "23:45 / 0:06". Split so every value is considered.
+        // City packs put several branch or direction times in one string with " / " ("23:45 /
+        // 0:06"); every value is considered.
         let firstMinutes = pool.flatMap { Self.times($0.firstTime) }
         let lastMinutes = pool.flatMap { Self.times($0.lastTime) }
         let nowMin = ChinaClock.minutesOfDay(of: departure)
@@ -192,8 +162,8 @@ struct ServiceHoursResolver {
         guard let firstMin = firstMinutes.min() else {
             return statusFromLastTrainAlone(lastMinutes, at: nowMin)
         }
-        // Pick the service-latest last train: a value before the first train wrapped past
-        // midnight (e.g. 0:06 is *after* 23:45), so order by service-day minutes then fold back.
+        // The service-latest last train: a value earlier than the first train has wrapped past
+        // midnight (0:06 is after 23:45), so order by service-day minutes.
         guard let lastMin = lastMinutes
             .map({ $0 >= firstMin ? $0 : $0 + 1440 })
             .max()
@@ -214,12 +184,11 @@ struct ServiceHoursResolver {
             return .running
         }
 
-        // Distinguish "service ended" from "not yet started" for both window shapes.
-        // Non-wrap [first, last]: ended once past last.
-        // Wrap window (last < first, last train past midnight): the off-service gap is
-        // (last, first). Split at the gap midpoint so the early half is "ended" and the
-        // late half is "not yet started": otherwise notYetStarted is unreachable for all
-        // midnight-wrap services (e.g. at 4:55 AM before a 5:00 first train).
+        // "Service ended" against "not yet started", for both window shapes. A non-wrapping window
+        // has ended once past its last train. A wrapping one (last train after midnight) is off
+        // between last and first; split that gap at its midpoint, early half ended and late half
+        // not yet started, or `notYetStarted` would be unreachable (4:55 before a 5:00 first
+        // train).
         let ended = firstMin <= lastMin
             ? nowMin > lastMin
             : nowMin > lastMin && nowMin < (lastMin + firstMin) / 2
@@ -229,21 +198,16 @@ struct ServiceHoursResolver {
         return .notYetStarted(startsAtText: ChinaClock.clockText(minutes: firstMin))
     }
 
-    /// What a row holding a last train and no first train can honestly say.
+    /// What a row with a last train and no first train can honestly say. Without a first train
+    /// `now` cannot be placed in the service day, so `.running` and `.notYetStarted` are
+    /// unreachable. Two things do follow:
     ///
-    /// Not much, but not nothing, and until now it said `.unknown` — withholding the single fact
-    /// this whole feature exists to report. `RoutePlanningService` deliberately keeps one-sided rows
-    /// (Hangzhou nulls placeholder times per field, and Beijing's own merge can leave either side
-    /// empty), so they arrive here regularly.
+    /// - Shortly *before* the last train, service is running: no metro's first train is twenty
+    /// minutes before its last. - Shortly *after* it, service has ended; bounded to four hours so
+    /// breakfast is not answered with last night's closure.
     ///
-    /// Without a first train there is no way to place `now` inside the service day, so `.running`
-    /// and `.notYetStarted` are both unreachable: claiming either would be inventing the half of the
-    /// window we were not given. Two things do follow:
-    ///
-    /// - Shortly *before* the last train, service is certainly running — no metro's first train is
-    ///   twenty minutes before its last — so the countdown is sound.
-    /// - Shortly *after* it, service has certainly ended. Bounded to four hours so that a query at
-    ///   breakfast is not answered with last night's closure.
+    /// `RoutePlanningService` keeps one-sided rows on purpose (Hangzhou nulls placeholders per
+    /// field), so they arrive regularly.
     private func statusFromLastTrainAlone(_ lastMinutes: [Int], at nowMin: Int) -> RouteServiceStatus {
         guard !lastMinutes.isEmpty else { return .unknown }
         let toLast = lastMinutes.map { ($0 - nowMin + 1440) % 1440 }
@@ -283,20 +247,14 @@ struct DirectedServiceHop: Hashable, Sendable {
     let toStationID: String
 }
 
-/// Every hop a shut service makes, expanded from the one oriented hop that was observed.
+/// Every hop a shut service makes, expanded from the one oriented hop observed. The search needs
+/// the whole direction: any edge on the same line running the same way is the same train, equally
+/// gone. Each pattern holding both stations establishes which way round they sit; patterns holding
+/// only one say nothing about direction and are skipped, since guessing could ban a branch the
+/// rider can still use.
 ///
-/// A verdict is reached about a rider boarding at A heading toward B. What a search needs is not
-/// that pair but the whole direction: any edge on the same line running the same way is the same
-/// train and equally gone. So each pattern holding both stations is read once to establish which
-/// way round they sit, and every consecutive pair is taken in that order.
-///
-/// Patterns holding only one of the two say nothing about the direction and are skipped. On a
-/// branching line that is most of them, and guessing would ban the branch the rider could still
-/// use. A ring orders by index like anything else.
-///
-/// `patterns` are raw station IDs and `from`/`to` are whatever the caller identifies stations by,
-/// so `identify` bridges the two. The returned hops use the raw IDs, because they are compared
-/// against graph edges once per edge considered.
+/// `identify` bridges the caller's station identifiers to the patterns' raw IDs; the returned hops
+/// use raw IDs, compared against graph edges.
 func directedHops(
     lineID: String,
     from: String,

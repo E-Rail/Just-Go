@@ -3,14 +3,10 @@ import Foundation
 
 /// Credentials and endpoint for Baidu's Web Service API.
 ///
-/// The 服务端 (server) key type is deliberate. The alternative. An iOS-type key with Baidu's
-/// native SDK: would bind the key to the bundle ID, which is better for key safety, but it also
-/// links a closed-source binary that collects device identifiers into an app whose whole promise is
-/// that it does not do that. It also speaks BD-09, a third coordinate frame on top of the two this
-/// codebase already reconciles. HTTP + `ret_coordtype=gcj02` costs one client and stays honest.
-///
-/// `baseURL` is the port for moving off a shipped key: point it at a proxy that holds the AK and
-/// the app stops carrying a secret at all, with no other code changing.
+/// A 服务端 (server) key over plain HTTP, on purpose: Baidu's native SDK would bind the key to the
+/// bundle ID but links a closed binary that collects device identifiers, and speaks BD-09, a third
+/// coordinate frame. `baseURL` is the way off a shipped key: point it at a proxy that holds the AK
+/// and nothing else changes.
 struct BaiduMapsConfiguration: Sendable, Equatable {
     let accessKey: String
     let secretKey: String?
@@ -26,14 +22,9 @@ struct BaiduMapsConfiguration: Sendable, Equatable {
         self.baseURL = baseURL ?? URL(string: Self.defaultBaseHost)!
     }
 
-    /// No key means every Baidu-backed feature reports unavailable rather than guessing. The app
-    /// must build and run without one: a missing key is a normal state, not an error.
+    /// No key means every Baidu-backed feature reports unavailable. The app builds and runs without
+    /// one; a missing key is a normal state.
     var isConfigured: Bool { !accessKey.isEmpty }
-
-    /// Signing turns itself on when an SK exists. With the console set to IP 白名单 there is no SK
-    /// and requests go unsigned; switching the console to SN 校验 and pasting an SK into
-    /// Secrets.xcconfig is the whole migration.
-    var signsRequests: Bool { secretKey != nil }
 
     static func fromBundle(_ bundle: Bundle = .main) -> BaiduMapsConfiguration {
         BaiduMapsConfiguration(
@@ -43,16 +34,13 @@ struct BaiduMapsConfiguration: Sendable, Equatable {
     }
 }
 
-/// Baidu's SN request signature.
-///
-/// The published prose describes building `/path?query` + SK and taking its MD5. Doing exactly that
-/// produces the wrong digest: the assembled string is URL-encoded *again* before hashing, which
-/// only Baidu's worked example reveals. `Scripts/test_baidu_sn_signature.rb` pins that example so
-/// this cannot silently regress into a runtime `{"status":211,"message":"APP SN校验失败"}`.
+/// Baidu's SN request signature. The published prose (MD5 of `/path?query` + SK) produces the wrong
+/// digest: the string is URL-encoded again before hashing, which only Baidu's worked example shows.
+/// `Scripts/test_baidu_sn_signature.rb` pins that example.
 enum BaiduRequestSigner {
-    /// PHP's `urlencode`, which is what Baidu's reference implementations use. Note space becomes
-    /// `+`, not `%20`. Swift's `addingPercentEncoding` does the opposite and produces a signature
-    /// that fails for any query containing a space.
+    /// PHP's `urlencode`, as Baidu's reference implementations use: a space becomes `+`, not `%20`.
+    /// Swift's `addingPercentEncoding` does the opposite and breaks the signature for any query
+    /// with a space.
     static func urlEncoded(_ value: String) -> String {
         var encoded = ""
         encoded.reserveCapacity(value.utf8.count)
@@ -82,7 +70,7 @@ enum BaiduRequestSigner {
 
 enum BaiduMapsError: Error, Equatable {
     case notConfigured
-    /// Baidu answered, and said no. `status` is its own code. 302/210 Are quota and permission.
+    /// Baidu answered, and said no. `status` is its own code; 302 and 210 are quota and permission.
     case service(status: Int, message: String)
     case malformedResponse
     /// The transport answered, but not with a 200. Distinct from `.service`, which is Baidu
@@ -97,25 +85,17 @@ enum BaiduMapsError: Error, Equatable {
 }
 
 /// A handle on an in-flight `URLSessionDataTask`, so a caller that has stopped waiting can stop the
-/// transfer too.
-///
-/// A class, and not an actor, because `onCancel:` runs synchronously and cannot await. `NSLock`
-/// rather than a bare `var` because the adopting side and the cancelling side are different tasks:
-/// this is the one piece of shared mutable state the client has outside its own actor isolation.
+/// transfer too. A class because `onCancel:` runs synchronously and cannot await; `NSLock` because
+/// the adopting and cancelling sides are different tasks.
 private final class SessionTaskBox: @unchecked Sendable {
     private let lock = NSLock()
     private var task: URLSessionDataTask?
     private var cancelled = false
     private var waiters = 0
 
-    /// Callers currently waiting on this one shared transfer.
-    ///
-    /// `cancel()` used to be armed for the *originating* caller alone and tore down the transfer
-    /// that every coalesced caller was also awaiting. With the planner running Baidu under a
-    /// 3-second budget while this client spaces requests 350 ms apart and admits two at a time,
-    /// the first caller's deadline expiring while queued cancelled the second caller's answer too
-    /// — which then reported "unavailable" with almost its whole budget unspent, and the shared
-    /// budget unit already charged. The transfer is only abandoned once nobody is left waiting.
+    /// Callers waiting on this one shared transfer. It is abandoned only once nobody is left
+    /// waiting: one caller's deadline must not cancel an answer a joined caller is still waiting
+    /// for.
     func addWaiter() {
         lock.lock()
         waiters += 1
@@ -164,23 +144,16 @@ protocol BaiduResponseEnvelope: Decodable, Sendable {
     var message: String? { get }
 }
 
-/// Calls Baidu's Web Service API.
-///
-/// Requests are built as an ordered parameter list rather than a dictionary because the SN
-/// signature must be computed over the parameters *in the order they are sent*; a dictionary's
-/// arbitrary order would produce a valid-looking signature that Baidu rejects.
+/// Calls Baidu's Web Service API. Parameters are an ordered list, not a dictionary, because the SN
+/// signature is computed over them in the order they are sent.
 actor BaiduMapsClient {
     /// How many calls one launch may make to each endpoint family.
     ///
-    /// The published free allowance is per *account* per day, not per device: 100 place searches,
-    /// 300 reverse geocodes, 5,000 route plans, shared across every rider using the app. No number
-    /// held on a phone can enforce that, and this does not pretend to. What it does is stop a
-    /// single device spending the whole day's allowance in one sitting, and turn the aftermath into
-    /// an immediate local refusal instead of a round trip to be told 302 每日配额超限.
-    ///
-    /// The ceilings are deliberately lopsided in the same proportion as the allowance itself. Route
-    /// planning is where the headroom is and where every fact this app reads now comes from; place
-    /// search is the starved one.
+    /// The free allowance is per account per day, shared by every rider: 100 place searches, 300
+    /// reverse geocodes, 5,000 route plans. A phone cannot enforce that; this stops one device
+    /// spending the day's allowance in a sitting, and turns the aftermath into an immediate local
+    /// refusal. The ceilings follow the allowance's proportions: route planning has the headroom,
+    /// place search is starved.
     enum RequestBudget {
         static let ceilings: [String: Int] = [
             "/place/v2/search": 25,
@@ -190,48 +163,36 @@ actor BaiduMapsClient {
         ]
     }
 
-    /// At most this many requests may be in flight at once.
-    ///
-    /// The published free tier allows 3 QPS. Two, not three, because the ceiling is enforced on
-    /// Baidu's side across the whole account — every rider using the app shares it — so sitting
-    /// exactly on the limit means the first two devices to plan a trip in the same second decide
-    /// whether the third gets an answer. Concurrency is not the same as rate, which is why
-    /// `minimumRequestSpacing` exists as well.
+    /// At most this many requests in flight at once. The free tier allows 3 QPS across the whole
+    /// account, so two leaves room for another rider in the same second. Concurrency is not rate,
+    /// hence `minimumRequestSpacing` too.
     static let maximumConcurrentRequests = 2
-    /// Minimum wall-clock gap between two request *starts*, which is what a per-second quota
-    /// actually measures. 350 ms keeps a burst under 3/s even when every response is instant.
+    /// Minimum gap between two request starts, which is what a per-second quota measures: 350 ms
+    /// keeps a burst under 3/s.
     static let minimumRequestSpacing = Duration.milliseconds(350)
-    /// Baidu status codes that mean "and it will still be no in a moment": daily quota, concurrency
-    /// ceiling, service disabled, referer/IP rejected.
+    /// Baidu statuses that will still be no in a moment: daily quota, concurrency ceiling, service
+    /// disabled, referer or IP rejected.
     private static let refusalStatuses: Set<Int> = [210, 211, 240, 302, 401]
-    /// How long an endpoint is left alone after one of those. Long enough that a screen redrawing
-    /// or a rider retrying does not walk straight back into it; short enough that a concurrency
-    /// refusal clears on its own within a session.
+    /// How long an endpoint is left alone after one of those: long enough that a redraw or a retry
+    /// does not walk back into it, short enough that a concurrency refusal clears within a session.
     private static let refusalHoldOff = Duration.seconds(120)
 
     let configuration: BaiduMapsConfiguration
     private let session: URLSession
     private var spent: [String: Int] = [:]
-    /// The last thing Baidu said no about, per endpoint.
-    ///
-    /// Recorded because every one of the five call sites turns a failure into
-    /// `AppLog.…info("… unavailable: \(error)")` and moves on. `BaiduMapsError.service` has always
-    /// carried Baidu's own status code — 302 daily quota, 401 concurrency, 240 service disabled —
-    /// and nothing has ever read it, so "the API stopped working" has been unanswerable from
-    /// inside the app. Kept in memory only, like everything else this client touches.
+    /// The last thing Baidu refused, per endpoint, with its own status code, so "the API stopped
+    /// working" is answerable from Transit Data. In memory only, like everything this client
+    /// touches.
     private var failures: [String: BaiduEndpointDiagnostics.Failure] = [:]
     /// Endpoints Baidu has refused, and the instant it is worth asking again.
     private var refusedUntil: [String: ContinuousClock.Instant] = [:]
     private var inFlightRequests = 0
     private var waiting: [CheckedContinuation<Void, Never>] = []
     private var earliestNextStart: ContinuousClock.Instant = .now
-    /// Identical requests already on the wire, keyed by URL.
-    ///
+    /// Identical requests already on the wire, keyed by URL, with the handle that can stop each.
     /// The per-service caches check on the way in and write on the way out, so two identical plans
-    /// starting together both miss and both spend a call. This closes that window, and it closes it
-    /// for every endpoint at once rather than once per service.
-    /// In-flight requests by URL, with the handle that can stop each one. The box travels
-    /// with the task because joined callers need it too — see `SessionTaskBox.addWaiter`.
+    /// starting together would both spend a call. The box travels with the task because joined
+    /// callers need it too; see `SessionTaskBox.addWaiter`.
     private var coalescing: [String: (task: Task<Data, Error>, box: SessionTaskBox)] = [:]
 
     init(configuration: BaiduMapsConfiguration, session: URLSession? = nil) {
@@ -240,8 +201,8 @@ actor BaiduMapsClient {
             self.session = session
         } else {
             let sessionConfiguration = URLSessionConfiguration.ephemeral
-            // Ephemeral: Baidu's terms forbid caching what the service releases, and a URL cache
-            // writing responses to disk is exactly that. It also keeps rider queries off the disk.
+            // Ephemeral: Baidu's terms forbid caching what the service releases, and it keeps rider
+            // queries off the disk.
             sessionConfiguration.urlCache = nil
             sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
             sessionConfiguration.timeoutIntervalForRequest = 12
@@ -263,8 +224,8 @@ actor BaiduMapsClient {
         ordered.append((name: "output", value: "json"))
         ordered.append((name: "ak", value: configuration.accessKey))
 
-        // The signed string and the sent string must be byte-identical, so both are built from the
-        // same encoder. Encoding twice with two different escapers is the classic way to get 211.
+        // The signed string and the sent string must be byte-identical, so both come from the same
+        // encoder; two escapers is the classic way to get 211.
         var query = ordered
             .map { "\($0.name)=\(BaiduRequestSigner.urlEncoded($0.value))" }
             .joined(separator: "&")
@@ -283,12 +244,10 @@ actor BaiduMapsClient {
         do {
             decoded = try JSONDecoder().decode(Response.self, from: data)
         } catch {
-            // The real decoding error, not just "malformed". Without it the diagnostics cannot
-            // tell an HTML error page from a schema change, which are opposite problems.
-            //
-            // Written into the same per-endpoint failure the Transit Data screen already shows,
-            // rather than through `AppLog`: this file has no app dependencies at all, which is
-            // what lets `Scripts/test_baidu_request_gate.sh` compile it on its own.
+            // The real decoding error, so diagnostics can tell an HTML error page from a schema
+            // change. Recorded in the per-endpoint failure rather than through `AppLog`: this file
+            // has no app dependencies, which lets `Scripts/test_baidu_request_gate.sh` compile it
+            // alone.
             record(BaiduMapsError.malformedResponse, for: path)
             failures[path] = BaiduEndpointDiagnostics.Failure(
                 at: Date(),
@@ -304,12 +263,9 @@ actor BaiduMapsClient {
         return decoded
     }
 
-    /// Everything between deciding to make a request and having its bytes: coalescing, the budget,
-    /// the concurrency gate and the rate gate, in that order.
-    ///
-    /// The order matters. Coalescing comes first so a request that is already on the wire costs no
-    /// budget and takes no slot; the budget comes next so an exhausted one is refused without ever
-    /// queueing; and the two gates come last, closest to the wire.
+    /// Everything between deciding to make a request and having its bytes, in order: coalescing (a
+    /// request already on the wire costs no budget and no slot), the budget (an exhausted one is
+    /// refused without queueing), then the concurrency and rate gates, closest to the wire.
     private func fetch(_ url: URL, path: String) async throws -> Data {
         let key = url.absoluteString
         if let existing = coalescing[key] {
@@ -323,20 +279,15 @@ actor BaiduMapsClient {
             }
         }
 
-        // Baidu has already said no about this endpoint and said it recently. Every other provider
-        // in this app holds a `retryNotBefore` after a refusal; this one, which is the only one with
-        // a hard daily quota, kept sending until the local ceiling tripped — turning one 302
-        // 每日配额超限 into as many round trips as the rider had patience for. A refusal is the
-        // clearest possible signal that the next call is also wasted.
+        // Refused recently: the next call is also wasted, and this endpoint has a hard daily quota.
         if let until = refusedUntil[path], until > ContinuousClock.now {
             let error = BaiduMapsError.refusedRecently(path: path)
             record(error, for: path)
             throw error
         }
 
-        // Checked before anything is sent, so an exhausted budget costs nothing at all. Every
-        // caller already treats a throw as "no answer" and falls back, so this needs no new
-        // handling anywhere: it degrades the app to what it is with no key.
+        // Checked before anything is sent. Every caller treats a throw as "no answer", so an
+        // exhausted budget degrades the app to what it is with no key.
         if let ceiling = RequestBudget.ceilings[path] {
             let used = spent[path, default: 0]
             guard used < ceiling else {
@@ -347,20 +298,13 @@ actor BaiduMapsClient {
             spent[path] = used + 1
         }
 
-        // Detached on purpose. A plain `Task` inside an actor method inherits that actor's
-        // isolation, so `enterGate` would be a same-actor call — synchronous, never suspending,
-        // and the gate would admit everything it was written to hold back.
+        // Detached on purpose. A plain `Task` inside an actor method inherits its isolation, so
+        // `enterGate` would never suspend and the gate would admit everything.
         //
-        // Detaching also severs cancellation, which is what `leaveGate` needs — a caller walking
-        // away must not abandon a held slot — and is exactly what made every deadline around this
-        // client a fiction. `withTaskGroup` drains its children before it returns, `cancelAll()`
-        // only marks them, and the awaiting side of `task.value` does not throw when *it* is
-        // cancelled. So the planner's three-second budget for an observation was really
-        // `timeoutIntervalForRequest`, twelve seconds, with the plan waiting behind it.
-        //
-        // The URLSession task is therefore cancelled explicitly on the way out. The detached body
-        // still owns the slot and still releases it, because the throw it takes is
-        // `session.data`'s own.
+        // Detaching also severs cancellation, which `leaveGate` needs (a caller walking away must
+        // not abandon a held slot), and awaiting `task.value` does not throw when the waiter is
+        // cancelled. So the URLSession task is cancelled explicitly on the way out; the detached
+        // body still owns and releases the slot.
         let sessionTask = SessionTaskBox()
         let task = Task.detached { [session] () throws -> Data in
             await self.enterGate()
@@ -373,8 +317,7 @@ actor BaiduMapsClient {
                 await self.leaveGate()
                 return data
             } catch let error as BaiduMapsError {
-                // Passed through as it is. Rewrapped, an HTTP failure arrived as `.service(-1)` and
-                // `record` never held the endpoint off, so a captive portal spent the whole budget.
+                // Rethrown as it is, so `record` sees an HTTP failure and holds the endpoint off.
                 await self.leaveGate()
                 throw error
             } catch {
@@ -406,13 +349,9 @@ actor BaiduMapsClient {
                     continuation.resume(throwing: error)
                     return
                 }
-                // The response used to be discarded. A gateway 502, or a captive portal, answers
-                // with `error == nil` and an HTML body: the decode below then failed as
-                // `.malformedResponse`, which `record` does not treat as a refusal, so nothing
-                // held the client off and it spent the endpoint's whole 200-request launch budget
-                // — real units of a shared non-commercial daily quota — against a page that was
-                // never JSON. Every other network path in this app checks the status; this one did
-                // not.
+                // A gateway error or a captive portal answers with no error and an HTML body.
+                // Checked, and held off in `record`, or it decodes as malformed and spends the
+                // endpoint's whole launch budget on a page that was never JSON.
                 guard let http = response as? HTTPURLResponse else {
                     continuation.resume(throwing: BaiduMapsError.malformedResponse)
                     return
@@ -431,19 +370,16 @@ actor BaiduMapsClient {
     /// Waits until this request is allowed to start, by concurrency and then by rate.
     private func enterGate() async {
         if inFlightRequests >= Self.maximumConcurrentRequests {
-            // The slot is handed over directly by `leaveGate` rather than released and re-taken,
-            // so a third caller cannot slip into it between the resume and this continuation
-            // running.
+            // The slot is handed over directly by `leaveGate`, not released and re-taken, so a
+            // third caller cannot slip in between.
             await withCheckedContinuation { waiting.append($0) }
         } else {
             inFlightRequests += 1
         }
 
-        // The slot is reserved *before* the sleep, not after it. An actor releases its lock across
-        // an await, so reading the next free instant, sleeping to it, and only then writing the one
-        // after lets every waiter read the same instant and wake together — which is the shape of
-        // the burst this exists to prevent. Reserving first is the only part that has to be atomic,
-        // and between these two lines there is no suspension point.
+        // The slot is reserved before the sleep: an actor releases its lock across an await, and
+        // reading the next free instant, sleeping, then writing would let every waiter read the
+        // same instant and wake together. There is no suspension point between these two lines.
         let start = max(ContinuousClock.now, earliestNextStart)
         earliestNextStart = start.advanced(by: Self.minimumRequestSpacing)
         try? await Task.sleep(until: start, clock: ContinuousClock())
@@ -465,16 +401,15 @@ actor BaiduMapsClient {
         case .malformedResponse: summary = "malformed response"
         case .http(let status):
             summary = "HTTP \(status)"
-            // Held off like one of Baidu's own refusals. A gateway error or an intercepted
-            // response does not clear within a second, and asking again only spends quota.
+            // Held off like one of Baidu's own refusals: a gateway error or intercepted response
+            // does not clear within a second.
             refusedUntil[path] = ContinuousClock.now.advanced(by: Self.refusalHoldOff)
         case .budgetExhausted: summary = "this launch's own budget for this endpoint"
         case .refusedRecently: summary = "held off after a recent refusal"
         case .service(let status, let message):
             summary = message.isEmpty ? "status \(status)" : "\(status) \(message)"
-            // Baidu's own refusals, not ours, and not a transport failure (which arrives as -1 and
-            // may well succeed on the next try): 302 daily quota, 401 concurrency, 240 service
-            // disabled, 210/211 referer or IP rejected. None of these changes within a few seconds.
+            // Baidu's own refusals, not a transport failure (-1, which may succeed next time): 302
+            // daily quota, 401 concurrency, 240 service disabled, 210/211 referer or IP rejected.
             if Self.refusalStatuses.contains(status) {
                 refusedUntil[path] = ContinuousClock.now.advanced(by: Self.refusalHoldOff)
             }
@@ -510,13 +445,12 @@ struct BaiduEndpointDiagnostics: Sendable, Identifiable {
     var id: String { path }
 }
 
-/// A coordinate as Baidu returns it. Requested as GCJ-02 on every endpoint, which is the frame the
-/// rest of this app draws and measures in, so nothing needs converting on arrival.
+/// A coordinate as Baidu returns it, requested as GCJ-02 on every endpoint, so nothing is converted
+/// on arrival.
 ///
-/// Note the parameter that asks for it differs per endpoint. `Coord_type=gcj02` on directions,
-/// `coord_type=2` on place search, `coordtype=gcj02ll` on reverse geocoding. They were each
-/// verified against the live API rather than inferred, because a wrong one is not an error: it
-/// returns BD-09 that looks plausible and lands a few hundred metres away.
+/// The parameter that asks for it differs per endpoint (`coord_type=gcj02` on directions,
+/// `coord_type=2` on place search, `coordtype=gcj02ll` on reverse geocoding), each verified against
+/// the live API: a wrong one returns plausible BD-09 a few hundred metres off, not an error.
 struct BaiduCoordinate: Decodable, Sendable {
     let lat: Double
     let lng: Double

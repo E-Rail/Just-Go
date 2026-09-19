@@ -15,47 +15,37 @@ struct TripStep: Identifiable, Equatable {
     let id: Int
     let kind: LiveStepKind
     let lineName: String?
-    let lineColorHex: String?
+    /// The leg's drawn colour (`RouteSegment.colorHex`); nil for arrival, which is not a leg.
+    let colorHex: String?
     let fromStationName: String?
     let toStationName: String?
     let stopCount: Int
     let walkingDistance: Double
-    /// Estimated duration of this step (from the underlying route segment). Used to schedule an
-    /// estimated "get off" alert when a ride step starts. There is no live train-position feed.
+    /// Estimated duration of this step, from its segment. Schedules the estimated "get off" alert;
+    /// there is no live train-position feed.
     var duration: TimeInterval = 0
     /// Recommended exit/entrance at the step's end station, when known (best-available).
     var exitHint: String? = nil
-    /// The stop before the rider's, so a `.ride` step can tell them when to stand up.
-    ///
-    /// Resolved from the graph on every plan as `arrivalPreviousStationName` and read by nothing
-    /// until now. "One more stop" is not the same instruction as "get off next" and this is the
-    /// only thing on the screen that can say which.
+    /// The stop before the rider's, so a `.ride` step can say when to stand up: "one more stop" is
+    /// not "get off next".
     var alightAfterStationName: String? = nil
-    /// What the route already knows about this change, in the assembler's own words.
-    ///
-    /// For an out-of-station interchange that is "Leave the station and walk to X" and, where the
-    /// operator treats it as one journey, "Counts as one trip, with no second fare". The route
-    /// screen has shown these from `RouteSegment.accessibilityNotes` all along; Live Go never
-    /// copied them onto the step, so the rider standing at the gate deciding whether to tap out
-    /// was the one person not told. It is money, and a wrong guess costs a fare.
+    /// What the route knows about this change, in the assembler's words: "Leave the station and
+    /// walk to X", and "Counts as one trip, with no second fare" where the operator says so. A
+    /// wrong guess at the gate costs a fare.
     var notes: [String] = []
-    /// Station coordinate for `.transfer` steps, used to frame the outdoor map and any
-    /// separately verified indoor guidance.
-    /// `CodableCoordinate` (not `CLLocationCoordinate2D`) keeps `Equatable` synthesis working.
-    /// Matches the same raw-then-computed-coordinate pattern used by `Station`/`RouteStationStop`.
+    /// Station coordinate for `.transfer` steps, to frame the map. `CodableCoordinate` keeps
+    /// `Equatable` synthesis working.
     var transferCoordinate: CodableCoordinate? = nil
-    /// Apple's real, already-computed walking-route polyline for `.walkToStation`/
-    /// `.walkToDestination` steps (the same data already stored on `RouteSegment.polylineCoordinates`).
+    /// The walking polyline for `.walkToStation` and `.walkToDestination` steps, from
+    /// `RouteSegment.polylineCoordinates`.
     var walkingPathCoordinates: [CodableCoordinate] = []
     /// Index of the `Route.segments` entry this step came from (nil for the synthetic
     /// `.arrive` step): lets the live map frame the step's real geometry.
     var segmentIndex: Int? = nil
     var transferContext: TransferContext? = nil
-    /// How the rider covers this access leg. The step *kind* stays `.walkToStation` /
-    /// `.walkToDestination` because everything structural about the step is the same. It is the
-    /// first or last mile, it has a drawn path, it frames the same way. Only the verb changes,
-    /// and telling someone to "walk" a 9 km drive is exactly the kind of confident wrong sentence
-    /// this app exists not to produce.
+    /// How the rider covers this access leg. The step kind stays
+    /// `.walkToStation`/`.walkToDestination` because everything structural is the same; only the
+    /// verb changes, and telling someone to "walk" a 9 km drive is a confident wrong sentence.
     var accessMode: AccessLegMode = .walking
 
     var transferCLCoordinate: CLLocationCoordinate2D? {
@@ -98,9 +88,8 @@ struct TripStep: Identifiable, Equatable {
             let line = lineName ?? AppLocalization.text(english: "the train", simplified: "列车", traditional: "列車")
             return AppLocalization.text(english: "Board \(line)", simplified: "乘坐\(line)", traditional: "乘坐\(line)")
         case .transfer:
-            // An out-of-station interchange has no outgoing line to name — it is a walk between two
-            // stations — so it names the station instead of falling through to "the next line",
-            // which tells a rider standing at the gates nothing they can act on.
+            // An out-of-station interchange has no outgoing line (it is a walk between two
+            // stations), so it names the station rather than "the next line".
             guard let lineName else {
                 if let station = toStationName, station != fromStationName {
                     return AppLocalization.text(

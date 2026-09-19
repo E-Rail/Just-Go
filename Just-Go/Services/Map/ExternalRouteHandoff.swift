@@ -3,23 +3,14 @@ import Foundation
 import MapKit
 import UIKit
 
-/// Handing one leg of a trip to an app that routes it better than this one can.
+/// Handing one leg of a trip to an app that routes it better: **bike and car legs only**. Trains,
+/// walks and exits are what this app is for; live road navigation and hailing a car are not.
 ///
-/// Deliberately narrow: **bike and car legs only**. Everything else — the trains, the walk to the
-/// platform, the exit to use — is what this app is for, and sending a rider out to a competitor for
-/// it would be giving up rather than helping. What Just-Go genuinely cannot do is live turn-by-turn
-/// road navigation or hail a car, and those are exactly the two legs it does not model well: a
-/// cycling leg with no key is the pedestrian route re-timed, and a driving leg is MapKit's road
-/// route with no traffic, no restrictions and no parking.
+/// Every destination carries an https fallback for an installed app that rejects the URL built for
+/// it (uninstalled apps are already dropped by `destinations(for:)`). It is the only branch
+/// testable off-device: no simulator has these apps.
 ///
-/// Every destination carries an https fallback, for the one case it actually covers: the app is
-/// installed — `destinations(for:)` has already dropped it otherwise — but rejects the particular
-/// URL built for it. A rider who does not have the app never reaches `open` at all, so the fallback
-/// is not what serves them; hiding the button is. It remains the only arm exercisable off-device,
-/// because no simulator has any of these apps and `canOpenURL` answers false for all of them here.
-///
-/// Coordinates go out in GCJ-02, which is what the whole app already holds and what all three
-/// Chinese services expect. No conversion, and none wanted: converting would move the pin.
+/// Coordinates go out in GCJ-02, which the app holds and all three Chinese services expect.
 enum ExternalRouteHandoff {
     enum Destination: String, CaseIterable, Identifiable {
         case appleMaps
@@ -49,9 +40,8 @@ enum ExternalRouteHandoff {
             }
         }
 
-        /// The scheme this app asks about, which must also appear in `LSApplicationQueriesSchemes`
-        /// or `canOpenURL` answers false however installed the app is. Apple Maps has none because
-        /// it is reached through `MKMapItem`, which needs no declaration and cannot be absent.
+        /// Must also appear in `LSApplicationQueriesSchemes`, or `canOpenURL` answers false however
+        /// installed the app is. Apple Maps has none: it is reached through `MKMapItem`.
         var queryScheme: String? {
             switch self {
             case .appleMaps: return nil
@@ -70,26 +60,16 @@ enum ExternalRouteHandoff {
         }
     }
 
-    /// Opening a scanner, so a rider can unlock a shared bike.
+    /// Opens a scanner, so a rider can unlock a shared bike, which is how every shared bike in
+    /// mainland China is unlocked. Not a `Destination`: it goes nowhere.
     ///
-    /// Not a `Destination`. Those all route between two points; this one goes nowhere — it opens a
-    /// camera. That is how every shared bike in mainland China is actually unlocked, and it is the
-    /// step this app was leaving a rider to find on their own after telling them to cycle.
+    /// **Just-Go has no bike-share data and this button claims none**: not that a bike is there,
+    /// nor which operator serves the street. It never tells anyone to photograph anything either;
+    /// station photography is restricted in parts of mainland China.
     ///
-    /// **Just-Go has no bike-share data and this button does not imply otherwise.** It does not
-    /// know a bike is there, whether the dock is empty, or which operator serves the street. It
-    /// opens a scanner and claims nothing else, which is why it is titled for the action rather
-    /// than the outcome.
-    ///
-    /// It also never tells anyone to photograph anything. Station photography is restricted in
-    /// parts of mainland China and enforcement is inconsistent; a scanner pointed at a bike's own
-    /// QR code is not that, and the app should not drift into instructing either way.
-    ///
-    /// **These two schemes are not documented by Tencent or Ant for third-party use.** They are
-    /// widely used and they may change or stop working without notice. Both are therefore offered
-    /// only when `canOpenURL` says the app is installed, and neither has a web fallback: a browser
-    /// cannot open a camera, and a link pretending to would be a dead end. If one stops working it
-    /// should be deleted rather than patched around.
+    /// **These two schemes are not documented by Tencent or Ant for third-party use** and may stop
+    /// working. Offered only when `canOpenURL` says the app is installed, with no web fallback (a
+    /// browser cannot open a camera). If one breaks, delete it.
     enum BikeScanner: String, CaseIterable, Identifiable {
         case alipay
         case weChat
@@ -137,11 +117,8 @@ enum ExternalRouteHandoff {
         UIApplication.shared.open(url)
     }
 
-    /// Which destinations are worth showing for this leg.
-    ///
-    /// Apple Maps is always in the list: it is reached through `MKMapItem` rather than a scheme, so
-    /// it cannot be missing and needs no permission to ask about. The rest are offered only when
-    /// installed — a button that opens a web page a rider did not want is worse than no button.
+    /// Which destinations to show for this leg. Apple Maps always, since it cannot be missing; the
+    /// rest only when installed.
     @MainActor
     static func destinations(for mode: AccessLegMode) -> [Destination] {
         Destination.allCases.filter { destination in
@@ -162,20 +139,10 @@ enum ExternalRouteHandoff {
         mode: AccessLegMode
     ) {
         if destination == .appleMaps {
-            // Both ends, deliberately. `openInMaps` on a single item routes from wherever the
-            // rider is standing, and this row is only ever drawn on an access leg — the first or
-            // last mile — so the origin is a station they have not reached yet when they plan.
-            // A rider planning at home was handed directions from home to their destination, with
-            // the ride from the station they were actually going to leave from nowhere in it.
-            // Amap, Baidu and DiDi were all passed `origin` already; Apple Maps was the one that
-            // dropped it.
-            //
-            // **And both ends must be named.** Passing two items was not enough on its own. An
-            // `MKMapItem` built from a bare coordinate carries no name and no address, and Maps
-            // silently substitutes the rider's own location for a start it cannot label — the same
-            // wrong route as before, by a different mechanism. The destination end always looked
-            // right because it was the only one that got a name, and that asymmetry is what gave
-            // the cause away.
+            // Both ends, and both named. `openInMaps` on one item routes from wherever the rider is
+            // standing, but an access leg starts at a station they have not reached. An `MKMapItem`
+            // built from a bare coordinate has no name, and Maps silently substitutes the rider's
+            // location for a start it cannot label.
             let start = MKMapItem(placemark: MKPlacemark(coordinate: origin))
             start.name = originName
             let item = MKMapItem(placemark: MKPlacemark(coordinate: target))
@@ -258,16 +225,9 @@ enum ExternalRouteHandoff {
         }
     }
 
-    /// Percent-encodes everything a query value must not carry through raw.
-    ///
-    /// `.alphanumerics` was the wrong set: it is the Unicode letter, mark and number categories, so
-    /// CJK ideographs are `Lo` and pass through **unencoded**. `encoded("人民广场")` returned
-    /// "人民广场" — a no-op for this app's primary language, which is the only language most of
-    /// these place names are in. Delimiters were encoded, so nothing could be injected, and iOS 18's
-    /// URL parser has been covering for it; but a function whose whole job is to encode should not
-    /// depend on that.
-    ///
-    /// ASCII unreserved (RFC 3986 §2.3) and nothing else, so every non-ASCII byte is escaped.
+    /// Percent-encodes everything a query value must not carry raw: ASCII unreserved (RFC 3986
+    /// §2.3) and nothing else. `.alphanumerics` is the wrong set: CJK ideographs are letters to it
+    /// and pass through unencoded.
     private static let queryValueAllowed: CharacterSet = {
         var allowed = CharacterSet(charactersIn: "A"..."Z")
         allowed.formUnion(CharacterSet(charactersIn: "a"..."z"))

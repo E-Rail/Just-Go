@@ -99,15 +99,9 @@ struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Cod
     /// where this particular train ends.
     let direction: String
     /// Where this individual service terminates, when the operator distinguishes it from the
-    /// direction marker.
-    ///
-    /// Beijing publishes both, and at 国贸 every northbound 10号线 row shares
-    /// `terminalStationName = 双井` while `destStationName` separates them into 车道沟, 成寿寺 and
-    /// 巴沟 — three services, three last trains. Folding them together published one 23:36 window,
-    /// which belongs to a train that turns back seventeen stops before 车道沟.
-    ///
-    /// Optional and defaulted: most sources publish one name for both, and a device cache written
-    /// before this field existed must still decode.
+    /// direction marker. At 国贸 every northbound 10号线 row shares `terminalStationName = 双井` while
+    /// `destStationName` separates 车道沟, 成寿寺 and 巴沟: three services, three last trains. Optional so
+    /// sources with one name, and older device caches, decode.
     let destination: String?
     let firstTrain: String?
     let lastTrain: String?
@@ -127,19 +121,16 @@ struct OfficialStationServiceInformation: Identifiable, Sendable, Equatable, Cod
         self.liveTime = liveTime
     }
 
-    /// Positional, not `compactMap`-ed: dropping nils before joining made
-    /// `(first: "5:27", last: nil)` and `(first: nil, last: "5:27")` collide on one id, and the
-    /// `uniqued(by:)` at the call sites then silently deleted the second row.
+    /// Positional, not `compactMap`-ed, so `(first: "5:27", last: nil)` and `(first: nil, last:
+    /// "5:27")` stay distinct ids and `uniqued(by:)` keeps both rows.
     var id: String {
         [direction, destination ?? "", firstTrain ?? "", lastTrain ?? "", liveTime ?? ""]
             .joined(separator: "|")
     }
 }
 
-/// Services grouped under the line that runs them. Nesting rather than repeating `lineName` on
-/// every row is what makes the payload usable by anyone other than this app: a consumer reads one
-/// line's whole service picture without regrouping a flat list, and the line's colour is stated
-/// once instead of once per direction.
+/// Services grouped under the line that runs them, so a consumer of the published payload reads one
+/// line's whole picture without regrouping, and the line's colour is stated once.
 struct OfficialStationLineInformation: Identifiable, Sendable, Equatable, Codable {
     let lineName: String
     let lineColorHex: String?
@@ -176,12 +167,10 @@ struct OfficialStationFacilityGroup: Identifiable, Sendable, Equatable, Codable 
     var id: String { name }
 }
 
-/// Whether a snapshot came straight from the official service or from this device's own
-/// last-good copy served while the service was unreachable.
-/// Encoded as `{"state": "live"}` / `{"state": "cached", "fetchedAt": "…"}` rather than the
-/// synthesised `{"live": {}}` / `{"cached": {"fetchedAt": …}}`: this type is part of a published
-/// interchange contract (`DataPacks/STATION_INFORMATION_SCHEMA.md`), and a payload keyed by its
-/// own case name is not something another implementation can reasonably produce.
+/// Whether a snapshot came from the official service or from this device's last-good copy while the
+/// service was unreachable. Encoded as `{"state": "live"}` / `{"state": "cached", "fetchedAt":
+/// "…"}`, not Swift's synthesised shape: this type is part of a published interchange contract
+/// (`DataPacks/STATION_INFORMATION_SCHEMA.md`).
 enum OfficialStationInformationFreshness: Sendable, Equatable, Codable {
     case live
     case cached(fetchedAt: Date)
@@ -223,12 +212,9 @@ struct OfficialStationInformationSnapshot: Sendable, Equatable, Codable {
     let stationName: String
     let source: OfficialStationInformationSource
     let freshness: OfficialStationInformationFreshness
-    /// Which service day these times describe, in the source's own words, when it says.
-    ///
-    /// Hangzhou's payload is titled `工作日时刻表` — the *weekday* timetable — and the app has been
-    /// showing it on Saturdays as though it were today's. `StationInfoAPI/sources/sources.json`
-    /// recorded that the title existed; nothing read it. Optional because only Hangzhou publishes
-    /// one, and because a cache written before this existed must still decode.
+    /// Which service day these times describe, in the source's own words, when it says: Hangzhou's
+    /// payload is titled `工作日时刻表`, the weekday timetable. Optional because only Hangzhou publishes
+    /// one and older caches must decode.
     let serviceDayNote: String?
     let lines: [OfficialStationLineInformation]
     let exits: [OfficialStationExitInformation]
@@ -293,9 +279,9 @@ enum OfficialStationInformationReference: Hashable, Sendable {
     /// Guangzhou's serviceTime endpoint returns every line for a physical station from any one of
     /// its per-line codes, so the reference carries a single representative stationShowCode.
     case guangzhou(stationShowCode: String, expectedNames: [String])
-    /// Hangzhou returns the whole network in one response, so the reference carries every station
-    /// code the operator publishes for this physical station. Usually one, but 火车东站 is split
-    /// upstream into a main-hall and an east-plaza record that have to be read together.
+    /// Hangzhou returns the whole network at once, so the reference carries every code the operator
+    /// publishes for this station: usually one, but 火车东站 is split into a main-hall and an
+    /// east-plaza record.
     case hangzhou(stationCodes: [String], expectedNames: [String])
 }
 
@@ -321,11 +307,10 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
     case serviceUnavailable(String?)
     case contractViolation(String)
 
-    /// Transient failures worth another attempt before the rider sees an error. A cold first
-    /// request after launch: the initial DNS/TLS handshake, racing the app's own launch work.
-    /// Can time out or have its connection reset while the endpoint is perfectly reachable, then
-    /// load on a retry. Permanent failures (bad request, contract mismatch, oversize response)
-    /// and rate limiting (which carries its own backoff) are never retried.
+    /// Transient failures worth another attempt before the rider sees an error: a cold first
+    /// request after launch can time out or reset on the DNS/TLS handshake while the endpoint is
+    /// reachable. Permanent failures and rate limiting, which carries its own backoff, are never
+    /// retried.
     var isRetryable: Bool {
         switch self {
         case .timedOut, .transport, .serviceUnavailable:
@@ -337,13 +322,10 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
         }
     }
 
-    /// Whether a failure may be answered from the copy this device stored earlier.
-    ///
-    /// On the error rather than in each provider, which all four had their own copy of: an
-    /// availability failure is worth a cached answer labelled as cached, a caller or contract
-    /// error never is — a stored copy must not paper over a request the operator rejected or a
-    /// response that no longer means what the app thinks. Non-provider errors, cancellation above
-    /// all, propagate untouched.
+    /// Whether a failure may be answered from the copy this device stored earlier. An availability
+    /// failure gets the cached answer, labelled as cached; a rejected request or a contract
+    /// violation never does, because a stored copy must not paper over a response that no longer
+    /// means what the app thinks. Non-provider errors, cancellation above all, propagate untouched.
     var allowsStoredFallback: Bool {
         switch self {
         case .timedOut, .transport, .invalidResponse, .responseTooLarge,
@@ -355,12 +337,8 @@ enum OfficialStationInformationProviderError: Error, Equatable, Sendable {
     }
 }
 
-/// The small parsers every operator provider needs, in one place.
-///
-/// Four providers each carried their own copy of these — identical but for line breaks — and a
-/// rule changed in one was a rule the other three still had the old version of. They are pure
-/// string handling: what an operator's field means, not how any one operator's API is shaped,
-/// which is what stays in each provider.
+/// The small parsers every operator provider needs: what an operator's field means, not how any
+/// one operator's API is shaped, which stays in each provider.
 enum OperatorFieldParsing {
     static func trimmed(_ value: String?) -> String? {
         guard let value else { return nil }
@@ -368,19 +346,21 @@ enum OperatorFieldParsing {
         return result.isEmpty ? nil : result
     }
 
-    /// The placeholders operators write where they have no value. A merged set: Shanghai listed
-    /// the fullwidth slash and Guangzhou did not, so Guangzhou used to print "／" at a rider as
-    /// though it were a time.
-    static let placeholders: Set<String> = ["--", "-", "/", "／", "—", "n/a", "na", "none", "无", "暂无"]
+    /// What operators write where they have no value, including "终点站" where a direction ends at
+    /// this station and so has no departure to show.
+    static let placeholders: Set<String> = [
+        "--", "-", "/", "／", "—", "——", "n/a", "na", "none", "null",
+        "无", "沒有", "没有", "暫無", "暂无", "终点站", "終點站"
+    ]
 
     /// Nil for a value that only looks like data.
     static func placeholderAware(_ value: String?) -> String? {
-        guard let value = OperatorFieldParsing.trimmed(value) else { return nil }
+        guard let value = trimmed(value) else { return nil }
         return placeholders.contains(value.lowercased()) ? nil : value
     }
 
-    /// "23:45" as minutes from midnight, with after-midnight hours carried past 24:00 so a last
-    /// train at 00:30 sorts after one at 23:50 rather than before it.
+    /// "23:45" as minutes into the service day, with after-midnight hours carried past 24:00 so a
+    /// last train at 00:30 sorts after one at 23:50 rather than before it.
     static func serviceMinutes(_ value: String) -> Int? {
         let parts = value.split(separator: ":")
         guard parts.count == 2,
@@ -395,8 +375,8 @@ enum OperatorFieldParsing {
         guard let lhs else { return rhs }
         guard let rhs else { return lhs }
         // An unparseable time keeps the side we can reason about rather than winning by accident.
-        guard let lhsMinutes = OperatorFieldParsing.serviceMinutes(lhs) else { return rhs }
-        guard let rhsMinutes = OperatorFieldParsing.serviceMinutes(rhs) else { return lhs }
+        guard let lhsMinutes = serviceMinutes(lhs) else { return rhs }
+        guard let rhsMinutes = serviceMinutes(rhs) else { return lhs }
         let preferLhs = earliest ? lhsMinutes <= rhsMinutes : lhsMinutes >= rhsMinutes
         return preferLhs ? lhs : rhs
     }
@@ -404,22 +384,44 @@ enum OperatorFieldParsing {
     /// A station name reduced to what two spellings of it have in common: case, width and accents
     /// folded away, everything that is not a letter or digit dropped.
     static func normalizedName(_ value: String) -> String {
-        value.folding(
-            options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
-            locale: nil
-        )
-        .unicodeScalars
-        .filter(CharacterSet.alphanumerics.contains)
-        .map(String.init)
-        .joined()
+        value.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
+            .unicodeScalars
+            .filter(CharacterSet.alphanumerics.contains)
+            .map(String.init)
+            .joined()
+    }
+
+    static func isReviewedName(_ name: String, in expectedNames: [String]) -> Bool {
+        expectedNames.map(normalizedName).contains(normalizedName(name))
+    }
+
+    /// `#RRGGBB`, from a colour with or without `#` and with an alpha byte (Guangzhou) dropped.
+    static func hexColor(_ value: String?) -> String? {
+        guard let raw = trimmed(value)?.trimmingCharacters(in: CharacterSet(charactersIn: "#")) else { return nil }
+        let hex = raw.count == 8 ? String(raw.prefix(6)) : raw
+        guard hex.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else { return nil }
+        return "#\(hex.uppercased())"
+    }
+
+    /// The request's station ID and the reviewed names a response must carry. Both are required:
+    /// without them a response cannot be checked against the station the rider asked about.
+    static func reviewedIdentity(
+        of request: OfficialStationInformationRequest,
+        names: [String]
+    ) throws -> (stationID: String, expectedNames: [String]) {
+        guard let stationID = trimmed(request.stationID) else {
+            throw OfficialStationInformationProviderError.invalidRequest("stationID is empty")
+        }
+        let expectedNames = names.compactMap(trimmed).uniqued().sorted()
+        guard !expectedNames.isEmpty else {
+            throw OfficialStationInformationProviderError.invalidRequest("expected station names are empty")
+        }
+        return (stationID, expectedNames)
     }
 }
 
-/// Follows a redirect only back to the same operator, over https.
-///
-/// One class for all four operator providers. Each had its own, identical but for the host it
-/// named, and the rule they enforce is the point: an operator endpoint that redirects off its own
-/// host is not answering for that operator any more, and the app must not follow it there.
+/// Follows a redirect only back to the same operator, over https: an endpoint that redirects off
+/// its own host is not answering for that operator any more.
 final class OperatorRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     private let host: String
 
@@ -443,37 +445,200 @@ final class OperatorRedirectDelegate: NSObject, URLSessionTaskDelegate, @uncheck
     }
 }
 
-actor BeijingStationInformationProvider: OfficialStationInformationProviding {
-    /// Cities whose station accessibility/facility facts come from this official online
-    /// surface rather than the bundled pack. Coverage UI uses this to avoid claiming the
-    /// data doesn't exist while every station page renders it.
-    static func servesStationInformation(forCityID cityID: String) -> Bool {
-        cityID == "1100"
+/// How every operator provider talks to its operator.
+enum OperatorHTTP {
+    /// Ephemeral and cookie-free: operator content is fetched for this rider, now, and nothing about
+    /// the exchange is kept by the URL system. The app's own caches decide what is kept.
+    static func session(timeout: TimeInterval) -> URLSession {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        configuration.httpCookieStorage = nil
+        configuration.httpShouldSetCookies = false
+        configuration.timeoutIntervalForRequest = timeout
+        configuration.timeoutIntervalForResource = timeout
+        return URLSession(configuration: configuration)
     }
 
+    /// One request to an operator's own endpoint: the body, or the provider error that says why not.
+    ///
+    /// The response has to still be https on `host` (and `path`, when given) after redirects, 2xx,
+    /// within `maximumBytes`, and JSON when `requiresJSON`; a 429 carries its Retry-After. Raced
+    /// against `timeout`, because the session's own timeout only fires when no bytes arrive and a
+    /// connection that trickles never trips it. `data(for:)` rather than `bytes(for:)`, whose
+    /// one-byte-per-iteration loop measured 0.09 MB/s and timed out on the read alone.
+    static func data(
+        for request: URLRequest,
+        host: String,
+        path: String? = nil,
+        maximumBytes: Int,
+        requiresJSON: Bool = false,
+        timeout: TimeInterval,
+        using session: URLSession
+    ) async throws -> Data {
+        try await withDeadline(seconds: timeout, onTimeout: { OfficialStationInformationProviderError.timedOut }) {
+            let data: Data
+            let response: URLResponse
+            do {
+                (data, response) = try await session.data(for: request, delegate: OperatorRedirectDelegate(host: host))
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch let error as URLError where error.code == .timedOut {
+                throw OfficialStationInformationProviderError.timedOut
+            } catch let error as URLError where error.code == .cancelled && Task.isCancelled {
+                throw CancellationError()
+            } catch {
+                throw OfficialStationInformationProviderError.transport(error.localizedDescription)
+            }
+            guard let http = response as? HTTPURLResponse,
+                  http.url?.scheme?.lowercased() == "https",
+                  http.url?.host?.lowercased() == host,
+                  path == nil || http.url?.path == path else {
+                throw OfficialStationInformationProviderError.invalidResponse
+            }
+            if http.statusCode == 429 {
+                throw OfficialStationInformationProviderError.rateLimited(retryAfter: retryAfterDelay(from: http))
+            }
+            guard (200..<300).contains(http.statusCode) else {
+                throw OfficialStationInformationProviderError.httpStatus(http.statusCode)
+            }
+            // The declared length rejects an honest oversize body before it is read; the count
+            // catches a server that lies about it.
+            guard http.expectedContentLength <= Int64(maximumBytes), data.count <= maximumBytes else {
+                throw OfficialStationInformationProviderError.responseTooLarge
+            }
+            if requiresJSON, http.value(forHTTPHeaderField: "Content-Type")?.lowercased().hasPrefix("application/json") != true {
+                throw OfficialStationInformationProviderError.invalidResponse
+            }
+            return data
+        }
+    }
+
+    /// Retry-After as seconds, whether the header is a number or an HTTP date.
+    static func retryAfterDelay(from response: HTTPURLResponse) -> TimeInterval? {
+        guard let rawValue = OperatorFieldParsing.trimmed(response.value(forHTTPHeaderField: "Retry-After")) else {
+            return nil
+        }
+        if let seconds = TimeInterval(rawValue), seconds >= 0 {
+            return seconds
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
+        guard let date = formatter.date(from: rawValue) else { return nil }
+        return max(date.timeIntervalSinceNow, 0)
+    }
+}
+
+/// Operator answers kept in memory for half an hour, one fetch per key however many callers arrive
+/// together, and a hold-off after the operator answers 429.
+///
+/// The fetch runs in an unstructured task, so a caller that stops waiting (the planner's deadline)
+/// leaves the answer to land here for the next caller instead of cancelling a request already paid
+/// for. Nothing here touches storage: the device-only copy is `OfficialStationInformationCaching`.
+actor OperatorAnswerCache<Key: Hashable & Sendable, Value: Sendable> {
+    private let cacheLifetime: TimeInterval = 1800
+    private let defaultRateLimitBackoff: TimeInterval = 30
+    private let clock = ContinuousClock()
+    private var entries: [Key: (value: Value, expiresAt: ContinuousClock.Instant)] = [:]
+    private var inFlight: [Key: (token: UUID, task: Task<Value, Error>)] = [:]
+    private var rateLimitedUntil: ContinuousClock.Instant?
+
+    func value(for key: Key, fetch: @escaping @Sendable () async throws -> Value) async throws -> Value {
+        let now = clock.now
+        entries = entries.filter { $0.value.expiresAt > now }
+        if let entry = entries[key] { return entry.value }
+        if let rateLimitedUntil, rateLimitedUntil > now {
+            throw OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
+        }
+        let active: (token: UUID, task: Task<Value, Error>)
+        if let existing = inFlight[key] {
+            active = existing
+        } else {
+            active = (UUID(), Task { try await fetch() })
+            inFlight[key] = active
+        }
+        do {
+            let value = try await active.task.value
+            if inFlight[key]?.token == active.token {
+                inFlight[key] = nil
+                entries[key] = (value, clock.now.advanced(by: .seconds(cacheLifetime)))
+            }
+            return value
+        } catch {
+            if inFlight[key]?.token == active.token { inFlight[key] = nil }
+            if case .rateLimited(let retryAfter)? = error as? OfficialStationInformationProviderError {
+                let until = clock.now.advanced(by: .seconds(max(retryAfter ?? defaultRateLimitBackoff, 1)))
+                rateLimitedUntil = max(rateLimitedUntil ?? until, until)
+            }
+            throw error
+        }
+    }
+
+    func releaseMemory() {
+        entries.removeAll(keepingCapacity: false)
+    }
+}
+
+extension OperatorAnswerCache where Value == OfficialStationInformationSnapshot {
+    /// One station's answer: cached and shared as above, stored to the device after each real
+    /// fetch, and replaced by that stored copy when the failure allows it.
+    func snapshot(
+        for key: Key,
+        cityID: String,
+        stationID: String,
+        externalStationID: String,
+        diskCache: (any OfficialStationInformationCaching)?,
+        fetch: @escaping @Sendable () async throws -> Value
+    ) async throws -> Value {
+        do {
+            return try await value(for: key) {
+                let snapshot = try await fetch()
+                if let diskCache {
+                    Task { await diskCache.store(snapshot, cityID: cityID, externalStationID: externalStationID) }
+                }
+                return snapshot
+            }
+        } catch {
+            return try await storedSnapshot(
+                replacing: error,
+                from: diskCache,
+                cityID: cityID,
+                stationID: stationID,
+                externalStationID: externalStationID
+            )
+        }
+    }
+}
+
+/// The copy this device stored earlier, labelled as cached, when `error` allows one
+/// (`allowsStoredFallback`); otherwise `error` itself.
+func storedSnapshot(
+    replacing error: Error,
+    from diskCache: (any OfficialStationInformationCaching)?,
+    cityID: String,
+    stationID: String,
+    externalStationID: String
+) async throws -> OfficialStationInformationSnapshot {
+    guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
+          let diskCache,
+          let stored = await diskCache.storedSnapshot(
+              cityID: cityID,
+              stationID: stationID,
+              externalStationID: externalStationID
+          ) else {
+        throw error
+    }
+    return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
+}
+
+actor BeijingStationInformationProvider: OfficialStationInformationProviding {
     static let cityID = "1100"
     fileprivate static let host = "www.bjsubway.com"
     private static let endpointPath = "/api/guanwang/v2/getStationDetail"
     private static let maximumResponseBytes = 1_048_576
     private static let requestTimeout: TimeInterval = 5
-    // First/last trains, exits, and facilities change rarely; a longer in-session cache
-    // keeps station re-visits instant instead of re-fetching every few minutes. The provider
-    // itself never touches storage APIs. The injected `diskCache` (a separate file with its
-    // own validate_runtime_data_policy.rb rules) keeps a device-only last-good snapshot that
-    // is served, clearly labeled as cached, only when the official service is unreachable.
-    private static let cacheLifetime: TimeInterval = 1800
-    private static let defaultRateLimitBackoff: TimeInterval = 30
-    private static let clock = ContinuousClock()
-
-    private struct CacheEntry: Sendable {
-        let snapshot: OfficialStationInformationSnapshot
-        let expiresAt: ContinuousClock.Instant
-    }
-
-    private struct InFlightRequest: Sendable {
-        let token: UUID
-        let task: Task<OfficialStationInformationSnapshot, Error>
-    }
 
     private struct PreparedRequest: Hashable, Sendable {
         let stationID: String
@@ -483,192 +648,50 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
 
     private let session: URLSession
     private let diskCache: (any OfficialStationInformationCaching)?
-    private var cache: [PreparedRequest: CacheEntry] = [:]
-    private var inFlight: [PreparedRequest: InFlightRequest] = [:]
-    private var rateLimitedUntil: ContinuousClock.Instant?
+    private let answers = OperatorAnswerCache<PreparedRequest, OfficialStationInformationSnapshot>()
 
     init(session: URLSession? = nil, diskCache: (any OfficialStationInformationCaching)? = nil) {
+        self.session = session ?? OperatorHTTP.session(timeout: Self.requestTimeout)
         self.diskCache = diskCache
-        if let session {
-            self.session = session
-        } else {
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.urlCache = nil
-            configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            configuration.httpCookieStorage = nil
-            configuration.httpShouldSetCookies = false
-            configuration.timeoutIntervalForRequest = Self.requestTimeout
-            configuration.timeoutIntervalForResource = Self.requestTimeout
-            self.session = URLSession(configuration: configuration)
-        }
     }
 
     func information(
         for request: OfficialStationInformationRequest
     ) async throws -> OfficialStationInformationSnapshot {
         let prepared = try Self.prepare(request)
-        let now = Self.clock.now
-
-        // Entries otherwise only leave `cache` when that same station is looked up again after
-        // expiring: over a session visiting many distinct stations it only ever shrinks on an
-        // OS memory warning. Sweep proactively; bounded by the reviewed station count, so this
-        // is cheap even every call.
-        if !cache.isEmpty {
-            cache = cache.filter { $0.value.expiresAt > now }
-        }
-
-        if let cached = cache[prepared] {
-            if cached.expiresAt > now {
-                return cached.snapshot
-            }
-            cache.removeValue(forKey: prepared)
-        }
-
-        if let rateLimitedUntil {
-            guard rateLimitedUntil <= now else {
-                return try await servingStoredSnapshot(
-                    for: prepared,
-                    insteadOf: OfficialStationInformationProviderError.rateLimited(retryAfter: nil)
-                )
-            }
-            self.rateLimitedUntil = nil
-        }
-
-        if let active = inFlight[prepared] {
-            return try await finish(active, for: prepared)
-        }
-
-        let token = UUID()
         let session = self.session
-        let task = Task<OfficialStationInformationSnapshot, Error> {
+        return try await answers.snapshot(
+            for: prepared,
+            cityID: Self.cityID,
+            stationID: prepared.stationID,
+            externalStationID: prepared.externalStationID,
+            diskCache: diskCache
+        ) {
             try await Self.fetch(prepared, using: session)
         }
-        let active = InFlightRequest(token: token, task: task)
-        inFlight[prepared] = active
-        return try await finish(active, for: prepared)
     }
 
-    func releaseMemory() {
-        cache.removeAll(keepingCapacity: false)
+    func releaseMemory() async {
+        await answers.releaseMemory()
     }
 
-    private func finish(
-        _ active: InFlightRequest,
-        for request: PreparedRequest
-    ) async throws -> OfficialStationInformationSnapshot {
-        do {
-            let snapshot = try await active.task.value
-            if inFlight[request]?.token == active.token {
-                inFlight.removeValue(forKey: request)
-                cache[request] = CacheEntry(
-                    snapshot: snapshot,
-                    expiresAt: Self.clock.now.advanced(by: .seconds(Self.cacheLifetime))
-                )
-                if let diskCache {
-                    let externalStationID = request.externalStationID
-                    Task { await diskCache.store(snapshot, cityID: Self.cityID, externalStationID: externalStationID) }
-                }
-            }
-            return snapshot
-        } catch {
-            if inFlight[request]?.token == active.token {
-                inFlight.removeValue(forKey: request)
-            }
-            if let providerError = error as? OfficialStationInformationProviderError,
-               case .rateLimited(let retryAfter) = providerError {
-                let duration = max(retryAfter ?? Self.defaultRateLimitBackoff, 1)
-                let candidate = Self.clock.now.advanced(by: .seconds(duration))
-                if let current = rateLimitedUntil {
-                    rateLimitedUntil = max(current, candidate)
-                } else {
-                    rateLimitedUntil = candidate
-                }
-            }
-            return try await servingStoredSnapshot(for: request, insteadOf: error)
-        }
-    }
-
-    /// Availability failures fall back to the last snapshot this device stored, labeled as
-    /// cached. Caller and contract errors never do. A stored copy must not paper over a
-    /// station-identity mismatch or a malformed request.
-    private func servingStoredSnapshot(
-        for request: PreparedRequest,
-        insteadOf error: Error
-    ) async throws -> OfficialStationInformationSnapshot {
-        guard (error as? OfficialStationInformationProviderError)?.allowsStoredFallback == true,
-              let diskCache,
-              let stored = await diskCache.storedSnapshot(
-                  cityID: Self.cityID,
-                  stationID: request.stationID,
-                  externalStationID: request.externalStationID
-              ) else {
-            throw error
-        }
-        return stored.snapshot.withFreshness(.cached(fetchedAt: stored.fetchedAt))
-    }
-
-
-    private static func prepare(
-        _ request: OfficialStationInformationRequest
-    ) throws -> PreparedRequest {
-        let stationID = request.stationID.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !stationID.isEmpty else {
-            throw OfficialStationInformationProviderError.invalidRequest("stationID is empty")
-        }
-
-        switch request.reference {
-        case .beijing(let externalStationID, let expectedNames):
-            let externalID = externalStationID.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard externalID.range(of: #"^\d{9}$"#, options: .regularExpression) != nil else {
-                throw OfficialStationInformationProviderError.invalidRequest(
-                    "Beijing station reference is not a reviewed nine-digit ID"
-                )
-            }
-            let names = expectedNames
-                .compactMap(OperatorFieldParsing.trimmed)
-                .uniqued()
-                .sorted()
-            guard !names.isEmpty else {
-                throw OfficialStationInformationProviderError.invalidRequest(
-                    "expected station names are empty"
-                )
-            }
-            return PreparedRequest(
-                stationID: stationID,
-                externalStationID: externalID,
-                expectedNames: names
-            )
-        case .shanghai, .guangzhou, .hangzhou:
+    private static func prepare(_ request: OfficialStationInformationRequest) throws -> PreparedRequest {
+        guard case .beijing(let externalStationID, let names) = request.reference,
+              let externalID = OperatorFieldParsing.trimmed(externalStationID),
+              externalID.range(of: #"^\d{9}$"#, options: .regularExpression) != nil else {
             throw OfficialStationInformationProviderError.invalidRequest(
-                "Non-Beijing references are handled by their own provider"
+                "Beijing station reference is not a reviewed nine-digit ID"
             )
         }
+        let identity = try OperatorFieldParsing.reviewedIdentity(of: request, names: names)
+        return PreparedRequest(
+            stationID: identity.stationID,
+            externalStationID: externalID,
+            expectedNames: identity.expectedNames
+        )
     }
 
-    /// `timeoutIntervalForRequest` only fires when no bytes arrive for the interval. A
-    /// connection that trickles data indefinitely (observed on throttled routes to this host)
-    /// never triggers it, so the byte-by-byte read below could hang well past `requestTimeout`
-    /// and leave the loading spinner stuck. Race the whole fetch against an explicit deadline,
-    /// mirroring `withMapKitTimeout` in MapKitProviders.swift, so it is always bounded.
     private static func fetch(
-        _ request: PreparedRequest,
-        using session: URLSession
-    ) async throws -> OfficialStationInformationSnapshot {
-        try await withThrowingTaskGroup(of: OfficialStationInformationSnapshot.self) { group in
-            group.addTask { try await performFetch(request, using: session) }
-            group.addTask {
-                try await Task.sleep(for: .seconds(requestTimeout))
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            defer { group.cancelAll() }
-            guard let result = try await group.next() else {
-                throw OfficialStationInformationProviderError.timedOut
-            }
-            return result
-        }
-    }
-
-    private static func performFetch(
         _ request: PreparedRequest,
         using session: URLSession
     ) async throws -> OfficialStationInformationSnapshot {
@@ -680,11 +703,8 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             URLQueryItem(name: "accLocation", value: request.externalStationID)
         ]
         guard let url = components.url else {
-            throw OfficialStationInformationProviderError.invalidRequest(
-                "official station reference is invalid"
-            )
+            throw OfficialStationInformationProviderError.invalidRequest("official station reference is invalid")
         }
-
         var urlRequest = URLRequest(
             url: url,
             cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
@@ -692,67 +712,22 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
         )
         urlRequest.httpMethod = "GET"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        // `data(for:)`, not `bytes(for:)`. `URLSession.AsyncBytes` yields one `UInt8` per async
-        // iteration; measured over loopback with no latency, that loop moved 5 MB in 56.3 s
-        // (0.09 MB/s) against 0.012 s for `data(for:)`. This endpoint returns the whole network
-        // listing under a 10-second budget, so the read itself was the thing that timed out.
-        // The `expectedContentLength` guard below still rejects an honestly-declared oversize
-        // body, and the count check catches a server that lies about it.
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await session.data(
-                for: urlRequest,
-                delegate: OperatorRedirectDelegate(host: Self.host)
-            )
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch let error as URLError where error.code == .timedOut {
-            throw OfficialStationInformationProviderError.timedOut
-        } catch let error as URLError where error.code == .cancelled && Task.isCancelled {
-            throw CancellationError()
-        } catch {
-            throw OfficialStationInformationProviderError.transport(error.localizedDescription)
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.url?.scheme?.lowercased() == "https",
-              httpResponse.url?.host?.lowercased() == host,
-              httpResponse.url?.path == endpointPath else {
-            throw OfficialStationInformationProviderError.invalidResponse
-        }
-        if httpResponse.statusCode == 429 {
-            throw OfficialStationInformationProviderError.rateLimited(
-                retryAfter: retryAfterDelay(from: httpResponse)
-            )
-        }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            throw OfficialStationInformationProviderError.httpStatus(httpResponse.statusCode)
-        }
-        guard httpResponse.expectedContentLength <= 0 ||
-                httpResponse.expectedContentLength <= Int64(maximumResponseBytes) else {
-            throw OfficialStationInformationProviderError.responseTooLarge
-        }
-        let contentType = httpResponse.value(forHTTPHeaderField: "Content-Type")?
-            .lowercased() ?? ""
-        guard contentType.hasPrefix("application/json") else {
-            throw OfficialStationInformationProviderError.invalidResponse
-        }
-
-        guard data.count <= maximumResponseBytes else {
-            throw OfficialStationInformationProviderError.responseTooLarge
-        }
+        let data = try await OperatorHTTP.data(
+            for: urlRequest,
+            host: host,
+            path: endpointPath,
+            maximumBytes: maximumResponseBytes,
+            requiresJSON: true,
+            timeout: requestTimeout,
+            using: session
+        )
 
         let payload: BeijingPayload
         do {
             payload = try JSONDecoder().decode(BeijingPayload.self, from: data)
         } catch {
-            throw OfficialStationInformationProviderError.contractViolation(
-                "response is not valid station JSON"
-            )
+            throw OfficialStationInformationProviderError.contractViolation("response is not valid station JSON")
         }
-
         guard payload.status == 200 else {
             throw OfficialStationInformationProviderError.serviceUnavailable(OperatorFieldParsing.trimmed(payload.message))
         }
@@ -764,15 +739,9 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 "station identity is missing or does not match the reviewed reference"
             )
         }
-
-        let expectedNames = Set(request.expectedNames.map(OperatorFieldParsing.normalizedName))
-        guard expectedNames.contains(OperatorFieldParsing.normalizedName(stationName)) else {
-            throw OfficialStationInformationProviderError.contractViolation(
-                "station name does not match the reviewed catalog"
-            )
+        guard OperatorFieldParsing.isReviewedName(stationName, in: request.expectedNames) else {
+            throw OfficialStationInformationProviderError.contractViolation("station name does not match the reviewed catalog")
         }
-
-        let serviceLines = groupedLines(responseData.lines ?? [])
 
         let exits = (station.exits ?? []).compactMap { exit in
             guard let name = OperatorFieldParsing.trimmed(exit.name) else { return nil }
@@ -788,13 +757,11 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             let items = (group.data ?? []).compactMap { item in
                 guard let name = OperatorFieldParsing.trimmed(item.name),
                       let rawDetail = OperatorFieldParsing.trimmed(item.contentDesc) else { return nil }
-                let unavailable = unavailableFacilityMarkers.contains(
-                    rawDetail.lowercased()
-                )
+                let unavailable = OperatorFieldParsing.placeholderAware(rawDetail) == nil
                 return OfficialStationFacilityInformation(
                     name: name,
                     location: unavailable ? nil : rawDetail,
-                    availability: unavailable ? .unavailable : .available
+                    availability: unavailable ? OfficialStationFacilityAvailability.unavailable : .available
                 )
             }.uniqued(by: \OfficialStationFacilityInformation.id)
             guard !items.isEmpty else { return nil }
@@ -806,32 +773,22 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
             stationName: stationName,
             source: .beijingSubwayOnline,
             freshness: .live,
-            lines: serviceLines,
+            lines: groupedLines(responseData.lines ?? []),
             exits: exits,
             facilityGroups: facilityGroups
         )
     }
 
-    /// The upstream returns one record per *service*, not per direction: `terminalStationName`
-    /// is a direction marker (the next station toward that end of the line) while
-    /// `destStationName` is that individual service's terminus.
-    ///
-    /// Both are kept, and the grouping key is the pair. Keying on the direction marker alone —
-    /// which is what this did — folded every short-turn in a direction into one row spanning the
-    /// earliest first train and the **latest** last train. At 国贸, live, the three northbound
-    /// 10号线 records all read `terminalStationName = 双井` and differ only in `destStationName`:
+    /// Beijing returns one record per *service*: `terminalStationName` is a direction marker (the
+    /// next station that way), `destStationName` the service's terminus. The group key is the pair.
+    /// At 国贸 the three northbound 10号线 records share `terminalStationName = 双井`:
     ///
     ///     → 车道沟  5:18 – 21:28      → 成寿寺  5:18 – 23:36      → 巴沟  5:18 – 23:12
     ///
-    /// Folded, that published 5:18 – 23:36. But the 23:36 train turns back at 成寿寺, seventeen
-    /// stops before 车道沟, so a rider heading further round the ring was given a last train that
-    /// was never going to carry them. `ServiceHoursResolver.servingWindows` exists precisely to
-    /// pick the service that reaches a rider's own stop, and until now it was handed a single
-    /// pre-merged row and nothing to choose between.
-    ///
-    /// Records that genuinely describe the same service — same direction, same terminus, differing
-    /// only in the last-train digits — still collapse to one window, which is what platform signage
-    /// shows and what the duplicate-row problem this originally solved was about.
+    /// Grouped by direction alone that is 5:18 – 23:36, a last train that turns back seventeen
+    /// stops before 车道沟. `ServiceHoursResolver.servingWindows` picks the service that reaches the
+    /// rider's stop, and needs the services apart. Records with the same direction and terminus
+    /// still collapse into one window.
     private static func groupedLines(_ lines: [BeijingLine]) -> [OfficialStationLineInformation] {
         struct ServiceKey: Hashable {
             let direction: String
@@ -857,7 +814,7 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 services[lineName] = [:]
                 serviceOrder[lineName] = []
             }
-            if colors[lineName] == nil, let color = normalizedColor(line.lineColor) {
+            if colors[lineName] == nil, let color = OperatorFieldParsing.hexColor(line.lineColor) {
                 colors[lineName] = color
             }
 
@@ -888,53 +845,6 @@ actor BeijingStationInformationProvider: OfficialStationInformationProviding {
                 services: (serviceOrder[lineName] ?? []).compactMap { services[lineName]?[$0] }
             )
         }
-    }
-
-    /// Minutes into the *service* day. A metro service day runs past midnight, so a last train
-    /// at "0:21" is later than one at "23:39". Comparing the raw strings, or a plain clock
-    /// time, would rank it as the earliest of the day and discard the real last train.
-    private static func normalizedColor(_ value: String?) -> String? {
-        guard let value = OperatorFieldParsing.trimmed(value)?
-            .trimmingCharacters(in: CharacterSet(charactersIn: "#")),
-              value.range(of: #"^[0-9A-Fa-f]{6}$"#, options: .regularExpression) != nil else {
-            return nil
-        }
-        return "#\(value.uppercased())"
-    }
-
-    private static let unavailableFacilityMarkers: Set<String> = [
-        "/",
-        "／",
-        "-",
-        "--",
-        "—",
-        "n/a",
-        "na",
-        "none",
-        "null",
-        "无",
-        "沒有",
-        "没有",
-        "暫無",
-        "暂无"
-    ]
-
-    private static func retryAfterDelay(
-        from response: HTTPURLResponse
-    ) -> TimeInterval? {
-        guard let rawValue = OperatorFieldParsing.trimmed(
-            response.value(forHTTPHeaderField: "Retry-After")
-        ) else { return nil }
-        if let seconds = TimeInterval(rawValue), seconds >= 0 {
-            return seconds
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
-        guard let date = formatter.date(from: rawValue) else { return nil }
-        return max(date.timeIntervalSinceNow, 0)
     }
 }
 
@@ -1021,79 +931,75 @@ private struct BeijingExit: Decodable {
     }
 }
 
-private struct FlexibleInt: Decodable {
+/// An integer an operator may send as a number or as a string.
+struct FlexibleInt: Decodable {
     let value: Int
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Int.self) {
             self.value = value
-        } else {
-            let value = try container.decode(String.self)
-            guard let integer = Int(value) else {
-                throw DecodingError.dataCorruptedError(
-                    in: container,
-                    debugDescription: "Expected an integer"
-                )
-            }
-            self.value = integer
+            return
         }
+        if let value = try? container.decode(Double.self),
+           let integer = Int(exactly: value) {
+            self.value = integer
+            return
+        }
+        if let rawValue = try? container.decode(String.self),
+           let value = Int(rawValue.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            self.value = value
+            return
+        }
+        throw DecodingError.dataCorruptedError(
+            in: container,
+            debugDescription: "Expected an integer or integer string"
+        )
     }
 }
 
-private struct FlexibleString: Decodable {
+/// A string an operator may send as a number.
+struct FlexibleString: Decodable {
     let value: String
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(String.self) {
             self.value = value
-        } else {
-            self.value = String(try container.decode(Int.self))
+            return
         }
+        if let value = try? container.decode(Int.self) {
+            self.value = String(value)
+            return
+        }
+        if let value = try? container.decode(Double.self) {
+            self.value = Int(exactly: value).map(String.init) ?? String(value)
+            return
+        }
+        throw DecodingError.dataCorruptedError(
+            in: container,
+            debugDescription: "Expected a string or number"
+        )
     }
 }
 
-// One copy for all four operator providers, which each carried an identical private one.
-extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
-    }
-}
-
-extension Array {
-    func uniqued<Key: Hashable>(by keyPath: KeyPath<Element, Key>) -> [Element] {
-        var seen = Set<Key>()
-        return filter { seen.insert($0[keyPath: keyPath]).inserted }
-    }
-}
-
-/// One operating notice as the operator published it: their headline, their date, their page.
-///
-/// Nothing here is summarised, ranked or reworded. A notice is the operator speaking, and the only
-/// value this app adds is putting it in front of a rider who is about to ride the line it is about.
+/// One operating notice as the operator published it: headline, date, page. Nothing summarised,
+/// ranked or reworded.
 struct OperatorServiceNotice: Identifiable, Sendable, Equatable {
     let title: String
-    /// As published, `YYYY-MM-DD`. Shown verbatim so a stale feed is visibly stale rather than
-    /// quietly presented as today's news.
+    /// As published, `YYYY-MM-DD`, shown verbatim so a stale feed is visibly stale.
     let publishedOn: String
     let url: URL
 
     var id: String { url.absoluteString }
 }
 
-/// Fetches Beijing Subway's 运营信息 notices from the operator's own site, on the rider's device.
+/// Fetches Beijing Subway's 运营信息 notices from the operator's site, on the rider's device. The
+/// content is `LicenseRef-External-Link-Only`: fetched at runtime, held in memory only, never
+/// committed or redistributed.
 ///
-/// The operator's content is `LicenseRef-External-Link-Only`: it may not be committed to this
-/// repository, and it is not: this fetches at runtime, holds the result in memory only, and
-/// redistributes it to nobody. That is the same arrangement the station-information providers in
-/// this file already operate under.
-///
-/// **This is not a live advisory feed and must not be presented as one.** Beijing publishes here
-/// irregularly: at the time this was written the newest notice was 2026-05-16, so every notice
-/// carries its own publication date and the UI shows it. A rider needs to know they are reading
-/// something from May.
+/// **Not a live advisory feed, and must not be presented as one.** Beijing publishes here
+/// irregularly, so every notice carries its publication date and the UI shows it.
 actor BeijingServiceNoticeProvider {
     static let cityID = "1100"
     private static let host = "www.bjsubway.com"
@@ -1149,8 +1055,7 @@ actor BeijingServiceNoticeProvider {
     }
 
     /// Pulls `<a href="/news/qyxw/yyzd/2026-05-16/129685.html">标题2026-05-16</a>` rows out of the
-    /// listing page. The date is taken from the *path*, not the link text, because the text runs
-    /// the title and date together with no separator.
+    /// listing. The date comes from the path: the link text runs title and date together.
     nonisolated static func parse(html: String) -> [OperatorServiceNotice] {
         let pattern = #"<a[^>]+href="(/news/qyxw/yyzd/(\d{4}-\d{2}-\d{2})/\d+\.html)"[^>]*>(.*?)</a>"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {

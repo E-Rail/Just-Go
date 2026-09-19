@@ -105,17 +105,10 @@ extension SubwayLine {
 }
 
 extension Array where Element == Station {
-    /// Collapses the copies of one station that several packs each ship.
-    ///
-    /// Neighbouring cities' packs carry the intercity corridor they share, so a station on it is
-    /// shipped two or three times: 174 such pairs across the bundled data. Guangzhou's 科韵路
-    /// exists in three, and both the map and search would otherwise show all three.
-    ///
-    /// Identity is identical name **and** colocation, never distance alone: 体育西路 and 天河南 are
-    /// 281 m apart and are different stations. The copy that knows the most lines survives, which
-    /// is the one carrying the metro service rather than the intercity-only stub.
-    ///
-    /// One rule, two callers: the marker list and the search results drifted apart once already.
+    /// Collapses the copies of one station that several packs ship (neighbouring packs carry their
+    /// shared intercity corridor; 科韵路 is in three). Identity is identical name **and** colocation,
+    /// never distance alone: 体育西路 and 天河南 are 281 m apart and different. The copy knowing the most
+    /// lines survives. One rule for the map's markers and the search results.
     func oneEntryPerPlace() -> [Station] {
         var kept: [Station] = []
         kept.reserveCapacity(count)
@@ -141,8 +134,7 @@ extension Station {
         lines.uniqued(by: \.logicalLineIdentity)
     }
 
-    /// This station as a trip endpoint. Three screens built this by hand from the same three
-    /// fields; they agreed, but only by coincidence.
+    /// This station as a trip endpoint.
     var asTransitPlace: TransitPlace {
         TransitPlace(name: localizedName, coordinate: coordinate, source: .mapKit)
     }
@@ -175,16 +167,10 @@ private func suffixSafeContains(_ longer: String, _ shorter: String) -> Bool {
     return false
 }
 
-/// How a rider is told which train a service row describes.
-///
-/// One rule, two screens: the route sheet's Service hours row and the station sheet's line block
-/// render the same fact and drifted apart once already over exit names.
-///
-/// The direction marker and the terminus are not always the same station, and where they differ the
-/// terminus is what the rider needs — it is what the train itself is labelled with, and it is what
-/// decides whether the service reaches their stop. At 国贸 all three northbound 10号线 services read
-/// `direction` 双井 and terminate at 车道沟, 成寿寺 and 巴沟, with last trains 2h08m apart. Showing
-/// three identical "开往 双井" rows with different times would be the same fact withheld a new way.
+/// How a rider is told which train a service row describes, the same on the route sheet and the
+/// station sheet. Where the direction marker and the terminus differ, the terminus wins: it is what
+/// the train is labelled with and what decides whether it reaches the rider's stop (at 国贸 all three
+/// northbound 10号线 services read 双井 and end at 车道沟, 成寿寺 and 巴沟).
 func serviceDirectionLabel(direction: String?, destination: String?) -> String? {
     let marker = direction?.trimmingCharacters(in: .whitespacesAndNewlines)
     let terminus = destination?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -193,16 +179,9 @@ func serviceDirectionLabel(direction: String?, destination: String?) -> String? 
     return marker
 }
 
-/// The same labels, made distinguishable from one another.
-///
-/// A terminus names a service unambiguously on a line with two ends and not on a ring, where both
-/// directions arrive at the same place by going opposite ways round. 国贸 on 10号线 has five
-/// services and they render as `车道沟 / 成寿寺 / 巴沟 / 巴沟 / 车道沟` — two pairs a rider cannot
-/// tell apart, each pair nearly two hours apart in its last train. That is the duplicate-row
-/// problem the operator grouping was originally written to solve, arriving from the other side.
-///
-/// Where a label repeats, the direction marker is what separates the two — it is the next station
-/// toward that end, which is exactly the thing printed on the platform they are standing on.
+/// The same labels, made distinguishable. On a ring both directions can end at the same terminus
+/// (国贸 on 10号线: 车道沟 / 成寿寺 / 巴沟 / 巴沟 / 车道沟). Where a label repeats, the direction marker, the next
+/// station that way and what the platform sign shows, separates them.
 func distinguishedServiceLabels<Service: ServiceDirectionNaming>(_ services: [Service]) -> [String?] {
     let labels = services.map { serviceDirectionLabel(direction: $0.directionMarker, destination: $0.serviceDestination) }
     var counts: [String: Int] = [:]
@@ -220,9 +199,9 @@ func distinguishedServiceLabels<Service: ServiceDirectionNaming>(_ services: [Se
     }
 }
 
-/// A service row that can name where it is going. Two shapes carry this — the resolver's
-/// `StationServiceWindow` and the wire's `OfficialStationServiceInformation` — and the route sheet
-/// and the station sheet render one each. They must not disagree about what a service is called.
+/// A service row that can name where it is going. The resolver's `StationServiceWindow` and the
+/// wire's `OfficialStationServiceInformation` both carry this, and the two sheets must not disagree
+/// about a service's name.
 protocol ServiceDirectionNaming {
     var directionMarker: String? { get }
     var serviceDestination: String? { get }
@@ -239,12 +218,8 @@ extension OfficialStationServiceInformation: ServiceDirectionNaming {
 }
 
 /// The source's own words for which service day its times describe, shown only when it is not
-/// today's.
-///
-/// Hangzhou publishes `工作日时刻表` — the weekday timetable — and the app rendered it unlabelled on
-/// Saturdays and Sundays for as long as the source has been wired up. Nothing here tries to parse
-/// the Chinese into a weekday set: it checks whether the note says "weekday" and whether today is
-/// one, and otherwise stays quiet rather than captioning a correct table with a wrong caveat.
+/// today's (Hangzhou's `工作日时刻表` on a weekend). It checks only whether the note says "weekday" and
+/// whether today is one; otherwise it stays quiet.
 func serviceDayCaveat(_ note: String?, on date: Date) -> String? {
     guard let note = note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty else { return nil }
     guard note.contains("工作日") else { return nil }

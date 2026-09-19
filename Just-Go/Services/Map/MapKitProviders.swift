@@ -3,12 +3,9 @@ import MapKit
 
 struct MapKitTimeoutError: Error {}
 
-/// Something MapKit will actually stop when told to. `MKDirections`, `MKLocalSearch` and
-/// `CLGeocoder` each have a `cancel()`; none of them observes Swift task cancellation.
-///
-/// A class rather than a value, and `@unchecked Sendable` with a lock, for the reason
-/// `SessionTaskBox` in `BaiduMapsClient` is: the deadline that cancels and the task that runs are
-/// different tasks, so this is genuinely shared mutable state. Same shape, same justification.
+/// Something MapKit will stop when told to: `MKDirections`, `MKLocalSearch` and `CLGeocoder` each
+/// have a `cancel()`, and none observes Swift task cancellation. `@unchecked Sendable` with a lock,
+/// like `SessionTaskBox`: the deadline and the operation are different tasks.
 final class MapKitOperationBox: @unchecked Sendable {
     private let lock = NSLock()
     private var cancel: (() -> Void)?
@@ -34,15 +31,10 @@ final class MapKitOperationBox: @unchecked Sendable {
     }
 }
 
-/// Races `operation` against a deadline so a stalled MapKit call can't hang a user-facing spinner.
-///
-/// The `box` is not optional decoration — it is the whole mechanism. `withThrowingTaskGroup`
-/// cannot return while a child is still running: `cancelAll()` only *marks* children, and
-/// `MKDirections.calculate()`, `MKLocalSearch.start()` and `CLGeocoder.reverseGeocodeLocation` are
-/// ObjC completion-handler APIs bridged to async with no cancellation forwarding. So the previous
-/// version of this function, whose own comment said the caller was "unblocked either way", was
-/// not: a 30-second MapKit stall returned after 30 seconds, not after the 12 it promised. Calling
-/// the operation's own `cancel()` is what makes the deadline real.
+/// Races `operation` against a deadline so a stalled MapKit call cannot hang a spinner. The `box`
+/// is the mechanism: a task group cannot return while a child runs, `cancelAll()` only marks
+/// children, and these completion-handler APIs ignore task cancellation. Calling the operation's
+/// own `cancel()` is what makes the deadline real.
 func withMapKitTimeout<T: Sendable>(
     seconds: TimeInterval = 12,
     box: MapKitOperationBox,
@@ -71,34 +63,25 @@ protocol PlaceSearchProviding {
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace
 }
 
-/// "Where I am", as somewhere a trip can start from.
-///
-/// The ladder below has four ways to go wrong. A cached fix that is fresh enough, a live request,
-/// a coarser last-known fallback, and a reverse-geocode that may fail on its own, and it used to
-/// live inside `RoutePlannerViewModel.useCurrentLocation` because the deleted route-entry page was
-/// the only thing that ever asked. Two screens ask now, and a second copy of a four-branch fallback
-/// is exactly the drift `CLAUDE.md` warns about.
+/// "Where I am", as somewhere a trip can start from, shared by the planner and the search page so
+/// its four-branch fallback exists once: a fresh cached fix, a live request, a coarser last-known
+/// fix, and a reverse geocode that may fail on its own.
 struct CurrentPlaceResolver {
     let locationService: LocationService
     let placeSearchProvider: PlaceSearchProviding
 
     /// A fix good enough to route from, already in the map's coordinate frame. Throws rather than
-    /// returning nil: "you have not allowed this" and "it never arrived" need different words on
-    /// screen, and only the error carries which one happened.
-    ///
-    /// `@MainActor` because every branch below reads `LocationService` state, and that is where
-    /// that state lives. Nothing here computes; the two `await`s suspend rather than block.
+    /// returning nil, because "not allowed" and "never arrived" need different words on screen.
+    /// `@MainActor` because every branch reads `LocationService` state.
     @MainActor
     func coordinate() async throws -> CLLocationCoordinate2D {
         if let recent = locationService.currentLocation,
            recent.horizontalAccuracy >= 0,
            recent.horizontalAccuracy <= 100,
            abs(recent.timestamp.timeIntervalSinceNow) <= 120 {
-            // A recent, sufficiently accurate fix (e.g. from pre-warming) is good enough for a
-            // route origin: use it instead of waiting on a fresh one that can stall indoors, on
-            // weak GPS, or in the simulator. The ≤120 s window is looser than
-            // requestCurrentLocation's 30 s so a just-prewarmed fix answers instantly; the
-            // accuracy gate is what keeps it safe.
+            // A recent, accurate fix (from pre-warming, say) is good enough for an origin and
+            // avoids a fresh request that can stall indoors. The 120 s window is looser than
+            // `requestCurrentLocation`'s 30 s; the accuracy gate keeps it safe.
             return locationService.mapSpaceCoordinate(from: recent.coordinate)
         }
 
@@ -109,9 +92,8 @@ struct CurrentPlaceResolver {
             if let locationError = error as? LocationServiceError, locationError == .permissionDenied {
                 throw error
             }
-            // Last resort: a last-known fix so the field still fills, but reject an obviously
-            // coarse one (accuracy relaxed only to a city-level bound) rather than seed routing
-            // with a km-off origin.
+            // Last resort: a last-known fix, relaxed only to city-level accuracy, so the field
+            // fills without seeding a route kilometres off.
             guard let lastKnown = locationService.currentLocation,
                   lastKnown.horizontalAccuracy >= 0,
                   lastKnown.horizontalAccuracy <= 1000 else {
@@ -143,17 +125,12 @@ struct CurrentPlaceResolver {
     }
 }
 
-/// One direction of one line, established to have stopped running when the rider would board it.
+/// One direction of one line that has stopped running when the rider would board it. A direction,
+/// not a line: at 天通苑南 on 5号线 the southbound last train is 22:51 and the northbound 23:57, and
+/// banning the line would throw away a train still running late at night.
 ///
-/// A direction, not a line, because that is what the timetable actually says. 天通苑南 on 5号线 has
-/// a southbound last train at 22:51 and a northbound one at 23:57 — 66 minutes apart, and across a
-/// 60-station Beijing sample 92 % of station/line pairs differ by more than 15 minutes. Banning the
-/// whole line on the strength of one direction threw away a train that was still running, which at
-/// 23:20 is when there are fewest of them left.
-///
-/// The direction is carried as one oriented hop the shut service makes rather than as a name or a
-/// terminus: the graph can order any pattern against it, and it needs no vocabulary shared with
-/// whichever operator supplied the verdict.
+/// Carried as one oriented hop the service makes, so the graph can order any pattern against it
+/// with no vocabulary shared with the operator that supplied the verdict.
 struct ClosedServiceDirection: Hashable, Sendable {
     let lineID: String
     /// Qualified (`network-<city>-<station>`) IDs, so a caller holding a route's own leg context can
@@ -164,11 +141,8 @@ struct ClosedServiceDirection: Hashable, Sendable {
 
 protocol TransitRouteProviding {
     /// - Parameter excludingServices: line directions the caller has established are not running
-    ///   when this rider would board them. The graph itself is deliberately time-blind — it is a
-    ///   mechanical shortest path, and first/last train is enrichment's business, arriving from an
-    ///   operator or a routing provider long after the search would need it. This is how the clock
-    ///   reaches the search anyway: not as a timetable it cannot read, but as the conclusion drawn
-    ///   from one.
+    /// when this rider would board them. The graph is time-blind by design; this is how the
+    /// conclusion of a timetable reaches it without the graph reading one.
     func routes(
         from origin: TransitPlace,
         to destination: TransitPlace,
@@ -177,10 +151,8 @@ protocol TransitRouteProviding {
     ) async throws -> [Route]
 }
 
-/// Builds one walking leg. Extracted from `BundledMetroRouteProvider` because enrichment needs it
-/// too: the graph walks the rider to the station, then `RoutePlanningService` picks which door they
-/// should actually use, and the leg has to be recomputed against that door. Two callers, one
-/// implementation: a second copy would drift on exactly the numbers riders read.
+/// Builds one walking leg, for both the graph (to the station) and `RoutePlanningService` (to the
+/// door it picks), so the numbers riders read come from one implementation.
 protocol WalkingRouteProviding {
     func walkingSegment(
         from: CLLocationCoordinate2D,
@@ -189,8 +161,8 @@ protocol WalkingRouteProviding {
         toName: String
     ) async -> RouteSegment?
 
-    /// The same leg by whichever mode its length calls for. Walking is unchanged; the other two
-    /// are described on the implementation, which is where their honesty caveats belong.
+    /// The same leg by whichever mode its length calls for; the other modes' caveats are on their
+    /// implementations.
     func accessSegment(
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
@@ -286,17 +258,12 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
         }
     }
 
-    /// A bike ride along the **walking** route, re-timed.
+    /// A bike ride along the **walking** route, re-timed, used where no cycling router is
+    /// available: MapKit has no cycling transport type, and `.transit` refuses to calculate
+    /// (`MKErrorDomain` 5). The leg says it is the pedestrian shape.
     ///
-    /// `MKDirectionsTransportType` has `.automobile`, `.walking`, `.transit` and `.any`. There is
-    /// no cycling type, and `.transit` refuses to calculate at all (measured: `MKErrorDomain` 5).
-    /// So there is no cycling routing available to this app, and the honest thing to do with that
-    /// is say it rather than draw a line that pretends otherwise: the shape is the pedestrian
-    /// route, and the leg says so.
-    ///
-    /// The failure this guards against is a walking route that no bike can follow. Apple's own
-    /// steps name stairs, and a step-mentioning leg keeps the pedestrian duration and carries the
-    /// warning instead of quietly promising a 14 km/h average over a staircase.
+    /// Where Apple's steps name stairs, the leg keeps the walking duration and carries the warning
+    /// instead of promising 14 km/h over a staircase.
     private func cyclingSegment(
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
@@ -321,16 +288,14 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
                 traditional: "此路線含階梯，可能需要推行。"
             ))
         }
-        // 14 km/h: a shared bike in city traffic, and slow enough that a rider who beats it is
-        // early rather than late. Not applied where stairs were named. See above.
+        // 14 km/h: a shared bike in city traffic, slow enough that a faster rider is early rather
+        // than late. Not applied where stairs were named.
         let duration = hasStairs ? walk.duration : walk.distance / Self.cyclingMetresPerSecond
         return walk.retyped(as: .cycling, duration: duration, accessibilityNotes: notes)
     }
 
-    /// A real driving route from MapKit. `.Automobile` is a transport type `MKDirections` will
-    /// actually calculate, unlike `.transit`, so unlike the bike this one is measured rather than
-    /// derived. Falls back to the walking leg when MapKit declines, because a leg that exists is
-    /// worth more than a mode that is missing.
+    /// A real driving route from MapKit, measured rather than derived. Falls back to the walking
+    /// leg when MapKit declines: a leg that exists beats a missing mode.
     private func drivingSegment(
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
@@ -352,13 +317,10 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             mapRoute = nil
         }
         guard let mapRoute else {
-            // Retyped, not returned as-is. `SegmentType.isOnFoot`'s own docstring says a summary
-            // folding a drive into walking distance "would be lying in the one number riders check
-            // hardest" — and that is exactly what this path did: the leg was classified driving
-            // because it is over 8 km, and it came back typed .walking, so "Walk 12 km" went on the
-            // card, into route.walkingDistance, into the Least Walking sort and into the confidence
-            // penalty. The mode was decided by the distance and does not change because MapKit
-            // declined to draw it.
+            // Retyped, not returned as-is: the mode was decided by distance and does not change
+            // because MapKit declined to draw it. A fallback typed `.walking` would put "Walk 12
+            // km" on the card and into the walking total, the Least Walking sort and the confidence
+            // penalty.
             guard let walk = await walkingSegment(
                 from: from,
                 to: to,
@@ -389,8 +351,8 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
             polylineCoordinates: mapRoute.polyline.routeCoordinates.map {
                 CodableCoordinate(latitude: $0.latitude, longitude: $0.longitude)
             },
-            // Deliberately nil rather than the driving steps: `walkingDirections` is what the
-            // stairs and step-free checks read, and a car's turn list has nothing to say to them.
+            // nil rather than the driving steps: `walkingDirections` feeds the stairs and step-free
+            // checks, which a car's turn list means nothing to.
             walkingDirections: nil,
             accessibilityNotes: [AppLocalization.text(
                 english: "Driving time excludes parking",
@@ -431,10 +393,8 @@ final class MapKitPlaceSearchProvider: PlaceSearchProviding {
     }
 
     func reverseGeocode(location: CLLocationCoordinate2D, name: String?) async throws -> TransitPlace {
-        // A fresh CLGeocoder per call: CLGeocoder allows only one in-flight request per
-        // instance and cancels a prior request when a new one starts, so a shared instance
-        // would make overlapping reverse-geocodes (e.g. quick Current-Location taps across
-        // fields) cancel each other. Reverse-geocode is one-shot, not a hot path.
+        // A fresh `CLGeocoder` per call: one instance allows one request at a time and cancels the
+        // previous one, so overlapping reverse geocodes would cancel each other.
         let geocoder = CLGeocoder()
         let placemarks = try await withMapKitTimeout(box: MapKitOperationBox { geocoder.cancelGeocode() }) {
             try await geocoder.reverseGeocodeLocation(

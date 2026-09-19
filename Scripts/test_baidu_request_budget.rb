@@ -145,8 +145,10 @@ class TypingCostsNothingTest < Minitest::Test
 
   def test_the_online_search_is_reachable_without_a_keyboard
     # A capability that only answers the return key is one most riders never find.
-    assert_includes VIEW, "private var searchOnlineRow: some View"
+    assert_includes VIEW, "struct SearchOnlineRow: View"
+    assert_includes VIEW, "SearchOnlineRow(isSearching: false, action: searchOnline)"
     assert_includes VIEW, "private func searchOnline() {"
+    assert_includes QUICK_TAG, "SearchOnlineRow(isSearching: isSearchingOnline, action: searchOnline)"
   end
 end
 

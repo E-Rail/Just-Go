@@ -56,35 +56,28 @@ private struct LiveTransferGuidanceRequest: Hashable {
     let stepID: Int
 }
 
-/// Map-first, accessibility-first step-by-step trip companion: a full-screen interactive
-/// map (pan/zoom, user-location puck, follow-me button) with the whole route drawn on it,
-/// a compact instruction panel at the bottom, and off-route re-planning while walking.
+/// The step-by-step trip companion: a full-screen interactive map with the whole route drawn on it,
+/// a compact instruction panel, and off-route re-planning while walking.
 struct LiveGoView: View {
-    /// Rendered inside another screen rather than over it. The route detail turns *into* the
-    /// navigator rather than covering itself with a second one, so this drops the navigation
-    /// chrome that only a presented copy needs and hands the exit back to its host. One
-    /// implementation, two containers: a second navigator would drift from this one, and this is
-    /// where the off-route recovery, the arrival alert and the transfer surface all live.
+    /// Rendered inside the route detail rather than over it: this drops the navigation chrome only
+    /// a presented copy needs and hands the exit to its host. One navigator, two containers.
     var embedded = false
-    var onExit: (() -> Void)?
+    let onExit: () -> Void
 
     @State private var viewModel: LiveGoViewModel
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
     @AppStorage("arrivalAlertLeadMinutes") private var arrivalAlertLeadMinutes = 2
-    // Read directly rather than via Color.accentColor: this view is presented in a
-    // .fullScreenCover, whose first rendered frame doesn't yet have the root .tint(...)
-    // environment value propagated and would otherwise flash system blue.
+    // Read directly rather than via `Color.accentColor`: in a full-screen cover the first frame
+    // does not yet have the root `.tint` and would flash system blue.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @State private var showGetOffBanner = false
-    /// When the rider reached the ride step being alerted for. Back, Next and the toggle all
-    /// re-run the scheduling, and each used to count the whole ride again from that moment, so a
-    /// rider who checked the previous step 15 minutes into a 20-minute ride was woken 18 minutes
-    /// later, well past the stop.
+    /// When the rider reached the ride step being alerted for. Back, Next and the toggle all re-run
+    /// the scheduling, which must count from this moment, not from the re-run, or the alert fires
+    /// past the stop.
     @State private var alertRideStart: (stepID: TripStep.ID, at: Date)?
     @State private var alertTask: Task<Void, Never>?
     // Accessibility step-change effects (无障碍 sheet): speech, haptics, visual banner.
@@ -94,16 +87,13 @@ struct LiveGoView: View {
     @State private var reminderRegistrationTask: Task<Void, Never>?
     @State private var scheduledStationKey: String?
     // Live-navigation map + off-route recovery.
-    @State private var camera: MapCameraPosition = .automatic
+    @State private var mapRegion: MapVisibleRegion?
     @State private var isRerouting = false
     @State private var offRouteStrikes = 0
     @State private var lastRerouteAt = Date.distantPast
-    /// How long to wait before the next reroute, doubling each time until the rider advances.
-    ///
-    /// A fixed 45 s meant a rider taking a different street to the station was re-planned every
-    /// 45 s for the whole walk, and each re-plan is a full plan: several MapKit legs and a metered
-    /// transit call. Doubling backs off a rider who is simply going their own way, while still
-    /// answering quickly the first time someone genuinely turns the wrong way.
+    /// How long to wait before the next reroute, doubling until the rider advances. Each re-plan is
+    /// a full plan (several MapKit legs and a metered transit call), so a rider taking their own
+    /// street is backed off, while a genuine wrong turn is still answered quickly.
     @State private var rerouteInterval: TimeInterval = 45
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
@@ -111,18 +101,16 @@ struct LiveGoView: View {
     // Transfer guidance is loaded lazily only while its transfer step is current.
     @State private var transferGuidance: LiveTransferGuidance?
     @State private var isLoadingTransferGuidance = false
-    /// Speech during guidance, persisted so a rider who muted it once stays muted. Default on:
-    /// pressing a button labelled "Navigate" and getting silence is not what anybody means by it.
-    /// The Accessibility toggle below is a stronger promise than this one. See `onAppear`.
+    /// Speech during guidance, persisted so a muted rider stays muted. On by default: "Navigate"
+    /// means speaking. The Accessibility toggle overrides it; see `onAppear`.
     @AppStorage("guidanceVoiceEnabled") private var voiceEnabled = true
-    /// Whether the camera tracks the rider. On while guiding, because "where am I on this route"
-    /// is the question guidance exists to answer; stepping through manually turns it off so the
-    /// map stays on the step being read.
+    /// Whether the camera tracks the rider: on while guiding, off when stepping through manually so
+    /// the map stays on the step being read.
     @State private var followsRider = true
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
-    init(route: Route, embedded: Bool = false, onExit: (() -> Void)? = nil) {
+    init(route: Route, embedded: Bool = false, onExit: @escaping () -> Void) {
         self.embedded = embedded
         self.onExit = onExit
         _viewModel = State(initialValue: LiveGoViewModel(route: route))
@@ -144,13 +132,9 @@ struct LiveGoView: View {
                 if isActiveTransferStep {
                     transferStepSurface
                 } else {
-                    // The panel is a safe-area inset rather than a ZStack overlay so MapKit knows
-                    // the space is taken. Stacked, the map believed it owned the whole screen and
-                    // laid its own POI labels and pin glyphs out underneath our opaque card.
-                    // Apple's icons peeking out from behind our text, which is what it looked
-                    // like. Insetting keeps the map drawing full-bleed (the panel still floats
-                    // over live map) while moving MapKit's own labelling, controls and legal
-                    // attribution into the part of the screen the rider can actually see.
+                    // The panel is a safe-area inset, not a `ZStack` overlay, so MapKit knows the
+                    // space is taken and lays out its labels, controls and legal attribution where
+                    // the rider can see them, while the map still draws full-bleed.
                     liveMap
                         .ignoresSafeArea(edges: .bottom)
                         .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -193,26 +177,12 @@ struct LiveGoView: View {
             }
     }
 
-    /// Leaving guidance. Presented, that is a dismissal; embedded, the host decides what the page
-    /// becomes next, so it is told rather than dismissed out from under.
-    private func leave() {
-        if let onExit { onExit() } else { dismiss() }
-    }
-
-    /// Ending a trip finishes it in the rider's history.
-    ///
-    /// The history used to depend on the rider separately remembering to open the trip card and
-    /// tap "Log this trip": `markTripComplete` had exactly one caller and it was that button, so
-    /// finishing a guided journey recorded nothing at all. Both ways into this view end here, so
-    /// both now record.
-    ///
-    /// It asks nothing on the way out. Riders were once asked about lifts, exits and how long a
-    /// change took; the city packs and the route provider carry those now, and a question the data
-    /// already answers only teaches riders their answers do not matter.
+    /// Ending a trip completes it in the rider's history, whichever way guidance was entered. It
+    /// asks the rider nothing: the packs and the route provider already carry those facts.
     private func exit() {
         let planned = viewModel.plannedRoute
         tripMemoryService.markTripComplete(route: planned, cityID: planned.networkCityID ?? "")
-        leave()
+        onExit()
     }
 
     var body: some View {
@@ -225,7 +195,7 @@ struct LiveGoView: View {
             // Audio Navigation gets it, whatever the mute button was last left at.
             if appState.accessibilityPreference.audioNavigation { voiceEnabled = true }
             followsRider = true
-            frameCurrentStep(animated: false)
+            frameCurrentStep()
             refreshArrivalAlert()
             announceCurrentStep()
         }
@@ -241,15 +211,14 @@ struct LiveGoView: View {
         .onChange(of: viewModel.currentIndex) { _, _ in
             // Follow-me is turned off by the Back and Next buttons themselves, not here: a reroute
             // also resets the index, and the rider did not ask to stop being followed.
-            frameCurrentStep(animated: true)
+            frameCurrentStep()
             refreshArrivalAlert()
             announceCurrentStep()
         }
         .onChange(of: arrivalAlertEnabled) { _, _ in refreshArrivalAlert() }
-        // Observes the raw fix because that is what changes, but hands on the corrected one: off-route
-        // detection, the arrival alert and the reroute origin are all measured against GCJ-02 route
-        // geometry, and a raw WGS-84 fix is ~540 m from it. Enough to declare a rider off a route
-        // they are standing on. See LocationService.mapSpaceCorrection.
+        // Observes the raw fix, which is what changes, but hands on the corrected one: off-route
+        // detection, the arrival alert and the reroute origin measure against GCJ-02 route
+        // geometry, and a raw WGS-84 fix is ~540 m off. See `LocationService.mapSpaceCorrection`.
         .onChange(of: container.locationService.currentLocation) { _, _ in
             handleLocationUpdate(container.locationService.mapSpaceLocation)
         }
@@ -303,13 +272,9 @@ struct LiveGoView: View {
         .background(Color.appBackground)
     }
 
-    /// The measured walk between the two platforms, where the route provider returned one.
-    ///
-    /// Read off the leg the planner already costed, rather than asked for again: it used to
-    /// re-request the whole trip from the routing provider, one metered call per guided journey and
-    /// one more after each reroute, for a figure the plan was built from. When nothing was
-    /// measured, and an in-station change often has nothing to measure, this shows nothing rather
-    /// than a number the app would have had to invent.
+    /// The measured walk between the two platforms, read off the leg the planner already costed.
+    /// When nothing was measured (an in-station change often has nothing), this shows nothing
+    /// rather than an invented number.
     @ViewBuilder
     private var transferCorridorSection: some View {
         if let metres = viewModel.currentStep.flatMap(measuredCorridorMetres(for:)) {
@@ -320,19 +285,18 @@ struct LiveGoView: View {
                     .foregroundStyle(Color.accentColor)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
-                    // "Walking distance", not "transfer time". The metres were measured; the
-                    // seconds were not, and naming this after time would be the app inventing the
-                    // precision it exists to refuse.
+                    // "Walking distance", not "transfer time": the metres were measured, the
+                    // seconds were not.
                     Text(AppLocalization.text(
                         english: "Walking distance between platforms",
                         simplified: "站台之间的步行距离",
                         traditional: "月台之間的步行距離"
                     ))
                     .rowMeta()
-                    // Leads with the metres, because that is the part that was observed; the bucket
-                    // beside it is this app's walking model applied to that distance. The literal
-                    // " m " once spliced an English unit into a Chinese sentence here, and the
-                    // validator skips interpolated literals, which is why it passed.
+                    // Leads with the metres, the observed part; the bucket is this app's walking
+                    // model applied to them. The unit comes from `AppLocalization.distance`: the
+                    // localization validator skips interpolated literals, so a spliced " m " would
+                    // pass it.
                     Text("\(AppLocalization.distance(Double(metres))) · \(pace.title)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -347,10 +311,8 @@ struct LiveGoView: View {
         }
     }
 
-    /// The corridor the planner measured for the change this step makes.
-    ///
-    /// Matched by the two stations the leg joins, because a step and a segment describe the same
-    /// change from different ends: the step is built from the segment it follows.
+    /// The corridor the planner measured for this step's change, matched by the two stations the
+    /// leg joins.
     private func measuredCorridorMetres(for step: TripStep) -> Int? {
         guard step.kind == .transfer, let station = step.fromStationName else { return nil }
         return viewModel.route.segments.first {
@@ -375,9 +337,9 @@ struct LiveGoView: View {
             .accessibilityElement(children: .combine)
         } else if let guidance = activeTransferGuidance {
             VStack(spacing: 12) {
-                Image(systemName: "arrow.triangle.2.circlepath")
+                Image(systemName: SegmentType.transfer.symbolName)
                     .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color(hex: SegmentType.transfer.colorHex(line: nil)))
                     .accessibilityHidden(true)
                 Text(guidance.stationTitle)
                     .font(.title2)
@@ -434,15 +396,10 @@ struct LiveGoView: View {
         }
     }
 
-    /// What the route already worked out about this change, shown where the rider is making it.
-    ///
-    /// Two sentences at most, both written by the assembler: whether the change leaves the paid
-    /// area, and — only where the operator says so — that it still counts as one journey. The route
-    /// screen has shown these all along. Live Go never did, so the rider standing at the gate
-    /// deciding whether to tap out was the one person who could not see them.
-    ///
-    /// Silence where the fare is unknown is deliberate and comes from the assembler: saying nothing
-    /// lets the rider read the gates, and saying the wrong thing sends them through the wrong one.
+    /// What the route worked out about this change, shown where the rider is making it: whether it
+    /// leaves the paid area and, only where the operator says so, that it still counts as one
+    /// journey. Silence where the fare is unknown comes from the assembler: the rider can read the
+    /// gates.
     @ViewBuilder
     private var transferNotes: some View {
         let notes = viewModel.currentStep?.kind == .transfer ? (viewModel.currentStep?.notes ?? []) : []
@@ -507,201 +464,60 @@ struct LiveGoView: View {
 
     // MARK: - Map
 
-    private struct RouteOverlay: Identifiable {
-        let id: Int
-        let coordinates: [CLLocationCoordinate2D]
-        let color: Color
-        let isWalking: Bool
-        let isCurrent: Bool
-    }
-
-    private struct StopMarker: Identifiable {
-        let id: String
-        let name: String
-        let coordinate: CLLocationCoordinate2D
-    }
-
+    /// The same map, drawn by the same code, as the route detail: a leg looks identical on both.
     private var liveMap: some View {
-        Map(position: $camera) {
-            UserAnnotation()
-
-            ForEach(routeOverlays) { overlay in
-                MapPolyline(coordinates: overlay.coordinates)
-                    .stroke(
-                        overlay.color.opacity(overlay.isCurrent ? 1 : 0.55),
-                        style: StrokeStyle(
-                            lineWidth: overlay.isCurrent ? 7 : 4.5,
-                            lineCap: .round,
-                            lineJoin: .round,
-                            dash: overlay.isWalking ? [7, 7] : []
-                        )
-                    )
-            }
-
-            ForEach(stopMarkers) { stop in
-                Annotation(stop.name, coordinate: stop.coordinate) {
-                    Circle()
-                        .fill(.white)
-                        .stroke(.black, lineWidth: 1.5)
-                        .frame(width: 10, height: 10)
-                }
-                .annotationTitles(.hidden)
-            }
-
-            if let destination = destinationCoordinate {
-                Marker(
-                    viewModel.plan.destination,
-                    systemImage: "flag.checkered",
-                    coordinate: destination
-                )
-                .tint(.green)
-            }
-        }
-        .mapControls {
-            MapUserLocationButton()
-            MapCompass()
-            MapScaleView()
-        }
+        TransitMapView(
+            visibleRegion: $mapRegion,
+            stations: viewModel.route.mapStations,
+            alwaysShowsStations: true,
+            metroNetworks: [],
+            route: viewModel.route,
+            showsUserLocation: true,
+            onUserLocationChanged: { container.locationService.observeMapSpaceUserLocation($0) },
+            onRegionChanged: { mapRegion = $0 },
+            onStationSelected: { _ in }
+        )
     }
 
-    /// One drawable per route segment, with the current step's segment emphasized.
-    /// Transfers have no geometry and draw nothing; segments without a polyline fall back
-    /// to their station-to-station straight line (same rule as TransitMapView).
-    private var routeOverlays: [RouteOverlay] {
-        let currentSegmentIndex = viewModel.currentStep?.segmentIndex
-        return viewModel.route.segments.enumerated().compactMap { index, segment in
-            let coordinates = segment.drawableCoordinates.map {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-            }
-            guard coordinates.count >= 2 else { return nil }
-            let isWalking = segment.type.isAccessLeg
-            return RouteOverlay(
-                id: index,
-                coordinates: coordinates,
-                color: isWalking ? .gray : Color(hex: segment.lineColorHex ?? "#007AFF"),
-                isWalking: isWalking,
-                isCurrent: index == currentSegmentIndex
-            )
-        }
-    }
-
-    private var stopMarkers: [StopMarker] {
-        var seen = Set<String>()
-        var markers: [StopMarker] = []
-        for segment in viewModel.route.segments where segment.type.isTransit {
-            for stop in segment.stationStops {
-                guard let coordinate = stop.coordinate,
-                      seen.insert("\(stop.stationID)|\(coordinate.latitude)").inserted else { continue }
-                markers.append(StopMarker(
-                    id: "\(stop.stationID)|\(coordinate.latitude)|\(coordinate.longitude)",
-                    name: stop.name,
-                    coordinate: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                ))
-            }
-        }
-        return markers
-    }
-
-    /// The trip's real end point: the last segment that carries geometry, walking back
-    /// from the end of the route.
-    private var destinationCoordinate: CLLocationCoordinate2D? {
-        for segment in viewModel.route.segments.reversed() {
-            if let last = segment.polylineCoordinates.last {
-                return CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
-            }
-            if let stop = segment.stationStops.last?.coordinate {
-                return CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude)
-            }
-        }
-        return nil
-    }
-
-    /// Re-frame the camera on the current step's geometry. The rider stays free to pan and
-    /// zoom afterwards (and can follow their own position via the map's location button).
-    /// Only a step change or a reroute moves the camera.
-    private func frameCurrentStep(animated: Bool) {
-        guard let region = region(for: viewModel.currentStep) else { return }
-        if animated {
-            withAnimation(.easeInOut(duration: 0.6)) { camera = .region(region) }
-        } else {
-            camera = .region(region)
-        }
-    }
-
-    private func region(for step: TripStep?) -> MKCoordinateRegion? {
-        guard let step else { return nil }
-        var coordinates: [CLLocationCoordinate2D] = []
+    /// Frames the current step's geometry. The rider stays free to pan and zoom afterwards; only a
+    /// step change, a reroute or turning follow-me off moves the camera.
+    private func frameCurrentStep() {
+        guard let step = viewModel.currentStep else { return }
+        let segment = step.segmentIndex.flatMap { viewModel.route.segments.indices.contains($0) ? viewModel.route.segments[$0] : nil }
+        var coordinates: [CodableCoordinate]
         switch step.kind {
-        case .walkToStation, .walkToDestination:
-            coordinates = step.walkingPathCLCoordinates
-        case .transfer:
-            if let coordinate = step.transferCLCoordinate { coordinates = [coordinate] }
-        case .ride:
-            if let index = step.segmentIndex, viewModel.route.segments.indices.contains(index) {
-                let segment = viewModel.route.segments[index]
-                coordinates = segment.polylineCoordinates.map {
-                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                }
-                if coordinates.count < 2 {
-                    coordinates = segment.stationStops.compactMap(\.coordinate).map {
-                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                    }
-                }
-            }
-        case .arrive:
-            if let destination = destinationCoordinate { coordinates = [destination] }
+        case .walkToStation, .walkToDestination: coordinates = step.walkingPathCoordinates
+        case .transfer: coordinates = step.transferCoordinate.map { [$0] } ?? []
+        case .ride: coordinates = segment?.drawableCoordinates ?? []
+        case .arrive: coordinates = viewModel.route.groundDestination.map { [$0] } ?? []
         }
-        guard let first = coordinates.first else { return nil }
-        guard coordinates.count > 1 else {
-            return MKCoordinateRegion(
-                center: first,
-                span: MKCoordinateSpan(latitudeDelta: 0.006, longitudeDelta: 0.006)
-            )
+        let points = coordinates.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        if let region = MapVisibleRegion(fitting: points, minimumSpan: 0.006) {
+            mapRegion = region
         }
-        let latitudes = coordinates.map(\.latitude)
-        let longitudes = coordinates.map(\.longitude)
-        let center = CLLocationCoordinate2D(
-            latitude: (latitudes.min()! + latitudes.max()!) / 2,
-            longitude: (longitudes.min()! + longitudes.max()!) / 2
-        )
-        // 1.45× padding so the step never touches the screen edges; floor keeps very short
-        // steps from zooming in to building level.
-        return MKCoordinateRegion(
-            center: center,
-            span: MKCoordinateSpan(
-                latitudeDelta: max(0.006, (latitudes.max()! - latitudes.min()!) * 1.45),
-                longitudeDelta: max(0.006, (longitudes.max()! - longitudes.min()!) * 1.45)
-            )
-        )
     }
 
     // MARK: - Off-route recovery
 
-    /// Off-route detection runs ONLY on walking steps with a decent fix: underground (rides,
-    /// transfers) GPS drifts or vanishes entirely, and auto-rerouting on tunnel noise would
-    /// constantly replan a trip the rider is following correctly.
+    /// Off-route detection runs only on walking steps with a decent fix: underground, GPS drifts or
+    /// vanishes, and rerouting on tunnel noise would re-plan a trip the rider is following
+    /// correctly.
     private func handleLocationUpdate(_ location: CLLocation?) {
-        // Centre on the rider, zoomed in, for as long as they are following rather than reading
-        // ahead. `MapCameraSpan.station` is the app's existing tightest scale. The same number the
-        // map uses for one station and its exits, so guidance does not introduce a fifth zoom.
+        // Centre on the rider while they follow, at `MapCameraSpan.station`, the app's tightest
+        // existing scale.
         if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
-            withAnimation(.easeInOut(duration: 0.35)) {
-                camera = .region(MKCoordinateRegion(
-                    center: location.coordinate,
-                    span: MKCoordinateSpan(
-                        latitudeDelta: MapCameraSpan.station,
-                        longitudeDelta: MapCameraSpan.station
-                    )
-                ))
-            }
+            mapRegion = MapVisibleRegion(
+                center: location.coordinate,
+                latitudeDelta: MapCameraSpan.station,
+                longitudeDelta: MapCameraSpan.station
+            )
         }
         guard let location,
               location.horizontalAccuracy >= 0,
               location.horizontalAccuracy <= 65,
               let step = viewModel.currentStep,
-              // A 9 km drive is not a walk that has gone wrong. Off-route detection and the replan
-              // behind it are tuned to a pedestrian corridor — 100 m of it — and a bike or car leg
-              // is handed to another app anyway, so the rider is not following our line at all.
+              // Only walking legs: off-route detection is tuned to a 100 m pedestrian corridor, and
+              // a bike or car leg is handed to another app.
               step.accessMode == .walking,
               step.kind == .walkToStation || step.kind == .walkToDestination else {
             offRouteStrikes = 0
@@ -714,22 +530,21 @@ struct LiveGoView: View {
         } else {
             offRouteStrikes = 0
         }
-        // Two consecutive off-corridor fixes (distanceFilter is 10 m, so this is real
-        // movement, not jitter) + a cooldown so a failed or just-finished replan doesn't
-        // immediately fire again.
+        // Two consecutive off-corridor fixes (the distance filter is 10 m, so this is movement, not
+        // jitter) and a cooldown, so a failed or just-finished re-plan does not fire again at once.
         guard offRouteStrikes >= 2, !isRerouting,
               Date().timeIntervalSince(lastRerouteAt) > rerouteInterval else { return }
         offRouteStrikes = 0
-        // Stored, so closing the navigator stops it. Unstructured and untracked, a reroute in
-        // flight when the rider walked away still ran to completion and wrote its new route into
-        // `ActiveTripStore` — overwriting the resume-trip record for a journey they had left.
+        // Stored, so closing the navigator cancels it; a reroute left running would write its route
+        // into `ActiveTripStore` for a journey the rider has left.
         rerouteTask?.cancel()
         rerouteTask = Task { await reroute(from: location.coordinate) }
     }
 
     @MainActor
     private func reroute(from coordinate: CLLocationCoordinate2D) async {
-        guard let destination = destinationCoordinate else { return }
+        guard let ground = viewModel.route.groundDestination else { return }
+        let destination = CLLocationCoordinate2D(latitude: ground.latitude, longitude: ground.longitude)
         isRerouting = true
         lastRerouteAt = Date()
         rerouteInterval = min(rerouteInterval * 2, 480)
@@ -751,17 +566,15 @@ struct LiveGoView: View {
                     maxWalkingDistance: preference.maxWalkingDistance
                 )
             )
-            // Ranked the way the results list ranks them, boardable first. The planner's own order
-            // puts a drive ahead when service is closed, and `first` of that took a rider already
-            // on their way onto a driving handoff or a line that had stopped for the night.
+            // Ranked the way the results list ranks them, boardable first; the planner's own order
+            // can put a drive or a shut line first.
             let ranked = container.routePlanningService.sortRoutes(routes, by: .fastest, preferences: preference)
             guard let newRoute = ranked.first else { throw RoutePlanningError.noRouteFound }
-            // The plan can outlive the screen: MKLocalSearch ignores task cancellation, so a
-            // reroute started just before the rider closed the navigator can still land here.
-            // Nothing below should happen to a trip they have left.
+            // The plan can outlive the screen (`MKLocalSearch` ignores cancellation), and nothing
+            // below should happen to a trip the rider has left.
             guard !Task.isCancelled else { return }
-            // From any step but the first the index change runs framing, the alert and the
-            // announcement through `onChange`; running them here too spoke the step twice.
+            // From any step but the first, the index change runs framing, the alert and the
+            // announcement through `onChange`; doing it here too would speak the step twice.
             let indexChanges = viewModel.currentIndex != 0
             // A fresh plan from where the rider actually is: the next divergence is new information.
             rerouteInterval = 45
@@ -772,7 +585,7 @@ struct LiveGoView: View {
             // Keep the resume banner's stored trip in step with what's actually guiding.
             ActiveTripStore.save(newRoute)
             if !indexChanges {
-                frameCurrentStep(animated: true)
+                frameCurrentStep()
                 refreshArrivalAlert()
                 announceCurrentStep()
             }
@@ -837,15 +650,13 @@ struct LiveGoView: View {
             controls
         }
         .padding(16)
-        // `.ultraThinMaterial` let the map through: walking past a park turned the panel green,
-        // walking past water turned it blue, and the instruction the rider is following changed
-        // contrast with the scenery. This is the one surface on screen that has to stay readable.
+        // `.thickMaterial`: a thinner one lets parks and water tint the panel, and this is the one
+        // surface that must stay readable while walking.
         .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
         .elevated(.floating)
         .padding([.horizontal, .bottom], 12)
-        // The card is the thing the rider is reading while walking, so it must not slide under a
-        // tab bar the system has moved to the trailing edge. Applied outside the material, so the
-        // panel moves rather than its background stretching.
+        // Clear of a tab bar the system has moved to the trailing edge. Outside the material, so
+        // the panel moves rather than its background stretching.
         .safeAreaPadding(.horizontal)
     }
 
@@ -901,10 +712,8 @@ struct LiveGoView: View {
                 }
             }
 
-            // Where to stand up, named by the stop before theirs. `arrivalPreviousStationName` has
-            // been resolved from the graph on every plan since it was added and read by nothing;
-            // "one more stop" and "get off next" are different instructions and this is the only
-            // thing on the screen that can tell them apart.
+            // Where to stand up, named by the stop before the rider's: "one more stop" and "get off
+            // next" are different instructions.
             if let readyToAlight = step.readyToAlightText {
                 HStack(spacing: 12) {
                     Label(readyToAlight, systemImage: "figure.stand")
@@ -927,20 +736,15 @@ struct LiveGoView: View {
                 .tint(themeColor)
             }
         }
-        // `.contain`, not `.combine`. Combining folded the exit chip, the get-ready cue and the
-        // "Alert before getting off" Toggle into one label built from title and detail alone, so a
-        // VoiceOver user got neither the exit hint nor a reliably focusable alarm switch — on the
-        // screen this app's own accessibility settings route people to.
+        // `.contain`, not `.combine`: combining folds the exit chip, the get-ready cue and the
+        // alert toggle into one label, leaving VoiceOver without the exit hint or a focusable
+        // switch.
         .accessibilityElement(children: .contain)
         .accessibilityLabel(step.accessibilityLabel)
     }
 
-    /// A bike or car leg, inside live guidance.
-    ///
-    /// The step stays in the sequence — the rider really does have to cross this ground, and
-    /// dropping it would renumber the trip and hide a leg — but this app has no turn-by-turn to
-    /// give for a road, so the panel offers the apps that do instead of a walking instruction over
-    /// a driving distance.
+    /// A bike or car leg inside guidance. The step stays in the sequence (the rider does cross this
+    /// ground), but with no turn-by-turn for a road, the panel offers the apps that have it.
     @ViewBuilder
     private func roadHandoff(for step: TripStep) -> some View {
         if step.accessMode != .walking,
@@ -986,7 +790,7 @@ struct LiveGoView: View {
                     if followsRider {
                         handleLocationUpdate(container.locationService.mapSpaceLocation)
                     } else {
-                        frameCurrentStep(animated: true)
+                        frameCurrentStep()
                     }
                 }
 
@@ -1125,24 +929,19 @@ struct LiveGoView: View {
         .elevated(.floating)
     }
 
-    /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving,
-    /// so the kind alone cannot tell a 9 km drive from a walk and drew a walking figure over both.
+    /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving.
     private func icon(for step: TripStep) -> String {
         switch step.kind {
         case .walkToStation, .walkToDestination: return step.accessMode.symbolName
-        case .ride: return "tram.fill"
-        case .transfer: return "arrow.triangle.2.circlepath"
+        case .ride: return SegmentType.subway.symbolName
+        case .transfer: return SegmentType.transfer.symbolName
         case .arrive: return "flag.checkered"
         }
     }
 
+    /// The leg's own colour, as the rail and the map draw it. Arrival is not a leg.
     private func color(for step: TripStep) -> Color {
-        switch step.kind {
-        case .walkToStation, .walkToDestination: return .gray
-        case .ride: return Color(hex: step.lineColorHex ?? "#007AFF")
-        case .transfer: return .orange
-        case .arrive: return .green
-        }
+        step.colorHex.map { Color(hex: $0) } ?? .green
     }
 
     private var getOffBanner: some View {
@@ -1166,9 +965,9 @@ struct LiveGoView: View {
         .elevated(.floating)
     }
 
-    /// (Re)arms the estimated "get off" alert for the current step. Cancels any prior alert first,
-    /// then: only for a ride step with the toggle on. Schedules a hands-free local notification
-    /// and an in-app timer that buzzes + shows a banner if the app is still foreground at fire time.
+    /// Re-arms the estimated "get off" alert for the current step: cancels any prior alert, then,
+    /// for a ride step with the toggle on, schedules a local notification and an in-app timer that
+    /// buzzes and shows a banner if the app is still foreground.
     @MainActor
     private func refreshArrivalAlert() {
         cancelArrivalAlert()
@@ -1188,10 +987,9 @@ struct LiveGoView: View {
         let exitHint = step.exitHint
         reminderRegistrationTask = Task { @MainActor in
             guard await container.tripReminderService.requestAuthorization() else { return }
-            // requestAuthorization can take a while (first-run system prompt). If the rider
-            // advanced past this step while it was pending, cancelArrivalAlert() already ran
-            // with the OLD scheduledStationKey and found nothing registered yet to cancel.
-            // Registering now would leave a stale "get off" alert for an already-passed stop.
+            // Authorization can wait on a first-run prompt. If the rider advanced meanwhile, the
+            // cancel already ran with nothing registered, and registering now would leave an alert
+            // for a stop already passed.
             guard !Task.isCancelled, scheduledStationKey == key else { return }
             await container.tripReminderService.scheduleArrivalReminder(
                 stationID: key,
@@ -1227,7 +1025,7 @@ struct LiveGoView: View {
     }
 }
 
-/// Thin haptic-feedback helper. The app had no haptics before; this is the single entry point.
+/// The app's single entry point for haptic feedback.
 enum Haptics {
     @MainActor
     static func notify(_ type: UINotificationFeedbackGenerator.FeedbackType) {

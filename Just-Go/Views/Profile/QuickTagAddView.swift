@@ -2,8 +2,8 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
-/// Search-and-tag without leaving tag management: stations from the selected city's network
-/// and arbitrary map places, each saving through the shared quick-tag editor.
+/// Search-and-tag without leaving tag management: stations from the bundled network and map places,
+/// each saved through the shared quick-tag editor.
 struct QuickTagAddView: View {
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
@@ -16,8 +16,8 @@ struct QuickTagAddView: View {
     @State private var isSearchingOnline = false
     @State private var isSearching = false
     @State private var searchTask: Task<Void, Never>?
-    // Held separately from the editor's presentation flag: the custom-label alert outlives
-    // the kind-picker dialog, so the target must survive the dialog's dismissal.
+    // Held apart from the editor's presentation flag: the custom-label alert outlives the
+    // kind-picker dialog, so the target must survive its dismissal.
     @State private var pendingTarget: PendingTarget?
     @State private var showEditor = false
 
@@ -37,10 +37,10 @@ struct QuickTagAddView: View {
                                     title: station.localizedName,
                                     caption: station.lines.map(\.localizedName).joined(separator: " • "),
                                     icon: "tram.fill",
-                                    isTagged: tripMemoryService.isQuickTagged(
+                                    isTagged: tripMemoryService.quickTag(
                                         stationID: station.stationID,
                                         cityID: station.cityID
-                                    )
+                                    ) != nil
                                 ) {
                                     pendingTarget = .station(station)
                                     showEditor = true
@@ -68,7 +68,7 @@ struct QuickTagAddView: View {
                         }
                     }
                     if canSearchOnline {
-                        searchOnlineRow
+                        SearchOnlineRow(isSearching: isSearchingOnline, action: searchOnline)
                     }
                     if stationResults.isEmpty && placeResults.isEmpty && !canSearchOnline {
                         Section {
@@ -168,58 +168,11 @@ struct QuickTagAddView: View {
         }
     }
 
-    /// Typing answers from the bundled network and nothing else.
-    ///
-    /// This fired two place searches on every 300 ms pause — one through `searchStations`, which
-    /// omitted `includingPlaces:` and so took its `true` default, and a second through
-    /// `searchMapPlaces` with a different `limit`, which is a different URL and so not even
-    /// coalesced. A six-character query could cost twelve of the day's hundred. The search page
-    /// was moved off this pattern when the budget work was done; this screen was missed, and it is
-    /// the one a rider uses while browsing rather than while going somewhere.
-    ///
-    /// The bundled index holds every station in every supported city, which is what someone
-    /// tagging a place is usually reaching for. Everything else is one tap away below.
-    /// Two characters, matching the search page. A single character is almost never a place name
-    /// and is the query most likely to be a rider still typing.
+    /// Typing answers from the bundled network and nothing else; place search runs only on request,
+    /// against an allowance of 100 a day for the whole account. From two characters, as on the
+    /// search page: one character is almost never a place name.
     private var canSearchOnline: Bool {
         searchText.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
-    }
-
-    /// A capability that only responds to the return key is one most riders never find, so it gets
-    /// a row. The wording names what it does rather than what it costs: the daily allowance is our
-    /// problem, not the rider's.
-    private var searchOnlineRow: some View {
-        Section {
-            Button {
-                searchOnline()
-            } label: {
-                HStack(spacing: 10) {
-                    if isSearchingOnline {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Image(systemName: "magnifyingglass.circle.fill")
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    Text(AppLocalization.text(
-                        english: "Search online for places",
-                        simplified: "在线搜索地点",
-                        traditional: "線上搜尋地點"
-                    ))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    Spacer(minLength: 4)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .disabled(isSearchingOnline)
-        } footer: {
-            Text(AppLocalization.text(
-                english: "Stations above come from the offline network and are already complete.",
-                simplified: "以上车站来自离线线网，已经完整。",
-                traditional: "以上車站來自離線線網，已經完整。"
-            ))
-        }
     }
 
     private func runSearch(keyword: String) {
@@ -233,8 +186,7 @@ struct QuickTagAddView: View {
             return
         }
         isSearching = true
-        // Biased to the rider rather than to a selected city. A quick tag is almost always
-        // somewhere they have been, and there is no selected city to fall back to.
+        // Biased to the rider: a quick tag is almost always somewhere they have been.
         let here = container.locationService.mapSpaceLocation?.coordinate
         searchTask = Task {
             let stations = await searchStations(keyword: trimmed, near: here)
@@ -245,7 +197,7 @@ struct QuickTagAddView: View {
         }
     }
 
-    /// The place search that used to run on every keystroke, made deliberate and visible.
+    /// Place search, run when the rider asks.
     private func searchOnline() {
         onlineSearchTask?.cancel()
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -254,8 +206,7 @@ struct QuickTagAddView: View {
         let here = container.locationService.mapSpaceLocation?.coordinate
         onlineSearchTask = Task {
             let places = await searchMapPlaces(keyword: trimmed, near: here)
-            // MKLocalSearch ignores task cancellation, so guard on the live query text
-            // instead of trusting Task.isCancelled alone.
+            // `MKLocalSearch` ignores task cancellation, so guard on the live query text as well.
             guard !Task.isCancelled,
                   searchText.trimmingCharacters(in: .whitespacesAndNewlines) == trimmed else { return }
             placeResults = places

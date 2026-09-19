@@ -1,14 +1,10 @@
 import SwiftUI
 
-/// What the rider has put into this app, in one place.
+/// What the rider has put into the app: trips and saved places. How the app behaves lives in
+/// Profile.
 ///
-/// Split out of Profile, which had become two unrelated things under one label: what the rider
-/// owns and how the app behaves. Trips and saved places are the first of those; appearance, language, accessibility and data sources are the second. Only
-/// the second is a profile.
-///
-/// One `NavigationStack` at the root and stack-free content underneath it. A `NavigationStack`
-/// inside a pushed destination fails silently on iOS 18, which is why `QuickTagsView` takes an
-/// `embedded` flag rather than carrying its own.
+/// One `NavigationStack` at the root and stack-free content beneath it: a `NavigationStack` inside
+/// a pushed destination fails silently, which is why `QuickTagsView` takes an `embedded` flag.
 struct TripsView: View {
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(AppState.self) private var appState
@@ -157,81 +153,59 @@ struct TripsView: View {
         }
     }
 
-    @ViewBuilder
+    /// The whole row plans this trip again.
     private func tripRow(_ record: TripRecord) -> some View {
-        let content = VStack(alignment: .leading, spacing: 8) {
+        Button {
+            appState.pendingTripReplay = record
+            appState.selectedTab = .map
+        } label: {
             HStack {
-                Text("\(record.originName) → \(record.destinationName)")
-                    .font(.headline)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer()
-                if record.isCompleted {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                }
-            }
-
-            HStack(spacing: 12) {
-                Label(AppLocalization.minutes(Int(record.plannedDuration / 60)), systemImage: "clock")
-                Label(AppLocalization.transfers(record.transferCount), systemImage: "arrow.triangle.2.circlepath")
-                Label(AppLocalization.distance(record.walkingDistance), systemImage: "figure.walk")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-
-            // `routeSummary` is a frozen, locale-stamped duration string and duplicates the
-            // localized duration above; the strategy alone follows the current language.
-            Text(record.strategy.localizedName)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            if !record.warningMessages.isEmpty {
-                Text(record.warningMessages.prefix(2).joined(separator: "; "))
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
-            if let note = record.note {
-                Text(note)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("\(record.originName) → \(record.destinationName)")
+                            .font(.headline)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if record.isCompleted {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    HStack(spacing: 12) {
+                        Label(AppLocalization.minutes(Int(record.plannedDuration / 60)), systemImage: "clock")
+                        Label(AppLocalization.transfers(record.transferCount), systemImage: "arrow.triangle.2.circlepath")
+                        Label(AppLocalization.distance(record.walkingDistance), systemImage: "figure.walk")
+                    }
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            }
-        }
-        .padding(.vertical, 8)
-
-        // Only rows that carry both station IDs can be planned again. Older rows kept names only,
-        // and re-matching a trip by name is exactly the guess this app does not make.
-        if record.canReplan {
-            Button {
-                replan(record)
-            } label: {
-                HStack {
-                    content
-                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Text(record.strategy.title)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    if !record.warningMessages.isEmpty {
+                        Text(record.warningMessages.prefix(2).joined(separator: "; "))
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+                    if let note = record.note {
+                        Text(note)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                .contentShape(Rectangle())
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
             }
-            .buttonStyle(.plain)
-            .accessibilityHint(AppLocalization.text(
-                english: "Plans this trip again",
-                simplified: "重新规划这次行程",
-                traditional: "重新規劃這次行程"
-            ))
-        } else {
-            content
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityHint(AppLocalization.text(
+            english: "Plans this trip again",
+            simplified: "重新规划这次行程",
+            traditional: "重新規劃這次行程"
+        ))
     }
-
-    private func replan(_ record: TripRecord) {
-        guard let origin = record.originStationID, let destination = record.destinationStationID else { return }
-        appState.pendingTripReplay = AppState.PendingTripReplay(
-            cityID: record.cityID,
-            originStationID: origin,
-            destinationStationID: destination
-        )
-        appState.selectedTab = .map
-    }
-
 }
 
 enum TripsDestination: Hashable {

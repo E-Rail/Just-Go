@@ -1,9 +1,8 @@
 import Foundation
 
-/// Races `operation` against an explicit deadline. `URLSessionConfiguration.timeoutIntervalForRequest`
-/// only fires when no bytes arrive for the interval. A connection that trickles data
-/// indefinitely never trips it, so an unguarded fetch can hang well past its declared timeout
-/// and leave a loading spinner stuck. Wrapping a fetch here guarantees it always resolves.
+/// Races `operation` against an explicit deadline. A session's `timeoutIntervalForRequest` only
+/// fires when no bytes arrive, so a connection that trickles data never trips it and an unguarded
+/// fetch can hang past its timeout.
 func withDeadline<T: Sendable>(
     seconds: TimeInterval,
     onTimeout: @escaping @Sendable () -> Error,

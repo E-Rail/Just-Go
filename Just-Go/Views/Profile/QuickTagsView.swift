@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct QuickTagsView: View {
-    /// False when this is a detail column rather than a sheet. `dismiss()` has nothing to dismiss
-    /// in a column, so a Done button there is a control that looks live and does nothing.
+    /// False in a detail column, where `dismiss()` has nothing to dismiss and a Done button would
+    /// do nothing.
     var showsDoneButton = true
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(DIContainer.self) private var container
@@ -16,8 +16,8 @@ struct QuickTagsView: View {
         AppLocalization.text(english: "Tag", simplified: "标签", traditional: "標籤")
     }
 
-    /// True when this is pushed onto a stack that already exists. A `NavigationStack` inside a
-    /// pushed destination renders blank on iOS 18, so the Trips tab asks for the content alone.
+    /// True when pushed onto an existing stack: a `NavigationStack` inside a pushed destination
+    /// renders blank, so the Trips tab asks for the content alone.
     var embedded = false
 
     var body: some View {
@@ -33,15 +33,9 @@ struct QuickTagsView: View {
             Group {
                 Section {
                     if tripMemoryService.stationQuickTags.isEmpty {
-                        // Apple's own empty state, and the separator hidden with it.
-                        //
-                        // A plain `List` aligns a row's separator to the leading edge of that row's
-                        // *content*. This row's content is centred, so both of its separators were
-                        // drawn starting a third of the way across the sheet — which reads as a
-                        // broken rule rather than a list. Hand-rolling the empty state is what
-                        // created a centred row in the first place; `ContentUnavailableView` is the
-                        // control Apple ships for this, and it is already used in fourteen other
-                        // places here.
+                        // Apple's own empty state. A hand-rolled centred row would get a `List`
+                        // separator aligned to its centred content, starting a third of the way
+                        // across.
                         ContentUnavailableView {
                             Label(AppLocalization.localized("No Quick Tags yet"), systemImage: "tag.circle")
                         } description: {

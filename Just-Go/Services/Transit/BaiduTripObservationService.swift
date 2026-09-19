@@ -1,15 +1,10 @@
 import CoreLocation
 import Foundation
 
-/// How far a rider actually walks between two platforms, in metres.
-///
-/// The metres are the point. Baidu also returns a duration for the same step, and it was measured
-/// across 26 interchanges to be exactly `distance ÷ 1.19 m/s` every time, standard deviation 0.0075.
-/// That makes it arithmetic rather than observation: it accounts for no stairs, no escalators, no
-/// waiting and no crowds. This app already divides by 1.25 m/s in `BundledMetroRouteProvider`, so
-/// Baidu's seconds would add nothing while sounding like they had. The distance is the part the app
-/// genuinely does not have: 1,153 of its interchanges are two lines meeting at one node with no
-/// geometry at all.
+/// How far a rider walks between two platforms, in metres. The metres are the point: Baidu's
+/// duration for the same step is `distance ÷ 1.19 m/s` in all 26 interchanges measured, arithmetic
+/// rather than observation, and this app already walks at 1.25 m/s. The distance is what the app
+/// lacks: 1,153 of its interchanges are two lines meeting at one node with no geometry.
 struct TransferGeometry: Equatable, Sendable {
     let stationName: String
     let fromLineName: String
@@ -17,35 +12,24 @@ struct TransferGeometry: Equatable, Sendable {
     let distanceMetres: Int
 }
 
-/// What one trip costs in fare, for one boarding→alighting station pair.
-///
-/// Held against the station pair rather than against a route, because that is the level at which
-/// the number is true. Chinese metro tariffs are charged on the entry and exit gates, not on the
-/// path between them: 天通苑→大兴机场 returned three routes riding different lines over 69.2 km,
-/// 71.5 km and 76.2 km, and Baidu priced all three at ¥41. That is what licenses attaching a fare
-/// observed on Baidu's route to the route this app planned, and it is only sound while the pair
-/// matches, which is why the caller checks it.
+/// What one trip costs, for one boarding → alighting station pair. Held against the pair because
+/// that is where the number is true: Chinese metro tariffs are charged at the gates, not along the
+/// path (天通苑 → 大兴机场 over three routes of 69.2, 71.5 and 76.2 km priced ¥41 each). That is what lets
+/// a fare observed on Baidu's route attach to this app's route, and only while the pair matches.
 struct ObservedFare: Equatable, Sendable {
     let boardingStationName: String
     let alightingStationName: String
     let yuan: Double
 }
 
-/// A bus journey between the same two points, priced below the rail fare.
-///
-/// Just-Go plans rail and only rail, and that is not changing. But a flat ¥2 bus against a ¥6 metro
-/// fare is a real choice for a rider counting money, and staying silent about a cheaper option the
-/// same response already named would be its own kind of dishonesty. Carried so one line can say so
-/// and send them elsewhere for it.
+/// A bus between the same two points, priced below the rail fare. Just-Go plans rail only, but a ¥2
+/// bus against a ¥6 metro fare is a real choice for a rider counting money.
 struct ObservedBusAlternative: Equatable, Sendable {
     let yuan: Double
     let duration: TimeInterval
 }
 
-/// What a taxi over the same ground costs, by time of day.
-///
-/// The rider-facing point is the price of missing the last train, which is a number this app can
-/// now put next to the warning it already shows.
+/// What a taxi over the same ground costs by time of day: the price of missing the last train.
 struct ObservedTaxiFare: Equatable, Sendable {
     /// When the night tariff applies. `nil` means the city quoted one rate for the whole day.
     struct NightWindow: Equatable, Sendable {
@@ -65,30 +49,24 @@ struct ObservedTaxiFare: Equatable, Sendable {
     let nightYuan: Double
     let nightWindow: NightWindow?
 
-    /// The rate in force at a given hour. The window is read from the city's own label rather than
-    /// assumed: Beijing's day starts at 05:00 and Chengdu's at 06:00, and hardcoding either would
-    /// quote the wrong tariff in the other city.
+    /// The rate in force at a given hour, with the window read from the city's own label: Beijing's
+    /// day starts at 05:00 and Chengdu's at 06:00.
     func yuan(atHour hour: Int) -> Double {
         guard let nightWindow else { return dayYuan }
         return nightWindow.contains(hour: hour) ? nightYuan : dayYuan
     }
 }
 
-/// First and last train for one line, in the direction it was ridden, out of one boarding station.
-///
-/// No endpoint answers "when is the last train from 西单 on line 4". This arrives only as a
-/// by-product of routing a trip that happens to ride that line, which is exactly the trip the rider
-/// asked about, so the by-product is the answer.
+/// First and last train for one line, in the direction ridden, from one boarding station. No
+/// endpoint answers "last train from 西单 on line 4"; it arrives only as a by-product of routing a
+/// trip that rides that line, which is the trip the rider asked about.
 struct ObservedLineHours: Equatable, Sendable {
     let lineName: String
     let boardingStationName: String
-    /// `direct_text`, e.g. "潞阳方向" — the service these hours belong to.
-    ///
-    /// Load-bearing, not decoration. The two directions of one line at one station are routinely
-    /// an hour apart, and a line subdivides again into full runs and short-turns: 花园桥 on 6号线
-    /// eastbound is 22:45 to 潞阳 and 23:56 to 草房. Baidu resolves both for the exact ride it
-    /// costed and says which in this field, so carrying it is the difference between a last train
-    /// this rider can use and the most optimistic one at the station.
+    /// `direct_text`, e.g. "潞阳方向": the service these hours belong to. Load-bearing: two directions
+    /// at one station are routinely an hour apart, and a line splits into full runs and short-turns
+    /// (花园桥 on 6号线 eastbound: 22:45 to 潞阳, 23:56 to 草房). Baidu resolves the exact ride it costed
+    /// and names it here.
     let directionText: String?
     let firstTrain: String
     let lastTrain: String
@@ -105,14 +83,10 @@ struct ObservedStop: Equatable, Sendable {
     }
 }
 
-/// A line as the routing service currently sees it: the stops it calls at, in order, with the
-/// colour it is drawn in and the terminal it runs towards.
-///
-/// This is the same response the app already reads a fare and a last train out of. `stop_info`
-/// carries every intermediate stop with a coordinate, and 马连洼 → 天通苑东 returns all eleven
-/// stations of Beijing 18号线 in one call. The bundled OSM network stays the offline source of
-/// truth; this exists so a rider can ask the question the packs cannot answer, which is whether
-/// what they are looking at is still current.
+/// A line as the routing service sees it now: its stops in order, its colour, the terminal it runs
+/// towards. From the same response a fare and last train come from (`stop_info` carries every
+/// intermediate stop with a coordinate). The bundled OSM network stays the offline truth; this lets
+/// a rider check whether it is still current.
 struct ObservedLine: Equatable, Sendable {
     let name: String
     let colorHex: String?
@@ -123,17 +97,12 @@ struct ObservedLine: Equatable, Sendable {
     let stops: [ObservedStop]
 }
 
-/// Asking the routing service about one line rather than one trip.
-///
-/// Split from `TripObservationProviding` on purpose. A trip is planned whether the rider asks or
-/// not; a line is looked up only when they open its page and tap for it, and the two deserve
-/// different budgets and different failure stories.
+/// Asking the routing service about one line rather than one trip: looked up only when a rider
+/// opens a line and taps for it, so it has its own budget and failure story.
 protocol LineObservationProviding: Sendable {
-    /// The line ridden between two points, when a single line rides the whole way.
-    ///
-    /// Returns `nil` rather than a partial answer when the ride takes more than one line, which is
-    /// what happens on a ring line asked end to end, and when Baidu refuses the trip outright, as
-    /// it does for two adjacent stations 700 m apart.
+    /// The line ridden between two points, when a single line rides the whole way. nil rather than
+    /// a partial answer when the ride takes more than one line (a ring asked end to end) or Baidu
+    /// refuses the trip (two adjacent stations 700 m apart).
     func observedLine(
         from origin: CLLocationCoordinate2D,
         to destination: CLLocationCoordinate2D,
@@ -141,11 +110,7 @@ protocol LineObservationProviding: Sendable {
     ) async -> ObservedLine?
 }
 
-/// Everything one transit routing call answers about a trip.
-///
-/// The app used to make this call and read a single field out of the response. The other four are
-/// not extra requests, extra quota or extra latency; they were already arriving and being dropped
-/// on the floor.
+/// Everything one transit routing call answers about a trip, from one request.
 struct TripObservations: Equatable, Sendable {
     let transfers: [TransferGeometry]
     let railFares: [ObservedFare]
@@ -162,10 +127,9 @@ struct TripObservations: Equatable, Sendable {
     }
 }
 
-/// The port a better source of trip facts arrives through.
-///
-/// Deliberately not tied to Baidu. If an operator ever publishes real corridor lengths, tariffs or
-/// timetables in a redistributable form, they implement this and nothing else moves.
+/// The port a better source of trip facts arrives through. Not tied to Baidu: an operator
+/// publishing corridor lengths, tariffs or timetables in a redistributable form implements this and
+/// nothing else moves.
 protocol TripObservationProviding: Sendable {
     /// One call per trip, not one per fact.
     func observations(
@@ -174,27 +138,24 @@ protocol TripObservationProviding: Sendable {
     ) async -> TripObservations
 }
 
-/// Reads a trip's fare, taxi fallback, service hours and transfer corridors out of Baidu's transit
+/// Reads a trip's fare, taxi fallback, service hours and transfer corridors from Baidu's transit
 /// routing.
 ///
 /// **Nothing is written to disk.** Baidu's terms forbid storing or caching what the service
-/// releases, so results live in memory for the session and are gone on relaunch. That is a real
-/// cost, and the app's own graph stays the offline answer with this as online enrichment on top,
-/// but it is the honest reading of the licence. `validate_runtime_data_policy.rb` enforces that no
-/// Baidu-derived byte is ever committed.
+/// releases, so results live in memory for the session. The app's own graph stays the offline
+/// answer; this is online enrichment on top. `validate_runtime_data_policy.rb` enforces that no
+/// Baidu-derived byte is committed.
 actor BaiduTripObservationService: TripObservationProviding, LineObservationProviding {
     private let client: BaiduMapsClient
-    /// Session-scoped, in memory only. See the note above on why this is not a disk cache.
-    ///
-    /// Capped, newest use last. Keys round the trip's two ends to about ten metres, so a guided
-    /// journey that reroutes from the rider's moving position added an entry each time — every one
-    /// holding a whole trip's fares, service hours and corridors — and nothing removed them.
+    /// Session-scoped, in memory only (see above). Capped, newest use last: keys round the ends to
+    /// about ten metres, so a guided journey rerouting from the rider's moving position adds an
+    /// entry each time.
     private var cache: [String: TripObservations] = [:]
     private var cacheOrder: [String] = []
     private var lineCacheOrder: [String] = []
     private static let maximumCachedEntries = 32
-    /// Line lookups are cached separately and just as briefly: same session-only rule, and a
-    /// negative result is cached too so a ring line does not spend a call every time it is opened.
+    /// Line lookups, cached separately under the same session-only rule. A negative result is
+    /// cached too, so a ring line does not spend a call each time it is opened.
     private var lineCache: [String: ObservedLine?] = [:]
 
     init(client: BaiduMapsClient) {
@@ -220,20 +181,7 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let response: BaiduTransitResponse
         do {
-            response = try await client.get(
-                BaiduTransitResponse.self,
-                path: "/direction/v2/transit",
-                parameters: [
-                    (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
-                    (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
-                    (name: "coord_type", value: "gcj02"),
-                    (name: "ret_coordtype", value: "gcj02"),
-                    // 地铁优先. The default policy is 推荐, which mixes buses freely into results this
-                    // app cannot use. Asking for the rail-first plan costs nothing and returns more
-                    // rail-only routes, which are the only ones a fare can be attributed from.
-                    (name: "tactics_incity", value: "5")
-                ]
-            )
+            response = try await transit(from: origin, to: destination)
         } catch {
             AppLog.routing.info("Baidu trip observations unavailable: \(error)")
             return .none
@@ -241,13 +189,37 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let observations = Self.observations(in: response)
         cache[cacheKey] = observations
-        cacheOrder.removeAll { $0 == cacheKey }
-        cacheOrder.append(cacheKey)
-        while cacheOrder.count > Self.maximumCachedEntries {
-            let evicted = cacheOrder.removeFirst()
-            cache[evicted] = nil
-        }
+        Self.remember(cacheKey, in: &cacheOrder) { cache[$0] = nil }
         return observations
+    }
+
+    /// The transit plan both lookups read: 地铁优先 (`tactics_incity=5`), because the default 推荐
+    /// mixes buses freely into results this app cannot use, and only rail-only routes can have a
+    /// fare attributed to them.
+    private func transit(
+        from origin: CLLocationCoordinate2D,
+        to destination: CLLocationCoordinate2D
+    ) async throws -> BaiduTransitResponse {
+        try await client.get(
+            BaiduTransitResponse.self,
+            path: "/direction/v2/transit",
+            parameters: [
+                (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
+                (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
+                (name: "coord_type", value: "gcj02"),
+                (name: "ret_coordtype", value: "gcj02"),
+                (name: "tactics_incity", value: "5")
+            ]
+        )
+    }
+
+    /// Marks `key` newest and evicts the oldest past `maximumCachedEntries`.
+    private static func remember(_ key: String, in order: inout [String], evict: (String) -> Void) {
+        order.removeAll { $0 == key }
+        order.append(key)
+        while order.count > maximumCachedEntries {
+            evict(order.removeFirst())
+        }
     }
 
     // MARK: - One line
@@ -265,17 +237,7 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let response: BaiduTransitResponse
         do {
-            response = try await client.get(
-                BaiduTransitResponse.self,
-                path: "/direction/v2/transit",
-                parameters: [
-                    (name: "origin", value: "\(origin.latitude),\(origin.longitude)"),
-                    (name: "destination", value: "\(destination.latitude),\(destination.longitude)"),
-                    (name: "coord_type", value: "gcj02"),
-                    (name: "ret_coordtype", value: "gcj02"),
-                    (name: "tactics_incity", value: "5")
-                ]
-            )
+            response = try await transit(from: origin, to: destination)
         } catch {
             AppLog.routing.info("Baidu line observation unavailable: \(error)")
             return nil
@@ -283,23 +245,15 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
         let line = Self.observedLine(in: response, named: expectedName)
         lineCache[cacheKey] = line
-        lineCacheOrder.removeAll { $0 == cacheKey }
-        lineCacheOrder.append(cacheKey)
-        while lineCacheOrder.count > Self.maximumCachedEntries {
-            let evicted = lineCacheOrder.removeFirst()
-            lineCache[evicted] = nil
-        }
+        Self.remember(cacheKey, in: &lineCacheOrder) { lineCache[$0] = nil }
         return line
     }
 
     /// The line ridden end to end, when one line rides the whole way and it is the line asked for.
-    ///
-    /// Both conditions matter. Routing two terminals of a ring line returns a fragment rather than
-    /// the ring, and routing across a city returns whatever is fastest, which is frequently a line
-    /// nobody asked about. A branch is the one case where two steps are still one line: Guangzhou
-    /// 3号线 机场北 → 番禺广场 comes back as two steps both named 地铁3号线, because the rider does
-    /// change trains at 体育西路 and stays on the same line doing it. Those concatenate; anything
-    /// else returns nothing at all.
+    /// Routing a ring's two terminals returns a fragment, and routing across a city returns
+    /// whatever is fastest. A branch is the one case where two steps are one line (Guangzhou 3号线
+    /// 机场北 → 番禺广场 changes trains at 体育西路 on the same line); those concatenate, anything else
+    /// returns nothing.
     static func observedLine(in response: BaiduTransitResponse, named expectedName: String) -> ObservedLine? {
         for route in response.result?.routes ?? [] {
             let rides = route.steps.flatMap(\.steps).filter { $0.vehicleInfo?.type != nil && !$0.isWalking }
@@ -332,9 +286,9 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
         return nil
     }
 
-    /// Boarding and alighting stations arrive without a coordinate and frequently with an exit
-    /// letter attached ("古城站(D西南口)"), so they are normalised the same way every other station
-    /// name in this file is. A stop repeated at a branch join is dropped rather than drawn twice.
+    /// Boarding and alighting stations arrive without a coordinate and often with an exit letter
+    /// ("古城站(D西南口)"), so they are normalised like every station name here. A stop repeated at a
+    /// branch join is dropped.
     private static func appendStop(
         _ rawName: String?,
         at location: BaiduCoordinate?,
@@ -373,9 +327,8 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
                       let first = detail.firstTime, !first.isEmpty,
                       let last = detail.lastTime, !last.isEmpty else { continue }
                 let boarding = TransitLineMatching.normalizedStationName(station)
-                // Keyed on the service too. Without it, first-writer-wins across the five routes
-                // Baidu returns would let one direction's window stand in for the other's at the
-                // same station, which is the whole failure this field exists to stop.
+                // Keyed on the service too, so one direction's window cannot stand in for the
+                // other's at the same station.
                 let key = "\(boarding)|\(lineName)|\(detail.directText ?? "")"
                 if lineHours[key] == nil {
                     lineHours[key] = ObservedLineHours(
@@ -394,9 +347,8 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
             if vehicles.allSatisfy(\.isRail) {
                 if let fare = railFare(for: route, railSteps: vehicles) {
                     let key = "\(fare.boardingStationName)>\(fare.alightingStationName)"
-                    // Lowest wins. Two rail-only plans over the same pair should price identically
-                    // by the tariff rule above; where they do not, quoting the higher one would
-                    // overstate what the rider has to pay.
+                    // Lowest wins: two rail-only plans over one pair should price identically, and
+                    // quoting the higher would overstate the fare.
                     if let existing = fares[key], existing.yuan <= fare.yuan { continue }
                     fares[key] = fare
                 }
@@ -438,12 +390,9 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
         )
     }
 
-    /// The rail ticket price for a plan that is rail from end to end.
-    ///
-    /// Only rail-only plans are priced, and the reason is a trap in the wire format rather than
-    /// caution: a bus-only plan reports `ticket_type: 1` (rail) with `ticket_price: 0` alongside its
-    /// real bus fare, so reading the rail entry off any plan that is not rail would confidently
-    /// return ¥0.
+    /// The rail ticket price for a plan that is rail end to end. Only rail-only plans are priced
+    /// because of a wire-format trap: a bus-only plan reports `ticket_type: 1` (rail) with
+    /// `ticket_price: 0` beside its bus fare.
     private static func railFare(for route: BaiduTransitResponse.Route, railSteps: [BaiduStep]) -> ObservedFare? {
         guard let boarding = railSteps.first?.vehicleInfo?.detail?.onStation,
               let alighting = railSteps.last?.vehicleInfo?.detail?.offStation else { return nil }
@@ -466,9 +415,8 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
         return ObservedBusAlternative(yuan: yuan, duration: TimeInterval(duration))
     }
 
-    /// Baidu labels its tariff rows in Chinese: 白天(05:00-23:00) and 夜间(23:00-05:00), or a single
-    /// 全天 row in cities that charge one rate. The hours are parsed from the label rather than
-    /// assumed, because they differ by city.
+    /// Baidu labels tariff rows in Chinese: 白天(05:00-23:00) and 夜间(23:00-05:00), or one 全天 row. The
+    /// hours are parsed from the label because they differ by city.
     private static func taxiFare(in taxi: BaiduTransitResponse.Taxi?) -> ObservedTaxiFare? {
         let rows = (taxi?.detail ?? []).compactMap { row -> (desc: String, yuan: Double)? in
             guard let price = row.totalPrice, price > 0 else { return nil }
@@ -492,9 +440,8 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
 
     private static let hourPattern = try! NSRegularExpression(pattern: "([0-9]{1,2}):[0-9]{2}")
 
-    /// `nil` when the label cannot be read, which downgrades the fare to a flat day rate rather than
-    /// guessing a window. Quoting the night price during the day would overstate the cost of a
-    /// missed train, and quoting the day price at night would understate it.
+    /// nil when the label cannot be read, which downgrades to a flat day rate rather than guessing
+    /// a window in either direction.
     private static func nightWindow(fromLabel label: String) -> ObservedTaxiFare.NightWindow? {
         let range = NSRange(label.startIndex..<label.endIndex, in: label)
         let hours = hourPattern.matches(in: label, range: range).compactMap { match -> Int? in
@@ -506,28 +453,18 @@ actor BaiduTripObservationService: TripObservationProviding, LineObservationProv
     }
 }
 
-/// Matching Baidu's line and station names onto this app's own.
-///
-/// Baidu says "地铁4号线大兴线" where a pack says "4号线", and "新街口站(A西北口)" where the graph
-/// says "新街口". Everything here fails closed: when a name cannot be matched confidently the
-/// caller gets nothing and the screen says nothing, which is the correct outcome for an app whose
-/// rule is that an unverified number is worse than a blank.
+/// Matching Baidu's line and station names onto this app's: "地铁4号线大兴线" for "4号线", "新街口站(A西北口)" for
+/// "新街口". Fails closed: a name that cannot be matched confidently gives the caller nothing, and the
+/// screen says nothing.
 enum TransitLineMatching {
     /// Baidu's own classification of a line: 1 地铁·轻轨, 3 有轨电车, 12 机场轨道快线.
     private static let railDetailTypes: Set<Int> = [1, 3, 12]
     /// 0 普通公交, 2 大巴, 6 夜班车, 8 轮渡, 10 专线快车. None of these is rail.
     private static let roadDetailTypes: Set<Int> = [0, 2, 6, 8, 10]
 
-    /// Whether a line is rail, decided by Baidu's own code for it rather than by reading its name.
-    ///
-    /// The name alone gets this wrong in both directions, and both were observed live. 大兴机场线
-    /// (the Daxing Airport express, code 12) contains none of the markers below and does not
-    /// contain the word "line", so it read as a bus and its interchanges were never measured.
-    /// Meanwhile 大兴机场大巴天通苑线 is an airport *coach* (code 2) that ends in 线, so any rule
-    /// generous enough to catch the first would have swallowed the second.
-    ///
-    /// The name check survives as the fallback for codes Baidu has not documented and this app has
-    /// not seen, where guessing from the name beats assuming road.
+    /// Whether a line is rail, by Baidu's own code rather than its name. Names mislead both ways:
+    /// 大兴机场线 (airport express, code 12) has no rail marker, while 大兴机场大巴天通苑线 is a coach (code 2)
+    /// that ends in 线. The name check remains the fallback for undocumented codes.
     static func isRailLine(_ name: String, detailType: Int?) -> Bool {
         if let detailType {
             if railDetailTypes.contains(detailType) { return true }
@@ -536,8 +473,8 @@ enum TransitLineMatching {
         return isRailLine(name)
     }
 
-    /// Buses are excluded on purpose. The product deliberately routes rail only, and Baidu returns
-    /// bus interchanges freely (`84路` → `665路`) that would otherwise be silently mixed in.
+    /// Buses excluded: the app routes rail only, and Baidu returns bus interchanges (`84路` →
+    /// `665路`) freely.
     static func isRailLine(_ name: String) -> Bool {
         let railMarkers = ["地铁", "轨道", "轻轨", "磁浮", "磁悬浮", "有轨电车", "APM", "MTR"]
         if railMarkers.contains(where: { name.localizedCaseInsensitiveContains($0) }) { return true }
@@ -581,12 +518,8 @@ enum TransitLineMatching {
         let left = normalizedLineToken(lhs)
         let right = normalizedLineToken(rhs)
         guard !left.isEmpty, !right.isEmpty else { return false }
-        // Numbers compare exactly. `contains` here made "4" match "14", so 4号线 and 14号线 were
-        // treated as the same line — and they meet at 北京南站, where a rider changes between them.
-        // Nine Beijing interchanges pair two lines whose numbers are a substring of each other
-        // (北京南站, 国贸, 大望路, 二里沟, 公主坟, 大屯路东, 木樨地, 永安里, 回龙观东大街).
-        // `TransferGeometry.matches` applies this with no second filter; the service-hours path
-        // survived only because `ServiceHoursResolver` happens to re-filter exactly afterwards.
+        // Numbers compare exactly. `contains` would make "4" match "14", and nine Beijing
+        // interchanges pair lines whose numbers are substrings of each other (北京南站, 国贸, 大望路, …).
         if isNumeric(left) || isNumeric(right) { return left == right }
         return left == right || left.contains(right) || right.contains(left)
     }
@@ -639,9 +572,8 @@ struct BaiduTransitResponse: BaiduResponseEnvelope {
 
     struct Result: Decodable, Sendable {
         let routes: [Route]?
-        /// Undocumented in Baidu's transit reference and served anyway, in every mainland city
-        /// probed. Optional in the strongest sense: an undocumented field can disappear without
-        /// notice, and when it does the app must simply stop mentioning taxis.
+        /// Undocumented in Baidu's transit reference and served in every mainland city probed. It
+        /// can disappear without notice; when it does, the app stops mentioning taxis.
         let taxi: Taxi?
     }
 
@@ -684,9 +616,8 @@ struct BaiduTransitResponse: BaiduResponseEnvelope {
 }
 
 /// Baidu nests same-city steps one level deeper than cross-city ones: an element of `steps` is
-/// sometimes an object and sometimes an array of them. Codable cannot express "either" without
-/// this, and assuming one shape decodes the other as a hard failure. Baidu's own documentation
-/// describes only the flat form; this was written against the live API, which is what ships.
+/// sometimes an object, sometimes an array. Written against the live API; the documentation
+/// describes only the flat form.
 struct BaiduStepGroup: Decodable, Sendable {
     let steps: [BaiduStep]
 
@@ -735,15 +666,13 @@ struct BaiduStep: Decodable, Sendable {
             let offStation: String?
             let firstTime: String?
             let lastTime: String?
-            /// The stops between `onStation` and `offStation`, in order, each with a coordinate.
-            /// Requested as GCJ-02 like everything else here, and spot-checked against the same
-            /// station returned by place search: identical to ten decimal places.
+            /// The stops between `onStation` and `offStation`, in order, each with a GCJ-02
+            /// coordinate (spot-checked against place search: identical to ten decimal places).
             let stopInfo: [Stop]?
             let lineColor: String?
             /// "天通苑东方向" — the terminal this service runs towards, which is how every station
             /// sign in China names a direction.
             let directText: String?
-            let stopNum: Int?
 
             struct Stop: Decodable, Sendable {
                 let stopName: String?
@@ -764,7 +693,6 @@ struct BaiduStep: Decodable, Sendable {
                 case stopInfo = "stop_info"
                 case lineColor = "line_color"
                 case directText = "direct_text"
-                case stopNum = "stop_num"
             }
         }
     }

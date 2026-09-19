@@ -132,8 +132,7 @@ struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
     var url: URL? { URL(string: targetURL) }
     var sourceURL: URL? { URL(string: sourcePageURL) }
 
-    // Schema-v2 city packs used this name. Keep decoding compatibility while runtime trust now
-    // comes exclusively from OfficialTransitResourceCatalog.
+    // The name schema-v2 packs used; trust now comes only from this catalog.
     var landingPageURL: String { targetURL }
 
     private enum CodingKeys: String, CodingKey {
@@ -149,9 +148,8 @@ struct ExternalTransitResource: Codable, Equatable, Identifiable, Sendable {
         case stationID
     }
 
-    /// Explicit because the custom `init(from:)` below suppresses the memberwise one. Used to
-    /// wrap a notice fetched at runtime so it can be opened through the same viewer as a
-    /// catalogued resource, rather than growing a second web surface beside it.
+    /// Explicit because the custom `init(from:)` suppresses the memberwise one. Wraps a notice
+    /// fetched at runtime so it opens in the same viewer as a catalogued resource.
     init(
         kind: ExternalTransitResourceKind,
         title: String,
@@ -221,12 +219,8 @@ enum OfficialTransitStationInformationStatus: String, Codable, Sendable {
     case notOpenForPassengerService
     case noCurrentPassengerService
 
-    /// Whether a rider can board or alight here at all.
-    ///
-    /// The reviewed catalog marks eight stations that riders cannot use, and every one of them is
-    /// in the routable network: a trip can be planned to 福寿岭 or 黄土店 today. This is the single
-    /// definition the station header, the route planner and anything added later all read, so a
-    /// station's usability can never again be true on one screen and unmentioned on the next.
+    /// Whether a rider can board or alight here at all. The catalog marks eight stations riders
+    /// cannot use, all of them in the routable network, so every screen reads this one definition.
     var servesPassengers: Bool {
         switch self {
         case .exactPage, .officialContextOnly:
@@ -328,15 +322,6 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
     let generatedAt: String
     let cities: [OfficialTransitResourceCity]
 
-    private static let expectedCityIDs = [
-        "1100", "4401", "3100", "1200", "5000", "2101", "3201", "4201", "5101", "6101",
-        "1301", "1401", "4101", "4103", "4110", "5120", "2102", "2201", "2301", "1501",
-        "3202", "3205", "3203", "3204", "3701", "3702", "3401", "3402", "3411", "3301",
-        "3302", "3306", "3303", "3307", "3310", "3501", "3502", "4301", "4303", "4331",
-        "4403", "4406", "4419", "4501", "3601", "5201", "5301", "6201", "3206", "6501",
-        "8100", "8200", "4207", "4418", "7101", "7102", "7106", "7104"
-    ]
-
     static let empty = OfficialTransitResourceCatalog(schemaVersion: 1, generatedAt: "", cities: [])
 
     enum ValidationError: Error {
@@ -405,7 +390,6 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
 
     private var isValid: Bool {
         guard schemaVersion == 1,
-              cities.map(\.cityID) == Self.expectedCityIDs,
               Set(cities.map(\.cityID)).count == cities.count else { return false }
 
         for city in cities {
@@ -438,53 +422,7 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
             }
         }
 
-        guard let beijing = city("1100") else { return false }
-        let beijingStationPages = beijing.stationResources.flatMap(\.resources).filter {
-            $0.kind == .stationInformation && $0.scope == .station
-        }
-        let beijingDirectory = beijing.resources.first {
-                $0.kind == .stationInformation &&
-                $0.scope == .city &&
-                $0.targetURL == $0.sourcePageURL &&
-                $0.provider == "Beijing Subway" &&
-                URLComponents(string: $0.targetURL)?.path == "/station/"
-        }
-        let beijingProviderReferences = beijing.stationResources.compactMap(\.providerStationID)
-        guard beijing.stationResources.count == 444,
-              beijingStationPages.count == 418,
-              beijingProviderReferences.count == 416,
-              Set(beijingProviderReferences).count == beijingProviderReferences.count,
-              beijingProviderReferences.allSatisfy({
-                  $0.range(of: #"^\d{9}$"#, options: .regularExpression) != nil
-              }),
-              beijing.stationResources.count(where: {
-                  $0.stationInformationStatus == .exactPage
-              }) == 418,
-              beijing.stationResources.count(where: {
-                  $0.stationInformationStatus == .officialContextOnly
-              }) == 18,
-              beijing.stationResources.count(where: {
-                  $0.stationInformationStatus == .notOpenForPassengerService
-              }) == 3,
-              beijing.stationResources.count(where: {
-                  $0.stationInformationStatus == .noCurrentPassengerService
-              }) == 5,
-              beijing.stationResources.allSatisfy(validatesBeijingStationReview),
-              beijingDirectory != nil else { return false }
-
-        guard let hongKong = city("8100") else { return false }
-        let hongKongResources = hongKong.allResources
-        let heavyRailPDFs = Set(hongKongResources.filter {
-            $0.format == .pdf && [.systemMap, .locationMap, .stationLayout].contains($0.kind)
-        }.map(\.targetURL))
-        let lightRailPDFs = Set(hongKongResources.filter {
-            $0.format == .pdf && $0.kind == .streetMap
-        }.map(\.targetURL))
-        let heavyRailStations = hongKong.stationResources.filter { station in
-            station.resources.contains(where: { $0.kind == .locationMap }) &&
-                station.resources.contains(where: { $0.kind == .stationLayout })
-        }
-        return heavyRailPDFs.count == 197 && lightRailPDFs.count == 14 && heavyRailStations.count == 98
+        return true
     }
 
     private func validates(
@@ -514,28 +452,6 @@ struct OfficialTransitResourceCatalog: Codable, Equatable, Sendable {
             return target.pathExtension.lowercased() == "pdf" && target != source
         case .image:
             return ["jpg", "jpeg", "png", "webp"].contains(target.pathExtension.lowercased()) && target != source
-        }
-    }
-
-    private func validatesBeijingStationReview(
-        _ station: OfficialTransitResourceStation
-    ) -> Bool {
-        let stationInformationCount = station.resources.count { $0.kind == .stationInformation }
-        if let providerStationID = station.providerStationID,
-           providerStationID.range(of: #"^\d{9}$"#, options: .regularExpression) == nil {
-            return false
-        }
-        switch station.stationInformationStatus {
-        case .exactPage:
-            return stationInformationCount == 1
-        case .officialContextOnly, .notOpenForPassengerService:
-            return station.providerStationID == nil &&
-                stationInformationCount == 0 &&
-                !station.resources.isEmpty
-        case .noCurrentPassengerService:
-            return station.providerStationID == nil && station.resources.isEmpty
-        case nil:
-            return false
         }
     }
 

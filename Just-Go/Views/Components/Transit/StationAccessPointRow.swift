@@ -1,14 +1,7 @@
 import SwiftUI
 
-/// The entrance row shared by the station detail sheet and the transfer sheet, which render it
-/// identically. Keeping one definition is what stops the two screens drifting: the transfer sheet
-/// printed access-point names raw and so showed a blank row for every entrance OpenStreetMap
-/// positioned without a sign letter.
-///
-/// `PlatformHintRow` used to live here too. It is gone with the rest of the transfer guide. No
-/// pack has ever carried a platform hint, and `validate_indoor_maps.rb` keeps it that way.
-
-/// One entrance row: a named exit, or a counted group of unlabeled entrances facing one direction.
+/// One entrance row, a named exit or a counted group of unlabeled entrances facing one direction,
+/// shared by the station sheet and the transfer sheet so the two render it identically.
 struct StationAccessPointRow: View {
     let group: StationAccessPointGroup
 
@@ -28,10 +21,8 @@ struct StationAccessPointRow: View {
                         traditional: "\(group.count) 個出入口"
                     ))
             }
-            // Three states, three treatments, and only two of them say anything. `.unknown` is the
-            // overwhelming majority of every OSM-sourced pack — 8,465 doors against 1,043 surveyed
-            // negatives — and it is silence, not a warning. Labelling it would turn "nobody has
-            // looked" into "this is not step-free", which is the one thing this app must not do.
+            // Three states, and only two say anything. `.unknown` is most doors in every
+            // OSM-sourced pack; labelling it would turn "nobody has looked" into "not step-free".
             switch group.stepFree {
             case .yes:
                 Text(AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙"))

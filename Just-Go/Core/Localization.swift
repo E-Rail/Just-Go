@@ -69,9 +69,8 @@ enum AppLocalization {
         localizationBundle.localizedString(forKey: key, value: key, table: nil)
     }
 
-    // Every `localizedName` on City/Station/SubwayLine/MetroLine funnels through here for
-    // Traditional Chinese users; the underlying set of names is small and finite, so caching
-    // the transform avoids re-running it on every row render.
+    // Every `localizedName` funnels through here for Traditional Chinese; the set of names is
+    // small, so the transform is cached rather than re-run on every row render.
     private static let hansToHantCache = NSCache<NSString, NSString>()
 
     static func chinese(_ simplified: String) -> String {
@@ -180,10 +179,9 @@ extension Station {
         AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
     }
 
-    /// The second line of a station label. Nil when it would merely repeat the first. A station
-    /// carrying no English name renders `localizedName` as its Chinese name, and returning that
-    /// same string here printed every map pin twice. The first expression is kept verbatim
-    /// because `validate_localizations.rb` pins it: in Chinese this must be nil, always.
+    /// The second line of a station label, or nil when it would repeat the first (a station with no
+    /// English name shows its Chinese name as `localizedName`). `validate_localizations.rb` pins
+    /// the first expression: in Chinese this is always nil.
     var alternateLocalizedName: String? {
         let alternate = AppLocalization.isChinese ? nil : name
         return alternate == localizedName ? nil : alternate

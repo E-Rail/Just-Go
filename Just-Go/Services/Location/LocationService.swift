@@ -1,17 +1,12 @@
 import Foundation
 import CoreLocation
 
-/// Main-actor isolated, and it has to be.
-///
-/// `requestCurrentLocation()` is `async`, so before this annotation it ran on the cooperative
-/// pool (SE-0338) and inserted into `pendingLocationContinuations` from there, while
-/// `CLLocationManager` — built on the main thread by `DIContainer.configure()` — delivered
-/// `didUpdateLocations` on main and called `removeAll()` on the same dictionary. An insert lost
-/// against that wipe leaves a `CheckedContinuation` that is never resumed: the caller suspends
-/// forever and "locating…" never clears. `MapViewModel` carries the same note for the same fix.
+/// Main-actor isolated, as `CLLocationManager` delivers its callbacks on main. A continuation
+/// stored off the main actor can lose a race with the delegate's `removeAll()` and never resume,
+/// leaving "locating…" forever.
 ///
 /// `@preconcurrency` on the delegate conformance because `CLLocationManagerDelegate` is a plain
-/// ObjC protocol with no isolation of its own; the callbacks genuinely do arrive on main.
+/// ObjC protocol with no isolation of its own.
 @MainActor
 @Observable
 final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate {
@@ -22,57 +17,40 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     /// one-shot request resolving must not stop the hardware while a session is active.
     private var continuousSessionCount = 0
 
-    /// The fix exactly as Core Location reported it. Correct for asking "which city is this" and
-    /// for measuring the correction below, and wrong for everything else. See `mapSpaceLocation`.
+    /// The fix as Core Location reported it: right for "which city is this" and for measuring the
+    /// correction below, wrong for everything else. See `mapSpaceLocation`.
     var currentLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
 
     /// How far Core Location's frame sits from the map's, measured rather than assumed.
     ///
-    /// Every coordinate this app stores, draws and measures against is GCJ-02, each bundled
-    /// network declares `"coordinateSystem": "gcj02"`, and Apple's basemap uses it across Greater
-    /// China. A `CLLocation` is the sole input nothing converts, so on a device that reports
-    /// WGS-84 the rider's own position is the one coordinate in the whole app in a different
-    /// frame. In Beijing that is ~540 m: half the distance between two stops.
+    /// Everything this app stores, draws and measures is GCJ-02 (every bundled network declares it,
+    /// and so does Apple's basemap in Greater China). A `CLLocation` is the one input nothing
+    /// converts, and on a device reporting WGS-84 it is ~540 m off in Beijing.
     ///
-    /// Deliberately not a datum transform. Whether a given iPhone reports WGS-84 or already-shifted
-    /// GCJ-02 is not something this code can know, and converting a coordinate that was already
-    /// converted would double the error rather than remove it, so the offset is *observed*. The
-    /// difference between what MapKit says (always the map's frame) and what Core Location said at
-    /// the same instant. A phone that needs no correction measures ~0 and nothing moves.
+    /// Not a datum transform: whether a given iPhone reports WGS-84 or already-shifted GCJ-02
+    /// cannot be known here, and converting a converted coordinate doubles the error. The offset is
+    /// observed as MapKit's position minus Core Location's at the same instant; a phone that needs
+    /// none measures ~0.
     private(set) var mapSpaceCorrection: (latitude: CLLocationDegrees, longitude: CLLocationDegrees)?
 
-    /// Where the correction above was measured, and the key it is stored under.
-    ///
-    /// The correction is *persisted* because it was otherwise unarmed at the moment it matters
-    /// most. It can only be measured once MapKit has reported the user dot, and the first trip of a
-    /// session is routinely planned before that has happened — so `mapSpaceCoordinate` was the
-    /// identity function and the route began at the raw fix, ~540 m from the rider. The rider's own
-    /// dot was drawn in the right place the whole time, which is what made it look like a routing
-    /// bug rather than a coordinate one.
-    ///
-    /// Stored with the coordinate it was measured at because the GCJ-02 offset varies across the
-    /// country: a correction measured in Beijing must not be applied in Shanghai. Near where it was
-    /// taken it is far better than nothing; far away it is discarded and the app waits to measure a
-    /// new one, exactly as before.
+    /// Where the correction was measured, stored with it. Persisted because it can only be measured
+    /// once MapKit reports the user dot, which the first trip of a session is often planned before.
+    /// Kept with its location because the GCJ-02 offset varies across the country: a Beijing
+    /// correction must not be applied in Shanghai.
     private(set) var correctionMeasuredAt: CLLocationCoordinate2D?
     private static let correctionDefaultsKey = "locationMapSpaceCorrection"
-    /// How far a stored correction still applies. The obfuscation drifts smoothly over tens of
-    /// metres across a metro area, so this is generous on purpose: within it the correction is
-    /// right to within a fraction of the error it removes.
+    /// How far a stored correction still applies. The offset drifts smoothly across a metro area,
+    /// so within this it is accurate to a fraction of the error it removes.
     private static let correctionReuseRadius: CLLocationDistance = 50_000
 
-    /// A MapKit report that arrived before Core Location had delivered anything to pair it with.
-    ///
-    /// On a cold start MapKit's first user-location callback can beat `didUpdateLocations`, and
-    /// `observeMapSpaceUserLocation` simply dropped that sample — so the correction stayed unarmed
-    /// until the rider moved enough to produce another one. Held briefly instead, and paired with
-    /// the next fix.
+    /// A MapKit report that arrived before Core Location delivered anything to pair it with (on a
+    /// cold start MapKit can be first). Held briefly and paired with the next fix.
     private var unpairedMapSpaceSample: (coordinate: CLLocationCoordinate2D, at: Date)?
 
-    /// The fix in the frame the rest of the app lives in. Identical to `currentLocation` until the
-    /// map has reported a user location. Unknown is left uncorrected rather than guessed at.
+    /// The fix in the map's frame. Identical to `currentLocation` until a correction is known;
+    /// unknown is left uncorrected, not guessed.
     var mapSpaceLocation: CLLocation? {
         guard let currentLocation else { return nil }
         return mapSpaceLocation(from: currentLocation)
@@ -90,9 +68,8 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     func requestCurrentLocation() async throws -> CLLocation {
         locationErrorMessage = nil
 
-        // The cache fast path returns before the cancellation handler below is armed.
-        // Without this check an already-cancelled caller (e.g. locate-me superseded by a
-        // city switch) would still receive a fix and act on it.
+        // The cache fast path returns before the cancellation handler below is armed, so an
+        // already-cancelled caller would otherwise still get a fix.
         try Task.checkCancellation()
 
         if let currentLocation,
@@ -121,8 +98,9 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
                 case .notDetermined:
                     manager.requestWhenInUseAuthorization()
                 case .authorizedAlways, .authorizedWhenInUse:
-                    // Acquire via the continuous stream (more forgiving than a single shot) and
-                    // stop it the moment a fix passes the gate. See finishPendingLocationRequests.
+                    // Acquire through the continuous stream, which is more forgiving than a single
+                    // shot, and stop it once a fix passes the gate. See
+                    // `finishPendingLocationRequests`.
                     startUpdatingLocation()
                 case .denied, .restricted:
                     let error = LocationServiceError.permissionDenied
@@ -141,13 +119,12 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         }
     }
 
-    /// Called by the map every time MapKit reports the rider's position. Paired against the fix
-    /// Core Location delivered for the same moment, the difference *is* the correction.
+    /// Called by the map whenever MapKit reports the rider's position. Paired with Core Location's
+    /// fix for the same moment, the difference is the correction.
     func observeMapSpaceUserLocation(_ coordinate: CLLocationCoordinate2D) {
-        // Only a fix from the same moment. Core Location stops once a one-shot request resolves,
-        // while MapKit keeps reporting the dot as the rider walks; pairing with that stale fix
-        // saved "how far they walked" as the frame offset, and every later trip began that far
-        // off. The same five seconds the other direction already demands.
+        // Only a fix from the same moment. Core Location stops after a one-shot request while
+        // MapKit keeps reporting the dot as the rider walks, and pairing with a stale fix would
+        // record the walk as the frame offset.
         guard let fix = currentLocation, abs(fix.timestamp.timeIntervalSinceNow) <= 5 else {
             // Held rather than dropped. See `unpairedMapSpaceSample`.
             unpairedMapSpaceSample = (coordinate, Date())
@@ -158,10 +135,9 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
 
     /// The measurement itself: MapKit's frame minus Core Location's, for the same instant.
     private func pairMapSpaceSample(mapSpace coordinate: CLLocationCoordinate2D, raw: CLLocationCoordinate2D) {
-        // A fix that arrived seconds ago and a MapKit update from now can differ because the rider
-        // moved, which is not a frame difference. Anything past a plausible datum shift (the GCJ-02
-        // obfuscation peaks around 800 m) is movement or a bad fix, so ignore it. A wrong
-        // correction is worse than none.
+        // Two readings seconds apart can differ because the rider moved. Anything past a plausible
+        // datum shift (GCJ-02 peaks around 800 m) is movement or a bad fix; a wrong correction is
+        // worse than none.
         guard coordinate.distance(to: raw) <= 900 else { return }
         mapSpaceCorrection = (coordinate.latitude - raw.latitude, coordinate.longitude - raw.longitude)
         correctionMeasuredAt = raw
@@ -243,10 +219,8 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         }
     }
 
-    /// Warm the location cache with a single fix without leaving continuous updates running.
-    /// `requestLocation()` delivers one update (via `didUpdateLocations`) then auto-stops, so
-    /// opening a screen that pre-warms doesn't drain the battery. No-op (and no permission
-    /// prompt) when location access hasn't been granted yet.
+    /// Warms the location cache with a single fix: `requestLocation()` delivers one update and
+    /// stops. No-op, with no permission prompt, when access has not been granted.
     func prewarmLocation() {
         guard isAuthorized else { return }
 
@@ -278,9 +252,8 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         authorizationStatus = manager.authorizationStatus
 
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            // Only start acquiring when a request is actually waiting (or a navigation
-            // session is active): granting permission alone shouldn't leave a continuous
-            // stream running for the app's lifetime.
+            // Start acquiring only when a request is waiting or a navigation session is active:
+            // granting permission alone must not leave a stream running.
             if !pendingLocationContinuations.isEmpty || continuousSessionCount > 0 {
                 startUpdatingLocation()
             }
@@ -296,10 +269,9 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // kCLErrorLocationUnknown is transient. Core Location keeps trying and will deliver
-        // a fix (or a real error) shortly. Failing every pending request here made a cold GPS
-        // start (indoors, first fix after launch) error out instantly; keep waiting instead.
-        // The 15s request timeout remains the backstop and stops the stream on expiry.
+        // `kCLErrorLocationUnknown` is transient: Core Location keeps trying and delivers a fix or
+        // a real error shortly, so a cold start indoors keeps waiting. The 15 s request timeout is
+        // the backstop.
         if (error as? CLError)?.code == .locationUnknown { return }
         locationErrorMessage = error.localizedDescription
         finishPendingLocationRequests(with: .failure(error))
@@ -316,9 +288,8 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     }
 
     private func finishPendingLocationRequests(with result: Result<CLLocation, Error>) {
-        // Tear down the continuous stream once the request(s) it was acquiring for resolve.
-        // Success, failure, or timeout, so GPS doesn't keep running for the app's lifetime.
-        // Unless a live-navigation session holds it open.
+        // Stop the stream once the requests it was acquiring for resolve, however they resolved,
+        // unless a navigation session holds it.
         if continuousSessionCount == 0 {
             manager.stopUpdatingLocation()
         }

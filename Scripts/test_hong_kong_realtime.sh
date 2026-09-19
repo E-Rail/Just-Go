@@ -25,6 +25,8 @@ trap 'rm -rf "$BUILD_DIR"' EXIT HUP INT TERM
     -o "$BUILD_DIR/test-hong-kong-realtime" \
     "$ROOT/Just-Go/Core/Logging.swift" \
     "$ROOT/Just-Go/Core/Concurrency/Deadline.swift" \
+    "$ROOT/Just-Go/Core/Extensions/Sequence+Uniqued.swift" \
+    "$ROOT/Just-Go/Services/Transit/OfficialStationInformationProvider.swift" \
     "$ROOT/Just-Go/Models/Transit/RealTimeArrival.swift" \
     "$ROOT/Just-Go/Services/Transit/HongKongRealtimeArrivalProvider.swift" \
     "$ROOT/Scripts/test_hong_kong_realtime.swift"

@@ -55,8 +55,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     let latitude: Double
     let longitude: Double
     let cityID: String
-    // var: repairable via withCityMetadata. Rows favorited from another city's context
-    // were historically stamped with the selected city's name.
+    // `var`: repaired by `withCityMetadata` when a tag carries the wrong city's name.
     var cityName: String
     var cityNameEn: String?
     let lineNames: [String]
@@ -64,8 +63,8 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     let lineIDs: [String]?
     let lineColorsHex: [String]?
     var kind: StationQuickTagKind
-    // Both nil on tags stored before place support existed; `resolvedTargetType` maps
-    // that legacy shape back to `.station` so old data keeps decoding untouched.
+    // Both nil on tags stored before places could be tagged; `resolvedTargetType` reads that shape
+    // as `.station`.
     let targetType: QuickTagTargetType?
     let address: String?
 

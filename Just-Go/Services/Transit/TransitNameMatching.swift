@@ -1,16 +1,12 @@
 import Foundation
 
-/// Comparing the names two sources give the same line or station.
-///
-/// Split out of `TransitFormatting` so it can be compiled on its own: it is pure string work with
-/// no dependency on the transit model, and `ServiceHoursResolver` — which decides whether a rider's
-/// last train has gone — rests entirely on it. `Scripts/test_service_hours_resolver.sh` builds this
-/// file, `ChinaClock` and the resolver together and nothing else.
+/// Comparing the names two sources give one line or station. Kept free of the transit model so
+/// `Scripts/test_service_hours_resolver.sh` can build it with `ChinaClock` and the resolver alone:
+/// whether a rider's last train has gone rests on it.
 
 private let chineseLineNumberExpression = try! NSRegularExpression(pattern: "[零〇一二三四五六七八九十百]+(?=号线)")
 
-// Pre-compiled once instead of recompiling the pattern on every call. NSRegularExpression is
-// immutable and thread-safe.
+// Compiled once; `NSRegularExpression` is immutable and thread-safe.
 private let whitespaceExpression = try! NSRegularExpression(pattern: "\\s+")
 private let parentheticalExpression = try! NSRegularExpression(pattern: "（.*?）|\\(.*?\\)")
 private let lineReferenceExpression = try! NSRegularExpression(pattern: "[a-z]?\\d+(?=号?线|$)")

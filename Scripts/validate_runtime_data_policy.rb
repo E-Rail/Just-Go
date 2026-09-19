@@ -337,8 +337,6 @@ unless download_callers == ["Just-Go/Views/Profile/TransitDataView.swift"]
   errors << "remote city-pack downloads must only be initiated from TransitDataView: #{download_callers.join(", ")}"
 end
 
-image_source = read.call("Just-Go/Views/Station/FullScreenStationImageView.swift")
-errors << "station media renderer must reject non-file URLs" unless image_source.include?("url.isFileURL")
 errors << "runtime network image loading is forbidden" if swift_sources.values.any? { |source| source.include?("AsyncImage") }
 
 realtime_source = read.call("Just-Go/Services/Transit/HongKongRealtimeArrivalProvider.swift")

@@ -1,11 +1,7 @@
 import Foundation
 
-/// Single source of truth for China-local (UTC+8) time math shared by the
-/// trip-confidence features (service hours, last-train, rush-hour, departure planning).
-///
-/// Centralising the calendar and the midnight-wrap logic here prevents the three
-/// time-aware features from each inventing a slightly different UTC+8 calendar or
-/// wrap-around implementation.
+/// China-local (UTC+8) time maths for service hours, last trains, rush hour and departure planning,
+/// in one place so no feature builds its own calendar or midnight wrap.
 enum ChinaClock {
     /// Gregorian calendar pinned to China Standard Time so first/last-train and
     /// rush-hour logic stay correct regardless of the device's own timezone.

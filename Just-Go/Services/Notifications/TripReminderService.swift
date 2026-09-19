@@ -1,23 +1,22 @@
 import Foundation
 import UserNotifications
 
-/// The only notification layer in the app. Schedules a single "time to leave" local
-/// notification for an explicit departure plan. Authorization is requested lazily
-/// (never at launch) and past-dated reminders are never scheduled.
+/// The app's only notification layer: one "time to leave" local notification for an explicit
+/// departure plan. Authorization is asked for when first needed, never at launch, and past-dated
+/// reminders are never scheduled.
 @MainActor
 final class TripReminderService {
     private let center = UNUserNotificationCenter.current()
     private let foregroundPresenter = ForegroundNotificationPresenter()
 
     init() {
-        // Show scheduled local notifications as a banner even while the app is foregrounded, so
-        // an estimated "get off" alert is visible if the rider still has Live Go open.
+        // Show local notifications as a banner while the app is foregrounded, so a "get off" alert
+        // is visible with Live Go open.
         center.delegate = foregroundPresenter
     }
 
-    /// One identifier for every leave reminder, so the system itself keeps a single one. Keyed by
-    /// route it was one per plan, and the only thing cancelling the previous was the detail page's
-    /// memory of it, which ended when the page closed: re-plan the same trip later and both fired.
+    /// One identifier for every leave reminder, so the system keeps a single one however many times
+    /// a trip is re-planned.
     private let leaveIdentifier = "trip-leave"
     private func arrivalIdentifier(for stationID: String) -> String { "station-arrive-\(stationID)" }
 
@@ -49,16 +48,14 @@ final class TripReminderService {
 
         var components = ChinaClock.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         components.timeZone = ChinaClock.calendar.timeZone
-        // The calendar too, not only the zone. `UNCalendarNotificationTrigger` matches components
-        // against `Calendar.current` when they name none, so Gregorian year 2026 handed to a device
-        // set to the Buddhist, Japanese or Republic-of-China calendar is a date centuries away —
-        // and the reminder simply never fires.
+        // The calendar too, not only the zone: `UNCalendarNotificationTrigger` reads components
+        // against `Calendar.current` when they name none, and a Gregorian year on a Buddhist or
+        // Japanese calendar device is centuries away.
         components.calendar = ChinaClock.calendar
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         let request = UNNotificationRequest(identifier: leaveIdentifier, content: content, trigger: trigger)
-        // `add` throws — the 64-pending-notification limit is the reachable one — and the
-        // caller paints the row as set on this answer, so a swallowed throw would claim a
-        // reminder that does not exist.
+        // `add` throws (the 64-pending limit is reachable) and the caller shows the reminder as set
+        // on this answer, so a swallowed throw would claim a reminder that does not exist.
         do {
             try await center.add(request)
             return true
@@ -67,9 +64,9 @@ final class TripReminderService {
         }
     }
 
-    /// Schedules an estimated "get off" alert to fire at `fireDate`. Timing is derived from the
-    /// route's segment durations: there is NO live train-position feed, so the copy says so.
-    /// Returns false when nothing was scheduled: the time is past, or `add` refused it.
+    /// Schedules an estimated "get off" alert for `fireDate`, timed from segment durations; there
+    /// is no live train-position feed, and the copy says so. Returns false when nothing was
+    /// scheduled: the time is past, or `add` refused it.
     @discardableResult
     func scheduleArrivalReminder(stationID: String, stationName: String, exitHint: String?, fireDate: Date) async -> Bool {
         cancelArrivalReminder(stationID: stationID)
@@ -109,9 +106,8 @@ final class TripReminderService {
     }
 }
 
-/// Presents scheduled local notifications as a banner while the app is foregrounded.
-/// (Without a delegate iOS suppresses foreground notifications.) Kept off the main actor so it can
-/// satisfy the non-isolated `UNUserNotificationCenterDelegate` requirement cleanly.
+/// Presents local notifications as a banner while the app is foregrounded (iOS suppresses them
+/// without a delegate). Not main-actor, to satisfy the nonisolated delegate requirement.
 final class ForegroundNotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,

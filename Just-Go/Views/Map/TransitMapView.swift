@@ -323,7 +323,10 @@ struct TransitMapView: UIViewRepresentable {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
                 }
                 guard coordinates.count >= 2 else { continue }
-                let width: CGFloat = segment.type.isAccessLeg ? 7 : 6
+                // Thinner than the track it feeds, the way a walking route is drawn everywhere: a
+                // first or last mile doubles back within a couple of streets, and a stroke as wide
+                // as the ride's fills that whole area in one colour instead of showing the path.
+                let width: CGFloat = segment.type.isAccessLeg ? 5 : 6
                 let dash = segment.type.dash(width: width)
                 // A dark casing under every solid leg, because a line's colour is data and some of
                 // it is the same grey the basemap draws roads with. Solid legs only: behind a
@@ -505,8 +508,7 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         /// How much to shrink every stroke at the current zoom. `MKPolylineRenderer.lineWidth` is
-        /// in screen points, so zoomed out to a whole trip a walk's round dots merge into one blob.
-        /// The dash pattern scales by the same factor to keep its rhythm.
+        /// in screen points, so at the whole trip's zoom an unshrunk leg is a band across the city.
         private func strokeScale(for maxDelta: CLLocationDegrees) -> CGFloat {
             switch maxDelta {
             case ..<0.055: return 1
@@ -518,10 +520,16 @@ struct TransitMapView: UIViewRepresentable {
 
         private func applyStrokeWidth(to renderer: MKPolylineRenderer, polyline: MKPolyline) {
             let key = ObjectIdentifier(polyline)
-            let scale = strokeScale(for: currentMaxDelta)
+            let width = overlayWidths[key] ?? 5
             // Floored so a hairline never disappears entirely at the widest zooms.
-            renderer.lineWidth = max(1.5, (overlayWidths[key] ?? 5) * scale)
-            renderer.lineDashPattern = overlayDashes[key]?.map { NSNumber(value: Double(max(0.1, $0 * scale))) }
+            renderer.lineWidth = max(1.5, width * strokeScale(for: currentMaxDelta))
+            // Against the width actually drawn, floor included, so the dash keeps the proportions
+            // `SegmentType.dash(width:)` set. Butt caps under a dash, because a round one overhangs
+            // half a width past each end and closes the gaps into a string of blobs; round on a
+            // solid leg, where it caps the dark casing over the line's own end.
+            let dash = overlayDashes[key]
+            renderer.lineDashPattern = dash?.map { NSNumber(value: Double($0 * renderer.lineWidth / width)) }
+            renderer.lineCap = dash == nil ? .round : .butt
         }
 
         /// Re-strokes overlays already on screen: MapKit hands back its existing renderers, so this
@@ -626,7 +634,6 @@ struct TransitMapView: UIViewRepresentable {
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
             applyStrokeWidth(to: renderer, polyline: polyline)
-            renderer.lineCap = .round
             renderer.lineJoin = .round
             return renderer
         }

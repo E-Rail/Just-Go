@@ -941,15 +941,18 @@ enum SegmentType: String, Codable {
         }
     }
 
-    /// The dash for a round-capped stroke `width` wide, in the same proportions on every surface.
-    /// Empty is solid: round dots on foot, a long dash by bike, a short one for a change, and solid
-    /// for anything that carries the rider.
+    /// The dash for a stroke `width` wide, in the same proportions on every surface. Empty is
+    /// solid: a dot on foot, a long dash by bike, a short one for a change, and solid for anything
+    /// that carries the rider.
+    ///
+    /// Multiples of the width, drawn with the default butt cap, so the line is exactly what this
+    /// array says at any width and any zoom. A round cap overhangs half a width past each end of a
+    /// dash, which closes every gap narrower than the width and draws the leg as a string of blobs.
     func dash(width: CGFloat) -> [CGFloat] {
-        let unit = width / 7
         switch self {
-        case .walking: return [0.1, 11 * unit]
-        case .cycling: return [7 * unit, 6 * unit]
-        case .transfer: return [2 * unit, 6 * unit]
+        case .walking: return [width, width]
+        case .cycling: return [width * 3, width * 2]
+        case .transfer: return [width * 2, width]
         case .driving, .subway: return []
         }
     }

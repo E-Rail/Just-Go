@@ -882,8 +882,9 @@ struct RouteDetailView: View {
         boardingServiceHours = hours
     }
 
-    /// The journey as one continuous path: an unbroken vertical rail in each leg's colour and dash,
-    /// with the line's badge where the rider boards. Ride legs expand to the stations they pass.
+    /// The journey as one continuous path: an unbroken vertical rail, each stretch in the colour and
+    /// dash of the leg travelled along it, with the line's badge where the rider boards. Ride legs
+    /// expand to the stations they pass.
     private var journeyCard: some View {
         VStack(spacing: 0) {
             ForEach(Array(route.segments.enumerated()), id: \.element.id) { index, segment in
@@ -905,10 +906,18 @@ struct RouteDetailView: View {
         let isExpanded = expandedLegs.contains(segment.id)
         return HStack(alignment: .top, spacing: 0) {
             ZStack(alignment: .top) {
-                JourneyRail(segment: segment)
-                    // The first leg's rail starts at its own marker; drawn full height it would
-                    // stick out of the top of the card like a trip that began somewhere else.
-                    .padding(.top, index == 0 ? Self.markerInset + Self.markerSize / 2 : 0)
+                VStack(spacing: 0) {
+                    // Above the marker the rider is still on the leg before, so a leg's colour and
+                    // dash run from its own marker to the next one. Nothing above the first marker:
+                    // drawn there, the rail would stick out of the top of the card like a trip that
+                    // began somewhere else.
+                    JourneyRail(segment: index == 0 ? nil : route.segments[index - 1])
+                        .frame(height: Self.markerInset + Self.markerSize / 2)
+                        // Drawn a point into the row above, so one leg's rail crosses the row
+                        // boundary under a covered pixel instead of leaving an antialiased seam.
+                        .padding(.top, -1)
+                    JourneyRail(segment: segment)
+                }
                 legMarker(segment)
                     .padding(.top, Self.markerInset)
             }
@@ -1043,6 +1052,7 @@ struct RouteDetailView: View {
             ZStack(alignment: .top) {
                 JourneyRail(segment: route.segments.last)
                     .frame(height: Self.markerInset + Self.markerSize / 2)
+                    .padding(.top, -1)
                 Image(systemName: "mappin.circle.fill")
                     .font(.system(size: Self.markerSize))
                     .foregroundStyle(.white, Color.accentColor)

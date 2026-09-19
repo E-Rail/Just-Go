@@ -151,20 +151,25 @@ struct JourneyBadgeChain: View {
     private var shown: [RouteSegment] { segments.filter { $0.type != .transfer } }
 }
 
-/// The continuous vertical line that ties a journey's legs into one path, drawn in the leg's own
-/// colour and dash (`SegmentType.colorHex(line:)`, `dash(width:)`) so it matches the maps. One
-/// stroked path rather than a stack of capsules, so adjacent legs actually touch.
+/// One stretch of the vertical line that ties a journey's legs into one path: the leg travelled
+/// along it, in that leg's own colour and dash (`SegmentType.colorHex(line:)`, `dash(width:)`) so it
+/// matches the maps. One stroked path rather than a stack of capsules, so adjacent legs actually
+/// touch.
+///
+/// A stretch with no leg on it — above the first marker — is stroked clear rather than skipped: a
+/// view that renders nothing also measures as nothing, and the stretch below it would then start at
+/// the top of the row instead of at the marker.
 struct JourneyRail: View {
     let segment: RouteSegment?
     var width: CGFloat = 6
 
     var body: some View {
-        let dash = segment?.type.dash(width: width) ?? []
         RailPath()
             .stroke(
-                Color(hex: segment?.colorHex ?? SegmentType.walking.colorHex(line: nil)),
-                // Butt caps on a solid rail, so it ends flush against the next leg's.
-                style: StrokeStyle(lineWidth: width, lineCap: dash.isEmpty ? .butt : .round, dash: dash)
+                segment.map { Color(hex: $0.colorHex) } ?? .clear,
+                // The default butt cap, on a dash and on a solid rail alike: it draws
+                // `dash(width:)` as written and ends flush against the next leg's.
+                style: StrokeStyle(lineWidth: width, dash: segment?.type.dash(width: width) ?? [])
             )
             .frame(width: width)
             .accessibilityHidden(true)

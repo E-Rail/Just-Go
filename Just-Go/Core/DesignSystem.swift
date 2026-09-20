@@ -117,6 +117,22 @@ extension View {
     }
 }
 
+/// The line between two rows of a card, drawn where a `List` draws it: starting at the row's text
+/// rather than at the card's edge, and running all the way to the card's trailing edge — measured
+/// against this app's own `List`s on iOS 27, which add no trailing inset of their own.
+///
+/// A card stacked in a `ScrollView` has no separator to ask for: `listRowSeparatorLeading` is a
+/// `List`'s guide and does nothing outside one. So the row's leading column — its mark and the gap
+/// after it — is passed in, and the caller states it as the row's own geometry rather than as a
+/// number copied from another screen.
+struct RowSeparator: View {
+    let textInset: CGFloat
+
+    var body: some View {
+        Divider().padding(.leading, textInset)
+    }
+}
+
 /// The app's one card treatment: Liquid Glass on iOS 26, the flat surface below it. The
 /// availability check lives here once, so the two designs cannot drift apart.
 struct CardSurface: ViewModifier {

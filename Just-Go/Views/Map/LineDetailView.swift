@@ -216,7 +216,8 @@ struct LineDetailView: View {
                     }
                     .frame(minHeight: Metrics.minimumTapTarget)
                     if index < pattern.count - 1 {
-                        Divider().padding(.leading, 22)
+                        // Starts at the station name: the line's colour dot plus the gap after it.
+                        RowSeparator(textInset: 10 + Metrics.m)
                     }
                 }
             }

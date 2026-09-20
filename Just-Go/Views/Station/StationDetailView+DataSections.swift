@@ -9,6 +9,17 @@ struct OfficialStationExitStreet: Identifiable {
     var id: String { name }
 }
 
+/// The leading column of an official-data row: the mark that opens it and the gap to its text. The
+/// row and the line between rows both read these, so the line starts where the text does.
+private enum OfficialRowMetrics {
+    static let lineDot: CGFloat = 10
+    static let exitIcon: CGFloat = 22
+    static let gap: CGFloat = 10
+
+    static var lineTextInset: CGFloat { lineDot + gap }
+    static var exitTextInset: CGFloat { exitIcon + gap }
+}
+
 extension StationDetailView {
     /// The categories the loaded snapshot has data for, so a lines-only source (Guangzhou) has no
     /// empty tabs, and the control appears only with more than one thing to switch between.
@@ -244,12 +255,12 @@ extension StationDetailView {
                 }
                 ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                     if index > 0 {
-                        Divider()
+                        RowSeparator(textInset: OfficialRowMetrics.lineTextInset)
                     }
-                    HStack(alignment: .top, spacing: 10) {
+                    HStack(alignment: .top, spacing: OfficialRowMetrics.gap) {
                         Circle()
                             .fill(line.lineColorHex.map(Color.init(hex:)) ?? Color.accentColor)
-                            .frame(width: 10, height: 10)
+                            .frame(width: OfficialRowMetrics.lineDot, height: OfficialRowMetrics.lineDot)
                             .padding(.top, 5)
                         VStack(alignment: .leading, spacing: 8) {
                             Text(line.lineName)
@@ -354,12 +365,20 @@ extension StationDetailView {
                 } else {
                     ForEach(Array(streets.enumerated()), id: \.element.id) { index, street in
                         if index > 0 {
-                            Divider()
+                            RowSeparator(textInset: OfficialRowMetrics.exitTextInset)
                         }
                         VStack(alignment: .leading, spacing: 7) {
-                            Label(street.name, systemImage: "signpost.right")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
+                            // The icon in a column of its own, the same one the plain exit list
+                            // uses: a `Label` sizes its icon to the glyph, which would leave the
+                            // two exit lists and their separators starting in three places.
+                            HStack(spacing: OfficialRowMetrics.gap) {
+                                Image(systemName: "signpost.right")
+                                    .frame(width: OfficialRowMetrics.exitIcon)
+                                    .accessibilityHidden(true)
+                                Text(street.name)
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
                             LazyVGrid(
                                 columns: [GridItem(.adaptive(minimum: 62), spacing: 6)],
                                 alignment: .leading,
@@ -547,14 +566,14 @@ extension StationDetailView {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(exits.enumerated()), id: \.element.id) { index, exit in
                 if index > 0 {
-                    Divider()
+                    RowSeparator(textInset: OfficialRowMetrics.exitTextInset)
                 }
-                HStack(alignment: .top, spacing: 10) {
+                HStack(alignment: .top, spacing: OfficialRowMetrics.gap) {
                     Image(systemName: exit.isAccessible == true
                         ? "figure.roll"
                         : "door.left.hand.open")
                         .foregroundStyle(exit.isAccessible == true ? .green : Color.accentColor)
-                        .frame(width: 22)
+                        .frame(width: OfficialRowMetrics.exitIcon)
                     Text(exit.name)
                         .font(.subheadline)
                         .fontWeight(.medium)

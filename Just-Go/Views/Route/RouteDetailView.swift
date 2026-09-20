@@ -828,10 +828,10 @@ struct RouteDetailView: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
     }
 
-    /// Inset to clear the icon well, so the dividers separate the *text* column and the icons read
-    /// as one vertical run.
+    /// Starts at the row's title, the way a `List` starts a separator: `detailRow`'s own leading
+    /// padding, its icon well and the gap after it. The icons then read as one vertical run.
     private var rowDivider: some View {
-        Divider().padding(.leading, 56)
+        RowSeparator(textInset: 16 + 28 + 12)
     }
 
     private func detailRow<Trailing: View>(

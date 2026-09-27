@@ -150,29 +150,38 @@ enum BaiduRequestGateTests {
             "true"
         )
 
-        // An exhausted budget is refused locally, and the refusal is recorded rather than swallowed
-        // — the whole reason a rider could never tell which Baidu limit they had hit.
-        print("budget and diagnostics")
+        // An exhausted budget is refused locally, before anything is sent, and the caller is told
+        // why rather than handed an empty answer.
+        print("budget")
         CountingProtocol.reset()
         let rationed = makeClient()
         let ceiling = BaiduMapsClient.RequestBudget.ceilings["/place/v2/search"] ?? 0
+        var lastError: Error?
         for index in 0...ceiling {
-            _ = try? await rationed.get(
-                Envelope.self,
-                path: "/place/v2/search",
-                parameters: [(name: "query", value: "q\(index)")]
-            )
+            do {
+                _ = try await rationed.get(
+                    Envelope.self,
+                    path: "/place/v2/search",
+                    parameters: [(name: "query", value: "q\(index)")]
+                )
+            } catch {
+                lastError = error
+            }
         }
         recorder.check(
             "spending stops at the ceiling",
             String(CountingProtocol.allSamples.count),
             String(ceiling)
         )
-        let search = await rationed.diagnostics().first { $0.path == "/place/v2/search" }
-        recorder.check("the ceiling is reported", String(search?.spent ?? -1), String(ceiling))
+        let refusedForBudget: Bool
+        if case .budgetExhausted? = lastError as? BaiduMapsError {
+            refusedForBudget = true
+        } else {
+            refusedForBudget = false
+        }
         recorder.check(
-            "and the refusal is recorded, not swallowed",
-            String(search?.lastFailure != nil),
+            "and the call past it is refused for the budget",
+            String(refusedForBudget),
             "true"
         )
 

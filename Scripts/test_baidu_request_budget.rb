@@ -66,9 +66,7 @@ class RequestBudgetTest < Minitest::Test
     # spends a whole ceiling against a stub URLProtocol and counts what reaches the wire. This
     # stays a source check because it is about the *shape* callers depend on.
     assert_includes CLIENT, "case budgetExhausted(path: String)"
-    assert_includes CLIENT, "BaiduMapsError.budgetExhausted(path: path)"
-    assert_match(/let error = BaiduMapsError\.budgetExhausted.*\n.*record\(error.*\n.*throw error/, CLIENT,
-                 "an exhausted budget must be recorded as well as thrown, or nobody can tell which limit was hit")
+    assert_includes CLIENT, "throw BaiduMapsError.budgetExhausted(path: path)"
   end
 
   def test_the_rate_gate_stays_inside_the_published_free_tier

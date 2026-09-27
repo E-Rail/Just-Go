@@ -170,6 +170,16 @@ protocol WalkingRouteProviding {
         toName: String,
         mode: AccessLegMode
     ) async -> RouteSegment?
+
+    /// MapKit's car route, or nil where MapKit finds none. No fallback, unlike a driving access
+    /// leg: a whole journey drawn along a straight line is a drive that does not exist, and from
+    /// Beijing to Taipei it crosses the strait.
+    func measuredDrivingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment?
 }
 
 final class MapKitWalkingRouteProvider: WalkingRouteProviding {
@@ -294,9 +304,38 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
         return walk.retyped(as: .cycling, duration: duration, accessibilityNotes: notes)
     }
 
-    /// A real driving route from MapKit, measured rather than derived. Falls back to the walking
-    /// leg when MapKit declines: a leg that exists beats a missing mode.
+    /// A driving access leg. Falls back to the walking leg when MapKit declines: a leg that exists
+    /// beats a missing mode.
     private func drivingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        if let drive = await measuredDrivingSegment(from: from, to: to, fromName: fromName, toName: toName) {
+            return drive
+        }
+        // Retyped, not returned as-is: the mode was decided by distance and does not change
+        // because MapKit declined to draw it. A fallback typed `.walking` would put "Walk 12 km" on
+        // the card and into the walking total, the Least Walking sort and the confidence penalty.
+        guard let walk = await walkingSegment(
+            from: from,
+            to: to,
+            fromName: fromName,
+            toName: toName
+        ) else { return nil }
+        var notes = walk.accessibilityNotes
+        notes.append(AppLocalization.text(
+            english: "Drawn along the walking route. No driving directions are available.",
+            simplified: "沿步行路线绘制，没有可用的驾车导航数据。",
+            traditional: "沿步行路線繪製，沒有可用的駕車導航資料。"
+        ))
+        return walk.retyped(as: .driving, duration: walk.duration, accessibilityNotes: notes)
+    }
+
+    /// A real driving route from MapKit, measured rather than derived. MapKit declines with
+    /// `FAR_FROM_ROADS` where no road joins the two ends.
+    func measuredDrivingSegment(
         from: CLLocationCoordinate2D,
         to: CLLocationCoordinate2D,
         fromName: String,
@@ -313,28 +352,10 @@ final class MapKitWalkingRouteProvider: WalkingRouteProviding {
                 try await directions.calculate().routes.first
             }
         } catch {
-            AppLog.routing.info("Driving directions unavailable, falling back to the walking leg: \(error)")
+            AppLog.routing.info("Driving directions unavailable: \(error)")
             mapRoute = nil
         }
-        guard let mapRoute else {
-            // Retyped, not returned as-is: the mode was decided by distance and does not change
-            // because MapKit declined to draw it. A fallback typed `.walking` would put "Walk 12
-            // km" on the card and into the walking total, the Least Walking sort and the confidence
-            // penalty.
-            guard let walk = await walkingSegment(
-                from: from,
-                to: to,
-                fromName: fromName,
-                toName: toName
-            ) else { return nil }
-            var notes = walk.accessibilityNotes
-            notes.append(AppLocalization.text(
-                english: "Drawn along the walking route. No driving directions are available.",
-                simplified: "沿步行路线绘制，没有可用的驾车导航数据。",
-                traditional: "沿步行路線繪製，沒有可用的駕車導航資料。"
-            ))
-            return walk.retyped(as: .driving, duration: walk.duration, accessibilityNotes: notes)
-        }
+        guard let mapRoute else { return nil }
         return RouteSegment(
             id: UUID(),
             type: .driving,

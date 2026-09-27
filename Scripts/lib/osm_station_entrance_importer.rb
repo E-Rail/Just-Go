@@ -55,7 +55,20 @@ module OSMStationEntranceImporter
   # run on one busy moment, and try each mirror in turn on every attempt.
   RETRY_DELAYS = [10, 30, 60, 120].freeze
 
-  def fetch(bbox, sleeper: method(:sleep), logger: nil)
+  # The snapshot an Overpass answer was cut from, as a date.
+  def snapshot_date(payload)
+    payload.is_a?(Hash) ? payload.dig("osm3s", "timestamp_osm_base").to_s[0, 10] : ""
+  end
+
+  # Whether an answer predates `not_before`. An answer with no timestamp is taken as it is.
+  def stale?(payload, not_before)
+    snapshot = snapshot_date(payload)
+    !not_before.nil? && !snapshot.empty? && snapshot < not_before
+  end
+
+  # `not_before` is the snapshot of the network the doors bind to. The fallback mirror can lag the
+  # primary by months, and doors older than their stations miss every station that has opened since.
+  def fetch(bbox, sleeper: method(:sleep), logger: nil, not_before: nil)
     body = "data=#{URI.encode_www_form_component(overpass_query(bbox))}"
     last_error = nil
 
@@ -73,7 +86,11 @@ module OSMStationEntranceImporter
             http.request(request)
           end
           if response.code == "200"
-            return JSON.parse(response.body.to_s.force_encoding("UTF-8").scrub)
+            payload = JSON.parse(response.body.to_s.force_encoding("UTF-8").scrub)
+            return payload unless stale?(payload, not_before)
+
+            last_error = "snapshot #{snapshot_date(payload)} from #{url.host} is older than the network's #{not_before}"
+            next
           end
 
           last_error = "HTTP #{response.code} from #{url.host}"

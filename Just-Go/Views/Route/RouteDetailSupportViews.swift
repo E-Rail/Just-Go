@@ -114,7 +114,8 @@ struct RouteConfidenceDetailView: View {
                         LabeledContent {
                             Text(AppLocalization.text(
                                 english: "+\(feasibility.estimatedExtraMinutes) min",
-                                chinese: "+\(feasibility.estimatedExtraMinutes) 分钟"
+                                simplified: "+\(feasibility.estimatedExtraMinutes) 分钟",
+                                traditional: "+\(feasibility.estimatedExtraMinutes) 分鐘"
                             ))
                             .rowValue()
                         } label: {

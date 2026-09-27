@@ -18,6 +18,9 @@ struct JustGoApp: App {
         MainThreadHangMonitor.start()
         #endif
         Self.applyDataRightsEpochIfNeeded()
+        // Keeps iOS's language for this app in step with the in-app choice, including one saved by a
+        // build whose picker did not write it. iOS reads it at launch, so it applies from the next.
+        AppLocalization.applyToSystem(AppLocalization.launchPreference)
         let container = DIContainer.configure()
         _container = State(initialValue: container)
         // Off the main thread and not awaited: the sweep's cost grows with whatever has accumulated

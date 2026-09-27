@@ -1,12 +1,12 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "cities": [
     {
       "cityID": "1100",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 720712,
-      "sha256": "fbba6d0fd77df8ea5150affa2a2c4d0f728d4957b3925630af871f34f11ab171",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 723574,
+      "sha256": "a61f65be36425b4871169ba951d448a8f1fbe44ed349743f55df3f8b5eeade09",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/1100.json",
       "rightsIDs": [
@@ -25,42 +25,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 449,
+        "networkStations": 450,
         "matchedStations": {
-          "covered": 449,
-          "total": 449
+          "covered": 450,
+          "total": 450
         },
         "accessibility": {
           "covered": 43,
-          "total": 449
+          "total": 450
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 449
+          "total": 450
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 449
+          "total": 450
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 449
+          "total": 450
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 449
+          "total": 450
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 449
+          "total": 450
         }
       }
     },
     {
       "cityID": "4401",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 516965,
-      "sha256": "5e691c7554133e16a59bf6cea9bb7f0399e76b5d8403047971a1e8abe1dd96e8",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 520374,
+      "sha256": "4c3ccc02c8d991bc7ff0f3361f6d798dbd5b27f96f58e706018318509ec58abe",
       "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4401.json",
       "rightsIDs": [
@@ -78,42 +78,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 414,
+        "networkStations": 434,
         "matchedStations": {
-          "covered": 329,
-          "total": 414
+          "covered": 333,
+          "total": 434
         },
         "accessibility": {
-          "covered": 37,
-          "total": 414
+          "covered": 40,
+          "total": 434
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 414
+          "total": 434
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 414
+          "total": 434
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 414
+          "total": 434
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 414
+          "total": 434
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 414
+          "total": 434
         }
       }
     },
     {
       "cityID": "3100",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 568599,
-      "sha256": "b7a375838e876e9368a3aa0f7cbaaa1bcfc9e1d2930c288e4da2621c848e4cbc",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 569987,
+      "sha256": "c2d5220a1faefcff6a220f42eb17e718fa8fb556e7f0806322c8ac3b93aba985",
       "bundledResource": "BundledCityPacks/3100.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3100.json",
       "rightsIDs": [
@@ -164,9 +164,9 @@
     },
     {
       "cityID": "1200",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 147712,
-      "sha256": "1c38d5a633415b30d68cdc2662d887b2754d10447289ad759ac896df8f3e6a94",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 149806,
+      "sha256": "df256c480f652bf5443c451d78b23b1bb92df0b9dcc74a7e34ef224ed74e8e8e",
       "bundledResource": "BundledCityPacks/1200.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/1200.json",
       "rightsIDs": [
@@ -184,42 +184,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 239,
+        "networkStations": 240,
         "matchedStations": {
-          "covered": 108,
-          "total": 239
+          "covered": 110,
+          "total": 240
         },
         "accessibility": {
           "covered": 5,
-          "total": 239
+          "total": 240
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 239
+          "total": 240
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 239
+          "total": 240
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 239
+          "total": 240
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 239
+          "total": 240
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 239
+          "total": 240
         }
       }
     },
     {
       "cityID": "5000",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 118841,
-      "sha256": "619b393e88ee6738283617fef07eced63f24b399fed3fd3616a646594558975f",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 122440,
+      "sha256": "1f52769b3aa55c01ba093bd0890efda06ff389a2dfa1cded91b26a30b71335c8",
       "bundledResource": "BundledCityPacks/5000.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/5000.json",
       "rightsIDs": [
@@ -239,7 +239,7 @@
       "coverage": {
         "networkStations": 273,
         "matchedStations": {
-          "covered": 83,
+          "covered": 87,
           "total": 273
         },
         "accessibility": {
@@ -290,42 +290,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 67,
+        "networkStations": 144,
         "matchedStations": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "accessibility": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 67
+          "total": 144
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 67
+          "total": 144
         }
       }
     },
     {
       "cityID": "3201",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 153525,
-      "sha256": "b7ea634c167921e85db49081f4638a477e323ad1cfe8e0e90d31cafcef9ab3e1",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 185419,
+      "sha256": "aa659bb896b4f4d11ba31a3a691e499397a67b50f874e12285cad9b7234af723",
       "bundledResource": "BundledCityPacks/3201.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3201.json",
       "rightsIDs": [
@@ -343,42 +343,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 210,
+        "networkStations": 248,
         "matchedStations": {
-          "covered": 100,
-          "total": 210
+          "covered": 127,
+          "total": 248
         },
         "accessibility": {
           "covered": 11,
-          "total": 210
+          "total": 248
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 210
+          "total": 248
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 210
+          "total": 248
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 210
+          "total": 248
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 210
+          "total": 248
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 210
+          "total": 248
         }
       }
     },
     {
       "cityID": "4201",
-      "version": "oss-safe-v2-20260715",
+      "version": "oss-safe-v2-20260923",
       "sizeBytes": 129774,
-      "sha256": "7f3bd23e864729e2bff22307cf9fd7b52343d64709c1d875e09eada5bd2d0013",
+      "sha256": "3429e08416af3781e506bcf0e63bf5f47a5a72c57a73b3c72d5877201b627d59",
       "bundledResource": "BundledCityPacks/4201.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4201.json",
       "rightsIDs": [
@@ -429,9 +429,9 @@
     },
     {
       "cityID": "5101",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 293979,
-      "sha256": "1030078a3c5c6b9eacd2dd339e16ae6555b5f5a90dbfd92fb769a799523b60a5",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 307031,
+      "sha256": "39d56ee04b258530e8e710f881b56a2af0dd918793c0a3c232f18a9d46be31a4",
       "bundledResource": "BundledCityPacks/5101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/5101.json",
       "rightsIDs": [
@@ -449,42 +449,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 402,
+        "networkStations": 403,
         "matchedStations": {
-          "covered": 184,
-          "total": 402
+          "covered": 192,
+          "total": 403
         },
         "accessibility": {
-          "covered": 9,
-          "total": 402
+          "covered": 10,
+          "total": 403
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 402
+          "total": 403
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 402
+          "total": 403
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 402
+          "total": 403
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 402
+          "total": 403
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 402
+          "total": 403
         }
       }
     },
     {
       "cityID": "6101",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 423482,
-      "sha256": "748d11fea76dde0b88d87ba84866c88e667d91d9b3fc06b7ce242325ee1eff25",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 428044,
+      "sha256": "891593ee98dac5d9cffd016cdb1bb67db763428c3adaa924604dbef00db86766",
       "bundledResource": "BundledCityPacks/6101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/6101.json",
       "rightsIDs": [
@@ -502,34 +502,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 247,
+        "networkStations": 248,
         "matchedStations": {
-          "covered": 227,
-          "total": 247
+          "covered": 229,
+          "total": 248
         },
         "accessibility": {
-          "covered": 164,
-          "total": 247
+          "covered": 166,
+          "total": 248
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 247
+          "total": 248
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 247
+          "total": 248
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 247
+          "total": 248
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 247
+          "total": 248
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 247
+          "total": 248
         }
       }
     },
@@ -661,34 +661,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 136,
+        "networkStations": 208,
         "matchedStations": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "accessibility": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 136
+          "total": 208
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 136
+          "total": 208
         }
       }
     },
@@ -926,34 +926,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 60,
+        "networkStations": 130,
         "matchedStations": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "accessibility": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 60
+          "total": 130
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 60
+          "total": 130
         }
       }
     },
@@ -1118,9 +1118,9 @@
     },
     {
       "cityID": "3205",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 87498,
-      "sha256": "8e1e61d3023779a6248a4fb4da4481cd620381845a180f90f32bae45be212149",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 87510,
+      "sha256": "95872ecab327e4f5259aa7ef2701aed4d580356e80e399cc055d4de47bd3ca71",
       "bundledResource": "BundledCityPacks/3205.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3205.json",
       "rightsIDs": [
@@ -1191,34 +1191,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 33,
+        "networkStations": 70,
         "matchedStations": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "accessibility": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 33
+          "total": 70
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 33
+          "total": 70
         }
       }
     },
@@ -1244,34 +1244,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 15,
+        "networkStations": 43,
         "matchedStations": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "accessibility": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 15
+          "total": 43
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 15
+          "total": 43
         }
       }
     },
@@ -1297,34 +1297,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 46,
+        "networkStations": 102,
         "matchedStations": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "accessibility": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 46
+          "total": 102
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 46
+          "total": 102
         }
       }
     },
@@ -1350,34 +1350,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 92,
+        "networkStations": 98,
         "matchedStations": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "accessibility": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 92
+          "total": 98
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 92
+          "total": 98
         }
       }
     },
@@ -1403,34 +1403,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 184,
+        "networkStations": 198,
         "matchedStations": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "accessibility": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 184
+          "total": 198
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 184
+          "total": 198
         }
       }
     },
@@ -1542,9 +1542,9 @@
     },
     {
       "cityID": "3301",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 481930,
-      "sha256": "85e570dd40bb4885907541c4094e8e6ad48bb6ab2e8eae2cf2ce05bdfd8a9d7b",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 481933,
+      "sha256": "b2e06c82388652d8c00174638e021eda74098ceb9364addae84447d37ec8121b",
       "bundledResource": "BundledCityPacks/3301.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3301.json",
       "rightsIDs": [
@@ -1615,34 +1615,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 150,
+        "networkStations": 159,
         "matchedStations": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "accessibility": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 150
+          "total": 159
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 150
+          "total": 159
         }
       }
     },
@@ -1880,34 +1880,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 87,
+        "networkStations": 104,
         "matchedStations": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "accessibility": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 87
+          "total": 104
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 87
+          "total": 104
         }
       }
     },
@@ -1933,34 +1933,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 69,
+        "networkStations": 97,
         "matchedStations": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "accessibility": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 69
+          "total": 97
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 69
+          "total": 97
         }
       }
     },
@@ -1986,34 +1986,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 140,
+        "networkStations": 150,
         "matchedStations": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "accessibility": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 140
+          "total": 150
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 140
+          "total": 150
         }
       }
     },
@@ -2125,9 +2125,9 @@
     },
     {
       "cityID": "4403",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 557468,
-      "sha256": "6ca60b7e6d6a8b3d1c0a377516150b51ad3c3bc4c87b96837343cbdca4b71eb1",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 574496,
+      "sha256": "6bfdbaaae0da7b61ebf3a4d929e07282122637e2413bfdffcba42088752a90e6",
       "bundledResource": "BundledCityPacks/4403.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4403.json",
       "rightsIDs": [
@@ -2145,34 +2145,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 372,
+        "networkStations": 380,
         "matchedStations": {
-          "covered": 321,
-          "total": 372
+          "covered": 330,
+          "total": 380
         },
         "accessibility": {
-          "covered": 19,
-          "total": 372
+          "covered": 29,
+          "total": 380
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 372
+          "total": 380
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 372
+          "total": 380
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 372
+          "total": 380
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 372
+          "total": 380
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 372
+          "total": 380
         }
       }
     },
@@ -2198,34 +2198,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 132,
+        "networkStations": 134,
         "matchedStations": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "accessibility": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 132
+          "total": 134
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 132
+          "total": 134
         }
       }
     },
@@ -2251,34 +2251,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 93,
+        "networkStations": 114,
         "matchedStations": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "accessibility": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 93
+          "total": 114
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 93
+          "total": 114
         }
       }
     },
@@ -2357,34 +2357,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 103,
+        "networkStations": 104,
         "matchedStations": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "accessibility": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 103
+          "total": 104
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 103
+          "total": 104
         }
       }
     },
@@ -2655,9 +2655,9 @@
     },
     {
       "cityID": "8100",
-      "version": "oss-safe-v2-20260715",
+      "version": "oss-safe-v2-20260923",
       "sizeBytes": 740292,
-      "sha256": "c735260173285e5f269d0fd6c0f0e07a4657878ad8e2bac7030f7c41eae54c0d",
+      "sha256": "9c35506c19bd791298c1a3d2706b14762b3907a825214ebb3702bdb10a1347cf",
       "bundledResource": "BundledCityPacks/8100.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/8100.json",
       "rightsIDs": [
@@ -2874,9 +2874,9 @@
     },
     {
       "cityID": "7101",
-      "version": "oss-safe-v2-20260715",
-      "sizeBytes": 211132,
-      "sha256": "3a1225911d183862ed94a8e3462d47520a6e619918817eff9448a1a3a5eb001d",
+      "version": "oss-safe-v2-20260923",
+      "sizeBytes": 212623,
+      "sha256": "ac7cd20c7e71bcec24c5a849425fab53290286aca3511fbb885f22c7303d9934",
       "bundledResource": "BundledCityPacks/7101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/7101.json",
       "rightsIDs": [
@@ -2895,34 +2895,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 151,
+        "networkStations": 152,
         "matchedStations": {
-          "covered": 118,
-          "total": 151
+          "covered": 119,
+          "total": 152
         },
         "accessibility": {
-          "covered": 118,
-          "total": 151
+          "covered": 119,
+          "total": 152
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 151
+          "total": 152
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 151
+          "total": 152
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 151
+          "total": 152
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 151
+          "total": 152
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 151
+          "total": 152
         }
       }
     },

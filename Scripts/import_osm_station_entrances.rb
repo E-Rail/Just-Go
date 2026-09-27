@@ -61,9 +61,11 @@ selected.each do |city_id|
       JSON.parse(File.read(cache_path))
     else
       warn "fetching #{city_id} #{city.fetch(:name)}…"
+      network_snapshot = JSON.parse(File.read(File.join(NETWORK_DIR, "#{city_id}.json"))).fetch("sourceSnapshot")
       fetched = OSMStationEntranceImporter.fetch(
         city.fetch(:bbox),
-        logger: ->(message) { warn message }
+        logger: ->(message) { warn message },
+        not_before: network_snapshot
       )
       File.write(cache_path, JSON.generate(fetched))
       # Overpass is free and shared; pause between cities rather than hammering it.

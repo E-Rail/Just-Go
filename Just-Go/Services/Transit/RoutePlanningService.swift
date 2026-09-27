@@ -756,20 +756,20 @@ final class RoutePlanningService {
         )
     }
 
-    /// The whole journey by car: one access leg from MapKit's `.automobile` router, no enrichment,
-    /// no fare, no provider quota. No distance ceiling: a drive gets better the further it goes,
-    /// which is where the metro's transfers start to cost more than the ride.
+    /// The whole journey by car: one leg from MapKit's `.automobile` router, no enrichment, no
+    /// fare, no provider quota. No distance ceiling: a drive gets better the further it goes, which
+    /// is where the metro's transfers start to cost more than the ride. Measured or nothing: where
+    /// MapKit finds no road, there is no drive to offer.
     private func directDrivingRoute(from origin: TransitPlace, to destination: TransitPlace) async -> Route? {
         let from = origin.routeCoordinate
         let to = destination.routeCoordinate
         guard from.distance(to: to) >= 1_000 else { return nil }
-        guard let segment = await walkingRoutes.accessSegment(
+        guard let segment = await walkingRoutes.measuredDrivingSegment(
             from: from,
             to: to,
             fromName: origin.name,
-            toName: destination.name,
-            mode: .driving
-        ), segment.type == .driving else {
+            toName: destination.name
+        ) else {
             return nil
         }
 

@@ -22,7 +22,11 @@ struct ArrivalCountdown: View {
                 Text(arrival.lineName)
                     .font(.caption)
                     .fontWeight(.medium)
-                Text(AppLocalization.text(english: "to \(arrival.destination)", chinese: "开往 \(arrival.destination)"))
+                Text(AppLocalization.text(
+                    english: "to \(arrival.destination)",
+                    simplified: "开往 \(arrival.destination)",
+                    traditional: "開往 \(arrival.destination)"
+                ))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 Text(arrival.statusLabel)
@@ -48,7 +52,8 @@ struct ArrivalCountdown: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(AppLocalization.text(
             english: "\(arrival.lineName) to \(arrival.destination), \(arrival.formattedArrival)",
-            chinese: "\(arrival.lineName) 开往 \(arrival.destination)，\(arrival.formattedArrival)"
+            simplified: "\(arrival.lineName) 开往 \(arrival.destination)，\(arrival.formattedArrival)",
+            traditional: "\(arrival.lineName) 開往 \(arrival.destination)，\(arrival.formattedArrival)"
         ))
     }
 }

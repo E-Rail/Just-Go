@@ -64,6 +64,9 @@ struct SettingsView: View {
                     Text(preference.localizedName).tag(preference.rawValue)
                 }
             }
+            .onChange(of: languagePreference) { _, newValue in
+                AppLocalization.applyToSystem(AppLanguagePreference(rawValue: newValue) ?? .system)
+            }
         } header: {
             Text(AppLocalization.text(english: "Appearance", simplified: "外观", traditional: "外觀"))
         } footer: {

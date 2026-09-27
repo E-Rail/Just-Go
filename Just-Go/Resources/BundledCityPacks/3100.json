@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "3100",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -9443,6 +9443,46 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14096102287",
+          "name": "6",
+          "kind": "exit",
+          "latitude": 31.175472,
+          "longitude": 121.416052,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14096163013",
+          "name": "7",
+          "kind": "exit",
+          "latitude": 31.174634,
+          "longitude": 121.415304,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14096163014",
+          "name": "8",
+          "kind": "exit",
+          "latitude": 31.176015,
+          "longitude": 121.415379,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14096163015",
+          "name": "9",
+          "kind": "exit",
+          "latitude": 31.17653,
+          "longitude": 121.41515,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-3114709846",
           "name": "4",
           "kind": "exit",
@@ -16885,11 +16925,21 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14082105347",
+          "name": "1",
+          "kind": "exit",
+          "latitude": 31.078366,
+          "longitude": 121.611317,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-3116556630",
           "name": "2",
           "kind": "exit",
-          "latitude": 31.077618,
-          "longitude": 121.611634,
+          "latitude": 31.077211,
+          "longitude": 121.611607,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -17666,8 +17716,8 @@
           "id": "osm-2697741556",
           "name": "北2",
           "kind": "exit",
-          "latitude": 31.142088,
-          "longitude": 121.41373,
+          "latitude": 31.142061,
+          "longitude": 121.41372,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -23159,8 +23209,8 @@
           "id": "osm-575350890",
           "name": "3",
           "kind": "exit",
-          "latitude": 31.219969,
-          "longitude": 121.433438,
+          "latitude": 31.220007,
+          "longitude": 121.433386,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

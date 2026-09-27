@@ -56,7 +56,8 @@ struct MetroLine: Codable, Equatable, Identifiable {
 
 /// One kind of train on a line that is not the ordinary all-stops service.
 struct MetroServiceVariant: Codable, Equatable, Identifiable {
-    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车.
+    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车. An express
+    /// the operator calls something else (晨曦特快, 直快列车) reads 快车; `name` keeps which it is.
     let kind: String
     let name: String
     let sourceRelationID: String
@@ -109,7 +110,7 @@ struct MetroStation: Codable, Equatable, Identifiable {
     let cityEn: String?
 
     var localizedCity: String? {
-        AppLocalization.isChinese ? city.map(AppLocalization.chinese) : cityEn ?? city
+        AppLocalization.isChinese ? city : cityEn ?? city
     }
 }
 
@@ -123,7 +124,7 @@ struct MetroNetworkSummary: Decodable {
 
 /// A network file's stations and lines, without `lines[].paths`. The polylines are 69% of the
 /// bundled bytes and exist only to be drawn, so leaving them out makes one nationwide station list
-/// affordable: 53 packs, 6,711 stations, ranked by distance.
+/// affordable: 53 packs, over 7,000 stations, ranked by distance.
 struct MetroNetworkStationIndex: Decodable {
     struct Line: Decodable {
         let id: String
@@ -187,7 +188,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 
     func matchingStation(named name: String, near coordinate: CLLocationCoordinate2D) -> MetroStation? {
-        let key = normalizedStationName(name)
+        let key = Self.indexKey(name)
         let candidates = Self.normalizedIndex(for: self)[key] ?? []
         return candidates.min {
             CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: coordinate) <
@@ -234,6 +235,13 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
         normalizedIndexCache.removeAllObjects()
     }
 
+    /// Folded before normalizing, so 地鐵站 is stripped like 地铁站. Folded at all because Apple Maps
+    /// names Hong Kong, Macau and Taipei stations in Simplified for a Chinese-language rider (中环,
+    /// 妈阁) while the packs hold them in Traditional (中環, 媽閣).
+    private static func indexKey(_ name: String) -> String {
+        normalizedStationName(searchFoldedName(name))
+    }
+
     private static func normalizedIndex(for network: MetroNetwork) -> [String: [MetroStation]] {
         let key = "\(network.cityID):\(network.version)" as NSString
         if let cached = normalizedIndexCache.object(forKey: key) {
@@ -241,10 +249,10 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
         }
         var index: [String: [MetroStation]] = [:]
         for station in network.stations {
-            let primary = normalizedStationName(station.name)
+            let primary = indexKey(station.name)
             index[primary, default: []].append(station)
             if let nameEn = station.nameEn, !nameEn.isEmpty {
-                let secondary = normalizedStationName(nameEn)
+                let secondary = indexKey(nameEn)
                 if secondary != primary {
                     index[secondary, default: []].append(station)
                 }

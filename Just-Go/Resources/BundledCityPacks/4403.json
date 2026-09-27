@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "4403",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 372,
+    "networkStations": 380,
     "matchedStations": {
-      "covered": 321,
-      "total": 372
+      "covered": 330,
+      "total": 380
     },
     "accessibility": {
-      "covered": 19,
-      "total": 372
+      "covered": 29,
+      "total": 380
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 372
+      "total": 380
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 372
+      "total": 380
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 372
+      "total": 380
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 372
+      "total": 380
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 372
+      "total": 380
     }
   },
   "stations": [
@@ -2280,8 +2280,8 @@
           "id": "osm-5192381652",
           "name": "D",
           "kind": "exit",
-          "latitude": 22.601103,
-          "longitude": 114.043224,
+          "latitude": 22.601094,
+          "longitude": 114.043212,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4999,8 +4999,8 @@
           "id": "osm-11171208241",
           "name": "F出口",
           "kind": "exit",
-          "latitude": 22.561269,
-          "longitude": 114.093535,
+          "latitude": 22.561231,
+          "longitude": 114.093556,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5671,6 +5671,26 @@
           "kind": "exit",
           "latitude": 22.540538,
           "longitude": 114.063484,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12060740530",
+          "name": "4",
+          "kind": "exit",
+          "latitude": 22.539147,
+          "longitude": 114.063743,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12060740531",
+          "name": "5",
+          "kind": "exit",
+          "latitude": 22.539622,
+          "longitude": 114.064105,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -9526,6 +9546,155 @@
       ]
     },
     {
+      "stationID": "72460f53538bf7fd",
+      "stationName": "横岗",
+      "stationNameEn": "Henggang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-2283655225",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.647695,
+          "longitude": 114.208734,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2283655235",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.64816,
+          "longitude": 114.208173,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2283655245",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.648559,
+          "longitude": 114.209724,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2283655260",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.64905,
+          "longitude": 114.20916,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "72d6447aa3ee9b50",
+      "stationName": "李松蓢",
+      "stationNameEn": "Lisonglang",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "D",
+          "A"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971100277",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.804604,
+          "longitude": 113.893428,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971100278",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.80626,
+          "longitude": 113.894047,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971100279",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.806226,
+          "longitude": 113.894402,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971100280",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.803888,
+          "longitude": 113.894445,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "740fc3fde71c71f7",
       "stationName": "龙胜",
       "stationNameEn": "Longsheng",
@@ -9899,6 +10068,89 @@
       ]
     },
     {
+      "stationID": "78667da8175b8035",
+      "stationName": "德雅路",
+      "stationNameEn": "Deya Road",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "B",
+          "D"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13970618309",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.738677,
+          "longitude": 113.946191,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13970618310",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.73918,
+          "longitude": 113.946212,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13970618311",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.737589,
+          "longitude": 113.948285,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13970618312",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.739451,
+          "longitude": 113.948406,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "78cc995fd7ef69be",
       "stationName": "华为",
       "stationNameEn": "Huawei",
@@ -9980,6 +10232,89 @@
           "longitude": 114.067814,
           "isAccessible": false,
           "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "792bdec8897c392c",
+      "stationName": "红坳公园",
+      "stationNameEn": "Hong'ao Park",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "A",
+          "D"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971105449",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.724138,
+          "longitude": 113.947128,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105450",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.723694,
+          "longitude": 113.947246,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105451",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.723076,
+          "longitude": 113.945629,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105452",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.723456,
+          "longitude": 113.944459,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -10149,6 +10484,16 @@
           "longitude": 113.893199,
           "isAccessible": true,
           "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105337",
+          "name": "F",
+          "kind": "exit",
+          "latitude": 22.775994,
+          "longitude": 113.893863,
+          "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
@@ -10385,16 +10730,6 @@
           "kind": "exit",
           "latitude": 22.539418,
           "longitude": 113.94393,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-2400351132",
-          "name": "A3",
-          "kind": "exit",
-          "latitude": 22.540298,
-          "longitude": 113.943852,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -10908,41 +11243,11 @@
       ],
       "stationAccessPoints": [
         {
-          "id": "osm-2613258333",
-          "name": "",
-          "kind": "exit",
-          "latitude": 22.524845,
-          "longitude": 113.967558,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
           "id": "osm-2613258341",
           "name": "",
           "kind": "exit",
           "latitude": 22.524898,
           "longitude": 113.969012,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-2613258523",
-          "name": "",
-          "kind": "exit",
-          "latitude": 22.52491,
-          "longitude": 113.967736,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-2613258568",
-          "name": "",
-          "kind": "exit",
-          "latitude": 22.525398,
-          "longitude": 113.967669,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -12048,6 +12353,99 @@
           "kind": "exit",
           "latitude": 22.594067,
           "longitude": 114.049089,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "945a8bf5f750db93",
+      "stationName": "将围",
+      "stationNameEn": "Jiangwei",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "E",
+          "A"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971105382",
+          "name": "F",
+          "kind": "exit",
+          "latitude": 22.756305,
+          "longitude": 113.905157,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105383",
+          "name": "E",
+          "kind": "exit",
+          "latitude": 22.757925,
+          "longitude": 113.905041,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105386",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.758007,
+          "longitude": 113.905719,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105387",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.756361,
+          "longitude": 113.906305,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971647898",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.758119,
+          "longitude": 113.905671,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13520,8 +13918,8 @@
           "id": "osm-11980984484",
           "name": "B出口",
           "kind": "exit",
-          "latitude": 22.555137,
-          "longitude": 114.09524,
+          "latitude": 22.555425,
+          "longitude": 114.095367,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13706,6 +14104,79 @@
           "longitude": 113.945269,
           "isAccessible": false,
           "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "a48216c497f379c9",
+      "stationName": "下村",
+      "stationNameEn": "Xiacun",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "B",
+          "A"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971105308",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.793222,
+          "longitude": 113.894226,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105309",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.794168,
+          "longitude": 113.893749,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105310",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.794469,
+          "longitude": 113.894653,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -14101,16 +14572,6 @@
 
       ],
       "stationAccessPoints": [
-        {
-          "id": "osm-12127828688",
-          "name": "5",
-          "kind": "exit",
-          "latitude": 22.546797,
-          "longitude": 114.086457,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
         {
           "id": "osm-12127828689",
           "name": "4",
@@ -17489,6 +17950,79 @@
       ]
     },
     {
+      "stationID": "c4d049e929ae7371",
+      "stationName": "上村",
+      "stationNameEn": "Shangcun",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "C",
+          "A"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971105327",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.783799,
+          "longitude": 113.893947,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105328",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.785444,
+          "longitude": 113.894247,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105329",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.785398,
+          "longitude": 113.894742,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "c4ddbb34c5dc8e48",
       "stationName": "平峦山",
       "stationNameEn": "Pingluan Hill",
@@ -18179,7 +18713,23 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "A3出口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -18222,8 +18772,8 @@
           "kind": "exit",
           "latitude": 22.566354,
           "longitude": 114.067622,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -21614,6 +22164,78 @@
       ]
     },
     {
+      "stationID": "f0ac85490ab4d45e",
+      "stationName": "月亮路",
+      "stationNameEn": "Yueliang Rd",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "A"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13970617470",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.746304,
+          "longitude": 113.910078,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13970617471",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.745543,
+          "longitude": 113.911581,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13970617472",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.746703,
+          "longitude": 113.911733,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "f0ffcbf6b55aeec4",
       "stationName": "黄阁坑",
       "stationNameEn": "Huanggekeng",
@@ -22057,8 +22679,8 @@
           "id": "osm-12196500478",
           "name": "D",
           "kind": "exit",
-          "latitude": 22.569931,
-          "longitude": 113.903368,
+          "latitude": 22.569762,
+          "longitude": 113.903455,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22067,8 +22689,8 @@
           "id": "osm-12196500479",
           "name": "E",
           "kind": "exit",
-          "latitude": 22.569436,
-          "longitude": 113.90335,
+          "latitude": 22.569297,
+          "longitude": 113.903451,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22077,8 +22699,8 @@
           "id": "osm-12196500480",
           "name": "C1",
           "kind": "exit",
-          "latitude": 22.570108,
-          "longitude": 113.904947,
+          "latitude": 22.569916,
+          "longitude": 113.905004,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22087,8 +22709,8 @@
           "id": "osm-12196500481",
           "name": "B",
           "kind": "exit",
-          "latitude": 22.569339,
-          "longitude": 113.904668,
+          "latitude": 22.56916,
+          "longitude": 113.904655,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22097,8 +22719,8 @@
           "id": "osm-12196500482",
           "name": "F",
           "kind": "exit",
-          "latitude": 22.568538,
-          "longitude": 113.903205,
+          "latitude": 22.568593,
+          "longitude": 113.903403,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22107,8 +22729,8 @@
           "id": "osm-12196500483",
           "name": "A2",
           "kind": "exit",
-          "latitude": 22.568411,
-          "longitude": 113.904427,
+          "latitude": 22.568402,
+          "longitude": 113.904351,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22117,8 +22739,8 @@
           "id": "osm-12196500484",
           "name": "A1",
           "kind": "exit",
-          "latitude": 22.568437,
-          "longitude": 113.903624,
+          "latitude": 22.568383,
+          "longitude": 113.903709,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22132,7 +22754,25 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "A2",
+          "C1",
+          "C3"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -22153,8 +22793,8 @@
           "id": "osm-11306444357",
           "name": "A1",
           "kind": "exit",
-          "latitude": 22.558493,
-          "longitude": 114.181898,
+          "latitude": 22.558386,
+          "longitude": 114.181912,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22163,18 +22803,18 @@
           "id": "osm-11306444358",
           "name": "A2",
           "kind": "exit",
-          "latitude": 22.558939,
-          "longitude": 114.182303,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 22.55884,
+          "longitude": 114.182307,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-11306444359",
           "name": "D",
           "kind": "exit",
-          "latitude": 22.558476,
-          "longitude": 114.183705,
+          "latitude": 22.558176,
+          "longitude": 114.183462,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22183,28 +22823,28 @@
           "id": "osm-11306468071",
           "name": "C1",
           "kind": "exit",
-          "latitude": 22.556807,
-          "longitude": 114.183676,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 22.556879,
+          "longitude": 114.183692,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-11306468072",
           "name": "C3",
           "kind": "exit",
-          "latitude": 22.556689,
-          "longitude": 114.182834,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 22.556531,
+          "longitude": 114.182897,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-11306468073",
           "name": "C2",
           "kind": "exit",
-          "latitude": 22.556681,
-          "longitude": 114.18303,
+          "latitude": 22.556372,
+          "longitude": 114.183197,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22271,6 +22911,129 @@
           "kind": "exit",
           "latitude": 22.598802,
           "longitude": 114.009753,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f44b9077c847bfba",
+      "stationName": "新庄",
+      "stationNameEn": "Xinzhuang",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "E2",
+          "B1"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13971105375",
+          "name": "E2",
+          "kind": "exit",
+          "latitude": 22.764594,
+          "longitude": 113.902593,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105376",
+          "name": "E1",
+          "kind": "exit",
+          "latitude": 22.765648,
+          "longitude": 113.902227,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105377",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.766862,
+          "longitude": 113.901313,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105378",
+          "name": "C2",
+          "kind": "exit",
+          "latitude": 22.767743,
+          "longitude": 113.902313,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105379",
+          "name": "B2",
+          "kind": "exit",
+          "latitude": 22.766632,
+          "longitude": 113.902777,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105380",
+          "name": "B1",
+          "kind": "exit",
+          "latitude": 22.765964,
+          "longitude": 113.903,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971105381",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.765044,
+          "longitude": 113.903351,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13971654694",
+          "name": "C1",
+          "kind": "exit",
+          "latitude": 22.767455,
+          "longitude": 113.902523,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -22787,16 +23550,6 @@
           "kind": "exit",
           "latitude": 22.539576,
           "longitude": 114.069086,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-12060740521",
-          "name": "8",
-          "kind": "exit",
-          "latitude": 22.537856,
-          "longitude": 114.06775,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

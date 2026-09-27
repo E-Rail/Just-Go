@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "6101",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 247,
+    "networkStations": 248,
     "matchedStations": {
-      "covered": 227,
-      "total": 247
+      "covered": 229,
+      "total": 248
     },
     "accessibility": {
-      "covered": 164,
-      "total": 247
+      "covered": 166,
+      "total": 248
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 247
+      "total": 248
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 247
+      "total": 248
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 247
+      "total": 248
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 247
+      "total": 248
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 247
+      "total": 248
     }
   },
   "stations": [
@@ -829,7 +829,7 @@
     {
       "stationID": "07d5191a687e6eb9",
       "stationName": "延平门",
-      "stationNameEn": "YANPINGMEN",
+      "stationNameEn": "Yanpingmen",
       "aliases": [
 
       ],
@@ -3587,7 +3587,7 @@
     {
       "stationID": "2e0adf92f56902f4",
       "stationName": "桃花潭",
-      "stationNameEn": "TAOHUATAN",
+      "stationNameEn": "Taohuatan",
       "aliases": [
 
       ],
@@ -3998,8 +3998,8 @@
           "id": "osm-9032498686",
           "name": "仁村-A口",
           "kind": "exit",
-          "latitude": 34.15164,
-          "longitude": 108.845103,
+          "latitude": 34.151627,
+          "longitude": 108.845149,
           "isAccessible": true,
           "stepFree": "yes",
           "source": "specificEntrance"
@@ -4008,8 +4008,18 @@
           "id": "osm-9032498687",
           "name": "仁村-B口",
           "kind": "exit",
-          "latitude": 34.15061,
-          "longitude": 108.844463,
+          "latitude": 34.15058,
+          "longitude": 108.844476,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9032498688",
+          "name": "仁村-C口",
+          "kind": "exit",
+          "latitude": 34.150282,
+          "longitude": 108.845211,
           "isAccessible": false,
           "stepFree": "no",
           "source": "specificEntrance"
@@ -4018,8 +4028,8 @@
           "id": "osm-9032498689",
           "name": "仁村-D口",
           "kind": "exit",
-          "latitude": 34.151365,
-          "longitude": 108.845826,
+          "latitude": 34.151327,
+          "longitude": 108.845846,
           "isAccessible": false,
           "stepFree": "no",
           "source": "specificEntrance"
@@ -6985,7 +6995,7 @@
     {
       "stationID": "5b50516957f90589",
       "stationName": "石家街",
-      "stationNameEn": "SHIJIAJIE",
+      "stationNameEn": "Shijiajie",
       "aliases": [
 
       ],
@@ -7229,98 +7239,6 @@
           "longitude": 108.947286,
           "isAccessible": false,
           "stepFree": "no",
-          "source": "specificEntrance"
-        }
-      ]
-    },
-    {
-      "stationID": "5e025bfae4ec6172",
-      "stationName": "延兴门（沙坡）",
-      "stationNameEn": "YANXINGMEN",
-      "aliases": [
-
-      ],
-      "accessibility": {
-        "source": "openstreetmap/subway-entrances",
-        "hasElevator": null,
-        "hasEscalator": null,
-        "hasWheelchairRamp": null,
-        "hasTactilePath": null,
-        "hasAccessibleRestroom": null,
-        "elevatorLocations": [
-
-        ],
-        "accessibleEntrances": [
-          "延兴门-D口"
-        ],
-        "facilityNotes": [
-
-        ]
-      },
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
-      ],
-      "stationAccessPoints": [
-        {
-          "id": "osm-9021492989",
-          "name": "延兴门-A口",
-          "kind": "exit",
-          "latitude": 34.244571,
-          "longitude": 108.996324,
-          "isAccessible": false,
-          "stepFree": "no",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9021492990",
-          "name": "延兴门-B1口",
-          "kind": "exit",
-          "latitude": 34.24312,
-          "longitude": 108.995501,
-          "isAccessible": false,
-          "stepFree": "no",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9021492991",
-          "name": "延兴门-B2口",
-          "kind": "exit",
-          "latitude": 34.242186,
-          "longitude": 108.995978,
-          "isAccessible": false,
-          "stepFree": "no",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9021492992",
-          "name": "延兴门-C口",
-          "kind": "exit",
-          "latitude": 34.243431,
-          "longitude": 108.997538,
-          "isAccessible": false,
-          "stepFree": "no",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9021492993",
-          "name": "延兴门-D口",
-          "kind": "exit",
-          "latitude": 34.244551,
-          "longitude": 108.997267,
-          "isAccessible": true,
-          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -11362,7 +11280,7 @@
     {
       "stationID": "a920becc556111e5",
       "stationName": "北大街",
-      "stationNameEn": "North Avenue",
+      "stationNameEn": "Beidajie",
       "aliases": [
 
       ],
@@ -11947,6 +11865,98 @@
           "longitude": 109.014052,
           "isAccessible": false,
           "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "b32a8e6c71be343e",
+      "stationName": "延兴门",
+      "stationNameEn": "Yanxingmen",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "延兴门-D口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9021492989",
+          "name": "延兴门-A口",
+          "kind": "exit",
+          "latitude": 34.244571,
+          "longitude": 108.996324,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9021492990",
+          "name": "延兴门-B1口",
+          "kind": "exit",
+          "latitude": 34.24312,
+          "longitude": 108.995501,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9021492991",
+          "name": "延兴门-B2口",
+          "kind": "exit",
+          "latitude": 34.242186,
+          "longitude": 108.995978,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9021492992",
+          "name": "延兴门-C口",
+          "kind": "exit",
+          "latitude": 34.243431,
+          "longitude": 108.997538,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9021492993",
+          "name": "延兴门-D口",
+          "kind": "exit",
+          "latitude": 34.244551,
+          "longitude": 108.997267,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -15037,7 +15047,7 @@
     {
       "stationID": "d8ed2aaa4e80cacc",
       "stationName": "新筑",
-      "stationNameEn": "XINZHU",
+      "stationNameEn": "Xinzhu",
       "aliases": [
 
       ],
@@ -16410,6 +16420,182 @@
           "longitude": 108.947195,
           "isAccessible": false,
           "stepFree": "no",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "ee0a2d908ebb8e55",
+      "stationName": "西安南站",
+      "stationNameEn": "Xi'an South Railway Station",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "西安南站-A2口",
+          "西安南站-D口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14171066838",
+          "name": "西安南站-A2口",
+          "kind": "exit",
+          "latitude": 34.12246,
+          "longitude": 108.815461,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14171066839",
+          "name": "西安南站-A1口",
+          "kind": "exit",
+          "latitude": 34.121721,
+          "longitude": 108.815427,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14171066840",
+          "name": "西安南站-D口",
+          "kind": "exit",
+          "latitude": 34.120635,
+          "longitude": 108.817492,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "ee998f5dda96f9f5",
+      "stationName": "西安东站",
+      "stationNameEn": "Xi'an East Railway Station",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "西安东站-D口",
+          "西安东站-C口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13983518589",
+          "name": "西安东站-A口",
+          "kind": "exit",
+          "latitude": 34.214566,
+          "longitude": 109.060959,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13983518590",
+          "name": "西安东站-B口",
+          "kind": "exit",
+          "latitude": 34.213671,
+          "longitude": 109.060946,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13983518591",
+          "name": "西安东站-D口",
+          "kind": "exit",
+          "latitude": 34.215351,
+          "longitude": 109.062334,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13983518592",
+          "name": "西安东站-C口",
+          "kind": "exit",
+          "latitude": 34.213149,
+          "longitude": 109.062343,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13983518593",
+          "name": "西安东站-E口",
+          "kind": "exit",
+          "latitude": 34.213339,
+          "longitude": 109.062502,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13983518594",
+          "name": "西安东站-K口",
+          "kind": "exit",
+          "latitude": 34.215046,
+          "longitude": 109.062535,
+          "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]

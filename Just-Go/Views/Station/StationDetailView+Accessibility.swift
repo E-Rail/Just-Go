@@ -233,7 +233,8 @@ extension StationDetailView {
         }
         return AppLocalization.text(
             english: "Coverage: \(Int(accessibility.tactilePathCoverage * 100))%",
-            chinese: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%"
+            simplified: "覆盖率：\(Int(accessibility.tactilePathCoverage * 100))%",
+            traditional: "覆蓋率：\(Int(accessibility.tactilePathCoverage * 100))%"
         )
     }
 }

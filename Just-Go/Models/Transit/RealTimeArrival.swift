@@ -23,14 +23,12 @@ struct RealtimeArrivalName: Hashable, Sendable {
         guard AppLocalization.isChinese else {
             return english ?? traditional ?? simplified ?? ""
         }
+        // The operator's own wording in the other script before English, and never a conversion:
+        // Simplified→Traditional turns 東涌 into 東湧.
         if AppLocalization.isTraditionalChinese {
-            return traditional ?? simplified.map(AppLocalization.chinese) ?? english ?? ""
+            return traditional ?? simplified ?? english ?? ""
         }
-        return simplified
-            ?? traditional?.applyingTransform(StringTransform("Hant-Hans"), reverse: false)
-            ?? traditional
-            ?? english
-            ?? ""
+        return simplified ?? traditional ?? english ?? ""
     }
 
     private func nonEmpty(_ value: String) -> String? {

@@ -437,6 +437,6 @@ enum LineNaming {
     /// The same rule `Station.localizedName` follows, so a line and the stations on it cannot end
     /// up labelled in two different languages on one screen.
     static func localizedName(of line: MetroLine) -> String {
-        AppLocalization.isChinese ? AppLocalization.chinese(line.name) : (line.nameEn ?? line.name)
+        AppLocalization.isChinese ? line.name : (line.nameEn ?? line.name)
     }
 }

@@ -84,6 +84,9 @@ RESOURCES.each do |resource|
     # encoding is recorded below so the transformation stays auditable.
     body = raw.dup.force_encoding(resource.fetch(:encoding)).encode("UTF-8")
     body = body.sub(/\A﻿/, "")
+    # LF, like every other committed file: CRLF reads as trailing whitespace to `git diff --check`.
+    # The CSV parser strips the carriage returns either way, so the built pack does not change.
+    body = body.gsub("\r\n", "\n")
     body += "\n" unless body.end_with?("\n")
     File.binwrite(path, body)
   end

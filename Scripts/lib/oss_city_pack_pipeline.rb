@@ -8,8 +8,8 @@ require "json"
 require_relative "gcj02"
 
 module OSSCityPackPipeline
-  GENERATED_AT = "2026-07-15T00:00:00Z"
-  VERSION = "oss-safe-v2-20260715"
+  GENERATED_AT = "2026-09-23T00:00:00Z"
+  VERSION = "oss-safe-v2-20260923"
   EMPTY_SHA256 = Digest::SHA256.hexdigest("")
 
   DataLicenseMetadata = Struct.new(
@@ -458,20 +458,11 @@ module OSSCityPackPipeline
 
       light_rail_groups.each do |_stop_code, rows|
         source = rows.first
-        canonical = if source["English Name"] == "Hoi Wong Road"
-          match_canonical!(canonical_index, "屯門泳池", "Tuen Mun Swimming Pool")
-        else
-          match_canonical!(canonical_index, source["Chinese Name"], source["English Name"])
-        end
+        canonical = match_canonical!(canonical_index, source["Chinese Name"], source["English Name"])
         record = records[canonical.fetch("id")] ||= base_station(canonical)
         add_source_aliases(record, canonical, source["Chinese Name"], source["English Name"])
-        if source["English Name"] == "Hoi Wong Road"
-          record["aliases"].delete(source["Chinese Name"])
-          record["aliases"].delete(source["English Name"])
-          record["aliases"].concat([canonical["name"], canonical["nameEn"]].compact)
-          record["stationName"] = source.fetch("Chinese Name")
-          record["stationNameEn"] = source.fetch("English Name")
-        end
+        # The stop's former name, which riders still search for.
+        record["aliases"].concat(["屯門泳池", "Tuen Mun Swimming Pool"]) if source["English Name"] == "Hoi Wong Road"
 
         stop_id = source.fetch("Stop ID")
         record["liveArrivalReferences"].concat(

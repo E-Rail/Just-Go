@@ -77,6 +77,10 @@ CITIES = {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
     networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
     own_unknown_lines: ["前门大街有轨电车"],
+    # 城市副中心线's relations list these three after 良乡 and in reverse (北京西站 → 良乡 → 房山东 →
+    # 后吕村 → 衙门口东), which routes a rider for 衙门口东 out to 良乡 and back and makes 北京西站 → 良乡
+    # one hop past all three. Left out until OpenStreetMap orders them, rather than reordered by guess.
+    unverified_stations: ["衙门口东", "后吕村", "房山东"],
     # Beijing's street interchanges (出站换乘): the rider leaves the paid area, walks a block and
     # re-enters. `from`/`to` are two named stations with no shared line; `at` is one name whose
     # two lines' stations are separate buildings (大钟寺 12/13 until its passage opens with Line
@@ -141,25 +145,38 @@ CITIES = {
   "1200" => { name: "Tianjin", bbox: [38.85, 116.80, 39.45, 117.80], networks: ["天津地铁", "天津轨道交通"], own_unknown_lines: [] },
   "5000" => { name: "Chongqing", bbox: [29.30, 106.20, 29.90, 106.90], networks: ["重庆轨道交通", "重庆地铁"], own_unknown_lines: [] },
   "4201" => { name: "Wuhan", bbox: [30.35, 113.95, 30.85, 114.65], networks: ["武汉地铁", "武汉轨道交通"], own_unknown_lines: [] },
-  "3201" => { name: "Nanjing", bbox: [31.70, 118.45, 32.30, 119.05], networks: ["南京地铁", "南京轨道交通"], own_unknown_lines: [] },
+  # 2号线 and S3号线 carry no network or operator tag.
+  "3201" => { name: "Nanjing", bbox: [31.70, 118.45, 32.30, 119.05], networks: ["南京地铁", "南京轨道交通"], own_unknown_lines: ["南京地铁2号线", "南京地铁S3号线"] },
   "6101" => { name: "Xian", bbox: [34.05, 108.65, 34.55, 109.25], networks: ["西安地铁", "西安轨道交通"], own_unknown_lines: [] },
   "3205" => { name: "Suzhou", bbox: [31.10, 120.35, 31.55, 120.95], networks: ["苏州轨道交通", "苏州地铁"], own_unknown_lines: [] },
-  "4101" => { name: "Zhengzhou", bbox: [34.55, 113.30, 34.95, 113.95], networks: ["郑州地铁", "郑州轨道交通"], own_unknown_lines: [] },
+  # Five lines carry no network or operator tag.
+  "4101" => {
+    name: "Zhengzhou", bbox: [34.55, 113.30, 34.95, 113.95], networks: ["郑州地铁", "郑州轨道交通"],
+    own_unknown_lines: ["郑州地铁2号线", "郑州地铁城郊线", "郑州地铁7号线", "郑州地铁8号线", "郑州地铁10号线"]
+  },
   "4301" => { name: "Changsha", bbox: [28.05, 112.75, 28.45, 113.25], networks: ["长沙地铁", "长沙市轨道交通", "长沙轨道交通"], own_unknown_lines: [] },
-  "2101" => { name: "Shenyang", bbox: [41.60, 123.15, 42.00, 123.75], networks: ["沈阳地铁", "沈阳轨道交通"], own_unknown_lines: [] },
+  # 2号线, 10号线 and 4号线 carry no network or operator tag; 4号线's two directions are named
+  # only in English, and differently.
+  "2101" => {
+    name: "Shenyang", bbox: [41.60, 123.15, 42.00, 123.75], networks: ["沈阳地铁", "沈阳轨道交通"],
+    own_unknown_lines: ["沈阳地铁2号线", "沈阳地铁10号线", "line 4", "Line 4"]
+  },
   "3702" => { name: "Qingdao", bbox: [35.85, 119.95, 36.45, 120.65], networks: ["青岛地铁", "青岛轨道交通"], own_unknown_lines: [] },
   "2102" => { name: "Dalian", bbox: [38.70, 121.25, 39.15, 122.05], networks: ["大连地铁", "大连轨道交通"], own_unknown_lines: [] },
-  "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"], own_unknown_lines: [] },
+  # 12号线's relations carry no network or operator tag.
+  "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"], own_unknown_lines: ["12号线"] },
   "3202" => { name: "Wuxi", bbox: [31.35, 120.10, 31.75, 120.60], networks: ["无锡地铁", "无锡轨道交通"], own_unknown_lines: [] },
   "5301" => { name: "Kunming", bbox: [24.70, 102.50, 25.20, 102.95], networks: ["昆明地铁", "昆明轨道交通"], own_unknown_lines: [] },
   "3601" => { name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"], own_unknown_lines: [] },
-  "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"], own_unknown_lines: [] },
+  # 一号线 carries no network or operator tag.
+  "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"], own_unknown_lines: ["福州轨道交通一号线"] },
   "3502" => { name: "Xiamen", bbox: [24.40, 117.95, 24.80, 118.25], networks: ["厦门地铁", "厦门轨道交通"], allow_unknown: true, own_unknown_lines: [] },
   "3401" => { name: "Hefei", bbox: [31.60, 117.00, 32.05, 117.50], networks: ["合肥轨道交通", "合肥地铁"], own_unknown_lines: [] },
   "1301" => { name: "Shijiazhuang", bbox: [37.85, 114.30, 38.20, 114.75], networks: ["石家庄地铁", "石家庄市轨道交通", "石家庄轨道交通"], own_unknown_lines: [] },
   "5201" => { name: "Guiyang", bbox: [26.40, 106.50, 26.85, 106.95], networks: ["贵阳地铁", "贵阳轨道交通"], allow_unknown: true, own_unknown_lines: [] },
   "2301" => { name: "Harbin", bbox: [45.55, 126.40, 45.95, 126.90], networks: ["哈尔滨地铁", "哈尔滨轨道交通"], allow_unknown: true, own_unknown_lines: [] },
-  "2201" => { name: "Changchun", bbox: [43.65, 125.10, 44.00, 125.55], networks: ["长春轨道交通", "长春地铁"], own_unknown_lines: [] },
+  # 3号线, 4号线 and 8号线 name their network in English.
+  "2201" => { name: "Changchun", bbox: [43.65, 125.10, 44.00, 125.55], networks: ["长春轨道交通", "长春地铁", "Changchun Rail Transit"], own_unknown_lines: [] },
   "4501" => { name: "Nanning", bbox: [22.65, 108.10, 23.00, 108.55], networks: ["南宁轨道交通", "南宁地铁"], own_unknown_lines: [] },
   "6201" => { name: "Lanzhou", bbox: [35.95, 103.55, 36.20, 104.05], networks: ["兰州轨道交通", "兰州市轨道交通"], allow_unknown: true, own_unknown_lines: [] },
   "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true, own_unknown_lines: [] },
@@ -177,9 +194,12 @@ CITIES = {
   },
   "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"], own_unknown_lines: [] },
   "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"], own_unknown_lines: [] },
-  "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: [] },
-  "3204" => { name: "Changzhou", bbox: [31.65, 119.80, 31.95, 120.15], networks: ["常州地铁", "常州轨道交通"], own_unknown_lines: [] },
-  "3701" => { name: "Jinan", bbox: [36.45, 116.75, 36.80, 117.30], networks: ["济南地铁", "济南轨道交通"], own_unknown_lines: [] },
+  # 2号线 and 3号线 carry no network or operator tag.
+  "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: ["徐州地铁2号线", "徐州地铁3号线"] },
+  # 1号线 carries no network or operator tag.
+  "3204" => { name: "Changzhou", bbox: [31.65, 119.80, 31.95, 120.15], networks: ["常州地铁", "常州轨道交通"], own_unknown_lines: ["常州地铁1号线"] },
+  # 4号线, 6号线 and 8号线 carry no network or operator tag.
+  "3701" => { name: "Jinan", bbox: [36.45, 116.75, 36.80, 117.30], networks: ["济南地铁", "济南轨道交通"], own_unknown_lines: ["4号线", "6号线", "8号线"] },
   "4103" => { name: "Luoyang", bbox: [34.50, 112.30, 34.78, 112.65], networks: ["洛阳地铁", "洛阳轨道交通"], own_unknown_lines: [] },
   "3402" => { name: "Wuhu", bbox: [31.20, 118.25, 31.45, 118.55], networks: ["芜湖轨道交通", "芜湖地铁"], allow_unknown: true, own_unknown_lines: [] },
   "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
@@ -440,6 +460,44 @@ def service_variant_kind(name)
   SERVICE_VARIANT_MARKERS.find { |marker| name.include?(marker) }
 end
 
+# The kind of train a relation is: from its name or, where the name is silent, from its `service`
+# tag in the operator's own words. Shenzhen and Ningbo say it only there: `地铁 2&8号线：赤湾 → 溪涌`
+# carries `service=大站快车`, `12号线：小洋江 → 大目湾` carries `service=直快列车`. The tag's English
+# values (express, local, regular) stay ignored, for the reason above.
+def relation_variant_kind(tags)
+  service_variant_kind(tags["name"]) || service_tag_variant_kind(tags["service"])
+end
+
+# 特快 and 直快 have no exact counterpart among the kinds the app shows, so they read as the generic
+# 快车. The variant's `name` keeps which express it is (晨曦特快).
+def service_tag_variant_kind(value)
+  service_variant_kind(value) || (value.to_s.match?(/特快|直快/) ? "快车" : nil)
+end
+
+# The one line each `service`-tagged express belongs to: the group holding a relation of the same
+# network whose ref the express's ref names. `2;8` names both halves of Shenzhen's through-run, which
+# are one line here. An express whose ref names no line is the only train there, and is returned to
+# be a line itself; one whose ref names two separate lines is left out rather than guessed.
+def attach_service_tagged_variants(variants, groups)
+  attached = Hash.new { |hash, key| hash[key] = [] }
+  unmatched = []
+  ambiguous = []
+  variants.each do |relation|
+    tags = relation.fetch("tags", {})
+    network = network_identity(tags)
+    references = tags["ref"].to_s.split(/[;；]/).map { |reference| normalized(reference) }.reject(&:empty?)
+    matches = groups.each_index.select do |index|
+      groups[index].any? { |profile| profile[:network] == network && references.include?(profile[:route_ref]) }
+    end
+    case matches.length
+    when 0 then unmatched << relation
+    when 1 then attached[matches.first] << relation
+    else ambiguous << relation
+    end
+  end
+  [attached, unmatched, ambiguous]
+end
+
 def express_of(name_key)
   stripped = name_key.sub(/大?站?快车\z/, "")
   stripped == name_key ? nil : stripped
@@ -613,7 +671,8 @@ end
 def strip_ordinary_service_marker(name)
   return name if name.nil? || name.empty?
 
-  stripped = name.sub(/普通(车|列车)\z/, "").strip
+  # Both scripts, bracketed or not: 桃園機場捷運 普通車, 城际 滨海快线 (普通列车).
+  stripped = name.sub(/\s*[(（]?普通(车|車|列车|列車)[)）]?\z/, "").strip
   stripped.empty? ? name : stripped
 end
 
@@ -665,14 +724,28 @@ def fetch_source(city_id, city, refresh:)
   return JSON.parse(File.read(path)) if File.file?(path) && !refresh
   fail_with("#{city[:name]} cache missing; rerun with --refresh") unless refresh
 
-  body = overpass_post(overpass_query(city[:bbox]), city)
+  body = overpass_post(overpass_query(city[:bbox]), city, not_before: committed_snapshot(city_id))
   File.write(path, body)
   JSON.parse(body)
 end
 
+# The snapshot the committed network was built from. A refresh must not be older: the fallback
+# server can lag the primary by months, and its answer would quietly roll a city back past what
+# already ships.
+def committed_snapshot(city_id)
+  path = File.join(OUTPUT_DIR, "#{city_id}.json")
+  return nil unless File.file?(path)
+
+  File.open(path) { |file| file.read(4096) }[/"sourceSnapshot":"(\d{4}-\d{2}-\d{2})"/, 1]
+end
+
+def response_snapshot(body)
+  body.to_s[0, 4096][/"timestamp_osm_base":\s*"(\d{4}-\d{2}-\d{2})/, 1]
+end
+
 # Retried with a growing pause: the public servers hand out two query slots per client and refuse
 # a burst of queries with 429 or 504 rather than queueing them.
-def overpass_post(query, city)
+def overpass_post(query, city, not_before: nil)
   4.times do |attempt|
     sleep(30 * attempt)
     response = OVERPASS_URLS.lazy.map do |url|
@@ -689,7 +762,14 @@ def overpass_post(query, city)
     rescue StandardError => error
       warn "#{city[:name]} Overpass request failed: #{error.message}"
       nil
-    end.find { |candidate| candidate.is_a?(Net::HTTPSuccess) }
+    end.find do |candidate|
+      next false unless candidate.is_a?(Net::HTTPSuccess)
+
+      snapshot = response_snapshot(candidate.body)
+      stale = not_before && snapshot && snapshot < not_before
+      warn "#{city[:name]} Overpass answered with #{snapshot}, older than the committed #{not_before}" if stale
+      !stale
+    end
     return response.body if response
   end
   fail_with("#{city[:name]} could not fetch a successful Overpass response")
@@ -989,15 +1069,25 @@ end
 
 def passenger_station_members(relation, elements_by_key, include_unbuilt: false)
   stops = named_relation_members(relation, elements_by_key, "stop", accept_station_tags: true)
-  usable_stops = stops.reject { |_member, _element, name| unbuilt_station_name?(name) }
-  if include_unbuilt
-    return stops unless usable_stops.empty?
-  else
-    return usable_stops unless usable_stops.empty?
-  end
-
   platforms = named_relation_members(relation, elements_by_key, "platform")
-  include_unbuilt ? platforms : platforms.reject { |_member, _element, name| unbuilt_station_name?(name) }
+  usable_stops = stops.reject { |_member, _element, name| unbuilt_station_name?(name) }
+  usable_platforms = platforms.reject { |_member, _element, name| unbuilt_station_name?(name) }
+  use_platforms = usable_stops.empty? || platforms_name_more_stations?(usable_stops, usable_platforms)
+  if use_platforms
+    include_unbuilt ? platforms : usable_platforms
+  else
+    include_unbuilt ? stops : usable_stops
+  end
+end
+
+# Stop positions only at the ends, a platform at every station: Shanghai's Songjiang trams are mapped
+# that way, and the stops alone keep 4 of 松江有轨电车2号线's 36 stations. The platforms win only when
+# they name every station the stops do and more, so a relation whose platforms carry per-platform
+# names ("1号站台") keeps its stops.
+def platforms_name_more_stations?(stops, platforms)
+  stop_names = stops.map { |_member, _element, name| normalized_station_name(name) }.uniq
+  platform_names = platforms.map { |_member, _element, name| normalized_station_name(name) }.uniq
+  platform_names.length > stop_names.length && (stop_names - platform_names).empty?
 end
 
 def relation_station_names(relation, elements_by_key)
@@ -1286,7 +1376,7 @@ def passenger_service_patterns(relations, elements_by_key)
       # The kind of train, from the relation's own name. Two relations that disagree about it are
       # two different services and must not be folded into one, however completely one contains
       # the other — containment is what an express *is*.
-      variant: candidates.map { |relation| service_variant_kind(relation.dig("tags", "name")) }.compact.first,
+      variant: candidates.map { |relation| relation_variant_kind(relation.fetch("tags", {})) }.compact.first,
       candidates: candidates
     }
   end
@@ -1359,7 +1449,11 @@ def select_service_relations(relations, elements_by_key, ways)
     end
     selected
   end
-  validate_selected_corridors!(selections, elements_by_key, ways)
+  # The check guards the routing graph, which a variant never enters, and a variant can run one
+  # direction only: Shenzhen's 2&8号线大站快车 goes 赤湾 → 溪涌 on the other track from the
+  # ordinary service chosen here. Where every train is a variant, they are the service and checked.
+  ordinary = selections.reject { |relation| variant_kinds[relation["id"].to_s] }
+  validate_selected_corridors!(ordinary.empty? ? selections : ordinary, elements_by_key, ways)
   [
     selections,
     patterns.length,
@@ -1397,16 +1491,48 @@ def build_network(city_id, city, source)
   station_nodes = physical_station_nodes(elements)
   pattern_station_nodes = physical_station_nodes(elements, include_unbuilt: true)
   relations = elements.select { |item| item["type"] == "relation" && supported_route_relation?(item) }
+  unverified = city.fetch(:unverified_stations, [])
+  unless unverified.empty?
+    named = lambda do |element|
+      tags = element&.fetch("tags", {}) || {}
+      unverified.include?(tags["name:zh"] || tags["name"])
+    end
+    relations = relations.map do |relation|
+      relation.merge("members" => relation.fetch("members", []).reject do |member|
+        named.call(elements_by_key["#{member["type"]}:#{member["ref"]}"])
+      end)
+    end
+    station_nodes = station_nodes.reject { |_id, (element, _name)| named.call(element) }
+    pattern_station_nodes = pattern_station_nodes.reject { |_id, (element, _name)| named.call(element) }
+  end
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
   end
-  groups, same_corridor_groups, canonicalization_report = canonicalize_relations(passenger_relations, elements_by_key, ways)
+  # An express that says so only in its `service` tag has no name to join its line by, and its ref
+  # can name two lines at once. Built as a line, it becomes one of its own (晨曦特快), and its
+  # non-stop hops reach the routing graph. So it waits until the lines exist, then joins its own.
+  tagged_variants, line_relations = passenger_relations.partition do |relation|
+    tags = relation.fetch("tags", {})
+    service_variant_kind(tags["name"]).nil? && !service_tag_variant_kind(tags["service"]).nil?
+  end
+  groups, same_corridor_groups, canonicalization_report = canonicalize_relations(line_relations, elements_by_key, ways)
+  attached_variants, unmatched_variants, ambiguous_variants = attach_service_tagged_variants(tagged_variants, groups)
+  unless unmatched_variants.empty?
+    groups, same_corridor_groups, canonicalization_report =
+      canonicalize_relations(line_relations + unmatched_variants, elements_by_key, ways)
+    attached_variants, = attach_service_tagged_variants(tagged_variants - unmatched_variants, groups)
+  end
+  canonicalization_report["serviceTaggedVariants"] = {
+    "attached" => attached_variants.values.flatten.map { |relation| relation["id"].to_s }.sort,
+    "ownLine" => unmatched_variants.map { |relation| relation["id"].to_s }.sort,
+    "leftOut" => ambiguous_variants.map { |relation| relation["id"].to_s }.sort
+  }
   service_pattern_decisions = []
 
   station_groups = {}
-  lines = groups.zip(same_corridor_groups).map do |profiles, same_corridor|
+  lines = groups.zip(same_corridor_groups).each_with_index.map do |(profiles, same_corridor), group_index|
     canonical = canonical_profile(profiles)
-    direction_relations = profiles.map { |profile| profile[:relation] }
+    direction_relations = profiles.map { |profile| profile[:relation] } + attached_variants[group_index]
     canonical_network = canonical[:network].empty? ? "unknown" : canonical[:network]
     # Drop lines that belong to another city's system (pulled in via the bbox / a cross-border
     # transfer station). Skipping the group here means its line and its not-shared stations are
@@ -1791,6 +1917,17 @@ def self_test
   )
   fail_with("platform difference created a service pattern") unless platform_patterns == 1 && platform_selected.length == 1
 
+  # Stops at the ends only, a platform at every station: the platforms name the line.
+  ends_only = fixture_relation.call(7, [10, 12], [100]).tap do |relation|
+    [10, 11, 12].each { |node| relation["members"] << { "type" => "node", "ref" => node, "role" => "platform" } }
+  end
+  fail_with("a relation with stops only at its ends lost its middle stations") unless relation_station_names(ends_only, fixture_elements).length == 3
+  # Platforms named per platform never replace the stations the stops name.
+  per_platform = fixture_relation.call(8, [10, 11, 12], [100]).tap do |relation|
+    [20, 21, 22, 23].each { |way| relation["members"] << { "type" => "way", "ref" => way, "role" => "platform" } }
+  end
+  fail_with("per-platform names replaced the stations") unless relation_station_names(per_platform, fixture_elements) == relation_station_names(fixture_relation.call(9, [10, 11, 12], [100]), fixture_elements)
+
   # Express and short-turn services, which OSM publishes as their own relations.
   fail_with("大站快车 must not be read as 快车") unless service_variant_kind("16号线大站快车：甲 -> 乙") == "大站快车"
   fail_with("直达快车 must not be read as 直达车") unless service_variant_kind("城际 (直达快车)") == "直达快车"
@@ -1800,6 +1937,27 @@ def self_test
   # ordinary train at all, which is how 上海 16号线 would lose the only service it actually ships.
   fail_with("普通车 must not be a variant") unless service_variant_kind("16号线普通车：滴水湖 -> 龙阳路").nil?
   fail_with("an ordinary name must not be a variant") unless service_variant_kind("6号线").nil?
+  fail_with("普通車 not stripped from a line name") unless strip_ordinary_service_marker("桃園機場捷運 普通車") == "桃園機場捷運"
+  fail_with("a bracketed 普通列车 not stripped") unless strip_ordinary_service_marker("城际 滨海快线 (普通列车)") == "城际 滨海快线"
+  fail_with("an ordinary line name was changed") unless strip_ordinary_service_marker("16号线") == "16号线"
+  fail_with("a service tag's 大站快车 not recognised") unless relation_variant_kind("name" => "地铁 2&8号线：赤湾 → 溪涌", "service" => "大站快车") == "大站快车"
+  fail_with("a service tag's 特快 not read as 快车") unless relation_variant_kind("name" => "晨曦特快", "service" => "晨曦特快") == "快车"
+  fail_with("an English service value must not be a variant") unless relation_variant_kind("name" => "2号线", "service" => "express").nil?
+  # A through-run's name is not a service tag: 南京 S1-S7贯通特快 calls at every stop of both lines.
+  fail_with("a name's 特快 must not be a variant") unless relation_variant_kind("name" => "南京地铁S1-S7贯通特快").nil?
+  tagged_profile = lambda { |network, reference| { network: network, route_ref: reference } }
+  tagged_groups = [[tagged_profile.call("深圳", "2"), tagged_profile.call("深圳", "8")], [tagged_profile.call("深圳", "11")]]
+  tagged_relation = lambda { |id, reference| { "id" => id, "tags" => { "network" => "深圳", "ref" => reference, "service" => "大站快车" } } }
+  tagged_attached, tagged_unmatched, tagged_ambiguous = attach_service_tagged_variants(
+    [tagged_relation.call(1, "2;8"), tagged_relation.call(2, "11"), tagged_relation.call(3, "9")],
+    tagged_groups
+  )
+  fail_with("a 2;8 express did not join the one 2/8 line") unless tagged_attached[0].map { |relation| relation["id"] } == [1]
+  fail_with("an express did not join the line its ref names") unless tagged_attached[1].map { |relation| relation["id"] } == [2]
+  fail_with("an express with no line must stay a line") unless tagged_unmatched.map { |relation| relation["id"] } == [3]
+  tagged_split, _, tagged_split_ambiguous = attach_service_tagged_variants([tagged_relation.call(4, "2;11")], tagged_groups)
+  fail_with("an express naming two separate lines must be left out") unless tagged_split.empty? && tagged_split_ambiguous.length == 1
+  fail_with("unexpected ambiguity") unless tagged_ambiguous.empty?
 
   # An express calls at a strict subset of the ordinary service's stops, which is exactly what
   # `passenger_service_patterns` folds away — so before this rule 上海 16号线大站车 and 直达车 were

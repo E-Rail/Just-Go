@@ -6,10 +6,10 @@
   "sourceDirectoryURL": "https://www.bjsubway.com/station/",
   "detailPageURL": "https://www.bjsubway.com/station/siteinfo.html",
   "provider": "Beijing Subway",
-  "canonicalStationCount": 449,
+  "canonicalStationCount": 450,
   "sourceStationCount": 423,
-  "mappedStationCount": 421,
-  "stationPageCount": 422,
+  "mappedStationCount": 422,
+  "stationPageCount": 423,
   "stationPageGapCount": 27,
   "stations": [
     {
@@ -1031,6 +1031,16 @@
       ],
       "externalStationID": "150996001",
       "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996001"
+    },
+    {
+      "stationID": "43976522726a507f",
+      "stationName": "通运门",
+      "stationNameEn": "Tongyun Men",
+      "aliases": [
+
+      ],
+      "externalStationID": "150996547",
+      "sourcePageURL": "https://www.bjsubway.com/station/siteinfo.html?loc=150996547"
     },
     {
       "stationID": "45ba9a8855b8ee07",
@@ -4671,5 +4681,5 @@
       ]
     }
   ],
-  "sourceOnlyStationCount": 2
+  "sourceOnlyStationCount": 1
 }

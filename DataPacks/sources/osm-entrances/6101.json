@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 930,
-    "boundCount": 920,
-    "unmatchedCount": 10,
+    "entranceCount": 937,
+    "boundCount": 930,
+    "unmatchedCount": 7,
     "ambiguousCount": 0,
-    "stationsWithEntrances": 227,
-    "networkStationCount": 247
+    "stationsWithEntrances": 229,
+    "networkStationCount": 248
   },
   "stations": {
     "0060bbbf0da8a0d3": [
@@ -1693,24 +1693,32 @@
     "346a4bcb7bc187c5": [
       {
         "osmNodeID": "9032498686",
-        "latitude": 34.1516401,
-        "longitude": 108.8451027,
+        "latitude": 34.1516272,
+        "longitude": 108.8451491,
         "ref": "A",
         "name": "仁村-A口",
         "wheelchair": "yes"
       },
       {
         "osmNodeID": "9032498687",
-        "latitude": 34.1506102,
-        "longitude": 108.8444632,
+        "latitude": 34.1505802,
+        "longitude": 108.8444761,
         "ref": "B",
         "name": "仁村-B口",
         "wheelchair": "no"
       },
       {
+        "osmNodeID": "9032498688",
+        "latitude": 34.1502818,
+        "longitude": 108.8452109,
+        "ref": "C",
+        "name": "仁村-C口",
+        "wheelchair": "no"
+      },
+      {
         "osmNodeID": "9032498689",
-        "latitude": 34.151365,
-        "longitude": 108.8458255,
+        "latitude": 34.1513265,
+        "longitude": 108.8458461,
         "ref": "D",
         "name": "仁村-D口",
         "wheelchair": "no"
@@ -3066,48 +3074,6 @@
         "ref": "G",
         "name": "南稍门-G口",
         "wheelchair": "no"
-      }
-    ],
-    "5e025bfae4ec6172": [
-      {
-        "osmNodeID": "9021492989",
-        "latitude": 34.244571,
-        "longitude": 108.996324,
-        "ref": "A",
-        "name": "延兴门-A口",
-        "wheelchair": "no"
-      },
-      {
-        "osmNodeID": "9021492990",
-        "latitude": 34.2431195,
-        "longitude": 108.995501,
-        "ref": "B1",
-        "name": "延兴门-B1口",
-        "wheelchair": "no"
-      },
-      {
-        "osmNodeID": "9021492991",
-        "latitude": 34.2421859,
-        "longitude": 108.9959778,
-        "ref": "B2",
-        "name": "延兴门-B2口",
-        "wheelchair": "no"
-      },
-      {
-        "osmNodeID": "9021492992",
-        "latitude": 34.243431,
-        "longitude": 108.9975382,
-        "ref": "C",
-        "name": "延兴门-C口",
-        "wheelchair": "no"
-      },
-      {
-        "osmNodeID": "9021492993",
-        "latitude": 34.2445514,
-        "longitude": 108.9972674,
-        "ref": "D",
-        "name": "延兴门-D口",
-        "wheelchair": "yes"
       }
     ],
     "5e61a93c48ada1de": [
@@ -5095,6 +5061,48 @@
         "name": "西等驾坡-D口"
       }
     ],
+    "b32a8e6c71be343e": [
+      {
+        "osmNodeID": "9021492989",
+        "latitude": 34.244571,
+        "longitude": 108.996324,
+        "ref": "A",
+        "name": "延兴门-A口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492990",
+        "latitude": 34.2431195,
+        "longitude": 108.995501,
+        "ref": "B1",
+        "name": "延兴门-B1口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492991",
+        "latitude": 34.2421859,
+        "longitude": 108.9959778,
+        "ref": "B2",
+        "name": "延兴门-B2口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492992",
+        "latitude": 34.243431,
+        "longitude": 108.9975382,
+        "ref": "C",
+        "name": "延兴门-C口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "9021492993",
+        "latitude": 34.2445514,
+        "longitude": 108.9972674,
+        "ref": "D",
+        "name": "延兴门-D口",
+        "wheelchair": "yes"
+      }
+    ],
     "b3bad4b61e05fa2f": [
       {
         "osmNodeID": "9029084687",
@@ -6995,6 +7003,77 @@
         "ref": "F",
         "name": "小寨-F口",
         "wheelchair": "no"
+      }
+    ],
+    "ee0a2d908ebb8e55": [
+      {
+        "osmNodeID": "14171066839",
+        "latitude": 34.1217209,
+        "longitude": 108.8154272,
+        "ref": "A1",
+        "name": "西安南站-A1口"
+      },
+      {
+        "osmNodeID": "14171066838",
+        "latitude": 34.1224604,
+        "longitude": 108.8154613,
+        "ref": "A2",
+        "name": "西安南站-A2口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "14171066840",
+        "latitude": 34.120635,
+        "longitude": 108.8174924,
+        "ref": "D",
+        "name": "西安南站-D口",
+        "wheelchair": "yes"
+      }
+    ],
+    "ee998f5dda96f9f5": [
+      {
+        "osmNodeID": "13983518589",
+        "latitude": 34.2145656,
+        "longitude": 109.0609591,
+        "ref": "A",
+        "name": "西安东站-A口"
+      },
+      {
+        "osmNodeID": "13983518590",
+        "latitude": 34.2136714,
+        "longitude": 109.0609455,
+        "ref": "B",
+        "name": "西安东站-B口"
+      },
+      {
+        "osmNodeID": "13983518592",
+        "latitude": 34.2131492,
+        "longitude": 109.0623427,
+        "ref": "C",
+        "name": "西安东站-C口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13983518591",
+        "latitude": 34.2153512,
+        "longitude": 109.0623335,
+        "ref": "D",
+        "name": "西安东站-D口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13983518593",
+        "latitude": 34.2133388,
+        "longitude": 109.0625019,
+        "ref": "E",
+        "name": "西安东站-E口"
+      },
+      {
+        "osmNodeID": "13983518594",
+        "latitude": 34.2150463,
+        "longitude": 109.0625349,
+        "ref": "K",
+        "name": "西安东站-K口"
       }
     ],
     "f0be6e6e925e61a7": [

@@ -180,10 +180,6 @@ actor BaiduMapsClient {
     let configuration: BaiduMapsConfiguration
     private let session: URLSession
     private var spent: [String: Int] = [:]
-    /// The last thing Baidu refused, per endpoint, with its own status code, so "the API stopped
-    /// working" is answerable from Transit Data. In memory only, like everything this client
-    /// touches.
-    private var failures: [String: BaiduEndpointDiagnostics.Failure] = [:]
     /// Endpoints Baidu has refused, and the instant it is worth asking again.
     private var refusedUntil: [String: ContinuousClock.Instant] = [:]
     private var inFlightRequests = 0
@@ -244,20 +240,11 @@ actor BaiduMapsClient {
         do {
             decoded = try JSONDecoder().decode(Response.self, from: data)
         } catch {
-            // The real decoding error, so diagnostics can tell an HTML error page from a schema
-            // change. Recorded in the per-endpoint failure rather than through `AppLog`: this file
-            // has no app dependencies, which lets `Scripts/test_baidu_request_gate.sh` compile it
-            // alone.
-            record(BaiduMapsError.malformedResponse, for: path)
-            failures[path] = BaiduEndpointDiagnostics.Failure(
-                at: Date(),
-                summary: "malformed response: \(error)"
-            )
             throw BaiduMapsError.malformedResponse
         }
         guard decoded.status == 0 else {
             let error = BaiduMapsError.service(status: decoded.status, message: decoded.message ?? "")
-            record(error, for: path)
+            holdOffIfRefused(error, for: path)
             throw error
         }
         return decoded
@@ -281,9 +268,7 @@ actor BaiduMapsClient {
 
         // Refused recently: the next call is also wasted, and this endpoint has a hard daily quota.
         if let until = refusedUntil[path], until > ContinuousClock.now {
-            let error = BaiduMapsError.refusedRecently(path: path)
-            record(error, for: path)
-            throw error
+            throw BaiduMapsError.refusedRecently(path: path)
         }
 
         // Checked before anything is sent. Every caller treats a throw as "no answer", so an
@@ -291,9 +276,7 @@ actor BaiduMapsClient {
         if let ceiling = RequestBudget.ceilings[path] {
             let used = spent[path, default: 0]
             guard used < ceiling else {
-                let error = BaiduMapsError.budgetExhausted(path: path)
-                record(error, for: path)
-                throw error
+                throw BaiduMapsError.budgetExhausted(path: path)
             }
             spent[path] = used + 1
         }
@@ -317,7 +300,7 @@ actor BaiduMapsClient {
                 await self.leaveGate()
                 return data
             } catch let error as BaiduMapsError {
-                // Rethrown as it is, so `record` sees an HTTP failure and holds the endpoint off.
+                // Rethrown as it is, so `holdOffIfRefused` sees an HTTP failure.
                 await self.leaveGate()
                 throw error
             } catch {
@@ -335,7 +318,7 @@ actor BaiduMapsClient {
                 sessionTask.removeWaiter()
             }
         } catch {
-            record(error, for: path)
+            holdOffIfRefused(error, for: path)
             throw error
         }
     }
@@ -350,8 +333,8 @@ actor BaiduMapsClient {
                     return
                 }
                 // A gateway error or a captive portal answers with no error and an HTML body.
-                // Checked, and held off in `record`, or it decodes as malformed and spends the
-                // endpoint's whole launch budget on a page that was never JSON.
+                // Checked, and held off in `holdOffIfRefused`, or it decodes as malformed and
+                // spends the endpoint's whole launch budget on a page that was never JSON.
                 guard let http = response as? HTTPURLResponse else {
                     continuation.resume(throwing: BaiduMapsError.malformedResponse)
                     return
@@ -393,56 +376,24 @@ actor BaiduMapsClient {
         }
     }
 
-    private func record(_ error: Error, for path: String) {
+    /// Holds the endpoint off where Baidu refused it, since the next call would be refused too.
+    private func holdOffIfRefused(_ error: Error, for path: String) {
         guard let error = error as? BaiduMapsError else { return }
-        let summary: String
         switch error {
-        case .notConfigured: return
-        case .malformedResponse: summary = "malformed response"
-        case .http(let status):
-            summary = "HTTP \(status)"
+        case .http:
             // Held off like one of Baidu's own refusals: a gateway error or intercepted response
             // does not clear within a second.
             refusedUntil[path] = ContinuousClock.now.advanced(by: Self.refusalHoldOff)
-        case .budgetExhausted: summary = "this launch's own budget for this endpoint"
-        case .refusedRecently: summary = "held off after a recent refusal"
-        case .service(let status, let message):
-            summary = message.isEmpty ? "status \(status)" : "\(status) \(message)"
+        case .service(let status, _):
             // Baidu's own refusals, not a transport failure (-1, which may succeed next time): 302
             // daily quota, 401 concurrency, 240 service disabled, 210/211 referer or IP rejected.
             if Self.refusalStatuses.contains(status) {
                 refusedUntil[path] = ContinuousClock.now.advanced(by: Self.refusalHoldOff)
             }
-        }
-        failures[path] = BaiduEndpointDiagnostics.Failure(at: Date(), summary: summary)
-    }
-
-    /// What this launch has spent and what it was last refused, per endpoint.
-    func diagnostics() -> [BaiduEndpointDiagnostics] {
-        RequestBudget.ceilings.keys.sorted().map { path in
-            BaiduEndpointDiagnostics(
-                path: path,
-                spent: spent[path, default: 0],
-                ceiling: RequestBudget.ceilings[path] ?? 0,
-                lastFailure: failures[path]
-            )
+        case .notConfigured, .malformedResponse, .budgetExhausted, .refusedRecently:
+            break
         }
     }
-}
-
-/// One endpoint's usage this launch, for the Transit Data screen.
-struct BaiduEndpointDiagnostics: Sendable, Identifiable {
-    struct Failure: Sendable, Equatable {
-        let at: Date
-        let summary: String
-    }
-
-    let path: String
-    let spent: Int
-    let ceiling: Int
-    let lastFailure: Failure?
-
-    var id: String { path }
 }
 
 /// A coordinate as Baidu returns it, requested as GCJ-02 on every endpoint, so nothing is converted

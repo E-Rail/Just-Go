@@ -156,7 +156,7 @@ actor MemoizingAccessRouteProvider: WalkingRouteProviding {
         fromName: String,
         toName: String
     ) async -> RouteSegment? {
-        await memoized(from: from, to: to, fromName: fromName, toName: toName, mode: .walking) { provider in
+        await memoized(from: from, to: to, fromName: fromName, toName: toName, kind: String(describing: AccessLegMode.walking)) { provider in
             await provider.walkingSegment(from: from, to: to, fromName: fromName, toName: toName)
         }
     }
@@ -168,8 +168,20 @@ actor MemoizingAccessRouteProvider: WalkingRouteProviding {
         toName: String,
         mode: AccessLegMode
     ) async -> RouteSegment? {
-        await memoized(from: from, to: to, fromName: fromName, toName: toName, mode: mode) { provider in
+        await memoized(from: from, to: to, fromName: fromName, toName: toName, kind: String(describing: mode)) { provider in
             await provider.accessSegment(from: from, to: to, fromName: fromName, toName: toName, mode: mode)
+        }
+    }
+
+    func measuredDrivingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        // Its own key: a driving access leg for the same two points may be the walking fallback.
+        await memoized(from: from, to: to, fromName: fromName, toName: toName, kind: "measuredDriving") { provider in
+            await provider.measuredDrivingSegment(from: from, to: to, fromName: fromName, toName: toName)
         }
     }
 
@@ -183,7 +195,7 @@ actor MemoizingAccessRouteProvider: WalkingRouteProviding {
         to: CLLocationCoordinate2D,
         fromName: String,
         toName: String,
-        mode: AccessLegMode,
+        kind: String,
         fetch: @escaping @Sendable (WalkingRouteProviding) async -> RouteSegment?
     ) async -> RouteSegment? {
         // ~1 m precision: finer than real coordinates differ, coarser than float noise. The mode
@@ -191,7 +203,7 @@ actor MemoizingAccessRouteProvider: WalkingRouteProviding {
         let key = String(
             format: "%.5f,%.5f>%.5f,%.5f|%@",
             from.latitude, from.longitude, to.latitude, to.longitude,
-            String(describing: mode)
+            kind
         )
         if let entry = entries[key], entry.at.duration(to: .now) < lifetime {
             return entry.segment?.relabelled(from: fromName, to: toName)
@@ -265,6 +277,15 @@ final class CompositeAccessRouteProvider: WalkingRouteProviding {
             )
         }
         return Self.segment(for: route, from: fromName, to: toName, vehicle: chosen)
+    }
+
+    func measuredDrivingSegment(
+        from: CLLocationCoordinate2D,
+        to: CLLocationCoordinate2D,
+        fromName: String,
+        toName: String
+    ) async -> RouteSegment? {
+        await mapKit.measuredDrivingSegment(from: from, to: to, fromName: fromName, toName: toName)
     }
 
     static func segment(

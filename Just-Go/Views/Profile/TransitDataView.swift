@@ -18,9 +18,6 @@ struct TransitDataView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @StateObject private var state = TransitDataState()
-    /// What this launch has spent against the route provider, and what it was last refused.
-    /// Empty when no key is configured, which is a normal state.
-    @State private var providerUsage: [BaiduEndpointDiagnostics] = []
 
     /// Only the cities whose pack holds station data (14 of 53). Every city keeps its bundled
     /// network for routing and search; this page is about the station layer, and listing an empty
@@ -38,7 +35,7 @@ struct TransitDataView: View {
                     Section {
                         HStack {
                             Image(systemName: "antenna.radiowaves.left.and.right")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(Color.accentColor)
                             Text(AppLocalization.localized("Transit Data Sources"))
                                 .font(.headline)
                         }
@@ -209,41 +206,6 @@ struct TransitDataView: View {
                             traditional: "僅列出擁有車站資料的城市。其他城市仍可使用內置線網規劃路線。刪除下載的更新後會恢復內置版本。"
                         ))
                     }
-                    if !providerUsage.isEmpty {
-                        Section {
-                            ForEach(providerUsage) { endpoint in
-                                VStack(alignment: .leading, spacing: 3) {
-                                    HStack {
-                                        Text(endpoint.path)
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                        Spacer()
-                                        Text(verbatim: "\(endpoint.spent) / \(endpoint.ceiling)")
-                                            .font(.caption)
-                                            .monospacedDigit()
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    if let failure = endpoint.lastFailure {
-                                        Text(failure.summary)
-                                            .font(.caption2)
-                                            .foregroundStyle(.orange)
-                                    }
-                                }
-                            }
-                        } header: {
-                            Text(AppLocalization.text(
-                                english: "Route Provider Usage",
-                                simplified: "路线服务用量",
-                                traditional: "路線服務用量"
-                            ))
-                        } footer: {
-                            Text(AppLocalization.text(
-                                english: "This launch only, and never written to disk. The daily allowance is shared by everyone using the app, so these counts are a guard against one device spending it, not a measure of what is left.",
-                                simplified: "仅统计本次启动，且不会写入磁盘。每日额度由所有使用者共享，因此这里只是防止单台设备耗尽额度，并非剩余额度。",
-                                traditional: "僅統計本次啟動，且不會寫入磁碟。每日額度由所有使用者共享，因此這裡只是防止單一裝置耗盡額度，並非剩餘額度。"
-                            ))
-                        }
-                    }
                 }
                 .listRowBackground(Color.clear)
             }
@@ -261,7 +223,6 @@ struct TransitDataView: View {
             }
             .task {
                 await refreshPackStatuses()
-                providerUsage = await container.baiduMapsClient?.diagnostics() ?? []
             }
         }
     }
@@ -428,18 +389,20 @@ struct OfficialResourcesDirectoryView: View {
     private var filteredCities: [OfficialTransitResourceCity] {
         let query = debouncedQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return cities }
+        // Folded like station search, so 中环 finds Hong Kong's 中環.
+        let needle = searchFoldedName(query)
+        func matches(_ text: String) -> Bool { searchFoldedName(text).contains(needle) }
         return cities.filter { city in
-            city.localizedName.localizedCaseInsensitiveContains(query) ||
-                city.name.localizedCaseInsensitiveContains(query) ||
-                city.nameEn.localizedCaseInsensitiveContains(query) ||
+            matches(city.localizedName) ||
+                matches(city.name) ||
+                matches(city.nameEn) ||
                 city.allResources.contains { resource in
-                    resource.provider.localizedCaseInsensitiveContains(query) ||
-                        resource.kind.localizedTitle.localizedCaseInsensitiveContains(query)
+                    matches(resource.provider) || matches(resource.kind.localizedTitle)
                 } ||
                 city.stationResources.contains { station in
-                    station.localizedName.localizedCaseInsensitiveContains(query) ||
-                        station.stationName.localizedCaseInsensitiveContains(query) ||
-                        station.stationNameEn.localizedCaseInsensitiveContains(query)
+                    matches(station.localizedName) ||
+                        matches(station.stationName) ||
+                        matches(station.stationNameEn)
                 }
         }
     }
@@ -647,11 +610,7 @@ struct CityCapabilityTags: View, Equatable {
     }
 
     var body: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 86), spacing: 6)],
-            alignment: .leading,
-            spacing: 6
-        ) {
+        ChipFlowLayout(spacing: 6) {
             ForEach(tags) { tag in
                 capabilityTag(title: tag.title, status: tag.status)
             }
@@ -699,5 +658,57 @@ struct CityCapabilityTags: View, Equatable {
         case .pending:
             return AppLocalization.localized("Pending")
         }
+    }
+}
+
+/// Chips at their own widths, left to right, wrapping when the next one would not fit. A grid gives
+/// every chip the same column instead, which cut "实时 0/162" short in a wide iPad column with room
+/// to spare.
+private struct ChipFlowLayout: Layout {
+    var spacing: CGFloat
+
+    private struct Row {
+        var items: [(index: Int, x: CGFloat, size: CGSize)] = []
+        var y: CGFloat = 0
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = arrange(subviews, width: proposal.width ?? .infinity)
+        return CGSize(
+            width: rows.map(\.width).max() ?? 0,
+            height: rows.last.map { $0.y + $0.height } ?? 0
+        )
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        for row in arrange(subviews, width: bounds.width) {
+            for item in row.items {
+                subviews[item.index].place(
+                    at: CGPoint(x: bounds.minX + item.x, y: bounds.minY + row.y),
+                    proposal: ProposedViewSize(item.size)
+                )
+            }
+        }
+    }
+
+    private func arrange(_ subviews: Subviews, width: CGFloat) -> [Row] {
+        var rows = [Row()]
+        for index in subviews.indices {
+            var size = subviews[index].sizeThatFits(.unspecified)
+            // A chip longer than the whole line truncates rather than running off the edge.
+            size.width = min(size.width, width)
+            if let last = rows.last, !last.items.isEmpty, last.width + spacing + size.width > width {
+                rows.append(Row(y: last.y + last.height + spacing))
+            }
+            var row = rows.removeLast()
+            let x = row.items.isEmpty ? 0 : row.width + spacing
+            row.items.append((index, x, size))
+            row.width = x + size.width
+            row.height = max(row.height, size.height)
+            rows.append(row)
+        }
+        return rows
     }
 }

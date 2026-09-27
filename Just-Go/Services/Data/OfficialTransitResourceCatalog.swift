@@ -290,7 +290,7 @@ struct OfficialTransitResourceStation: Codable, Equatable, Identifiable, Sendabl
 
     var id: String { stationID }
     var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(stationName) : stationNameEn
+        AppLocalization.isChinese ? stationName : stationNameEn
     }
 }
 

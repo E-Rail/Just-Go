@@ -50,6 +50,19 @@ func transitLineReferences(_ value: String) -> Set<String> {
     return references
 }
 
+private let traditionalToSimplified = StringTransform("Hant-Hans")
+
+/// A name as search compares it: lowercased, with Traditional characters folded to Simplified, so
+/// 南京复兴 finds 南京復興, 西直門 finds 西直门, and 后湖大道 finds the 後湖大道 OSM ships for Wuhan.
+/// Fold both sides and never show the result: the fold is lossy (乾 → 干, 垵 → 埯), so only a
+/// comparison of two folded strings means anything.
+func searchFoldedName(_ value: String) -> String {
+    let lowered = value.lowercased()
+    // An English name has nothing to fold, and skipping ICU keeps its cost off half the index.
+    guard !lowered.allSatisfy(\.isASCII) else { return lowered }
+    return lowered.applyingTransform(traditionalToSimplified, reverse: false) ?? lowered
+}
+
 func normalizedStationName(_ value: String) -> String {
     value
         .lowercased()

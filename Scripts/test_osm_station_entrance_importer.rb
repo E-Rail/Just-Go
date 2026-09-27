@@ -93,6 +93,14 @@ class OSMStationEntranceImporterTest < Minitest::Test
     assert_equal %w[A B], first.fetch("stations").fetch("a").map { |e| e.fetch("ref") }
   end
 
+  def test_an_answer_older_than_the_network_is_stale
+    answer = { "osm3s" => { "timestamp_osm_base" => "2026-05-31T12:00:00Z" }, "elements" => [] }
+    assert Importer.stale?(answer, "2026-09-23"), "a May answer must not bind doors to a September network"
+    refute Importer.stale?(answer, "2026-05-31")
+    refute Importer.stale?(answer, nil)
+    refute Importer.stale?({ "elements" => [] }, "2026-09-23"), "no timestamp is taken as it is"
+  end
+
   def test_rejects_an_invalid_payload
     assert_raises(Importer::ImportError) { Importer.normalize({ "elements" => nil }) }
   end

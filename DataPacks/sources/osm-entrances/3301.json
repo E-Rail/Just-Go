@@ -8,9 +8,9 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 1464,
+    "entranceCount": 1467,
     "boundCount": 1333,
-    "unmatchedCount": 131,
+    "unmatchedCount": 134,
     "ambiguousCount": 0,
     "stationsWithEntrances": 262,
     "networkStationCount": 270
@@ -6878,8 +6878,8 @@
       },
       {
         "osmNodeID": "5024217884",
-        "latitude": 30.2641293,
-        "longitude": 120.1632268,
+        "latitude": 30.264132,
+        "longitude": 120.1632359,
         "ref": "D1",
         "name": "D1"
       },
@@ -8597,15 +8597,13 @@
         "osmNodeID": "12085405995",
         "latitude": 30.1811234,
         "longitude": 120.2745325,
-        "ref": "C1",
-        "name": "C1"
+        "ref": "C1"
       },
       {
         "osmNodeID": "12085406000",
         "latitude": 30.18051,
         "longitude": 120.2749724,
-        "ref": "C2",
-        "name": "C2"
+        "ref": "C2"
       },
       {
         "osmNodeID": "8997710424",

@@ -8,9 +8,9 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 248,
+    "entranceCount": 250,
     "boundCount": 230,
-    "unmatchedCount": 18,
+    "unmatchedCount": 20,
     "ambiguousCount": 0,
     "stationsWithEntrances": 53,
     "networkStationCount": 235
@@ -95,44 +95,40 @@
         "longitude": 120.6289826
       },
       {
-        "osmNodeID": "11773074604",
-        "latitude": 31.2539914,
-        "longitude": 120.6292412,
-        "name": "6"
-      },
-      {
-        "osmNodeID": "11773074605",
-        "latitude": 31.2540838,
-        "longitude": 120.6297876,
-        "name": "5"
-      },
-      {
         "osmNodeID": "11773074602",
         "latitude": 31.2522872,
         "longitude": 120.6294048,
-        "ref": "1",
-        "name": "1"
+        "ref": "1"
       },
       {
         "osmNodeID": "11773074607",
         "latitude": 31.2523315,
         "longitude": 120.6300224,
-        "ref": "2",
-        "name": "2"
-      },
-      {
-        "osmNodeID": "13604530012",
-        "latitude": 31.2530216,
-        "longitude": 120.6287857,
-        "ref": "2",
-        "name": "4"
+        "ref": "2"
       },
       {
         "osmNodeID": "11773074606",
         "latitude": 31.2530007,
         "longitude": 120.6305085,
-        "ref": "3",
-        "name": "3"
+        "ref": "3"
+      },
+      {
+        "osmNodeID": "13604530012",
+        "latitude": 31.2530216,
+        "longitude": 120.6287857,
+        "ref": "4"
+      },
+      {
+        "osmNodeID": "11773074605",
+        "latitude": 31.2540838,
+        "longitude": 120.6297876,
+        "ref": "5"
+      },
+      {
+        "osmNodeID": "11773074604",
+        "latitude": 31.2539914,
+        "longitude": 120.6292412,
+        "ref": "6"
       }
     ],
     "17d40bb35b377bbe": [
@@ -934,7 +930,7 @@
         "osmNodeID": "7745754928",
         "latitude": 31.3077406,
         "longitude": 120.6311305,
-        "ref": "2"
+        "ref": "2（封闭）"
       },
       {
         "osmNodeID": "7745754931",
@@ -1059,43 +1055,37 @@
         "osmNodeID": "11811147552",
         "latitude": 31.2699634,
         "longitude": 120.7697057,
-        "ref": "1",
-        "name": "1"
+        "ref": "1"
       },
       {
         "osmNodeID": "11811147554",
         "latitude": 31.2702902,
         "longitude": 120.7709611,
-        "ref": "2",
-        "name": "2"
+        "ref": "2"
       },
       {
         "osmNodeID": "13613656583",
         "latitude": 31.2707257,
         "longitude": 120.7709319,
-        "ref": "2",
-        "name": "3"
+        "ref": "3"
       },
       {
         "osmNodeID": "11811147553",
         "latitude": 31.270395,
         "longitude": 120.7695012,
-        "ref": "4",
-        "name": "4"
+        "ref": "4"
       },
       {
         "osmNodeID": "13613656585",
         "latitude": 31.2711441,
         "longitude": 120.7725231,
-        "ref": "5a",
-        "name": "5a"
+        "ref": "5a"
       },
       {
         "osmNodeID": "13613656584",
         "latitude": 31.2712836,
         "longitude": 120.7718285,
-        "ref": "5b",
-        "name": "5b"
+        "ref": "5b"
       }
     ],
     "b521f5a8b92aa1d9": [
@@ -1430,29 +1420,25 @@
         "osmNodeID": "12007046477",
         "latitude": 31.2634191,
         "longitude": 120.7398083,
-        "ref": "1",
-        "name": "1"
+        "ref": "1"
       },
       {
         "osmNodeID": "12331216121",
         "latitude": 31.2640749,
         "longitude": 120.7418855,
-        "ref": "2",
-        "name": "2"
+        "ref": "2"
       },
       {
         "osmNodeID": "12007046475",
         "latitude": 31.2649517,
         "longitude": 120.7407128,
-        "ref": "3",
-        "name": "3"
+        "ref": "3"
       },
       {
         "osmNodeID": "13608713663",
         "latitude": 31.2641532,
         "longitude": 120.74013,
-        "ref": "4",
-        "name": "4"
+        "ref": "4"
       },
       {
         "osmNodeID": "12007046476",
@@ -1465,15 +1451,13 @@
         "osmNodeID": "12331216119",
         "latitude": 31.2626628,
         "longitude": 120.7409864,
-        "ref": "7",
-        "name": "7"
+        "ref": "7"
       },
       {
         "osmNodeID": "12331216120",
         "latitude": 31.2627628,
         "longitude": 120.741562,
-        "ref": "8",
-        "name": "8"
+        "ref": "8"
       }
     ],
     "f3fc696df308dd31": [

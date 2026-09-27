@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 2419,
-    "boundCount": 1262,
-    "unmatchedCount": 1155,
+    "entranceCount": 2410,
+    "boundCount": 1265,
+    "unmatchedCount": 1143,
     "ambiguousCount": 2,
-    "stationsWithEntrances": 329,
-    "networkStationCount": 414
+    "stationsWithEntrances": 333,
+    "networkStationCount": 434
   },
   "stations": {
     "021f71d3c5a2ab84": [
@@ -111,8 +111,8 @@
       },
       {
         "osmNodeID": "12452785424",
-        "latitude": 23.0805275,
-        "longitude": 113.3121858,
+        "latitude": 23.0804402,
+        "longitude": 113.3122167,
         "ref": "D",
         "name": "上涌站D出入口",
         "wheelchair": "no"
@@ -569,6 +569,28 @@
         "name": "宝岗大道站 D出入口"
       }
     ],
+    "103c5ba15eea3b9f": [
+      {
+        "osmNodeID": "12609651984",
+        "latitude": 22.7338302,
+        "longitude": 113.7931327
+      },
+      {
+        "osmNodeID": "12609651985",
+        "latitude": 22.7330946,
+        "longitude": 113.7930735
+      },
+      {
+        "osmNodeID": "12609651986",
+        "latitude": 22.7330421,
+        "longitude": 113.7936952
+      },
+      {
+        "osmNodeID": "12609651987",
+        "latitude": 22.7336911,
+        "longitude": 113.79375
+      }
+    ],
     "11a13c0385be4689": [
       {
         "osmNodeID": "6449068835",
@@ -722,31 +744,25 @@
     ],
     "19d5db24f924bd73": [
       {
-        "osmNodeID": "13272025477",
-        "latitude": 23.098232,
-        "longitude": 113.2349793,
-        "name": "芳村站新建出入口"
-      },
-      {
         "osmNodeID": "3979544464",
         "latitude": 23.0982557,
         "longitude": 113.236038,
         "ref": "A1",
-        "name": "芳村站 A1出入口"
+        "name": "芳村站A1出入口"
       },
       {
         "osmNodeID": "3979544462",
         "latitude": 23.0977226,
         "longitude": 113.2357752,
         "ref": "A2",
-        "name": "芳村站 A2出入口"
+        "name": "芳村站A2出入口"
       },
       {
         "osmNodeID": "3979544468",
         "latitude": 23.0993157,
         "longitude": 113.2363302,
         "ref": "B1",
-        "name": "芳村站 B1出入口",
+        "name": "芳村站B1出入口",
         "wheelchair": "no"
       },
       {
@@ -775,14 +791,21 @@
         "latitude": 23.0993539,
         "longitude": 113.2350264,
         "ref": "F",
-        "name": "芳村站 F出入口"
+        "name": "芳村站F出入口"
+      },
+      {
+        "osmNodeID": "13272025477",
+        "latitude": 23.098232,
+        "longitude": 113.2349793,
+        "ref": "G",
+        "name": "芳村站G出入口"
       },
       {
         "osmNodeID": "13272025474",
         "latitude": 23.0973846,
         "longitude": 113.2347398,
         "ref": "H",
-        "name": "芳村站 H出入口"
+        "name": "芳村站H出入口"
       }
     ],
     "1a386e6700d11de6": [
@@ -1045,7 +1068,8 @@
         "latitude": 22.9379959,
         "longitude": 113.4412066,
         "ref": "B",
-        "name": "B"
+        "name": "亚运大道",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "12944538279",
@@ -1140,7 +1164,8 @@
         "latitude": 23.1170882,
         "longitude": 113.2468916,
         "ref": "E",
-        "name": "E"
+        "name": "下九路（上下九步行街）",
+        "nameEn": "Xiajiu Lu (Shangxiajiu Pedestrian Street)"
       }
     ],
     "21f2aa37337f70ff": [
@@ -1704,6 +1729,14 @@
         "longitude": 113.465303,
         "ref": "B",
         "name": "石碁站 B出入口"
+      }
+    ],
+    "3065089ae135f92d": [
+      {
+        "osmNodeID": "14065682842",
+        "latitude": 23.3123532,
+        "longitude": 113.5751588,
+        "ref": "A"
       }
     ],
     "30825d00902b23a7": [
@@ -2425,8 +2458,8 @@
     "448626edd20dfc99": [
       {
         "osmNodeID": "10055056913",
-        "latitude": 23.1333507,
-        "longitude": 113.245495,
+        "latitude": 23.1333916,
+        "longitude": 113.2455347,
         "ref": "A",
         "name": "彩虹桥站 A出入口"
       },
@@ -2439,15 +2472,15 @@
       },
       {
         "osmNodeID": "10055056912",
-        "latitude": 23.1328829,
-        "longitude": 113.2444446,
+        "latitude": 23.1329037,
+        "longitude": 113.2444979,
         "ref": "D",
         "name": "彩虹桥站 D出入口"
       },
       {
         "osmNodeID": "12432890173",
-        "latitude": 23.1345412,
-        "longitude": 113.246675,
+        "latitude": 23.1343514,
+        "longitude": 113.2475056,
         "ref": "F",
         "name": "彩虹桥站F出入口"
       },
@@ -2529,15 +2562,15 @@
     "4536ba7d67b3a540": [
       {
         "osmNodeID": "6449068827",
-        "latitude": 22.9195905,
-        "longitude": 113.4850361,
+        "latitude": 22.9196831,
+        "longitude": 113.4848493,
         "ref": "A",
         "name": "低涌站 A出入口"
       },
       {
         "osmNodeID": "6449068828",
-        "latitude": 22.9191281,
-        "longitude": 113.4851045,
+        "latitude": 22.919143,
+        "longitude": 113.4849076,
         "ref": "B",
         "name": "低涌站 B出入口"
       }
@@ -2559,15 +2592,15 @@
       },
       {
         "osmNodeID": "9090870666",
-        "latitude": 23.0834504,
-        "longitude": 113.5190766,
+        "latitude": 23.0834783,
+        "longitude": 113.5190546,
         "ref": "C",
         "name": "夏园站 C出入口"
       },
       {
         "osmNodeID": "9090870665",
-        "latitude": 23.0829938,
-        "longitude": 113.5174325,
+        "latitude": 23.0830209,
+        "longitude": 113.5174278,
         "ref": "D",
         "name": "夏园站 D出入口"
       }
@@ -3763,26 +3796,6 @@
         "name": "双岗站 C出入口"
       }
     ],
-    "710143c75bd0986e": [
-      {
-        "osmNodeID": "12114235350",
-        "latitude": 22.9894678,
-        "longitude": 113.2741125,
-        "name": "番禺站F"
-      },
-      {
-        "osmNodeID": "13724084174",
-        "latitude": 22.9892402,
-        "longitude": 113.2762121,
-        "name": "番禺站C"
-      },
-      {
-        "osmNodeID": "13724084175",
-        "latitude": 22.9887691,
-        "longitude": 113.2754416,
-        "name": "番禺站B"
-      }
-    ],
     "712180761a1742ce": [
       {
         "osmNodeID": "11518559279",
@@ -4930,13 +4943,6 @@
     ],
     "8b29ebaed94b3e3a": [
       {
-        "osmNodeID": "9048102837",
-        "latitude": 23.11876,
-        "longitude": 113.3207973,
-        "name": "珠江新城站 B2出入口",
-        "wheelchair": "yes"
-      },
-      {
         "osmNodeID": "5408792653",
         "latitude": 23.1201147,
         "longitude": 113.320905,
@@ -4958,6 +4964,14 @@
         "ref": "B1",
         "name": "珠江新城站 B1出入口",
         "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "9048102837",
+        "latitude": 23.11876,
+        "longitude": 113.3207973,
+        "ref": "B2",
+        "name": "花城大道",
+        "wheelchair": "no"
       },
       {
         "osmNodeID": "9048102842",
@@ -5061,18 +5075,18 @@
         "name": "凤凰新村站 A出入口"
       },
       {
-        "osmNodeID": "13644572209",
-        "latitude": 23.0941056,
-        "longitude": 113.255958,
-        "ref": "A",
-        "name": "凤凰新村站 D出入口"
-      },
-      {
         "osmNodeID": "5033559700",
         "latitude": 23.0956347,
         "longitude": 113.2564786,
         "ref": "B",
         "name": "凤凰新村站 B出入口"
+      },
+      {
+        "osmNodeID": "13644572209",
+        "latitude": 23.0941254,
+        "longitude": 113.2557826,
+        "ref": "D",
+        "name": "凤凰新村站 D出入口"
       }
     ],
     "8f72ae3719af06c6": [
@@ -5103,6 +5117,72 @@
         "longitude": 113.4949807,
         "ref": "C",
         "name": "新南站 C出入口"
+      }
+    ],
+    "8fefabaf30ca8429": [
+      {
+        "osmNodeID": "11528325439",
+        "latitude": 22.6878916,
+        "longitude": 113.7890716,
+        "ref": "A",
+        "name": "A",
+        "nameEn": "A"
+      },
+      {
+        "osmNodeID": "11941940613",
+        "latitude": 22.6900366,
+        "longitude": 113.7900422,
+        "ref": "A",
+        "name": "A",
+        "nameEn": "A"
+      },
+      {
+        "osmNodeID": "11528325440",
+        "latitude": 22.6878412,
+        "longitude": 113.789766,
+        "ref": "B",
+        "name": "B",
+        "nameEn": "B"
+      },
+      {
+        "osmNodeID": "11941940612",
+        "latitude": 22.6894827,
+        "longitude": 113.789995,
+        "ref": "B",
+        "name": "B",
+        "nameEn": "B"
+      },
+      {
+        "osmNodeID": "11528325437",
+        "latitude": 22.6888536,
+        "longitude": 113.7898517,
+        "ref": "C",
+        "name": "C",
+        "nameEn": "C"
+      },
+      {
+        "osmNodeID": "11941940611",
+        "latitude": 22.6895232,
+        "longitude": 113.7892479,
+        "ref": "C",
+        "name": "C",
+        "nameEn": "C"
+      },
+      {
+        "osmNodeID": "11528325438",
+        "latitude": 22.6888685,
+        "longitude": 113.7891568,
+        "ref": "D",
+        "name": "D",
+        "nameEn": "D"
+      },
+      {
+        "osmNodeID": "11941940590",
+        "latitude": 22.6902439,
+        "longitude": 113.7893163,
+        "ref": "D",
+        "name": "D",
+        "nameEn": "D"
       }
     ],
     "9038ce3953653d5e": [
@@ -5423,8 +5503,8 @@
     "970d6f075d96ec30": [
       {
         "osmNodeID": "12432890175",
-        "latitude": 23.1399851,
-        "longitude": 113.2565803,
+        "latitude": 23.1399196,
+        "longitude": 113.256545,
         "ref": "B",
         "name": "流花站B出口"
       },
@@ -5696,7 +5776,8 @@
         "latitude": 23.1985382,
         "longitude": 113.2811707,
         "ref": "A",
-        "name": "萧岗站 A出入口"
+        "name": "萧岗站 A出入口",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "6220027932",
@@ -6167,8 +6248,8 @@
     "af80ef55de0271e2": [
       {
         "osmNodeID": "6277965636",
-        "latitude": 23.0672673,
-        "longitude": 113.3761406,
+        "latitude": 23.0672639,
+        "longitude": 113.3761425,
         "ref": "A",
         "name": "官洲站 A出入口"
       },
@@ -6267,18 +6348,6 @@
     ],
     "b0ea9aa7ffadc756": [
       {
-        "osmNodeID": "13524456581",
-        "latitude": 23.1168208,
-        "longitude": 113.3791443,
-        "name": "科韵路站 出入口"
-      },
-      {
-        "osmNodeID": "13524456582",
-        "latitude": 23.1171179,
-        "longitude": 113.3781741,
-        "name": "科韵路站 出入口"
-      },
-      {
         "osmNodeID": "4261922242",
         "latitude": 23.1189522,
         "longitude": 113.3765404,
@@ -6298,20 +6367,6 @@
         "longitude": 113.376538,
         "ref": "C",
         "name": "科韵路站 C出入口"
-      },
-      {
-        "osmNodeID": "13524456583",
-        "latitude": 23.1179964,
-        "longitude": 113.378281,
-        "ref": "E",
-        "name": "科韵路站 E出入口"
-      },
-      {
-        "osmNodeID": "13523679193",
-        "latitude": 23.118241,
-        "longitude": 113.3790324,
-        "ref": "F",
-        "name": "科韵路站 F出入口"
       }
     ],
     "b118c802a4521fdd": [
@@ -6718,29 +6773,29 @@
     "ba8620def0326aac": [
       {
         "osmNodeID": "13516159605",
-        "latitude": 23.1577892,
-        "longitude": 113.3832007,
+        "latitude": 23.1577096,
+        "longitude": 113.3830228,
         "ref": "A",
         "name": "岑村站A出口"
       },
       {
         "osmNodeID": "13516055438",
-        "latitude": 23.1592124,
-        "longitude": 113.3825729,
+        "latitude": 23.1591938,
+        "longitude": 113.382554,
         "ref": "B",
         "name": "岑村站B出口"
       },
       {
         "osmNodeID": "13516124881",
-        "latitude": 23.1600124,
-        "longitude": 113.3818815,
+        "latitude": 23.1600829,
+        "longitude": 113.3818533,
         "ref": "C",
         "name": "岑村站C出口"
       },
       {
         "osmNodeID": "13516055429",
-        "latitude": 23.1578978,
-        "longitude": 113.3814721,
+        "latitude": 23.1579263,
+        "longitude": 113.3814205,
         "ref": "D",
         "name": "岑村站D出口"
       }
@@ -7119,12 +7174,6 @@
         "latitude": 22.9349682,
         "longitude": 113.3835833,
         "ref": "G1"
-      },
-      {
-        "osmNodeID": "9129393151",
-        "latitude": 22.9321139,
-        "longitude": 113.3836879,
-        "ref": "H"
       }
     ],
     "c975633631b6e6e4": [
@@ -7637,6 +7686,14 @@
         "name": "五凤站F出入口"
       }
     ],
+    "d3e5ebb66b6852bc": [
+      {
+        "osmNodeID": "14064036263",
+        "latitude": 23.2842566,
+        "longitude": 113.5920424,
+        "ref": "J"
+      }
+    ],
     "d41ed5739df15fbf": [
       {
         "osmNodeID": "4809857420",
@@ -7815,6 +7872,16 @@
         "ref": "E"
       }
     ],
+    "d8489d94bdefb41a": [
+      {
+        "osmNodeID": "12375719664",
+        "latitude": 22.6232664,
+        "longitude": 113.8130356,
+        "ref": "A",
+        "name": "A出口",
+        "nameEn": "Exit A"
+      }
+    ],
     "d86f8d2b8aa8d079": [
       {
         "osmNodeID": "9078927060",
@@ -7913,7 +7980,7 @@
         "latitude": 23.0804013,
         "longitude": 113.3416147,
         "ref": "B",
-        "name": "龙潭站 B出入口"
+        "name": "龙潭站B出入口"
       },
       {
         "osmNodeID": "9141102362",
@@ -7927,7 +7994,7 @@
         "latitude": 23.0802881,
         "longitude": 113.3408712,
         "ref": "D",
-        "name": "龙潭站 D出入口"
+        "name": "龙潭站D出入口"
       },
       {
         "osmNodeID": "12452785437",
@@ -8145,7 +8212,8 @@
         "latitude": 23.0848509,
         "longitude": 113.3622187,
         "ref": "D",
-        "name": "赤沙站 D出入口"
+        "name": "赤沙站 D出入口",
+        "wheelchair": "yes"
       }
     ],
     "e1d393320b289cad": [
@@ -8381,7 +8449,8 @@
         "latitude": 23.132397,
         "longitude": 113.4078133,
         "ref": "D",
-        "name": "黄村站 D出入口"
+        "name": "环场路",
+        "wheelchair": "limited"
       },
       {
         "osmNodeID": "8955592215",
@@ -8422,8 +8491,7 @@
         "osmNodeID": "5615232928",
         "latitude": 22.9906118,
         "longitude": 113.2968331,
-        "ref": "C",
-        "name": "谢村站 C出入口"
+        "ref": "C"
       }
     ],
     "ea9d1c7e12543a70": [
@@ -8482,19 +8550,19 @@
         "osmNodeID": "13601109997",
         "latitude": 23.1718753,
         "longitude": 113.260459,
-        "name": "B"
+        "ref": "B"
       },
       {
         "osmNodeID": "13601109998",
         "latitude": 23.1710299,
         "longitude": 113.2606373,
-        "name": "C"
+        "ref": "C"
       },
       {
         "osmNodeID": "13601109999",
         "latitude": 23.1700925,
         "longitude": 113.2601143,
-        "name": "D"
+        "ref": "D"
       }
     ],
     "ec10611b628f7857": [
@@ -8889,18 +8957,6 @@
     ],
     "f9af39bdac379780": [
       {
-        "osmNodeID": "9624417353",
-        "latitude": 22.9884321,
-        "longitude": 113.272145,
-        "name": "Q"
-      },
-      {
-        "osmNodeID": "9624417354",
-        "latitude": 22.9895359,
-        "longitude": 113.2721543,
-        "name": "M"
-      },
-      {
         "osmNodeID": "9120024373",
         "latitude": 22.9882024,
         "longitude": 113.2685854,
@@ -8979,11 +9035,25 @@
         "name": "L"
       },
       {
+        "osmNodeID": "9624417354",
+        "latitude": 22.9894927,
+        "longitude": 113.2722462,
+        "ref": "M",
+        "name": "M"
+      },
+      {
         "osmNodeID": "7036272511",
-        "latitude": 22.9896505,
-        "longitude": 113.2715593,
+        "latitude": 22.9896067,
+        "longitude": 113.2714693,
         "ref": "P",
         "name": "P"
+      },
+      {
+        "osmNodeID": "9624417353",
+        "latitude": 22.9882433,
+        "longitude": 113.272407,
+        "ref": "Q",
+        "name": "Q"
       }
     ],
     "f9f0599af6648abe": [
@@ -9215,30 +9285,6 @@
         "longitude": 113.4095179,
         "ref": "D",
         "name": "深井站 D出入口"
-      },
-      {
-        "osmNodeID": "13094342958",
-        "latitude": 23.0668,
-        "longitude": 113.4082509,
-        "ref": "E"
-      },
-      {
-        "osmNodeID": "13094342959",
-        "latitude": 23.0661226,
-        "longitude": 113.4096406,
-        "ref": "F"
-      },
-      {
-        "osmNodeID": "13094342957",
-        "latitude": 23.0667381,
-        "longitude": 113.4101593,
-        "ref": "G"
-      },
-      {
-        "osmNodeID": "13094342960",
-        "latitude": 23.0672933,
-        "longitude": 113.4096318,
-        "ref": "H"
       }
     ],
     "fffac67c0aac9801": [

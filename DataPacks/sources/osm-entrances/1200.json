@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 349,
-    "boundCount": 344,
+    "entranceCount": 353,
+    "boundCount": 348,
     "unmatchedCount": 5,
     "ambiguousCount": 0,
-    "stationsWithEntrances": 108,
-    "networkStationCount": 239
+    "stationsWithEntrances": 110,
+    "networkStationCount": 240
   },
   "stations": {
     "011ffb43b70bc973": [
@@ -262,16 +262,28 @@
         "name": "昌凌路地铁站-F口"
       }
     ],
+    "253d684a53cfc07e": [
+      {
+        "osmNodeID": "12472082383",
+        "latitude": 39.0481527,
+        "longitude": 117.3443301
+      },
+      {
+        "osmNodeID": "12472082384",
+        "latitude": 39.047123,
+        "longitude": 117.3454434
+      }
+    ],
     "279fab9a51faaf15": [
       {
         "osmNodeID": "2267683679",
-        "latitude": 39.0932108,
-        "longitude": 117.1630754
+        "latitude": 39.0932355,
+        "longitude": 117.1630834
       },
       {
         "osmNodeID": "5798383446",
-        "latitude": 39.0930925,
-        "longitude": 117.1637431
+        "latitude": 39.0930831,
+        "longitude": 117.163712
       }
     ],
     "28c7b10e308f7a2d": [
@@ -529,15 +541,15 @@
     "2f76113289658136": [
       {
         "osmNodeID": "8508321777",
-        "latitude": 39.137489,
-        "longitude": 117.1348777,
+        "latitude": 39.137446,
+        "longitude": 117.1348839,
         "ref": "G",
         "name": "咸阳路地铁站-G口"
       },
       {
         "osmNodeID": "8508321759",
-        "latitude": 39.138053,
-        "longitude": 117.1357316,
+        "latitude": 39.1380052,
+        "longitude": 117.1357285,
         "ref": "I",
         "name": "咸阳路地铁站-I口"
       }
@@ -581,18 +593,34 @@
         "name": "D出入口"
       }
     ],
+    "383e8e3a34ee4899": [
+      {
+        "osmNodeID": "14071076345",
+        "latitude": 39.1640852,
+        "longitude": 117.1786545,
+        "ref": "B2",
+        "name": "北运河地铁站-B2口"
+      },
+      {
+        "osmNodeID": "14071076338",
+        "latitude": 39.1656339,
+        "longitude": 117.1790569,
+        "ref": "D3",
+        "name": "北运河地铁站-D3口"
+      }
+    ],
     "3a627a907680bd61": [
       {
         "osmNodeID": "13729772249",
         "latitude": 39.0184071,
         "longitude": 117.7028997,
-        "name": "A1"
+        "ref": "A1"
       },
       {
         "osmNodeID": "13729772250",
         "latitude": 39.0184639,
         "longitude": 117.7027473,
-        "name": "A2"
+        "ref": "A2"
       },
       {
         "osmNodeID": "13729772236",
@@ -610,8 +638,7 @@
         "osmNodeID": "13729772233",
         "latitude": 39.0182595,
         "longitude": 117.7026374,
-        "ref": "A5",
-        "name": "A5"
+        "ref": "A5"
       },
       {
         "osmNodeID": "13729772247",
@@ -796,22 +823,22 @@
     "47c222c9b599d959": [
       {
         "osmNodeID": "13331475213",
-        "latitude": 39.0632961,
-        "longitude": 117.1942812,
+        "latitude": 39.0633279,
+        "longitude": 117.194202,
         "ref": "A",
         "name": "丽江道地铁站-A口"
       },
       {
         "osmNodeID": "13331356290",
-        "latitude": 39.0618151,
-        "longitude": 117.1920963,
+        "latitude": 39.0618558,
+        "longitude": 117.1921286,
         "ref": "B",
         "name": "丽江道地铁站-B口"
       },
       {
         "osmNodeID": "13331356289",
-        "latitude": 39.0607136,
-        "longitude": 117.1935954,
+        "latitude": 39.0607302,
+        "longitude": 117.1936354,
         "ref": "C",
         "name": "丽江道地铁站-C口"
       },
@@ -895,7 +922,7 @@
       },
       {
         "osmNodeID": "1159555712",
-        "latitude": 39.104819,
+        "latitude": 39.1048141,
         "longitude": 117.2226454,
         "ref": "C",
         "name": "下瓦房地铁站-C口"
@@ -1212,8 +1239,8 @@
     "6f73422dc5cac123": [
       {
         "osmNodeID": "13307915822",
-        "latitude": 39.0285307,
-        "longitude": 117.2176068,
+        "latitude": 39.0284864,
+        "longitude": 117.217625,
         "ref": "A1",
         "name": "张道口地铁站-A1口"
       },
@@ -1226,22 +1253,22 @@
       },
       {
         "osmNodeID": "13307915820",
-        "latitude": 39.0281463,
-        "longitude": 117.2182139,
+        "latitude": 39.028102,
+        "longitude": 117.2182231,
         "ref": "B",
         "name": "张道口地铁站-B口"
       },
       {
         "osmNodeID": "13307915848",
-        "latitude": 39.0295016,
-        "longitude": 117.2184682,
+        "latitude": 39.029459,
+        "longitude": 117.2184753,
         "ref": "C",
         "name": "张道口地铁站-C口"
       },
       {
         "osmNodeID": "13307915823",
-        "latitude": 39.0295483,
-        "longitude": 117.217594,
+        "latitude": 39.0294319,
+        "longitude": 117.2175286,
         "ref": "D",
         "name": "张道口地铁站-D口"
       }
@@ -1251,25 +1278,29 @@
         "osmNodeID": "10831669920",
         "latitude": 39.0594366,
         "longitude": 117.2173095,
-        "ref": "A"
+        "ref": "A",
+        "name": "左江道地铁站-A口"
       },
       {
         "osmNodeID": "10831669919",
         "latitude": 39.0598374,
         "longitude": 117.2180449,
-        "ref": "B"
+        "ref": "B",
+        "name": "左江道地铁站-B口"
       },
       {
         "osmNodeID": "10831669918",
         "latitude": 39.0603968,
         "longitude": 117.2180626,
-        "ref": "C"
+        "ref": "C",
+        "name": "左江道地铁站-C口"
       },
       {
         "osmNodeID": "10831669921",
         "latitude": 39.0608385,
         "longitude": 117.2173407,
-        "ref": "D"
+        "ref": "D",
+        "name": "左江道地铁站-D口"
       }
     ],
     "76dc89b0574870c2": [
@@ -1429,6 +1460,22 @@
         "longitude": 117.1500932,
         "ref": "C",
         "name": "鞍山西道地铁站-C口"
+      }
+    ],
+    "837923fced6764eb": [
+      {
+        "osmNodeID": "14132047323",
+        "latitude": 39.0033977,
+        "longitude": 117.4305229,
+        "ref": "C",
+        "name": "双桥河地铁站-C口"
+      },
+      {
+        "osmNodeID": "14132047324",
+        "latitude": 39.0017696,
+        "longitude": 117.4310371,
+        "ref": "D",
+        "name": "双桥河地铁站-D口"
       }
     ],
     "87b37fa3cc9da09f": [
@@ -1657,8 +1704,8 @@
     "93fc94a5c5a736aa": [
       {
         "osmNodeID": "13725480588",
-        "latitude": 39.056994,
-        "longitude": 117.0622153
+        "latitude": 39.056927,
+        "longitude": 117.0622585
       }
     ],
     "944ba2c5def94aeb": [
@@ -1932,15 +1979,15 @@
     "acd98af6583e5a26": [
       {
         "osmNodeID": "13397305856",
-        "latitude": 39.1579875,
-        "longitude": 117.3343566,
+        "latitude": 39.1580117,
+        "longitude": 117.3343829,
         "ref": "A",
         "name": "空港经济区地铁站-A口"
       },
       {
         "osmNodeID": "13397305857",
-        "latitude": 39.1579883,
-        "longitude": 117.3352624,
+        "latitude": 39.1580148,
+        "longitude": 117.3352869,
         "ref": "B",
         "name": "空港经济区地铁站-B口"
       }
@@ -2057,39 +2104,24 @@
         "name": "小街地铁站-D口"
       }
     ],
-    "ba6967f2a695b15a": [
-      {
-        "osmNodeID": "12472082383",
-        "latitude": 39.0481527,
-        "longitude": 117.3443301
-      },
-      {
-        "osmNodeID": "12472082384",
-        "latitude": 39.047123,
-        "longitude": 117.3454434
-      }
-    ],
     "c1e090fd2a95e7b4": [
       {
         "osmNodeID": "13867391278",
         "latitude": 39.0854122,
         "longitude": 117.1992278,
-        "ref": "A",
-        "name": "天津宾馆地铁站-A口"
+        "ref": "A"
       },
       {
         "osmNodeID": "13867391283",
         "latitude": 39.0858012,
         "longitude": 117.1987104,
-        "ref": "B",
-        "name": "天津宾馆地铁站-B口"
+        "ref": "B"
       },
       {
         "osmNodeID": "13867391288",
         "latitude": 39.0851347,
         "longitude": 117.1976011,
-        "ref": "C",
-        "name": "天津宾馆地铁站-C口"
+        "ref": "C"
       }
     ],
     "c205c3e42d38dc88": [
@@ -2256,8 +2288,8 @@
       },
       {
         "osmNodeID": "13334053770",
-        "latitude": 39.0795541,
-        "longitude": 117.1844158,
+        "latitude": 39.0783386,
+        "longitude": 117.184127,
         "ref": "B2",
         "name": "肿瘤医院地铁站-B2口"
       },
@@ -2307,29 +2339,33 @@
     ],
     "db588bc0c8e6b095": [
       {
-        "osmNodeID": "1163259967",
-        "latitude": 39.0966038,
-        "longitude": 117.2235293,
-        "name": "南楼",
-        "wheelchair": "no"
-      },
-      {
-        "osmNodeID": "1163259979",
-        "latitude": 39.0955268,
-        "longitude": 117.2233465,
-        "name": "南楼"
-      },
-      {
         "osmNodeID": "1163260910",
         "latitude": 39.096338,
         "longitude": 117.2241133,
-        "name": "南楼"
+        "ref": "A",
+        "name": "南楼地铁站-A口"
+      },
+      {
+        "osmNodeID": "1163259967",
+        "latitude": 39.0966038,
+        "longitude": 117.2235293,
+        "ref": "B",
+        "name": "南楼地铁站-B口",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "14094200882",
+        "latitude": 39.0956011,
+        "longitude": 117.2233656,
+        "ref": "C（未开放）",
+        "name": "南楼地铁站-C口（未开放）"
       },
       {
         "osmNodeID": "1163263892",
-        "latitude": 39.0951776,
-        "longitude": 117.2241951,
-        "name": "南楼"
+        "latitude": 39.0955138,
+        "longitude": 117.2242219,
+        "ref": "D",
+        "name": "南楼地铁站-D口"
       }
     ],
     "e30c012809ed46e8": [
@@ -2450,8 +2486,8 @@
       },
       {
         "osmNodeID": "13511998425",
-        "latitude": 39.1717028,
-        "longitude": 117.1620167,
+        "latitude": 39.1719438,
+        "longitude": 117.1618883,
         "ref": "D",
         "name": "洪湖里地铁站-D口"
       },

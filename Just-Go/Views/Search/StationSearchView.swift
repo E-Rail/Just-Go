@@ -321,7 +321,7 @@ struct SearchPageView: View {
                 .fill(Color(hex: line.colorHex))
                 .frame(width: 6, height: 28)
             VStack(alignment: .leading, spacing: 2) {
-                Text(AppLocalization.isChinese ? AppLocalization.chinese(line.name) : (line.nameEn ?? line.name))
+                Text(AppLocalization.isChinese ? line.name : (line.nameEn ?? line.name))
                     .rowTitle()
                 // The city is the point: "18号线" matches five lines in five cities, all "Line 18" in
                 // English.

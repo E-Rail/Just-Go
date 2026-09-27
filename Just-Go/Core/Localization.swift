@@ -41,6 +41,34 @@ enum AppLocalization {
         rawValue: UserDefaults.standard.string(forKey: preferenceKey) ?? ""
     ) ?? .system
 
+    private static let appleLanguagesKey = "AppleLanguages"
+    /// The value `applyToSystem` last wrote, so "System Default" undoes only its own write.
+    private static let writtenAppleLanguageKey = "appleLanguagesWrittenByApp"
+
+    /// Hands the rider's choice to iOS as this app's language, which is what MapKit names places in
+    /// and what the system draws inside the app (alerts, permission prompts, pickers). The in-app
+    /// choice alone only swaps the app's own strings. Takes effect at the next launch, like the
+    /// choice itself.
+    ///
+    /// `AppleLanguages` in the app's own domain is the key Settings → Just Go → Language writes; the
+    /// phone's language is in the global domain and is untouched.
+    static func applyToSystem(_ preference: AppLanguagePreference) {
+        let defaults = UserDefaults.standard
+        if let identifier = preference.localizationIdentifier {
+            defaults.set([identifier], forKey: appleLanguagesKey)
+            defaults.set(identifier, forKey: writtenAppleLanguageKey)
+            return
+        }
+        // Read from the app's domain only: `stringArray(forKey:)` falls through to the phone's
+        // languages. A language the rider set in iOS Settings is not this app's write, so it stays.
+        let appDomain = Bundle.main.bundleIdentifier.flatMap(defaults.persistentDomain(forName:))
+        if let written = defaults.string(forKey: writtenAppleLanguageKey),
+           appDomain?[appleLanguagesKey] as? [String] == [written] {
+            defaults.removeObject(forKey: appleLanguagesKey)
+        }
+        defaults.removeObject(forKey: writtenAppleLanguageKey)
+    }
+
     private static let activeLanguage: AppLanguagePreference = {
         guard launchPreference == .system else { return launchPreference }
         let languageCode = Bundle.main.preferredLocalizations.first
@@ -67,26 +95,6 @@ enum AppLocalization {
 
     static func localized(_ key: String) -> String {
         localizationBundle.localizedString(forKey: key, value: key, table: nil)
-    }
-
-    // Every `localizedName` funnels through here for Traditional Chinese; the set of names is
-    // small, so the transform is cached rather than re-run on every row render.
-    private static let hansToHantCache = NSCache<NSString, NSString>()
-
-    static func chinese(_ simplified: String) -> String {
-        guard isTraditionalChinese else { return simplified }
-        let key = simplified as NSString
-        if let cached = hansToHantCache.object(forKey: key) {
-            return cached as String
-        }
-        let converted = simplified.applyingTransform(StringTransform("Hans-Hant"), reverse: false) ?? simplified
-        hansToHantCache.setObject(converted as NSString, forKey: key)
-        return converted
-    }
-
-    static func text(english: String, chinese: String) -> String {
-        guard isChinese else { return english }
-        return self.chinese(chinese)
     }
 
     static func text(english: String, simplified: String, traditional: String) -> String {
@@ -166,7 +174,7 @@ enum AppLocalization {
 
 extension City {
     var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : nameEn
+        AppLocalization.isChinese ? name : nameEn
     }
 
     var alternateLocalizedName: String? {
@@ -176,7 +184,7 @@ extension City {
 
 extension Station {
     var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
+        AppLocalization.isChinese ? name : (nameEn ?? name)
     }
 
     /// The second line of a station label, or nil when it would repeat the first (a station with no
@@ -199,10 +207,10 @@ extension Station {
         if let alternateName = alternateLocalizedName { label += ", \(alternateName)" }
         if let city { label += ", \(city)" }
         if isTransferStation {
-            label += AppLocalization.text(english: ", transfer station", chinese: "，换乘站")
+            label += AppLocalization.text(english: ", transfer station", simplified: "，换乘站", traditional: "，轉乘站")
         }
         if accessibility?.hasElevator == true {
-            label += AppLocalization.text(english: ", has elevator", chinese: "，有电梯")
+            label += AppLocalization.text(english: ", has elevator", simplified: "，有电梯", traditional: "，有電梯")
         }
         if accessibility?.isFullyAccessible == true {
             label += AppLocalization.text(
@@ -217,7 +225,7 @@ extension Station {
 
 extension SubwayLine {
     var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
+        AppLocalization.isChinese ? name : (nameEn ?? name)
     }
 
     var alternateLocalizedName: String? {
@@ -227,7 +235,7 @@ extension SubwayLine {
 
 extension MetroLine {
     var localizedName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
+        AppLocalization.isChinese ? name : (nameEn ?? name)
     }
 }
 
@@ -237,7 +245,8 @@ extension RouteSegment {
         case .walking:
             return AppLocalization.text(
                 english: "Walk \(AppLocalization.distance(distance))",
-                chinese: "步行 \(AppLocalization.distance(distance))"
+                simplified: "步行 \(AppLocalization.distance(distance))",
+                traditional: "步行 \(AppLocalization.distance(distance))"
             )
         case .cycling:
             return AppLocalization.text(

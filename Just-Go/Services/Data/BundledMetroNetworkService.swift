@@ -109,7 +109,7 @@ struct MetroStation: Codable, Equatable, Identifiable {
     let cityEn: String?
 
     var localizedCity: String? {
-        AppLocalization.isChinese ? city.map(AppLocalization.chinese) : cityEn ?? city
+        AppLocalization.isChinese ? city : cityEn ?? city
     }
 }
 

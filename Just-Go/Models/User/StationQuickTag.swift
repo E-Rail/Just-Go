@@ -133,13 +133,13 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     /// Station name localized for display, derived from the stored raw identifiers so the
     /// persisted `name` stays a stable lookup key across locales. Mirrors `Station.localizedName`.
     var displayName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(name) : (nameEn ?? name)
+        AppLocalization.isChinese ? name : (nameEn ?? name)
     }
 
     /// Line names localized for display, mirroring `SubwayLine.localizedName`.
     var displayLineNames: [String] {
         if AppLocalization.isChinese {
-            return lineNames.map { AppLocalization.chinese($0) }
+            return lineNames
         }
         if let lineNamesEn, lineNamesEn.count == lineNames.count {
             return lineNamesEn
@@ -148,7 +148,7 @@ struct StationQuickTag: Identifiable, Codable, Equatable {
     }
 
     var displayCityName: String {
-        AppLocalization.isChinese ? AppLocalization.chinese(cityName) : (cityNameEn ?? cityName)
+        AppLocalization.isChinese ? cityName : (cityNameEn ?? cityName)
     }
 
     func toStation() -> Station {

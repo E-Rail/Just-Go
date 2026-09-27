@@ -61,7 +61,8 @@ struct RouteTabs: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(AppLocalization.text(
                         english: "Route \(index + 1), \(route.formattedDuration), \(route.formattedTransfers)",
-                        chinese: "路线 \(index + 1)，\(route.formattedDuration)，\(route.formattedTransfers)"
+                        simplified: "路线 \(index + 1)，\(route.formattedDuration)，\(route.formattedTransfers)",
+                        traditional: "路線 \(index + 1)，\(route.formattedDuration)，\(route.formattedTransfers)"
                     ))
                     .accessibilityAddTraits(selection == route.id ? .isSelected : [])
                 }

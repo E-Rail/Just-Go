@@ -8,9 +8,9 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 1501,
-    "boundCount": 1430,
-    "unmatchedCount": 69,
+    "entranceCount": 1509,
+    "boundCount": 1435,
+    "unmatchedCount": 72,
     "ambiguousCount": 2,
     "stationsWithEntrances": 369,
     "networkStationCount": 471
@@ -3701,6 +3701,30 @@
         "latitude": 31.1751912,
         "longitude": 121.4179352,
         "ref": "5"
+      },
+      {
+        "osmNodeID": "14096102287",
+        "latitude": 31.1754722,
+        "longitude": 121.4160524,
+        "ref": "6"
+      },
+      {
+        "osmNodeID": "14096163013",
+        "latitude": 31.1746341,
+        "longitude": 121.415304,
+        "ref": "7"
+      },
+      {
+        "osmNodeID": "14096163014",
+        "latitude": 31.1760146,
+        "longitude": 121.4153787,
+        "ref": "8"
+      },
+      {
+        "osmNodeID": "14096163015",
+        "latitude": 31.1765295,
+        "longitude": 121.4151495,
+        "ref": "9"
       }
     ],
     "60c915bf56f06598": [
@@ -6703,9 +6727,15 @@
         "ref": "1"
       },
       {
+        "osmNodeID": "14082105347",
+        "latitude": 31.0783662,
+        "longitude": 121.6113165,
+        "ref": "1"
+      },
+      {
         "osmNodeID": "3116556630",
-        "latitude": 31.0776175,
-        "longitude": 121.6116337,
+        "latitude": 31.0772109,
+        "longitude": 121.611607,
         "ref": "2"
       }
     ],
@@ -7013,8 +7043,8 @@
       },
       {
         "osmNodeID": "2697741556",
-        "latitude": 31.142088,
-        "longitude": 121.4137304,
+        "latitude": 31.1420605,
+        "longitude": 121.4137197,
         "ref": "2",
         "name": "北2"
       }
@@ -9157,8 +9187,8 @@
       },
       {
         "osmNodeID": "575350890",
-        "latitude": 31.2199689,
-        "longitude": 121.4334379,
+        "latitude": 31.220007,
+        "longitude": 121.4333856,
         "ref": "3"
       },
       {

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "8100",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "data-gov-hk-mtr",
     "osm-metro-networks"
@@ -12076,57 +12076,6 @@
       ]
     },
     {
-      "stationID": "79fc0753c0922a24",
-      "stationName": "海皇路",
-      "stationNameEn": "Hoi Wong Road",
-      "aliases": [
-        "Tuen Mun Swimming Pool",
-        "屯門泳池"
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-        {
-          "mode": "lightRail",
-          "lineCode": "507",
-          "stationCode": "250",
-          "lineID": "9b2d1fee9e7e4682",
-          "lineName": "輕鐵507綫",
-          "lineNameEn": "Light Rail 507",
-          "colorHex": "#1A8539"
-        },
-        {
-          "mode": "lightRail",
-          "lineCode": "614",
-          "stationCode": "250",
-          "lineID": "16d76d6063966ddb",
-          "lineName": "輕鐵614綫",
-          "lineNameEn": "Light Rail 614",
-          "colorHex": "#44ADC3"
-        },
-        {
-          "mode": "lightRail",
-          "lineCode": "614P",
-          "stationCode": "250",
-          "lineID": "49e0d74923e6cf38",
-          "lineName": "輕鐵614P綫",
-          "lineNameEn": "Light Rail 614P",
-          "colorHex": "#F4858D"
-        }
-      ]
-    },
-    {
       "stationID": "7f5518bbd9044a10",
       "stationName": "大水坑",
       "stationNameEn": "Tai Shui Hang",
@@ -13428,6 +13377,57 @@
           "lineName": "港鐵將軍澳綫",
           "lineNameEn": "MTR Tseung Kwan O Line",
           "colorHex": "#7D499D"
+        }
+      ]
+    },
+    {
+      "stationID": "989c407db822f3dd",
+      "stationName": "海皇路",
+      "stationNameEn": "Hoi Wong Road",
+      "aliases": [
+        "Tuen Mun Swimming Pool",
+        "屯門泳池"
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+        {
+          "mode": "lightRail",
+          "lineCode": "507",
+          "stationCode": "250",
+          "lineID": "9b2d1fee9e7e4682",
+          "lineName": "輕鐵507綫",
+          "lineNameEn": "Light Rail 507",
+          "colorHex": "#1A8539"
+        },
+        {
+          "mode": "lightRail",
+          "lineCode": "614",
+          "stationCode": "250",
+          "lineID": "16d76d6063966ddb",
+          "lineName": "輕鐵614綫",
+          "lineNameEn": "Light Rail 614",
+          "colorHex": "#44ADC3"
+        },
+        {
+          "mode": "lightRail",
+          "lineCode": "614P",
+          "stationCode": "250",
+          "lineID": "49e0d74923e6cf38",
+          "lineName": "輕鐵614P綫",
+          "lineNameEn": "Light Rail 614P",
+          "colorHex": "#F4858D"
         }
       ]
     },

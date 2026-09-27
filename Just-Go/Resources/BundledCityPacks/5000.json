@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "5000",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 273,
     "matchedStations": {
-      "covered": 83,
+      "covered": 87,
       "total": 273
     },
     "accessibility": {
@@ -1125,6 +1125,62 @@
       ]
     },
     {
+      "stationID": "2a6c46c8328eb1bc",
+      "stationName": "二郎",
+      "stationNameEn": "Erlang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13950129689",
+          "name": "2",
+          "kind": "exit",
+          "latitude": 29.504122,
+          "longitude": 106.461327,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13950129694",
+          "name": "3",
+          "kind": "exit",
+          "latitude": 29.504098,
+          "longitude": 106.463425,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13950129702",
+          "name": "4",
+          "kind": "exit",
+          "latitude": 29.506433,
+          "longitude": 106.462555,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "2e32905b06b631a7",
       "stationName": "高义口",
       "stationNameEn": "Gaoyikou",
@@ -1762,8 +1818,8 @@
           "id": "osm-9468836682",
           "name": "2",
           "kind": "exit",
-          "latitude": 29.616465,
-          "longitude": 106.582353,
+          "latitude": 29.616485,
+          "longitude": 106.582321,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2032,8 +2088,8 @@
           "id": "osm-9702282581",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.531294,
-          "longitude": 106.563898,
+          "latitude": 29.531489,
+          "longitude": 106.563912,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2042,8 +2098,8 @@
           "id": "osm-9702282582",
           "name": "2",
           "kind": "exit",
-          "latitude": 29.531172,
-          "longitude": 106.563127,
+          "latitude": 29.531183,
+          "longitude": 106.563072,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2355,6 +2411,78 @@
       ]
     },
     {
+      "stationID": "5e15a6ccf6ce4043",
+      "stationName": "龙头寺公园",
+      "stationNameEn": "Longtousi Park",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13958133195",
+          "name": "5",
+          "kind": "exit",
+          "latitude": 29.599491,
+          "longitude": 106.551032,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "6222fa4a5d124910",
+      "stationName": "渝鲁",
+      "stationNameEn": "Yulu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13958133153",
+          "name": "2",
+          "kind": "exit",
+          "latitude": 29.596818,
+          "longitude": 106.56004,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "64badb53630434ab",
       "stationName": "华新街",
       "stationNameEn": "Huaxinjie",
@@ -2596,8 +2724,8 @@
           "id": "osm-9458207871",
           "name": "5",
           "kind": "exit",
-          "latitude": 29.55555,
-          "longitude": 106.459583,
+          "latitude": 29.555541,
+          "longitude": 106.459604,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2616,8 +2744,8 @@
           "id": "osm-9888858333",
           "name": "",
           "kind": "exit",
-          "latitude": 29.556878,
-          "longitude": 106.460269,
+          "latitude": 29.556861,
+          "longitude": 106.460263,
           "isAccessible": true,
           "stepFree": "yes",
           "source": "specificEntrance"
@@ -2626,7 +2754,7 @@
           "id": "osm-9888858334",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.557351,
+          "latitude": 29.557325,
           "longitude": 106.459729,
           "isAccessible": false,
           "stepFree": "no",
@@ -2636,8 +2764,8 @@
           "id": "osm-9888858335",
           "name": "2",
           "kind": "exit",
-          "latitude": 29.556383,
-          "longitude": 106.461355,
+          "latitude": 29.556385,
+          "longitude": 106.46135,
           "isAccessible": false,
           "stepFree": "no",
           "source": "specificEntrance"
@@ -2829,6 +2957,42 @@
       ]
     },
     {
+      "stationID": "8996b631f384dd00",
+      "stationName": "重庆北站南广场",
+      "stationNameEn": "Chongqing North Station South Square",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13958133350",
+          "name": "1",
+          "kind": "exit",
+          "latitude": 29.606466,
+          "longitude": 106.548804,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "8a89a4db83a58606",
       "stationName": "大礼堂",
       "stationNameEn": "Chongqing People’s Auditorium",
@@ -2994,8 +3158,8 @@
           "id": "osm-13027157592",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.552914,
-          "longitude": 106.537572,
+          "latitude": 29.552913,
+          "longitude": 106.537573,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3005,7 +3169,7 @@
           "name": "2",
           "kind": "exit",
           "latitude": 29.552981,
-          "longitude": 106.538051,
+          "longitude": 106.53805,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4476,8 +4640,8 @@
           "id": "osm-9463613018",
           "name": "3A",
           "kind": "exit",
-          "latitude": 29.574809,
-          "longitude": 106.552285,
+          "latitude": 29.574846,
+          "longitude": 106.552249,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4770,8 +4934,8 @@
           "id": "osm-11386816887",
           "name": "3",
           "kind": "exit",
-          "latitude": 29.540409,
-          "longitude": 106.569604,
+          "latitude": 29.540396,
+          "longitude": 106.569626,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4803,11 +4967,21 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-13049544545",
+          "name": "1B",
+          "kind": "exit",
+          "latitude": 29.544558,
+          "longitude": 106.466984,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-13709647397",
           "name": "2",
           "kind": "exit",
-          "latitude": 29.545591,
-          "longitude": 106.469132,
+          "latitude": 29.545281,
+          "longitude": 106.468655,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4964,8 +5138,8 @@
           "id": "osm-13027159404",
           "name": "2",
           "kind": "exit",
-          "latitude": 29.507801,
-          "longitude": 106.514026,
+          "latitude": 29.507811,
+          "longitude": 106.513987,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4974,8 +5148,8 @@
           "id": "osm-13027159432",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.507864,
-          "longitude": 106.513824,
+          "latitude": 29.507873,
+          "longitude": 106.5138,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

@@ -2,16 +2,34 @@
   "schemaVersion": 1,
   "verifiedAt": "2026-07-23",
   "sourceIndexURL": "https://apis.gzmtr.com/app-map/metroweb/linestation",
-  "sourceIndexSHA256": "c20f6244b708036d638799c093c58726e2aa6bedf0b9a8e9d026e39065cd0f0a",
+  "sourceIndexSHA256": "15f98db3a401cd03a02c4cc45beabd08f71d435b9be712c4be490e3d75ef03ad",
   "serviceTimeURL": "https://apis.gzmtr.com/app-map/serviceTime/list/{stationShowCode}",
   "operatorURL": "https://www.gzmtr.com/",
   "provider": "Guangzhou Metro",
-  "canonicalStationCount": 348,
-  "sourceStationCount": 585,
-  "mappedStationCount": 346,
-  "stationPageCount": 346,
-  "stationPageGapCount": 2,
+  "canonicalStationCount": 434,
+  "sourceStationCount": 592,
+  "mappedStationCount": 428,
+  "stationPageCount": 428,
+  "stationPageGapCount": 6,
   "stations": [
+    {
+      "stationID": "009ab7ba98a554db",
+      "stationName": "清城",
+      "stationNameEn": "Qingcheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "7001"
+    },
+    {
+      "stationID": "00e48a16c14faaae",
+      "stationName": "白云湖",
+      "stationNameEn": "Baiyunhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "7013"
+    },
     {
       "stationID": "021f71d3c5a2ab84",
       "stationName": "永泰",
@@ -22,6 +40,15 @@
       "externalStationID": "323"
     },
     {
+      "stationID": "0352a790dd2f0e0c",
+      "stationName": "云东海",
+      "stationNameEn": "Yundonghai",
+      "aliases": [
+
+      ],
+      "externalStationID": "7207"
+    },
+    {
       "stationID": "03ebe7edacb59842",
       "stationName": "二沙岛",
       "stationNameEn": "Ersha Island",
@@ -29,6 +56,24 @@
 
       ],
       "externalStationID": "1217"
+    },
+    {
+      "stationID": "03f58a95189aac82",
+      "stationName": "官桥北",
+      "stationNameEn": "Guanqiaobei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7303"
+    },
+    {
+      "stationID": "0443c99c653f3e65",
+      "stationName": "三水北",
+      "stationNameEn": "Sanshui North",
+      "aliases": [
+
+      ],
+      "externalStationID": "7208"
     },
     {
       "stationID": "0444790988568894",
@@ -193,6 +238,24 @@
       "externalStationID": "818"
     },
     {
+      "stationID": "103c5ba15eea3b9f",
+      "stationName": "沙井西",
+      "stationNameEn": "Shajingxi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7811"
+    },
+    {
+      "stationID": "1156ec42debcc838",
+      "stationName": "鼎湖山",
+      "stationNameEn": "Dinghushan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7203"
+    },
+    {
       "stationID": "11a13c0385be4689",
       "stationName": "蕉门",
       "stationNameEn": "Jiaomen",
@@ -227,6 +290,15 @@
 
       ],
       "externalStationID": "720"
+    },
+    {
+      "stationID": "1639d49b0b991018",
+      "stationName": "白云机场东",
+      "stationNameEn": "Baiyun Airport East",
+      "aliases": [
+        "白云机场东（T3）"
+      ],
+      "externalStationID": "7602"
     },
     {
       "stationID": "16ef0797d37f2270",
@@ -272,6 +344,24 @@
 
       ],
       "externalStationID": "701-5"
+    },
+    {
+      "stationID": "1a4f5361d3e2bf49",
+      "stationName": "钟落潭东",
+      "stationNameEn": "Zhongluotandong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7701"
+    },
+    {
+      "stationID": "1addf8480318489d",
+      "stationName": "东莞西",
+      "stationNameEn": "Dongguanxi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7306"
     },
     {
       "stationID": "1d0b06574eeeeec3",
@@ -436,6 +526,15 @@
       "externalStationID": "THP113"
     },
     {
+      "stationID": "25d92a4df8ce6e51",
+      "stationName": "惠州北",
+      "stationNameEn": "惠州北",
+      "aliases": [
+
+      ],
+      "externalStationID": "7324"
+    },
+    {
       "stationID": "2660daff0c1d0274",
       "stationName": "同济路",
       "stationNameEn": "Tongji Lu",
@@ -553,6 +652,15 @@
       "externalStationID": "1122"
     },
     {
+      "stationID": "2c88f04222508d2f",
+      "stationName": "大源",
+      "stationNameEn": "Dayuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7507"
+    },
+    {
       "stationID": "2c982a512ee33194",
       "stationName": "林和西",
       "stationNameEn": "Linhexi",
@@ -569,6 +677,15 @@
 
       ],
       "externalStationID": "THZ106"
+    },
+    {
+      "stationID": "2d528bc9e0e1a497",
+      "stationName": "厚街",
+      "stationNameEn": "Houjie",
+      "aliases": [
+
+      ],
+      "externalStationID": "7806"
     },
     {
       "stationID": "2d5954974e768365",
@@ -589,6 +706,15 @@
       "externalStationID": "415"
     },
     {
+      "stationID": "2ec16aed09ce7922",
+      "stationName": "洲心",
+      "stationNameEn": "Zhouxin",
+      "aliases": [
+
+      ],
+      "externalStationID": "7009"
+    },
+    {
       "stationID": "2eea9707a2b2e080",
       "stationName": "岭头东",
       "stationNameEn": "Lingtou East",
@@ -596,6 +722,15 @@
 
       ],
       "externalStationID": "THP115"
+    },
+    {
+      "stationID": "3065089ae135f92d",
+      "stationName": "新龙",
+      "stationNameEn": "新龙",
+      "aliases": [
+
+      ],
+      "externalStationID": "7704"
     },
     {
       "stationID": "30825d00902b23a7",
@@ -717,7 +852,7 @@
     {
       "stationID": "3d2ca0bf09721cdf",
       "stationName": "科丰路",
-      "stationNameEn": "Kefenglu",
+      "stationNameEn": "Kefeng Road",
       "aliases": [
 
       ],
@@ -805,6 +940,15 @@
       "externalStationID": "2117"
     },
     {
+      "stationID": "424e367da51b57e2",
+      "stationName": "寮步",
+      "stationNameEn": "Liaobu",
+      "aliases": [
+
+      ],
+      "externalStationID": "7310"
+    },
+    {
       "stationID": "42b310d308c095af",
       "stationName": "普君北路",
       "stationNameEn": "Pujun Beilu",
@@ -868,6 +1012,15 @@
       "externalStationID": "413"
     },
     {
+      "stationID": "45b1dc708ad88ced",
+      "stationName": "永宁北",
+      "stationNameEn": "Yongningbei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7706"
+    },
+    {
       "stationID": "45d86f1aab6596a1",
       "stationName": "夏园",
       "stationNameEn": "Xiayuan",
@@ -884,6 +1037,15 @@
 
       ],
       "externalStationID": "1123"
+    },
+    {
+      "stationID": "47f7018ae134db3d",
+      "stationName": "东莞港",
+      "stationNameEn": "Dongguan Port",
+      "aliases": [
+
+      ],
+      "externalStationID": "7805"
     },
     {
       "stationID": "4847cd456878785b",
@@ -1003,6 +1165,15 @@
       "externalStationID": "802"
     },
     {
+      "stationID": "54a2d487335c6e43",
+      "stationName": "肇庆",
+      "stationNameEn": "肇庆",
+      "aliases": [
+
+      ],
+      "externalStationID": "7201"
+    },
+    {
       "stationID": "55480c0219731de1",
       "stationName": "浔峰岗北",
       "stationNameEn": "Xunfenggang North",
@@ -1120,6 +1291,15 @@
       "externalStationID": "111"
     },
     {
+      "stationID": "5d088a00b075b847",
+      "stationName": "中堂",
+      "stationNameEn": "Zhongtang",
+      "aliases": [
+
+      ],
+      "externalStationID": "7802"
+    },
+    {
       "stationID": "5d2a50d2ae4d522c",
       "stationName": "天河客运站",
       "stationNameEn": "Tianhe Coach Terminal",
@@ -1136,6 +1316,15 @@
 
       ],
       "externalStationID": "524"
+    },
+    {
+      "stationID": "5e5ca7da2cadc52d",
+      "stationName": "惠环",
+      "stationNameEn": "Huihuan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7319"
     },
     {
       "stationID": "603d97eae9001e0d",
@@ -1183,6 +1372,15 @@
       "externalStationID": "308"
     },
     {
+      "stationID": "6369ecf32674c591",
+      "stationName": "佛山西",
+      "stationNameEn": "Foshanxi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7211"
+    },
+    {
       "stationID": "639802d25ff6f9cb",
       "stationName": "增城广场",
       "stationNameEn": "Zengcheng Square",
@@ -1190,6 +1388,15 @@
 
       ],
       "externalStationID": "2121"
+    },
+    {
+      "stationID": "64b40a6b674c5344",
+      "stationName": "大朗镇",
+      "stationNameEn": "Dalangzhen",
+      "aliases": [
+
+      ],
+      "externalStationID": "7312"
     },
     {
       "stationID": "64c20b2ce77eabb7",
@@ -1318,6 +1525,24 @@
       "externalStationID": "715"
     },
     {
+      "stationID": "6ef14a25d990d604",
+      "stationName": "新塘南",
+      "stationNameEn": "Xintangnan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7801"
+    },
+    {
+      "stationID": "704662420c2d5b1f",
+      "stationName": "广州莲花山",
+      "stationNameEn": "Guangzhoulianhaushan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7304"
+    },
+    {
       "stationID": "70639d770131f9de",
       "stationName": "双岗",
       "stationNameEn": "Shuanggang",
@@ -1325,6 +1550,24 @@
 
       ],
       "externalStationID": "1326"
+    },
+    {
+      "stationID": "70841fd1af08c167",
+      "stationName": "虎门北",
+      "stationNameEn": "Humenbei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7807"
+    },
+    {
+      "stationID": "710143c75bd0986e",
+      "stationName": "番禺",
+      "stationNameEn": "Panyu",
+      "aliases": [
+
+      ],
+      "externalStationID": "7216"
     },
     {
       "stationID": "712180761a1742ce",
@@ -1399,6 +1642,15 @@
       "externalStationID": "319"
     },
     {
+      "stationID": "76d61c2f5092a881",
+      "stationName": "永宁南",
+      "stationNameEn": "永宁南",
+      "aliases": [
+
+      ],
+      "externalStationID": "7707"
+    },
+    {
       "stationID": "7739061968ea3559",
       "stationName": "中山八",
       "stationNameEn": "Zhongshanba",
@@ -1471,6 +1723,15 @@
       "externalStationID": "207"
     },
     {
+      "stationID": "79ca1c09d4594795",
+      "stationName": "江高",
+      "stationNameEn": "Jianggao",
+      "aliases": [
+
+      ],
+      "externalStationID": "7012"
+    },
+    {
       "stationID": "7b3cd290a1f75e7e",
       "stationName": "市桥",
       "stationNameEn": "Shiqiao",
@@ -1478,6 +1739,15 @@
 
       ],
       "externalStationID": "302"
+    },
+    {
+      "stationID": "7c0391b8a23e02d4",
+      "stationName": "洪梅",
+      "stationNameEn": "Hongmei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7804"
     },
     {
       "stationID": "7c56629e775e9d0d",
@@ -1507,6 +1777,15 @@
       "externalStationID": "GF14"
     },
     {
+      "stationID": "7f1d6029d30cf68b",
+      "stationName": "常平东",
+      "stationNameEn": "常平东",
+      "aliases": [
+
+      ],
+      "externalStationID": "7314"
+    },
+    {
       "stationID": "7f8b7945a5a5b176",
       "stationName": "琶洲大桥南",
       "stationNameEn": "Pazhou Bridge South",
@@ -1516,6 +1795,15 @@
       "externalStationID": "THZ108"
     },
     {
+      "stationID": "7fb52742209f1d03",
+      "stationName": "花都",
+      "stationNameEn": "Huadu",
+      "aliases": [
+
+      ],
+      "externalStationID": "7006"
+    },
+    {
       "stationID": "800b536390185ccd",
       "stationName": "东平",
       "stationNameEn": "Dongping",
@@ -1523,6 +1811,15 @@
 
       ],
       "externalStationID": "F319"
+    },
+    {
+      "stationID": "80d2084e8bf8a6ae",
+      "stationName": "大旺",
+      "stationNameEn": "Dawang",
+      "aliases": [
+
+      ],
+      "externalStationID": "7206"
     },
     {
       "stationID": "80d60bd01635b7ce",
@@ -1588,6 +1885,15 @@
       "externalStationID": "212"
     },
     {
+      "stationID": "844affcb03df9bc8",
+      "stationName": "沥林北",
+      "stationNameEn": "Lilinbei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7317"
+    },
+    {
       "stationID": "851dd0220a605347",
       "stationName": "会议中心",
       "stationNameEn": "Convention Center",
@@ -1613,6 +1919,24 @@
 
       ],
       "externalStationID": "THP104"
+    },
+    {
+      "stationID": "85ad966c835de280",
+      "stationName": "长安",
+      "stationNameEn": "Chang'an",
+      "aliases": [
+
+      ],
+      "externalStationID": "7810"
+    },
+    {
+      "stationID": "8688e5c0bcd7182b",
+      "stationName": "广州长隆",
+      "stationNameEn": "Guangzhouchanglong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7301"
     },
     {
       "stationID": "86d715f2ee7e3a49",
@@ -1660,6 +1984,15 @@
       "externalStationID": "218"
     },
     {
+      "stationID": "885a5c6e2f2f7c88",
+      "stationName": "长安西",
+      "stationNameEn": "Chang'anxi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7809"
+    },
+    {
       "stationID": "8860458fd53827f8",
       "stationName": "陈家祠",
       "stationNameEn": "Chen Clan Academy",
@@ -1705,6 +2038,15 @@
       "externalStationID": "1411"
     },
     {
+      "stationID": "8b1082ce85b76f89",
+      "stationName": "龙丰",
+      "stationNameEn": "Longfeng",
+      "aliases": [
+
+      ],
+      "externalStationID": "7320"
+    },
+    {
       "stationID": "8b29ebaed94b3e3a",
       "stationName": "珠江新城",
       "stationNameEn": "Zhujiang New Town",
@@ -1741,6 +2083,15 @@
       "externalStationID": "328"
     },
     {
+      "stationID": "8eda826bd5bc95c4",
+      "stationName": "樟木头东",
+      "stationNameEn": "Zhangmutoudong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7315"
+    },
+    {
       "stationID": "8ef7cf8716ebea15",
       "stationName": "凤凰新村",
       "stationNameEn": "Fenghuang Xincun",
@@ -1759,6 +2110,15 @@
       "externalStationID": "1423"
     },
     {
+      "stationID": "8fefabaf30ca8429",
+      "stationName": "福海西",
+      "stationNameEn": "Fuhaixi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7812"
+    },
+    {
       "stationID": "9038ce3953653d5e",
       "stationName": "鹭江",
       "stationNameEn": "Lujiang",
@@ -1775,6 +2135,15 @@
 
       ],
       "externalStationID": "603"
+    },
+    {
+      "stationID": "9071453f6ce70317",
+      "stationName": "燕湖",
+      "stationNameEn": "Yanhu",
+      "aliases": [
+
+      ],
+      "externalStationID": "7010"
     },
     {
       "stationID": "91d3ae048637e55d",
@@ -1802,6 +2171,15 @@
 
       ],
       "externalStationID": "1209"
+    },
+    {
+      "stationID": "94dd7f938e8b0f88",
+      "stationName": "西平西",
+      "stationNameEn": "Xipingxi",
+      "aliases": [
+
+      ],
+      "externalStationID": "7308"
     },
     {
       "stationID": "95a9e9f79c385239",
@@ -1883,6 +2261,15 @@
 
       ],
       "externalStationID": "1329"
+    },
+    {
+      "stationID": "99e99bbe9644fdec",
+      "stationName": "麻涌",
+      "stationNameEn": "Machong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7305"
     },
     {
       "stationID": "9a17acc55340dc26",
@@ -2011,6 +2398,15 @@
       "externalStationID": "2204"
     },
     {
+      "stationID": "a350b44310a2c36a",
+      "stationName": "狮岭",
+      "stationNameEn": "Shiling",
+      "aliases": [
+
+      ],
+      "externalStationID": "7004"
+    },
+    {
       "stationID": "a3b0a776eb3db4cd",
       "stationName": "长寿路",
       "stationNameEn": "Changshou Lu",
@@ -2045,6 +2441,15 @@
 
       ],
       "externalStationID": "711"
+    },
+    {
+      "stationID": "a6332aa645a801dd",
+      "stationName": "北滘西",
+      "stationNameEn": "北滘西",
+      "aliases": [
+
+      ],
+      "externalStationID": "7214"
     },
     {
       "stationID": "a84b1d997df8333b",
@@ -2317,6 +2722,15 @@
       "externalStationID": "522"
     },
     {
+      "stationID": "ba8620def0326aac",
+      "stationName": "岑村",
+      "stationNameEn": "Cencun",
+      "aliases": [
+
+      ],
+      "externalStationID": "7505"
+    },
+    {
       "stationID": "bae543c2b7e6db7d",
       "stationName": "棠东",
       "stationNameEn": "Tangdong",
@@ -2335,6 +2749,15 @@
       "externalStationID": "GF13"
     },
     {
+      "stationID": "bb4ddc5e9dd3fc34",
+      "stationName": "白云机场北",
+      "stationNameEn": "Baiyun Airport North",
+      "aliases": [
+        "白云机场北（T2）"
+      ],
+      "externalStationID": "7103"
+    },
+    {
       "stationID": "bba69b2bb626fdfa",
       "stationName": "南横",
       "stationNameEn": "Nanheng",
@@ -2351,6 +2774,15 @@
 
       ],
       "externalStationID": "521"
+    },
+    {
+      "stationID": "bc9bf4f697198f47",
+      "stationName": "虎门东",
+      "stationNameEn": "Humendong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7808"
     },
     {
       "stationID": "bcd5e981fad66347",
@@ -2380,6 +2812,24 @@
       "externalStationID": "APM07"
     },
     {
+      "stationID": "bf4a0dd748a30b88",
+      "stationName": "佛塱",
+      "stationNameEn": "Folang",
+      "aliases": [
+
+      ],
+      "externalStationID": "7703"
+    },
+    {
+      "stationID": "bf4a26652f35c0cc",
+      "stationName": "花山镇",
+      "stationNameEn": "Huashanzhen",
+      "aliases": [
+
+      ],
+      "externalStationID": "7102"
+    },
+    {
       "stationID": "bf4d583bc98600be",
       "stationName": "龙口西",
       "stationNameEn": "Longkouxi",
@@ -2398,6 +2848,15 @@
       "externalStationID": "815"
     },
     {
+      "stationID": "c20e8bab26bb7b6f",
+      "stationName": "飞霞",
+      "stationNameEn": "Feixia",
+      "aliases": [
+
+      ],
+      "externalStationID": "7007"
+    },
+    {
       "stationID": "c226dfe469519ec7",
       "stationName": "滘口",
       "stationNameEn": "Jiaokou",
@@ -2405,6 +2864,42 @@
 
       ],
       "externalStationID": "501"
+    },
+    {
+      "stationID": "c2a4ef7ab05bee45",
+      "stationName": "陈江南",
+      "stationNameEn": "Chenjiangnan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7318"
+    },
+    {
+      "stationID": "c33230df9df7c353",
+      "stationName": "花城街",
+      "stationNameEn": "Huachengjie",
+      "aliases": [
+
+      ],
+      "externalStationID": "7101"
+    },
+    {
+      "stationID": "c4870bf423809d92",
+      "stationName": "道滘",
+      "stationNameEn": "道滘",
+      "aliases": [
+
+      ],
+      "externalStationID": "7307"
+    },
+    {
+      "stationID": "c5a68383ca3db75e",
+      "stationName": "化龙南",
+      "stationNameEn": "Hualongnan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7402"
     },
     {
       "stationID": "c68955ac4f1ad1d7",
@@ -2432,6 +2927,15 @@
 
       ],
       "externalStationID": "1203"
+    },
+    {
+      "stationID": "c750a193bacc4ef7",
+      "stationName": "狮山北",
+      "stationNameEn": "Shishanbei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7209"
     },
     {
       "stationID": "c79d9dd67c79dd72",
@@ -2488,6 +2992,15 @@
       "externalStationID": "608"
     },
     {
+      "stationID": "cba0637ecbbb5b3f",
+      "stationName": "鼎湖东",
+      "stationNameEn": "Dinghu East",
+      "aliases": [
+
+      ],
+      "externalStationID": "7204"
+    },
+    {
       "stationID": "cbdf2a51b309fc78",
       "stationName": "新和",
       "stationNameEn": "Xinhe",
@@ -2495,6 +3008,42 @@
 
       ],
       "externalStationID": "1416"
+    },
+    {
+      "stationID": "cc533cca97812d34",
+      "stationName": "广州白云",
+      "stationNameEn": "Guangzhou Baiyun",
+      "aliases": [
+
+      ],
+      "externalStationID": "7014"
+    },
+    {
+      "stationID": "ccee5b38c2480376",
+      "stationName": "狮山",
+      "stationNameEn": "Shishan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7210"
+    },
+    {
+      "stationID": "cddb2d380f72b65d",
+      "stationName": "望牛墩",
+      "stationNameEn": "望牛墩",
+      "aliases": [
+
+      ],
+      "externalStationID": "7803"
+    },
+    {
+      "stationID": "cdf80d19b41d9b1b",
+      "stationName": "帽峰山",
+      "stationNameEn": "Maofengshan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7508"
     },
     {
       "stationID": "ce164e6523860161",
@@ -2576,6 +3125,15 @@
 
       ],
       "externalStationID": "604"
+    },
+    {
+      "stationID": "d13d9cc0b157ed62",
+      "stationName": "大石东",
+      "stationNameEn": "Dashidong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7501"
     },
     {
       "stationID": "d1b7985e2250d485",
@@ -2677,6 +3235,15 @@
       "externalStationID": "716"
     },
     {
+      "stationID": "d60bde9818c36688",
+      "stationName": "乐同",
+      "stationNameEn": "Letong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7005"
+    },
+    {
       "stationID": "d71f6078b10148e0",
       "stationName": "美的",
       "stationNameEn": "Midea",
@@ -2702,6 +3269,15 @@
 
       ],
       "externalStationID": "1406"
+    },
+    {
+      "stationID": "d8489d94bdefb41a",
+      "stationName": "深圳机场",
+      "stationNameEn": "Shenzhen Airport",
+      "aliases": [
+        "深圳机场（T3）"
+      ],
+      "externalStationID": "7814"
     },
     {
       "stationID": "d86f8d2b8aa8d079",
@@ -2794,6 +3370,15 @@
       "externalStationID": "330"
     },
     {
+      "stationID": "de5faa471be8d2c8",
+      "stationName": "东城南",
+      "stationNameEn": "Dongchengnan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7309"
+    },
+    {
       "stationID": "ded06f1fccde3dfd",
       "stationName": "飞鹅岭",
       "stationNameEn": "Fei'eling",
@@ -2801,6 +3386,24 @@
 
       ],
       "externalStationID": "901"
+    },
+    {
+      "stationID": "df2a79051842e784",
+      "stationName": "九佛",
+      "stationNameEn": "九佛",
+      "aliases": [
+
+      ],
+      "externalStationID": "7702"
+    },
+    {
+      "stationID": "df613439d2e2615e",
+      "stationName": "龙塘镇",
+      "stationNameEn": "Longtangzhen",
+      "aliases": [
+
+      ],
+      "externalStationID": "7002"
     },
     {
       "stationID": "e154c81be5c7c772",
@@ -2875,6 +3478,15 @@
       "externalStationID": "204"
     },
     {
+      "stationID": "e7ffb67c636fba9f",
+      "stationName": "神山",
+      "stationNameEn": "Shenshan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7011"
+    },
+    {
       "stationID": "e84872e713df3044",
       "stationName": "干部健康中心",
       "stationNameEn": "Guangzhou Cadre Health Management Center",
@@ -2891,6 +3503,15 @@
 
       ],
       "externalStationID": "305"
+    },
+    {
+      "stationID": "e9645703d790126d",
+      "stationName": "小金口",
+      "stationNameEn": "Xiaojinkou",
+      "aliases": [
+
+      ],
+      "externalStationID": "7323"
     },
     {
       "stationID": "e9b060b3cedab7e6",
@@ -2929,6 +3550,15 @@
       "externalStationID": "1125"
     },
     {
+      "stationID": "eb2cfc25869f55bb",
+      "stationName": "东环",
+      "stationNameEn": "东环",
+      "aliases": [
+
+      ],
+      "externalStationID": "7302"
+    },
+    {
       "stationID": "ec0d763a391f6a91",
       "stationName": "乐嘉路",
       "stationNameEn": "Lejia Road",
@@ -2945,6 +3575,15 @@
 
       ],
       "externalStationID": "1801"
+    },
+    {
+      "stationID": "ec3db1812515d961",
+      "stationName": "银盏",
+      "stationNameEn": "Yinzhan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7003"
     },
     {
       "stationID": "ec713ea9f059bf6d",
@@ -2974,6 +3613,15 @@
       "externalStationID": "418"
     },
     {
+      "stationID": "eded6a52c9448635",
+      "stationName": "云山",
+      "stationNameEn": "Yunshan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7322"
+    },
+    {
       "stationID": "ee48693ee7b79e25",
       "stationName": "贤江公园",
       "stationNameEn": "Xianjiang Park",
@@ -2981,6 +3629,15 @@
 
       ],
       "externalStationID": "THP117"
+    },
+    {
+      "stationID": "efc97397c2351c3d",
+      "stationName": "松山湖北",
+      "stationNameEn": "Songshanhubei",
+      "aliases": [
+
+      ],
+      "externalStationID": "7311"
     },
     {
       "stationID": "f07a2fbeeee5f7e2",
@@ -2992,6 +3649,15 @@
       "externalStationID": "324"
     },
     {
+      "stationID": "f1b4a6b9d17143ef",
+      "stationName": "四会",
+      "stationNameEn": "Sihui",
+      "aliases": [
+
+      ],
+      "externalStationID": "7205"
+    },
+    {
       "stationID": "f1c35c8bd2bbcb4d",
       "stationName": "大石",
       "stationNameEn": "Dashi",
@@ -2999,6 +3665,24 @@
 
       ],
       "externalStationID": "304"
+    },
+    {
+      "stationID": "f2b4d204d63c5866",
+      "stationName": "西湖东",
+      "stationNameEn": "Xihudong",
+      "aliases": [
+
+      ],
+      "externalStationID": "7321"
+    },
+    {
+      "stationID": "f39732245b466893",
+      "stationName": "广州大学城",
+      "stationNameEn": "Guangzhoudaxuecheng",
+      "aliases": [
+
+      ],
+      "externalStationID": "7502"
     },
     {
       "stationID": "f47bfb4bf104a5bc",
@@ -3046,6 +3730,15 @@
       "externalStationID": "1110"
     },
     {
+      "stationID": "f91caefecff913ac",
+      "stationName": "端州",
+      "stationNameEn": "Duanzhou",
+      "aliases": [
+
+      ],
+      "externalStationID": "7202"
+    },
+    {
       "stationID": "f9af39bdac379780",
       "stationName": "广州南站",
       "stationNameEn": "Guangzhou South Railway Station",
@@ -3053,6 +3746,42 @@
 
       ],
       "externalStationID": "201"
+    },
+    {
+      "stationID": "f9d90b78f3e5a308",
+      "stationName": "常平南",
+      "stationNameEn": "Changpingnan",
+      "aliases": [
+
+      ],
+      "externalStationID": "7313"
+    },
+    {
+      "stationID": "f9f0599af6648abe",
+      "stationName": "张槎",
+      "stationNameEn": "张槎",
+      "aliases": [
+
+      ],
+      "externalStationID": "F215"
+    },
+    {
+      "stationID": "faf599f3df55ccbf",
+      "stationName": "银瓶",
+      "stationNameEn": "Yinping",
+      "aliases": [
+
+      ],
+      "externalStationID": "7316"
+    },
+    {
+      "stationID": "fb0027e933790d81",
+      "stationName": "深圳机场北",
+      "stationNameEn": "Shenzhen Airport North",
+      "aliases": [
+
+      ],
+      "externalStationID": "7813"
     },
     {
       "stationID": "fb617acdbc73258b",
@@ -3125,6 +3854,15 @@
 
       ],
       "externalStationID": "710"
+    },
+    {
+      "stationID": "fffac67c0aac9801",
+      "stationName": "顺德北",
+      "stationNameEn": "顺德北",
+      "aliases": [
+
+      ],
+      "externalStationID": "7213"
     }
   ],
   "canonicalCoverageGaps": [
@@ -3145,162 +3883,123 @@
         "3号线"
       ],
       "reason": "operatorOmitsServiceTime"
+    },
+    {
+      "stationID": "86b63c8da3adaeb3",
+      "stationName": "白云机场南",
+      "stationNameEn": "Baiyun Airport South",
+      "lineNames": [
+        "广州东环-广佛南环-广肇城际",
+        "广州东环-琶莲-佛莞城际"
+      ],
+      "reason": "notListedByOperator"
+    },
+    {
+      "stationID": "8be7f35316b463b8",
+      "stationName": "湖蝶湾",
+      "stationNameEn": "Butterfly Bay",
+      "lineNames": [
+        "清远长隆磁浮旅游专线"
+      ],
+      "reason": "notListedByOperator"
+    },
+    {
+      "stationID": "cfac26b7b4e5c1ec",
+      "stationName": "清远长隆",
+      "stationNameEn": "Qingyuan Chimelong",
+      "lineNames": [
+        "清远长隆磁浮旅游专线"
+      ],
+      "reason": "notListedByOperator"
+    },
+    {
+      "stationID": "e15886043ade1381",
+      "stationName": "长隆森林王国",
+      "stationNameEn": "Chimelong Forest Kingdom",
+      "lineNames": [
+        "清远长隆磁浮旅游专线"
+      ],
+      "reason": "notListedByOperator"
     }
   ],
-  "sourceOnlyStationCount": 153,
+  "sourceOnlyStationCount": 77,
   "sourceOnlyStationNames": [
     "万胜围（有轨）",
     "三山新城北",
     "三山新城南",
-    "三水北",
     "东乐路",
-    "东城南",
-    "东环",
-    "东莞港",
-    "东莞西",
     "中区",
-    "中堂",
     "中山公园",
-    "乐同",
-    "云东海",
-    "云山",
     "亚艺公园",
     "仙涌",
     "伦教",
     "佛山大学",
     "佛山站",
-    "佛山西",
     "佛山西站",
     "兴业东路",
-    "化龙南",
-    "北滘西",
     "北滘西站",
     "华翠路",
     "南庄",
     "南海大学城",
     "博爱中路",
-    "厚街",
     "叠滘",
-    "四会",
     "地铁水西",
     "地铁长平",
     "地铁香雪",
     "夏东",
     "夏西",
     "大墩",
-    "大旺",
-    "大朗镇",
-    "大源",
-    "大石东",
     "大良钟楼",
     "孝德东",
     "季华六路",
-    "官桥北",
-    "寮步",
-    "小金口",
-    "岑村",
     "岳步",
-    "常平东",
-    "常平南",
-    "帽峰山",
     "平南",
     "平西",
     "广州塔（有轨）",
-    "广州大学城",
-    "广州白云",
-    "广州莲花山",
-    "广州长隆",
     "广教",
     "庆盛（南沙北站）",
     "康怡公园",
-    "张槎",
     "张槎(城际)",
-    "惠州北",
-    "惠环",
     "敦厚",
     "文翰湖公园（季华实验室）",
-    "新塘南",
     "智慧新城",
-    "望牛墩",
-    "机场北（T2）",
-    "松山湖北",
     "林岳东",
     "林岳东（有轨）",
     "林岳北",
     "林岳西",
-    "樟木头东",
     "水西（有轨）",
-    "江高",
-    "沙井西",
     "沙岗",
-    "沥林北",
-    "洪梅",
-    "洲心",
     "深井（城际）",
-    "深圳机场北",
-    "深圳机场（T3）",
-    "清城",
     "湖涌",
     "湾华",
     "潭洲会展",
-    "燕湖",
-    "狮山",
-    "狮山北",
-    "狮岭",
     "玉器街",
     "环市北",
     "琶洲（城际）",
-    "番禺",
     "登洲",
-    "白云机场东（T3）",
-    "白云机场北（T2）",
-    "白云湖",
     "石梁",
     "石洲",
     "石湾",
-    "神山",
-    "福海西",
     "科盛路",
     "科韵路（城际）",
-    "端州",
     "竹料（城际）",
     "绿岛湖",
     "罗村",
     "联和",
-    "肇庆",
     "花卉世界",
-    "花城街",
-    "花山镇",
-    "花都",
     "荔村",
-    "虎门东",
-    "虎门北",
     "虫雷 岗",
     "虫雷 岗（有轨）",
-    "西平西",
-    "西湖东",
     "西约",
-    "道滘",
-    "银瓶",
-    "银盏",
     "镇安",
-    "长安",
-    "长安西",
+    "镇龙（城际）",
     "陈村(城际)",
-    "陈江南",
     "顺德一中",
     "顺德人民医院",
-    "顺德北",
     "顺德学院站",
     "顺德欢乐海岸",
-    "飞霞",
     "驹荣北路",
     "高村",
-    "麻涌",
-    "鼎湖东",
-    "鼎湖山",
-    "龙丰",
-    "龙塘镇",
     "龙洞（城际）"
   ]
 }

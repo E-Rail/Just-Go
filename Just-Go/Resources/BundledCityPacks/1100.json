@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "1100",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "beijing-official-landing-links",
     "osm-metro-networks"
@@ -16,34 +16,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 449,
+    "networkStations": 450,
     "matchedStations": {
-      "covered": 449,
-      "total": 449
+      "covered": 450,
+      "total": 450
     },
     "accessibility": {
       "covered": 43,
-      "total": 449
+      "total": 450
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 449
+      "total": 450
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 449
+      "total": 450
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 449
+      "total": 450
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 449
+      "total": 450
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 449
+      "total": 450
     }
   },
   "stations": [
@@ -6320,7 +6320,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-1301959229",
-          "name": "",
+          "name": "H",
           "kind": "exit",
           "latitude": 39.906798,
           "longitude": 116.375086,
@@ -6360,7 +6360,7 @@
         },
         {
           "id": "osm-5077273852",
-          "name": "",
+          "name": "F1",
           "kind": "exit",
           "latitude": 39.907972,
           "longitude": 116.373686,
@@ -6370,7 +6370,7 @@
         },
         {
           "id": "osm-5077273885",
-          "name": "",
+          "name": "J1",
           "kind": "exit",
           "latitude": 39.906369,
           "longitude": 116.373692,
@@ -6380,7 +6380,7 @@
         },
         {
           "id": "osm-5077273896",
-          "name": "",
+          "name": "F2",
           "kind": "exit",
           "latitude": 39.907483,
           "longitude": 116.37315,
@@ -6390,7 +6390,7 @@
         },
         {
           "id": "osm-8500051831",
-          "name": "",
+          "name": "J2",
           "kind": "exit",
           "latitude": 39.906842,
           "longitude": 116.373156,
@@ -6702,6 +6702,63 @@
       ]
     },
     {
+      "stationID": "43976522726a507f",
+      "stationName": "通运门",
+      "stationNameEn": "Tongyun Men",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13975491183",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 39.911775,
+          "longitude": 116.671013,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13975491184",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 39.911172,
+          "longitude": 116.67326,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "45ba9a8855b8ee07",
       "stationName": "香山",
       "stationNameEn": "Fragrant Hills",
@@ -6823,16 +6880,6 @@
 
       ],
       "stationAccessPoints": [
-        {
-          "id": "osm-12433719325",
-          "name": "H",
-          "kind": "exit",
-          "latitude": 39.933391,
-          "longitude": 116.458194,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
         {
           "id": "osm-12433719330",
           "name": "团结湖H口垂直电梯",
@@ -7049,8 +7096,8 @@
           "id": "osm-7553495967",
           "name": "C",
           "kind": "exit",
-          "latitude": 40.000972,
-          "longitude": 116.369813,
+          "latitude": 40.000965,
+          "longitude": 116.369747,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -7059,8 +7106,8 @@
           "id": "osm-7553495968",
           "name": "B1",
           "kind": "exit",
-          "latitude": 40.002249,
-          "longitude": 116.368844,
+          "latitude": 40.002334,
+          "longitude": 116.368766,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -7069,8 +7116,8 @@
           "id": "osm-7553495969",
           "name": "B2",
           "kind": "exit",
-          "latitude": 40.002092,
-          "longitude": 116.370137,
+          "latitude": 40.002061,
+          "longitude": 116.370198,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -7079,8 +7126,8 @@
           "id": "osm-7553495970",
           "name": "A",
           "kind": "exit",
-          "latitude": 40.001707,
-          "longitude": 116.367375,
+          "latitude": 40.001732,
+          "longitude": 116.367294,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -12455,11 +12502,11 @@
           "source": "specificEntrance"
         },
         {
-          "id": "osm-12430955748",
+          "id": "osm-12430955742",
           "name": "E",
           "kind": "exit",
-          "latitude": 39.967107,
-          "longitude": 116.352987,
+          "latitude": 39.967092,
+          "longitude": 116.353011,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13314,11 +13361,31 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14182099928",
+          "name": "G",
+          "kind": "exit",
+          "latitude": 39.968341,
+          "longitude": 116.397891,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14183188904",
+          "name": "F",
+          "kind": "exit",
+          "latitude": 39.968964,
+          "longitude": 116.397863,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-2358646254",
           "name": "E",
           "kind": "exit",
-          "latitude": 39.966933,
-          "longitude": 116.394351,
+          "latitude": 39.96701,
+          "longitude": 116.394329,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13327,8 +13394,8 @@
           "id": "osm-6813701180",
           "name": "B",
           "kind": "exit",
-          "latitude": 39.969962,
-          "longitude": 116.394145,
+          "latitude": 39.969981,
+          "longitude": 116.394174,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13337,8 +13404,8 @@
           "id": "osm-6813718730",
           "name": "A",
           "kind": "exit",
-          "latitude": 39.969217,
-          "longitude": 116.39322,
+          "latitude": 39.969249,
+          "longitude": 116.393176,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13355,10 +13422,10 @@
         },
         {
           "id": "osm-7605950427",
-          "name": "D2",
+          "name": "D",
           "kind": "exit",
-          "latitude": 39.967198,
-          "longitude": 116.395114,
+          "latitude": 39.967258,
+          "longitude": 116.395084,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -15369,7 +15436,7 @@
           "latitude": 39.907655,
           "longitude": 116.275025,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -15389,7 +15456,7 @@
           "latitude": 39.907655,
           "longitude": 116.27456,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -18979,8 +19046,8 @@
           "id": "osm-13516609002",
           "name": "F",
           "kind": "exit",
-          "latitude": 39.994117,
-          "longitude": 116.448674,
+          "latitude": 39.994122,
+          "longitude": 116.44858,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -21171,7 +21238,7 @@
           "latitude": 39.907249,
           "longitude": 116.253455,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -21211,7 +21278,7 @@
           "latitude": 39.907257,
           "longitude": 116.2538,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -21277,6 +21344,16 @@
           "kind": "exit",
           "latitude": 39.899955,
           "longitude": 116.399088,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14182113609",
+          "name": "G",
+          "kind": "exit",
+          "latitude": 39.898947,
+          "longitude": 116.40054,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -21784,6 +21861,38 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14124123701",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.922728,
+          "longitude": 116.502971,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14124123702",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.923336,
+          "longitude": 116.502283,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-5365586568",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.922678,
+          "longitude": 116.501221,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -23324,8 +23433,8 @@
           "id": "osm-1303500882",
           "name": "A 出口",
           "kind": "exit",
-          "latitude": 39.908695,
-          "longitude": 116.477025,
+          "latitude": 39.908686,
+          "longitude": 116.47726,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

@@ -327,16 +327,18 @@ class TrackGeometryTest < Minitest::Test
   def test_the_pack_set_has_not_silently_shrunk
     # The denominator for everything below. If a pack is added or dropped this moves, and the
     # counts underneath it have to be re-read rather than merely re-passed.
-    assert_equal 8_015, MEASURED[:hops], "bundled hop count changed; re-read the pins below"
+    assert_equal 8_648, MEASURED[:hops], "bundled hop count changed; re-read the pins below"
   end
 
   def test_almost_every_hop_draws_real_track
-    # 6 with the shipped resolver, in 4 distinct pairs: 南口 → 八达岭 and 康庄 → 沙城 on the S2
-    # line, 清河 → 昌平北 on 怀密线, and 馬場 → 沙田 across the East Rail racecourse spur. No way on
-    # any of those lines reaches both stations, so each is drawn as a straight line — the honest
-    # rendering of "there is no track here in the data", not a bug to be papered over.
+    # 7 with the shipped resolver, in 4 distinct pairs: 康庄 → 沙城 on the S2 line, 清河 → 昌平北 on
+    # 怀密线, 北京西站 → 良乡 on 城市副中心线, and 馬場 → 沙田 across the East Rail racecourse spur. No
+    # way on any of those lines reaches both stations, so each is drawn as a straight line — the
+    # honest rendering of "there is no track here in the data", not a bug to be papered over.
+    # 城市副中心线's track now runs through three stops OSM lists out of order and the importer
+    # leaves out (`unverified_stations`), so its hop stays a chord until they are ordered.
     assert_operator MEASURED[:chords], :<=, 8,
-                    "more hops lost their track geometry (was 6 of 8,015)"
+                    "more hops lost their track geometry (was 7 of 8,648)"
   end
 
   def test_legs_hold_together_at_their_joins
@@ -344,7 +346,7 @@ class TrackGeometryTest < Minitest::Test
     # A leg is one polyline, so a join gap is drawn as a straight segment through the station.
     # Under 1 m is a rounding artefact of two projections onto the same point.
     assert_operator gaps.count { |g| g > 1 }, :<=, 30,
-                    "more joins came apart (was 19 of 7,612)"
+                    "more joins came apart (was 20 of 8,217)"
     # The visible ones. This is the number the whole design exists for and it is zero: solving a
     # pattern as a chain rather than hop by hop means a break is only ever accepted when no chain
     # avoids it, and across the bundled data none has to be.

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "7101",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks",
     "taipei-open-data"
@@ -16,34 +16,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 151,
+    "networkStations": 152,
     "matchedStations": {
-      "covered": 118,
-      "total": 151
+      "covered": 119,
+      "total": 152
     },
     "accessibility": {
-      "covered": 118,
-      "total": 151
+      "covered": 119,
+      "total": 152
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 151
+      "total": 152
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 151
+      "total": 152
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 151
+      "total": 152
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 151
+      "total": 152
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 151
+      "total": 152
     }
   },
   "stations": [
@@ -2499,8 +2499,8 @@
           "id": "4dfbe191a63f2b12-2",
           "name": "科技大樓站出口2",
           "kind": "exit",
-          "latitude": 25.022943,
-          "longitude": 121.545493,
+          "latitude": 25.022966,
+          "longitude": 121.547117,
           "isAccessible": true,
           "stepFree": "yes",
           "source": "specificEntrance"
@@ -4813,6 +4813,69 @@
           "kind": "exit",
           "latitude": 24.995225,
           "longitude": 121.577175,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "920cd260ade66cc4",
+      "stationName": "廣慈/奉天宮",
+      "stationNameEn": "Guangci/Fengtian Temple Station (Under construction)",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "data.taipei/taipei-metro-station-exits",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "廣慈/奉天宮站出口1",
+          "廣慈/奉天宮站出口2"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "920cd260ade66cc4-1",
+          "name": "廣慈/奉天宮站出口1",
+          "kind": "exit",
+          "latitude": 25.034483,
+          "longitude": 121.585523,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "920cd260ade66cc4-2",
+          "name": "廣慈/奉天宮站出口2",
+          "kind": "exit",
+          "latitude": 25.035397,
+          "longitude": 121.587112,
           "isAccessible": true,
           "stepFree": "yes",
           "source": "specificEntrance"

@@ -56,7 +56,8 @@ struct MetroLine: Codable, Equatable, Identifiable {
 
 /// One kind of train on a line that is not the ordinary all-stops service.
 struct MetroServiceVariant: Codable, Equatable, Identifiable {
-    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车.
+    /// The operator's own word for it: 大站车 / 大站快车 / 直达车 / 直达快车 / 快车 / 区间车. An express
+    /// the operator calls something else (晨曦特快, 直快列车) reads 快车; `name` keeps which it is.
     let kind: String
     let name: String
     let sourceRelationID: String
@@ -123,7 +124,7 @@ struct MetroNetworkSummary: Decodable {
 
 /// A network file's stations and lines, without `lines[].paths`. The polylines are 69% of the
 /// bundled bytes and exist only to be drawn, so leaving them out makes one nationwide station list
-/// affordable: 53 packs, 6,711 stations, ranked by distance.
+/// affordable: 53 packs, over 7,000 stations, ranked by distance.
 struct MetroNetworkStationIndex: Decodable {
     struct Line: Decodable {
         let id: String

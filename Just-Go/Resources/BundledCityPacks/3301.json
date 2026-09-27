@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "3301",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -14169,7 +14169,7 @@
     {
       "stationID": "a4da899eb205bf3c",
       "stationName": "水澄桥",
-      "stationNameEn": "Shuichengqiao",
+      "stationNameEn": "Shuicheng Bridge",
       "aliases": [
 
       ],
@@ -15714,8 +15714,8 @@
           "id": "osm-5024217884",
           "name": "D1",
           "kind": "exit",
-          "latitude": 30.264129,
-          "longitude": 120.163227,
+          "latitude": 30.264132,
+          "longitude": 120.163236,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

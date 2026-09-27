@@ -41,9 +41,16 @@ module GuangzhouStationInformationImporter
   #   机场南 — in the network, but the operator omits it from the line listing and its
   #            serviceTime response is empty, so there is no published first/last to link to.
   #   会展西 — Haizhu Tram; the metro serviceTime API rejects its stop, so it is another operator.
+  # Network stations the operator's listing has no record for, each checked by hand. The
+  # 清远长隆 maglev is a tourist line the listing leaves out entirely, and 白云机场南 is absent
+  # although the intercity's other airport stations are listed.
   REVIEWED_GAPS = {
     "机场南" => "operatorOmitsServiceTime",
-    "会展西" => "haizhuTram"
+    "会展西" => "haizhuTram",
+    "清远长隆" => "notListedByOperator",
+    "湖蝶湾" => "notListedByOperator",
+    "长隆森林王国" => "notListedByOperator",
+    "白云机场南" => "notListedByOperator"
   }.freeze
 
   # Bracket and separator forms differ between the operator's listing and OSM; normalise both
@@ -230,8 +237,10 @@ module GuangzhouStationInformationImporter
     station.merge("reason" => reason)
   end
 
+  # The operator also suffixes an airport station with its terminal (白云机场东T3, 深圳机场（T3）);
+  # the network names the station without it.
   def normalized(value)
-    value.to_s.gsub(SEPARATORS, "")
+    value.to_s.gsub(SEPARATORS, "").sub(/T\d\z/, "")
   end
 
   def non_empty_string(value, label)

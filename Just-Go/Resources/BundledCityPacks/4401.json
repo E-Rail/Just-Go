@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "4401",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 414,
+    "networkStations": 434,
     "matchedStations": {
-      "covered": 329,
-      "total": 414
+      "covered": 333,
+      "total": 434
     },
     "accessibility": {
-      "covered": 37,
-      "total": 414
+      "covered": 40,
+      "total": 434
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 414
+      "total": 434
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 414
+      "total": 434
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 414
+      "total": 434
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 414
+      "total": 434
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 414
+      "total": 434
     }
   },
   "stations": [
@@ -288,8 +288,8 @@
           "id": "osm-12452785424",
           "name": "上涌站D出入口",
           "kind": "exit",
-          "latitude": 23.080528,
-          "longitude": 113.312186,
+          "latitude": 23.08044,
+          "longitude": 113.312217,
           "isAccessible": false,
           "stepFree": "no",
           "source": "specificEntrance"
@@ -1335,6 +1335,72 @@
       ]
     },
     {
+      "stationID": "103c5ba15eea3b9f",
+      "stationName": "沙井西",
+      "stationNameEn": "Shajingxi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12609651984",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.73383,
+          "longitude": 113.793133,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12609651985",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.733095,
+          "longitude": 113.793074,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12609651986",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.733042,
+          "longitude": 113.793695,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12609651987",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.733691,
+          "longitude": 113.79375,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "11a13c0385be4689",
       "stationName": "蕉门",
       "stationNameEn": "Jiaomen",
@@ -1746,7 +1812,7 @@
         },
         {
           "id": "osm-13249605525",
-          "name": "芳村站 F出入口",
+          "name": "芳村站F出入口",
           "kind": "exit",
           "latitude": 23.099354,
           "longitude": 113.235026,
@@ -1756,7 +1822,7 @@
         },
         {
           "id": "osm-13272025474",
-          "name": "芳村站 H出入口",
+          "name": "芳村站H出入口",
           "kind": "exit",
           "latitude": 23.097385,
           "longitude": 113.23474,
@@ -1766,7 +1832,7 @@
         },
         {
           "id": "osm-13272025477",
-          "name": "芳村站新建出入口",
+          "name": "芳村站G出入口",
           "kind": "exit",
           "latitude": 23.098232,
           "longitude": 113.234979,
@@ -1776,7 +1842,7 @@
         },
         {
           "id": "osm-3979544462",
-          "name": "芳村站 A2出入口",
+          "name": "芳村站A2出入口",
           "kind": "exit",
           "latitude": 23.097723,
           "longitude": 113.235775,
@@ -1786,7 +1852,7 @@
         },
         {
           "id": "osm-3979544464",
-          "name": "芳村站 A1出入口",
+          "name": "芳村站A1出入口",
           "kind": "exit",
           "latitude": 23.098256,
           "longitude": 113.236038,
@@ -1796,7 +1862,7 @@
         },
         {
           "id": "osm-3979544468",
-          "name": "芳村站 B1出入口",
+          "name": "芳村站B1出入口",
           "kind": "exit",
           "latitude": 23.099316,
           "longitude": 113.23633,
@@ -2403,7 +2469,23 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "亚运大道"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -2432,12 +2514,12 @@
         },
         {
           "id": "osm-12944538280",
-          "name": "B",
+          "name": "亚运大道",
           "kind": "exit",
           "latitude": 22.937996,
           "longitude": 113.441207,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
@@ -2614,7 +2696,7 @@
         },
         {
           "id": "osm-8298573795",
-          "name": "E",
+          "name": "下九路（上下九步行街）",
           "kind": "exit",
           "latitude": 23.117088,
           "longitude": 113.246892,
@@ -3967,6 +4049,42 @@
       ]
     },
     {
+      "stationID": "3065089ae135f92d",
+      "stationName": "新龙",
+      "stationNameEn": "新龙",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14065682842",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 23.312353,
+          "longitude": 113.575159,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "30825d00902b23a7",
       "stationName": "镇龙西",
       "stationNameEn": "Zhenlongxi",
@@ -4873,7 +4991,7 @@
     {
       "stationID": "3d2ca0bf09721cdf",
       "stationName": "科丰路",
-      "stationNameEn": "Kefenglu",
+      "stationNameEn": "Kefeng Road",
       "aliases": [
 
       ],
@@ -5714,8 +5832,8 @@
           "id": "osm-10055056912",
           "name": "彩虹桥站 D出入口",
           "kind": "exit",
-          "latitude": 23.132883,
-          "longitude": 113.244445,
+          "latitude": 23.132904,
+          "longitude": 113.244498,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5724,8 +5842,8 @@
           "id": "osm-10055056913",
           "name": "彩虹桥站 A出入口",
           "kind": "exit",
-          "latitude": 23.133351,
-          "longitude": 113.245495,
+          "latitude": 23.133392,
+          "longitude": 113.245535,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5764,8 +5882,8 @@
           "id": "osm-12432890173",
           "name": "彩虹桥站F出入口",
           "kind": "exit",
-          "latitude": 23.134541,
-          "longitude": 113.246675,
+          "latitude": 23.134351,
+          "longitude": 113.247506,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5932,8 +6050,8 @@
           "id": "osm-6449068827",
           "name": "低涌站 A出入口",
           "kind": "exit",
-          "latitude": 22.919591,
-          "longitude": 113.485036,
+          "latitude": 22.919683,
+          "longitude": 113.484849,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5942,8 +6060,8 @@
           "id": "osm-6449068828",
           "name": "低涌站 B出入口",
           "kind": "exit",
-          "latitude": 22.919128,
-          "longitude": 113.485105,
+          "latitude": 22.919143,
+          "longitude": 113.484908,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5998,8 +6116,8 @@
           "id": "osm-9090870665",
           "name": "夏园站 D出入口",
           "kind": "exit",
-          "latitude": 23.082994,
-          "longitude": 113.517433,
+          "latitude": 23.083021,
+          "longitude": 113.517428,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6008,8 +6126,8 @@
           "id": "osm-9090870666",
           "name": "夏园站 C出入口",
           "kind": "exit",
-          "latitude": 23.08345,
-          "longitude": 113.519077,
+          "latitude": 23.083478,
+          "longitude": 113.519055,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -8811,62 +8929,6 @@
       ]
     },
     {
-      "stationID": "710143c75bd0986e",
-      "stationName": "番禺",
-      "stationNameEn": "Panyu",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
-      ],
-      "stationAccessPoints": [
-        {
-          "id": "osm-12114235350",
-          "name": "番禺站F",
-          "kind": "exit",
-          "latitude": 22.989468,
-          "longitude": 113.274113,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13724084174",
-          "name": "番禺站C",
-          "kind": "exit",
-          "latitude": 22.98924,
-          "longitude": 113.276212,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13724084175",
-          "name": "番禺站B",
-          "kind": "exit",
-          "latitude": 22.988769,
-          "longitude": 113.275442,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        }
-      ]
-    },
-    {
       "stationID": "712180761a1742ce",
       "stationName": "黄埔新港",
       "stationNameEn": "Huangpu New Port",
@@ -11532,8 +11594,7 @@
 
         ],
         "accessibleEntrances": [
-          "珠江新城站 B1出入口",
-          "珠江新城站 B2出入口"
+          "珠江新城站 B1出入口"
         ],
         "facilityNotes": [
 
@@ -11587,12 +11648,12 @@
         },
         {
           "id": "osm-9048102837",
-          "name": "珠江新城站 B2出入口",
+          "name": "花城大道",
           "kind": "exit",
           "latitude": 23.11876,
           "longitude": 113.320797,
-          "isAccessible": true,
-          "stepFree": "yes",
+          "isAccessible": false,
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -11823,8 +11884,8 @@
           "id": "osm-13644572209",
           "name": "凤凰新村站 D出入口",
           "kind": "exit",
-          "latitude": 23.094106,
-          "longitude": 113.255958,
+          "latitude": 23.094125,
+          "longitude": 113.255783,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -11911,6 +11972,112 @@
           "kind": "exit",
           "latitude": 23.378067,
           "longitude": 113.494981,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "8fefabaf30ca8429",
+      "stationName": "福海西",
+      "stationNameEn": "Fuhaixi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-11528325437",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.688854,
+          "longitude": 113.789852,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11528325438",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.688869,
+          "longitude": 113.789157,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11528325439",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.687892,
+          "longitude": 113.789072,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11528325440",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.687841,
+          "longitude": 113.789766,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11941940590",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.690244,
+          "longitude": 113.789316,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11941940611",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 22.689523,
+          "longitude": 113.789248,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11941940612",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.689483,
+          "longitude": 113.789995,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-11941940613",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.690037,
+          "longitude": 113.790042,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -12703,8 +12870,8 @@
           "id": "osm-12432890175",
           "name": "流花站B出口",
           "kind": "exit",
-          "latitude": 23.139985,
-          "longitude": 113.25658,
+          "latitude": 23.13992,
+          "longitude": 113.256545,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -13367,7 +13534,23 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "萧岗站 A出入口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -13410,8 +13593,8 @@
           "kind": "exit",
           "latitude": 23.198538,
           "longitude": 113.281171,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -14593,8 +14776,8 @@
           "id": "osm-6277965636",
           "name": "官洲站 A出入口",
           "kind": "exit",
-          "latitude": 23.067267,
-          "longitude": 113.376141,
+          "latitude": 23.067264,
+          "longitude": 113.376143,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -14842,46 +15025,6 @@
 
       ],
       "stationAccessPoints": [
-        {
-          "id": "osm-13523679193",
-          "name": "科韵路站 F出入口",
-          "kind": "exit",
-          "latitude": 23.118241,
-          "longitude": 113.379032,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13524456581",
-          "name": "科韵路站 出入口",
-          "kind": "exit",
-          "latitude": 23.116821,
-          "longitude": 113.379144,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13524456582",
-          "name": "科韵路站 出入口",
-          "kind": "exit",
-          "latitude": 23.117118,
-          "longitude": 113.378174,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13524456583",
-          "name": "科韵路站 E出入口",
-          "kind": "exit",
-          "latitude": 23.117996,
-          "longitude": 113.378281,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
         {
           "id": "osm-4261922241",
           "name": "科韵路站 B出入口",
@@ -15885,8 +16028,8 @@
           "id": "osm-13516055429",
           "name": "岑村站D出口",
           "kind": "exit",
-          "latitude": 23.157898,
-          "longitude": 113.381472,
+          "latitude": 23.157926,
+          "longitude": 113.381421,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -15895,8 +16038,8 @@
           "id": "osm-13516055438",
           "name": "岑村站B出口",
           "kind": "exit",
-          "latitude": 23.159212,
-          "longitude": 113.382573,
+          "latitude": 23.159194,
+          "longitude": 113.382554,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -15905,8 +16048,8 @@
           "id": "osm-13516124881",
           "name": "岑村站C出口",
           "kind": "exit",
-          "latitude": 23.160012,
-          "longitude": 113.381882,
+          "latitude": 23.160083,
+          "longitude": 113.381853,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -15915,8 +16058,8 @@
           "id": "osm-13516159605",
           "name": "岑村站A出口",
           "kind": "exit",
-          "latitude": 23.157789,
-          "longitude": 113.383201,
+          "latitude": 23.15771,
+          "longitude": 113.383023,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -16800,16 +16943,6 @@
           "longitude": 113.385015,
           "isAccessible": true,
           "stepFree": "yes",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9129393151",
-          "name": "H",
-          "kind": "exit",
-          "latitude": 22.932114,
-          "longitude": 113.383688,
-          "isAccessible": false,
-          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -17989,6 +18122,42 @@
       ]
     },
     {
+      "stationID": "d3e5ebb66b6852bc",
+      "stationName": "镇龙",
+      "stationNameEn": "Zhenlong",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14064036263",
+          "name": "J",
+          "kind": "exit",
+          "latitude": 23.284257,
+          "longitude": 113.592042,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "d41ed5739df15fbf",
       "stationName": "东涌",
       "stationNameEn": "Dongchong",
@@ -18437,6 +18606,42 @@
       ]
     },
     {
+      "stationID": "d8489d94bdefb41a",
+      "stationName": "深圳机场",
+      "stationNameEn": "Shenzhen Airport",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12375719664",
+          "name": "A出口",
+          "kind": "exit",
+          "latitude": 22.623266,
+          "longitude": 113.813036,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "d86f8d2b8aa8d079",
       "stationName": "坦尾",
       "stationNameEn": "Tanwei",
@@ -18700,7 +18905,7 @@
         },
         {
           "id": "osm-9141102353",
-          "name": "龙潭站 D出入口",
+          "name": "龙潭站D出入口",
           "kind": "exit",
           "latitude": 23.080288,
           "longitude": 113.340871,
@@ -18710,7 +18915,7 @@
         },
         {
           "id": "osm-9141102358",
-          "name": "龙潭站 B出入口",
+          "name": "龙潭站B出入口",
           "kind": "exit",
           "latitude": 23.080401,
           "longitude": 113.341615,
@@ -19141,7 +19346,23 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "赤沙站 D出入口"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -19194,8 +19415,8 @@
           "kind": "exit",
           "latitude": 23.084851,
           "longitude": 113.362219,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]
@@ -19764,12 +19985,12 @@
         },
         {
           "id": "osm-8955592218",
-          "name": "黄村站 D出入口",
+          "name": "环场路",
           "kind": "exit",
           "latitude": 23.132397,
           "longitude": 113.407813,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
@@ -19830,7 +20051,7 @@
         },
         {
           "id": "osm-5615232928",
-          "name": "谢村站 C出入口",
+          "name": "C",
           "kind": "exit",
           "latitude": 22.990612,
           "longitude": 113.296833,
@@ -20956,8 +21177,8 @@
           "id": "osm-7036272511",
           "name": "P",
           "kind": "exit",
-          "latitude": 22.989651,
-          "longitude": 113.271559,
+          "latitude": 22.989607,
+          "longitude": 113.271469,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -21066,8 +21287,8 @@
           "id": "osm-9624417353",
           "name": "Q",
           "kind": "exit",
-          "latitude": 22.988432,
-          "longitude": 113.272145,
+          "latitude": 22.988243,
+          "longitude": 113.272407,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -21076,8 +21297,8 @@
           "id": "osm-9624417354",
           "name": "M",
           "kind": "exit",
-          "latitude": 22.989536,
-          "longitude": 113.272154,
+          "latitude": 22.989493,
+          "longitude": 113.272246,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -21639,46 +21860,6 @@
           "kind": "exit",
           "latitude": 23.069042,
           "longitude": 113.409518,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13094342957",
-          "name": "G",
-          "kind": "exit",
-          "latitude": 23.066738,
-          "longitude": 113.410159,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13094342958",
-          "name": "E",
-          "kind": "exit",
-          "latitude": 23.0668,
-          "longitude": 113.408251,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13094342959",
-          "name": "F",
-          "kind": "exit",
-          "latitude": 23.066123,
-          "longitude": 113.409641,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-13094342960",
-          "name": "H",
-          "kind": "exit",
-          "latitude": 23.067293,
-          "longitude": 113.409632,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

@@ -160,7 +160,7 @@ final class StationSearchService {
     }
 
     /// How many stations the no-query list offers. Enough to cover a rider standing anywhere in a
-    /// metro area, far short of the 6,711 that exist.
+    /// metro area, far short of the over 7,000 that exist.
     var nearbyStationLimit: Int { 60 }
 
     func stations(in cityID: String) async -> [Station] {

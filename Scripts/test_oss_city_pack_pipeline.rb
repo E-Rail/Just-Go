@@ -51,7 +51,7 @@ class OSSCityPackPipelineTest < Minitest::Test
     assert_equal ["macau-official-landing-link", "osm-metro-networks"], macau.fetch("rightsIDs")
     assert_equal "https://www.mlm.com.mo/en/", macau.fetch("externalResources").first.fetch("landingPageURL")
 
-    assert_equal 449, beijing.fetch("stations").length
+    assert_equal 450, beijing.fetch("stations").length
     assert_equal 162, hong_kong.fetch("stations").length
     assert_equal 98, hong_kong.fetch("stations").count { |station| station["accessibility"] }
     assert_equal 2_047, hong_kong.fetch("stations").sum { |station| station.fetch("stationFacilities").length }
@@ -61,7 +61,7 @@ class OSSCityPackPipelineTest < Minitest::Test
     assert_equal 121, references.count { |reference| reference["mode"] == "heavyRail" }
     assert_equal 205, references.count { |reference| reference["mode"] == "lightRail" }
     assert_equal 326, references.length
-    assert_equal({ "covered" => 0, "total" => 449 }, beijing.dig("coverage", "externalLayouts"))
+    assert_equal({ "covered" => 0, "total" => 450 }, beijing.dig("coverage", "externalLayouts"))
 
     barrier = sources.fetch("resources").find do |resource|
       resource["fileName"] == "barrier_free_facilities.csv"
@@ -100,7 +100,7 @@ class OSSCityPackPipelineTest < Minitest::Test
       end
     end
 
-    assert_equal 388, points.length
+    assert_equal 390, points.length
     assert_operator points.min, :<, 40, "no exit is close to its station; coordinates look unconverted"
     assert_operator points.sort[points.length / 2], :<, 150, "median exit distance is too large"
     assert_operator points.max, :<, 800, "an exit is implausibly far from its station"
@@ -111,7 +111,7 @@ class OSSCityPackPipelineTest < Minitest::Test
 
     assert_equal %w[osm-metro-networks taipei-open-data], pack.fetch("rightsIDs")
     assert_equal "partial_static", pack.fetch("capabilities").fetch("accessibility")
-    assert_equal 118, pack.fetch("stations").length
+    assert_equal 119, pack.fetch("stations").length
 
     pack.fetch("stations").each do |station|
       assert_empty station.fetch("schedules"), "the exit dataset carries no timetable"

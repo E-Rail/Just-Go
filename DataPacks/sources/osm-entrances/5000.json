@@ -8,11 +8,11 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 305,
-    "boundCount": 299,
+    "entranceCount": 312,
+    "boundCount": 306,
     "unmatchedCount": 5,
     "ambiguousCount": 1,
-    "stationsWithEntrances": 83,
+    "stationsWithEntrances": 87,
     "networkStationCount": 273
   },
   "stations": {
@@ -426,6 +426,26 @@
         "ref": "4"
       }
     ],
+    "2a6c46c8328eb1bc": [
+      {
+        "osmNodeID": "13950129689",
+        "latitude": 29.504122,
+        "longitude": 106.4613266,
+        "ref": "2"
+      },
+      {
+        "osmNodeID": "13950129694",
+        "latitude": 29.5040978,
+        "longitude": 106.4634254,
+        "ref": "3"
+      },
+      {
+        "osmNodeID": "13950129702",
+        "latitude": 29.506433,
+        "longitude": 106.4625546,
+        "ref": "4"
+      }
+    ],
     "2e32905b06b631a7": [
       {
         "osmNodeID": "9375954367",
@@ -655,8 +675,8 @@
     "40acb8c4bd95e342": [
       {
         "osmNodeID": "9468836682",
-        "latitude": 29.6164648,
-        "longitude": 106.582353,
+        "latitude": 29.6164852,
+        "longitude": 106.5823209,
         "ref": "2"
       }
     ],
@@ -748,14 +768,14 @@
     "4e717d90262fa36b": [
       {
         "osmNodeID": "9702282581",
-        "latitude": 29.5312935,
-        "longitude": 106.5638979,
+        "latitude": 29.5314886,
+        "longitude": 106.5639119,
         "ref": "1"
       },
       {
         "osmNodeID": "9702282582",
-        "latitude": 29.5311724,
-        "longitude": 106.5631272,
+        "latitude": 29.5311827,
+        "longitude": 106.5630724,
         "ref": "2"
       },
       {
@@ -893,6 +913,22 @@
         "ref": "4B"
       }
     ],
+    "5e15a6ccf6ce4043": [
+      {
+        "osmNodeID": "13958133195",
+        "latitude": 29.5994908,
+        "longitude": 106.5510318,
+        "ref": "5"
+      }
+    ],
+    "6222fa4a5d124910": [
+      {
+        "osmNodeID": "13958133153",
+        "latitude": 29.5968181,
+        "longitude": 106.5600399,
+        "ref": "2"
+      }
+    ],
     "64badb53630434ab": [
       {
         "osmNodeID": "9702282357",
@@ -963,21 +999,21 @@
     "6e54fc597c79ae19": [
       {
         "osmNodeID": "9888858333",
-        "latitude": 29.5568782,
-        "longitude": 106.4602686,
+        "latitude": 29.5568613,
+        "longitude": 106.4602632,
         "wheelchair": "yes"
       },
       {
         "osmNodeID": "9888858334",
-        "latitude": 29.5573505,
+        "latitude": 29.5573254,
         "longitude": 106.4597285,
         "ref": "1",
         "wheelchair": "no"
       },
       {
         "osmNodeID": "9888858335",
-        "latitude": 29.5563827,
-        "longitude": 106.461355,
+        "latitude": 29.5563851,
+        "longitude": 106.4613496,
         "ref": "2",
         "wheelchair": "no"
       },
@@ -989,8 +1025,8 @@
       },
       {
         "osmNodeID": "9458207871",
-        "latitude": 29.5555502,
-        "longitude": 106.4595833,
+        "latitude": 29.5555414,
+        "longitude": 106.4596041,
         "ref": "5"
       },
       {
@@ -1056,6 +1092,14 @@
         "ref": "4B"
       }
     ],
+    "8996b631f384dd00": [
+      {
+        "osmNodeID": "13958133350",
+        "latitude": 29.6064661,
+        "longitude": 106.5488041,
+        "ref": "1"
+      }
+    ],
     "8a89a4db83a58606": [
       {
         "osmNodeID": "13273977404",
@@ -1101,14 +1145,14 @@
     "8fae75cb76e81fc1": [
       {
         "osmNodeID": "13027157592",
-        "latitude": 29.5529135,
-        "longitude": 106.5375716,
+        "latitude": 29.5529125,
+        "longitude": 106.537573,
         "ref": "1"
       },
       {
         "osmNodeID": "13027157597",
-        "latitude": 29.5529809,
-        "longitude": 106.5380506,
+        "latitude": 29.5529813,
+        "longitude": 106.5380501,
         "ref": "2"
       }
     ],
@@ -1690,8 +1734,8 @@
       },
       {
         "osmNodeID": "9463613018",
-        "latitude": 29.5748093,
-        "longitude": 106.5522854,
+        "latitude": 29.5748462,
+        "longitude": 106.5522485,
         "ref": "3A"
       },
       {
@@ -1806,16 +1850,22 @@
       },
       {
         "osmNodeID": "11386816887",
-        "latitude": 29.5404087,
-        "longitude": 106.5696041,
+        "latitude": 29.540396,
+        "longitude": 106.5696258,
         "ref": "3"
       }
     ],
     "eeadc441ecabba0c": [
       {
+        "osmNodeID": "13049544545",
+        "latitude": 29.5445575,
+        "longitude": 106.4669835,
+        "ref": "1B"
+      },
+      {
         "osmNodeID": "13709647397",
-        "latitude": 29.5455906,
-        "longitude": 106.4691319,
+        "latitude": 29.5452809,
+        "longitude": 106.468655,
         "ref": "2"
       }
     ],
@@ -1850,14 +1900,14 @@
     "f30426691a89805c": [
       {
         "osmNodeID": "13027159432",
-        "latitude": 29.5078639,
-        "longitude": 106.5138237,
+        "latitude": 29.5078725,
+        "longitude": 106.5138,
         "ref": "1"
       },
       {
         "osmNodeID": "13027159404",
-        "latitude": 29.5078008,
-        "longitude": 106.5140256,
+        "latitude": 29.5078111,
+        "longitude": 106.5139871,
         "ref": "2"
       },
       {

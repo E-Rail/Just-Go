@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "3205",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -2156,7 +2156,7 @@
         },
         {
           "id": "osm-7745754928",
-          "name": "2",
+          "name": "2（封闭）",
           "kind": "exit",
           "latitude": 31.307741,
           "longitude": 120.631131,

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "cityID": "1200",
-  "version": "oss-safe-v2-20260715",
-  "generatedAt": "2026-07-15T00:00:00Z",
+  "version": "oss-safe-v2-20260923",
+  "generatedAt": "2026-09-23T00:00:00Z",
   "rightsIDs": [
     "osm-metro-networks"
   ],
@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 239,
+    "networkStations": 240,
     "matchedStations": {
-      "covered": 108,
-      "total": 239
+      "covered": 110,
+      "total": 240
     },
     "accessibility": {
       "covered": 5,
-      "total": 239
+      "total": 240
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 239
+      "total": 240
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 239
+      "total": 240
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 239
+      "total": 240
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 239
+      "total": 240
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 239
+      "total": 240
     }
   },
   "stations": [
@@ -759,6 +759,52 @@
       ]
     },
     {
+      "stationID": "253d684a53cfc07e",
+      "stationName": "洪泥河东",
+      "stationNameEn": "Hongnihedong",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-12472082383",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.048153,
+          "longitude": 117.34433,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-12472082384",
+          "name": "",
+          "kind": "exit",
+          "latitude": 39.047123,
+          "longitude": 117.345443,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "279fab9a51faaf15",
       "stationName": "周邓纪念馆",
       "stationNameEn": "Zhoudengji'nianguan",
@@ -786,8 +832,8 @@
           "id": "osm-2267683679",
           "name": "",
           "kind": "exit",
-          "latitude": 39.093211,
-          "longitude": 117.163075,
+          "latitude": 39.093236,
+          "longitude": 117.163083,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -796,8 +842,8 @@
           "id": "osm-5798383446",
           "name": "",
           "kind": "exit",
-          "latitude": 39.093093,
-          "longitude": 117.163743,
+          "latitude": 39.093083,
+          "longitude": 117.163712,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -1426,8 +1472,8 @@
           "id": "osm-8508321759",
           "name": "咸阳路地铁站-I口",
           "kind": "exit",
-          "latitude": 39.138053,
-          "longitude": 117.135732,
+          "latitude": 39.138005,
+          "longitude": 117.135729,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -1436,8 +1482,8 @@
           "id": "osm-8508321777",
           "name": "咸阳路地铁站-G口",
           "kind": "exit",
-          "latitude": 39.137489,
-          "longitude": 117.134878,
+          "latitude": 39.137446,
+          "longitude": 117.134884,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -1540,6 +1586,52 @@
           "kind": "exit",
           "latitude": 39.100151,
           "longitude": 117.164894,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "383e8e3a34ee4899",
+      "stationName": "北运河",
+      "stationNameEn": "Beiyunhe",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14071076338",
+          "name": "北运河地铁站-D3口",
+          "kind": "exit",
+          "latitude": 39.165634,
+          "longitude": 117.179057,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14071076345",
+          "name": "北运河地铁站-B2口",
+          "kind": "exit",
+          "latitude": 39.164085,
+          "longitude": 117.178655,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2098,8 +2190,8 @@
           "id": "osm-13331356289",
           "name": "丽江道地铁站-C口",
           "kind": "exit",
-          "latitude": 39.060714,
-          "longitude": 117.193595,
+          "latitude": 39.06073,
+          "longitude": 117.193635,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2108,8 +2200,8 @@
           "id": "osm-13331356290",
           "name": "丽江道地铁站-B口",
           "kind": "exit",
-          "latitude": 39.061815,
-          "longitude": 117.192096,
+          "latitude": 39.061856,
+          "longitude": 117.192129,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2118,8 +2210,8 @@
           "id": "osm-13331475213",
           "name": "丽江道地铁站-A口",
           "kind": "exit",
-          "latitude": 39.063296,
-          "longitude": 117.194281,
+          "latitude": 39.063328,
+          "longitude": 117.194202,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2306,7 +2398,7 @@
           "id": "osm-1159555712",
           "name": "下瓦房地铁站-C口",
           "kind": "exit",
-          "latitude": 39.104819,
+          "latitude": 39.104814,
           "longitude": 117.222645,
           "isAccessible": false,
           "stepFree": "unknown",
@@ -3142,8 +3234,8 @@
           "id": "osm-13307915820",
           "name": "张道口地铁站-B口",
           "kind": "exit",
-          "latitude": 39.028146,
-          "longitude": 117.218214,
+          "latitude": 39.028102,
+          "longitude": 117.218223,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3162,8 +3254,8 @@
           "id": "osm-13307915822",
           "name": "张道口地铁站-A1口",
           "kind": "exit",
-          "latitude": 39.028531,
-          "longitude": 117.217607,
+          "latitude": 39.028486,
+          "longitude": 117.217625,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3172,8 +3264,8 @@
           "id": "osm-13307915823",
           "name": "张道口地铁站-D口",
           "kind": "exit",
-          "latitude": 39.029548,
-          "longitude": 117.217594,
+          "latitude": 39.029432,
+          "longitude": 117.217529,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3182,8 +3274,8 @@
           "id": "osm-13307915848",
           "name": "张道口地铁站-C口",
           "kind": "exit",
-          "latitude": 39.029502,
-          "longitude": 117.218468,
+          "latitude": 39.029459,
+          "longitude": 117.218475,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3216,7 +3308,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-10831669918",
-          "name": "C",
+          "name": "左江道地铁站-C口",
           "kind": "exit",
           "latitude": 39.060397,
           "longitude": 117.218063,
@@ -3226,7 +3318,7 @@
         },
         {
           "id": "osm-10831669919",
-          "name": "B",
+          "name": "左江道地铁站-B口",
           "kind": "exit",
           "latitude": 39.059837,
           "longitude": 117.218045,
@@ -3236,7 +3328,7 @@
         },
         {
           "id": "osm-10831669920",
-          "name": "A",
+          "name": "左江道地铁站-A口",
           "kind": "exit",
           "latitude": 39.059437,
           "longitude": 117.21731,
@@ -3246,7 +3338,7 @@
         },
         {
           "id": "osm-10831669921",
-          "name": "D",
+          "name": "左江道地铁站-D口",
           "kind": "exit",
           "latitude": 39.060839,
           "longitude": 117.217341,
@@ -3642,6 +3734,52 @@
           "kind": "exit",
           "latitude": 39.117182,
           "longitude": 117.150093,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "837923fced6764eb",
+      "stationName": "双桥河",
+      "stationNameEn": "Shuangqiaohe",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14132047323",
+          "name": "双桥河地铁站-C口",
+          "kind": "exit",
+          "latitude": 39.003398,
+          "longitude": 117.430523,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14132047324",
+          "name": "双桥河地铁站-D口",
+          "kind": "exit",
+          "latitude": 39.00177,
+          "longitude": 117.431037,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4230,8 +4368,8 @@
           "id": "osm-13725480588",
           "name": "",
           "kind": "exit",
-          "latitude": 39.056994,
-          "longitude": 117.062215,
+          "latitude": 39.056927,
+          "longitude": 117.062259,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4922,8 +5060,8 @@
           "id": "osm-13397305856",
           "name": "空港经济区地铁站-A口",
           "kind": "exit",
-          "latitude": 39.157988,
-          "longitude": 117.334357,
+          "latitude": 39.158012,
+          "longitude": 117.334383,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4932,8 +5070,8 @@
           "id": "osm-13397305857",
           "name": "空港经济区地铁站-B口",
           "kind": "exit",
-          "latitude": 39.157988,
-          "longitude": 117.335262,
+          "latitude": 39.158015,
+          "longitude": 117.335287,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5221,52 +5359,6 @@
       ]
     },
     {
-      "stationID": "ba6967f2a695b15a",
-      "stationName": "洪泥河东站",
-      "stationNameEn": "Hongnihedong",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
-      ],
-      "stationAccessPoints": [
-        {
-          "id": "osm-12472082383",
-          "name": "",
-          "kind": "exit",
-          "latitude": 39.048153,
-          "longitude": 117.34433,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-12472082384",
-          "name": "",
-          "kind": "exit",
-          "latitude": 39.047123,
-          "longitude": 117.345443,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        }
-      ]
-    },
-    {
       "stationID": "c1e090fd2a95e7b4",
       "stationName": "天津宾馆",
       "stationNameEn": "Tianjinbinguan",
@@ -5292,7 +5384,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-13867391278",
-          "name": "天津宾馆地铁站-A口",
+          "name": "A",
           "kind": "exit",
           "latitude": 39.085412,
           "longitude": 117.199228,
@@ -5302,7 +5394,7 @@
         },
         {
           "id": "osm-13867391283",
-          "name": "天津宾馆地铁站-B口",
+          "name": "B",
           "kind": "exit",
           "latitude": 39.085801,
           "longitude": 117.19871,
@@ -5312,7 +5404,7 @@
         },
         {
           "id": "osm-13867391288",
-          "name": "天津宾馆地铁站-C口",
+          "name": "C",
           "kind": "exit",
           "latitude": 39.085135,
           "longitude": 117.197601,
@@ -5788,8 +5880,8 @@
           "id": "osm-13334053770",
           "name": "肿瘤医院地铁站-B2口",
           "kind": "exit",
-          "latitude": 39.079554,
-          "longitude": 117.184416,
+          "latitude": 39.078339,
+          "longitude": 117.184127,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5918,7 +6010,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-1163259967",
-          "name": "南楼",
+          "name": "南楼地铁站-B口",
           "kind": "exit",
           "latitude": 39.096604,
           "longitude": 117.223529,
@@ -5927,18 +6019,8 @@
           "source": "specificEntrance"
         },
         {
-          "id": "osm-1163259979",
-          "name": "南楼",
-          "kind": "exit",
-          "latitude": 39.095527,
-          "longitude": 117.223347,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
           "id": "osm-1163260910",
-          "name": "南楼",
+          "name": "南楼地铁站-A口",
           "kind": "exit",
           "latitude": 39.096338,
           "longitude": 117.224113,
@@ -5948,10 +6030,20 @@
         },
         {
           "id": "osm-1163263892",
-          "name": "南楼",
+          "name": "南楼地铁站-D口",
           "kind": "exit",
-          "latitude": 39.095178,
-          "longitude": 117.224195,
+          "latitude": 39.095514,
+          "longitude": 117.224222,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14094200882",
+          "name": "南楼地铁站-C口（未开放）",
+          "kind": "exit",
+          "latitude": 39.095601,
+          "longitude": 117.223366,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6312,8 +6404,8 @@
           "id": "osm-13511998425",
           "name": "洪湖里地铁站-D口",
           "kind": "exit",
-          "latitude": 39.171703,
-          "longitude": 117.162017,
+          "latitude": 39.171944,
+          "longitude": 117.161888,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

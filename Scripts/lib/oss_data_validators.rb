@@ -822,23 +822,21 @@ module OSSDataValidators
     # nobody has ever looked at. Losing these again would be silent without a pin, and in Xi'an,
     # where 455 of them are, it is the majority of what the survey actually says.
     OSM_ENTRANCE_PACK_EXPECTATIONS = {
-      "1200" => { stations: 108, exits: 344, accessibility: 5, surveyedNotStepFree: 1, network: 239 },
-      "3100" => { stations: 369, exits: 1430, accessibility: 56, surveyedNotStepFree: 128, network: 471 },
-      "3201" => { stations: 100, exits: 376, accessibility: 11, surveyedNotStepFree: 3, network: 210 },
+      "1200" => { stations: 110, exits: 348, accessibility: 5, surveyedNotStepFree: 1, network: 240 },
+      "3100" => { stations: 369, exits: 1435, accessibility: 56, surveyedNotStepFree: 128, network: 471 },
+      "3201" => { stations: 127, exits: 449, accessibility: 11, surveyedNotStepFree: 3, network: 248 },
       "3205" => { stations: 53, exits: 230, accessibility: 2, surveyedNotStepFree: 14, network: 235 },
       "3301" => { stations: 262, exits: 1333, accessibility: 10, surveyedNotStepFree: 18, network: 270 },
       "4201" => { stations: 89, exits: 319, accessibility: 7, surveyedNotStepFree: 10, network: 293 },
-      # Seven metro/intercity concourse pairs stopped being merged into one node and became
-      # declared in-station interchanges instead (see `build_interchanges`), so the network is
-      # back to its true 414. Entrances follow: 326 -> 329 stations carry exits and 1259 -> 1262
-      # bind, because each half is matched against its own platform rather than against a node
-      # sitting in the gap between them. The two now-ambiguous exits are at 广州白云, in range of
-      # both halves — reported and dropped rather than guessed at.
-      "4401" => { stations: 329, exits: 1262, accessibility: 37, surveyedNotStepFree: 79, network: 414 },
-      "4403" => { stations: 321, exits: 1504, accessibility: 19, surveyedNotStepFree: 44, network: 372 },
-      "5000" => { stations: 83, exits: 299, accessibility: 3, surveyedNotStepFree: 8, network: 273 },
-      "5101" => { stations: 184, exits: 771, accessibility: 9, surveyedNotStepFree: 15, network: 402 },
-      "6101" => { stations: 227, exits: 920, accessibility: 164, surveyedNotStepFree: 455, network: 247 }
+      # Metro/intercity concourse pairs are declared in-station interchanges (see
+      # `build_interchanges`), not merged into one node, so each half's doors match its own
+      # platform. Two exits at 广州白云 are in range of both halves and are reported and dropped
+      # rather than guessed at.
+      "4401" => { stations: 333, exits: 1265, accessibility: 40, surveyedNotStepFree: 81, network: 434 },
+      "4403" => { stations: 330, exits: 1539, accessibility: 29, surveyedNotStepFree: 44, network: 380 },
+      "5000" => { stations: 87, exits: 306, accessibility: 3, surveyedNotStepFree: 8, network: 273 },
+      "5101" => { stations: 192, exits: 805, accessibility: 10, surveyedNotStepFree: 15, network: 403 },
+      "6101" => { stations: 229, exits: 930, accessibility: 166, surveyedNotStepFree: 456, network: 248 }
     }.freeze
 
     def validate_city_expectations!(city_id, pack, network)
@@ -849,40 +847,40 @@ module OSSDataValidators
         # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
         # means the entrance import silently stopped matching.
         {
-          "networkStations" => 449,
-          "matchedStations" => { "covered" => 449, "total" => 449 },
-          "accessibility" => { "covered" => 43, "total" => 449 },
-          # 73 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
-          "staticSchedules" => { "covered" => 0, "total" => 449 },
-          "liveArrivals" => { "covered" => 0, "total" => 449 },
-          "externalLayouts" => { "covered" => 0, "total" => 449 },
-          "licensedMedia" => { "covered" => 0, "total" => 449 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 449 }
+          "networkStations" => 450,
+          "matchedStations" => { "covered" => 450, "total" => 450 },
+          "accessibility" => { "covered" => 43, "total" => 450 },
+          # 77 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
+          "staticSchedules" => { "covered" => 0, "total" => 450 },
+          "liveArrivals" => { "covered" => 0, "total" => 450 },
+          "externalLayouts" => { "covered" => 0, "total" => 450 },
+          "licensedMedia" => { "covered" => 0, "total" => 450 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 450 }
         }
       when "7101"
         # data.taipei covers the Taipei Metro proper; the New Taipei light-rail and branch lines
         # in the same canonical network have no published exit data, so coverage is partial and
         # the exact split is pinned here to catch a silent regression in either direction.
         exits = stations.sum { |station| Array(station["stationAccessPoints"]).length }
-        fail_validation("Taipei pack lost station exits (#{exits})") unless exits == 388
-        # The only fully surveyed source in the app: 193 是 and 195 否 with no blanks, so every
+        fail_validation("Taipei pack lost station exits (#{exits})") unless exits == 390
+        # The only fully surveyed source in the app: 195 是 and 195 否 with no blanks, so every
         # Taipei exit carries a real answer and none of them is "unknown".
         surveyed = stations.sum do |station|
           Array(station["stationAccessPoints"]).count { |point| point["stepFree"] != "unknown" }
         end
-        fail_validation("Taipei exits lost their survey (#{surveyed})") unless surveyed == 388
+        fail_validation("Taipei exits lost their survey (#{surveyed})") unless surveyed == 390
         unless stations.all? { |station| !Array(station["stationAccessPoints"]).empty? }
           fail_validation("Taipei pack has a station with no exits")
         end
         {
-          "networkStations" => 151,
-          "matchedStations" => { "covered" => 118, "total" => 151 },
-          "accessibility" => { "covered" => 118, "total" => 151 },
-          "staticSchedules" => { "covered" => 0, "total" => 151 },
-          "liveArrivals" => { "covered" => 0, "total" => 151 },
-          "externalLayouts" => { "covered" => 0, "total" => 151 },
-          "licensedMedia" => { "covered" => 0, "total" => 151 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 151 }
+          "networkStations" => 152,
+          "matchedStations" => { "covered" => 119, "total" => 152 },
+          "accessibility" => { "covered" => 119, "total" => 152 },
+          "staticSchedules" => { "covered" => 0, "total" => 152 },
+          "liveArrivals" => { "covered" => 0, "total" => 152 },
+          "externalLayouts" => { "covered" => 0, "total" => 152 },
+          "licensedMedia" => { "covered" => 0, "total" => 152 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 152 }
         }
       when *OSM_ENTRANCE_PACK_EXPECTATIONS.keys
         # Packs built purely from OpenStreetMap entrances. Station and exit counts are pinned per

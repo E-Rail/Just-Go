@@ -61,6 +61,9 @@ struct ProfileView: View {
     private var splitLayout: some View {
         NavigationSplitView {
             profileList
+                // The split view's own surface shows above its columns, under the status bar, and
+                // is white unless painted: a white strip over the grouped grey on iPad.
+                .containerBackground(Color.appBackground, for: .navigationSplitView)
         } detail: {
             if let destination {
                 destinationView(for: destination, showsDoneButton: false)

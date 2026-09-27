@@ -35,7 +35,7 @@ struct TransitDataView: View {
                     Section {
                         HStack {
                             Image(systemName: "antenna.radiowaves.left.and.right")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(Color.accentColor)
                             Text(AppLocalization.localized("Transit Data Sources"))
                                 .font(.headline)
                         }
@@ -610,11 +610,7 @@ struct CityCapabilityTags: View, Equatable {
     }
 
     var body: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 86), spacing: 6)],
-            alignment: .leading,
-            spacing: 6
-        ) {
+        ChipFlowLayout(spacing: 6) {
             ForEach(tags) { tag in
                 capabilityTag(title: tag.title, status: tag.status)
             }
@@ -662,5 +658,57 @@ struct CityCapabilityTags: View, Equatable {
         case .pending:
             return AppLocalization.localized("Pending")
         }
+    }
+}
+
+/// Chips at their own widths, left to right, wrapping when the next one would not fit. A grid gives
+/// every chip the same column instead, which cut "实时 0/162" short in a wide iPad column with room
+/// to spare.
+private struct ChipFlowLayout: Layout {
+    var spacing: CGFloat
+
+    private struct Row {
+        var items: [(index: Int, x: CGFloat, size: CGSize)] = []
+        var y: CGFloat = 0
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = arrange(subviews, width: proposal.width ?? .infinity)
+        return CGSize(
+            width: rows.map(\.width).max() ?? 0,
+            height: rows.last.map { $0.y + $0.height } ?? 0
+        )
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        for row in arrange(subviews, width: bounds.width) {
+            for item in row.items {
+                subviews[item.index].place(
+                    at: CGPoint(x: bounds.minX + item.x, y: bounds.minY + row.y),
+                    proposal: ProposedViewSize(item.size)
+                )
+            }
+        }
+    }
+
+    private func arrange(_ subviews: Subviews, width: CGFloat) -> [Row] {
+        var rows = [Row()]
+        for index in subviews.indices {
+            var size = subviews[index].sizeThatFits(.unspecified)
+            // A chip longer than the whole line truncates rather than running off the edge.
+            size.width = min(size.width, width)
+            if let last = rows.last, !last.items.isEmpty, last.width + spacing + size.width > width {
+                rows.append(Row(y: last.y + last.height + spacing))
+            }
+            var row = rows.removeLast()
+            let x = row.items.isEmpty ? 0 : row.width + spacing
+            row.items.append((index, x, size))
+            row.width = x + size.width
+            row.height = max(row.height, size.height)
+            rows.append(row)
+        }
+        return rows
     }
 }

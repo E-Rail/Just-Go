@@ -559,7 +559,9 @@ struct RouteDetailView: View {
                         detailRow(
                             icon: "building.columns.fill",
                             tint: .accentColor,
-                            title: resource.title
+                            // The kind, as the resource viewer titles it: the catalog's own `title` is
+                            // English only.
+                            title: resource.kind.localizedTitle
                         ) {
                             Image(systemName: "arrow.up.right")
                                 .font(.footnote)

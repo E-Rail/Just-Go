@@ -24,15 +24,15 @@ final class Station: Identifiable, Hashable {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    /// The station's names, lowercased and joined once, for keyword search to scan with a plain
-    /// `contains` (about 4× cheaper per keystroke than a locale-aware search over 6,718 stations).
-    /// Built lazily: most stations are never searched in a session.
+    /// The station's names, folded by `searchFoldedName` and joined once, for keyword search to scan
+    /// with a plain `contains` (about 4× cheaper per keystroke than a locale-aware search over 6,718
+    /// stations). Built lazily: most stations are never searched in a session.
     private var cachedSearchKey: String?
 
     var searchKey: String {
         if let cachedSearchKey { return cachedSearchKey }
         // No `namePinyin`: network-derived stations never populate it.
-        let key = (nameEn.map { "\(name) \($0)" } ?? name).lowercased()
+        let key = searchFoldedName(nameEn.map { "\(name) \($0)" } ?? name)
         cachedSearchKey = key
         return key
     }

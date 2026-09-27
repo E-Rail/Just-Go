@@ -428,18 +428,20 @@ struct OfficialResourcesDirectoryView: View {
     private var filteredCities: [OfficialTransitResourceCity] {
         let query = debouncedQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return cities }
+        // Folded like station search, so 中环 finds Hong Kong's 中環.
+        let needle = searchFoldedName(query)
+        func matches(_ text: String) -> Bool { searchFoldedName(text).contains(needle) }
         return cities.filter { city in
-            city.localizedName.localizedCaseInsensitiveContains(query) ||
-                city.name.localizedCaseInsensitiveContains(query) ||
-                city.nameEn.localizedCaseInsensitiveContains(query) ||
+            matches(city.localizedName) ||
+                matches(city.name) ||
+                matches(city.nameEn) ||
                 city.allResources.contains { resource in
-                    resource.provider.localizedCaseInsensitiveContains(query) ||
-                        resource.kind.localizedTitle.localizedCaseInsensitiveContains(query)
+                    matches(resource.provider) || matches(resource.kind.localizedTitle)
                 } ||
                 city.stationResources.contains { station in
-                    station.localizedName.localizedCaseInsensitiveContains(query) ||
-                        station.stationName.localizedCaseInsensitiveContains(query) ||
-                        station.stationNameEn.localizedCaseInsensitiveContains(query)
+                    matches(station.localizedName) ||
+                        matches(station.stationName) ||
+                        matches(station.stationNameEn)
                 }
         }
     }

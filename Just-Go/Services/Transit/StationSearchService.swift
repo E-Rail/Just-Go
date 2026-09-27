@@ -36,7 +36,7 @@ final class StationSearchService {
     ) async throws -> [Station] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return await nearestStations(to: coordinate, limit: nearbyStationLimit) }
-        let needle = query.lowercased()
+        let needle = searchFoldedName(query)
         let bundledMatches = rankedByDistance(
             await metroNetworkProvider.allStations().filter { $0.searchKey.contains(needle) },
             from: coordinate
@@ -95,7 +95,7 @@ final class StationSearchService {
     func searchLines(keyword: String, near coordinate: CLLocationCoordinate2D?) async -> [LineResult] {
         let query = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 1 else { return [] }
-        let needle = query.lowercased()
+        let needle = searchFoldedName(query)
         let queryToken = TransitLineMatching.normalizedLineToken(query)
 
         var counts: [String: Int] = [:]
@@ -118,7 +118,7 @@ final class StationSearchService {
         }
 
         let matches = lines.values.filter { line in
-            if line.name.lowercased().contains(needle) { return true }
+            if searchFoldedName(line.name).contains(needle) { return true }
             if line.nameEn?.lowercased().contains(needle) == true { return true }
             // "18" finds 18号线 and 北京地铁18号线 alike. Empty tokens match nothing rather than
             // everything, which is what a bare "地铁" would otherwise do.

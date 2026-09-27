@@ -187,7 +187,7 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 
     func matchingStation(named name: String, near coordinate: CLLocationCoordinate2D) -> MetroStation? {
-        let key = normalizedStationName(name)
+        let key = Self.indexKey(name)
         let candidates = Self.normalizedIndex(for: self)[key] ?? []
         return candidates.min {
             CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: coordinate) <
@@ -234,6 +234,13 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
         normalizedIndexCache.removeAllObjects()
     }
 
+    /// Folded before normalizing, so 地鐵站 is stripped like 地铁站. Folded at all because Apple Maps
+    /// names Hong Kong, Macau and Taipei stations in Simplified for a Chinese-language rider (中环,
+    /// 妈阁) while the packs hold them in Traditional (中環, 媽閣).
+    private static func indexKey(_ name: String) -> String {
+        normalizedStationName(searchFoldedName(name))
+    }
+
     private static func normalizedIndex(for network: MetroNetwork) -> [String: [MetroStation]] {
         let key = "\(network.cityID):\(network.version)" as NSString
         if let cached = normalizedIndexCache.object(forKey: key) {
@@ -241,10 +248,10 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
         }
         var index: [String: [MetroStation]] = [:]
         for station in network.stations {
-            let primary = normalizedStationName(station.name)
+            let primary = indexKey(station.name)
             index[primary, default: []].append(station)
             if let nameEn = station.nameEn, !nameEn.isEmpty {
-                let secondary = normalizedStationName(nameEn)
+                let secondary = indexKey(nameEn)
                 if secondary != primary {
                     index[secondary, default: []].append(station)
                 }

@@ -10,6 +10,7 @@ require "set"
 require "uri"
 require_relative "lib/gcj02"
 require_relative "lib/line_names"
+require_relative "lib/official_transit_city_reviews"
 
 ROOT = File.expand_path("..", __dir__)
 CACHE_DIR = File.join(ROOT, ".cache", "osm-metro")
@@ -28,10 +29,11 @@ SUPPORTED_ROUTE_MODES = [*URBAN_ROUTE_MODES, "train"].freeze
 # Each city's bounding box overlaps neighbouring systems (Shenzhen↔Hong Kong,
 # Guangzhou↔Foshan/Dongguan/intercity, Shanghai↔Suzhou, Hangzhou↔Shaoxing …), so a
 # cross-border transfer station would otherwise pull a different system's line into the
-# wrong city. `networks` is the allowlist of OSM network/operator identities that truly
-# belong to the city — every other route relation in the bbox is dropped. `own_unknown_lines`
-# whitelists the handful of the city's own lines that carry no network/operator tag in OSM
-# (so they would otherwise be indistinguishable from foreign untagged lines).
+# wrong city. A line is the city's when its OSM network/operator is on the city's `networks`
+# allowlist, or, failing that, when most of its stops lie inside the city's own boundary (see
+# `location_refusal`). The allowlist is what keeps lines whose stops are mostly elsewhere, like
+# the intercity railway below. `excluded_lines` names the lines no tag marks as closed to
+# ordinary riders: campus, tourist and closed lines.
 # The Pearl River Delta intercity railway (城际铁路) is a scheduled, metro-style service riders
 # use to move between the delta's cities, and it interchanges with the metro at shared stations.
 # It is named here as its own allowlist entry rather than opening `route=train` generally, so
@@ -76,7 +78,6 @@ CITIES = {
   "1100" => {
     name: "Beijing", bbox: [39.60, 115.85, 40.30, 116.90],
     networks: ["北京地铁", "北京市郊铁路", "北京亦庄公交有轨电车有限责任公司"],
-    own_unknown_lines: ["前门大街有轨电车"],
     # 城市副中心线's relations list these three after 良乡 and in reverse (北京西站 → 良乡 → 房山东 →
     # 后吕村 → 衙门口东), which routes a rider for 衙门口东 out to 良乡 and back and makes 北京西站 → 良乡
     # one hop past all three. Left out until OpenStreetMap orders them, rather than reordered by guess.
@@ -101,14 +102,12 @@ CITIES = {
   "3100" => {
     name: "Shanghai", bbox: [30.65, 120.75, 31.90, 122.20],
     networks: ["上海地铁", "上海浦东机场旅客捷运系统", "松江有轨电车", "上海市域铁路", "上海市域轨道交通"],
-    own_unknown_lines: ["磁浮线"],
     # ¥50 one way, on its own ticket.
     premium_fare_lines: ["磁浮线"]
   },
   "4401" => {
     name: "Guangzhou", bbox: [22.55, 112.75, 23.90, 114.20],
     networks: ["广州地铁", *GUANGDONG_INTERCITY_NETWORKS],
-    own_unknown_lines: [],
     # Metro station first, the intercity station it interchanges with second. Two stations, not
     # one station with two names — they were fused into a single node at the mean of both halves,
     # which put the marker in the gap between two platforms and made the city's station count 7
@@ -129,114 +128,123 @@ CITIES = {
   },
   "4403" => {
     name: "Shenzhen", bbox: [22.35, 113.65, 22.95, 114.75],
-    networks: ["深圳地铁", "深圳有轨电车", "坪山云巴"],
-    own_unknown_lines: []
+    networks: ["深圳地铁", "深圳有轨电车", "坪山云巴"]
   },
   "5101" => {
     name: "Chengdu", bbox: [30.20, 103.55, 31.10, 104.65],
-    networks: ["成都地铁", "成都有轨电车"],
-    own_unknown_lines: ["天府机场APM"]
+    networks: ["成都地铁", "成都有轨电车"]
   },
   "3301" => {
     name: "Hangzhou", bbox: [29.75, 119.65, 30.85, 120.95],
-    networks: ["杭州地铁"],
-    own_unknown_lines: []
+    networks: ["杭州地铁"]
   },
-  "1200" => { name: "Tianjin", bbox: [38.85, 116.80, 39.45, 117.80], networks: ["天津地铁", "天津轨道交通"], own_unknown_lines: [] },
-  "5000" => { name: "Chongqing", bbox: [29.30, 106.20, 29.90, 106.90], networks: ["重庆轨道交通", "重庆地铁"], own_unknown_lines: [] },
-  "4201" => { name: "Wuhan", bbox: [30.35, 113.95, 30.85, 114.65], networks: ["武汉地铁", "武汉轨道交通"], own_unknown_lines: [] },
-  # 2号线 and S3号线 carry no network or operator tag.
-  "3201" => { name: "Nanjing", bbox: [31.70, 118.45, 32.30, 119.05], networks: ["南京地铁", "南京轨道交通"], own_unknown_lines: ["南京地铁2号线", "南京地铁S3号线"] },
-  "6101" => { name: "Xian", bbox: [34.05, 108.65, 34.55, 109.25], networks: ["西安地铁", "西安轨道交通"], own_unknown_lines: [] },
-  "3205" => { name: "Suzhou", bbox: [31.10, 120.35, 31.55, 120.95], networks: ["苏州轨道交通", "苏州地铁"], own_unknown_lines: [] },
-  # Five lines carry no network or operator tag.
+  "1200" => { name: "Tianjin", bbox: [38.85, 116.80, 39.45, 117.80], networks: ["天津地铁", "天津轨道交通"] },
+  "5000" => { name: "Chongqing", bbox: [29.30, 106.20, 29.90, 106.90], networks: ["重庆轨道交通", "重庆地铁"] },
+  "4201" => {
+    name: "Wuhan", bbox: [30.35, 113.95, 30.85, 114.65], networks: ["武汉地铁", "武汉轨道交通"],
+    # OSM names this line only in English; "车都T1线" is the operator's and the city's name for it.
+    line_names: { "Auto City T1 Line" => { name: "车都T1线", name_en: "Auto City T1 Line" } }
+  },
+  "3201" => { name: "Nanjing", bbox: [31.70, 118.45, 32.30, 119.05], networks: ["南京地铁", "南京轨道交通"] },
+  "6101" => { name: "Xian", bbox: [34.05, 108.65, 34.55, 109.25], networks: ["西安地铁", "西安轨道交通"] },
+  "3205" => {
+    name: "Suzhou", bbox: [31.10, 120.35, 31.55, 120.95], networks: ["苏州轨道交通", "苏州地铁"],
+    # The trams' relations name too few of their stops: hops of 6–13 km with none between, which
+    # would reach the routing graph as non-stop runs. Left out until OSM lists them.
+    excluded_lines: ["高新有轨电车1号线", "高新有轨电车2号线"]
+  },
   "4101" => {
-    name: "Zhengzhou", bbox: [34.55, 113.30, 34.95, 113.95], networks: ["郑州地铁", "郑州轨道交通"],
-    own_unknown_lines: ["郑州地铁2号线", "郑州地铁城郊线", "郑州地铁7号线", "郑州地铁8号线", "郑州地铁10号线"]
+    name: "Zhengzhou", bbox: [34.55, 113.30, 34.95, 113.95], networks: ["郑州地铁", "郑州轨道交通"]
   },
-  "4301" => { name: "Changsha", bbox: [28.05, 112.75, 28.45, 113.25], networks: ["长沙地铁", "长沙市轨道交通", "长沙轨道交通"], own_unknown_lines: [] },
-  # 2号线, 10号线 and 4号线 carry no network or operator tag; 4号线's two directions are named
-  # only in English, and differently.
+  "4301" => {
+    name: "Changsha", bbox: [28.05, 112.75, 28.45, 113.25], networks: ["长沙地铁", "长沙市轨道交通", "长沙轨道交通"],
+    # A shuttle inside the 大王山 resort, 大王山旅游线 in Wikidata; its track carries no tourism tag.
+    excluded_lines: ["大王山云巴"],
+    # The maglev's relations name only its run ("磁浮机场站→磁浮高铁站"), which reduces to a station.
+    line_names: { "磁浮高铁站" => { name: "磁浮快线", name_en: "Changsha Maglev Express" } },
+    # The maglev's stations have their own gates; the metro interchange at each end is a walk.
+    interchanges: [
+      { from: "长沙火车南站", to: "磁浮高铁站", kind: "outOfStation" },
+      { from: "黄花机场T1T2", to: "磁浮机场站", kind: "outOfStation" }
+    ],
+    # ¥20 end to end on its own ticket, ¥10 a section.
+    premium_fare_lines: ["磁浮快线"]
+  },
   "2101" => {
-    name: "Shenyang", bbox: [41.60, 123.15, 42.00, 123.75], networks: ["沈阳地铁", "沈阳轨道交通"],
-    own_unknown_lines: ["沈阳地铁2号线", "沈阳地铁10号线", "line 4", "Line 4"]
+    name: "Shenyang", bbox: [41.60, 123.15, 42.00, 123.75], networks: ["沈阳地铁", "沈阳轨道交通"]
   },
-  "3702" => { name: "Qingdao", bbox: [35.85, 119.95, 36.45, 120.65], networks: ["青岛地铁", "青岛轨道交通"], own_unknown_lines: [] },
-  "2102" => { name: "Dalian", bbox: [38.70, 121.25, 39.15, 122.05], networks: ["大连地铁", "大连轨道交通"], own_unknown_lines: [] },
-  # 12号线's relations carry no network or operator tag.
-  "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"], own_unknown_lines: ["12号线"] },
-  "3202" => { name: "Wuxi", bbox: [31.35, 120.10, 31.75, 120.60], networks: ["无锡地铁", "无锡轨道交通"], own_unknown_lines: [] },
-  "5301" => { name: "Kunming", bbox: [24.70, 102.50, 25.20, 102.95], networks: ["昆明地铁", "昆明轨道交通"], own_unknown_lines: [] },
-  "3601" => { name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"], own_unknown_lines: [] },
-  # 一号线 carries no network or operator tag.
-  "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"], own_unknown_lines: ["福州轨道交通一号线"] },
-  "3502" => { name: "Xiamen", bbox: [24.40, 117.95, 24.80, 118.25], networks: ["厦门地铁", "厦门轨道交通"], allow_unknown: true, own_unknown_lines: [] },
-  "3401" => { name: "Hefei", bbox: [31.60, 117.00, 32.05, 117.50], networks: ["合肥轨道交通", "合肥地铁"], own_unknown_lines: [] },
-  "1301" => { name: "Shijiazhuang", bbox: [37.85, 114.30, 38.20, 114.75], networks: ["石家庄地铁", "石家庄市轨道交通", "石家庄轨道交通"], own_unknown_lines: [] },
-  "5201" => { name: "Guiyang", bbox: [26.40, 106.50, 26.85, 106.95], networks: ["贵阳地铁", "贵阳轨道交通"], allow_unknown: true, own_unknown_lines: [] },
-  "2301" => { name: "Harbin", bbox: [45.55, 126.40, 45.95, 126.90], networks: ["哈尔滨地铁", "哈尔滨轨道交通"], allow_unknown: true, own_unknown_lines: [] },
+  "3702" => { name: "Qingdao", bbox: [35.85, 119.95, 36.45, 120.65], networks: ["青岛地铁", "青岛轨道交通"] },
+  "2102" => {
+    name: "Dalian", bbox: [38.70, 121.25, 39.15, 122.05], networks: ["大连地铁", "大连轨道交通"],
+    # The trams' relations list stops out of order: 201 puts 民主广场 after its terminus (a 3.2 km
+    # hop from 华乐广场) and 202 starts with 中国华录 and 解放广场 (8–10 km hops), past stops the
+    # trams make. Left out until OSM orders them, like `unverified_stations`.
+    excluded_lines: ["201", "202"]
+  },
+  "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"] },
+  "3202" => { name: "Wuxi", bbox: [31.35, 120.10, 31.75, 120.60], networks: ["无锡地铁", "无锡轨道交通"] },
+  "5301" => { name: "Kunming", bbox: [24.70, 102.50, 25.20, 102.95], networks: ["昆明地铁", "昆明轨道交通"] },
+  "3601" => { name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"] },
+  "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"] },
+  "3502" => { name: "Xiamen", bbox: [24.40, 117.95, 24.80, 118.25], networks: ["厦门地铁", "厦门轨道交通"], allow_unknown: true },
+  "3401" => { name: "Hefei", bbox: [31.60, 117.00, 32.05, 117.50], networks: ["合肥轨道交通", "合肥地铁"] },
+  "1301" => { name: "Shijiazhuang", bbox: [37.85, 114.30, 38.20, 114.75], networks: ["石家庄地铁", "石家庄市轨道交通", "石家庄轨道交通"] },
+  "5201" => { name: "Guiyang", bbox: [26.40, 106.50, 26.85, 106.95], networks: ["贵阳地铁", "贵阳轨道交通"], allow_unknown: true },
+  "2301" => { name: "Harbin", bbox: [45.55, 126.40, 45.95, 126.90], networks: ["哈尔滨地铁", "哈尔滨轨道交通"], allow_unknown: true },
   # 3号线, 4号线 and 8号线 name their network in English.
-  "2201" => { name: "Changchun", bbox: [43.65, 125.10, 44.00, 125.55], networks: ["长春轨道交通", "长春地铁", "Changchun Rail Transit"], own_unknown_lines: [] },
-  "4501" => { name: "Nanning", bbox: [22.65, 108.10, 23.00, 108.55], networks: ["南宁轨道交通", "南宁地铁"], own_unknown_lines: [] },
-  "6201" => { name: "Lanzhou", bbox: [35.95, 103.55, 36.20, 104.05], networks: ["兰州轨道交通", "兰州市轨道交通"], allow_unknown: true, own_unknown_lines: [] },
-  "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true, own_unknown_lines: [] },
-  "1501" => { name: "Hohhot", bbox: [40.70, 111.50, 41.00, 112.00], networks: ["呼和浩特地铁", "呼和浩特轨道交通"], own_unknown_lines: [] },
-  "1401" => { name: "Taiyuan", bbox: [37.65, 112.40, 38.05, 112.70], networks: ["太原轨道交通", "太原地铁"], own_unknown_lines: [] },
+  "2201" => { name: "Changchun", bbox: [43.65, 125.10, 44.00, 125.55], networks: ["长春轨道交通", "长春地铁", "Changchun Rail Transit"] },
+  "4501" => { name: "Nanning", bbox: [22.65, 108.10, 23.00, 108.55], networks: ["南宁轨道交通", "南宁地铁"] },
+  "6201" => { name: "Lanzhou", bbox: [35.95, 103.55, 36.20, 104.05], networks: ["兰州轨道交通", "兰州市轨道交通"], allow_unknown: true },
+  "6501" => { name: "Urumqi", bbox: [43.65, 87.40, 44.05, 87.80], networks: ["乌鲁木齐轨道交通", "乌鲁木齐地铁"], allow_unknown: true },
+  "1501" => { name: "Hohhot", bbox: [40.70, 111.50, 41.00, 112.00], networks: ["呼和浩特地铁", "呼和浩特轨道交通"] },
+  "1401" => { name: "Taiyuan", bbox: [37.65, 112.40, 38.05, 112.70], networks: ["太原轨道交通", "太原地铁"] },
   "4419" => {
     name: "Dongguan", bbox: [22.85, 113.55, 23.15, 114.00],
     networks: ["东莞轨道交通", "东莞地铁", *GUANGDONG_INTERCITY_NETWORKS],
-    own_unknown_lines: []
+    # Huawei's Songshan Lake campus shuttle, for its staff and visitors.
+    excluded_lines: ["华为松山湖有轨电车1号线", "华为松山湖有轨电车2号线", "华为松山湖有轨电车3号线"]
   },
   "4406" => {
     name: "Foshan", bbox: [22.80, 112.90, 23.25, 113.35],
-    networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车", *GUANGDONG_INTERCITY_NETWORKS],
-    own_unknown_lines: []
+    networks: ["佛山地铁", "佛山市轨道交通", "佛山有轨电车", *GUANGDONG_INTERCITY_NETWORKS]
   },
-  "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"], own_unknown_lines: [] },
-  "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"], own_unknown_lines: [] },
-  # 2号线 and 3号线 carry no network or operator tag.
-  "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"], own_unknown_lines: ["徐州地铁2号线", "徐州地铁3号线"] },
-  # 1号线 carries no network or operator tag.
-  "3204" => { name: "Changzhou", bbox: [31.65, 119.80, 31.95, 120.15], networks: ["常州地铁", "常州轨道交通"], own_unknown_lines: ["常州地铁1号线"] },
-  # 4号线, 6号线 and 8号线 carry no network or operator tag.
-  "3701" => { name: "Jinan", bbox: [36.45, 116.75, 36.80, 117.30], networks: ["济南地铁", "济南轨道交通"], own_unknown_lines: ["4号线", "6号线", "8号线"] },
-  "4103" => { name: "Luoyang", bbox: [34.50, 112.30, 34.78, 112.65], networks: ["洛阳地铁", "洛阳轨道交通"], own_unknown_lines: [] },
-  "3402" => { name: "Wuhu", bbox: [31.20, 118.25, 31.45, 118.55], networks: ["芜湖轨道交通", "芜湖地铁"], allow_unknown: true, own_unknown_lines: [] },
-  "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"], own_unknown_lines: [] },
-  "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"], own_unknown_lines: [] },
+  "3303" => { name: "Wenzhou", bbox: [27.75, 120.50, 28.15, 120.95], networks: ["温州轨道交通", "温州市域铁路"] },
+  "3306" => { name: "Shaoxing", bbox: [29.85, 120.40, 30.15, 120.80], networks: ["绍兴轨道交通"] },
+  "3203" => { name: "Xuzhou", bbox: [34.10, 117.05, 34.40, 117.45], networks: ["徐州地铁", "徐州轨道交通"] },
+  "3204" => { name: "Changzhou", bbox: [31.65, 119.80, 31.95, 120.15], networks: ["常州地铁", "常州轨道交通"] },
+  "3701" => {
+    name: "Jinan", bbox: [36.45, 116.75, 36.80, 117.30], networks: ["济南地铁", "济南轨道交通"],
+    # OSM's `name:en` drops the J.
+    line_names: { "云巴线" => { name: "云巴线", name_en: "Jinan SkyShuttle Line 1" } }
+  },
+  "4103" => { name: "Luoyang", bbox: [34.50, 112.30, 34.78, 112.65], networks: ["洛阳地铁", "洛阳轨道交通"] },
+  "3402" => { name: "Wuhu", bbox: [31.20, 118.25, 31.45, 118.55], networks: ["芜湖轨道交通", "芜湖地铁"], allow_unknown: true },
+  "3206" => { name: "Nantong", bbox: [31.85, 120.70, 32.15, 121.05], networks: ["南通地铁", "南通轨道交通"] },
+  "3310" => { name: "Taizhou", bbox: [28.50, 121.20, 28.80, 121.55], networks: ["台州市域铁路", "台州轨道交通"] },
   "8100" => {
-    name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"], own_unknown_lines: [],
+    name: "HongKong", bbox: [22.15, 113.83, 22.58, 114.45], networks: ["港鐵 MTR", "輕鐵 Light Rail", "港铁"],
     # Its own fare table, several times the 東涌綫 fare over the same track.
     premium_fare_lines: ["機場快綫"]
   },
-  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"], own_unknown_lines: [] },
-  # Taipei's three busiest lines (板南, 文湖, 淡水信義) carry no network/operator tag in OSM and
-  # exist *only* as untagged relations — without naming them here the city would import with its
-  # core network missing. They are listed rather than `allow_unknown` because the same bbox also
-  # holds the untagged 貓空纜車 gondola, which is not rail. 新北捷運/淡海輕軌 are the New Taipei
-  # half of the same metro system; 桃園捷運 is excluded here and imported as Taoyuan (7106).
+  "8200" => { name: "Macau", bbox: [22.10, 113.52, 22.22, 113.62], networks: ["澳門輕軌 Metro Ligeiro de Macau", "澳門輕軌", "澳门轻轨", "Macau LRT"] },
+  # 新北捷運/淡海輕軌 are the New Taipei half of the same metro system; 桃園捷運 is excluded here
+  # and imported as Taoyuan (7106).
   "7101" => {
     name: "Taipei", bbox: [24.90, 121.30, 25.30, 121.80],
-    networks: ["臺北捷運", "台北捷運", "新北捷運", "淡海輕軌"],
-    own_unknown_lines: [
-      "臺北捷運 南港-板橋-土城線",
-      "捷運文湖線",
-      "淡水信義線",
-      "臺北捷運 淡水線-信義線"
-    ]
+    networks: ["臺北捷運", "台北捷運", "新北捷運", "淡海輕軌"]
   },
-  "7102" => { name: "Kaohsiung", bbox: [22.45, 120.15, 22.85, 120.50], networks: ["高雄捷運", "環狀輕軌"], own_unknown_lines: [] },
-  "7104" => { name: "Taichung", bbox: [24.05, 120.55, 24.35, 120.80], networks: ["臺中捷運", "台中捷運"], own_unknown_lines: [] },
-  # The bbox reaches Taipei Main Station because the Airport MRT terminates there; the
-  # allowlist keeps Taipei's own lines out.
-  "7106" => { name: "Taoyuan", bbox: [24.90, 121.15, 25.12, 121.55], networks: ["桃園捷運"], own_unknown_lines: [] },
+  "7102" => { name: "Kaohsiung", bbox: [22.45, 120.15, 22.85, 120.50], networks: ["高雄捷運", "環狀輕軌"] },
+  "7104" => { name: "Taichung", bbox: [24.05, 120.55, 24.35, 120.80], networks: ["臺中捷運", "台中捷運"] },
+  # The bbox reaches Taipei Main Station because the Airport MRT terminates there; Taipei's own
+  # lines stay out because none of their stops are in Taoyuan.
+  "7106" => { name: "Taoyuan", bbox: [24.90, 121.15, 25.12, 121.55], networks: ["桃園捷運"] },
   # The only route relations in this bbox are the city's own 金义东线, so untagged ones are safe.
-  "3307" => { name: "Jinhua", bbox: [28.85, 119.50, 29.45, 120.45], networks: ["浙中都市圈城际轨道交通", "金华轨道交通"], allow_unknown: true, own_unknown_lines: [] },
-  # 宁滁线 is Chuzhou-operated and tagged as such; the rest of this bbox is Nanjing Metro, so
-  # untagged relations are *not* allowed through here.
-  "3411" => { name: "Chuzhou", bbox: [31.95, 118.15, 32.45, 118.70], networks: ["滁州轨道交通"], own_unknown_lines: [] },
+  "3307" => { name: "Jinhua", bbox: [28.85, 119.50, 29.45, 120.45], networks: ["浙中都市圈城际轨道交通", "金华轨道交通"], allow_unknown: true },
+  # 宁滁线 is Chuzhou-operated and tagged as such; the rest of this bbox is Nanjing Metro, whose
+  # untagged lines stop in Nanjing and so stay out. No `allow_unknown` here, for the same reason.
+  "3411" => { name: "Chuzhou", bbox: [31.95, 118.15, 32.45, 118.70], networks: ["滁州轨道交通"] },
   # 郑许线 carries no network tag and is the only rail in the bbox.
-  "4110" => { name: "Xuchang", bbox: [33.95, 113.60, 34.45, 114.05], networks: ["许昌轨道交通", "郑许线"], allow_unknown: true, own_unknown_lines: [] }
+  "4110" => { name: "Xuchang", bbox: [33.95, 113.60, 34.45, 114.05], networks: ["许昌轨道交通", "郑许线"], allow_unknown: true }
 }.freeze
 
 EARTH_RADIUS = 6_371_000.0
@@ -307,31 +315,130 @@ def service_identity(tags)
   normalized(tags["wikidata"])
 end
 
-# Whether a canonicalized line belongs to the city being imported. `network_identity` is the
+# Whether the city's allowlist claims a canonicalized line. `network_identity` is the
 # already-normalized network/operator of the line (or "unknown" when OSM gives neither), so it
-# is matched against the city's normalized allowlist. Lines with no network/operator are kept
-# only if explicitly whitelisted by name (the city's own untagged lines); anything else —
-# a neighbouring city's metro, an intercity service, Hong Kong MTR, etc. — is rejected.
-def city_owns_line?(city, network_identity, name, mode: nil)
+# is matched against the city's normalized allowlist. A line this does not claim can still be the
+# city's by where its stops are; see `location_refusal`.
+def network_claims_line?(city, network_identity, mode: nil)
   allowed = (city[:networks] || []).map { |value| normalized(value) }
   return true if allowed.include?(network_identity)
-  if network_identity == "unknown"
-    # Isolated systems whose OSM relations carry no network/operator tag: there is no
-    # neighbouring metro inside the bbox to confuse them with, so keep their untagged lines.
-    # `allow_unknown` covers urban modes only. Unidentified heavy rail inside a city bbox is
-    # national or cross-border rail, not that city's metro — Urumqi's bbox holds the
-    # "13/14 乌鲁木齐<=>Алматы" sleeper to Almaty, tagged route=train network=unknown.
-    return true if city[:allow_unknown] && mode != "train"
-    return (city[:own_unknown_lines] || []).include?(name)
-  end
 
-  false
+  # Isolated systems whose OSM relations carry no network/operator tag: there is no
+  # neighbouring metro inside the bbox to confuse them with, so keep their untagged lines.
+  # `allow_unknown` covers urban modes only. Unidentified heavy rail inside a city bbox is
+  # national or cross-border rail, not that city's metro — Urumqi's bbox holds the
+  # "13/14 乌鲁木齐<=>Алматы" sleeper to Almaty, tagged route=train network=unknown.
+  network_identity == "unknown" && city[:allow_unknown] && mode != "train"
 end
 
-def relation_owned_by_city?(city, relation)
+def relation_claimed_by_network?(city, relation)
   tags = relation.fetch("tags", {})
   identity = network_identity(tags)
-  city_owns_line?(city, identity.empty? ? "unknown" : identity, passenger_line_name(tags), mode: tags["route"])
+  network_claims_line?(city, identity.empty? ? "unknown" : identity, mode: tags["route"])
+end
+
+# The pack's own city, by the name its stations are labelled with. OSM's `ref:admin:CN` would be
+# the natural key, but most mainland boundaries do not carry it.
+CITY_NAMES = OfficialTransitCityReviews::CITY_REVIEWS.to_h { |review| [review[0], review[1]] }.freeze
+RESTRICTED_ACCESS = %w[no private permit].freeze
+
+# Why a line the allowlist does not claim is not the city's, or nil when it is.
+#
+# OSM leaves `network` and `operator` off whole lines: Qingdao 2/3/4, Ningbo 4, 济阳线, the Changsha
+# maglev. Naming them one by one only ever caught the ones riders had already reported missing.
+# Where a line stops is known for every line, tagged or not, and the neighbours a bbox takes in
+# (Nanjing's lines in Chuzhou's box, Taipei's in Taoyuan's, Suzhou's in Shanghai's) stop nowhere in
+# the city. "Most" is a strict majority of distinct stations, so a line shared with a neighbour
+# joins the pack of the city that holds more of it: 郑许线 is Zhengzhou's by 15 of 26.
+#
+# Urban modes only, because heavy rail through a city is national rail. The line must also be one a
+# rider boards on an ordinary ticket: on rails (a gondola mapped as `route=tram` and a trackless 智轨
+# on the road are not), not behind a permit (the airport's airside people mover), and not a
+# sightseeing line. A campus line, or a tourist line whose track is not tagged as one, says so in no
+# tag, so the city names it in `excluded_lines`.
+def location_refusal(mode, home_stops, stops, relations, ways)
+  return "notUrban" unless URBAN_ROUTE_MODES.include?(mode)
+  return "restrictedAccess" if relations.any? { |relation| RESTRICTED_ACCESS.include?(relation.dig("tags", "access")) }
+
+  track = relations.flat_map { |relation| relation_track_ways(relation, ways) }.uniq { |way| way["id"] }
+  return "noRailTrack" unless track.count { |way| way.dig("tags", "railway") } * 2 > track.length
+  # OSM's own mark for a sightseeing line: 都江堰's M-TR, 昆明池's 智轨 and Changchun's 氢春号.
+  return "tourist" if track.count { |way| way.dig("tags", "usage") == "tourism" } * 2 > track.length
+  return "fewHomeStops" unless home_stops * 2 > stops
+
+  nil
+end
+
+# Refusals that mean "not a line a rider boards", as opposed to "not this city's line".
+DELIBERATE_REFUSALS = %w[excluded restrictedAccess noRailTrack tourist].freeze
+
+# The audit that a full import must pass: every line Wikidata says is open, and OSM maps with
+# stops, ships in some pack. It is how the lines lost to missing `network` tags were found, and a
+# rule about stops cannot see a line it wrongly refuses. Rapid-transit networks only (Q5503), which
+# is how Wikidata classes metros, not trams.
+WIKIDATA_URL = URI("https://query.wikidata.org/sparql")
+WIKIDATA_QUERY = <<~SPARQL
+  SELECT ?line ?lineLabel ?opening ?closing WHERE {
+    VALUES ?country { wd:Q148 wd:Q8646 wd:Q14773 wd:Q865 }
+    ?net wdt:P17 ?country; wdt:P31/wdt:P279* wd:Q5503.
+    ?line wdt:P16 ?net; wdt:P31/wdt:P279* wd:Q728937.
+    OPTIONAL { ?line wdt:P1619 ?opening }
+    OPTIONAL { ?line wdt:P3999 ?closing }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "zh-hans,zh,en". }
+  }
+SPARQL
+
+# Wikidata's lines by QID: a name, the earliest opening date (nil when undated), and whether any
+# closure date is recorded. One line comes back as several rows when a property has several values.
+def wikidata_lines(refresh:)
+  path = File.join(CACHE_DIR, "wikidata-lines.json")
+  if refresh || !File.file?(path)
+    uri = WIKIDATA_URL.dup
+    uri.query = URI.encode_www_form(query: WIKIDATA_QUERY, format: "json")
+    request = Net::HTTP::Get.new(uri)
+    request["User-Agent"] = "Just-Go metro geometry importer"
+    request["Accept"] = "application/sparql-results+json"
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 240, open_timeout: 30) do |http|
+      http.request(request)
+    end
+    fail_with("Wikidata lines unavailable: HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+    File.write(path, response.body)
+  end
+  JSON.parse(File.read(path)).dig("results", "bindings").each_with_object({}) do |row, lines|
+    qid = row.dig("line", "value").to_s[%r{/(Q\d+)\z}, 1]
+    next if qid.nil?
+
+    line = lines[qid] ||= { "name" => row.dig("lineLabel", "value"), "opened" => nil, "closed" => false }
+    opened = row.dig("opening", "value").to_s[/\A\d{4}-\d{2}-\d{2}/]
+    line["opened"] = [line["opened"], opened].compact.min if opened
+    line["closed"] ||= !row.dig("closing", "value").to_s.empty?
+  end
+end
+
+# The open lines OSM maps with stops that no pack emits and none left out on purpose, as
+# [qid, name, relation IDs]; and the open lines with no stop-bearing relation in any cache, which
+# is either a city the app does not bundle or a gap in OSM, not something an import can fix.
+def unimported_open_lines(lines, snapshot, wikidata_relations, emitted, left_out_on_purpose)
+  open_lines = lines.reject { |_qid, line| line["closed"] || line["opened"].nil? || line["opened"] > snapshot }
+  unmapped, mapped = open_lines.partition { |qid, _line| wikidata_relations[qid].to_a.empty? }
+  missing = mapped.map do |qid, line|
+    ids = wikidata_relations[qid].uniq.sort
+    next if ids.any? { |id| emitted.include?(id) } || ids.all? { |id| left_out_on_purpose.include?(id) }
+
+    [qid, line["name"], ids]
+  end.compact
+  [missing.sort, unmapped.map(&:first).sort]
+end
+
+# How many of a line's distinct stations lie inside `home`, and how many it has.
+def home_stop_count(relations, elements_by_key, nodes, home)
+  coordinates = relations.each_with_object({}) do |relation, result|
+    passenger_station_members(relation, elements_by_key).each do |_member, element, name|
+      coordinate = element_coordinate(element, nodes)
+      result[normalized_station_name(name)] ||= coordinate if coordinate
+    end
+  end
+  [coordinates.values.count { |latitude, longitude| area_contains?(home, latitude, longitude) }, coordinates.length]
 end
 
 def supported_route_relation?(relation)
@@ -791,10 +898,19 @@ end
 # the GCJ-02 conversion, and a converted point sits ~600 m off, the wrong side of a border station.
 CITY_ISO_CODE = /\A(?:CN-(?:BJ|SH|TJ|CQ|HK|MO)|TW-[A-Z]+)\z/.freeze
 
-def station_cities(city_id, city, points)
+
+# Every boundary around `points`, which is every stop of every candidate line: which lines are the
+# city's is decided from these boundaries before any station exists. The cache is fetched again
+# when a point falls outside every cached boundary's box, as a line newly the city's can reach
+# past the stations the cache was sized for (郑许线's Xuchang half, for Zhengzhou).
+def city_areas(city_id, city, points)
   path = File.join(CACHE_DIR, "boundaries-#{city_id}.json")
-  unless File.file?(path)
-    latitudes, longitudes = points.values.transpose
+  cached = File.file?(path) ? JSON.parse(File.read(path)).fetch("elements") : []
+  covered = points.all? do |latitude, longitude|
+    cached.any? { |relation| within_bounds?(relation.fetch("bounds"), latitude, longitude) }
+  end
+  unless covered
+    latitudes, longitudes = points.transpose
     box = "(#{latitudes.min - 0.05},#{longitudes.min - 0.05},#{latitudes.max + 0.05},#{longitudes.max + 0.05})"
     File.write(path, overpass_post(<<~QUERY, city))
       [out:json][timeout:120];
@@ -805,23 +921,45 @@ def station_cities(city_id, city, points)
       out tags bb;
     QUERY
   end
-  areas = JSON.parse(File.read(path)).fetch("elements").map do |relation|
+  JSON.parse(File.read(path)).fetch("elements").map do |relation|
     [relation.fetch("tags"), relation.fetch("bounds"), boundary_edges(relation.fetch("id"), city)]
   end
-  points.transform_values do |(latitude, longitude)|
-    containing = areas.select do |_tags, bounds, edges|
-      next false unless latitude.between?(bounds["minlat"], bounds["maxlat"]) && longitude.between?(bounds["minlon"], bounds["maxlon"])
+end
 
-      edges.count do |(lat_a, lon_a), (lat_b, lon_b)|
-        (lat_a > latitude) != (lat_b > latitude) &&
-          longitude < lon_a + (latitude - lat_a) * (lon_b - lon_a) / (lat_b - lat_a)
-      end.odd?
-    end.map(&:first)
+def within_bounds?(bounds, latitude, longitude)
+  latitude.between?(bounds["minlat"], bounds["maxlat"]) && longitude.between?(bounds["minlon"], bounds["maxlon"])
+end
+
+def area_contains?(area, latitude, longitude)
+  _tags, bounds, edges = area
+  return false unless within_bounds?(bounds, latitude, longitude)
+
+  edges.count do |(lat_a, lon_a), (lat_b, lon_b)|
+    (lat_a > latitude) != (lat_b > latitude) &&
+      longitude < lon_a + (latitude - lat_a) * (lon_b - lon_a) / (lat_b - lat_a)
+  end.odd?
+end
+
+def area_name(tags)
+  (tags["name:zh-Hans"] || tags["name"]).sub(/(?<=..)市\z/, "")
+end
+
+def home_area(city_id, city, areas)
+  name = CITY_NAMES[city_id]
+  fail_with("#{city[:name]} has no name in OfficialTransitCityReviews") if name.nil?
+  matches = areas.select { |tags, _bounds, _edges| area_name(tags) == name }
+  fail_with("#{city[:name]} matches #{matches.length} boundaries named #{name}, not one") unless matches.length == 1
+  matches.first
+end
+
+def station_cities(areas, city, points)
+  points.transform_values do |(latitude, longitude)|
+    containing = areas.select { |area| area_contains?(area, latitude, longitude) }.map(&:first)
     tags = containing.find { |candidate| candidate["ISO3166-2"].to_s.match?(CITY_ISO_CODE) } ||
       containing.find { |candidate| candidate["admin_level"] == "5" }
     fail_with("#{city[:name]} has a station inside no city boundary at #{latitude},#{longitude}") if tags.nil?
     {
-      "name" => (tags["name:zh-Hans"] || tags["name"]).sub(/(?<=..)市\z/, ""),
+      "name" => area_name(tags),
       "nameEn" => tags["name:en"].to_s.sub(/ City\z/, "")
     }
   end
@@ -872,6 +1010,61 @@ end
 # *not* an interchange, while 太平桥 and 复兴门 at 625m are. No threshold separates those, so a
 # threshold would invent transfers between the busiest stations in both cities. A wrong transfer
 # is worse than a missing one.
+# Stops that share a name are one station only while they are close enough to change between.
+# Names repeat across a city: Wuhan's 光谷大道 tram stop is 4.7 km from the 光谷大道 metro station and
+# Shenyang's 综合保税区 tram stop 14 km from its namesake. Fused, they become one marker between the
+# two and a transfer nobody can make. A line whose stops lie farther from the rest than the longest
+# interchange the importer accepts gets a station of its own under the same name.
+#
+# The cluster holding the heaviest mode (metro before tram) keeps the name's key, and so its ID:
+# the station the doors and the operators' directories are bound to.
+def split_distant_namesakes!(city_id, station_groups, lines, line_modes)
+  limit = MAX_INTERCHANGE_METERS.fetch("outOfStation")
+  lines_by_id = lines.to_h { |line| [line["id"], line] }
+  station_groups.keys.each do |key|
+    station = station_groups[key]
+    centroids = station["lineCoordinates"].transform_values { |points| average_coordinate("coordinates" => points) }
+    clusters = clusters_within(centroids, limit)
+    next if clusters.length < 2
+
+    keeper = clusters.min_by do |ids|
+      [ids.map { |id| SUPPORTED_ROUTE_MODES.index(line_modes[id]) || SUPPORTED_ROUTE_MODES.length }.min, -ids.length, ids.first]
+    end
+    old_id = station_id(city_id, key)
+    (clusters - [keeper]).each do |ids|
+      split_key = "#{key}|#{ids.first}"
+      new_id = station_id(city_id, split_key)
+      station_groups[split_key] = station.merge(
+        "coordinates" => ids.flat_map { |id| station["lineCoordinates"][id] },
+        "lineCoordinates" => station["lineCoordinates"].select { |id, _points| ids.include?(id) },
+        "lineIDs" => Set.new(ids)
+      )
+      ids.each do |id|
+        line = lines_by_id.fetch(id)
+        line["servicePatterns"] = line["servicePatterns"].map { |pattern| pattern.map { |stop| stop == old_id ? new_id : stop } }
+        line["serviceVariants"].each do |variant|
+          variant["stationIDs"] = variant["stationIDs"].map { |stop| stop == old_id ? new_id : stop }
+        end
+      end
+    end
+    kept = station["lineCoordinates"].select { |id, _points| keeper.include?(id) }
+    station_groups[key] = station.merge(
+      "coordinates" => kept.values.flatten(1),
+      "lineCoordinates" => kept,
+      "lineIDs" => Set.new(keeper)
+    )
+  end
+end
+
+# Line IDs grouped so each is within `limit` metres of another in its group, each group sorted.
+def clusters_within(points, limit)
+  points.keys.sort.each_with_object([]) do |id, clusters|
+    near = clusters.select { |ids| ids.any? { |other| meters_between(points[id], points[other]) <= limit } }
+    near.each { |ids| clusters.delete(ids) }
+    clusters << (near.flatten + [id]).sort
+  end
+end
+
 def build_interchanges(city, city_id, station_groups)
   (city[:interchanges] || []).map do |link|
     from_key = normalized_station_name(link[:at] || link.fetch(:from))
@@ -1508,6 +1701,15 @@ def build_network(city_id, city, source)
   passenger_relations, evidence_only_relations = relations.partition do |relation|
     passenger_station_members(relation, elements_by_key).any?
   end
+  # Heavy rail no allowlist claims never enters the city, and its stops (a TRA service's run the
+  # length of Taiwan) would size the boundary query to a whole island.
+  candidate_stops = passenger_relations.flat_map do |relation|
+    next [] unless URBAN_ROUTE_MODES.include?(relation.dig("tags", "route")) || relation_claimed_by_network?(city, relation)
+
+    passenger_station_members(relation, elements_by_key).map { |_member, element, _name| element_coordinate(element, nodes) }
+  end.compact
+  areas = city_areas(city_id, city, candidate_stops)
+  home = home_area(city_id, city, areas)
   # An express that says so only in its `service` tag has no name to join its line by, and its ref
   # can name two lines at once. Built as a line, it becomes one of its own (晨曦特快), and its
   # non-stop hops reach the routing graph. So it waits until the lines exist, then joins its own.
@@ -1528,6 +1730,9 @@ def build_network(city_id, city, source)
     "leftOut" => ambiguous_variants.map { |relation| relation["id"].to_s }.sort
   }
   service_pattern_decisions = []
+  location_decisions = []
+  location_owned_relation_ids = Set.new
+  line_modes = {}
 
   station_groups = {}
   lines = groups.zip(same_corridor_groups).each_with_index.map do |(profiles, same_corridor), group_index|
@@ -1536,16 +1741,34 @@ def build_network(city_id, city, source)
     canonical_network = canonical[:network].empty? ? "unknown" : canonical[:network]
     # Drop lines that belong to another city's system (pulled in via the bbox / a cross-border
     # transfer station). Skipping the group here means its line and its not-shared stations are
-    # never emitted, and a shared transfer station keeps only this city's line IDs.
-    next unless city_owns_line?(
-      city,
-      canonical_network,
-      canonical[:name],
-      mode: canonical[:relation].dig("tags", "route")
-    )
+    # never emitted, and a shared transfer station keeps only this city's line IDs. The decision is
+    # the group's, over the stops of all its relations, so a short-turn is never judged apart from
+    # its line.
+    mode = canonical[:relation].dig("tags", "route")
+    relation_ids = direction_relations.map { |relation| relation["id"].to_s }.sort
+    excluded = (city[:excluded_lines] || []).include?(canonical[:name])
+    claimed = !excluded && network_claims_line?(city, canonical_network, mode: mode)
+    unless claimed
+      home_stops, stops = home_stop_count(direction_relations, elements_by_key, nodes, home)
+      refusal = excluded ? "excluded" : location_refusal(mode, home_stops, stops, direction_relations, ways)
+      unless refusal == "notUrban" || (refusal == "fewHomeStops" && home_stops.zero?)
+        location_decisions << {
+          "name" => canonical[:name],
+          "networkIdentity" => canonical_network,
+          "decision" => refusal || "owned",
+          "homeStops" => home_stops,
+          "stops" => stops,
+          "relationIDs" => relation_ids
+        }
+      end
+      next if refusal
+
+      location_owned_relation_ids.merge(relation_ids)
+    end
     route_reference = canonical_route_reference(profiles, canonical)
     key = [canonical_network, route_reference.empty? ? normalized(canonical[:name]) : route_reference].join("|")
     id = line_id(city_id, key)
+    line_modes[id] ||= mode
     all_selected_relations, service_pattern_count, pattern_decisions, extra_geometry_ways, variant_kinds =
       select_service_relations(direction_relations, elements_by_key, ways)
     service_pattern_decisions.concat(pattern_decisions.map { |decision| decision.merge("logicalLineID" => id) })
@@ -1687,6 +1910,16 @@ def build_network(city_id, city, source)
     base["servicePatternCount"] = base["selectedSourceRelationIDs"].length
     base
   end
+  split_distant_namesakes!(city_id, station_groups, lines, line_modes)
+
+  # The published name of a line OSM leaves unnamed or names in English only. Keyed by the name the
+  # import would otherwise show, so an override fails once OSM names the line itself.
+  (city[:line_names] || {}).each do |imported, published|
+    line = lines.find { |candidate| candidate["name"] == imported }
+    fail_with("#{city[:name]} renamed line is absent: #{imported}") if line.nil?
+    line["name"] = published.fetch(:name)
+    line["nameEn"] = published[:name_en] if published.key?(:name_en)
+  end
 
   # Lines on their own, higher tariff. The app rides one only where it saves real time, and says
   # so where it does.
@@ -1700,7 +1933,7 @@ def build_network(city_id, city, source)
 
   routed_groups = station_groups.reject { |_name_key, station| station["lineIDs"].empty? }
   cities = station_cities(
-    city_id,
+    areas,
     city,
     routed_groups.to_h { |name_key, station| [station_id(city_id, name_key), average_coordinate(station)] }
   )
@@ -1723,9 +1956,16 @@ def build_network(city_id, city, source)
   lines.each { |line| line["stationIDs"] = station_ids_by_line[line["id"]] }
   emitted_source_relation_ids = lines.flat_map { |line| line["sourceRelationIDs"] }.to_set
   # Only own-city relations are expected to be emitted; relations rejected as belonging to
-  # another city's system (see city_owns_line?) are intentionally absent and must not fail.
+  # another city's system (see network_claims_line? and location_refusal) or named in
+  # `excluded_lines` are intentionally absent and must not fail.
+  excluded_relation_ids = location_decisions
+    .select { |decision| decision["decision"] == "excluded" }
+    .flat_map { |decision| decision["relationIDs"] }.to_set
   missing_passenger_relations = passenger_relations.select do |relation|
-    !emitted_source_relation_ids.include?(relation["id"].to_s) && relation_owned_by_city?(city, relation)
+    id = relation["id"].to_s
+    next false if emitted_source_relation_ids.include?(id) || excluded_relation_ids.include?(id)
+
+    location_owned_relation_ids.include?(id) || relation_claimed_by_network?(city, relation)
   end
   fail_with(
     "#{city[:name]} omitted passenger-bearing relations: " \
@@ -1783,9 +2023,19 @@ def build_network(city_id, city, source)
         "reason" => "noPassengerStopsOrPlatforms"
       }
     end,
-    "servicePatternSelections" => service_pattern_decisions
+    "servicePatternSelections" => service_pattern_decisions,
+    # Every line the allowlist does not claim that has a stop in the city, and what became of it.
+    "locationDecisions" => location_decisions
   )
-  [network, report]
+  wikidata_relations = passenger_relations.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |relation, result|
+    relation.dig("tags", "wikidata").to_s.split(";").map(&:strip).grep(/\AQ\d+\z/).each do |qid|
+      result[qid] << relation["id"].to_s
+    end
+  end
+  left_out_on_purpose = location_decisions
+    .select { |decision| DELIBERATE_REFUSALS.include?(decision["decision"]) }
+    .flat_map { |decision| decision["relationIDs"] }
+  [network, report, { wikidata_relations: wikidata_relations, left_out_on_purpose: left_out_on_purpose }]
 end
 
 def self_test
@@ -1795,32 +2045,72 @@ def self_test
   fail_with("unbuilt station false-positive test failed") if unbuilt_station_name?("城市规划展览馆")
   fail_with("unbuilt station parenthetical false-positive test failed") if unbuilt_station_name?("城市规划展览馆（A口）")
   fail_with("unbuilt station normal-name test failed") if unbuilt_station_name?("天通苑")
-  fail_with("own-network line should be kept") unless city_owns_line?(CITIES.fetch("4403"), normalized("深圳地铁"), "地铁 1号线")
-  fail_with("Hong Kong MTR line must not enter Shenzhen") if city_owns_line?(CITIES.fetch("4403"), normalized("港鐵 MTR"), "港鐵東鐵綫")
-  fail_with("Suzhou line must not enter Shanghai") if city_owns_line?(CITIES.fetch("3100"), normalized("苏州轨道交通"), "11号线")
-  fail_with("Shenzhen line must not enter Guangzhou") if city_owns_line?(CITIES.fetch("4401"), normalized("深圳地铁"), "深圳地铁13号线")
-  fail_with("Guangdong intercity should be kept") unless city_owns_line?(
-    CITIES.fetch("4401"), normalized("珠三角城际"), "广惠城际"
-  )
-  fail_with("Greater Bay intercity should be kept") unless city_owns_line?(
-    CITIES.fetch("4406"), normalized("粤港澳大湾区城际铁路"), "广清城际"
+  fail_with("own-network line should be kept") unless network_claims_line?(CITIES.fetch("4403"), normalized("深圳地铁"))
+  fail_with("Hong Kong MTR line must not enter Shenzhen") if network_claims_line?(CITIES.fetch("4403"), normalized("港鐵 MTR"))
+  fail_with("Suzhou line must not enter Shanghai") if network_claims_line?(CITIES.fetch("3100"), normalized("苏州轨道交通"))
+  fail_with("Shenzhen line must not enter Guangzhou") if network_claims_line?(CITIES.fetch("4401"), normalized("深圳地铁"))
+  fail_with("Guangdong intercity should be kept") unless network_claims_line?(CITIES.fetch("4401"), normalized("珠三角城际"))
+  fail_with("Greater Bay intercity should be kept") unless network_claims_line?(
+    CITIES.fetch("4406"), normalized("粤港澳大湾区城际铁路")
   )
   # Intercity is admitted by name, not by opening `route=train`: mainline and high-speed
   # railway sharing the same bounding box must still be rejected.
-  fail_with("national rail must not enter Guangzhou") if city_owns_line?(
-    CITIES.fetch("4401"), normalized("中国铁路"), "广深铁路", mode: "train"
+  fail_with("national rail must not enter Guangzhou") if network_claims_line?(
+    CITIES.fetch("4401"), normalized("中国铁路"), mode: "train"
   )
-  fail_with("high-speed rail must not enter Guangzhou") if city_owns_line?(
-    CITIES.fetch("4401"), normalized("台灣高鐵"), "高鐵", mode: "train"
+  fail_with("high-speed rail must not enter Guangzhou") if network_claims_line?(
+    CITIES.fetch("4401"), normalized("台灣高鐵"), mode: "train"
   )
-  fail_with("own untagged line should be kept") unless city_owns_line?(CITIES.fetch("3100"), "unknown", "磁浮线")
-  fail_with("foreign untagged line must be dropped") if city_owns_line?(CITIES.fetch("4401"), "unknown", "华为松山湖有轨电车1号线")
-  fail_with("untagged urban line should be kept under allow_unknown") unless city_owns_line?(
-    CITIES.fetch("6501"), "unknown", "1号线", mode: "subway"
+  fail_with("untagged urban line should be kept under allow_unknown") unless network_claims_line?(
+    CITIES.fetch("6501"), "unknown", mode: "subway"
   )
-  fail_with("untagged heavy rail must not enter a city") if city_owns_line?(
-    CITIES.fetch("6501"), "unknown", "13/14", mode: "train"
-  )
+  fail_with("untagged heavy rail must not enter a city") if network_claims_line?(CITIES.fetch("6501"), "unknown", mode: "train")
+  fail_with("an untagged line was claimed without allow_unknown") if network_claims_line?(CITIES.fetch("3702"), "unknown", mode: "subway")
+
+  # Ownership by location. A unit square stands in for the city; its edges are [lat, lon] pairs.
+  square = [
+    { "name" => "青岛市" },
+    { "minlat" => 0.0, "maxlat" => 1.0, "minlon" => 0.0, "maxlon" => 1.0 },
+    [[[0.0, 0.0], [0.0, 1.0]], [[0.0, 1.0], [1.0, 1.0]], [[1.0, 1.0], [1.0, 0.0]], [[1.0, 0.0], [0.0, 0.0]]]
+  ]
+  fail_with("a point inside the city was placed outside it") unless area_contains?(square, 0.5, 0.5)
+  fail_with("a point outside the city was placed inside it") if area_contains?(square, 1.5, 0.5)
+  neighbour = [{ "name" => "潍坊市" }, square[1], square[2]]
+  unless home_area("3702", { name: "Qingdao" }, [neighbour, square]).equal?(square)
+    fail_with("the home boundary was not found by the city's name")
+  end
+  rail = { "id" => 1, "nodes" => [1, 2], "tags" => { "railway" => "tram" } }
+  road = { "id" => 2, "nodes" => [2, 3], "tags" => { "highway" => "primary" } }
+  track_ways = { 1 => rail, 2 => road }
+  on_rails = { "id" => 9, "tags" => { "route" => "tram" }, "members" => [{ "type" => "way", "ref" => 1, "role" => "" }] }
+  fail_with("a line with most stops in the city was refused") unless location_refusal("tram", 2, 3, [on_rails], track_ways).nil?
+  fail_with("half the stops was taken for most") unless location_refusal("tram", 1, 2, [on_rails], track_ways) == "fewHomeStops"
+  fail_with("a neighbour's line entered the city") unless location_refusal("subway", 0, 20, [on_rails], track_ways) == "fewHomeStops"
+  fail_with("heavy rail was owned by location") unless location_refusal("train", 3, 3, [on_rails], track_ways) == "notUrban"
+  airside = on_rails.merge("tags" => { "route" => "light_rail", "access" => "permit" })
+  unless location_refusal("light_rail", 2, 2, [airside], track_ways) == "restrictedAccess"
+    fail_with("an airside people mover was owned")
+  end
+  trackless = on_rails.merge("members" => [{ "type" => "way", "ref" => 2, "role" => "" }])
+  fail_with("a trackless 智轨 was owned") unless location_refusal("tram", 7, 7, [trackless], track_ways) == "noRailTrack"
+  gondola = on_rails.merge("members" => [])
+  fail_with("a line with no track was owned") unless location_refusal("tram", 4, 4, [gondola], track_ways) == "noRailTrack"
+
+  # The Wikidata gate: only open, dated lines that OSM maps and no pack emits.
+  wikidata = {
+    "Q1" => { "name" => "2号线", "opened" => "2017-12-10", "closed" => false },
+    "Q2" => { "name" => "emitted", "opened" => "2010-01-01", "closed" => false },
+    "Q3" => { "name" => "future", "opened" => "2030-01-01", "closed" => false },
+    "Q4" => { "name" => "closed", "opened" => "2010-01-01", "closed" => true },
+    "Q5" => { "name" => "undated", "opened" => nil, "closed" => false },
+    "Q6" => { "name" => "unmapped", "opened" => "2010-01-01", "closed" => false },
+    "Q7" => { "name" => "campus", "opened" => "2010-01-01", "closed" => false }
+  }
+  relations_by_qid = { "Q1" => ["11"], "Q2" => %w[21 22], "Q3" => ["31"], "Q4" => ["41"], "Q5" => ["51"], "Q7" => ["71"] }
+  missing, unmapped = unimported_open_lines(wikidata, "2026-09-23", relations_by_qid, Set["22"], Set["71"])
+  unless missing == [["Q1", "2号线", ["11"]]] && unmapped == ["Q6"]
+    fail_with("the Wikidata gate judged the wrong lines: #{missing.inspect} #{unmapped.inspect}")
+  end
   fail_with("direction suffix line-name test failed") unless passenger_line_name(
     "name" => "Light Rail 505 (A → B)"
   ) == "Light Rail 505"
@@ -1828,6 +2118,8 @@ def self_test
   # "Light Rail 614P (Tuen Mun Ferry Pier" — cut mid-bracket by an arrow split — reached the app.
   fail_with("English line-name reduction test failed") unless
     LineNames.clean("Light Rail 614P (Tuen Mun Ferry Pier → Siu Hong)") == "Light Rail 614P"
+  fail_with("a stray trailing backslash survived") unless
+    LineNames.clean("Hong Kong Tramways Shau Kei Wan to Happy Valley\\") == "Hong Kong Tramways Shau Kei Wan to Happy Valley"
   fail_with("nested-bracket run annotation test failed") unless
     LineNames.clean("呼和浩特地铁1号线（坝堰（机场）→伊利健康谷）") == "呼和浩特地铁1号线"
   fail_with("hyphenated line name must survive") unless
@@ -2208,6 +2500,25 @@ def self_test
     fail_with("a street transfer was not measured between its two lines' platforms: #{street.inspect}")
   end
 
+  # The 光谷大道 shape: a metro station and a tram stop of the same name ~4.5 km apart, and a second
+  # metro line 300 m from the first, which is a real interchange and stays one station.
+  namesakes = {
+    "k" => {
+      "name" => "甲", "nameEn" => nil, "coordinates" => [],
+      "lineCoordinates" => { "metro" => [[30.5, 114.4]], "metro2" => [[30.5027, 114.4]], "tram" => [[30.54, 114.4]] },
+      "lineIDs" => Set["metro", "metro2", "tram"]
+    }
+  }
+  namesake_lines = %w[metro metro2 tram].map do |id|
+    { "id" => id, "servicePatterns" => [[station_id("0000", "k"), "x"]], "serviceVariants" => [] }
+  end
+  split_distant_namesakes!("0000", namesakes, namesake_lines, "metro" => "subway", "metro2" => "subway", "tram" => "tram")
+  tram_stop = station_id("0000", "k|tram")
+  unless namesakes.fetch("k")["lineIDs"] == Set["metro", "metro2"] && namesakes.fetch("k|tram")["lineIDs"] == Set["tram"] &&
+         namesake_lines.last["servicePatterns"] == [[tram_stop, "x"]] && namesake_lines.first["servicePatterns"] == [[station_id("0000", "k"), "x"]]
+    fail_with("a distant namesake was not split from the metro station: #{namesakes.keys.inspect}")
+  end
+
   puts "OSM metro importer self-test ok"
 end
 
@@ -2223,15 +2534,35 @@ FileUtils.mkdir_p(OUTPUT_DIR)
 FileUtils.mkdir_p(REPORT_DIR)
 reports = []
 networks_by_city = {}
+wikidata_relations = Hash.new { |hash, key| hash[key] = [] }
+left_out_on_purpose = Set.new
 city_ids.each do |city_id|
   city = CITIES.fetch(city_id)
   source = fetch_source(city_id, city, refresh: !!refresh)
-  network, report = build_network(city_id, city, source)
+  network, report, audit = build_network(city_id, city, source)
   reports << report
   networks_by_city[city_id] = network
+  audit[:wikidata_relations].each { |qid, ids| wikidata_relations[qid].concat(ids) }
+  left_out_on_purpose.merge(audit[:left_out_on_purpose])
 end
 # After every network is built, because a cross-pack interchange needs both halves' coordinates.
 apply_cross_network_interchanges!(networks_by_city, city_ids)
+report_output = File.join(REPORT_DIR, "canonicalization_report.json")
+File.write(report_output, "#{JSON.pretty_generate({ "cities" => reports })}\n")
+puts "Canonicalization report -> #{report_output}"
+# Only a full run: a line may ship in a pack this run did not build.
+if city_ids.sort == CITIES.keys.sort
+  emitted = networks_by_city.values.flat_map { |network| network["lines"].flat_map { |line| line["sourceRelationIDs"] } }.to_set
+  snapshot = networks_by_city.values.map { |network| network["sourceSnapshot"] }.max
+  missing, unmapped = unimported_open_lines(
+    wikidata_lines(refresh: !!refresh), snapshot, wikidata_relations, emitted, left_out_on_purpose
+  )
+  puts "Wikidata: #{unmapped.length} open lines have no stop-bearing OSM relation in any city's cache"
+  fail_with(
+    "open lines mapped in OSM but in no pack: " +
+    missing.map { |qid, name, ids| "#{name} (#{qid}; relations #{ids.join(", ")})" }.join("; ")
+  ) unless missing.empty?
+end
 city_ids.each do |city_id|
   network = networks_by_city.fetch(city_id)
   output = File.join(OUTPUT_DIR, "#{city_id}.json")
@@ -2239,6 +2570,3 @@ city_ids.each do |city_id|
   points = network["lines"].sum { |line| line["paths"].sum(&:length) }
   puts "#{CITIES.fetch(city_id)[:name]}: lines=#{network["lines"].length} stations=#{network["stations"].length} points=#{points} -> #{output}"
 end
-report_output = File.join(REPORT_DIR, "canonicalization_report.json")
-File.write(report_output, "#{JSON.pretty_generate({ "cities" => reports })}\n")
-puts "Canonicalization report -> #{report_output}"

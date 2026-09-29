@@ -9,11 +9,11 @@
   "maxMatchMetres": 300.0,
   "stats": {
     "entranceCount": 937,
-    "boundCount": 930,
-    "unmatchedCount": 7,
+    "boundCount": 934,
+    "unmatchedCount": 3,
     "ambiguousCount": 0,
-    "stationsWithEntrances": 229,
-    "networkStationCount": 248
+    "stationsWithEntrances": 231,
+    "networkStationCount": 263
   },
   "stations": {
     "0060bbbf0da8a0d3": [
@@ -2289,6 +2289,20 @@
         "ref": "D",
         "name": "凤城五路-D口",
         "wheelchair": "yes"
+      }
+    ],
+    "455c152fdb2ec8ec": [
+      {
+        "osmNodeID": "14156261616",
+        "latitude": 34.1667417,
+        "longitude": 108.8670845,
+        "ref": "A"
+      },
+      {
+        "osmNodeID": "14156261617",
+        "latitude": 34.1663581,
+        "longitude": 108.8670884,
+        "ref": "B"
       }
     ],
     "4589af6cbfdb8494": [
@@ -7550,6 +7564,22 @@
         "longitude": 109.0248428,
         "ref": "C",
         "name": "植物园-C口",
+        "wheelchair": "yes"
+      }
+    ],
+    "fc705972d96e43ba": [
+      {
+        "osmNodeID": "14152789227",
+        "latitude": 34.1730729,
+        "longitude": 108.8695071,
+        "ref": "A",
+        "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "14152789228",
+        "latitude": 34.1730816,
+        "longitude": 108.8688546,
+        "ref": "B",
         "wheelchair": "yes"
       }
     ],

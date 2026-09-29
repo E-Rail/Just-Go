@@ -9,11 +9,11 @@
   "maxMatchMetres": 300.0,
   "stats": {
     "entranceCount": 332,
-    "boundCount": 319,
+    "boundCount": 318,
     "unmatchedCount": 11,
-    "ambiguousCount": 2,
+    "ambiguousCount": 3,
     "stationsWithEntrances": 89,
-    "networkStationCount": 293
+    "networkStationCount": 351
   },
   "stations": {
     "0305a37edb2fbdd1": [
@@ -200,14 +200,6 @@
         "latitude": 30.4896559,
         "longitude": 114.4929684,
         "ref": "C"
-      }
-    ],
-    "25f0d04b061a4bbb": [
-      {
-        "osmNodeID": "12466967859",
-        "latitude": 30.4967989,
-        "longitude": 114.4112275,
-        "ref": "A1"
       }
     ],
     "28e3ced94343ea67": [
@@ -805,6 +797,14 @@
         "longitude": 114.2188443
       }
     ],
+    "6405b4e5a8883148": [
+      {
+        "osmNodeID": "9311585495",
+        "latitude": 30.5069,
+        "longitude": 114.4128768,
+        "ref": "A1"
+      }
+    ],
     "642cb1a22b9206a0": [
       {
         "osmNodeID": "5227950244",
@@ -995,12 +995,6 @@
       }
     ],
     "79151f93005379a7": [
-      {
-        "osmNodeID": "9311585495",
-        "latitude": 30.5069,
-        "longitude": 114.4128768,
-        "ref": "A1"
-      },
       {
         "osmNodeID": "9311585492",
         "latitude": 30.506827,

@@ -824,19 +824,19 @@ module OSSDataValidators
     OSM_ENTRANCE_PACK_EXPECTATIONS = {
       "1200" => { stations: 110, exits: 348, accessibility: 5, surveyedNotStepFree: 1, network: 240 },
       "3100" => { stations: 369, exits: 1435, accessibility: 56, surveyedNotStepFree: 128, network: 471 },
-      "3201" => { stations: 127, exits: 449, accessibility: 11, surveyedNotStepFree: 3, network: 248 },
+      "3201" => { stations: 128, exits: 448, accessibility: 11, surveyedNotStepFree: 3, network: 267 },
       "3205" => { stations: 53, exits: 230, accessibility: 2, surveyedNotStepFree: 14, network: 235 },
       "3301" => { stations: 262, exits: 1333, accessibility: 10, surveyedNotStepFree: 18, network: 270 },
-      "4201" => { stations: 89, exits: 319, accessibility: 7, surveyedNotStepFree: 10, network: 293 },
+      "4201" => { stations: 89, exits: 318, accessibility: 7, surveyedNotStepFree: 10, network: 351 },
       # Metro/intercity concourse pairs are declared in-station interchanges (see
       # `build_interchanges`), not merged into one node, so each half's doors match its own
       # platform. Two exits at 广州白云 are in range of both halves and are reported and dropped
       # rather than guessed at.
       "4401" => { stations: 333, exits: 1265, accessibility: 40, surveyedNotStepFree: 81, network: 434 },
       "4403" => { stations: 330, exits: 1539, accessibility: 29, surveyedNotStepFree: 44, network: 380 },
-      "5000" => { stations: 87, exits: 306, accessibility: 3, surveyedNotStepFree: 8, network: 273 },
+      "5000" => { stations: 87, exits: 306, accessibility: 3, surveyedNotStepFree: 8, network: 288 },
       "5101" => { stations: 192, exits: 805, accessibility: 10, surveyedNotStepFree: 15, network: 403 },
-      "6101" => { stations: 229, exits: 930, accessibility: 166, surveyedNotStepFree: 456, network: 248 }
+      "6101" => { stations: 231, exits: 934, accessibility: 167, surveyedNotStepFree: 457, network: 263 }
     }.freeze
 
     def validate_city_expectations!(city_id, pack, network)
@@ -847,15 +847,15 @@ module OSSDataValidators
         # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
         # means the entrance import silently stopped matching.
         {
-          "networkStations" => 450,
-          "matchedStations" => { "covered" => 450, "total" => 450 },
-          "accessibility" => { "covered" => 43, "total" => 450 },
+          "networkStations" => 451,
+          "matchedStations" => { "covered" => 451, "total" => 451 },
+          "accessibility" => { "covered" => 43, "total" => 451 },
           # 77 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
-          "staticSchedules" => { "covered" => 0, "total" => 450 },
-          "liveArrivals" => { "covered" => 0, "total" => 450 },
-          "externalLayouts" => { "covered" => 0, "total" => 450 },
-          "licensedMedia" => { "covered" => 0, "total" => 450 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 450 }
+          "staticSchedules" => { "covered" => 0, "total" => 451 },
+          "liveArrivals" => { "covered" => 0, "total" => 451 },
+          "externalLayouts" => { "covered" => 0, "total" => 451 },
+          "licensedMedia" => { "covered" => 0, "total" => 451 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 451 }
         }
       when "7101"
         # data.taipei covers the Taipei Metro proper; the New Taipei light-rail and branch lines
@@ -918,10 +918,17 @@ module OSSDataValidators
           "verifiedTransferContexts" => { "covered" => 0, "total" => total }
         }
       else
+        # Every station an MTR line serves; the trams' stops have no data.gov.hk record.
+        published_line_ids = stations.flat_map do |station|
+          station.fetch("liveArrivalReferences").map { |reference| reference.fetch("lineID") }
+        end.uniq
         missing = network.fetch("stations").reject do |canonical|
-          stations.any? { |station| station["stationID"] == canonical["id"] }
+          stations.any? { |station| station["stationID"] == canonical["id"] } ||
+            (canonical.fetch("lineIDs") & published_line_ids).empty?
         end
-        fail_validation("Hong Kong pack must cover every canonical station") unless missing.empty?
+        fail_validation("Hong Kong pack must cover every MTR station") unless missing.empty?
+        tram_only = network.fetch("stations").length - stations.length
+        fail_validation("Hong Kong has #{tram_only} stations outside MTR data, expected 81") unless tram_only == 81
         renamed = stations.find { |station| station["stationNameEn"] == "Hoi Wong Road" }
         unless renamed && renamed["stationName"] == "海皇路" &&
             renamed["aliases"].include?("Tuen Mun Swimming Pool") &&
@@ -937,14 +944,14 @@ module OSSDataValidators
           fail_validation("Hong Kong Racecourse canonical/live reference is missing")
         end
         {
-          "networkStations" => 162,
-          "matchedStations" => { "covered" => 162, "total" => 162 },
-          "accessibility" => { "covered" => 98, "total" => 162 },
-          "staticSchedules" => { "covered" => 0, "total" => 162 },
-          "liveArrivals" => { "covered" => 162, "total" => 162 },
-          "externalLayouts" => { "covered" => 0, "total" => 162 },
-          "licensedMedia" => { "covered" => 0, "total" => 162 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 162 }
+          "networkStations" => 243,
+          "matchedStations" => { "covered" => 162, "total" => 243 },
+          "accessibility" => { "covered" => 98, "total" => 243 },
+          "staticSchedules" => { "covered" => 0, "total" => 243 },
+          "liveArrivals" => { "covered" => 162, "total" => 243 },
+          "externalLayouts" => { "covered" => 0, "total" => 243 },
+          "licensedMedia" => { "covered" => 0, "total" => 243 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 243 }
         }
       end
       fail_validation("#{city_id} exact coverage metrics changed") unless pack["coverage"] == expected

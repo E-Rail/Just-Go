@@ -15,8 +15,11 @@ SERVICE_VARIANT_KINDS = %w[大站快车 直达快车 大站车 直达车 区间�
 PREMIUM_FARE_LINES = {
   "1100" => %w[大兴机场线 首都机场线],
   "3100" => %w[磁浮线],
+  "4301" => %w[磁浮快线],
   "8100" => %w[機場快綫]
 }.freeze
+# The importer's MAX_INTERCHANGE_METERS["outOfStation"], past which same-named stops are split.
+NAMESAKE_MIN_METERS = 1_000
 paths = Dir.glob(File.join(ROOT, "Just-Go", "Resources", "MetroNetworks", "*.json")).sort
 abort "metro network validation failed: no assets" if paths.empty?
 city_service_source = File.read(File.join(ROOT, "Just-Go", "Services", "Data", "CityService.swift"))
@@ -81,7 +84,17 @@ paths.each do |path|
   station_ids = stations.map { |station| station.fetch("id") }.to_set
   station_names = stations.map { |station| normalized_station_name(station.fetch("name")) }
   abort "#{city}: passenger station name missing" if station_names.any?(&:empty?)
-  abort "#{city}: duplicate normalized passenger station" unless station_names.uniq.length == station_names.length
+  # Two stations may share a name only when they are different places: no line in common, and
+  # farther apart than the longest interchange the importer accepts (Wuhan's two 光谷大道 are 4.7 km
+  # apart). Anything closer is one station the import failed to fuse.
+  stations.group_by { |station| normalized_station_name(station.fetch("name")) }.each_value do |namesakes|
+    namesakes.combination(2).each do |left, right|
+      apart = point_segment_distance(left, right, right)
+      next if (left.fetch("lineIDs") & right.fetch("lineIDs")).empty? && apart > NAMESAKE_MIN_METERS
+
+      abort "#{city}: duplicate normalized passenger station #{left.fetch("name")} (#{apart.round}m apart)"
+    end
+  end
   line_ids = network.fetch("lines").map { |line| line.fetch("id") }.to_set
   logical_line_ids = network.fetch("lines").map { |line| line.fetch("logicalLineID") }
   abort "#{city}: duplicate canonical logical-line ID" unless logical_line_ids.uniq.length == logical_line_ids.length

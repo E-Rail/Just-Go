@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 248,
+    "networkStations": 263,
     "matchedStations": {
-      "covered": 229,
-      "total": 248
+      "covered": 231,
+      "total": 263
     },
     "accessibility": {
-      "covered": 166,
-      "total": 248
+      "covered": 167,
+      "total": 263
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 248
+      "total": 263
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 248
+      "total": 263
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 248
+      "total": 263
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 248
+      "total": 263
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 248
+      "total": 263
     }
   },
   "stations": [
@@ -5388,6 +5388,52 @@
           "longitude": 108.946249,
           "isAccessible": false,
           "stepFree": "no",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "455c152fdb2ec8ec",
+      "stationName": "时代广场",
+      "stationNameEn": "Shidaiguangchang",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14156261616",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 34.166742,
+          "longitude": 108.867085,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14156261617",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 34.166358,
+          "longitude": 108.867088,
+          "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -17756,6 +17802,68 @@
           "longitude": 109.024993,
           "isAccessible": false,
           "stepFree": "no",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "fc705972d96e43ba",
+      "stationName": "紫薇田园都市",
+      "stationNameEn": "Ziweitianyuandushi",
+      "aliases": [
+
+      ],
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "B"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14152789227",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 34.173073,
+          "longitude": 108.869507,
+          "isAccessible": false,
+          "stepFree": "no",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14152789228",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 34.173082,
+          "longitude": 108.868855,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         }
       ]

@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 293,
+    "networkStations": 351,
     "matchedStations": {
       "covered": 89,
-      "total": 293
+      "total": 351
     },
     "accessibility": {
       "covered": 7,
-      "total": 293
+      "total": 351
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 293
+      "total": 351
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 293
+      "total": 351
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 293
+      "total": 351
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 293
+      "total": 351
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 293
+      "total": 351
     }
   },
   "stations": [
@@ -622,42 +622,6 @@
           "kind": "exit",
           "latitude": 30.489656,
           "longitude": 114.492968,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        }
-      ]
-    },
-    {
-      "stationID": "25f0d04b061a4bbb",
-      "stationName": "关山大道",
-      "stationNameEn": "Guanshan Boulevard",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
-      ],
-      "stationAccessPoints": [
-        {
-          "id": "osm-12466967859",
-          "name": "A1",
-          "kind": "exit",
-          "latitude": 30.496799,
-          "longitude": 114.411228,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -2183,6 +2147,42 @@
       ]
     },
     {
+      "stationID": "6405b4e5a8883148",
+      "stationName": "华中大",
+      "stationNameEn": "Huazhong University of Science and Technology",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-9311585495",
+          "name": "A1",
+          "kind": "exit",
+          "latitude": 30.5069,
+          "longitude": 114.412877,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "642cb1a22b9206a0",
       "stationName": "东亭",
       "stationNameEn": "Dongting",
@@ -2802,16 +2802,6 @@
           "kind": "exit",
           "latitude": 30.507466,
           "longitude": 114.415932,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9311585495",
-          "name": "A1",
-          "kind": "exit",
-          "latitude": 30.5069,
-          "longitude": 114.412877,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

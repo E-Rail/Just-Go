@@ -327,7 +327,7 @@ class TrackGeometryTest < Minitest::Test
   def test_the_pack_set_has_not_silently_shrunk
     # The denominator for everything below. If a pack is added or dropped this moves, and the
     # counts underneath it have to be re-read rather than merely re-passed.
-    assert_equal 8_648, MEASURED[:hops], "bundled hop count changed; re-read the pins below"
+    assert_equal 9_437, MEASURED[:hops], "bundled hop count changed; re-read the pins below"
   end
 
   def test_almost_every_hop_draws_real_track
@@ -338,7 +338,7 @@ class TrackGeometryTest < Minitest::Test
     # 城市副中心线's track now runs through three stops OSM lists out of order and the importer
     # leaves out (`unverified_stations`), so its hop stays a chord until they are ordered.
     assert_operator MEASURED[:chords], :<=, 8,
-                    "more hops lost their track geometry (was 7 of 8,648)"
+                    "more hops lost their track geometry (was 7 of 9,437)"
   end
 
   def test_legs_hold_together_at_their_joins
@@ -346,7 +346,7 @@ class TrackGeometryTest < Minitest::Test
     # A leg is one polyline, so a join gap is drawn as a straight segment through the station.
     # Under 1 m is a rounding artefact of two projections onto the same point.
     assert_operator gaps.count { |g| g > 1 }, :<=, 30,
-                    "more joins came apart (was 20 of 8,217)"
+                    "more joins came apart (was 21 of 8,974)"
     # The visible ones. This is the number the whole design exists for and it is zero: solving a
     # pattern as a chain rather than hop by hop means a break is only ever accepted when no chain
     # avoids it, and across the bundled data none has to be.
@@ -355,9 +355,10 @@ class TrackGeometryTest < Minitest::Test
   end
 
   def test_the_worst_join_has_not_got_worse
-    # 13.5 m, which is a way-to-way seam in the source data and not a chosen discontinuity. The
+    # 28.4 m, at 金地滨河国际 on 沈阳有轨电车5号线, whose track arrives as four polylines with ends
+    # 22–29 m apart: a way-to-way seam in the source data and not a chosen discontinuity. The
     # bound is set below the 50 m the test above calls visible, so this fails first.
     assert_operator MEASURED[:gaps].max, :<=, 40,
-                    "the widest join gap grew (was 13.5 m)"
+                    "the widest join gap grew (was 28.4 m)"
   end
 end

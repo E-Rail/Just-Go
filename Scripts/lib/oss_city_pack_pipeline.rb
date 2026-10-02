@@ -478,8 +478,13 @@ module OSSCityPackPipeline
         raise BuildError, "Hong Kong matched #{stations.length} canonical stations; expected 162"
       end
 
+      # A station only lines data.gov.hk does not publish serve (Hong Kong Tramways) has no MTR
+      # record to match, and is not a gap in this source.
+      published_line_ids = records.values.flat_map do |record|
+        record.fetch("liveArrivalReferences").map { |reference| reference.fetch("lineID") }
+      end.uniq
       unmatched = network.fetch("stations").reject do |station|
-        records.key?(station.fetch("id"))
+        records.key?(station.fetch("id")) || (station.fetch("lineIDs") & published_line_ids).empty?
       end
       unless unmatched.empty?
         raise BuildError, "unexpected Hong Kong canonical gaps: #{unmatched.map { |station| station["nameEn"] }.inspect}"

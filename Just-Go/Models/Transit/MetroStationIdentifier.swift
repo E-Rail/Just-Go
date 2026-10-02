@@ -26,4 +26,15 @@ enum MetroStationIdentifier {
         }
         return String(identifier[identifier.index(after: separator)...])
     }
+
+    /// Whether a record found by *name* may stand for this station. Names repeat across a network:
+    /// 顺义 on 15号线 and on 通密线 are 1.1 km apart, and Wuhan's 光谷大道 tram stop is 4.7 km from the
+    /// metro station. A record bound to another network station describes that station, and its
+    /// doors are worse than none. A place or a provider's stop is not a network station, and a
+    /// record with no station ID is bound to nothing, so those still match by name.
+    static func nameMatch(forStationID stationID: String?, mayUseRecordOf recordStationID: String?) -> Bool {
+        guard let stationID, cityID(of: stationID) != nil,
+              let recordStationID, !recordStationID.isEmpty else { return true }
+        return canonical(recordStationID) == canonical(stationID)
+    }
 }

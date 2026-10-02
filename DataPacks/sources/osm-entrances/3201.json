@@ -9,11 +9,11 @@
   "maxMatchMetres": 300.0,
   "stats": {
     "entranceCount": 457,
-    "boundCount": 449,
+    "boundCount": 448,
     "unmatchedCount": 8,
-    "ambiguousCount": 0,
-    "stationsWithEntrances": 127,
-    "networkStationCount": 248
+    "ambiguousCount": 1,
+    "stationsWithEntrances": 128,
+    "networkStationCount": 267
   },
   "stations": {
     "005c57892b9ebb88": [
@@ -625,6 +625,20 @@
         "longitude": 118.5916016
       }
     ],
+    "2d52ff06bfbd8888": [
+      {
+        "osmNodeID": "8039975275",
+        "latitude": 32.0046239,
+        "longitude": 118.728225,
+        "name": "奥体东#1"
+      },
+      {
+        "osmNodeID": "8039975278",
+        "latitude": 32.0052545,
+        "longitude": 118.728737,
+        "name": "奥体东#2"
+      }
+    ],
     "2d5fd82999f69be6": [
       {
         "osmNodeID": "8001768655",
@@ -867,28 +881,10 @@
     ],
     "4bc21bd3ea852a6d": [
       {
-        "osmNodeID": "7246781838",
-        "latitude": 32.0051473,
-        "longitude": 118.7298229,
-        "name": "奥体东#4"
-      },
-      {
         "osmNodeID": "8039975272",
         "latitude": 32.003967,
         "longitude": 118.7288617,
         "name": "奥体东#3"
-      },
-      {
-        "osmNodeID": "8039975275",
-        "latitude": 32.0046239,
-        "longitude": 118.728225,
-        "name": "奥体东#1"
-      },
-      {
-        "osmNodeID": "8039975278",
-        "latitude": 32.0052545,
-        "longitude": 118.728737,
-        "name": "奥体东#2"
       },
       {
         "osmNodeID": "1361254820",

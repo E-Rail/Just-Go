@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 248,
+    "networkStations": 267,
     "matchedStations": {
-      "covered": 127,
-      "total": 248
+      "covered": 128,
+      "total": 267
     },
     "accessibility": {
       "covered": 11,
-      "total": 248
+      "total": 267
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 248
+      "total": 267
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 248
+      "total": 267
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 248
+      "total": 267
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 248
+      "total": 267
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 248
+      "total": 267
     }
   },
   "stations": [
@@ -1669,6 +1669,52 @@
       ]
     },
     {
+      "stationID": "2d52ff06bfbd8888",
+      "stationName": "奥体中心东门",
+      "stationNameEn": "奥体中心东门",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-8039975275",
+          "name": "奥体东#1",
+          "kind": "exit",
+          "latitude": 32.004624,
+          "longitude": 118.728225,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-8039975278",
+          "name": "奥体东#2",
+          "kind": "exit",
+          "latitude": 32.005255,
+          "longitude": 118.728737,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "2d5fd82999f69be6",
       "stationName": "宏运大道",
       "stationNameEn": "宏运大道",
@@ -2365,41 +2411,11 @@
           "source": "specificEntrance"
         },
         {
-          "id": "osm-7246781838",
-          "name": "奥体东#4",
-          "kind": "exit",
-          "latitude": 32.005147,
-          "longitude": 118.729823,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
           "id": "osm-8039975272",
           "name": "奥体东#3",
           "kind": "exit",
           "latitude": 32.003967,
           "longitude": 118.728862,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-8039975275",
-          "name": "奥体东#1",
-          "kind": "exit",
-          "latitude": 32.004624,
-          "longitude": 118.728225,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-8039975278",
-          "name": "奥体东#2",
-          "kind": "exit",
-          "latitude": 32.005255,
-          "longitude": 118.728737,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

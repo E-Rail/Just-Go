@@ -63,7 +63,7 @@ module LineNames
     value = strip_annotations(value)
     value = strip_terminus_pair(value)
     value = repair_brackets(value)
-    value = value.strip.sub(/\A地铁\s*/, "").sub(%r{[\s、,，/／-]+\z}, "").strip
+    value = value.strip.sub(/\A地铁\s*/, "").sub(%r{[\s、,，/／\\-]+\z}, "").strip
     value.empty? ? nil : value
   end
 

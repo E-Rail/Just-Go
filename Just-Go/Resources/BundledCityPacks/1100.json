@@ -16,34 +16,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 450,
+    "networkStations": 451,
     "matchedStations": {
-      "covered": 450,
-      "total": 450
+      "covered": 451,
+      "total": 451
     },
     "accessibility": {
       "covered": 43,
-      "total": 450
+      "total": 451
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 450
+      "total": 451
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 450
+      "total": 451
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 450
+      "total": 451
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 450
+      "total": 451
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 450
+      "total": 451
     }
   },
   "stations": [
@@ -9378,6 +9378,48 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-1808536941",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 40.130577,
+          "longitude": 116.65633,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2800286835",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 40.130141,
+          "longitude": 116.658145,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2800286836",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 40.129683,
+          "longitude": 116.657852,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-3409913414",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 40.129356,
+          "longitude": 116.656497,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -19356,6 +19398,41 @@
           "stepFree": "unknown",
           "source": "specificEntrance"
         }
+      ]
+    },
+    {
+      "stationID": "be756e348f254c61",
+      "stationName": "顺义",
+      "stationNameEn": "Shunyi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
       ]
     },
     {

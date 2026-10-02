@@ -109,6 +109,11 @@ enum BaiduRequestGateTests {
         print("distinct requests")
         CountingProtocol.reset()
         let distinct = makeClient()
+        // One request first, so the measured burst goes through a session that has started: a
+        // fresh session's first request pays its setup before `startLoading`, which on a slow CI
+        // runner shortened the first measured gap with the gate not at fault.
+        await fire(distinct, query: "warm-up")
+        CountingProtocol.reset()
         await withTaskGroup(of: Void.self) { group in
             for index in 0..<6 { group.addTask { await fire(distinct, query: "q\(index)") } }
         }
@@ -133,15 +138,28 @@ enum BaiduRequestGateTests {
 
         // The account limit is per second, which concurrency alone does not bound: two slots with
         // instant responses is unlimited throughput.
+        //
+        // The starts are read where the mock protocol begins loading, after URLSession's own
+        // dispatch, so a single gap shrinks by however late the request before it was handed over.
+        // The burst's average spacing is what a per-second quota counts and does not carry that
+        // noise; the floor still catches a gate that lets two through together, whose gaps are ~0.
         let starts = CountingProtocol.allSamples.map(\.startedAt).sorted()
         let tightest = zip(starts, starts.dropFirst())
             .map { $1.timeIntervalSince($0) }
             .min() ?? .infinity
+        let average = starts.count > 1
+            ? starts[starts.count - 1].timeIntervalSince(starts[0]) / Double(starts.count - 1)
+            : .infinity
         let spacing = Double(BaiduMapsClient.minimumRequestSpacing.components.attoseconds) / 1e18
             + Double(BaiduMapsClient.minimumRequestSpacing.components.seconds)
         recorder.check(
-            "starts are spaced by at least the declared minimum",
-            String(tightest >= spacing * 0.8),
+            "starts average at least the declared minimum apart",
+            String(average >= spacing * 0.9),
+            "true"
+        )
+        recorder.check(
+            "and no two start together",
+            String(tightest >= spacing * 0.5),
             "true"
         )
         recorder.check(

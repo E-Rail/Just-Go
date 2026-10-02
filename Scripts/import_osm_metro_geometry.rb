@@ -402,9 +402,14 @@ def wikidata_lines(refresh:)
       http.request(request)
     end
     fail_with("Wikidata lines unavailable: HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+    # Checked before it is cached: a throttled query can answer 200 with an HTML page, and a cached
+    # page would fail every later import until someone deleted the file.
+    fail_with("Wikidata answered with something other than SPARQL results") if wikidata_bindings(response.body).nil?
     File.write(path, response.body)
   end
-  JSON.parse(File.read(path)).dig("results", "bindings").each_with_object({}) do |row, lines|
+  bindings = wikidata_bindings(File.read(path))
+  fail_with("#{path} holds no SPARQL results; delete it or rerun with --refresh") if bindings.nil?
+  bindings.each_with_object({}) do |row, lines|
     qid = row.dig("line", "value").to_s[%r{/(Q\d+)\z}, 1]
     next if qid.nil?
 
@@ -413,6 +418,14 @@ def wikidata_lines(refresh:)
     line["opened"] = [line["opened"], opened].compact.min if opened
     line["closed"] ||= !row.dig("closing", "value").to_s.empty?
   end
+end
+
+# The result rows of a SPARQL JSON answer, or nil for anything else.
+def wikidata_bindings(body)
+  bindings = JSON.parse(body.to_s).dig("results", "bindings")
+  bindings.is_a?(Array) ? bindings : nil
+rescue JSON::ParserError, TypeError
+  nil
 end
 
 # The open lines OSM maps with stops that no pack emits and none left out on purpose, as
@@ -906,6 +919,7 @@ CITY_ISO_CODE = /\A(?:CN-(?:BJ|SH|TJ|CQ|HK|MO)|TW-[A-Z]+)\z/.freeze
 def city_areas(city_id, city, points)
   path = File.join(CACHE_DIR, "boundaries-#{city_id}.json")
   cached = File.file?(path) ? JSON.parse(File.read(path)).fetch("elements") : []
+  fail_with("#{city[:name]} has no stops to look up city boundaries for") if points.empty? && cached.empty?
   covered = points.all? do |latitude, longitude|
     cached.any? { |relation| within_bounds?(relation.fetch("bounds"), latitude, longitude) }
   end
@@ -2111,6 +2125,10 @@ def self_test
   unless missing == [["Q1", "2号线", ["11"]]] && unmapped == ["Q6"]
     fail_with("the Wikidata gate judged the wrong lines: #{missing.inspect} #{unmapped.inspect}")
   end
+  # What a throttled query can answer with 200, which must never reach the cache.
+  fail_with("an HTML page was taken for SPARQL results") unless wikidata_bindings("<html>Too Many Requests</html>").nil?
+  fail_with("an error object was taken for SPARQL results") unless wikidata_bindings('{"error":"timeout"}').nil?
+  fail_with("SPARQL results were refused") unless wikidata_bindings('{"results":{"bindings":[]}}') == []
   fail_with("direction suffix line-name test failed") unless passenger_line_name(
     "name" => "Light Rail 505 (A → B)"
   ) == "Light Rail 505"

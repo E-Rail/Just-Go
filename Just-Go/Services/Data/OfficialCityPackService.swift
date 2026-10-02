@@ -61,13 +61,20 @@ protocol OfficialStationDataProviding {
     func officialResourceReview(for station: Station) async -> OfficialTransitResourceStation?
     func arrivalSnapshot(for station: Station) async -> StationArrivalSnapshot
     func serviceWindows(cityID: String, stationName: String) async -> [StationServiceWindow]
-    func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage
+    func routeCoverage(cityID: String, stations: [OfficialStationKey]) async -> RouteDataCoverage
     func matchingStation(place: TransitPlace, cityID: String) async -> Station?
     /// Best-available entrance/exit (+ optional platform/interchange) guidance per station,
     /// keyed by the original station name passed in. Official when authored in the pack,
     /// otherwise text-extracted at `.estimated` confidence, otherwise `.empty`/`.unavailable`.
-    func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance]
+    func stationGuidance(cityID: String, stations: [OfficialStationKey]) async -> [String: StationAccessGuidance]
     func prefetchTransferAssets(for route: Route) async
+}
+
+/// A station as the pack lookups need it: the ID finds its own record, and the name is the fallback
+/// for a station that has none (a place, a provider's stop). Results are keyed by `name`.
+struct OfficialStationKey: Sendable, Hashable {
+    let name: String
+    let stationID: String?
 }
 
 private struct RealtimeLinePresentation: Sendable {
@@ -780,12 +787,16 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         } ?? []
     }
 
-    func routeCoverage(cityID: String, stationNames: [String]) async -> RouteDataCoverage {
+    func routeCoverage(cityID: String, stations keys: [OfficialStationKey]) async -> RouteDataCoverage {
         _ = await loadCityPack(for: cityID)
-        let names = Set(stationNames.map(normalizedStationName))
-        let stations = names.compactMap { stationRecord(cityID: cityID, normalizedName: $0) }
+        // One count per station: by ID where there is one, so two namesakes are two stations.
+        var seen = Set<String>()
+        let distinct = keys.filter { key in
+            seen.insert(key.stationID.map(networkStationID) ?? normalizedStationName(key.name)).inserted
+        }
+        let stations = distinct.compactMap { stationRecord(cityID: cityID, key: $0) }
         return RouteDataCoverage(
-            stationCount: names.count,
+            stationCount: distinct.count,
             // Only stations whose record states a lift or ramp count. Most records are an
             // OpenStreetMap entrance letter with both null, and a mapped door is not accessibility
             // information.
@@ -822,7 +833,14 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             network.matchingStation(named: place.name, near: place.coordinate).map(network.displayStation)
         }
         let fallbackRecord = records.count == 1 ? records[0] : nil
-        let station = canonicalMatch ?? nameMatch ?? Station(
+        // The nearer of the two. Only some stations have records, so the one a record is bound to
+        // can be a namesake kilometres away (Wuhan's metro 光谷大道, 4.7 km from the tram stop) while
+        // the network's nearest station of that name is the one the rider is at.
+        let nearest = [canonicalMatch, nameMatch].compactMap { $0 }.min {
+            CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude).distance(to: place.coordinate) <
+                CLLocationCoordinate2D(latitude: $1.latitude, longitude: $1.longitude).distance(to: place.coordinate)
+        }
+        let station = nearest ?? Station(
                 stationID: "official-\(cityID)-\(normalizedStationName(place.name))",
                 name: fallbackRecord?.stationName ?? place.name,
                 nameEn: fallbackRecord?.stationNameEn,
@@ -833,11 +851,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return enrichLoadedStation(station)
     }
 
-    func stationGuidance(cityID: String, stationNames: [String]) async -> [String: StationAccessGuidance] {
+    func stationGuidance(cityID: String, stations keys: [OfficialStationKey]) async -> [String: StationAccessGuidance] {
         _ = await loadCityPack(for: cityID)
         var result: [String: StationAccessGuidance] = [:]
-        for name in stationNames where result[name] == nil {
-            guard let record = stationRecord(cityID: cityID, normalizedName: normalizedStationName(name)) else {
+        for key in keys where result[key.name] == nil {
+            let name = key.name
+            guard let record = stationRecord(cityID: cityID, key: key) else {
                 result[name] = .empty
                 continue
             }
@@ -1303,7 +1322,23 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private func stationRecord(for station: Station) -> OfficialStation? {
         let canonicalStationID = networkStationID(station.stationID)
         return packs[station.cityID]?.stationsByID[canonicalStationID]
-            ?? stationRecord(cityID: station.cityID, stationName: station.name)
+            ?? usable(stationRecord(cityID: station.cityID, stationName: station.name), for: station.stationID)
+    }
+
+    private func stationRecord(cityID: String, key: OfficialStationKey) -> OfficialStation? {
+        if let stationID = key.stationID, let record = packs[cityID]?.stationsByID[networkStationID(stationID)] {
+            return record
+        }
+        return usable(stationRecord(cityID: cityID, normalizedName: normalizedStationName(key.name)), for: key.stationID)
+    }
+
+    /// A record found by name, unless it is bound to a different network station than this one.
+    private func usable(_ record: OfficialStation?, for stationID: String?) -> OfficialStation? {
+        guard let record,
+              MetroStationIdentifier.nameMatch(forStationID: stationID, mayUseRecordOf: record.stationID) else {
+            return nil
+        }
+        return record
     }
 
     private func stationRecord(cityID: String, stationName: String) -> OfficialStation? {

@@ -150,7 +150,7 @@ final class StationDetailViewModel {
 
             let loadedGuidance = (await officialStationData.stationGuidance(
                 cityID: station.cityID,
-                stationNames: [station.name]
+                stations: [OfficialStationKey(name: station.name, stationID: station.stationID)]
             ))[station.name]
             guard isCurrentCityPackLoad(stationID: stationID, generation: generation) else { return }
             accessGuidance = loadedGuidance

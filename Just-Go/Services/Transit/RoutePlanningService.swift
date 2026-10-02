@@ -799,12 +799,12 @@ final class RoutePlanningService {
         // below find nothing, which is right: no station was involved.
         let routeCityID = route.networkCityID ?? ""
         let criticalStops = criticalStops(for: route)
-        let criticalStopNames = criticalStops.map(\.name)
+        let criticalStopKeys = criticalStops.map { OfficialStationKey(name: $0.name, stationID: $0.stationID) }
 
         // Independent lookups, started together and awaited in the order their results are applied.
         async let dataCoverage = officialStationData.routeCoverage(
             cityID: routeCityID,
-            stationNames: criticalStopNames
+            stations: criticalStopKeys
         )
         async let criticalStationsResult = officialStationData.enrichStations(
             criticalStops.compactMap { stop -> Station? in
@@ -864,7 +864,7 @@ final class RoutePlanningService {
         // Per-station entrance/exit guidance (best available: official → estimated → unavailable).
         let packGuidance = await officialStationData.stationGuidance(
             cityID: routeCityID,
-            stationNames: criticalStopNames
+            stations: criticalStopKeys
         )
         let guidanceByStation = merged(packGuidance, with: officialSnapshots)
         let stationPositions = criticalStops.reduce(into: [String: CodableCoordinate]()) { index, stop in

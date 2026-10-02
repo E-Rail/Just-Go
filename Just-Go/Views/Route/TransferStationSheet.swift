@@ -75,7 +75,10 @@ struct TransferStationSheet: View {
                 // even when `matchingStation` found no full record.
                 guidance = (await container.officialStationData.stationGuidance(
                     cityID: cityID,
-                    stationNames: [stationName]
+                    stations: [OfficialStationKey(
+                        name: stationName,
+                        stationID: enrichedStation?.stationID ?? transferSegment.toStationID
+                    )]
                 ))[stationName]
                 let mapLookupStation = enrichedStation ?? initialLookupStation
                 let initialResources = await initialResourceLoad

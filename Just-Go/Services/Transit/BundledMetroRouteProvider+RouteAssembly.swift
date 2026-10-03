@@ -149,7 +149,13 @@ extension BundledMetroRouteProvider {
                 ))
             }
             let stationIDs = [first.fromStationID] + group.map(\.toStationID)
-            let stops = stationIDs.compactMap { id -> RouteStationStop? in
+            // Running, so stop `n` carries the cost of the `n` hops before it.
+            var offset: TimeInterval = 0
+            let offsets = [0] + group.map { hop -> TimeInterval in
+                offset += trainCost(hop.distance)
+                return offset
+            }
+            let stops = zip(stationIDs, offsets).compactMap { id, offset -> RouteStationStop? in
                 guard let station = graph.stationsByID[id] else { return nil }
                 let lineCount = graph.lineCount(for: station)
                 return RouteStationStop(
@@ -161,7 +167,8 @@ extension BundledMetroRouteProvider {
                     arrivalTimeText: nil,
                     isTransfer: lineCount > 1,
                     lineID: line.id,
-                    city: station.localizedCity
+                    city: station.localizedCity,
+                    offsetSeconds: offset
                 )
             }
             let coordinates = group.flatMap { graph.edgeGeometries[$0.key] ?? [] }.consecutiveUnique

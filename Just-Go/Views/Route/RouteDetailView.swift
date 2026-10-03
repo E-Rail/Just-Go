@@ -139,7 +139,6 @@ struct RouteDetailView: View {
                 // The page becomes the navigator rather than presenting a second one over itself.
                 LiveGoView(route: route, embedded: true) {
                     withAnimation(.easeInOut(duration: 0.25)) { isGuiding = false }
-                    ActiveTripStore.clear()
                 }
             } else if isRegularWidth {
                 splitLayout(feasibility: feasibility, confidence: confidence)
@@ -180,12 +179,10 @@ struct RouteDetailView: View {
             // leaving it lands on the full detail.
             if appState.accessibilityPreference.stepByStepGuidance, !didAutoPresentLiveGo {
                 didAutoPresentLiveGo = true
-                ActiveTripStore.save(route)
                 isGuiding = true
             }
             #if DEBUG
             if ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SCREEN"] == "guiding" {
-                ActiveTripStore.save(route)
                 isGuiding = true
             }
             // The card's detent is a drag, which cannot be injected here, so its range is checked
@@ -372,7 +369,6 @@ struct RouteDetailView: View {
     /// Pinned rather than scrolled past: the one control reachable at any scroll position.
     private var navigateBar: some View {
         Button {
-            ActiveTripStore.save(route)
             withAnimation(.easeInOut(duration: 0.25)) { isGuiding = true }
         } label: {
             Label(

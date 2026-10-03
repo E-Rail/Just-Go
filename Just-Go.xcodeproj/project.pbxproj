@@ -39,6 +39,8 @@
 		A1000027 /* Transit/SubwayLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* Transit/SubwayLine.swift */; };
 		A1000028 /* Transit/Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* Transit/Route.swift */; };
 		A1000410 /* Transit/MetroStationIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000410 /* Transit/MetroStationIdentifier.swift */; };
+		A1000980 /* Transit/TripTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000980 /* Transit/TripTimeline.swift */; };
+		A1000981 /* Transit/TripSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000981 /* Transit/TripSession.swift */; };
 		A1000029 /* Transit/RealTimeArrival.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* Transit/RealTimeArrival.swift */; };
 		A100002B /* City/City.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* City/City.swift */; };
 		A100002D /* User/AccessibilityPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002D /* User/AccessibilityPreference.swift */; };
@@ -155,6 +157,8 @@
 		A2000027 /* Transit/SubwayLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/SubwayLine.swift; sourceTree = "<group>"; };
 		A2000028 /* Transit/Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/Route.swift; sourceTree = "<group>"; };
 		A2000410 /* Transit/MetroStationIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/MetroStationIdentifier.swift; sourceTree = "<group>"; };
+		A2000980 /* Transit/TripTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTimeline.swift; sourceTree = "<group>"; };
+		A2000981 /* Transit/TripSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripSession.swift; sourceTree = "<group>"; };
 		A2000029 /* Transit/RealTimeArrival.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RealTimeArrival.swift; sourceTree = "<group>"; };
 		A200002B /* City/City.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = City/City.swift; sourceTree = "<group>"; };
 		A200002D /* User/AccessibilityPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityPreference.swift; sourceTree = "<group>"; };
@@ -320,6 +324,7 @@
 				A2000027 /* Transit/SubwayLine.swift */,
 				A2000028 /* Transit/Route.swift */,
 				A2000410 /* Transit/MetroStationIdentifier.swift */,
+				A2000980 /* Transit/TripTimeline.swift */,
 				A2000029 /* Transit/RealTimeArrival.swift */,
 				A2000053 /* Transit/RouteFeasibility.swift */,
 				A2000061 /* Transit/RoutePreference.swift */,
@@ -338,6 +343,7 @@
 			children = (
 				A2000600 /* Data/OfficialTransitResourceCatalog.swift */,
 				A2000305 /* Transit/TripConfidenceServices.swift */,
+				A2000981 /* Transit/TripSession.swift */,
 				A2000315 /* Transit/ServiceHoursResolver.swift */,
 				A2000316 /* Transit/TransitNameMatching.swift */,
 				A2000317 /* Map/ExternalRouteHandoff.swift */,
@@ -619,6 +625,8 @@
 				A1000027 /* Transit/SubwayLine.swift in Sources */,
 				A1000028 /* Transit/Route.swift in Sources */,
 				A1000410 /* Transit/MetroStationIdentifier.swift in Sources */,
+				A1000980 /* Transit/TripTimeline.swift in Sources */,
+				A1000981 /* Transit/TripSession.swift in Sources */,
 				A1000029 /* Transit/RealTimeArrival.swift in Sources */,
 				A1000053 /* Transit/RouteFeasibility.swift in Sources */,
 				A1000061 /* Transit/RoutePreference.swift in Sources */,

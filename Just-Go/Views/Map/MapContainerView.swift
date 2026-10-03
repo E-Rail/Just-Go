@@ -100,11 +100,10 @@ struct MapContainerView: View {
         }
         .task { offerToResumeTrip() }
         // Full screen rather than a push: a rider back in the app underground wants the navigator,
-        // not a map.
+        // not a map. Closing it hides the navigator; only End ends the trip.
         .fullScreenCover(item: $resumableTrip) { trip in
             LiveGoView(route: trip) {
                 resumableTrip = nil
-                ActiveTripStore.clear()
             }
         }
         .alert(
@@ -245,7 +244,8 @@ struct MapContainerView: View {
     /// rather than resumed: a saved trip can be hours stale.
     private func offerToResumeTrip() {
         guard pendingResumableTrip == nil, resumableTrip == nil, path.isEmpty else { return }
-        guard let saved = ActiveTripStore.load() else { return }
+        // A trip already running in this launch has its own way back, the pill on the map.
+        guard !container.tripSession.isActive, let saved = container.tripSession.savedTrip() else { return }
         pendingResumableTrip = saved
         isResumingTrip = true
     }
@@ -293,6 +293,7 @@ struct MapContainerView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 10) {
                 topControls
+                tripInProgressPill
                 HStack(spacing: 8) {
                     Spacer()
                     if viewModel?.metroNetworks.isEmpty == false {
@@ -500,6 +501,52 @@ struct MapContainerView: View {
             }
         }
         .zIndex(20)
+    }
+
+    /// The way back to a trip the rider left running. A trip does not end when its screen closes,
+    /// so the map says one is under way and reopens it.
+    @ViewBuilder
+    private var tripInProgressPill: some View {
+        let session = container.tripSession
+        if let trip = session.route, resumableTrip == nil {
+            Button {
+                resumableTrip = trip
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "location.north.line.fill")
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 20)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(AppLocalization.text(
+                            english: "Trip in progress",
+                            simplified: "行程进行中",
+                            traditional: "行程進行中"
+                        ))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        if let step = session.currentStep {
+                            Text(step.title)
+                                .rowMeta()
+                                .lineLimit(1)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(12)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
+                .elevated(.floating)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(AppLocalization.text(
+                english: "Opens guidance",
+                simplified: "打开导航",
+                traditional: "開啟導航"
+            ))
+        }
     }
 
     /// The one way this screen puts the camera on the rider, for the locate button and the first
@@ -840,8 +887,15 @@ struct MapContainerView: View {
         switch screen {
         case "search":
             path = [.search]
-        case "results", "detail", "guiding", "editEndpoint":
+        case "results", "detail", "guiding", "editEndpoint", "tripRunning":
             Task { await seedDebugRoute(landingOn: screen) }
+        case "resume":
+            // The answer to "Resume your trip?", which is a tap on an alert.
+            if let saved = container.tripSession.savedTrip() {
+                pendingResumableTrip = nil
+                isResumingTrip = false
+                resumableTrip = saved
+            }
         default:
             break
         }
@@ -900,6 +954,9 @@ struct MapContainerView: View {
             path = [.results]
         case "editEndpoint":
             path = [.results, .editEndpoint(.origin)]
+        case "tripRunning":
+            // A trip under way with its screen closed: the map as the rider finds it on coming back.
+            container.tripSession.start(first)
         default:
             path = [.results, .detail(first.id)]
         }

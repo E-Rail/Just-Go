@@ -45,6 +45,9 @@ final class DIContainer {
     let routeFeasibilityService: RouteFeasibilityService
     let routeConfidenceService: RouteConfidenceService
     let tripReminderService: TripReminderService
+    /// The trip being guided, if any. Here and not in a screen's state, because a trip outlives the
+    /// screen that started it.
+    let tripSession: TripSession
     let stationInformationDiskCache: OfficialStationInformationDiskCache?
     /// Operator notices, fetched on the device and held in memory only. Only Beijing publishes a
     /// parseable list.
@@ -68,6 +71,7 @@ final class DIContainer {
         routeFeasibilityService: RouteFeasibilityService,
         routeConfidenceService: RouteConfidenceService,
         tripReminderService: TripReminderService,
+        tripSession: TripSession,
         stationInformationDiskCache: OfficialStationInformationDiskCache? = nil,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
         memoryManagedStationInformationProvider: OfficialStationInformationRouter? = nil,
@@ -92,6 +96,7 @@ final class DIContainer {
         self.routeFeasibilityService = routeFeasibilityService
         self.routeConfidenceService = routeConfidenceService
         self.tripReminderService = tripReminderService
+        self.tripSession = tripSession
         self.stationInformationDiskCache = stationInformationDiskCache
         self.memoryWarningReleaseTargets = MemoryWarningReleaseTargets(
             officialStationData: memoryManagedOfficialStationData,
@@ -252,6 +257,11 @@ final class DIContainer {
         let routeFeasibilityService = RouteFeasibilityService()
         let routeConfidenceService = RouteConfidenceService()
         let tripReminderService = TripReminderService()
+        let tripSession = TripSession(
+            locationService: locationService,
+            reminders: tripReminderService,
+            tripMemory: tripMemoryService
+        )
 
         let container = DIContainer(
             locationService: locationService,
@@ -269,6 +279,7 @@ final class DIContainer {
             routeFeasibilityService: routeFeasibilityService,
             routeConfidenceService: routeConfidenceService,
             tripReminderService: tripReminderService,
+            tripSession: tripSession,
             stationInformationDiskCache: stationInformationDiskCache,
             memoryManagedOfficialStationData: officialStationData,
             memoryManagedStationInformationProvider: stationInformationRouter,

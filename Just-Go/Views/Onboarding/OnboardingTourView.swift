@@ -57,9 +57,9 @@ struct OnboardingTourView: View {
                         traditional: "首末段較長時會改為騎行或駕車，路線上會註明。"
                     )),
                     ("play.circle.fill", AppLocalization.text(
-                        english: "Navigate gives one step at a time, and alerts before your stop.",
-                        simplified: "“导航”每次只给一步，到站前会提醒。",
-                        traditional: "「導航」每次只給一步，到站前會提醒。"
+                        english: "Navigate follows your trip step by step, on the Lock Screen too, and alerts before your stop.",
+                        simplified: "“导航”会跟随行程逐步推进，锁屏上也能看到，到站前会提醒。",
+                        traditional: "「導航」會跟隨行程逐步推進，鎖定畫面上也能看到，到站前會提醒。"
                     ))
                 ]
             ),
@@ -89,9 +89,9 @@ struct OnboardingTourView: View {
                 title: AppLocalization.text(english: "Set it up", simplified: "个性化设置", traditional: "個人化設定"),
                 points: [
                     ("tag.fill", AppLocalization.text(
-                        english: "Save Home, Work and your own tags, then fill a field by tapping one.",
-                        simplified: "保存家、公司和自定义标签，之后点一下就能填入。",
-                        traditional: "儲存家、公司和自訂標籤，之後點一下就能填入。"
+                        english: "Save Home, Work and your own tags, then plan a trip there with one tap on the map.",
+                        simplified: "保存家、公司和自定义标签，之后在地图上点一下就能规划前往。",
+                        traditional: "儲存家、公司和自訂標籤，之後在地圖上點一下就能規劃前往。"
                     )),
                     ("figure.roll", AppLocalization.text(
                         english: "Set step-free needs once in Profile → Accessibility. Route search follows them.",

@@ -555,6 +555,10 @@ struct RouteStationStop: Identifiable, Codable {
     var lineID: String? = nil
     /// Localized; see `MetroStation.city`.
     var city: String? = nil
+    /// Modelled seconds from the leg's boarding stop to this one, summed from the same per-hop
+    /// cost as the leg's duration, so a stop count run from the clock agrees with the arrival time.
+    /// Optional with a default so trips saved in `ActiveTripStore` still decode.
+    var offsetSeconds: TimeInterval? = nil
 
     var id: String {
         "\(stationID)-\(lineName ?? "station")-\(arrivalTimeText ?? "")"

@@ -52,6 +52,8 @@ struct MapContainerView: View {
     /// How tall the floating chrome over the map's top edge is, so the map centres the rider in the
     /// part they can see.
     @State private var topChromeHeight: CGFloat = 0
+    /// The same for the rider's panel at the bottom, which changes height when it is minimized.
+    @State private var bottomChromeHeight: CGFloat = 0
     @State private var planTask: Task<Void, Never>?
     @State private var didCenterOnUser = false
     /// Non-nil for a few seconds after a locate attempt that could not produce a fix.
@@ -68,6 +70,10 @@ struct MapContainerView: View {
     @State private var pendingResumableTrip: Route?
     @State private var resumableTrip: Route?
     @State private var isResumingTrip = false
+    /// Where MapKit last put the rider, in the map's own frame, which is the stations' frame too.
+    /// Moved only by a real change of place: every frame of the dot's drift would otherwise redraw
+    /// the panel.
+    @State private var riderCoordinate: CLLocationCoordinate2D?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -293,7 +299,6 @@ struct MapContainerView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 10) {
                 topControls
-                tripInProgressPill
                 HStack(spacing: 8) {
                     Spacer()
                     if viewModel?.metroNetworks.isEmpty == false {
@@ -325,6 +330,15 @@ struct MapContainerView: View {
             } action: { height in
                 topChromeHeight = height
             }
+        }
+        // An inset, not an overlay, so MapKit keeps its attribution and controls clear of the panel.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            riderPanel
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { height in
+                    bottomChromeHeight = height
+                }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle(AppLocalization.localized("Map"))
@@ -412,9 +426,13 @@ struct MapContainerView: View {
             route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
             topChromeHeight: topChromeHeight,
+            bottomChromeHeight: bottomChromeHeight,
             onUserLocationChanged: { coordinate in
                 container.locationService.observeMapSpaceUserLocation(coordinate)
                 viewModel?.mapUserLocationChanged(coordinate)
+                if riderCoordinate.map({ $0.distance(to: coordinate) > 25 }) ?? true {
+                    riderCoordinate = coordinate
+                }
             },
             onRegionChanged: { region in
                 viewModel?.viewportChanged(to: region)
@@ -503,50 +521,25 @@ struct MapContainerView: View {
         .zIndex(20)
     }
 
-    /// The way back to a trip the rider left running. A trip does not end when its screen closes,
-    /// so the map says one is under way and reopens it.
-    @ViewBuilder
-    private var tripInProgressPill: some View {
+    /// The rider's own things over the map. A trip does not end when its screen closes, so the
+    /// first row is the way back to one.
+    private var riderPanel: some View {
         let session = container.tripSession
-        if let trip = session.route, resumableTrip == nil {
-            Button {
-                resumableTrip = trip
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "location.north.line.fill")
-                        .foregroundStyle(Color.accentColor)
-                        .frame(width: 20)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(AppLocalization.text(
-                            english: "Trip in progress",
-                            simplified: "行程进行中",
-                            traditional: "行程進行中"
-                        ))
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        if let step = session.currentStep {
-                            Text(step.title)
-                                .rowMeta()
-                                .lineLimit(1)
-                        }
-                    }
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(12)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
-                .elevated(.floating)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint(AppLocalization.text(
-                english: "Opens guidance",
-                simplified: "打开导航",
-                traditional: "開啟導航"
-            ))
-        }
+        return RiderPanel(
+            trip: session.currentStep.map { step in
+                RiderPanel.Trip(title: step.title, detail: session.stopsLeftText(for: step))
+            },
+            savedPlaces: tripMemoryService.stationQuickTags,
+            nearest: riderCoordinate
+                .flatMap { viewModel?.nearestStation(to: $0) }
+                .map { RiderPanel.NearestStation(station: $0.station, distance: $0.distance) },
+            onOpenTrip: { resumableTrip = session.route },
+            onSelectPlace: { tag in
+                beginPlan(to: AppState.PendingRouteInput(place: tag.transitPlace, role: .destination))
+            },
+            onAddPlace: { appState.selectedTab = .trips },
+            onOpenStation: openStation
+        )
     }
 
     /// The one way this screen puts the camera on the rider, for the locate button and the first

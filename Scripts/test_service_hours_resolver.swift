@@ -537,6 +537,129 @@ enum ServiceHoursResolverTests {
         "0"
     )
 
+    // MARK: - How long the rider can still board
+    //
+    // The same windows, asked the other way: not "is it running" but "how much later could I
+    // leave". An answer here is acted on, so where `verdict` merges towards the latest train this
+    // takes the earliest.
+
+    func margin(_ value: LastTrainMargin?) -> String {
+        guard let value else { return "none" }
+        return "\(value.minutes) min to \(value.lastTrainText)\(value.isPinned ? "" : " (earliest)")"
+    }
+
+    print("last-train margin")
+    check(
+        "southbound from 天通苑南 at 22:00 has until its own last train",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: southbound, alightingStationName: "雍和宫",
+            windows: tiantongyuannan, at: at(22, 0)
+        )),
+        "51 min to 22:51"
+    )
+    check(
+        "northbound has the later one",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: northbound, alightingStationName: "天通苑",
+            windows: tiantongyuannan, at: at(22, 0)
+        )),
+        "117 min to 23:57"
+    )
+    check(
+        "a direction nobody can attribute takes the earliest, and says so",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: nil, alightingStationName: "雍和宫",
+            windows: tiantongyuannan, at: at(22, 0)
+        )),
+        "51 min to 22:51 (earliest)"
+    )
+    check(
+        "a single window is the only train there is",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: nil, alightingStationName: nil,
+            windows: [tiantongyuannan[0]], at: at(22, 0)
+        )),
+        "51 min to 22:51"
+    )
+    check(
+        "after the rider's last train there is no margin",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: southbound, alightingStationName: "雍和宫",
+            windows: tiantongyuannan, at: at(23, 20)
+        )),
+        "none"
+    )
+    check(
+        "nor before the first",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "5号线", onwardStationNames: southbound, alightingStationName: "雍和宫",
+            windows: tiantongyuannan, at: at(4, 30)
+        )),
+        "none"
+    )
+    check(
+        "another line's rows answer nothing",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "13号线", onwardStationNames: southbound, alightingStationName: "雍和宫",
+            windows: tiantongyuannan, at: at(22, 0)
+        )),
+        "none"
+    )
+    // A last train after midnight belongs to the day it started in.
+    let ringPastMidnight = [StationServiceWindow(lineName: "2号线", direction: "外环", firstTime: "5:10", lastTime: "0:06")]
+    check(
+        "a last train past midnight, asked before midnight",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "2号线", onwardStationNames: nil, alightingStationName: nil,
+            windows: ringPastMidnight, at: at(23, 50)
+        )),
+        "16 min to 0:06"
+    )
+    check(
+        "...and asked after it",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "2号线", onwardStationNames: nil, alightingStationName: nil,
+            windows: ringPastMidnight, at: at(0, 3)
+        )),
+        "3 min to 0:06"
+    )
+    check(
+        "...and once it has gone",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "2号线", onwardStationNames: nil, alightingStationName: nil,
+            windows: ringPastMidnight, at: at(0, 10)
+        )),
+        "none"
+    )
+    // 花园桥 eastbound: the short-turn to 草房 runs 71 minutes later than the full run.
+    check(
+        "a stop before the short-turn has until the later train",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "6号线", onwardStationNames: eastbound, alightingStationName: "呼家楼",
+            windows: huayuanqiao, at: at(22, 0)
+        )),
+        "116 min to 23:56"
+    )
+    check(
+        "a stop beyond it has only the full run",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "6号线", onwardStationNames: eastbound, alightingStationName: "潞城",
+            windows: huayuanqiao, at: at(22, 0)
+        )),
+        "45 min to 22:45"
+    )
+    // 23:30 against a 23:10 last train is twenty minutes late or twenty-three hours early, and
+    // only a first train says which.
+    check(
+        "a row with no first train gives no margin",
+        margin(resolver.lastTrainMargin(
+            boardingLineName: "2号线", onwardStationNames: nil, alightingStationName: nil,
+            windows: [StationServiceWindow(lineName: "2号线", direction: "外环", firstTime: nil, lastTime: "23:10")],
+            at: at(14, 0)
+        )),
+        "none"
+    )
+
     if recorder.failures > 0 {
         print("\n\(recorder.failures) failure(s)")
         exit(1)

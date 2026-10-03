@@ -69,6 +69,7 @@ struct RouteResultsView: View {
                     // routes; say so rather than showing a blank page.
                     StaleRoutesNotice()
                 } else {
+                    lastDepartureSection
                     routesSection
                 }
             }
@@ -287,6 +288,66 @@ struct RouteResultsView: View {
                 .padding(.vertical, 2)
             }
         }
+    }
+
+    /// The latest any listed route can still leave and ride every train in it. Above the list,
+    /// because it is a fact about tonight and not about one route: a rider at dinner wants the
+    /// time first, and then the route that goes with it.
+    private var latestDeparture: LastDeparture? {
+        viewModel.routes.compactMap(\.lastDeparture).max { $0.leaveBy < $1.leaveBy }
+    }
+
+    @ViewBuilder
+    private var lastDepartureSection: some View {
+        if let last = latestDeparture {
+            Section {
+                AdaptiveStack(isVertical: dynamicTypeSize.isAccessibilitySize, spacing: 12) {
+                    Image(systemName: "moon.stars.fill")
+                        .font(.title3)
+                        .foregroundStyle(.indigo)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(last.headline)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                        Text(last.detail)
+                            .rowMeta()
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 4)
+                    // Nothing to offer once the list is already planned for that moment.
+                    if !isPlanned(for: last.leaveBy) {
+                        Button {
+                            // The control's own state: its `onChange` re-plans, as a tap on it would.
+                            timingMode = .departAt
+                            chosenDate = last.leaveBy
+                        } label: {
+                            Text(AppLocalization.text(english: "Plan for then", simplified: "按此时间规划", traditional: "按此時間規劃"))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .fixedSize()
+                                .padding(.horizontal, 12)
+                                .frame(minHeight: Metrics.minimumTapTarget)
+                                .background(Color.accentColor.opacity(0.18), in: Capsule())
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(Metrics.l)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardSurface()
+                .readableColumn()
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+            }
+        }
+    }
+
+    private func isPlanned(for date: Date) -> Bool {
+        guard case .departBy(let planned) = viewModel.tripAnchor else { return false }
+        return abs(planned.timeIntervalSince(date)) < 60
     }
 
     private var routesSection: some View {

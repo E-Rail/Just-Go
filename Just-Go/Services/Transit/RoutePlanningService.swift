@@ -20,6 +20,7 @@ struct ServiceReading {
     let status: RouteServiceStatus
     let warning: RouteWarning?
     let closedServices: Set<ClosedServiceDirection>
+    var lastDeparture: LastDeparture? = nil
 
 }
 
@@ -309,6 +310,7 @@ final class RoutePlanningService {
             }
             if verdict.status != .unknown {
                 upgraded.serviceStatus = verdict.status
+                upgraded.lastDeparture = verdict.lastDeparture
                 closedServices = verdict.closedServices
                 if let warning = verdict.warning { upgraded.warnings.append(warning) }
             }
@@ -524,6 +526,10 @@ final class RoutePlanningService {
         var closedServices: Set<ClosedServiceDirection> = []
         var sawUnknown = false
         var sawAnswer = false
+        // How long each ride could still be boarded. One ride nobody can answer for and the trip
+        // has no latest departure: the unanswered ride may be the one that closes first.
+        var margins: [(margin: LastTrainMargin, segment: RouteSegment)] = []
+        var everyRideHasMargin = true
 
         for segment in route.segments {
             defer { elapsed += segment.duration }
@@ -536,6 +542,17 @@ final class RoutePlanningService {
                 windows: windows(segment),
                 at: departure.addingTimeInterval(elapsed)
             )
+            if let margin = serviceHoursResolver.lastTrainMargin(
+                boardingLineName: segment.lineName,
+                onwardStationNames: segment.transitContext?.onwardStationNames,
+                alightingStationName: segment.toStationName,
+                windows: windows(segment),
+                at: departure.addingTimeInterval(elapsed)
+            ) {
+                margins.append((margin, segment))
+            } else {
+                everyRideHasMargin = false
+            }
             if verdict.status == .unknown {
                 sawUnknown = true
                 continue
@@ -562,13 +579,18 @@ final class RoutePlanningService {
             }
         }
 
+        let lastDeparture = everyRideHasMargin
+            ? Self.lastDeparture(tightest: margins.min { $0.margin.minutes < $1.margin.minutes }, departure: departure)
+            : nil
+
         guard let worst else {
             // Nothing to report: every leg is inside its hours, or nobody could answer for one and
             // "running" would borrow another leg's answer.
             return ServiceReading(
                 status: sawAnswer && !sawUnknown ? .running : .unknown,
                 warning: nil,
-                closedServices: []
+                closedServices: [],
+                lastDeparture: lastDeparture
             )
         }
 
@@ -596,7 +618,29 @@ final class RoutePlanningService {
                     )
                 }
             },
-            closedServices: closedServices
+            closedServices: closedServices,
+            lastDeparture: lastDeparture
+        )
+    }
+
+    /// The latest the whole trip can start: the ride with the least slack sets it, and every ride
+    /// keeps its own offset into the trip, so moving the start later moves each boarding later by
+    /// the same amount. Nothing when that slack is inside the safety margin; the "last train soon"
+    /// banner already says to go now.
+    private static func lastDeparture(
+        tightest: (margin: LastTrainMargin, segment: RouteSegment)?,
+        departure: Date
+    ) -> LastDeparture? {
+        guard let tightest, let station = tightest.segment.fromStationName,
+              let line = tightest.segment.lineName else { return nil }
+        let slack = TimeInterval(tightest.margin.minutes * 60) - LastDeparture.safetyMargin
+        guard slack >= 0 else { return nil }
+        return LastDeparture(
+            leaveBy: departure.addingTimeInterval(slack),
+            lineName: line,
+            stationName: station,
+            lastTrainText: tightest.margin.lastTrainText,
+            isConservative: !tightest.margin.isPinned
         )
     }
 
@@ -849,6 +893,7 @@ final class RoutePlanningService {
             tripAnchor: tripAnchor
         )
         route.serviceStatus = service.status
+        route.lastDeparture = service.lastDeparture
         if let warning = service.warning {
             route.warnings.append(warning)
         }

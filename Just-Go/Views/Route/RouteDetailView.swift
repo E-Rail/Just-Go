@@ -90,6 +90,7 @@ struct RouteDetailView: View {
     @State var selectedRouteID: UUID
     @State var tripCardSheet: TripCardSheet?
     @State private var scheduledReminderRouteID: UUID?
+    @State private var lastDepartureReminderRouteID: UUID?
     @State var tripLoggedConfirmation = false
     @State private var reminderAlert: ReminderAlert?
     @State var tripNote = ""
@@ -763,6 +764,11 @@ struct RouteDetailView: View {
                 rowDivider
             }
 
+            if let lastDeparture = route.lastDeparture {
+                lastDepartureRow(lastDeparture)
+                rowDivider
+            }
+
             // The score grades station and network data, and a
             // walk uses neither.
             if route.boardingTransitSegment != nil {
@@ -828,6 +834,80 @@ struct RouteDetailView: View {
             }
         }
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
+        // One `.alert` registration for both reminder rows and all three reasons: two on one node
+        // shadow each other, and each row carrying its own would present it twice.
+        .alert(
+            reminderAlert?.title ?? "",
+            isPresented: Binding(
+                get: { reminderAlert != nil },
+                set: { if !$0 { reminderAlert = nil } }
+            ),
+            presenting: reminderAlert
+        ) { _ in
+            Button(AppLocalization.localized("OK"), role: .cancel) {}
+        } message: { alert in
+            Text(alert.message)
+        }
+    }
+
+    /// The latest this trip can start and still ride every train in it, the ride that sets the
+    /// limit, and a reminder for it. Present only where every ride's last train is published.
+    private func lastDepartureRow(_ lastDeparture: LastDeparture) -> some View {
+        let isSet = lastDepartureReminderRouteID == selectedRouteID
+        return HStack(spacing: 12) {
+            Image(systemName: "moon.stars.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.indigo)
+                .frame(width: 28, height: 28)
+                .background(Color.indigo.opacity(0.14), in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(lastDeparture.headline)
+                    .font(.body)
+                    .monospacedDigit()
+                Text(lastDeparture.detail)
+                    .rowMeta()
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            Button {
+                // The route id is captured with the answer, as `reminderRow` does.
+                Task { await scheduleLastDepartureReminder(lastDeparture, routeID: route.id) }
+            } label: {
+                Image(systemName: isSet ? "bell.fill" : "bell")
+                    .font(.body)
+                    .foregroundStyle(isSet ? Color.green : Color.accentColor)
+                    .tappable()
+            }
+            .buttonStyle(.plain)
+            .disabled(isSet)
+            .accessibilityLabel(isSet
+                ? AppLocalization.text(english: "Reminder set", simplified: "提醒已设置", traditional: "提醒已設定")
+                : AppLocalization.text(
+                    english: "Remind me \(reminderLeadMinutes) min before the last departure",
+                    simplified: "最晚出发时间前\(reminderLeadMinutes)分钟提醒我",
+                    traditional: "最晚出發時間前\(reminderLeadMinutes)分鐘提醒我"
+                ))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 11)
+    }
+
+    private func scheduleLastDepartureReminder(_ lastDeparture: LastDeparture, routeID: UUID) async {
+        guard lastDeparture.leaveBy.addingTimeInterval(-Double(reminderLeadMinutes) * 60) > Date() else {
+            reminderAlert = .tooLate
+            return
+        }
+        guard await container.tripReminderService.requestAuthorization() else {
+            reminderAlert = .denied
+            return
+        }
+        let scheduled = await container.tripReminderService.scheduleLastDepartureReminder(
+            lastDeparture,
+            destination: route.destination,
+            leadMinutes: reminderLeadMinutes
+        )
+        if scheduled { lastDepartureReminderRouteID = routeID }
+        if !scheduled { reminderAlert = .notScheduled }
     }
 
     /// Starts at the row's title, the way a `List` starts a separator: `detailRow`'s own leading
@@ -1297,19 +1377,6 @@ struct RouteDetailView: View {
             }
             .buttonStyle(.plain)
             .disabled(reminderScheduled)
-            // One `.alert` registration for three reasons: two on one node shadow each other.
-            .alert(
-                reminderAlert?.title ?? "",
-                isPresented: Binding(
-                    get: { reminderAlert != nil },
-                    set: { if !$0 { reminderAlert = nil } }
-                ),
-                presenting: reminderAlert
-            ) { _ in
-                Button(AppLocalization.localized("OK"), role: .cancel) {}
-            } message: { alert in
-                Text(alert.message)
-            }
         }
     }
 

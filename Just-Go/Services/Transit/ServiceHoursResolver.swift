@@ -48,6 +48,19 @@ struct ServiceHoursVerdict: Equatable {
     static let unanswered = ServiceHoursVerdict(status: .unknown, isDefinitive: false)
 }
 
+/// How much later a rider could still board at one station: the gap to the last train that takes
+/// them where they are going.
+struct LastTrainMargin: Equatable {
+    /// Whole minutes from the moment asked about to that train.
+    let minutes: Int
+    /// The train's own time, as the operator prints it.
+    let lastTrainText: String
+    /// Whether the time is the rider's own train's. When the windows could not be pinned to their
+    /// direction and service, the earliest last train among them stands in: a rider told that time
+    /// leaves no later than they had to, where the latest could strand them.
+    let isPinned: Bool
+}
+
 /// Pure, synchronous resolver that turns first and last train rows into a `RouteServiceStatus` for
 /// a departure moment. Owns all midnight-wrap, direction and service matching.
 struct ServiceHoursResolver {
@@ -89,6 +102,56 @@ struct ServiceHoursResolver {
         return ServiceHoursVerdict(
             status: merged,
             isDefinitive: pool.count == 1 || merged == .serviceEndedToday || merged.isNotYetStarted
+        )
+    }
+
+    /// How long after `departure` this rider can still board here. nil when it cannot be said: no
+    /// row for the line, no first train to place the moment in the service day, or a moment
+    /// outside it.
+    ///
+    /// The mirror of `verdict`'s merge. There an unattributable pool takes the latest last train,
+    /// an upper bound that is shown and never acted on. A leave-by time is acted on, so here the
+    /// same pool takes the earliest.
+    func lastTrainMargin(
+        boardingLineName: String?,
+        onwardStationNames: [String]?,
+        alightingStationName: String?,
+        windows: [StationServiceWindow],
+        at departure: Date
+    ) -> LastTrainMargin? {
+        let pool = matchingWindows(lineName: boardingLineName, windows: windows)
+        guard !pool.isEmpty else { return nil }
+        if let serving = servingWindows(in: pool, onward: onwardStationNames, alighting: alightingStationName),
+           !serving.isEmpty {
+            return margin(from: serving, takingLatest: true, isPinned: true, at: departure)
+        }
+        // One window is not a merge: it is the only train there is.
+        let single = pool.count == 1
+        return margin(from: pool, takingLatest: single, isPinned: single, at: departure)
+    }
+
+    private func margin(
+        from pool: [StationServiceWindow],
+        takingLatest: Bool,
+        isPinned: Bool,
+        at departure: Date
+    ) -> LastTrainMargin? {
+        let lastMinutes = pool.flatMap { Self.times($0.lastTime) }
+        // Without a first train "now" cannot be placed in the service day: 23:30 against a 23:10
+        // last train is twenty minutes late or twenty-three hours early.
+        guard let firstMin = pool.flatMap({ Self.times($0.firstTime) }).min(), !lastMinutes.isEmpty else {
+            return nil
+        }
+        // Service-day minutes: a time earlier than the first train has wrapped past midnight.
+        let onServiceDay: (Int) -> Int = { $0 >= firstMin ? $0 : $0 + 1440 }
+        let lasts = lastMinutes.map(onServiceDay)
+        guard let last = takingLatest ? lasts.max() : lasts.min() else { return nil }
+        let now = onServiceDay(ChinaClock.minutesOfDay(of: departure))
+        guard now <= last else { return nil }
+        return LastTrainMargin(
+            minutes: last - now,
+            lastTrainText: ChinaClock.clockText(minutes: last % 1440),
+            isPinned: isPinned
         )
     }
 

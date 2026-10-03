@@ -46,6 +46,9 @@ struct Route: Identifiable, Codable {
     var accessGuidance: [RouteAccessGuide]
     var dataCoverage: RouteDataCoverage = .unknown
     var serviceStatus: RouteServiceStatus = .unknown
+    /// The latest this trip can start and still ride every train in it. `nil` wherever a ride's
+    /// last train is not published, and whenever the trip cannot be ridden at its own departure.
+    var lastDeparture: LastDeparture?
     var stationGuidance: [RouteStationGuidance] = []
     /// What this journey costs, when a fare was observed for the same pair of gates. `nil` means
     /// nobody priced it and the screens say nothing, which is the answer for every city outside
@@ -188,6 +191,9 @@ struct Route: Identifiable, Codable {
         var stripped = self
         stripped.fare = nil
         stripped.missedTrainTaxiYuan = nil
+        // Carries an operator's or a provider's last-train time verbatim, and is out of date by the
+        // time a saved trip is read back.
+        stripped.lastDeparture = nil
         return stripped
     }
 }

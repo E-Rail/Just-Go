@@ -19,6 +19,9 @@ unavailable rather than inferred.
   metro-network baseline, separately attributed to OpenStreetMap under ODbL 1.0, covering 6,718
   stations. The remaining 5 are catalog-only.
 - Apple Maps place search, walking directions, and map rendering.
+- Guidance that follows the trip. Steps advance by location and by time, each position says
+  whether it was located or estimated, every ride has a "get ready" alert, and the step under
+  way is shown on the Lock Screen and in the Dynamic Island.
 - Station accessibility data for 582 stations across 14 cities, from each city's own open data.
 - Hong Kong MTR and Light Rail station, route, accessibility, and live-reference data from
   DATA.GOV.HK under its custom reuse terms.
@@ -154,6 +157,10 @@ license treatment.
   Opening the exact source page may also contact provider-selected third-party web services.
 - Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
   identifiers. They do not include personal media or the rider's location.
+- Location is read on the device and sent nowhere. It is asked for only while the app is in use.
+  A trip being guided keeps reading it with the app in the background, so the trip can correct
+  itself and move its Lock Screen activity on with the phone locked; the system shows its location
+  indicator for as long as that lasts, and it stops when the trip ends.
 - The app links to the published [Privacy Policy](https://e-rail.github.io/just-go/docs/privacy/)
   and [Terms of Service](https://e-rail.github.io/just-go/docs/terms/).
 

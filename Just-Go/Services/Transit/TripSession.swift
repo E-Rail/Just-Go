@@ -1,9 +1,10 @@
+import ActivityKit
 import Foundation
 import CoreLocation
 
 /// The trip in progress: what must keep going when no screen is showing it. The position on the
-/// timeline, the fixes that correct it, every ride's "get ready" alert, and the saved copy a
-/// relaunch resumes from.
+/// timeline, the fixes that correct it, every ride's "get ready" alert, the Lock Screen's copy of
+/// the step, and the saved copy a relaunch resumes from.
 ///
 /// A trip runs from Navigate until the rider ends it or it arrives. Leaving the guidance screen
 /// does not end it. Off-route re-planning stays with the screen, which hands the new route here.
@@ -31,6 +32,11 @@ final class TripSession {
     @ObservationIgnored private var scheduledAlerts: [TripAlert] = []
     @ObservationIgnored private var arrivedAt: Date?
     @ObservationIgnored private var startedAt = Date()
+    @ObservationIgnored private var activity: Activity<TripActivityAttributes>?
+    @ObservationIgnored private var shownActivityState: TripActivityAttributes.ContentState?
+    /// Updates are awaited one after another: two sent at once can land in either order, and the
+    /// Lock Screen would keep the older.
+    @ObservationIgnored private var activityUpdates: Task<Void, Never>?
 
     /// How far an alert's time must move before it is scheduled again: a walking fix re-anchors the
     /// trip every ten metres, and each one shifts every alert by a second or two.
@@ -40,6 +46,12 @@ final class TripSession {
     /// The longest a trip is followed. Nothing on a bundled network takes this long, and a trip
     /// held open by fixes that never reach its end must not run the location hardware for a day.
     private static let longestTrip: TimeInterval = 6 * 60 * 60
+    /// How far a step's modelled end may drift before the Lock Screen is told. A walk re-anchors
+    /// on every fix, and each one moves the end by a second or two.
+    private static let activityDriftThreshold: TimeInterval = 30
+    /// How long past a step's modelled end the Lock Screen still counts as current. Beyond it the
+    /// app has stopped updating, and the activity says so in place of a position.
+    private static let activityStaleGrace: TimeInterval = 120
 
     init(locationService: LocationService, reminders: TripReminderService, tripMemory: TripMemoryService) {
         self.locationService = locationService
@@ -81,11 +93,35 @@ final class TripSession {
                 restoredAt: now
             )
             if now.timeIntervalSince(timeline.estimatedEnd) > Self.arrivedGrace {
-                ActiveTripStore.clear()
+                discardSavedTrip()
                 return nil
             }
         }
         return route
+    }
+
+    /// Forgets the trip a relaunch would resume, and takes its Lock Screen activity down: one left
+    /// by a process the system killed has no trip behind it.
+    func discardSavedTrip() {
+        ActiveTripStore.clear()
+        guard !isActive else { return }
+        endOrphanedActivities()
+    }
+
+    /// Stops still ahead on a ride, counted down as the trip moves, in the words the navigator and
+    /// the Lock Screen both print. The step's own count until there is a position to read.
+    func stopsLeftText(for step: TripStep) -> String? {
+        guard step.kind == .ride else { return nil }
+        guard let remaining = position?.stopsRemaining else { return step.rideStopsRemainingText }
+        if remaining == 1 {
+            return AppLocalization.text(english: "Get off at the next stop", simplified: "下一站下车", traditional: "下一站下車")
+        }
+        guard let next = position?.nextStopName else { return AppLocalization.stopsLeft(remaining) }
+        return AppLocalization.text(
+            english: "\(AppLocalization.stopsLeft(remaining)) · next \(next)",
+            simplified: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)",
+            traditional: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)"
+        )
     }
 
     // MARK: - Starting and ending
@@ -112,7 +148,8 @@ final class TripSession {
         ActiveTripStore.saveAnchor(timeline.anchor)
 
         locationService.onFix = { [weak self] in self?.observe($0) }
-        locationService.beginContinuousUpdates()
+        locationService.beginTripUpdates()
+        endOrphanedActivities()
         refresh(at: now)
         scheduleAlerts(force: true)
         ticker = Task { [weak self] in
@@ -156,8 +193,9 @@ final class TripSession {
         ticker?.cancel()
         ticker = nil
         cancelAlerts()
+        endActivity()
         locationService.onFix = nil
-        locationService.endContinuousUpdates()
+        locationService.endTripUpdates()
         route = nil
         plannedRoute = nil
         plan = LiveTripPlan(steps: [], origin: "", destination: "")
@@ -243,6 +281,90 @@ final class TripSession {
 
         let due = scheduledAlerts.first { $0.stepIndex == next.stepIndex && $0.fireDate <= now }?.stepIndex
         if due != alightingSoonStep { alightingSoonStep = due }
+
+        // A train asks only which station; a walk needs the street.
+        let kind = currentStep?.kind
+        locationService.setStationLevelAccuracy(kind == .ride || kind == .transfer)
+        updateActivity()
+    }
+
+    // MARK: - Lock Screen
+
+    private func activityState() -> TripActivityAttributes.ContentState? {
+        guard let step = currentStep, let position else { return nil }
+        return TripActivityAttributes.ContentState(
+            symbolName: step.symbolName,
+            // Arrival is not a leg and has no colour of its own; green is what the navigator uses.
+            colorHex: step.colorHex ?? "#34C759",
+            badge: step.kind == .ride ? step.lineName.map(LineBadge.shortLabel(for:)) : nil,
+            title: step.title,
+            detail: step.detail,
+            stopsRemaining: position.stopsRemaining,
+            stopsUnit: position.stopsRemaining.map {
+                AppLocalization.text(english: $0 == 1 ? "stop" : "stops", simplified: "站", traditional: "站")
+            },
+            stopsText: stopsLeftText(for: step),
+            basisText: position.basis.label,
+            isEstimated: position.basis == .estimated,
+            stepStartedAt: position.stepStartedAt,
+            stepEndsAt: position.stepEndsAt,
+            staleText: AppLocalization.text(
+                english: "Open Just-Go to update",
+                simplified: "打开 Just-Go 更新",
+                traditional: "開啟 Just-Go 更新"
+            )
+        )
+    }
+
+    /// Puts the current step on the Lock Screen and in the Dynamic Island, when the rider allows
+    /// Live Activities. Without them the trip runs the same, with the alerts as its only reach
+    /// outside the app.
+    private func updateActivity() {
+        guard let state = activityState() else { return }
+        if let shown = shownActivityState, shown.showsSameStep(as: state, within: Self.activityDriftThreshold) { return }
+
+        // Arrival has no length, so nothing to go stale against.
+        let staleDate = state.stepEndsAt > state.stepStartedAt
+            ? state.stepEndsAt.addingTimeInterval(Self.activityStaleGrace)
+            : nil
+        let content = ActivityContent(state: state, staleDate: staleDate)
+        if let activity {
+            shownActivityState = state
+            let previous = activityUpdates
+            activityUpdates = Task {
+                await previous?.value
+                await activity.update(content)
+            }
+            return
+        }
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        // Refused when the app is not in the foreground or the system is at its limit. The next
+        // change of step asks again.
+        activity = try? Activity.request(
+            attributes: TripActivityAttributes(destination: plan.destination),
+            content: content,
+            pushType: nil
+        )
+        if activity != nil { shownActivityState = state }
+    }
+
+    private func endActivity() {
+        shownActivityState = nil
+        guard let activity else { return }
+        self.activity = nil
+        let previous = activityUpdates
+        activityUpdates = Task {
+            await previous?.value
+            await activity.end(nil, dismissalPolicy: .immediate)
+        }
+    }
+
+    /// Activities a previous process left behind. Ended before a new one is requested, and when a
+    /// saved trip is dropped.
+    private func endOrphanedActivities() {
+        for orphan in Activity<TripActivityAttributes>.activities where orphan.id != activity?.id {
+            Task { await orphan.end(nil, dismissalPolicy: .immediate) }
+        }
     }
 
     // MARK: - Alerts
@@ -306,5 +428,33 @@ final class TripSession {
         // Every step, not only the ones last scheduled: a cancelled schedule may have got part-way.
         plan.steps.indices.forEach { reminders.cancelArrivalReminder(stationID: Self.alertKey($0)) }
         scheduledAlerts = []
+    }
+}
+
+
+extension TripBasis {
+    /// How a position is known, in a word. Nothing when the rider said so themselves: they know.
+    var label: String? {
+        switch self {
+        case .located:
+            return AppLocalization.text(english: "Located", simplified: "已定位", traditional: "已定位")
+        case .estimated:
+            return AppLocalization.text(english: "Estimated", simplified: "估算", traditional: "估算")
+        case .confirmed:
+            return nil
+        }
+    }
+}
+
+extension TripActivityAttributes.ContentState {
+    /// Whether two states put the same thing on the Lock Screen: the same words, and step times
+    /// that have not drifted far enough to be worth telling the system about.
+    func showsSameStep(as other: Self, within drift: TimeInterval) -> Bool {
+        var aligned = other
+        aligned.stepStartedAt = stepStartedAt
+        aligned.stepEndsAt = stepEndsAt
+        return aligned == self
+            && abs(other.stepEndsAt.timeIntervalSince(stepEndsAt)) <= drift
+            && abs(other.stepStartedAt.timeIntervalSince(stepStartedAt)) <= drift
     }
 }

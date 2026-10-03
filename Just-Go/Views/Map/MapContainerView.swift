@@ -124,7 +124,7 @@ struct MapContainerView: View {
                 role: .destructive
             ) {
                 pendingResumableTrip = nil
-                ActiveTripStore.clear()
+                container.tripSession.discardSavedTrip()
             }
         } message: { trip in
             Text(verbatim: "\(trip.origin) → \(trip.destination)")

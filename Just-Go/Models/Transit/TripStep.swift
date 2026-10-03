@@ -170,6 +170,17 @@ struct TripStep: Identifiable, Equatable {
     var accessibilityLabel: String {
         [title, detail, rideStopsRemainingText, readyToAlightText].compactMap { $0 }.joined(separator: ", ")
     }
+
+    /// The step's glyph, one rule for the navigator and the Lock Screen. From the step and not
+    /// only its kind: the two access kinds cover walking, cycling and driving.
+    var symbolName: String {
+        switch kind {
+        case .walkToStation, .walkToDestination: return accessMode.symbolName
+        case .ride: return SegmentType.subway.symbolName
+        case .transfer: return SegmentType.transfer.symbolName
+        case .arrive: return "flag.checkered"
+        }
+    }
 }
 
 /// An ordered, render-ready plan for the Live "Go" companion.

@@ -16,6 +16,7 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     /// Screens that need a continuous stream (live navigation) hold a session here; a
     /// one-shot request resolving must not stop the hardware while a session is active.
     private var continuousSessionCount = 0
+    private var usesStationLevelAccuracy = false
 
     /// The fix as Core Location reported it: right for "which city is this" and for measuring the
     /// correction below, wrong for everything else. See `mapSpaceLocation`.
@@ -228,6 +229,36 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         if continuousSessionCount == 0, pendingLocationContinuations.isEmpty {
             manager.stopUpdatingLocation()
         }
+    }
+
+    /// Keeps fixes coming for a trip being guided, with the app in the background too: a rider on a
+    /// train has the phone locked, and a suspended app can neither correct the trip nor move the
+    /// Lock Screen on. Still when-in-use access; the system shows its own indicator while this runs.
+    /// Balanced with `endTripUpdates()`.
+    func beginTripUpdates() {
+        manager.allowsBackgroundLocationUpdates = true
+        manager.pausesLocationUpdatesAutomatically = false
+        manager.showsBackgroundLocationIndicator = true
+        beginContinuousUpdates()
+    }
+
+    func endTripUpdates() {
+        manager.allowsBackgroundLocationUpdates = false
+        manager.pausesLocationUpdatesAutomatically = true
+        manager.showsBackgroundLocationIndicator = false
+        setStationLevelAccuracy(false)
+        endContinuousUpdates()
+    }
+
+    /// On a train the trip asks only "which station", which Wi-Fi and cell answer without the GPS
+    /// radio hunting for a sky it cannot see. On foot it needs the street.
+    func setStationLevelAccuracy(_ stationLevel: Bool) {
+        // Only on a change: Core Location restarts the stream on every assignment, and the trip
+        // asks on each tick of its clock.
+        guard stationLevel != usesStationLevelAccuracy else { return }
+        usesStationLevelAccuracy = stationLevel
+        manager.desiredAccuracy = stationLevel ? kCLLocationAccuracyHundredMeters : kCLLocationAccuracyBest
+        manager.distanceFilter = stationLevel ? 50 : 10
     }
 
     /// Warms the location cache with a single fix: `requestLocation()` delivers one update and

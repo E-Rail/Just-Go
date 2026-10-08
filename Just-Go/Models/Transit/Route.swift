@@ -92,6 +92,9 @@ struct Route: Identifiable, Codable {
 
     /// `totalDuration` is `let` and stays that way. A route's headline number should not be
     /// quietly mutable, so re-costing rebuilds the value instead.
+    ///
+    /// Every stored property has to be handed on below. One declared with a default compiles
+    /// without being listed, and is then reset on every re-costed route.
     func replacingSegments(_ newSegments: [RouteSegment], totalDuration newTotal: TimeInterval) -> Route {
         Route(
             id: id,

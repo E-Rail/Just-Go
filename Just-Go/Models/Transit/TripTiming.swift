@@ -239,6 +239,19 @@ struct LastDeparture: Codable, Equatable {
 
     var leaveByText: String { ChinaClock.clockText(leaveBy) }
 
+    /// The same limit for a trip whose legs have been re-costed. A trip that grew may reach the
+    /// limiting train that much later, so the time moves earlier by all of it: which leg grew is
+    /// not known here, and a leave-by time is acted on. A trip that shrank keeps the time it had.
+    func allowing(forExtra seconds: TimeInterval) -> LastDeparture {
+        LastDeparture(
+            leaveBy: leaveBy.addingTimeInterval(-max(0, seconds)),
+            lineName: lineName,
+            stationName: stationName,
+            lastTrainText: lastTrainText,
+            isConservative: isConservative
+        )
+    }
+
     var headline: String {
         AppLocalization.text(
             english: "Last departure \(leaveByText)",

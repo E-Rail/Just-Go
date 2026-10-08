@@ -111,6 +111,7 @@ struct Route: Identifiable, Codable {
             accessGuidance: accessGuidance,
             dataCoverage: dataCoverage,
             serviceStatus: serviceStatus,
+            lastDeparture: lastDeparture?.allowing(forExtra: newTotal - totalDuration),
             stationGuidance: stationGuidance,
             fare: fare,
             missedTrainTaxiYuan: missedTrainTaxiYuan

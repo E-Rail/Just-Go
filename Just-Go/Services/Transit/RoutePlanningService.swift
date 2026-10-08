@@ -290,6 +290,11 @@ final class RoutePlanningService {
         ).departureDate
 
         var upgraded = route
+        // Re-costing a change can move the latest departure behind the trip's own start. It is
+        // then no longer a time to offer, and the status says what there is to say.
+        if let last = upgraded.lastDeparture, last.leaveBy < departure.addingTimeInterval(-60) {
+            upgraded.lastDeparture = nil
+        }
         var closedServices: Set<ClosedServiceDirection> = []
         if route.serviceStatus == .unknown, !observed.lineHours.isEmpty {
             let verdict = serviceVerdict(for: route, departure: departure) { segment in

@@ -189,6 +189,10 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
             altitude: location.altitude,
             horizontalAccuracy: location.horizontalAccuracy,
             verticalAccuracy: location.verticalAccuracy,
+            // Carried over: the shorter initializer reports both as unknown, and a caller telling
+            // a walker from a train reads the speed.
+            course: location.course,
+            speed: location.speed,
             timestamp: location.timestamp
         )
     }

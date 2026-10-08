@@ -136,6 +136,20 @@ struct TripAlert: Equatable, Sendable {
     let stationName: String
 }
 
+/// What to change in the alerts the system holds for a trip, worked out from what it holds now.
+struct TripAlertPlan: Equatable, Sendable {
+    /// What is held once the plan is carried out. An entry whose time has come has been given.
+    var held: [TripAlert] = []
+    /// To hand to the system. Each takes the place of whatever is held for its ride, and one dated
+    /// now is to be given at once.
+    var schedule: [TripAlert] = []
+    /// Rides whose alert is withdrawn.
+    var cancel: [Int] = []
+    /// A ride a fix has put the rider at the end of before its alert came. Given at once and in
+    /// its own words: it is an observation, where every other alert is an estimate.
+    var reached: TripAlert?
+}
+
 /// A trip that moves on its own. The clock carries the position forward from the anchor, a fix
 /// corrects it, and the rider can always overrule both.
 ///
@@ -246,6 +260,48 @@ struct TripTimeline: Equatable, Sendable {
         return alerts
     }
 
+    /// The alerts as the system should hold them, given the ones it holds. `lead` is nil when the
+    /// rider has alerts off.
+    ///
+    /// A correction never takes an alert away. One whose time has passed without being given is
+    /// given at once, since a fix that shows the train further on than the clock had it is the
+    /// moment the alert matters most. One already given is not given again.
+    func alertPlan(holding held: [TripAlert], before lead: TimeInterval?, now: Date) -> TripAlertPlan {
+        var plan = TripAlertPlan()
+        guard let lead else {
+            plan.cancel = held.map(\.stepIndex)
+            return plan
+        }
+        let given = Set(held.filter { $0.fireDate <= now }.map(\.stepIndex))
+        for alert in alerts(before: lead) {
+            if alert.fireDate > now {
+                plan.held.append(alert)
+                plan.schedule.append(alert)
+            } else if given.contains(alert.stepIndex) {
+                plan.held.append(alert)
+            } else {
+                let due = TripAlert(stepIndex: alert.stepIndex, fireDate: now, stationName: alert.stationName)
+                plan.held.append(due)
+                plan.schedule.append(due)
+            }
+        }
+        let wanted = Set(plan.held.map(\.stepIndex))
+        for alert in held where !wanted.contains(alert.stepIndex) {
+            // The ride is behind the rider. Put there by a fix at its last stop, with the alert
+            // still to come, they are at the doors and have not been told. Their own Next needs
+            // no telling, and nor does a fix further on: by then they are off the train.
+            let justReached = anchor.basis == .located
+                && anchor.stepIndex == alert.stepIndex + 1
+                && anchor.elapsed == 0
+            if justReached, alert.fireDate > now {
+                plan.reached = TripAlert(stepIndex: alert.stepIndex, fireDate: now, stationName: alert.stationName)
+            } else {
+                plan.cancel.append(alert.stepIndex)
+            }
+        }
+        return plan
+    }
+
     // MARK: - Writing
 
     /// The rider says they are at this step. A ride is taken as boarded: Next onto "Board" is
@@ -256,6 +312,24 @@ struct TripTimeline: Equatable, Sendable {
         anchor = TripAnchor(
             stepIndex: stepIndex,
             elapsed: steps[stepIndex].boarding,
+            date: date,
+            basis: .confirmed
+        )
+    }
+
+    /// The rider says the trip has run ahead of them and they are still at this earlier step.
+    ///
+    /// A walk or a change starts again. A ride does not: Back onto a ride is pressed by a rider
+    /// the clock has already taken off the train, so they are near its end, and starting the ride
+    /// over would count every stop again and put its alert a whole ride late. It is taken to be on
+    /// its last hop, the latest place that is still on the train.
+    mutating func goBack(to stepIndex: Int, at date: Date) {
+        guard steps.indices.contains(stepIndex) else { return }
+        let step = steps[stepIndex]
+        let lastHop = step.stops.count >= 2 ? step.stops[step.stops.count - 2].offset : 0
+        anchor = TripAnchor(
+            stepIndex: stepIndex,
+            elapsed: step.boarding + lastHop,
             date: date,
             basis: .confirmed
         )
@@ -408,7 +482,10 @@ struct TripTimeline: Equatable, Sendable {
 
     private func stopsPassed(in step: TimelineStep, elapsed: TimeInterval) -> Int {
         guard step.kind == .ride else { return 0 }
-        let riding = elapsed - step.boarding
-        return step.stops.lastIndex { $0.offset <= riding } ?? 0
+        // `boarding + offset` on the stop's side, the sum an anchor at a stop is written with.
+        // Taking the boarding time off `elapsed` instead does not always give the offset back
+        // (180 + 88.7 - 180 is a hair under 88.7), and a rider just located at a stop would read
+        // as one stop short of it, and then as estimated.
+        return step.stops.lastIndex { step.boarding + $0.offset <= elapsed } ?? 0
     }
 }

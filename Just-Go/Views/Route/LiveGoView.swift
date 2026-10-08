@@ -471,6 +471,10 @@ struct LiveGoView: View {
 
     // MARK: - Off-route recovery
 
+    /// Metres a second. Faster than a rider runs for a train, and slower than a train anywhere but
+    /// its last few metres into a platform. An unknown speed is reported as negative and passes.
+    private static let fastestWalk: CLLocationSpeed = 4
+
     /// Off-route detection runs only on walking steps with a decent fix: underground, GPS drifts or
     /// vanishes, and rerouting on tunnel noise would re-plan a trip the rider is following
     /// correctly.
@@ -488,6 +492,14 @@ struct LiveGoView: View {
               location.horizontalAccuracy >= 0,
               location.horizontalAccuracy <= 65,
               let step = session.currentStep,
+              // Only a walk the rider is known to be on. One the clock alone has reached is a
+              // guess: a train running a minute late above ground is still on the track, far from
+              // a walk the estimate has already begun, and re-planning from there replaces a trip
+              // the rider is following correctly.
+              session.position?.basis != .estimated,
+              // And nobody walks at this speed. A fix can end a ride a few hundred metres short of
+              // the platform, and the train is then still rolling in, off the walk's path.
+              location.speed <= Self.fastestWalk,
               // Only walking legs: off-route detection is tuned to a 100 m pedestrian corridor, and
               // a bike or car leg is handed to another app.
               step.accessMode == .walking,
@@ -517,6 +529,9 @@ struct LiveGoView: View {
     private func reroute(from coordinate: CLLocationCoordinate2D) async {
         guard let ground = route.groundDestination else { return }
         let destination = CLLocationCoordinate2D(latitude: ground.latitude, longitude: ground.longitude)
+        // Read now: the plan below takes seconds, and the trip's clock does not wait for it.
+        let headedForATrain = session.currentStep?.kind == .walkToStation
+            && route.boardingTransitSegment != nil
         isRerouting = true
         lastRerouteAt = Date()
         rerouteInterval = min(rerouteInterval * 2, 480)
@@ -539,15 +554,18 @@ struct LiveGoView: View {
                 )
             )
             // Ranked the way the results list ranks them, boardable first; the planner's own order
-            // can put a drive or a shut line first. A rider following a train trip is re-planned
-            // onto a train trip: by time alone a short trip comes back as a drive, and nobody
-            // walking to a station wants to be told to get in a car.
+            // can put a drive or a shut line first. A rider walking to their train is re-planned
+            // onto a train trip, where time alone would bring a short one back as something else.
+            // One already off their last train wants the quickest way from here.
             let ranked = container.routePlanningService.sortRoutes(
                 routes,
-                by: route.boardingTransitSegment != nil ? .metroFirst : .fastest,
+                by: headedForATrain ? .metroFirst : .fastest,
                 preferences: preference
             )
-            guard let newRoute = ranked.first else { throw RoutePlanningError.noRouteFound }
+            // On foot, as the rider is: off-route detection runs on walking legs only, and nobody
+            // who strayed from a walk wants to be told to get in a car.
+            let onFoot = ranked.first { $0.segments.allSatisfy { $0.accessLegMode == .walking } }
+            guard let newRoute = onFoot ?? ranked.first else { throw RoutePlanningError.noRouteFound }
             // The plan can outlive the screen (`MKLocalSearch` ignores cancellation), and nothing
             // below should happen to a trip the rider has left.
             guard !Task.isCancelled else { return }

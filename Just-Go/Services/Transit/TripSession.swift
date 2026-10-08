@@ -100,11 +100,18 @@ final class TripSession {
         return route
     }
 
-    /// Forgets the trip a relaunch would resume, and takes its Lock Screen activity down: one left
-    /// by a process the system killed has no trip behind it.
+    /// Forgets the trip a relaunch would resume, and takes down what the app that saved it left
+    /// with the system: its Lock Screen activity, and the alerts for rides it never reached. Both
+    /// outlive the process, and neither has a trip behind it any more.
     func discardSavedTrip() {
+        let saved = ActiveTripStore.load()
         ActiveTripStore.clear()
         guard !isActive else { return }
+        if let saved {
+            LiveGoTripBuilder().plan(for: saved).steps.indices.forEach {
+                reminders.cancelArrivalReminder(stationID: Self.alertKey($0))
+            }
+        }
         endOrphanedActivities()
     }
 

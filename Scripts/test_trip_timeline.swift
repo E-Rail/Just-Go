@@ -153,8 +153,23 @@ private func testTheRidersWordIsNotWalkedBack() throws {
     try expect(!timeline.observe(fix(stopA, accuracy: 120, at: 720), now: at(720)), "a boarding-station fix undid the rider's word")
 
     // And the rider can always go back.
-    timeline.confirm(stepIndex: 0, at: at(800))
+    timeline.goBack(to: 0, at: at(800))
     try expect(timeline.position(at: at(800)).stepIndex == 0, "Back did not go back")
+    try expect(timeline.anchor.elapsed == 0, "Back onto a walk must start it again")
+}
+
+private func testBackOntoARideIsItsLastHop() throws {
+    var timeline = trip()
+    // By the clock the ride ended at 1,140 and the change is a minute old. The rider is still aboard.
+    try expect(timeline.position(at: at(1_200)).stepIndex == 2, "the clock did not reach the change")
+    timeline.goBack(to: 1, at: at(1_200))
+
+    let aboard = timeline.position(at: at(1_200))
+    try expect(aboard.stepIndex == 1 && aboard.basis == .confirmed, "Back did not return to the ride")
+    try expect(aboard.stopsRemaining == 1 && aboard.nextStopName == "D", "Back onto a ride started the ride over")
+    try expect(aboard.departureKnown, "a rider who went back to a ride is on the train")
+    // One hop of 120 s left, so the stop is two minutes off and not a whole ride.
+    try expect(timeline.position(at: at(1_320)).stepIndex == 2, "the ride gone back to did not end after its last hop")
 }
 
 private func testAStationFixCorrectsTheRide() throws {
@@ -173,6 +188,34 @@ private func testAStationFixCorrectsTheRide() throws {
     let between = north(550, from: stopC)
     try expect(!timeline.observe(fix(between, accuracy: 150, at: 950), now: at(950)), "a fix between two stops named one of them")
     try expect(!timeline.observe(fix(stopD, accuracy: 350, at: 1_000), now: at(1_000)), "a fix too loose to name a stop was used")
+}
+
+private func testAStopReachedReadsAsThatStopWhateverItsTime() throws {
+    // Hop times as the planner gives them: not round, and 180 + 88.7 - 180 is a hair under 88.7.
+    var timeline = TripTimeline(
+        steps: [
+            TimelineStep(
+                kind: .ride,
+                duration: 180 + 301.9,
+                stops: [
+                    TimelineStop(name: "A", point: stopA, offset: 0),
+                    TimelineStop(name: "B", point: stopB, offset: 88.7),
+                    TimelineStop(name: "C", point: stopC, offset: 190.4),
+                    TimelineStop(name: "D", point: stopD, offset: 301.9)
+                ],
+                boarding: 180
+            ),
+            TimelineStep(kind: .arrive, duration: 0)
+        ],
+        startedAt: start
+    )
+    for (stop, name, left) in [(stopB, "C", 2), (stopC, "D", 1)] {
+        try expect(timeline.observe(fix(stop, at: 200), now: at(200)), "a station fix was ignored")
+        let located = timeline.position(at: at(200))
+        try expect(located.stopsRemaining == left && located.nextStopName == name, "a rider at a stop was counted one stop short of it")
+        try expect(located.basis == .located, "a rider just located at a stop read as estimated")
+        try expect(timeline.position(at: at(230)).basis == .located, "a located stop turned into an estimate while the train was still on the same hop")
+    }
 }
 
 private func testAStopTooFarFromTheEstimateIsRefused() throws {
@@ -244,6 +287,65 @@ private func testAlertsCoverEveryRideAndMoveWithTheAnchor() throws {
     try expect(timeline.alerts(before: 120).map(\.stepIndex) == [3], "a finished ride must have no alert")
 }
 
+private func testAnAlertWhoseTimeHasPassedIsGivenOnce() throws {
+    var timeline = trip()
+    timeline.confirm(stepIndex: 1, at: at(600))
+    // Boarded at 600 and at D by 960: with 150 s of notice the alert is for 810.
+    var held = timeline.alertPlan(holding: [], before: 150, now: at(600)).held
+    try expect(held.map(\.fireDate) == [at(810), at(1_530)], "the first plan does not follow the modelled trip")
+
+    // At 790 the train is already at C, one hop from D. The alert's moment was half a minute ago,
+    // and the one the system holds is still twenty seconds off.
+    try expect(timeline.observe(fix(stopC, accuracy: 150, at: 790), now: at(790)), "a station fix was ignored")
+    let corrected = timeline.alertPlan(holding: held, before: 150, now: at(790))
+    try expect(
+        corrected.schedule.first == TripAlert(stepIndex: 1, fireDate: at(790), stationName: "D"),
+        "an alert whose time passed before it was given must be given at once"
+    )
+    try expect(corrected.cancel.isEmpty && corrected.reached == nil, "a corrected alert was withdrawn")
+    held = corrected.held
+
+    // The same question ten seconds later: the rider has been told.
+    let after = timeline.alertPlan(holding: held, before: 150, now: at(800))
+    try expect(!after.schedule.contains { $0.stepIndex == 1 }, "an alert already given was given again")
+    try expect(after.held.contains { $0.stepIndex == 1 }, "an alert already given was forgotten")
+    try expect(after.cancel.isEmpty, "an alert already given was withdrawn")
+}
+
+private func testReachingTheStopBeforeItsAlertSaysSo() throws {
+    var timeline = trip()
+    timeline.confirm(stepIndex: 1, at: at(600))
+    let held = timeline.alertPlan(holding: [], before: 120, now: at(600)).held
+
+    // At D by 780, a minute before the alert for it.
+    try expect(timeline.observe(fix(stopD, accuracy: 100, at: 780), now: at(780)), "arriving at the last stop was ignored")
+    let arrived = timeline.alertPlan(holding: held, before: 120, now: at(780))
+    try expect(
+        arrived.reached == TripAlert(stepIndex: 1, fireDate: at(780), stationName: "D"),
+        "a rider at their stop before its alert must be told they are there"
+    )
+    try expect(!arrived.cancel.contains(1), "the alert for a stop just reached was withdrawn")
+    try expect(arrived.held.map(\.stepIndex) == [3], "a finished ride's alert was kept")
+
+    // The rider's own Next is not news to them.
+    var pressed = trip()
+    pressed.confirm(stepIndex: 1, at: at(600))
+    pressed.confirm(stepIndex: 2, at: at(780))
+    let moved = pressed.alertPlan(holding: held, before: 120, now: at(780))
+    try expect(moved.reached == nil && moved.cancel == [1], "Next past a ride must withdraw its alert and say nothing")
+
+    // Out on the street past the last ride: the rider got off without being told to.
+    var surfaced = trip()
+    surfaced.confirm(stepIndex: 1, at: at(600))
+    surfaced.observe(fix(east(200, from: stopF), at: 1_300), now: at(1_300))
+    let outside = surfaced.alertPlan(holding: held, before: 120, now: at(1_300))
+    try expect(outside.reached == nil && outside.cancel == [1, 3], "a rider already on the street was told to get off")
+
+    // Alerts turned off withdraw every one.
+    let silenced = trip().alertPlan(holding: held, before: nil, now: at(600))
+    try expect(silenced.held.isEmpty && silenced.schedule.isEmpty && silenced.cancel == [1, 3], "alerts turned off were kept")
+}
+
 private func testASavedAnchorIsRestoredAndAForeignOneIsNot() throws {
     let steps = trip().steps
     let saved = TripAnchor(stepIndex: 3, elapsed: 150, date: at(2_000), basis: .located)
@@ -279,12 +381,16 @@ private enum TripTimelineHarness {
             ("another door into the station ends the walk", testAnotherDoorIntoTheStationEndsTheWalk),
             ("boarding-station fixes hold the train for a limited time", testFixesAtTheBoardingStationHoldTheTrainForALimitedTime),
             ("the rider's word is not walked back", testTheRidersWordIsNotWalkedBack),
+            ("Back onto a ride is its last hop", testBackOntoARideIsItsLastHop),
             ("a station fix corrects the ride", testAStationFixCorrectsTheRide),
+            ("a stop reached reads as that stop whatever its time", testAStopReachedReadsAsThatStopWhateverItsTime),
             ("a stop too far from the estimate is refused", testAStopTooFarFromTheEstimateIsRefused),
             ("a change is not skipped by standing in the station", testAChangeIsNotSkippedByStandingInTheStation),
             ("coming back above ground finds the trip", testComingBackAboveGroundFindsTheTrip),
             ("fixes that prove nothing are ignored", testFixesThatProveNothingAreIgnored),
             ("alerts cover every ride and move with the anchor", testAlertsCoverEveryRideAndMoveWithTheAnchor),
+            ("an alert whose time has passed is given once", testAnAlertWhoseTimeHasPassedIsGivenOnce),
+            ("reaching the stop before its alert says so", testReachingTheStopBeforeItsAlertSaysSo),
             ("a saved anchor is restored and a foreign one is not", testASavedAnchorIsRestoredAndAForeignOneIsNot),
             ("projection measures off and along", testProjectionMeasuresOffAndAlong)
         ]

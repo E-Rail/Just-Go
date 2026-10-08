@@ -129,7 +129,10 @@ final class TripSession {
     /// Begins following a route, or does nothing when it is already the one being followed. A
     /// saved trip resumes from its saved position.
     func start(_ route: Route) {
-        guard self.route?.id != route.id else { return }
+        // Also the route this trip was planned from: an off-route re-plan has since replaced it,
+        // and opening guidance from the original's page must show the trip under way, not start
+        // the old one over.
+        guard route.id != self.route?.id, route.id != plannedRoute?.id else { return }
         stop()
 
         let now = Date()
@@ -174,6 +177,9 @@ final class TripSession {
     /// Swaps in a freshly planned route (off-route recovery) and starts its steps from the first.
     func reroute(with newRoute: Route) {
         guard isActive else { return }
+        // The old route's alerts go with it. Left to be replaced step by step, one already given
+        // would count as given for whichever ride of the new route has its number.
+        cancelAlerts()
         let now = Date()
         let builder = LiveGoTripBuilder()
         let timeline = TripTimeline(steps: builder.timelineSteps(for: newRoute), startedAt: now)
@@ -214,7 +220,9 @@ final class TripSession {
 
     func goBack() {
         guard canGoBack else { return }
-        confirm(stepIndex: currentIndex - 1)
+        let now = Date()
+        timeline?.goBack(to: currentIndex - 1, at: now)
+        anchorMoved(at: now)
     }
 
     /// "I'm on the train": the one moment the clock cannot work out for itself.
@@ -388,26 +396,67 @@ final class TripSession {
     private static func alertKey(_ stepIndex: Int) -> String { "trip-step-\(stepIndex)" }
 
     /// Every ride's alert, set at once, so a rider whose phone stays in a pocket from the first
-    /// platform to the last is still told at each stop they leave at.
+    /// platform to the last is still told at each stop they leave at. `TripTimeline.alertPlan`
+    /// decides what changes; this carries it out.
     private func scheduleAlerts(force: Bool) {
-        guard let timeline else { return }
-        let wanted = alertsEnabled ? timeline.alerts(before: alertLead) : []
-        let unchanged = wanted.count == scheduledAlerts.count && zip(wanted, scheduledAlerts).allSatisfy {
-            $0.stepIndex == $1.stepIndex
-                && abs($0.fireDate.timeIntervalSince($1.fireDate)) <= Self.alertRescheduleThreshold
-        }
+        guard let timeline, let routeID = route?.id else { return }
+        let now = Date()
+        let alerts = timeline.alertPlan(
+            holding: scheduledAlerts,
+            before: alertsEnabled ? alertLead : nil,
+            now: now
+        )
+        let unchanged = alerts.cancel.isEmpty && alerts.reached == nil
+            && alerts.held.count == scheduledAlerts.count
+            && zip(alerts.held, scheduledAlerts).allSatisfy {
+                $0.stepIndex == $1.stepIndex
+                    && abs($0.fireDate.timeIntervalSince($1.fireDate)) <= Self.alertRescheduleThreshold
+            }
         guard force || !unchanged else { return }
 
-        let dropped = Set(scheduledAlerts.map(\.stepIndex)).subtracting(wanted.map(\.stepIndex))
-        dropped.forEach { reminders.cancelArrivalReminder(stationID: Self.alertKey($0)) }
-        scheduledAlerts = wanted
+        alerts.cancel.forEach { reminders.cancelArrivalReminder(stationID: Self.alertKey($0)) }
+        scheduledAlerts = alerts.held
 
         let steps = plan.steps
+        let exitHint: (TripAlert) -> String? = { alert in
+            steps.indices.contains(alert.stepIndex) ? steps[alert.stepIndex].exitHint : nil
+        }
+
+        // What is to be given now goes by itself and is not cancelled by a newer schedule. The
+        // plan already counts it as given, so one lost to a fix arriving a moment later would
+        // never be made up.
+        let dueNow = alerts.schedule.filter { $0.fireDate <= now }
+        if !dueNow.isEmpty || alerts.reached != nil {
+            Task { [weak self, reminders] in
+                // Still this trip: authorization can wait on a first-run prompt, and the rider
+                // may have ended the trip behind it.
+                guard await reminders.requestAuthorization(), self?.route?.id == routeID else { return }
+                for alert in dueNow {
+                    await reminders.scheduleArrivalReminder(
+                        stationID: Self.alertKey(alert.stepIndex),
+                        stationName: alert.stationName,
+                        exitHint: exitHint(alert),
+                        fireDate: alert.fireDate
+                    )
+                }
+                if let reached = alerts.reached {
+                    await reminders.scheduleArrivalReminder(
+                        stationID: Self.alertKey(reached.stepIndex),
+                        stationName: reached.stationName,
+                        exitHint: exitHint(reached),
+                        fireDate: reached.fireDate,
+                        reached: true
+                    )
+                }
+            }
+        }
+
+        let later = alerts.schedule.filter { $0.fireDate > now }
         alertTask?.cancel()
-        guard !wanted.isEmpty else { return }
+        guard !later.isEmpty else { return }
         alertTask = Task { [reminders] in
             guard await reminders.requestAuthorization() else { return }
-            for alert in wanted {
+            for alert in later {
                 // Authorization can wait on a first-run prompt, and each `add` is its own await. A
                 // newer schedule takes over from wherever this one got to: the keys are per step,
                 // so it replaces what is here.
@@ -415,7 +464,7 @@ final class TripSession {
                 await reminders.scheduleArrivalReminder(
                     stationID: Self.alertKey(alert.stepIndex),
                     stationName: alert.stationName,
-                    exitHint: steps.indices.contains(alert.stepIndex) ? steps[alert.stepIndex].exitHint : nil,
+                    exitHint: exitHint(alert),
                     fireDate: alert.fireDate
                 )
             }

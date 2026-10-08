@@ -27,6 +27,9 @@ unavailable rather than inferred.
   DATA.GOV.HK under its custom reuse terms.
 - Official Hong Kong live arrivals from the government transport API, with timeout, cache,
   request-coalescing, and rate-limit handling.
+- The latest departure for a trip: the last moment it can start and still ride every train in it,
+  with the ride that sets the limit and a reminder. Shown only where the operator publishes a
+  first and a last train for every ride in the trip.
 - Native three-category station information for 416 reviewed Beijing Subway stations
   (First / Last, Exits, Facilities) and all 162 Hong Kong stations
   (Live Trains, Exits, Facilities).

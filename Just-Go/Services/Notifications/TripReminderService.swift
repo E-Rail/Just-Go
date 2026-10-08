@@ -2,9 +2,9 @@ import Foundation
 import UserNotifications
 
 /// The app's only notification layer: a "time to leave" reminder for an explicit departure plan,
-/// and a trip's "get off" alerts. Authorization is asked for when first needed, never at launch.
-/// A leave reminder whose time has passed is not scheduled; a "get off" alert whose time has
-/// passed is given at once.
+/// one for the night's last departure, and a trip's "get off" alerts. Authorization is asked for
+/// when first needed, never at launch. A leave reminder whose time has passed is not scheduled; a
+/// "get off" alert whose time has passed is given at once.
 @MainActor
 final class TripReminderService {
     private let center = UNUserNotificationCenter.current()
@@ -19,6 +19,9 @@ final class TripReminderService {
     /// One identifier for every leave reminder, so the system keeps a single one however many times
     /// a trip is re-planned.
     private let leaveIdentifier = "trip-leave"
+    /// Its own identifier: a rider can hold a leave-by reminder for a planned time and a
+    /// last-departure one for the night's last train, and neither replaces the other.
+    private let lastDepartureIdentifier = "last-departure"
     private func arrivalIdentifier(for stationID: String) -> String { "station-arrive-\(stationID)" }
 
     func authorizationStatus() async -> UNAuthorizationStatus {
@@ -57,6 +60,45 @@ final class TripReminderService {
         let request = UNNotificationRequest(identifier: leaveIdentifier, content: content, trigger: trigger)
         // `add` throws (the 64-pending limit is reachable) and the caller shows the reminder as set
         // on this answer, so a swallowed throw would claim a reminder that does not exist.
+        do {
+            try await center.add(request)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// Schedules the reminder `leadMinutes` before the latest moment a trip can start and still ride
+    /// every train in it. Returns false when nothing was scheduled, as `scheduleReminder` does.
+    @discardableResult
+    func scheduleLastDepartureReminder(
+        _ lastDeparture: LastDeparture,
+        destination: String,
+        leadMinutes: Int
+    ) async -> Bool {
+        center.removePendingNotificationRequests(withIdentifiers: [lastDepartureIdentifier])
+        let fireDate = lastDeparture.leaveBy.addingTimeInterval(TimeInterval(-leadMinutes * 60))
+        guard fireDate > Date() else { return false }
+
+        let content = UNMutableNotificationContent()
+        content.title = AppLocalization.text(
+            english: "Leave soon for the last train",
+            simplified: "该出发赶末班车了",
+            traditional: "該出發趕末班車了"
+        )
+        content.body = AppLocalization.text(
+            english: "Leave by \(lastDeparture.leaveByText) to reach \(destination) by rail. \(lastDeparture.detail).",
+            simplified: "请于 \(lastDeparture.leaveByText) 前出发，才能乘地铁到达\(destination)。\(lastDeparture.detail)。",
+            traditional: "請於 \(lastDeparture.leaveByText) 前出發，才能搭地鐵抵達\(destination)。\(lastDeparture.detail)。"
+        )
+        content.sound = .default
+
+        var components = ChinaClock.calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+        components.timeZone = ChinaClock.calendar.timeZone
+        // The calendar too, for the reason given in `scheduleReminder`.
+        components.calendar = ChinaClock.calendar
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let request = UNNotificationRequest(identifier: lastDepartureIdentifier, content: content, trigger: trigger)
         do {
             try await center.add(request)
             return true

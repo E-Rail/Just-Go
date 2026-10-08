@@ -219,6 +219,63 @@ func unverifiedServiceHoursNotice(status: RouteServiceStatus, departing departur
     )
 }
 
+/// The latest moment this trip can start and still ride every train in it. Worked out from the
+/// operator's last trains, so it exists only where every ride in the trip has one.
+struct LastDeparture: Codable, Equatable {
+    /// Held back from the true latest moment. Ride time is modelled per hop and nothing waits for
+    /// a train, so a plan that reaches the platform as the last train leaves is a missed train.
+    static let safetyMargin: TimeInterval = 5 * 60
+
+    let leaveBy: Date
+    /// The ride that sets the limit, which on a trip with a change is usually not the first: the
+    /// connection is later and closer to closing.
+    let lineName: String
+    let stationName: String
+    /// That ride's last train, as the operator prints it.
+    let lastTrainText: String
+    /// True when the limiting ride's last train could not be pinned to the rider's direction and
+    /// the earliest candidate was used: the rider may have a little longer than this says.
+    let isConservative: Bool
+
+    var leaveByText: String { ChinaClock.clockText(leaveBy) }
+
+    /// The same limit for a trip whose legs have been re-costed. A trip that grew may reach the
+    /// limiting train that much later, so the time moves earlier by all of it: which leg grew is
+    /// not known here, and a leave-by time is acted on. A trip that shrank keeps the time it had.
+    func allowing(forExtra seconds: TimeInterval) -> LastDeparture {
+        LastDeparture(
+            leaveBy: leaveBy.addingTimeInterval(-max(0, seconds)),
+            lineName: lineName,
+            stationName: stationName,
+            lastTrainText: lastTrainText,
+            isConservative: isConservative
+        )
+    }
+
+    var headline: String {
+        AppLocalization.text(
+            english: "Last departure \(leaveByText)",
+            simplified: "最晚 \(leaveByText) 出发",
+            traditional: "最晚 \(leaveByText) 出發"
+        )
+    }
+
+    /// Which train sets the limit, and that the time errs early when it does.
+    var detail: String {
+        let limit = AppLocalization.text(
+            english: "Last \(lineName) from \(stationName) is \(lastTrainText)",
+            simplified: "\(stationName)的\(lineName)末班车为 \(lastTrainText)",
+            traditional: "\(stationName)的\(lineName)末班車為 \(lastTrainText)"
+        )
+        guard isConservative else { return limit }
+        return limit + AppLocalization.text(
+            english: ", the earliest of its directions",
+            simplified: "（取各方向中最早的）",
+            traditional: "（取各方向中最早的）"
+        )
+    }
+}
+
 enum LastTrainStatus: Equatable {
     case unknown
     case ok

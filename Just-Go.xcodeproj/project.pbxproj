@@ -39,6 +39,14 @@
 		A1000027 /* Transit/SubwayLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* Transit/SubwayLine.swift */; };
 		A1000028 /* Transit/Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* Transit/Route.swift */; };
 		A1000410 /* Transit/MetroStationIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000410 /* Transit/MetroStationIdentifier.swift */; };
+		A1000980 /* Transit/TripTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000980 /* Transit/TripTimeline.swift */; };
+		A1000981 /* Transit/TripSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000981 /* Transit/TripSession.swift */; };
+		A1000982 /* Transit/TripActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000982 /* Transit/TripActivityAttributes.swift */; };
+		AE100001 /* TripLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE200001 /* TripLiveActivity.swift */; };
+		AE100005 /* TripActivityViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE200003 /* TripActivityViews.swift */; };
+		AE100002 /* Transit/TripActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000982 /* Transit/TripActivityAttributes.swift */; };
+		AE100003 /* Extensions/Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* Extensions/Color+Hex.swift */; };
+		AE100004 /* Just-GoLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AE300001 /* Just-GoLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1000029 /* Transit/RealTimeArrival.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029 /* Transit/RealTimeArrival.swift */; };
 		A100002B /* City/City.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002B /* City/City.swift */; };
 		A100002D /* User/AccessibilityPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200002D /* User/AccessibilityPreference.swift */; };
@@ -52,6 +60,8 @@
 		A100003F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5000013 /* InfoPlist.strings */; };
 		A1000040 /* Map/TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000045 /* Map/TransitMapView.swift */; };
 		A1000960 /* Map/LineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000960 /* Map/LineDetailView.swift */; };
+		A1000983 /* Map/RiderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000983 /* Map/RiderPanel.swift */; };
+		A1000984 /* Components/SavedPlaceChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000984 /* Components/SavedPlaceChips.swift */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
 		A100004B /* Transit/TransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Transit/TransitFormatting.swift */; };
@@ -122,6 +132,30 @@
 		A1000311 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000311 /* manifest.json */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		AE900001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AE600001;
+			remoteInfo = "Just-GoLiveActivity";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AE700004 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AE100004 /* Just-GoLiveActivity.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		A2000001 /* JustGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustGoApp.swift; sourceTree = "<group>"; };
 		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -155,6 +189,13 @@
 		A2000027 /* Transit/SubwayLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/SubwayLine.swift; sourceTree = "<group>"; };
 		A2000028 /* Transit/Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/Route.swift; sourceTree = "<group>"; };
 		A2000410 /* Transit/MetroStationIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/MetroStationIdentifier.swift; sourceTree = "<group>"; };
+		A2000980 /* Transit/TripTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripTimeline.swift; sourceTree = "<group>"; };
+		A2000981 /* Transit/TripSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripSession.swift; sourceTree = "<group>"; };
+		A2000982 /* Transit/TripActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TripActivityAttributes.swift; sourceTree = "<group>"; };
+		AE200001 /* TripLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLiveActivity.swift; sourceTree = "<group>"; };
+		AE200003 /* TripActivityViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripActivityViews.swift; sourceTree = "<group>"; };
+		AE200002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AE300001 /* Just-GoLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Just-GoLiveActivity.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000029 /* Transit/RealTimeArrival.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/RealTimeArrival.swift; sourceTree = "<group>"; };
 		A200002B /* City/City.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = City/City.swift; sourceTree = "<group>"; };
 		A200002D /* User/AccessibilityPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/AccessibilityPreference.swift; sourceTree = "<group>"; };
@@ -173,6 +214,8 @@
 		A2000044 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A2000045 /* Map/TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/TransitMapView.swift; sourceTree = "<group>"; };
 		A2000960 /* Map/LineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/LineDetailView.swift; sourceTree = "<group>"; };
+		A2000983 /* Map/RiderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/RiderPanel.swift; sourceTree = "<group>"; };
+		A2000984 /* Components/SavedPlaceChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/SavedPlaceChips.swift; sourceTree = "<group>"; };
 		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -254,6 +297,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AE400001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -261,8 +311,19 @@
 			isa = PBXGroup;
 			children = (
 				A5000002 /* Just-Go */,
+				AE500001 /* Just-GoLiveActivity */,
 				A5000010 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		AE500001 /* Just-GoLiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				AE200001 /* TripLiveActivity.swift */,
+				AE200003 /* TripActivityViews.swift */,
+				AE200002 /* Info.plist */,
+			);
+			path = "Just-GoLiveActivity";
 			sourceTree = "<group>";
 		};
 		A5000002 /* Just-Go */ = {
@@ -320,6 +381,8 @@
 				A2000027 /* Transit/SubwayLine.swift */,
 				A2000028 /* Transit/Route.swift */,
 				A2000410 /* Transit/MetroStationIdentifier.swift */,
+				A2000980 /* Transit/TripTimeline.swift */,
+				A2000982 /* Transit/TripActivityAttributes.swift */,
 				A2000029 /* Transit/RealTimeArrival.swift */,
 				A2000053 /* Transit/RouteFeasibility.swift */,
 				A2000061 /* Transit/RoutePreference.swift */,
@@ -338,6 +401,7 @@
 			children = (
 				A2000600 /* Data/OfficialTransitResourceCatalog.swift */,
 				A2000305 /* Transit/TripConfidenceServices.swift */,
+				A2000981 /* Transit/TripSession.swift */,
 				A2000315 /* Transit/ServiceHoursResolver.swift */,
 				A2000316 /* Transit/TransitNameMatching.swift */,
 				A2000317 /* Map/ExternalRouteHandoff.swift */,
@@ -393,6 +457,8 @@
 				A2000005 /* Map/MapContainerView.swift */,
 				A2000045 /* Map/TransitMapView.swift */,
 				A2000960 /* Map/LineDetailView.swift */,
+				A2000983 /* Map/RiderPanel.swift */,
+				A2000984 /* Components/SavedPlaceChips.swift */,
 				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
 				A2000062 /* Station/StationDetailView+Accessibility.swift */,
@@ -447,6 +513,7 @@
 			isa = PBXGroup;
 			children = (
 				A3000001 /* Just-Go.app */,
+				AE300001 /* Just-GoLiveActivity.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -470,15 +537,34 @@
 				A7000001 /* Sources */,
 				A4000001 /* Frameworks */,
 				A7000002 /* Resources */,
+				AE700004 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AE900002 /* PBXTargetDependency */,
 			);
 			name = "Just-Go";
 			productName = "Just-Go";
 			productReference = A3000001 /* Just-Go.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AE600001 /* Just-GoLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AE800001 /* Build configuration list for PBXNativeTarget "Just-GoLiveActivity" */;
+			buildPhases = (
+				AE700001 /* Sources */,
+				AE400001 /* Frameworks */,
+				AE700002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Just-GoLiveActivity";
+			productName = "Just-GoLiveActivity";
+			productReference = AE300001 /* Just-GoLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -492,6 +578,9 @@
 				TargetAttributes = {
 					A6000001 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					AE600001 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -511,6 +600,7 @@
 			projectRoot = "";
 			targets = (
 				A6000001 /* Just-Go */,
+				AE600001 /* Just-GoLiveActivity */,
 			);
 		};
 /* End PBXProject section */
@@ -530,6 +620,13 @@
 				A1000507 /* THIRD_PARTY_NOTICES.md in Resources */,
 				A100003D /* Localizable.strings in Resources */,
 				A100003F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE700002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,6 +657,8 @@
 				A1000006 /* Map/MapViewModel.swift in Sources */,
 				A1000040 /* Map/TransitMapView.swift in Sources */,
 				A1000960 /* Map/LineDetailView.swift in Sources */,
+				A1000983 /* Map/RiderPanel.swift in Sources */,
+				A1000984 /* Components/SavedPlaceChips.swift in Sources */,
 				A1000008 /* Station/StationDetailView.swift in Sources */,
 				A1000062 /* Station/StationDetailView+Accessibility.swift in Sources */,
 				A1000063 /* Station/StationDetailView+DataSections.swift in Sources */,
@@ -619,6 +718,9 @@
 				A1000027 /* Transit/SubwayLine.swift in Sources */,
 				A1000028 /* Transit/Route.swift in Sources */,
 				A1000410 /* Transit/MetroStationIdentifier.swift in Sources */,
+				A1000980 /* Transit/TripTimeline.swift in Sources */,
+				A1000981 /* Transit/TripSession.swift in Sources */,
+				A1000982 /* Transit/TripActivityAttributes.swift in Sources */,
 				A1000029 /* Transit/RealTimeArrival.swift in Sources */,
 				A1000053 /* Transit/RouteFeasibility.swift in Sources */,
 				A1000061 /* Transit/RoutePreference.swift in Sources */,
@@ -646,7 +748,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AE700001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE100001 /* TripLiveActivity.swift in Sources */,
+				AE100005 /* TripActivityViews.swift in Sources */,
+				AE100002 /* Transit/TripActivityAttributes.swift in Sources */,
+				AE100003 /* Extensions/Color+Hex.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AE900002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AE600001 /* Just-GoLiveActivity */;
+			targetProxy = AE900001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		A5000012 /* Localizable.strings */ = {
@@ -700,6 +821,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -719,6 +841,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -757,6 +880,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -770,6 +894,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -787,7 +912,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
@@ -801,7 +925,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.erail.just-go";
 				PRODUCT_MODULE_NAME = JustGo;
 				PRODUCT_NAME = "Just-Go";
@@ -821,7 +944,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Just-Go/Just-Go.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44UAJ3CD7S;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Just-Go/Just-Go-Info.plist";
@@ -835,10 +957,61 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.erail.just-go";
 				PRODUCT_MODULE_NAME = JustGo;
 				PRODUCT_NAME = "Just-Go";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AEB00001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Just-GoLiveActivity/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Just-Go";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.erail.just-go.LiveActivity";
+				PRODUCT_MODULE_NAME = JustGoLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AEB00002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44UAJ3CD7S;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Just-GoLiveActivity/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Just-Go";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.erail.just-go.LiveActivity";
+				PRODUCT_MODULE_NAME = JustGoLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -864,6 +1037,15 @@
 			buildConfigurations = (
 				AA000001 /* Debug */,
 				AA000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AE800001 /* Build configuration list for PBXNativeTarget "Just-GoLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AEB00001 /* Debug */,
+				AEB00002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -99,6 +99,21 @@ final class MapViewModel {
         markerRefreshTask?.cancel()
     }
 
+    /// The loaded station nearest a point, and how far it is. Among the networks the viewport has
+    /// loaded, which include the rider's own whenever the map is on them, so this costs no load of
+    /// its own. Nothing beyond `limit`: three kilometres off is the nearest station and not a near
+    /// one.
+    func nearestStation(
+        to coordinate: CLLocationCoordinate2D,
+        within limit: CLLocationDistance = 3_000
+    ) -> (station: Station, distance: CLLocationDistance)? {
+        stationsByCity.values
+            .joined()
+            .map { (station: $0, distance: $0.coordinate.distance(to: coordinate)) }
+            .min { $0.distance < $1.distance }
+            .flatMap { $0.distance <= limit ? $0 : nil }
+    }
+
     /// The programmed station a place/POI corresponds to, if any (so a searched or tapped
     /// place that *is* a station opens the station detail instead of the Apple place card).
     func matchingStation(for place: TransitPlace) async -> Station? {

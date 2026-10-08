@@ -16,10 +16,14 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     /// Screens that need a continuous stream (live navigation) hold a session here; a
     /// one-shot request resolving must not stop the hardware while a session is active.
     private var continuousSessionCount = 0
+    private var usesStationLevelAccuracy = false
 
     /// The fix as Core Location reported it: right for "which city is this" and for measuring the
     /// correction below, wrong for everything else. See `mapSpaceLocation`.
     var currentLocation: CLLocation?
+    /// Told of every fix as it arrives. One listener, the trip in progress, which has to hear them
+    /// with no screen up to observe `currentLocation`.
+    @ObservationIgnored var onFix: ((CLLocation) -> Void)?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
 
@@ -186,8 +190,20 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
             altitude: location.altitude,
             horizontalAccuracy: location.horizontalAccuracy,
             verticalAccuracy: location.verticalAccuracy,
+            // Carried over: the shorter initializer reports both as unknown, and a caller telling
+            // a walker from a train reads the speed.
+            course: location.course,
+            speed: location.speed,
             timestamp: location.timestamp
         )
+    }
+
+    /// The fix in the map's frame, or nil where no correction is known to hold. For a caller that
+    /// acts on a position instead of drawing it: an uncorrected fix can sit ~540 m from the route
+    /// it is measured against, which reads as the rider being somewhere else.
+    func correctedMapSpaceLocation(from location: CLLocation) -> CLLocation? {
+        guard correction(near: location.coordinate) != nil else { return nil }
+        return mapSpaceLocation(from: location)
     }
 
     func mapSpaceCoordinate(from coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
@@ -219,6 +235,36 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         }
     }
 
+    /// Keeps fixes coming for a trip being guided, with the app in the background too: a rider on a
+    /// train has the phone locked, and a suspended app can neither correct the trip nor move the
+    /// Lock Screen on. Still when-in-use access; the system shows its own indicator while this runs.
+    /// Balanced with `endTripUpdates()`.
+    func beginTripUpdates() {
+        manager.allowsBackgroundLocationUpdates = true
+        manager.pausesLocationUpdatesAutomatically = false
+        manager.showsBackgroundLocationIndicator = true
+        beginContinuousUpdates()
+    }
+
+    func endTripUpdates() {
+        manager.allowsBackgroundLocationUpdates = false
+        manager.pausesLocationUpdatesAutomatically = true
+        manager.showsBackgroundLocationIndicator = false
+        setStationLevelAccuracy(false)
+        endContinuousUpdates()
+    }
+
+    /// On a train the trip asks only "which station", which Wi-Fi and cell answer without the GPS
+    /// radio hunting for a sky it cannot see. On foot it needs the street.
+    func setStationLevelAccuracy(_ stationLevel: Bool) {
+        // Only on a change: Core Location restarts the stream on every assignment, and the trip
+        // asks on each tick of its clock.
+        guard stationLevel != usesStationLevelAccuracy else { return }
+        usesStationLevelAccuracy = stationLevel
+        manager.desiredAccuracy = stationLevel ? kCLLocationAccuracyHundredMeters : kCLLocationAccuracyBest
+        manager.distanceFilter = stationLevel ? 50 : 10
+    }
+
     /// Warms the location cache with a single fix: `requestLocation()` delivers one update and
     /// stops. No-op, with no permission prompt, when access has not been granted.
     func prewarmLocation() {
@@ -246,6 +292,7 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
            abs(location.timestamp.timeIntervalSinceNow) <= 30 {
             finishPendingLocationRequests(with: .success(location))
         }
+        onFix?(location)
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

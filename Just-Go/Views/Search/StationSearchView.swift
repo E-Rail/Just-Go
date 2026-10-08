@@ -210,29 +210,12 @@ struct SearchPageView: View {
             HStack(spacing: 8) {
                 currentLocationChip
 
-                ForEach(quickTags) { quickTag in
-                    Button {
-                        isSearchFocused = false
-                        // The coordinate is the whole answer: a Beijing "Home" plans against
-                        // Beijing's network because that is where it is.
-                        onSelectPlace(quickTag.transitPlace)
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: quickTag.kind.icon)
-                                .font(.caption)
-                            Text(quickTag.kind.title)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .lineLimit(1)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.appSurface, in: Capsule())
-                        .overlay(Capsule().stroke(Color(.separator), lineWidth: 1))
-                        .contentShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
+                SavedPlaceChips(tags: quickTags) { quickTag in
+                    isSearchFocused = false
+                    // The coordinate is the whole answer: a Beijing "Home" plans against
+                    // Beijing's network because that is where it is.
+                    onSelectPlace(quickTag.transitPlace)
+                    dismiss()
                 }
             }
             .padding(.horizontal, 12)

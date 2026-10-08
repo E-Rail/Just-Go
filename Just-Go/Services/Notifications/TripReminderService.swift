@@ -1,9 +1,10 @@
 import Foundation
 import UserNotifications
 
-/// The app's only notification layer: one "time to leave" local notification for an explicit
-/// departure plan. Authorization is asked for when first needed, never at launch, and past-dated
-/// reminders are never scheduled.
+/// The app's only notification layer: a "time to leave" reminder for an explicit departure plan,
+/// one for the night's last departure, and a trip's "get off" alerts. Authorization is asked for
+/// when first needed, never at launch. A leave reminder whose time has passed is not scheduled; a
+/// "get off" alert whose time has passed is given at once.
 @MainActor
 final class TripReminderService {
     private let center = UNUserNotificationCenter.current()
@@ -106,25 +107,49 @@ final class TripReminderService {
         }
     }
 
-    /// Schedules an estimated "get off" alert for `fireDate`, timed from segment durations; there
-    /// is no live train-position feed, and the copy says so. Returns false when nothing was
-    /// scheduled: the time is past, or `add` refused it.
+    /// Schedules a "get off" alert for `fireDate`, or gives it at once when that moment has come:
+    /// the trip corrects its alerts as it learns where the train is, and a correction that finds
+    /// the stop closer than the clock had it must not cost the rider the alert.
+    ///
+    /// Timed from segment durations; there is no live train-position feed, and the copy says so.
+    /// `reached` is the one alert that is not an estimate: a fix has put the rider at the stop.
+    /// Returns false when `add` refused the request.
     @discardableResult
-    func scheduleArrivalReminder(stationID: String, stationName: String, exitHint: String?, fireDate: Date) async -> Bool {
+    func scheduleArrivalReminder(
+        stationID: String,
+        stationName: String,
+        exitHint: String?,
+        fireDate: Date,
+        reached: Bool = false
+    ) async -> Bool {
         cancelArrivalReminder(stationID: stationID)
-        let interval = fireDate.timeIntervalSinceNow
-        guard interval >= 1 else { return false }
+        // A time-interval trigger must be positive, and a second is the soonest it is reliable.
+        let interval = max(1, fireDate.timeIntervalSinceNow)
 
         let content = UNMutableNotificationContent()
-        content.title = AppLocalization.text(english: "Get ready to get off", simplified: "准备下车", traditional: "準備下車")
-        if let exitHint, !exitHint.isEmpty {
-            content.body = AppLocalization.text(
-                english: "Approaching \(stationName). Get off and head to \(exitHint). (estimated from route time)",
-                simplified: "即将到达\(stationName)，请下车前往\(exitHint)。（根据线路时间估算）",
-                traditional: "即將抵達\(stationName)，請下車前往\(exitHint)。（根據路線時間估算）"
+        let exit = exitHint.flatMap { $0.isEmpty ? nil : $0 }
+        if reached {
+            content.title = AppLocalization.text(english: "This is your stop", simplified: "到站了", traditional: "到站了")
+            content.body = exit.map { exit in
+                AppLocalization.text(
+                    english: "You have reached \(stationName). Get off and head to \(exit).",
+                    simplified: "已到达\(stationName)，请下车前往\(exit)。",
+                    traditional: "已抵達\(stationName)，請下車前往\(exit)。"
+                )
+            } ?? AppLocalization.text(
+                english: "You have reached \(stationName). Get off here.",
+                simplified: "已到达\(stationName)，请下车。",
+                traditional: "已抵達\(stationName)，請下車。"
             )
         } else {
-            content.body = AppLocalization.text(
+            content.title = AppLocalization.text(english: "Get ready to get off", simplified: "准备下车", traditional: "準備下車")
+            content.body = exit.map { exit in
+                AppLocalization.text(
+                    english: "Approaching \(stationName). Get off and head to \(exit). (estimated from route time)",
+                    simplified: "即将到达\(stationName)，请下车前往\(exit)。（根据线路时间估算）",
+                    traditional: "即將抵達\(stationName)，請下車前往\(exit)。（根據路線時間估算）"
+                )
+            } ?? AppLocalization.text(
                 english: "Approaching \(stationName). Get ready to get off. (estimated from route time)",
                 simplified: "即将到达\(stationName)，请准备下车。（根据线路时间估算）",
                 traditional: "即將抵達\(stationName)，請準備下車。（根據路線時間估算）"

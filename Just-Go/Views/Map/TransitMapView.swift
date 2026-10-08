@@ -42,6 +42,10 @@ struct TransitMapView: UIViewRepresentable {
     /// moves it too. MapKit centres inside the layout margins, so without this a rider is centred
     /// behind the search bar. See `ChromeInsetMapView`.
     var topChromeHeight: CGFloat = 0
+    /// The same for the bottom edge, where the browse map carries the rider's panel. MapKit puts
+    /// its attribution inside the margins too, so this is also what keeps "Legal" out from under
+    /// the panel.
+    var bottomChromeHeight: CGFloat = 0
     /// How heavily to draw the network's lines: heavier on a page about one line, where the browse
     /// map's weight reads as a hairline.
     var networkLineWidth: CGFloat = 6
@@ -66,7 +70,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = ChromeInsetMapView(frame: .zero)
-        mapView.chromeInsets = UIEdgeInsets(top: topChromeHeight, left: 0, bottom: 0, right: 0)
+        mapView.chromeInsets = UIEdgeInsets(top: topChromeHeight, left: 0, bottom: bottomChromeHeight, right: 0)
         mapView.delegate = context.coordinator
         mapView.showsCompass = true
         mapView.showsScale = true
@@ -87,7 +91,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         (mapView as? ChromeInsetMapView)?.chromeInsets = UIEdgeInsets(
-            top: topChromeHeight, left: 0, bottom: 0, right: 0
+            top: topChromeHeight, left: 0, bottom: bottomChromeHeight, right: 0
         )
         context.coordinator.sync(parent: self, on: mapView)
     }

@@ -100,15 +100,16 @@ struct TripsView: View {
                     .foregroundStyle(.secondary)
                 }
             } else {
+                // Each one plans a trip there from where the rider is, on the map, as the map's own
+                // panel does.
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(tags) { tag in
-                            Label(tag.kind.title, systemImage: tag.kind.icon)
-                                .font(.footnote)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.accentColor.opacity(0.18), in: Capsule())
-                                .foregroundStyle(Color.accentColor)
+                        SavedPlaceChips(tags: tags) { tag in
+                            appState.pendingRouteInput = AppState.PendingRouteInput(
+                                place: tag.transitPlace,
+                                role: .destination
+                            )
+                            appState.selectedTab = .map
                         }
                     }
                     .padding(.vertical, 2)

@@ -742,42 +742,19 @@ struct LiveGoView: View {
         .accessibilityLabel(step.accessibilityLabel)
     }
 
-    /// Stops still ahead on a ride, counted down as the trip moves. The step's own count until the
-    /// session has a position to read.
+    /// Stops still ahead on a ride, counted down as the trip moves. The session's wording, which
+    /// the Lock Screen prints too.
     private func stopsLeftText(for step: TripStep) -> String? {
-        guard step.kind == .ride else { return nil }
-        guard let remaining = session.position?.stopsRemaining else { return step.rideStopsRemainingText }
-        if remaining == 1 {
-            return AppLocalization.text(english: "Get off at the next stop", simplified: "下一站下车", traditional: "下一站下車")
-        }
-        guard let next = session.position?.nextStopName else { return AppLocalization.stopsLeft(remaining) }
-        return AppLocalization.text(
-            english: "\(AppLocalization.stopsLeft(remaining)) · next \(next)",
-            simplified: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)",
-            traditional: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)"
-        )
+        session.stopsLeftText(for: step)
     }
 
     /// How the step on screen is known. Nothing when the rider said so themselves: they know.
     @ViewBuilder
     private var basisLabel: some View {
-        switch session.position?.basis {
-        case .located:
-            Label(
-                AppLocalization.text(english: "Located", simplified: "已定位", traditional: "已定位"),
-                systemImage: "location.fill"
-            )
-            .font(.caption)
-            .foregroundStyle(.green)
-        case .estimated:
-            Label(
-                AppLocalization.text(english: "Estimated", simplified: "估算", traditional: "估算"),
-                systemImage: "clock"
-            )
-            .font(.caption)
-            .foregroundStyle(.orange)
-        case .confirmed, nil:
-            EmptyView()
+        if let basis = session.position?.basis, let label = basis.label {
+            Label(label, systemImage: basis == .estimated ? "clock" : "location.fill")
+                .font(.caption)
+                .foregroundStyle(basis == .estimated ? Color.orange : Color.green)
         }
     }
 
@@ -1000,15 +977,7 @@ struct LiveGoView: View {
         .elevated(.floating)
     }
 
-    /// Takes the step, not just its kind: the two access kinds cover walking, cycling and driving.
-    private func icon(for step: TripStep) -> String {
-        switch step.kind {
-        case .walkToStation, .walkToDestination: return step.accessMode.symbolName
-        case .ride: return SegmentType.subway.symbolName
-        case .transfer: return SegmentType.transfer.symbolName
-        case .arrive: return "flag.checkered"
-        }
-    }
+    private func icon(for step: TripStep) -> String { step.symbolName }
 
     /// The leg's own colour, as the rail and the map draw it. Arrival is not a leg.
     private func color(for step: TripStep) -> Color {

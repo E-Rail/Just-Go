@@ -90,8 +90,31 @@ retired_paths.each do |relative_path|
   errors << "retired runtime/data path is present: #{relative_path}"
 end
 
-swift_files = Dir.glob(File.join(ROOT, "Just-Go", "**", "*.swift")).sort
+# The app and its Live Activity extension: both ship, so both are held to the same rules.
+swift_files = Dir.glob(File.join(ROOT, "{Just-Go,Just-GoLiveActivity}", "**", "*.swift")).sort
 swift_sources = swift_files.to_h { |path| [path, File.read(path, encoding: "UTF-8")] }
+
+# The camera rule, for the two capabilities a guided trip declares. Background location keeps a
+# trip correcting itself with the phone locked, and Live Activities put it on the Lock Screen. A
+# key with no code behind it promises App Review something no rider can use, and code with no key
+# crashes (`allowsBackgroundLocationUpdates`) or silently does nothing (`Activity.request`).
+declares_background_location = info_plist =~ %r{<key>UIBackgroundModes</key>\s*<array>[^<]*(?:<string>[^<]*</string>\s*)*?<string>location</string>}m
+uses_background_location = swift_sources.values.any? { |source| source.include?("allowsBackgroundLocationUpdates = true") }
+if declares_background_location && !uses_background_location
+  errors << "Just-Go must not declare background location it never uses"
+end
+if uses_background_location && !declares_background_location
+  errors << "background location updates are enabled but Just-Go-Info.plist declares no location background mode"
+end
+declares_live_activities = info_plist =~ %r{<key>NSSupportsLiveActivities</key>\s*<true/>}
+requests_live_activity = swift_sources.values.any? { |source| source.include?("Activity.request(") }
+draws_live_activity = swift_sources.values.any? { |source| source.include?("ActivityConfiguration(for:") }
+if declares_live_activities && !(requests_live_activity && draws_live_activity)
+  errors << "Just-Go must not declare Live Activities it never starts or never draws"
+end
+if (requests_live_activity || draws_live_activity) && !declares_live_activities
+  errors << "a Live Activity exists but Just-Go-Info.plist does not declare NSSupportsLiveActivities"
+end
 
 expected_web_literals = Set.new([
   ["Just-Go/Views/Map/TransitMapView.swift", "https://www.openstreetmap.org/copyright"],

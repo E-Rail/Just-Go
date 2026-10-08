@@ -77,7 +77,10 @@ LOCALES.each do |locale|
   fail_with("#{locale} InfoPlist.strings is missing #{missing.inspect}") unless missing.empty?
 end
 
-swift_files = Dir[File.join(SWIFT_DIR, "**", "*.swift")]
+# The Live Activity extension too: it prints only strings the app hands it, and this is what keeps
+# a literal from being added there, where `AppLocalization` cannot reach.
+swift_files = Dir[File.join(SWIFT_DIR, "**", "*.swift")] +
+              Dir[File.join(ROOT, "Just-GoLiveActivity", "**", "*.swift")]
 english_keys = localizations.fetch("en")
 used_localization_keys = Set.new
 

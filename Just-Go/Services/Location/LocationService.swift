@@ -20,6 +20,9 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     /// The fix as Core Location reported it: right for "which city is this" and for measuring the
     /// correction below, wrong for everything else. See `mapSpaceLocation`.
     var currentLocation: CLLocation?
+    /// Told of every fix as it arrives. One listener, the trip in progress, which has to hear them
+    /// with no screen up to observe `currentLocation`.
+    @ObservationIgnored var onFix: ((CLLocation) -> Void)?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var locationErrorMessage: String?
 
@@ -186,8 +189,20 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
             altitude: location.altitude,
             horizontalAccuracy: location.horizontalAccuracy,
             verticalAccuracy: location.verticalAccuracy,
+            // Carried over: the shorter initializer reports both as unknown, and a caller telling
+            // a walker from a train reads the speed.
+            course: location.course,
+            speed: location.speed,
             timestamp: location.timestamp
         )
+    }
+
+    /// The fix in the map's frame, or nil where no correction is known to hold. For a caller that
+    /// acts on a position instead of drawing it: an uncorrected fix can sit ~540 m from the route
+    /// it is measured against, which reads as the rider being somewhere else.
+    func correctedMapSpaceLocation(from location: CLLocation) -> CLLocation? {
+        guard correction(near: location.coordinate) != nil else { return nil }
+        return mapSpaceLocation(from: location)
     }
 
     func mapSpaceCoordinate(from coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
@@ -246,6 +261,7 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
            abs(location.timestamp.timeIntervalSinceNow) <= 30 {
             finishPendingLocationRequests(with: .success(location))
         }
+        onFix?(location)
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

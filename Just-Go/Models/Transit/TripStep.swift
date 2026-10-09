@@ -171,15 +171,21 @@ struct TripStep: Identifiable, Equatable {
         [title, detail, rideStopsRemainingText, readyToAlightText].compactMap { $0 }.joined(separator: ", ")
     }
 
-    /// The step's glyph, one rule for the navigator and the Lock Screen. From the step and not
-    /// only its kind: the two access kinds cover walking, cycling and driving.
-    var symbolName: String {
+    /// The kind of leg the step is, which is what gives it its glyph and its dash. From the step
+    /// and not only its kind: the two access kinds cover walking, cycling and driving. Nil for
+    /// arrival, which is not a leg.
+    var segmentType: SegmentType? {
         switch kind {
-        case .walkToStation, .walkToDestination: return accessMode.symbolName
-        case .ride: return SegmentType.subway.symbolName
-        case .transfer: return SegmentType.transfer.symbolName
-        case .arrive: return "flag.checkered"
+        case .walkToStation, .walkToDestination: return accessMode.segmentType
+        case .ride: return .subway
+        case .transfer: return .transfer
+        case .arrive: return nil
         }
+    }
+
+    /// The step's glyph, one rule for the navigator and the Lock Screen.
+    var symbolName: String {
+        segmentType?.symbolName ?? "flag.checkered"
     }
 }
 

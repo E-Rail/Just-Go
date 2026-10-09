@@ -88,6 +88,35 @@ private func testTheClockCarriesTheTripAndSaysItIsEstimating() throws {
     try expect(ended.stepIndex == 5 && timeline.hasArrived(at: at(100_000)), "the clock must stop at the last step")
 }
 
+private func testProgressRunsInStopsOnARideAndQuartersOnFoot() throws {
+    var timeline = trip()
+
+    // The walk is 600 s: a quarter every 150 s, drawn from the middle of the quarter it is in.
+    let setOut = timeline.position(at: at(0)).progress
+    try expect(setOut.parts == 4 && setOut.place == 0.5 && !setOut.countsStops, "a walk is drawn in quarters")
+    try expect(setOut.changesAt == at(150), "a walk's place moves on at its next quarter")
+    let nearly = timeline.position(at: at(460)).progress
+    try expect(nearly.place == 3.5 && nearly.changesAt == at(600), "a walk's last quarter ends with the walk")
+
+    // The ride starts at 600 and its train leaves at 780: B at 900, C at 1,020, D at 1,140.
+    let waiting = timeline.position(at: at(700)).progress
+    try expect(waiting.parts == 3 && waiting.countsStops, "a ride is drawn in its hops")
+    try expect(waiting.place == 0 && waiting.changesAt == at(780), "a rider still on the platform is at the first stop until the train leaves")
+    let left = timeline.position(at: at(800)).progress
+    try expect(left.place == 0.5 && left.changesAt == at(900), "a train that has left is between the first two stops")
+    let riding = timeline.position(at: at(910)).progress
+    try expect(riding.place == 1.5 && riding.changesAt == at(1_020), "the place did not move on with the stop")
+    try expect(timeline.position(at: at(1_100)).progress.changesAt == at(1_140), "the last hop ends with the ride")
+
+    // A fix at C forty seconds early brings D forty seconds nearer.
+    try expect(timeline.observe(fix(stopC, accuracy: 150, at: 980), now: at(980)), "a station fix was ignored")
+    let located = timeline.position(at: at(980)).progress
+    try expect(located.place == 2.5 && located.changesAt == at(1_100), "a fix did not move the place and its next change")
+
+    let arrived = timeline.position(at: at(100_000)).progress
+    try expect(arrived.changesAt == nil, "an arrived trip has nothing left to change")
+}
+
 private func testAWalkFollowsTheFixNotTheClock() throws {
     var timeline = trip()
     try expect(timeline.observe(fix(north(375, from: home), at: 100), now: at(100)), "a fix on the path was ignored")
@@ -376,6 +405,7 @@ private enum TripTimelineHarness {
     static func main() {
         let tests: [(String, () throws -> Void)] = [
             ("the clock carries the trip and says it is estimating", testTheClockCarriesTheTripAndSaysItIsEstimating),
+            ("progress runs in stops on a ride and quarters on foot", testProgressRunsInStopsOnARideAndQuartersOnFoot),
             ("a walk follows the fix, not the clock", testAWalkFollowsTheFixNotTheClock),
             ("a tight fix off every path holds the walk", testATightFixOffEveryPathHoldsTheWalk),
             ("another door into the station ends the walk", testAnotherDoorIntoTheStationEndsTheWalk),

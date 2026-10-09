@@ -115,15 +115,28 @@ struct TripFix: Equatable, Sendable {
     let date: Date
 }
 
+/// A step cut into equal parts, and how far into them the rider is: a ride's hops, or the quarters
+/// of a walk or a change, which is as finely as a clock's guess at a walk is worth drawing.
+struct TripProgress: Equatable, Sendable {
+    /// A ride's hops; four for anything else.
+    let parts: Int
+    /// How many parts in. On a ride a whole number is at a stop and a half is between two.
+    let place: Double
+    /// Whether the parts are a ride's hops, each ending at a stop.
+    let countsStops: Bool
+    /// When the clock next moves `place` on, with nobody having said anything. Nil once arrived.
+    let changesAt: Date?
+}
+
 struct TripPosition: Equatable, Sendable {
     let stepIndex: Int
     let basis: TripBasis
-    let stepStartedAt: Date
-    let stepEndsAt: Date
     /// Ride steps: stops still ahead, the rider's own included.
     let stopsRemaining: Int?
     /// Ride steps: the stop the train reaches next.
     let nextStopName: String?
+    /// How far into the step, for anything that draws the rider along it.
+    let progress: TripProgress
     /// Ride steps: whether the moment the train left is known, from the rider or from a fix at a
     /// later stop. Until then the stop count runs from an assumed departure.
     let departureKnown: Bool
@@ -207,8 +220,9 @@ struct TripTimeline: Equatable, Sendable {
         let clock = clockPosition(at: now)
         guard steps.indices.contains(clock.stepIndex) else {
             return TripPosition(
-                stepIndex: 0, basis: .estimated, stepStartedAt: now, stepEndsAt: now,
-                stopsRemaining: nil, nextStopName: nil, departureKnown: false
+                stepIndex: 0, basis: .estimated, stopsRemaining: nil, nextStopName: nil,
+                progress: TripProgress(parts: 1, place: 1, countsStops: false, changesAt: nil),
+                departureKnown: false
             )
         }
         let step = steps[clock.stepIndex]
@@ -221,10 +235,9 @@ struct TripTimeline: Equatable, Sendable {
         return TripPosition(
             stepIndex: clock.stepIndex,
             basis: unchanged ? anchor.basis : .estimated,
-            stepStartedAt: clock.startedAt,
-            stepEndsAt: clock.startedAt.addingTimeInterval(step.duration),
             stopsRemaining: step.kind == .ride && lastStop > 0 ? lastStop - passed : nil,
             nextStopName: step.kind == .ride && passed < lastStop ? step.stops[passed + 1].name : nil,
+            progress: progress(in: step, elapsed: clock.elapsed, startedAt: clock.startedAt, passed: passed),
             departureKnown: step.kind == .ride && departureKnown(ofRide: clock.stepIndex)
         )
     }
@@ -473,6 +486,36 @@ struct TripTimeline: Equatable, Sendable {
             index += 1
         }
         return (index, min(elapsed, steps[index].duration), startedAt)
+    }
+
+    private func progress(in step: TimelineStep, elapsed: TimeInterval, startedAt: Date, passed: Int) -> TripProgress {
+        let end = startedAt.addingTimeInterval(step.duration)
+        let lastStop = step.stops.count - 1
+        switch step.kind {
+        case .arrive:
+            return TripProgress(parts: 1, place: 1, countsStops: false, changesAt: nil)
+        case .ride where lastStop > 0:
+            // Still on the platform until the boarding time is up: at the first stop, not past it.
+            if passed == 0, elapsed < step.boarding {
+                return TripProgress(
+                    parts: lastStop, place: 0, countsStops: true,
+                    changesAt: startedAt.addingTimeInterval(step.boarding)
+                )
+            }
+            guard passed < lastStop else {
+                return TripProgress(parts: lastStop, place: Double(lastStop), countsStops: true, changesAt: end)
+            }
+            return TripProgress(
+                parts: lastStop, place: Double(passed) + 0.5, countsStops: true,
+                changesAt: startedAt.addingTimeInterval(step.boarding + step.stops[passed + 1].offset)
+            )
+        case .access, .transfer, .ride:
+            let quarter = step.duration > 0 ? min(3, max(0, Int(elapsed / step.duration * 4))) : 3
+            return TripProgress(
+                parts: 4, place: Double(quarter) + 0.5, countsStops: false,
+                changesAt: quarter == 3 ? end : startedAt.addingTimeInterval(step.duration * Double(quarter + 1) / 4)
+            )
+        }
     }
 
     /// Seconds from the trip's start to a moment inside one of its steps, on the model's own clock.

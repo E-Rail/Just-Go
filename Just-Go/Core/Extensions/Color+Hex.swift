@@ -36,6 +36,18 @@ extension Color {
         let dark = base.legibleOnDarkBackground()
         return Color(UIColor { $0.userInterfaceStyle == .dark ? dark : base })
     }
+
+    /// Adaptive colour for any hex drawn as a shape a few points across: a rail, a dot, a ring.
+    /// The exact hex wherever it can be seen. A shape is found at a contrast text cannot be read
+    /// at, so only a colour too dark to find on a dark background is lightened, and a line keeps
+    /// the colour its badge beside it has.
+    static func adaptiveShape(hex: String) -> Color {
+        let (r, g, b) = Color.rgbComponents(hex: hex)
+        let base = UIColor(red: r, green: g, blue: b, alpha: 1)
+        // Where a grey reaches 3:1 against black, the contrast WCAG asks of a graphic.
+        let dark = base.legibleOnDarkBackground(targetLuminance: 0.35)
+        return Color(UIColor { $0.userInterfaceStyle == .dark ? dark : base })
+    }
 }
 
 extension Color {

@@ -355,25 +355,42 @@ final class TripSession {
         )
     }
 
-    /// The step as the Lock Screen's strip draws it: its own track, and the lines either side.
+    /// The step as the Lock Screen's strip draws it: its own track, and the legs either side.
     private func leg(of step: TripStep, at position: TripPosition) -> TripActivityAttributes.Leg? {
         guard let type = step.segmentType else { return nil }
+        let later = plan.steps.dropFirst(position.stepIndex + 1)
         let rideBefore = plan.steps.prefix(position.stepIndex).last { $0.kind == .ride }
-        let rideAfter = plan.steps.dropFirst(position.stepIndex + 1).first { $0.kind == .ride }
+        let rideAfter = later.first { $0.kind == .ride }
         let isRide = step.kind == .ride
         // A ride ends at a station on its own line. Any other leg ends at the station the next
         // ride leaves from, and with no ride left, at the destination.
         let endLine = isRide ? step : rideAfter
+        // Only a ride is placed along its track. On foot the timeline's place is a share of the
+        // step's time, and the strip draws no proportion.
+        let progress = position.progress
         return TripActivityAttributes.Leg(
             startColorHex: isRide ? step.colorHex : rideBefore?.colorHex,
             dash: type.dash(width: 1).map { Double($0) },
-            parts: position.progress.parts,
-            place: position.progress.place,
-            marksStops: position.progress.countsStops,
+            hops: progress.countsStops ? progress.parts : 0,
+            place: progress.countsStops ? progress.place : 0,
             endName: endLine == nil ? plan.destination : step.toStationName ?? step.fromStationName,
             endColorHex: endLine?.colorHex,
-            onwardBadge: rideAfter?.lineName.map(LineBadge.shortLabel(for:)),
-            onwardColorHex: rideAfter?.colorHex
+            onward: onward(after: later)
+        )
+    }
+
+    /// What the strip draws running on from the leg's end: the next line, and once the riding is
+    /// done, the way from the last station to the destination. A change between two lines is not
+    /// drawn, since the station it happens at is the one the strip already ends on.
+    private func onward(after later: ArraySlice<TripStep>) -> TripActivityAttributes.Onward? {
+        let legs = later.filter { $0.segmentType != nil }
+        guard let next = legs.first(where: { $0.kind == .ride }) ?? legs.first,
+              let type = next.segmentType, let colorHex = next.colorHex else { return nil }
+        return TripActivityAttributes.Onward(
+            badge: next.kind == .ride ? next.lineName.map(LineBadge.shortLabel(for:)) : nil,
+            colorHex: colorHex,
+            dash: type.dash(width: 1).map { Double($0) },
+            endsTrip: next.id == legs.last?.id
         )
     }
 

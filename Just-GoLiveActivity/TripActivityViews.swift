@@ -20,30 +20,17 @@ struct TripLockScreenView: View {
                 TripArrival(state: state)
                     .font(.title2)
             }
-            if let leg = state.leg {
-                TripLegStrip(state: state, leg: leg, isStale: isStale)
-            }
-            HStack(spacing: 8) {
-                TripBasisLine(state: state, isStale: isStale)
-                Spacer(minLength: 8)
-                // Only while the strip ends short of it: the trip's last leg and the arrival
-                // already name the destination.
-                if state.leg?.endColorHex != nil {
-                    Label(destination, systemImage: TripLegStrip.destinationSymbolName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
+            TripStepPicture(state: state, destination: destination, isStale: isStale)
         }
         .padding(16)
     }
 }
 
 /// The expanded island under its mark and its arrival: the headline at the island's full width,
-/// the sub line with the basis beside it, and the strip.
+/// the sub line, and the strip.
 struct TripIslandDetail: View {
     let state: TripActivityAttributes.ContentState
+    let destination: String
     let isStale: Bool
 
     var body: some View {
@@ -51,19 +38,28 @@ struct TripIslandDetail: View {
             VStack(alignment: .leading, spacing: 2) {
                 TripHeadline(state: state, isStale: isStale)
                     .minimumScaleFactor(0.8)
-                HStack(spacing: 8) {
-                    TripSubLine(state: state, isStale: isStale)
-                    Spacer(minLength: 0)
-                    TripBasisLine(state: state, isStale: isStale)
-                        .fixedSize()
-                }
+                TripSubLine(state: state, isStale: isStale)
             }
-            if let leg = state.leg {
-                TripLegStrip(state: state, leg: leg, isStale: isStale)
-            }
+            TripStepPicture(state: state, destination: destination, isStale: isStale)
         }
         // The region centres what does not fill it, and an arrived trip has no strip to fill it.
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// The step's strip, which carries the basis among its words. An arrived trip has no leg left to
+/// draw, and the basis stands alone.
+struct TripStepPicture: View {
+    let state: TripActivityAttributes.ContentState
+    let destination: String
+    let isStale: Bool
+
+    var body: some View {
+        if let leg = state.leg {
+            TripLegStrip(state: state, leg: leg, destination: destination, isStale: isStale)
+        } else {
+            TripBasisLine(state: state, isStale: isStale)
+        }
     }
 }
 
@@ -229,8 +225,8 @@ struct TripCompactFact: View {
             } else {
                 TripStepCount(stops: stops, unit: state.stopsUnit)
             }
-        } else if let badge = state.leg?.onwardBadge, let colorHex = state.leg?.onwardColorHex {
-            TripLineBadge(label: badge, colorHex: colorHex, size: 22)
+        } else if let onward = state.leg?.onward, let badge = onward.badge {
+            TripLineBadge(label: badge, colorHex: onward.colorHex, size: 22)
         } else if let time = state.arrivalText {
             Text(time)
                 .fontWeight(.semibold)
@@ -240,11 +236,13 @@ struct TripCompactFact: View {
     }
 }
 
-/// The step as a picture, left to right: where it starts, the track with the rider on it, the
-/// station it ends at, and the line that leaves from there.
+/// The step as a picture, left to right: where it starts, the track with the step's glyph on it,
+/// the station it ends at, and the next leg running on from there unbroken. The words go under
+/// the track, so nothing but the station's ring stands between one leg and the next.
 struct TripLegStrip: View {
     let state: TripActivityAttributes.ContentState
     let leg: TripActivityAttributes.Leg
+    let destination: String
     let isStale: Bool
     /// The track's stroke. Every other size on the strip is a multiple of it, so the strip keeps
     /// its proportions at any width.
@@ -253,7 +251,7 @@ struct TripLegStrip: View {
     static let destinationSymbolName = "flag.checkered"
 
     var body: some View {
-        HStack(spacing: width * 1.5) {
+        VStack(spacing: width) {
             TripTrack(
                 colorHex: state.colorHex,
                 symbolName: state.symbolName,
@@ -261,38 +259,94 @@ struct TripLegStrip: View {
                 isStale: isStale,
                 width: width
             )
-            if let name = leg.endName {
-                Text(name)
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
+            // The headline, the sub line and the arrival say all of it in words.
+            .accessibilityHidden(true)
+            TripStripLabels(anchor: TripTrack.end(of: leg), spacing: width * 2) {
+                place(.leading) { TripBasisLine(state: state, isStale: isStale) }
+                place(.leading) {
+                    if let name = leg.endName {
+                        Text(name)
+                            .fontWeight(.semibold)
+                            .accessibilityHidden(true)
+                    }
+                }
+                place(.trailing) {
+                    // The flag is on the track when the next leg ends the trip, and the name
+                    // under it needs no second one.
+                    if let onward = leg.onward {
+                        if onward.endsTrip {
+                            Text(destination)
+                        } else {
+                            Label(destination, systemImage: Self.destinationSymbolName)
+                        }
+                    }
+                }
+                .foregroundStyle(.secondary)
             }
-            onward
+            .font(.caption)
+            .lineLimit(1)
         }
-        // The headline, the sub line and the arrival say all of it in words.
-        .accessibilityHidden(true)
     }
 
-    /// The next line's badge, and its colour running on from the station and out of the picture.
-    @ViewBuilder private var onward: some View {
-        if let badge = leg.onwardBadge, let colorHex = leg.onwardColorHex {
-            let color = Color.adaptiveShape(hex: colorHex)
-            HStack(spacing: 0) {
-                TripLineBadge(label: badge, colorHex: colorHex, size: width * 5)
-                Rectangle()
-                    .fill(LinearGradient(colors: [color, color.opacity(0)], startPoint: .leading, endPoint: .trailing))
-                    .frame(width: width * 7, height: width)
-            }
+    /// One of the three places under the track. It is there when it holds nothing, and it is as
+    /// wide as the row makes it and no wider, down to nothing at all: an icon does not shrink,
+    /// and would otherwise be drawn over its neighbour.
+    private func place<Content: View>(_ alignment: Alignment, @ViewBuilder _ content: () -> Content) -> some View {
+        ZStack(content: content)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: alignment)
+            .clipped()
+    }
+}
+
+/// The words under the track, in three places: at the leading edge, under the leg's end, and at
+/// the trailing edge.
+///
+/// Three subviews in that order. The first takes the width it asks for. The second is centred on
+/// `anchor`, moved aside rather than drawn over the first, and cut short only where the row ends.
+/// The third has what is left: whole, or cut short while at least half of it shows, or not at
+/// all, since the first few letters of a place name it.
+private struct TripStripLabels: Layout {
+    /// Where the leg ends, as a share of the row's width.
+    let anchor: CGFloat
+    let spacing: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        return CGSize(
+            width: proposal.width ?? sizes.reduce(0) { $0 + $1.width },
+            height: sizes.map(\.height).max() ?? 0
+        )
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard subviews.count == 3 else { return }
+        let asked = subviews.map { $0.sizeThatFits(.unspecified).width }
+        let first = min(asked[0], bounds.width)
+        let free = first > 0 ? first + spacing : 0
+        let second = min(asked[1], max(0, bounds.width - free))
+        let start = max(free, min(bounds.width * anchor - second / 2, bounds.width - second))
+        let left = bounds.width - (second > 0 ? start + second + spacing : free)
+        let third = left >= asked[2] ? asked[2] : left * 2 >= asked[2] ? left : 0
+        let places: [(x: CGFloat, anchor: UnitPoint, width: CGFloat)] = [
+            (0, .leading, first), (start, .leading, second), (bounds.width, .trailing, third)
+        ]
+        for (subview, place) in zip(subviews, places) {
+            subview.place(
+                at: CGPoint(x: bounds.minX + place.x, y: bounds.midY),
+                anchor: place.anchor,
+                proposal: ProposedViewSize(width: place.width, height: nil)
+            )
         }
     }
 }
 
-/// A leg from its start to its end: a dot where it starts, the rail, and a ring where it ends,
-/// with the step's glyph on a disc where the rider is. Full colour ahead of the rider and faint
-/// behind, as a map draws a route being followed: what is left is what the rider reads.
+/// A leg from its start to its end, and the next leg on from there: a dot where the leg starts,
+/// its rail, a ring where it ends, and the next leg's own line leaving the ring.
 ///
-/// The rail runs from the centre of one end to the centre of the other, so a ride's first stop is
-/// the start dot, its last is the ring, and every hop between is the same length.
+/// Only a ride places its glyph: the rail runs from the centre of one end to the centre of the
+/// other, so a ride's first stop is the start dot, its last is the ring, and every hop between is
+/// the same length. Full colour ahead of the train and faint behind, as a map draws a route being
+/// followed. Any other leg has its glyph at the middle and is full colour throughout.
 struct TripTrack: View {
     let colorHex: String
     let symbolName: String
@@ -303,20 +357,29 @@ struct TripTrack: View {
     private var discSize: CGFloat { width * 4.5 }
     private var startSize: CGFloat { width * 2.5 }
     private var endSize: CGFloat { width * 3.5 }
+    private var badgeSize: CGFloat { width * 5 }
     private static let faint = 0.35
+
+    /// Where the leg ends, as a share of the strip's width: halfway when another leg runs on
+    /// from there, and at the trailing edge when none does.
+    static func end(of leg: TripActivityAttributes.Leg) -> CGFloat {
+        leg.onward == nil ? 1 : 0.5
+    }
 
     var body: some View {
         GeometryReader { proxy in
             let middle = proxy.size.height / 2
-            let first = startSize / 2
-            let last = proxy.size.width - endSize / 2
-            let reached = first + (last - first) * fraction
+            let first = discSize / 2
+            // The centre of whatever stands at the trailing edge, and of the leg's own end.
+            let edge = proxy.size.width - endSize / 2
+            let last = min(edge, proxy.size.width * Self.end(of: leg))
+            let reached = leg.hops > 0 ? first + (last - first) * fraction : (first + last) / 2
             let rail = TripRail(
                 width: width,
                 dash: leg.dash.map { CGFloat($0) * width },
                 from: first,
                 // Up to the ring and not into it; short of the flag, which is not a station.
-                to: proxy.size.width - endSize - (leg.endColorHex == nil ? width : 0),
+                to: last - endSize / 2 - (leg.endColorHex == nil ? width : 0),
                 stops: stops(from: first, to: last)
             )
             let color = Color.adaptiveShape(hex: colorHex)
@@ -325,7 +388,12 @@ struct TripTrack: View {
                 // A stale activity does not know where the rider is, and draws the track alone.
                 if !isStale {
                     rail.fill(color)
-                        .mask(alignment: .trailing) { Rectangle().frame(width: proxy.size.width - reached) }
+                        .mask(alignment: .trailing) {
+                            Rectangle().frame(width: proxy.size.width - (leg.hops > 0 ? reached : 0))
+                        }
+                }
+                if let onward = leg.onward {
+                    self.onward(onward, from: last + endSize / 2, edge: edge, in: proxy.size)
                 }
                 start.position(x: first, y: middle)
                 end.position(x: last, y: middle)
@@ -339,11 +407,42 @@ struct TripTrack: View {
                 }
             }
         }
-        .frame(height: discSize)
+        .frame(height: badgeSize)
         .frame(minWidth: discSize * 4)
     }
 
-    /// A dot in the colour of the line just left, faint like the rail once the rider is past it.
+    /// The next leg, leaving the ring in its own colour and dash with a line's badge on it. It
+    /// reaches the flag when the trip ends with it, and otherwise fades out at the edge: the trip
+    /// goes on past what the strip shows.
+    @ViewBuilder
+    private func onward(
+        _ onward: TripActivityAttributes.Onward, from: CGFloat, edge: CGFloat, in size: CGSize
+    ) -> some View {
+        let to = onward.endsTrip ? edge - endSize / 2 - width : size.width
+        let centre = (from + to) / 2
+        TripRail(width: width, dash: onward.dash.map { CGFloat($0) * width }, from: from, to: to, stops: [])
+            .fill(Color.adaptiveShape(hex: onward.colorHex))
+            .mask {
+                LinearGradient(
+                    stops: [
+                        Gradient.Stop(color: .black, location: 0),
+                        Gradient.Stop(color: .black, location: size.width > 0 ? centre / size.width : 0),
+                        Gradient.Stop(color: .black.opacity(onward.endsTrip ? 1 : 0), location: 1)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            }
+        if let badge = onward.badge {
+            TripLineBadge(label: badge, colorHex: onward.colorHex, size: badgeSize)
+                .position(x: centre, y: size.height / 2)
+        }
+        if onward.endsTrip {
+            flag.position(x: edge, y: size.height / 2)
+        }
+    }
+
+    /// A dot in the colour of the line just left, faint like the rail once the train is past it.
     /// Where the leg starts from where the rider set out, the dot a map draws for them.
     @ViewBuilder private var start: some View {
         if let colorHex = leg.startColorHex {
@@ -365,24 +464,29 @@ struct TripTrack: View {
                 .strokeBorder(Color.adaptiveShape(hex: colorHex), lineWidth: width * 0.75)
                 .frame(width: endSize, height: endSize)
         } else {
-            Image(systemName: TripLegStrip.destinationSymbolName)
-                .font(.system(size: endSize * 0.9, weight: .semibold))
-                .foregroundStyle(.green)
+            flag
         }
     }
 
+    private var flag: some View {
+        Image(systemName: TripLegStrip.destinationSymbolName)
+            .font(.system(size: endSize * 0.9, weight: .semibold))
+            .foregroundStyle(.green)
+    }
+
+    /// How far into a ride the train is. Zero on a leg with no hops.
     private var fraction: CGFloat {
-        guard leg.parts > 0 else { return 0 }
-        return CGFloat(min(max(leg.place / Double(leg.parts), 0), 1))
+        guard leg.hops > 0 else { return 0 }
+        return CGFloat(min(max(leg.place / Double(leg.hops), 0), 1))
     }
 
     /// Where the stops between a ride's two ends fall, or none when they would stand closer than
     /// the disc and a dot side by side: a twenty-stop ride on a strip this long is a blur of dots.
     private func stops(from first: CGFloat, to last: CGFloat) -> [CGFloat] {
-        guard leg.marksStops, leg.parts > 1 else { return [] }
-        let hop = (last - first) / CGFloat(leg.parts)
+        guard leg.hops > 1 else { return [] }
+        let hop = (last - first) / CGFloat(leg.hops)
         guard hop >= discSize + TripRail.stopSize(width: width) else { return [] }
-        return (1..<leg.parts).map { first + CGFloat($0) * hop }
+        return (1..<leg.hops).map { first + CGFloat($0) * hop }
     }
 }
 

@@ -38,7 +38,11 @@ struct TripLiveActivity: Widget {
                 // Nothing in the centre: the gap between the mark and the arrival holds half a
                 // headline, and "Get off at the next stop" is the one line that must not be cut.
                 DynamicIslandExpandedRegion(.bottom) {
-                    TripIslandDetail(state: state, isStale: context.isStale)
+                    TripIslandDetail(
+                        state: state,
+                        destination: context.attributes.destination,
+                        isStale: context.isStale
+                    )
                         .padding(.horizontal, 4)
                 }
             } compactLeading: {

@@ -34,6 +34,8 @@ final class TripSession {
     @ObservationIgnored private var startedAt = Date()
     @ObservationIgnored private var activity: Activity<TripActivityAttributes>?
     @ObservationIgnored private var shownActivityState: TripActivityAttributes.ContentState?
+    @ObservationIgnored private var shownStaleDate: Date?
+    @ObservationIgnored private var shownArrival: Date?
     /// Updates are awaited one after another: two sent at once can land in either order, and the
     /// Lock Screen would keep the older.
     @ObservationIgnored private var activityUpdates: Task<Void, Never>?
@@ -46,11 +48,12 @@ final class TripSession {
     /// The longest a trip is followed. Nothing on a bundled network takes this long, and a trip
     /// held open by fixes that never reach its end must not run the location hardware for a day.
     private static let longestTrip: TimeInterval = 6 * 60 * 60
-    /// How far a step's modelled end may drift before the Lock Screen is told. A walk re-anchors
-    /// on every fix, and each one moves the end by a second or two.
+    /// How far a modelled time may drift before the Lock Screen is told. A walk re-anchors on
+    /// every fix, and each one moves the trip's end and the next change by a second or two.
     private static let activityDriftThreshold: TimeInterval = 30
-    /// How long past a step's modelled end the Lock Screen still counts as current. Beyond it the
-    /// app has stopped updating, and the activity says so in place of a position.
+    /// How long past the next change the app should have reported the Lock Screen still counts as
+    /// current. Beyond it the app has stopped updating, and the activity says so in place of a
+    /// position.
     private static let activityStaleGrace: TimeInterval = 120
 
     init(locationService: LocationService, reminders: TripReminderService, tripMemory: TripMemoryService) {
@@ -115,19 +118,31 @@ final class TripSession {
         endOrphanedActivities()
     }
 
-    /// Stops still ahead on a ride, counted down as the trip moves, in the words the navigator and
-    /// the Lock Screen both print. The step's own count until there is a position to read.
-    func stopsLeftText(for step: TripStep) -> String? {
+    /// Stops still ahead on a ride, counted down as the trip moves: "2 stops left", and on the
+    /// last hop the cue to get off. The step's own count until there is a position to read.
+    func stopsLeftCount(for step: TripStep) -> String? {
         guard step.kind == .ride else { return nil }
         guard let remaining = position?.stopsRemaining else { return step.rideStopsRemainingText }
         if remaining == 1 {
             return AppLocalization.text(english: "Get off at the next stop", simplified: "下一站下车", traditional: "下一站下車")
         }
-        guard let next = position?.nextStopName else { return AppLocalization.stopsLeft(remaining) }
+        return AppLocalization.stopsLeft(remaining)
+    }
+
+    /// The stop the train reaches next, while there is one before the rider's own.
+    private var stopBeforeTheRiders: String? {
+        guard let remaining = position?.stopsRemaining, remaining > 1 else { return nil }
+        return position?.nextStopName
+    }
+
+    /// The count and the next stop in one line, as the navigator and the rider's panel print it.
+    func stopsLeftText(for step: TripStep) -> String? {
+        guard let count = stopsLeftCount(for: step) else { return nil }
+        guard step.kind == .ride, let next = stopBeforeTheRiders else { return count }
         return AppLocalization.text(
-            english: "\(AppLocalization.stopsLeft(remaining)) · next \(next)",
-            simplified: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)",
-            traditional: "\(AppLocalization.stopsLeft(remaining)) · 下一站\(next)"
+            english: "\(count) · next \(next)",
+            simplified: "\(count) · 下一站\(next)",
+            traditional: "\(count) · 下一站\(next)"
         )
     }
 
@@ -305,8 +320,12 @@ final class TripSession {
 
     // MARK: - Lock Screen
 
-    private func activityState() -> TripActivityAttributes.ContentState? {
+    private func activityState(arrivingAt arrival: Date) -> TripActivityAttributes.ContentState? {
         guard let step = currentStep, let position else { return nil }
+        // Up to the minute, so the clock never promises a minute the trip will not keep.
+        let arrivalMinute = Date(
+            timeIntervalSinceReferenceDate: (arrival.timeIntervalSinceReferenceDate / 60).rounded(.up) * 60
+        )
         return TripActivityAttributes.ContentState(
             symbolName: step.symbolName,
             // Arrival is not a leg and has no colour of its own; green is what the navigator uses.
@@ -318,11 +337,16 @@ final class TripSession {
             stopsUnit: position.stopsRemaining.map {
                 AppLocalization.text(english: $0 == 1 ? "stop" : "stops", simplified: "站", traditional: "站")
             },
-            stopsText: stopsLeftText(for: step),
+            stopsText: stopsLeftCount(for: step),
+            // A line of its own under the count, where the navigator runs the two together.
+            nextStopText: step.kind == .ride ? stopBeforeTheRiders.map {
+                AppLocalization.text(english: "Next stop: \($0)", simplified: "下一站 \($0)", traditional: "下一站 \($0)")
+            } : nil,
             basisText: position.basis.label,
             isEstimated: position.basis == .estimated,
-            stepStartedAt: position.stepStartedAt,
-            stepEndsAt: position.stepEndsAt,
+            arrivalText: step.kind == .arrive ? nil : ChinaClock.clockText(arrivalMinute),
+            arrivalCaption: AppLocalization.text(english: "ETA", simplified: "预计到达", traditional: "預計抵達"),
+            leg: leg(of: step, at: position),
             staleText: AppLocalization.text(
                 english: "Open Just-Go to update",
                 simplified: "打开 Just-Go 更新",
@@ -331,40 +355,99 @@ final class TripSession {
         )
     }
 
+    /// The step as the Lock Screen's strip draws it: its own track, and the lines either side.
+    private func leg(of step: TripStep, at position: TripPosition) -> TripActivityAttributes.Leg? {
+        guard let type = step.segmentType else { return nil }
+        let rideBefore = plan.steps.prefix(position.stepIndex).last { $0.kind == .ride }
+        let rideAfter = plan.steps.dropFirst(position.stepIndex + 1).first { $0.kind == .ride }
+        let isRide = step.kind == .ride
+        // A ride ends at a station on its own line. Any other leg ends at the station the next
+        // ride leaves from, and with no ride left, at the destination.
+        let endLine = isRide ? step : rideAfter
+        return TripActivityAttributes.Leg(
+            startColorHex: isRide ? step.colorHex : rideBefore?.colorHex,
+            dash: type.dash(width: 1).map { Double($0) },
+            parts: position.progress.parts,
+            place: position.progress.place,
+            marksStops: position.progress.countsStops,
+            endName: endLine == nil ? plan.destination : step.toStationName ?? step.fromStationName,
+            endColorHex: endLine?.colorHex,
+            onwardBadge: rideAfter?.lineName.map(LineBadge.shortLabel(for:)),
+            onwardColorHex: rideAfter?.colorHex
+        )
+    }
+
+    /// The trip's end as the Lock Screen prints it, held while the estimate moves by less than the
+    /// drift threshold: an estimate sitting on a minute boundary would otherwise flip the printed
+    /// minute, and send an update, with every fix of a walk.
+    private func settledArrival(for end: Date) -> Date {
+        if let shown = shownArrival, abs(end.timeIntervalSince(shown)) <= Self.activityDriftThreshold {
+            return shown
+        }
+        shownArrival = end
+        return end
+    }
+
     /// Puts the current step on the Lock Screen and in the Dynamic Island, when the rider allows
     /// Live Activities. Without them the trip runs the same, with the alerts as its only reach
     /// outside the app.
+    ///
+    /// Nothing the activity draws moves by itself, so it is told whenever what it draws changes,
+    /// and it is given the moment past which silence from here means the app has stopped: the next
+    /// change the clock would make, and a grace. Arrival has no next change and never goes stale.
     private func updateActivity() {
-        guard let state = activityState() else { return }
-        if let shown = shownActivityState, shown.showsSameStep(as: state, within: Self.activityDriftThreshold) { return }
+        guard let timeline, let position,
+              let state = activityState(arrivingAt: settledArrival(for: timeline.estimatedEnd)) else { return }
+        let staleDate = position.progress.changesAt?.addingTimeInterval(Self.activityStaleGrace)
+        let staleDateMoved: Bool
+        switch (staleDate, shownStaleDate) {
+        case (nil, nil): staleDateMoved = false
+        case let (new?, shown?): staleDateMoved = abs(new.timeIntervalSince(shown)) > Self.activityDriftThreshold
+        default: staleDateMoved = true
+        }
+        if state == shownActivityState, !staleDateMoved { return }
 
-        // Arrival has no length, so nothing to go stale against.
-        let staleDate = state.stepEndsAt > state.stepStartedAt
-            ? state.stepEndsAt.addingTimeInterval(Self.activityStaleGrace)
-            : nil
         let content = ActivityContent(state: state, staleDate: staleDate)
         if let activity {
             shownActivityState = state
+            shownStaleDate = staleDate
             let previous = activityUpdates
+            let alert = Self.debugAlert
             activityUpdates = Task {
                 await previous?.value
-                await activity.update(content)
+                await activity.update(content, alertConfiguration: alert)
             }
             return
         }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // Refused when the app is not in the foreground or the system is at its limit. The next
-        // change of step asks again.
+        // Refused when the app is not in the foreground or the system is at its limit, and asked
+        // for again on the clock's next tick.
         activity = try? Activity.request(
             attributes: TripActivityAttributes(destination: plan.destination),
             content: content,
             pushType: nil
         )
-        if activity != nil { shownActivityState = state }
+        if activity != nil {
+            shownActivityState = state
+            shownStaleDate = staleDate
+        }
     }
+
+    #if DEBUG
+    /// `JUST_GO_DEBUG_ACTIVITY_ALERT` makes every update an alert. An alert opens the expanded
+    /// island on an iPhone and shows the Lock Screen's card as a banner on an iPad, and nothing
+    /// else on a simulator reaches either.
+    private static let debugAlert = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_ACTIVITY_ALERT"] == nil
+        ? nil
+        : AlertConfiguration(title: "Just-Go", body: "Just-Go", sound: .default)
+    #else
+    private static let debugAlert: AlertConfiguration? = nil
+    #endif
 
     private func endActivity() {
         shownActivityState = nil
+        shownStaleDate = nil
+        shownArrival = nil
         guard let activity else { return }
         self.activity = nil
         let previous = activityUpdates
@@ -499,18 +582,5 @@ extension TripBasis {
         case .confirmed:
             return nil
         }
-    }
-}
-
-extension TripActivityAttributes.ContentState {
-    /// Whether two states put the same thing on the Lock Screen: the same words, and step times
-    /// that have not drifted far enough to be worth telling the system about.
-    func showsSameStep(as other: Self, within drift: TimeInterval) -> Bool {
-        var aligned = other
-        aligned.stepStartedAt = stepStartedAt
-        aligned.stepEndsAt = stepEndsAt
-        return aligned == self
-            && abs(other.stepEndsAt.timeIntervalSince(stepEndsAt)) <= drift
-            && abs(other.stepStartedAt.timeIntervalSince(stepStartedAt)) <= drift
     }
 }

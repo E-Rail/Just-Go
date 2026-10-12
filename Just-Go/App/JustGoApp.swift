@@ -1,5 +1,6 @@
 import CoreLocation
 import SwiftUI
+import WidgetKit
 
 /// Thrown when a gated launch stage outruns its budget, so the app hands off to the UI rather
 /// than holding the launch screen on work the first screen can live without.
@@ -49,6 +50,14 @@ struct JustGoApp: App {
             // On the window's root, so the appearance also covers the launch screen and every sheet
             // and full-screen cover.
             .preferredColorScheme(AppAppearance(rawValue: appearance)?.colorScheme)
+            // A tap on the trip's Lock Screen card or in its Dynamic Island. The activity carries
+            // no link, so the system opens the app and says only that a Live Activity was tapped;
+            // the trip is the only one there is. On the root, to be here for a launch the tap
+            // itself caused.
+            .onContinueUserActivity(NSUserActivityTypeLiveActivity) { _ in
+                appState.selectedTab = .map
+                appState.pendingTripOpen = true
+            }
             .task { await runLaunchStages() }
         }
     }

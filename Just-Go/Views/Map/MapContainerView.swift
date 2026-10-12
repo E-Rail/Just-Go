@@ -147,6 +147,11 @@ struct MapContainerView: View {
             appState.pendingTripReplay = nil
             replay(record)
         }
+        .onChange(of: appState.pendingTripOpen, initial: true) { _, pending in
+            guard pending else { return }
+            appState.pendingTripOpen = false
+            openTrip()
+        }
         // Accessibility Settings reach the planner here: seeded on appear and re-seeded on change,
         // so results planned under an old preference are dropped.
         .task(id: appState.accessibilityPreference) {
@@ -249,11 +254,29 @@ struct MapContainerView: View {
     /// A trip Live Go was running when iOS terminated the app, most likely underground. Asked
     /// rather than resumed: a saved trip can be hours stale.
     private func offerToResumeTrip() {
+        // A tap on the trip outside the app launched this: that is the answer, and `openTrip()`
+        // acts on it.
+        guard !appState.pendingTripOpen else { return }
         guard pendingResumableTrip == nil, resumableTrip == nil, path.isEmpty else { return }
         // A trip already running in this launch has its own way back, the pill on the map.
         guard !container.tripSession.isActive, let saved = container.tripSession.savedTrip() else { return }
         pendingResumableTrip = saved
         isResumingTrip = true
+    }
+
+    /// Brings up the navigator for the trip under way, or for the one a killed app left saved. The
+    /// rider asked for it by tapping the trip outside the app, so a saved one is opened without
+    /// the question `offerToResumeTrip()` puts.
+    private func openTrip() {
+        guard !appState.isGuidanceOnScreen else { return }
+        let session = container.tripSession
+        guard let trip = session.route ?? session.savedTrip() else { return }
+        pendingResumableTrip = nil
+        isResumingTrip = false
+        // To the map itself: a page on the stack can have a sheet up, and the navigator cannot be
+        // presented over one.
+        path.removeAll()
+        resumableTrip = trip
     }
 
     /// Opens the map where the rider left it. Nothing is loaded from this: the viewport decides

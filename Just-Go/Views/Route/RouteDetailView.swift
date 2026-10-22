@@ -103,6 +103,9 @@ struct RouteDetailView: View {
     @State private var isOnScreen = false
     /// Where the header map is looking: seeded from the trip's bounds, then left to the rider.
     @State private var headerRegion: MapVisibleRegion?
+    /// The route `headerRegion` was last seeded for, so a map rebuilt for the other size class (a
+    /// folding phone moving between its displays) keeps the rider's region instead of re-seeding.
+    @State private var seededRouteID: UUID?
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     /// Whether there is room to show the map and the trip side by side. The sheet's detents,
@@ -283,35 +286,19 @@ struct RouteDetailView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             // Duration and walking on the left, arrival on the right: the three numbers read
-            // together.
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(route.formattedDuration)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    // Switching alternatives changes this number in place; animating the digits
-                    // reads as one number changing.
-                    .contentTransition(.numericText())
-                    // "1 hr 52 min" in a large rounded face is wide; shrinking beats wrapping a
-                    // duration across two lines.
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .layoutPriority(2)
-                Text(AppLocalization.text(
-                    english: "\(route.formattedWalkingDistance) walk",
-                    simplified: "步行 \(route.formattedWalkingDistance)",
-                    traditional: "步行 \(route.formattedWalkingDistance)"
-                ))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                Spacer(minLength: 4)
-                Text(arrivalDetail)
-                    .font(.headline)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .layoutPriority(1)
+            // together. Where they do not fit on one line (a phone, a narrow column, large text)
+            // the arrival takes a line of its own rather than losing its clock time, or the walk
+            // its distance, to an ellipsis.
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    heroDurationAndWalk
+                    Spacer(minLength: 4)
+                    heroArrival
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    heroDurationAndWalk
+                    heroArrival
+                }
             }
 
             // The shape of the journey, readable before any of the words are: which lines, in
@@ -340,6 +327,33 @@ struct RouteDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
+    }
+
+    /// The duration and the walk, one line of the hero; the duration shrinks rather than wraps.
+    private var heroDurationAndWalk: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text(route.formattedDuration)
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                // "112 min" in a large rounded face is wide; shrinking beats wrapping a duration
+                // across two lines.
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .layoutPriority(1)
+            Text(AppLocalization.text(
+                english: "\(route.formattedWalkingDistance) walk",
+                simplified: "步行 \(route.formattedWalkingDistance)",
+                traditional: "步行 \(route.formattedWalkingDistance)"
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+    }
+
+    private var heroArrival: some View {
+        Text(arrivalDetail)
+            .font(.headline)
+            .monospacedDigit()
     }
 
     /// Stops, fare, transfers and which door to enter by: the line Amap spends on "13站 · ¥5 · 玉泉路
@@ -394,23 +408,18 @@ struct RouteDetailView: View {
         .background(Color.appBackground)
     }
 
-    /// Map and trip side by side, which a tablet has room for. The column has no `NavigationStack`
-    /// of its own: one nested in a pushed destination makes the whole screen fail to appear, with
-    /// no error. The phone's sheet can carry one because a sheet is its own presentation context.
+    /// Map and trip side by side, which a tablet has room for, or one to each side of a folding
+    /// phone's crease. The column has no `NavigationStack` of its own: one nested in a pushed
+    /// destination makes the whole screen fail to appear, with no error. The phone's sheet can
+    /// carry one because a sheet is its own presentation context.
     private func splitLayout(
         feasibility: RouteFeasibility,
         confidence: RouteConfidence
     ) -> some View {
-        // The reader hands the column a real width; inferred from an ambient container it measured
-        // zero points wide.
-        GeometryReader { geo in
-            HStack(spacing: 0) {
-                mapHeader()
-                    .frame(maxWidth: .infinity)
-                Divider()
-                tripCardContent(feasibility: feasibility, confidence: confidence)
-                    .sideColumn(max: Metrics.tripColumnWidth, in: geo.size.width)
-            }
+        SplitColumns(columnCap: Metrics.tripColumnWidth) {
+            mapHeader()
+        } secondary: {
+            tripCardContent(feasibility: feasibility, confidence: confidence)
         }
         // Sub-details are pushed inside the sheet on a phone and presented over the split here, so
         // the map and the trip both stay on screen behind them.
@@ -667,13 +676,17 @@ struct RouteDetailView: View {
             onStationSelected: { _ in }
         )
         .ignoresSafeArea(edges: .bottom)
-        // Seeded once: assigning on every pass would fight the rider for the camera.
-        .task(id: route.id) { headerRegion = route.previewRegion }
+        // Seeded once per route: assigning on every pass would fight the rider for the camera.
+        .task(id: route.id) {
+            guard seededRouteID != route.id else { return }
+            seededRouteID = route.id
+            headerRegion = route.previewRegion
+        }
         // At the map's top edge, the part the trip sheet never covers.
         .overlay(alignment: .topLeading) {
             VStack(alignment: .leading, spacing: 8) {
                 if alternatives.count > 1 {
-                    RouteTabs(routes: alternatives, selection: $selectedRouteID, floating: true)
+                    RouteTabs(routes: alternatives, selection: $selectedRouteID)
                 }
                 // The trip's track is the bundled OSM geometry, so it carries the ODbL attribution,
                 // placed where the trip card does not cover it.

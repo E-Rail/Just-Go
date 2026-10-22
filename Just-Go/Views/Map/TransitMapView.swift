@@ -17,7 +17,7 @@ struct MetroGeometryAttributionView: View {
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 4)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.small, style: .continuous))
+                .floatingChrome(in: Capsule(), isInteractive: true)
                 // ODbL attribution is mandatory, so it stays readable and tappable: a 44 pt target
                 // around a ~21 pt pill.
                 .frame(minHeight: Metrics.minimumTapTarget)
@@ -46,6 +46,10 @@ struct TransitMapView: UIViewRepresentable {
     /// its attribution inside the margins too, so this is also what keeps "Legal" out from under
     /// the panel.
     var bottomChromeHeight: CGFloat = 0
+    /// The same for the leading edge: on a phone folded side to side, the pane before the crease,
+    /// which the browse map gives to its search field and the rider's panel, so the rider is
+    /// centred in the pane beyond rather than on the crease.
+    var leadingChromeWidth: CGFloat = 0
     /// How heavily to draw the network's lines: heavier on a page about one line, where the browse
     /// map's weight reads as a hairline.
     var networkLineWidth: CGFloat = 6
@@ -54,6 +58,9 @@ struct TransitMapView: UIViewRepresentable {
     /// `LocationService.mapSpaceCorrection`.
     var onUserLocationChanged: ((CLLocationCoordinate2D) -> Void)?
     let onRegionChanged: ((MapVisibleRegion) -> Void)?
+    /// All the map shows, bounds and not layout margins, for a caller that loads what is in view.
+    /// Reported before `onRegionChanged`, so a load that region schedules reads this one.
+    var onShownRegionChanged: ((MapVisibleRegion) -> Void)?
     let onStationSelected: (Station) -> Void
     // Two-phase POI tap: `onPlaceTapped` fires synchronously with the feature's name +
     // coordinate so the UI can react instantly; `onPlaceResolved` fires later once the
@@ -70,7 +77,9 @@ struct TransitMapView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = ChromeInsetMapView(frame: .zero)
-        mapView.chromeInsets = UIEdgeInsets(top: topChromeHeight, left: 0, bottom: bottomChromeHeight, right: 0)
+        mapView.chromeInsets = UIEdgeInsets(
+            top: topChromeHeight, left: leadingChromeWidth, bottom: bottomChromeHeight, right: 0
+        )
         mapView.delegate = context.coordinator
         mapView.showsCompass = true
         mapView.showsScale = true
@@ -91,7 +100,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         (mapView as? ChromeInsetMapView)?.chromeInsets = UIEdgeInsets(
-            top: topChromeHeight, left: 0, bottom: bottomChromeHeight, right: 0
+            top: topChromeHeight, left: leadingChromeWidth, bottom: bottomChromeHeight, right: 0
         )
         context.coordinator.sync(parent: self, on: mapView)
     }
@@ -507,6 +516,14 @@ struct TransitMapView: UIViewRepresentable {
                 // Safe on the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) include
                 // `strokeScale`'s (0.055, 0.18, 0.8). Keep that true if either set moves.
                 refreshOverlayWidths(on: mapView)
+            }
+            if let onShownRegionChanged = parent.onShownRegionChanged {
+                let shown = mapView.convert(mapView.bounds, toRegionFrom: mapView)
+                onShownRegionChanged(MapVisibleRegion(
+                    center: shown.center,
+                    latitudeDelta: shown.span.latitudeDelta,
+                    longitudeDelta: shown.span.longitudeDelta
+                ))
             }
             parent.onRegionChanged?(visibleRegion)
         }

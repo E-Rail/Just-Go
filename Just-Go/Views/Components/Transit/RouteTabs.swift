@@ -1,12 +1,11 @@
 import SwiftUI
 
+/// The alternatives over the route map, one tab each, in the map's own chrome: `Color.appSurface`
+/// and a plain accent tint are partly transparent and unreadable over cartography, so a tab is
+/// floating chrome, washed with the accent when selected.
 struct RouteTabs: View {
     let routes: [Route]
     @Binding var selection: UUID
-    /// Drawn over the map: `Color.appSurface` and a 15% accent tint are partly transparent and
-    /// unreadable over cartography, so the floating form uses a material and an opaque selected
-    /// fill.
-    var floating = false
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -17,7 +16,7 @@ struct RouteTabs: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(route.formattedDuration)
-                                .font(floating ? .title3 : .subheadline)
+                                .font(.title3)
                                 .fontWeight(selection == route.id ? .semibold : .regular)
                                 .lineLimit(1)
 
@@ -25,38 +24,22 @@ struct RouteTabs: View {
                                 .frame(height: 3)
                                 .clipShape(Capsule())
 
-                            // Only on the floating card, where a rider compares alternatives; the
-                            // inline row sits under a list that says it.
-                            if floating {
-                                Text(route.formattedTransfers)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
+                            // A rider comparing alternatives compares changes too.
+                            Text(route.formattedTransfers)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
-                        .frame(minWidth: floating ? 104 : 0, alignment: .leading)
+                        .frame(minWidth: 104, alignment: .leading)
                         .padding(.horizontal, 12)
-                        .padding(.vertical, floating ? 11 : 9)
-                        .background {
-                            let shape = RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
-                            if floating {
-                                shape.fill(.regularMaterial)
-                                    .overlay(shape.fill(
-                                        selection == route.id
-                                            ? Color.accentColor.opacity(0.22)
-                                            : Color.clear
-                                    ))
-                                    .elevated(.floating)
-                            } else {
-                                shape.fill(
-                                    selection == route.id ? Color.accentColor.opacity(0.15) : Color.appSurface
-                                )
-                            }
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Radius.medium, style: .continuous)
-                                .stroke(selection == route.id ? Color.accentColor : .clear, lineWidth: 1)
-                        }
+                        .padding(.vertical, 11)
+                        // Not interactive glass: its press response grows past the 2 points the
+                        // scroll view leaves above and below and is cut off. The button's own
+                        // press dimming is the response.
+                        .floatingChrome(
+                            minimumRadius: Radius.medium,
+                            tint: selection == route.id ? Color.accentColor.opacity(0.3) : nil
+                        )
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(AppLocalization.text(
@@ -68,7 +51,7 @@ struct RouteTabs: View {
                 }
             }
             .padding(.vertical, 2)
-            .padding(.horizontal, floating ? 12 : 0)
+            .padding(.horizontal, 12)
         }
         .scrollBounceBehavior(.basedOnSize)
     }

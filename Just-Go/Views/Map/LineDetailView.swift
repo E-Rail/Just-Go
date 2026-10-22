@@ -47,28 +47,22 @@ struct LineDetailView: View {
 
     // MARK: - Layout
 
-    /// Side by side when there is width, stacked otherwise, so an iPad does not put the stops a
-    /// screen below their line.
+    /// Side by side when there is width, or one to each side of a folding phone's crease; stacked
+    /// otherwise, so an iPad does not put the stops a screen below their line.
     @ViewBuilder
     private func content(for line: MetroLine) -> some View {
         if horizontalSizeClass == .regular {
-            // The stop list gets a measured width (see `sideColumn(max:in:)`); left to infer one,
-            // it renders as nothing.
-            GeometryReader { geo in
-                HStack(spacing: 0) {
-                    map(for: line)
-                        .frame(maxWidth: .infinity)
-                    Divider()
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: Metrics.l) {
-                            header(for: line)
-                            serviceVariants(for: line)
-                            stopList(for: line)
-                            operatorCheck(for: line)
-                        }
-                        .padding(Metrics.l)
+            SplitColumns(columnCap: Metrics.stopColumnWidth) {
+                map(for: line)
+            } secondary: {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: Metrics.l) {
+                        header(for: line)
+                        serviceVariants(for: line)
+                        stopList(for: line)
+                        operatorCheck(for: line)
                     }
-                    .sideColumn(max: Metrics.stopColumnWidth, in: geo.size.width)
+                    .padding(Metrics.l)
                 }
             }
         } else {

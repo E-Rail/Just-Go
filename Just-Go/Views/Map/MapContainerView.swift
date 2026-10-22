@@ -40,6 +40,7 @@ struct MapContainerView: View {
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var viewModel: MapViewModel?
     @State private var path: [MapRoute] = []
     @State private var tappedPlace: TappedPlace?
@@ -54,6 +55,9 @@ struct MapContainerView: View {
     @State private var topChromeHeight: CGFloat = 0
     /// The same for the rider's panel at the bottom, which changes height when it is minimized.
     @State private var bottomChromeHeight: CGFloat = 0
+    /// A folding phone's crease across the map, which the search field and the rider panel keep to
+    /// one side of.
+    @State private var mapFold = FoldedSurface()
     @State private var planTask: Task<Void, Never>?
     @State private var didCenterOnUser = false
     /// Non-nil for a few seconds after a locate attempt that could not produce a fix.
@@ -309,7 +313,8 @@ struct MapContainerView: View {
             appState.lastMapCamera = AppState.MapCamera(
                 latitude: region.center.latitude,
                 longitude: region.center.longitude,
-                spanDelta: region.maxDelta
+                // Restored as a square, so the side MapKit fitted, not the one it widened.
+                spanDelta: region.fittedDelta
             )
         }
     }
@@ -321,28 +326,44 @@ struct MapContainerView: View {
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             VStack(spacing: 10) {
-                topControls
-                HStack(spacing: 8) {
-                    Spacer()
-                    if viewModel?.metroNetworks.isEmpty == false {
-                        MetroGeometryAttributionView()
-                            .lineLimit(1)
-                            .layoutPriority(0)
+                // Beside a crease the map's own row rises level with the search field, in the pane
+                // beyond. Elsewhere it sits under the field with the full width, so the ODbL
+                // attribution in it is never squeezed to an ellipsis beside a column. One layout
+                // either way, so opening the phone does not rebuild the field.
+                let crease = mapFold.paneBeforeWidth.flatMap { before in mapFold.paneAfterStart.map { $0 - before } }
+                let layout = crease.map { AnyLayout(HStackLayout(spacing: $0)) }
+                    ?? AnyLayout(VStackLayout(spacing: 10))
+                layout {
+                    // Exactly the column: beside a crease a flexible field would split the row's
+                    // room with the spacer beside it.
+                    topControls
+                        .frame(width: leadingColumnWidth.map { $0 - Metrics.l })
+                        .frame(maxWidth: crease == nil ? .infinity : nil, alignment: .leading)
+                    HStack(spacing: 8) {
+                        Spacer()
+                        if viewModel?.metroNetworks.isEmpty == false {
+                            MetroGeometryAttributionView()
+                                .lineLimit(1)
+                                .layoutPriority(0)
+                        }
+                        mapLocateButton
+                            .layoutPriority(1)
                     }
-                    mapLocateButton
-                        .layoutPriority(1)
                 }
                 if let locateFailure {
                     Text(locateFailure)
                         .font(.footnote)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(.regularMaterial, in: Capsule())
+                        .floatingChrome(in: Capsule(), isInteractive: false)
+                        // Beside a crease, centred in the map's pane, under the button that asked.
+                        .frame(maxWidth: .infinity)
+                        .padding(.leading, mapFold.paneAfterStart.map { $0 - Metrics.l } ?? 0)
                         .transition(.opacity)
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: locateFailure)
-            .padding(.horizontal)
+            .padding(.horizontal, Metrics.l)
             .padding(.top, 14)
             .padding(.bottom, 10)
             .zIndex(2)
@@ -362,6 +383,13 @@ struct MapContainerView: View {
                 } action: { height in
                     bottomChromeHeight = height
                 }
+        }
+        // Measured on the whole map, outside both insets: a panel that grew or shrank would
+        // otherwise move the frame the crease is measured in, or push the crease out of it.
+        .onGeometryChange(for: FoldedSurface.self) { proxy in
+            FoldedSurface(proxy)
+        } action: { surface in
+            mapFold = surface
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle(AppLocalization.localized("Map"))
@@ -449,7 +477,8 @@ struct MapContainerView: View {
             route: nil,
             showsUserLocation: viewModel?.isLocationAuthorized == true,
             topChromeHeight: topChromeHeight,
-            bottomChromeHeight: bottomChromeHeight,
+            bottomChromeHeight: mapBottomChrome,
+            leadingChromeWidth: mapFold.paneAfterStart ?? 0,
             onUserLocationChanged: { coordinate in
                 container.locationService.observeMapSpaceUserLocation(coordinate)
                 viewModel?.mapUserLocationChanged(coordinate)
@@ -461,6 +490,7 @@ struct MapContainerView: View {
                 viewModel?.viewportChanged(to: region)
                 rememberCamera(region)
             },
+            onShownRegionChanged: { viewModel?.shownRegion = $0 },
             onStationSelected: openStation,
             onPlaceTapped: handlePlaceTapped,
             onPlaceResolved: handlePlaceResolved,
@@ -508,14 +538,16 @@ struct MapContainerView: View {
     /// screen.
     private var topControls: some View {
         HStack(spacing: 10) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                    .frame(width: 20)
-
-                Button {
-                    path.append(.search)
-                } label: {
+            // The whole pill is the button, so the glass that answers a touch is the part that
+            // opens search.
+            Button {
+                path.append(.search)
+            } label: {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
+                        .frame(width: 20)
+                        .accessibilityHidden(true)
                     Text(AppLocalization.text(
                         english: "Search places or stations",
                         simplified: "搜索地点或车站",
@@ -525,23 +557,42 @@ struct MapContainerView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
-                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .padding(12)
+                .contentShape(Capsule())
+                .floatingChrome(in: Capsule(), isInteractive: true)
             }
-            .padding(12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
-            .elevated(.floating)
-            .accessibilityElement(children: .contain)
+            .buttonStyle(.plain)
 
             if isLoadingStationDetail {
                 ProgressView()
                     .controlSize(.small)
                     .frame(width: 34, height: 34)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .floatingChrome(in: Circle(), isInteractive: false)
             }
         }
         .zIndex(20)
+    }
+
+    /// What MapKit centres the rider above. Unfolded, the rider's panel. Folded side to side,
+    /// nothing: the panel keeps to the pane before the crease, and the map centres in the pane
+    /// beyond (`leadingChromeWidth`). Folded across, everything from the crease down, so the rider
+    /// is centred in the upper pane rather than on the fold.
+    private var mapBottomChrome: CGFloat {
+        switch mapFold.fold?.axis {
+        case nil: return bottomChromeHeight
+        case .vertical: return 0
+        case .horizontal: return mapFold.belowCreaseHeight ?? 0
+        }
+    }
+
+    /// How far from the leading edge the search field and the rider's panel reach, margins
+    /// included. On a wide screen a column, so a panel the width of an iPad does not cover the map
+    /// it is there to accompany; from the size class, so a narrow split-screen window keeps the
+    /// bar. Across a fold, the pane before the crease. Nil where both run the full width.
+    private var leadingColumnWidth: CGFloat? {
+        mapFold.paneBeforeWidth
+            ?? (horizontalSizeClass == .regular ? Metrics.tripColumnWidth + RiderPanel.margin : nil)
     }
 
     /// The rider's own things over the map. A trip does not end when its screen closes, so the
@@ -561,7 +612,9 @@ struct MapContainerView: View {
                 beginPlan(to: AppState.PendingRouteInput(place: tag.transitPlace, role: .destination))
             },
             onAddPlace: { appState.selectedTab = .trips },
-            onOpenStation: openStation
+            onOpenStation: openStation,
+            columnWidth: leadingColumnWidth,
+            paneHeight: mapFold.paneBelowHeight
         )
     }
 
@@ -591,7 +644,7 @@ struct MapContainerView: View {
                 .font(.headline)
                 .foregroundStyle(viewModel?.isLocationAuthorized == true ? Color.accentColor : Color.primary)
                 .frame(width: 44, height: 44)
-                .background(.regularMaterial, in: Circle())
+                .floatingChrome(in: Circle(), isInteractive: true)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(AppLocalization.localized("Center map on my location"))

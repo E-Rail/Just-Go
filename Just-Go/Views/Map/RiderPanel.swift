@@ -23,26 +23,32 @@ struct RiderPanel: View {
     let onSelectPlace: (StationQuickTag) -> Void
     let onAddPlace: () -> Void
     let onOpenStation: (Station) -> Void
+    /// How far from the leading edge the panel reaches, its own margin included: a column on a
+    /// wide screen, or the pane before a folding phone's crease. Nil runs the full width. The map
+    /// decides it, because the search field above shares it.
+    var columnWidth: CGFloat?
+    /// Folded across, how tall the pane below the crease is, which the panel keeps within.
+    var paneHeight: CGFloat?
+
+    /// The gap between the panel and the screen's edges, which `columnWidth` includes.
+    static let margin = Metrics.m
 
     @AppStorage("riderPanelMinimized") private var isMinimized = false
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         VStack(spacing: 0) {
             if isMinimized {
                 minimizedRow
             } else {
-                expandedRows
+                // Held to the pane below a crease, the rows scroll rather than reach onto the fold.
+                CappedScroll(maxHeight: paneHeight.map { $0 - Metrics.s }) { expandedRows }
             }
         }
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
-        .elevated(.floating)
-        // A column on a wide screen, where a panel the width of an iPad would cover the map it is
-        // there to accompany. From the size class, so a narrow split-screen window keeps the bar.
-        .frame(maxWidth: horizontalSizeClass == .regular ? Metrics.tripColumnWidth : .infinity)
+        .floatingChrome()
+        .frame(maxWidth: columnWidth.map { $0 - Self.margin } ?? .infinity)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.bottom, 8)
+        .padding(.horizontal, Self.margin)
+        .padding(.bottom, Metrics.s)
         .animation(.easeInOut(duration: 0.2), value: isMinimized)
     }
 

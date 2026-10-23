@@ -112,3 +112,71 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
             GCC_TREAT_WARNINGS_AS_ERRORS=YES
+
+  # The job above builds with an iOS 26 SDK, where the iPhone Duo's fold APIs (`reservedRegions`,
+  # `concentricCornerRadii`) do not exist and `#if canImport(UIKit.UIViewReservedRegion)` compiles
+  # them out. That proves the fallback compiles and nothing else: the fold path itself compiles
+  # only against the iOS 27.1 SDK, and only this job does that. Its own image, because the one
+  # above has to stay macos-15 for Ruby 2.6 (see there) and no macos-15 image carries Xcode 27;
+  # this job runs no Ruby. `xcode-27` is a public preview, so it can queue.
+  build-fold:
+    name: Build with the iOS 27.1 SDK
+    runs-on: xcode-27
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      # The newest release Xcode at 27.1 or later. Not a beta: its SDK can carry symbols a release
+      # does not, so a pass would not mean the shipping toolchain compiles. A path is a beta by
+      # where its symlink resolves, since `Xcode_27.2.app` points at `Xcode_27.2_beta_2.app`.
+      - name: Select Xcode 27.1 or newer
+        run: |
+          selected=""
+          for app in $(ls -d /Applications/Xcode*.app | sort -Vr); do
+            case "$(cd "$app" && pwd -P)" in *[Bb]eta*) continue ;; esac
+            version="$("$app/Contents/Developer/usr/bin/xcodebuild" -version 2>/dev/null | head -1 | awk '{print $2}')"
+            major="${version%%.*}"
+            rest="${version#*.}"
+            if [ "$rest" = "$version" ]; then minor=0; else minor="${rest%%.*}"; fi
+            case "$major$minor" in ''|*[!0-9]*) continue ;; esac
+            if [ "$major" -gt 27 ] || { [ "$major" -eq 27 ] && [ "$minor" -ge 1 ]; }; then
+              selected="$app"
+              break
+            fi
+          done
+          if [ -z "$selected" ]; then
+            echo "::error::No release Xcode 27.1 or newer on this runner, so the iPhone Duo fold path cannot be compiled."
+            ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+          sudo xcode-select -s "$selected"
+          xcodebuild -version
+          echo "iOS Simulator SDK $(xcrun --sdk iphonesimulator --show-sdk-version)"
+
+      - name: Build Debug
+        run: |
+          xcodebuild clean build \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES
+
+      - name: Build Release
+        run: |
+          xcodebuild build \
+            -project Just-Go.xcodeproj \
+            -scheme Just-Go \
+            -configuration Release \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData-Release" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES

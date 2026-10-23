@@ -30,6 +30,7 @@ struct LiveGoView: View {
     /// has started, and a re-plan from the rider's location replaces that.
     private let initialRoute: Route
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
     // Read directly rather than via `Color.accentColor`: in a full-screen cover the first frame
@@ -68,8 +69,24 @@ struct LiveGoView: View {
     /// Back, embedded, is a question: leaving the page would leave a trip running with no screen
     /// showing it.
     @State private var isConfirmingEnd = false
+    /// Where a folding phone's crease crosses the surface, so the panel can take the pane beyond it.
+    @State private var surfaceFold = FoldedSurface()
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
+
+    /// The safe areas the map runs under: everywhere but the top on a whole screen; on a folded
+    /// one, every side but the one the panel's pane is on, so the map stops at the crease.
+    private var mapEdges: Edge.Set {
+        switch surfaceFold.fold?.axis {
+        case .vertical: return [.bottom, .leading]
+        case .horizontal: return .horizontal
+        case nil: return [.bottom, .horizontal]
+        }
+    }
+
+    /// Whether the panel floats over the map, rather than sitting on the plain background of a
+    /// transfer step or of a folded phone's own pane.
+    private var panelOverMap: Bool { !isActiveTransferStep && surfaceFold.fold == nil }
 
     private var session: TripSession { container.tripSession }
     private var route: Route { session.route ?? initialRoute }
@@ -98,13 +115,30 @@ struct LiveGoView: View {
                 } else {
                     // The panel is a safe-area inset, not a `ZStack` overlay, so MapKit knows the
                     // space is taken and lays out its labels, controls and legal attribution where
-                    // the rider can see them, while the map still draws full-bleed.
+                    // the rider can see them, while the map still draws full-bleed. Where the phone
+                    // folds the panel takes the pane beyond the crease and the map keeps to its
+                    // own. One panel in one inset whatever the fold does, so opening or closing
+                    // the phone rebuilds neither the map nor the panel. The map also runs under a
+                    // side bar (a landscape notch, a foldable's vertical bar) as the browse map does.
                     liveMap
-                        .ignoresSafeArea(edges: .bottom)
+                        .ignoresSafeArea(edges: mapEdges)
+                        .safeAreaPadding(.trailing, surfaceFold.beyondCreaseWidth ?? 0)
                         .safeAreaInset(edge: .bottom, spacing: 0) {
                             instructionPanel
+                                .frame(width: surfaceFold.paneAfterWidth)
+                                .frame(height: surfaceFold.paneBelowHeight, alignment: .bottom)
+                                .frame(
+                                    maxWidth: .infinity,
+                                    minHeight: surfaceFold.belowCreaseHeight,
+                                    alignment: surfaceFold.besideCrease ? .bottomTrailing : .bottom
+                                )
                         }
                 }
+            }
+            .onGeometryChange(for: FoldedSurface.self) { proxy in
+                FoldedSurface(proxy)
+            } action: { surface in
+                surfaceFold = surface
             }
             .overlay(alignment: .top) {
                 VStack(spacing: 8) {
@@ -129,6 +163,9 @@ struct LiveGoView: View {
                     }
                 }
                 .padding(.horizontal)
+                // Beside a crease, in the pane before it rather than across the fold.
+                .frame(width: surfaceFold.paneBeforeWidth)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .navigationTitle(embedded ? "" : transferNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -288,10 +325,20 @@ struct LiveGoView: View {
     }
 
     private var transferStepSurface: some View {
-        VStack(spacing: 0) {
+        // Stacked, or side by side across a crease; one layout either way, so nothing is rebuilt
+        // when the phone opens or closes.
+        let layout = surfaceFold.besideCrease
+            ? AnyLayout(HStackLayout(alignment: .bottom, spacing: 0))
+            : AnyLayout(VStackLayout(spacing: 0))
+        let fold = surfaceFold.fold
+        return layout {
             transferStatusContent
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(surfaceFold.besideCrease ? .trailing : .bottom, fold?.clearanceBefore ?? 0)
+            // Padding adds to the frame it pads, so the panel's pane begins at the crease's line.
             instructionPanel
+                .frame(width: surfaceFold.paneAfterWidth, height: surfaceFold.paneBelowHeight, alignment: .bottom)
+                .padding(surfaceFold.besideCrease ? .leading : .top, fold?.clearanceAfter ?? 0)
         }
         .background(Color.appBackground)
     }
@@ -683,7 +730,13 @@ struct LiveGoView: View {
                 .tint(themeColor)
 
             if let step = session.currentStep {
-                stepSummary(step)
+                // Held to the pane below a crease, the step scrolls rather than pushing the panel
+                // onto the fold, and the progress bar and the controls stay where they are.
+                // Anywhere else the scroll view takes the step's own height. One view either way,
+                // so folding the phone keeps the panel's identity.
+                ScrollView { stepSummary(step) }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .fixedSize(horizontal: false, vertical: surfaceFold.paneBelowHeight == nil)
                     .id(step.id)
                     .transition(.opacity)
             }
@@ -691,10 +744,14 @@ struct LiveGoView: View {
             controls
         }
         .padding(16)
-        // `.thickMaterial`: a thinner one lets parks and water tint the panel, and this is the one
-        // surface that must stay readable while walking.
-        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
-        .elevated(.floating)
+        // Below iOS 26, `.thickMaterial`: a thinner one lets parks and water tint the panel, and
+        // this is the one surface that must stay readable while walking.
+        .floatingChrome(material: .thickMaterial, overContent: panelOverMap)
+        // Over the map on a wide screen, a column as the browse map's rider panel is, so the map it
+        // guides along stays in view beside it. From the size class, so a narrow split-screen
+        // window keeps the bar. Folded, the panel has a pane of its own and fills it.
+        .frame(maxWidth: horizontalSizeClass == .regular && panelOverMap ? Metrics.tripColumnWidth : .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .bottom], 12)
         // Clear of a tab bar the system has moved to the trailing edge. Outside the material, so
         // the panel moves rather than its background stretching.

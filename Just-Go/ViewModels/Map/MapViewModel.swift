@@ -11,6 +11,14 @@ struct MapVisibleRegion {
         max(latitudeDelta, longitudeDelta)
     }
 
+    /// The span this region was asked for, as a square. MapKit fits a square into the map's layout
+    /// margins by widening one side to their aspect, so the narrower side is the asked span, and
+    /// re-applying it as a square gives the same region back. Re-applying `maxDelta` widens it
+    /// again each time (0.014 asked, 0.0195 shown, 0.0271 after one more pass).
+    var fittedDelta: CLLocationDegrees {
+        min(latitudeDelta, longitudeDelta)
+    }
+
     func contains(_ coordinate: CLLocationCoordinate2D, paddingFactor: Double) -> Bool {
         let latitudePadding = latitudeDelta * paddingFactor
         let longitudePadding = longitudeDelta * paddingFactor
@@ -64,10 +72,11 @@ enum MapCameraSpan {
 final class MapViewModel {
     var stations: [Station] = []
     var visibleRegion: MapVisibleRegion?
-    /// The span the last camera move asked for, which is not what `visibleRegion` then holds (see
-    /// `mapUserLocationChanged`). Every writer of `visibleRegion` sets it, or a stale value becomes
-    /// a jump to a zoom nobody asked for.
-    private var requestedSpanDelta: CLLocationDegrees = MapCameraSpan.city
+    /// All the map shows, which is more than `visibleRegion`: MapKit reports the region inside its
+    /// layout margins, so on a folded phone that is one pane, and the chrome's insets trim it on
+    /// every device. What is loaded and drawn is decided by this one; zoom thresholds and the
+    /// camera stay on `visibleRegion`. Nil until the map has reported, when `visibleRegion` stands in.
+    @ObservationIgnored var shownRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
     var isLocationAuthorized: Bool {
         locationService.isAuthorized
@@ -123,7 +132,6 @@ final class MapViewModel {
     /// What the map has loaded is decided by what the map is looking at, and nothing else.
     func viewportChanged(to region: MapVisibleRegion) {
         visibleRegion = region
-        requestedSpanDelta = region.maxDelta
         viewportLoadTask?.cancel()
         scheduleVisibleStationsRefresh()
 
@@ -137,8 +145,9 @@ final class MapViewModel {
             guard !Task.isCancelled, let self else { return }
             // Which packs the viewport touches, by their own bounding boxes. City centroids are
             // only in view when zoomed out to a whole metro area.
+            let shown = shownRegion ?? region
             let visibleCityIDs = await metroNetworkProvider.networkSummaries()
-                .filter { $0.bounds.intersects(region) }
+                .filter { $0.bounds.intersects(shown) }
                 .map(\.cityID)
             guard !Task.isCancelled else { return }
             // Claim the token only once this load starts: during the debounce, a still-running
@@ -150,7 +159,6 @@ final class MapViewModel {
 
     @discardableResult
     func selectStation(_ station: Station) async -> Station {
-        requestedSpanDelta = MapCameraSpan.station
         withAnimation {
             visibleRegion = MapVisibleRegion(
                 center: station.coordinate,
@@ -178,14 +186,11 @@ final class MapViewModel {
               let region = visibleRegion,
               region.center.distance(to: raw) < 50,
               region.center.distance(to: coordinate) > 50 else { return }
-        // The span this camera was *asked* for. `visibleRegion` holds what MapKit settled on after
-        // widening the square to the screen's aspect; re-applying that widens it again (0.014
-        // asked, 0.0271 shown).
-        updateCamera(to: coordinate, spanDelta: requestedSpanDelta)
+        // The span this camera was asked for, not what MapKit widened it to (see `fittedDelta`).
+        updateCamera(to: coordinate, spanDelta: region.fittedDelta)
     }
 
     func updateCamera(to coordinate: CLLocationCoordinate2D, spanDelta: CLLocationDegrees) {
-        requestedSpanDelta = spanDelta
         withAnimation {
             visibleRegion = MapVisibleRegion(
                 center: coordinate,
@@ -249,8 +254,9 @@ final class MapViewModel {
         }
 
         // Stage 1: lines.
+        let shown = shownRegion ?? region
         metroNetworks = loadedByCity.values
-            .filter { $0.bounds.intersects(region) }
+            .filter { $0.bounds.intersects(shown) }
             .sorted { $0.cityID < $1.cityID }
 
         // Stage 2: station markers.
@@ -290,10 +296,11 @@ final class MapViewModel {
         }
 
         let showsNormalStations = region.maxDelta <= 0.12
+        let shown = shownRegion ?? region
         let inView = metroNetworks
             .flatMap { stationsByCity[$0.cityID] ?? [] }
             .filter { station in
-                region.contains(station.coordinate, paddingFactor: 0.2) &&
+                shown.contains(station.coordinate, paddingFactor: 0.2) &&
                     (showsNormalStations || station.isTransferStation)
             }
         // Only one pack in view means no pack can be duplicating another's stations.

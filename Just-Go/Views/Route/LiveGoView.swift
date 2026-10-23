@@ -47,9 +47,11 @@ struct LiveGoView: View {
     @State private var isRerouting = false
     @State private var offRouteStrikes = 0
     @State private var lastRerouteAt = Date.distantPast
-    /// How long to wait before the next reroute, doubling until the rider advances. Each re-plan is
-    /// a full plan (several MapKit legs and a metered transit call), so a rider taking their own
-    /// street is backed off, while a genuine wrong turn is still answered quickly.
+    /// How long to wait before the next reroute, doubling with every re-plan until the rider
+    /// reaches a later step. Each re-plan is a full plan (several MapKit legs and metered transit
+    /// calls), so a rider taking their own street is backed off, while a genuine wrong turn is
+    /// still answered quickly. A re-plan that lands does not reset it: that rider leaves each new
+    /// route as they left the last.
     @State private var rerouteInterval: TimeInterval = 45
     @State private var rerouteNotice: String?
     @State private var rerouteNoticeTask: Task<Void, Never>?
@@ -218,12 +220,21 @@ struct LiveGoView: View {
             rerouteNoticeTask?.cancel()
             rerouteTask?.cancel()
         }
-        .onChange(of: session.currentIndex) { _, _ in
+        .onChange(of: session.currentIndex) { old, new in
             // Follow-me is turned off by the Back and Next buttons themselves, not here: the trip
             // also moves on by itself, and the rider did not ask to stop being followed.
             keepScreenOnWhileWalking()
             frameCurrentStep()
             announceCurrentStep()
+            // The rider is following the route again. A re-plan itself goes back to the first
+            // step, which is not that.
+            if new > old { rerouteInterval = 45 }
+        }
+        // The trip ended without this screen: it arrived and was left, or ran past the longest a
+        // trip is followed. A navigator with no trip has nothing to show, and appearing again
+        // would start the same trip over.
+        .onChange(of: session.isActive) { _, isActive in
+            if !isActive { onExit() }
         }
         .onChange(of: session.alightingSoonStep) { _, step in
             raiseGetOffBanner(for: step)
@@ -613,8 +624,6 @@ struct LiveGoView: View {
             // From any step but the first, the index change runs framing and the announcement
             // through `onChange`; doing it here too would speak the step twice.
             let indexChanges = session.currentIndex != 0
-            // A fresh plan from where the rider actually is: the next divergence is new information.
-            rerouteInterval = 45
             session.reroute(with: newRoute)
             transferGuidance = nil
             if !indexChanges {

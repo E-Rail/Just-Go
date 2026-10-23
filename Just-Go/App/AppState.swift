@@ -98,6 +98,14 @@ final class AppState {
     /// `pendingRouteInput`: the map reads it once and clears it.
     var pendingTripReplay: TripRecord?
 
+    /// The rider tapped the trip on the Lock Screen or in the Dynamic Island, and wants its
+    /// navigator. One-shot, like `pendingRouteInput`: the map reads it once and clears it.
+    var pendingTripOpen = false
+    /// Whether a navigator is what the rider is looking at, embedded in a route's page or
+    /// presented over the map. `LiveGoView` keeps it; the map reads it so as not to present a
+    /// second one over the first.
+    var isGuidanceOnScreen = false
+
     var accessibilityPreference: AccessibilityPreference {
         didSet {
             userDefaults.setCodable(accessibilityPreference, forKey: accessibilityPreferenceKey)

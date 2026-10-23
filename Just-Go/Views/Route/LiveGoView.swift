@@ -18,7 +18,8 @@ private struct LiveTransferGuidanceRequest: Hashable {
 /// a compact instruction panel, and off-route re-planning while walking.
 ///
 /// The trip itself lives in `TripSession`, which moves it on by the clock and by location, so this
-/// screen shows a trip and does not own one: leaving it leaves the trip running.
+/// screen shows a trip and does not own one: leaving it leaves the trip running. That is why Back,
+/// where the screen has one, asks whether to end the trip before it lets the rider go.
 struct LiveGoView: View {
     /// Rendered inside the route detail rather than over it: this drops the navigation chrome only
     /// a presented copy needs and hands the exit to its host. One navigator, two containers.
@@ -62,6 +63,9 @@ struct LiveGoView: View {
     /// Whether the camera tracks the rider: on while guiding, off when stepping through manually so
     /// the map stays on the step being read.
     @State private var followsRider = true
+    /// Back, embedded, is a question: leaving the page would leave a trip running with no screen
+    /// showing it.
+    @State private var isConfirmingEnd = false
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
 
@@ -126,8 +130,22 @@ struct LiveGoView: View {
             }
             .navigationTitle(embedded ? "" : transferNavigationTitle)
             .navigationBarTitleDisplayMode(.inline)
+            // The host's back button would pop the page with the trip still running, and so would
+            // the swipe that goes with it, which a hand on a crowded train makes by accident.
+            .navigationBarBackButtonHidden(embedded)
             .toolbar {
-                if !embedded {
+                if embedded {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            isConfirmingEnd = true
+                        } label: {
+                            Image(systemName: "chevron.backward")
+                        }
+                        // The colour of the back button it stands in for, not the theme's.
+                        .tint(.primary)
+                        .accessibilityLabel(AppLocalization.text(english: "Back", simplified: "返回", traditional: "返回"))
+                    }
+                } else {
                     // Presented, there is no back button to leave by, and End is not leaving.
                     ToolbarItem(placement: .topBarLeading) {
                         Button {
@@ -146,6 +164,27 @@ struct LiveGoView: View {
                     }
                 }
             }
+            .alert(
+                AppLocalization.text(english: "End this trip?", simplified: "结束本次行程？", traditional: "結束本次行程？"),
+                isPresented: $isConfirmingEnd
+            ) {
+                Button(
+                    AppLocalization.text(english: "End", simplified: "结束", traditional: "結束"),
+                    role: .destructive
+                ) {
+                    exit()
+                }
+                Button(
+                    AppLocalization.text(english: "Keep going", simplified: "继续导航", traditional: "繼續導航"),
+                    role: .cancel
+                ) {}
+            } message: {
+                Text(AppLocalization.text(
+                    english: "Guidance and its get-off alerts will stop.",
+                    simplified: "导航和下车提醒将停止。",
+                    traditional: "導航和下車提醒將停止。"
+                ))
+            }
     }
 
     /// End or Done: the trip is over, and the session completes it in the rider's history.
@@ -160,6 +199,7 @@ struct LiveGoView: View {
             // Starts the trip, or finds it already running: the session keeps the fixes, the clock
             // and the alerts going whether or not this screen is up.
             session.start(initialRoute)
+            appState.isGuidanceOnScreen = true
             // The Accessibility toggle is a promise, not a preference: a rider who turned on
             // Audio Navigation gets it, whatever the mute button was last left at.
             if appState.accessibilityPreference.audioNavigation { voiceEnabled = true }
@@ -169,6 +209,7 @@ struct LiveGoView: View {
             announceCurrentStep()
         }
         .onDisappear {
+            appState.isGuidanceOnScreen = false
             UIApplication.shared.isIdleTimerDisabled = false
             getOffBannerTask?.cancel()
             showGetOffBanner = false

@@ -21,7 +21,7 @@ unavailable rather than inferred.
 - Apple Maps place search, walking directions, and map rendering.
 - Guidance that follows the trip. Steps advance by location and by time, each position says
   whether it was located or estimated, every ride has a "get ready" alert, and the step under
-  way is shown on the Lock Screen and in the Dynamic Island.
+  way is shown on the Lock Screen and in the Dynamic Island, where a tap returns to guidance.
 - Station accessibility data for 582 stations across 14 cities, from each city's own open data.
 - Hong Kong MTR and Light Rail station, route, accessibility, and live-reference data from
   DATA.GOV.HK under its custom reuse terms.

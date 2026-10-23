@@ -115,7 +115,7 @@ final class TripSession {
                 reminders.cancelArrivalReminder(stationID: Self.alertKey($0))
             }
         }
-        endOrphanedActivities()
+        endActivity()
     }
 
     /// Stops still ahead on a ride, counted down as the trip moves: "2 stops left", and on the
@@ -174,7 +174,6 @@ final class TripSession {
 
         locationService.onFix = { [weak self] in self?.observe($0) }
         locationService.beginTripUpdates()
-        endOrphanedActivities()
         refresh(at: now)
         scheduleAlerts(force: true)
         ticker = Task { [weak self] in
@@ -217,11 +216,13 @@ final class TripSession {
     }
 
     private func stop() {
+        // With or without a trip of its own to stop: a killed process may have left its activity
+        // on the Lock Screen, and a trip about to start asks for a new one.
+        endActivity()
         guard isActive else { return }
         ticker?.cancel()
         ticker = nil
         cancelAlerts()
-        endActivity()
         locationService.onFix = nil
         locationService.endTripUpdates()
         route = nil
@@ -444,7 +445,8 @@ final class TripSession {
             content: content,
             pushType: nil
         )
-        if activity != nil {
+        if let activity {
+            AppLog.trip.notice("Requested Live Activity \(activity.id, privacy: .public)")
             shownActivityState = state
             shownStaleDate = staleDate
         }
@@ -461,24 +463,26 @@ final class TripSession {
     private static let debugAlert: AlertConfiguration? = nil
     #endif
 
+    /// Takes the trip off the Lock Screen and out of the Dynamic Island. Called only with no trip
+    /// to show, so it ends every activity the system holds for the app and not only this trip's:
+    /// any other is one a killed process left behind.
+    ///
+    /// Not queued behind the updates. One that lands after the end is ignored by the system, and
+    /// an end waiting its turn would wait on whatever held an update up.
     private func endActivity() {
         shownActivityState = nil
         shownStaleDate = nil
         shownArrival = nil
-        guard let activity else { return }
-        self.activity = nil
-        let previous = activityUpdates
-        activityUpdates = Task {
-            await previous?.value
-            await activity.end(nil, dismissalPolicy: .immediate)
-        }
-    }
-
-    /// Activities a previous process left behind. Ended before a new one is requested, and when a
-    /// saved trip is dropped.
-    private func endOrphanedActivities() {
-        for orphan in Activity<TripActivityAttributes>.activities where orphan.id != activity?.id {
-            Task { await orphan.end(nil, dismissalPolicy: .immediate) }
+        var ending = Activity<TripActivityAttributes>.activities
+        // This trip's own, should the system's list not have it.
+        if let activity, !ending.contains(where: { $0.id == activity.id }) { ending.append(activity) }
+        activity = nil
+        for activity in ending {
+            AppLog.trip.notice("Ending Live Activity \(activity.id, privacy: .public)")
+            Task {
+                await activity.end(nil, dismissalPolicy: .immediate)
+                AppLog.trip.notice("Ended Live Activity \(activity.id, privacy: .public)")
+            }
         }
     }
 

@@ -44,8 +44,8 @@ struct TripActivityAttributes: ActivityAttributes {
         var staleText: String
     }
 
-    /// One leg drawn as a strip: where it starts, the track the rider moves along, the place it
-    /// ends, and the line that leaves from there.
+    /// One leg drawn as a strip: where it starts, the track with the step's glyph on it, the place
+    /// it ends, and the leg that leaves from there.
     struct Leg: Codable, Hashable {
         /// The line the rider has just left, for the dot the leg starts from. Nil when the leg
         /// starts where the rider set out, which is drawn as the rider.
@@ -53,18 +53,31 @@ struct TripActivityAttributes: ActivityAttributes {
         /// The track's dash in multiples of its own width, as `SegmentType.dash(width:)` gives it.
         /// Empty is solid.
         var dash: [Double]
-        /// The track in equal parts and how many of them the rider is into it. On a ride the parts
-        /// are its hops and each ends at a stop.
-        var parts: Int
+        /// A ride in hops, each ending at a stop, and how many of them the rider is into it: a
+        /// whole number at a stop, a half between two. No hops on any other leg. Stops are a
+        /// count and the glyph is placed by it; a walk has only a proportion, which is not drawn,
+        /// and its glyph stands at the middle of the track.
+        var hops: Int
         var place: Double
-        var marksStops: Bool
         /// Where the leg ends: a station, or the trip's destination.
         var endName: String?
         /// The colour of the line that station is on. Nil when the leg ends the trip.
         var endColorHex: String?
-        /// The next line the rider takes from there, as its badge prints it, and its colour.
-        var onwardBadge: String?
-        var onwardColorHex: String?
+        /// The leg the rider takes from there. Nil when this one ends the trip.
+        var onward: Onward?
+    }
+
+    /// The leg drawn running on from a station: the next line, or once the riding is done, the
+    /// way to the destination.
+    struct Onward: Codable, Hashable {
+        /// A ride's line as its badge prints it; nil for a leg that is not a ride.
+        var badge: String?
+        var colorHex: String
+        /// As `Leg.dash`.
+        var dash: [Double]
+        /// The trip ends where this leg does, and it is drawn up to the flag. A leg the trip goes
+        /// on from runs out of the picture.
+        var endsTrip: Bool
     }
 
     /// Where the trip ends.

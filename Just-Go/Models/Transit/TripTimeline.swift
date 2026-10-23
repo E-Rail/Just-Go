@@ -116,7 +116,8 @@ struct TripFix: Equatable, Sendable {
 }
 
 /// A step cut into equal parts, and how far into them the rider is: a ride's hops, or the quarters
-/// of a walk or a change, which is as finely as a clock's guess at a walk is worth drawing.
+/// of a walk or a change. A ride's hops are stops and can be drawn as such. A walk's quarters are
+/// a share of its time, good for saying when it is next heard from and not for a picture.
 struct TripProgress: Equatable, Sendable {
     /// A ride's hops; four for anything else.
     let parts: Int

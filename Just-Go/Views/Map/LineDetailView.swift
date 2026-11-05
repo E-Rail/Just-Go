@@ -7,13 +7,14 @@ import SwiftUI
 struct LineDetailView: View {
     let cityID: String
     let lineID: String
+    /// The map beside the panel draws the line, so the page hands it over once loaded, and again
+    /// when the rider picks another branch.
+    let onShowLine: (LineMap) -> Void
 
     @Environment(DIContainer.self) private var container
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var line: MetroLine?
     @State private var stationsByID: [String: Station] = [:]
-    @State private var visibleRegion: MapVisibleRegion?
     @State private var isLoading = true
     @State private var selectedPatternIndex = 0
     @State private var observed: ObservedLine?
@@ -39,7 +40,7 @@ struct LineDetailView: View {
                 unavailableNotice
             }
         }
-        .background(Color.appBackground)
+        .pageBackground()
         .navigationTitle(line.map { LineNaming.localizedName(of: $0) } ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
@@ -47,61 +48,30 @@ struct LineDetailView: View {
 
     // MARK: - Layout
 
-    /// Side by side when there is width, or one to each side of a folding phone's crease; stacked
-    /// otherwise, so an iPad does not put the stops a screen below their line.
-    @ViewBuilder
     private func content(for line: MetroLine) -> some View {
-        if horizontalSizeClass == .regular {
-            SplitColumns(columnCap: Metrics.stopColumnWidth) {
-                map(for: line)
-            } secondary: {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Metrics.l) {
-                        header(for: line)
-                        serviceVariants(for: line)
-                        stopList(for: line)
-                        operatorCheck(for: line)
-                    }
-                    .padding(Metrics.l)
-                }
+        ScrollView {
+            VStack(alignment: .leading, spacing: Metrics.l) {
+                header(for: line)
+                serviceVariants(for: line)
+                stopList(for: line)
+                operatorCheck(for: line)
             }
-        } else {
-            ScrollView {
-                VStack(alignment: .leading, spacing: Metrics.l) {
-                    map(for: line)
-                        .frame(height: 260)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.large, style: .continuous))
-                    header(for: line)
-                    serviceVariants(for: line)
-                    stopList(for: line)
-                    operatorCheck(for: line)
-                }
-                .padding(Metrics.l)
-                .readableColumn()
-            }
+            .padding(Metrics.l)
+            .readableColumn()
         }
+        .onChange(of: selectedPatternIndex) { _, _ in showOnMap(line) }
     }
 
-    /// One line becomes a network of one line, so this page draws with the browse map's renderer,
-    /// strokes and markers.
-    private func map(for line: MetroLine) -> some View {
-        TransitMapView(
-            visibleRegion: $visibleRegion,
-            stations: orderedStations(for: line),
-            alwaysShowsStations: true,
-            metroNetworks: [singleLineNetwork(for: line)],
-            route: nil,
-            showsUserLocation: false,
-            // Heavier than the browse map's, which is set so a dozen crossing lines stay separable.
-            networkLineWidth: 9,
-            onRegionChanged: nil,
-            onStationSelected: { _ in }
-        )
-        .overlay(alignment: .bottomLeading) {
-            // ODbL: every screen that draws this geometry has to say where it came from.
-            MetroGeometryAttributionView()
-                .padding(8)
+    private func showOnMap(_ line: MetroLine) {
+        let points = line.paths.flatMap { $0 }.map {
+            CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
         }
+        onShowLine(LineMap(
+            key: LineMap.key(cityID: cityID, lineID: lineID),
+            line: line,
+            stations: orderedStations(for: line),
+            region: MapVisibleRegion(fitting: points)
+        ))
     }
 
     /// Other trains on this line: an express that skips stops, a short-turn that ends part way.
@@ -343,13 +313,9 @@ struct LineDetailView: View {
             zip(network.stations.map(\.id), await container.metroNetworkProvider.stations(in: cityID)),
             uniquingKeysWith: { first, _ in first }
         )
-        visibleRegion = MapVisibleRegion(
-            fitting: match.paths.flatMap { $0 }.map {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-            }
-        )
         line = match
         isLoading = false
+        showOnMap(match)
     }
 
     private func activePattern(of line: MetroLine) -> [String] {
@@ -360,19 +326,6 @@ struct LineDetailView: View {
 
     private func orderedStations(for line: MetroLine) -> [Station] {
         activePattern(of: line).compactMap { stationsByID[$0] }
-    }
-
-    /// A network carrying this line alone, so the map draws one line rather than the whole city.
-    private func singleLineNetwork(for line: MetroLine) -> MetroNetwork {
-        MetroNetwork(
-            cityID: cityID,
-            version: "line-\(line.id)",
-            bounds: MetroBounds(minLatitude: -90, minLongitude: -180, maxLatitude: 90, maxLongitude: 180),
-            geometryKind: "physicalTrack",
-            lines: [line],
-            stations: [],
-            interchanges: []
-        )
     }
 
     // MARK: - Text

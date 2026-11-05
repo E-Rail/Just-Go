@@ -123,7 +123,7 @@ struct StationDetailView: View {
             }
             .padding()
         }
-        .background(Color.appBackground)
+        .pageBackground()
         .navigationTitle(displayedStation.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

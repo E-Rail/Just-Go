@@ -116,11 +116,11 @@ class TypingCostsNothingTest < Minitest::Test
     # limit 12 through the view. Typing is now answered entirely from the bundled station index.
     assert_includes MODEL, "await self?.search(includingPlaces: false)"
     assert_includes SERVICE, "guard includingPlaces else { return bundledMatches }"
-    assert_includes VIEW, ".onSubmit { searchOnline() }"
+    assert_includes VIEW, ".onSubmit(of: .search) { searchOnline() }"
 
-    setter = VIEW[/set: \{ newValue in(.*?)\n            \)\)/m, 1]
-    refute_nil setter, "could not find the search field's setter"
-    refute_includes setter, "schedulePlaceSearch(",
+    binding = VIEW[/private var searchText: Binding<String> \{(.*?)\n    \}\n/m, 1]
+    refute_nil binding, "could not find the search field's binding"
+    refute_includes binding, "schedulePlaceSearch(",
                     "typing must not start a place search"
   end
 

@@ -14,26 +14,33 @@ private struct LiveTransferGuidanceRequest: Hashable {
     let stepID: Int
 }
 
-/// The step-by-step trip companion: a full-screen interactive map with the whole route drawn on it,
-/// a compact instruction panel, and off-route re-planning while walking.
+/// The step-by-step trip companion: the step the rider is on, the controls, and off-route
+/// re-planning while walking. A page of the map's panel; the map beside it draws the trip, and this
+/// page moves its camera through `camera`.
 ///
 /// The trip itself lives in `TripSession`, which moves it on by the clock and by location, so this
-/// screen shows a trip and does not own one: leaving it leaves the trip running. That is why Back,
-/// where the screen has one, asks whether to end the trip before it lets the rider go.
+/// page shows a trip and does not own one: leaving it leaves the trip running. That is why Back,
+/// where the page has one, asks whether to end the trip before it lets the rider go.
 struct LiveGoView: View {
-    /// Rendered inside the route detail rather than over it: this drops the navigation chrome only
-    /// a presented copy needs and hands the exit to its host. One navigator, two containers.
+    /// Opened from a route's page, whose Back it replaces with one that asks to end the trip. Not
+    /// embedded, it is the panel's first page (a resumed trip, a tap on the Live Activity): it hides
+    /// and leaves the trip running, or ends it with Done.
     var embedded = false
+    /// The camera of the map beside the panel, framed on each step and kept on the rider.
+    @Binding var camera: MapVisibleRegion?
+    /// How tall the page needs to be, its bar included, so the panel sits just that tall.
+    var onFittedHeight: (CGFloat) -> Void = { _ in }
+    /// Leaves the page. Runs once for End and Done and again when the session reports the trip
+    /// over, so the host's handler must be safe to run twice.
     let onExit: () -> Void
 
     /// The route this screen was opened with. The session's own route replaces it once the trip
     /// has started, and a re-plan from the rider's location replaces that.
     private let initialRoute: Route
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(DIContainer.self) private var container
     @AppStorage("arrivalAlertEnabled") private var arrivalAlertEnabled = true
-    // Read directly rather than via `Color.accentColor`: in a full-screen cover the first frame
+    // Read directly rather than via `Color.accentColor`: in a presented panel the first frame
     // does not yet have the root `.tint` and would flash system blue.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
     @Environment(AppState.self) private var appState
@@ -43,8 +50,7 @@ struct LiveGoView: View {
     @State private var speechSynthesizer = AVSpeechSynthesizer()
     @State private var announcedStep: TripStep?
     @State private var announcementTask: Task<Void, Never>?
-    // Live-navigation map + off-route recovery.
-    @State private var mapRegion: MapVisibleRegion?
+    // Off-route recovery.
     @State private var isRerouting = false
     @State private var offRouteStrikes = 0
     @State private var lastRerouteAt = Date.distantPast
@@ -69,162 +75,120 @@ struct LiveGoView: View {
     /// Back, embedded, is a question: leaving the page would leave a trip running with no screen
     /// showing it.
     @State private var isConfirmingEnd = false
-    /// Where a folding phone's crease crosses the surface, so the panel can take the pane beyond it.
-    @State private var surfaceFold = FoldedSurface()
+    /// The step's own height, and the bar above it, measured apart: the step does not move with the
+    /// panel's height, and the bar does not move with the step's.
+    @State private var contentHeight: CGFloat = 0
+    @State private var barHeight: CGFloat = 0
 
     private var themeColor: Color { Color.adaptive(hex: selectedThemeHex) }
-
-    /// The safe areas the map runs under: everywhere but the top on a whole screen; on a folded
-    /// one, every side but the one the panel's pane is on, so the map stops at the crease.
-    private var mapEdges: Edge.Set {
-        switch surfaceFold.fold?.axis {
-        case .vertical: return [.bottom, .leading]
-        case .horizontal: return .horizontal
-        case nil: return [.bottom, .horizontal]
-        }
-    }
-
-    /// Whether the panel floats over the map, rather than sitting on the plain background of a
-    /// transfer step or of a folded phone's own pane.
-    private var panelOverMap: Bool { !isActiveTransferStep && surfaceFold.fold == nil }
 
     private var session: TripSession { container.tripSession }
     private var route: Route { session.route ?? initialRoute }
 
-    init(route: Route, embedded: Bool = false, onExit: @escaping () -> Void) {
+    init(
+        route: Route,
+        embedded: Bool = false,
+        camera: Binding<MapVisibleRegion?>,
+        onFittedHeight: @escaping (CGFloat) -> Void = { _ in },
+        onExit: @escaping () -> Void
+    ) {
         self.embedded = embedded
+        _camera = camera
+        self.onFittedHeight = onFittedHeight
         self.onExit = onExit
         initialRoute = route
     }
 
-    /// Presented, this owns a navigation stack; embedded, the host already has one.
-    private var navigatorSurface: some View {
-        Group {
-            if embedded {
-                surface
-            } else {
-                NavigationStack { surface }
+    /// The trip's banners, then the step. A change of lines adds where to go and the operator's
+    /// word on it, and the panel gives it the full height. One scroll view whatever the step, so the
+    /// page keeps its identity as the trip moves on, and a panel held shorter than the step (below
+    /// a crease) scrolls it rather than cutting it off.
+    private var surface: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                banners
+                if isActiveTransferStep {
+                    transferStatusContent
+                }
+                instructionPanel
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.height
+            } action: { height in
+                contentHeight = height
+                reportFittedHeight()
             }
         }
-    }
-
-    private var surface: some View {
-        Group {
-                if isActiveTransferStep {
-                    transferStepSurface
-                } else {
-                    // The panel is a safe-area inset, not a `ZStack` overlay, so MapKit knows the
-                    // space is taken and lays out its labels, controls and legal attribution where
-                    // the rider can see them, while the map still draws full-bleed. Where the phone
-                    // folds the panel takes the pane beyond the crease and the map keeps to its
-                    // own. One panel in one inset whatever the fold does, so opening or closing
-                    // the phone rebuilds neither the map nor the panel. The map also runs under a
-                    // side bar (a landscape notch, a foldable's vertical bar) as the browse map does.
-                    liveMap
-                        .ignoresSafeArea(edges: mapEdges)
-                        .safeAreaPadding(.trailing, surfaceFold.beyondCreaseWidth ?? 0)
-                        .safeAreaInset(edge: .bottom, spacing: 0) {
-                            instructionPanel
-                                .frame(width: surfaceFold.paneAfterWidth)
-                                .frame(height: surfaceFold.paneBelowHeight, alignment: .bottom)
-                                .frame(
-                                    maxWidth: .infinity,
-                                    minHeight: surfaceFold.belowCreaseHeight,
-                                    alignment: surfaceFold.besideCrease ? .bottomTrailing : .bottom
-                                )
-                        }
+        .scrollBounceBehavior(.basedOnSize)
+        // The top inset only. A phone's panel leaves room for the home indicator below a height of
+        // its own (measured on iOS 27: asked for the step and both insets, the panel came out 21 pt
+        // taller than asked, with that much empty under the controls).
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.safeAreaInsets.top
+        } action: { height in
+            barHeight = height
+            reportFittedHeight()
+        }
+        .navigationTitle(transferNavigationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        // Embedded, the panel's back button would pop the page with the trip still running, and so
+        // would the swipe that goes with it, which a hand on a crowded train makes by accident. As
+        // the first page, the wide screen's card still pushes it over its home, and that back
+        // button would be a second way to hide beside the chevron.
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            if embedded {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isConfirmingEnd = true
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                    }
+                    // The colour of the back button it stands in for, not the theme's.
+                    .tint(.primary)
+                    .accessibilityLabel(AppLocalization.text(english: "Back", simplified: "返回", traditional: "返回"))
+                }
+            } else {
+                // The first page: hiding leaves the trip running, and End is not leaving.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        onExit()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                    }
+                    .accessibilityLabel(AppLocalization.text(
+                        english: "Hide guidance, keep the trip running",
+                        simplified: "收起导航，行程继续",
+                        traditional: "收起導航，行程繼續"
+                    ))
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(AppLocalization.localized("Done")) { exit() }
                 }
             }
-            .onGeometryChange(for: FoldedSurface.self) { proxy in
-                FoldedSurface(proxy)
-            } action: { surface in
-                surfaceFold = surface
-            }
-            .overlay(alignment: .top) {
-                VStack(spacing: 8) {
-                    if isRerouting {
-                        noticeBanner(
-                            text: AppLocalization.text(english: "Rerouting…", simplified: "正在重新规划…", traditional: "正在重新規劃…"),
-                            icon: "arrow.triangle.2.circlepath",
-                            showsSpinner: true
-                        )
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                    } else if let rerouteNotice {
-                        noticeBanner(text: rerouteNotice, icon: "arrow.triangle.2.circlepath")
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-                    if showGetOffBanner {
-                        getOffBanner
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-                    if let announcedStep {
-                        announcementBanner(announcedStep)
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-                }
-                .padding(.horizontal)
-                // Beside a crease, in the pane before it rather than across the fold.
-                .frame(width: surfaceFold.paneBeforeWidth)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .navigationTitle(embedded ? "" : transferNavigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            // The host's back button would pop the page with the trip still running, and so would
-            // the swipe that goes with it, which a hand on a crowded train makes by accident.
-            .navigationBarBackButtonHidden(embedded)
-            .toolbar {
-                if embedded {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            isConfirmingEnd = true
-                        } label: {
-                            Image(systemName: "chevron.backward")
-                        }
-                        // The colour of the back button it stands in for, not the theme's.
-                        .tint(.primary)
-                        .accessibilityLabel(AppLocalization.text(english: "Back", simplified: "返回", traditional: "返回"))
-                    }
-                } else {
-                    // Presented, there is no back button to leave by, and End is not leaving.
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            onExit()
-                        } label: {
-                            Image(systemName: "chevron.down")
-                        }
-                        .accessibilityLabel(AppLocalization.text(
-                            english: "Hide guidance, keep the trip running",
-                            simplified: "收起导航，行程继续",
-                            traditional: "收起導航，行程繼續"
-                        ))
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(AppLocalization.localized("Done")) { exit() }
-                    }
-                }
-            }
-            .alert(
-                AppLocalization.text(english: "End this trip?", simplified: "结束本次行程？", traditional: "結束本次行程？"),
-                isPresented: $isConfirmingEnd
+        }
+        .alert(
+            AppLocalization.text(english: "End this trip?", simplified: "结束本次行程？", traditional: "結束本次行程？"),
+            isPresented: $isConfirmingEnd
+        ) {
+            Button(
+                AppLocalization.text(english: "End", simplified: "结束", traditional: "結束"),
+                role: .destructive
             ) {
-                Button(
-                    AppLocalization.text(english: "End", simplified: "结束", traditional: "結束"),
-                    role: .destructive
-                ) {
-                    exit()
-                }
-                Button(
-                    AppLocalization.text(english: "Keep going", simplified: "继续导航", traditional: "繼續導航"),
-                    role: .cancel
-                ) {}
-            } message: {
-                Text(AppLocalization.text(
-                    english: "Guidance and its get-off alerts will stop.",
-                    simplified: "导航和下车提醒将停止。",
-                    traditional: "導航和下車提醒將停止。"
-                ))
+                exit()
             }
-    }
+            Button(
+                AppLocalization.text(english: "Keep going", simplified: "继续导航", traditional: "繼續導航"),
+                role: .cancel
+            ) {}
+        } message: {
+            Text(AppLocalization.text(
+                english: "Guidance and its get-off alerts will stop.",
+                simplified: "导航和下车提醒将停止。",
+                traditional: "導航和下車提醒將停止。"
+            ))
+        }
+}
 
     /// End or Done: the trip is over, and the session completes it in the rider's history.
     private func exit() {
@@ -232,13 +196,44 @@ struct LiveGoView: View {
         onExit()
     }
 
+    /// Whole points, so a measurement that moves by a fraction cannot resize the panel, which would
+    /// measure again.
+    private func reportFittedHeight() {
+        onFittedHeight((contentHeight + barHeight).rounded(.up))
+    }
+
+    /// What the trip has to say right now, above the step.
+    private var banners: some View {
+        VStack(spacing: 8) {
+            if isRerouting {
+                noticeBanner(
+                    text: AppLocalization.text(english: "Rerouting…", simplified: "正在重新规划…", traditional: "正在重新規劃…"),
+                    icon: "arrow.triangle.2.circlepath",
+                    showsSpinner: true
+                )
+                .transition(.move(edge: .top).combined(with: .opacity))
+            } else if let rerouteNotice {
+                noticeBanner(text: rerouteNotice, icon: "arrow.triangle.2.circlepath")
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            if showGetOffBanner {
+                getOffBanner
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            if let announcedStep {
+                announcementBanner(announcedStep)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .padding(.horizontal)
+    }
+
     var body: some View {
-        navigatorSurface
+        surface
         .onAppear {
             // Starts the trip, or finds it already running: the session keeps the fixes, the clock
             // and the alerts going whether or not this screen is up.
             session.start(initialRoute)
-            appState.isGuidanceOnScreen = true
             // The Accessibility toggle is a promise, not a preference: a rider who turned on
             // Audio Navigation gets it, whatever the mute button was last left at.
             if appState.accessibilityPreference.audioNavigation { voiceEnabled = true }
@@ -248,7 +243,6 @@ struct LiveGoView: View {
             announceCurrentStep()
         }
         .onDisappear {
-            appState.isGuidanceOnScreen = false
             UIApplication.shared.isIdleTimerDisabled = false
             getOffBannerTask?.cancel()
             showGetOffBanner = false
@@ -322,25 +316,6 @@ struct LiveGoView: View {
               let transferGuidance,
               transferGuidance.stepID == step.id else { return nil }
         return transferGuidance
-    }
-
-    private var transferStepSurface: some View {
-        // Stacked, or side by side across a crease; one layout either way, so nothing is rebuilt
-        // when the phone opens or closes.
-        let layout = surfaceFold.besideCrease
-            ? AnyLayout(HStackLayout(alignment: .bottom, spacing: 0))
-            : AnyLayout(VStackLayout(spacing: 0))
-        let fold = surfaceFold.fold
-        return layout {
-            transferStatusContent
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(surfaceFold.besideCrease ? .trailing : .bottom, fold?.clearanceBefore ?? 0)
-            // Padding adds to the frame it pads, so the panel's pane begins at the crease's line.
-            instructionPanel
-                .frame(width: surfaceFold.paneAfterWidth, height: surfaceFold.paneBelowHeight, alignment: .bottom)
-                .padding(surfaceFold.besideCrease ? .leading : .top, fold?.clearanceAfter ?? 0)
-        }
-        .background(Color.appBackground)
     }
 
     /// The measured walk between the two platforms, read off the leg the planner already costed.
@@ -535,21 +510,6 @@ struct LiveGoView: View {
 
     // MARK: - Map
 
-    /// The same map, drawn by the same code, as the route detail: a leg looks identical on both.
-    private var liveMap: some View {
-        TransitMapView(
-            visibleRegion: $mapRegion,
-            stations: route.mapStations,
-            alwaysShowsStations: true,
-            metroNetworks: [],
-            route: route,
-            showsUserLocation: true,
-            onUserLocationChanged: { container.locationService.observeMapSpaceUserLocation($0) },
-            onRegionChanged: { mapRegion = $0 },
-            onStationSelected: { _ in }
-        )
-    }
-
     /// Frames the current step's geometry. The rider stays free to pan and zoom afterwards; only a
     /// step change, a reroute or turning follow-me off moves the camera.
     private func frameCurrentStep() {
@@ -564,7 +524,7 @@ struct LiveGoView: View {
         }
         let points = coordinates.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
         if let region = MapVisibleRegion(fitting: points, minimumSpan: 0.006) {
-            mapRegion = region
+            camera = region
         }
     }
 
@@ -581,7 +541,7 @@ struct LiveGoView: View {
         // Centre on the rider while they follow, at `MapCameraSpan.station`, the app's tightest
         // existing scale.
         if followsRider, let location, location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 100 {
-            mapRegion = MapVisibleRegion(
+            camera = MapVisibleRegion(
                 center: location.coordinate,
                 latitudeDelta: MapCameraSpan.station,
                 longitudeDelta: MapCameraSpan.station
@@ -730,13 +690,7 @@ struct LiveGoView: View {
                 .tint(themeColor)
 
             if let step = session.currentStep {
-                // Held to the pane below a crease, the step scrolls rather than pushing the panel
-                // onto the fold, and the progress bar and the controls stay where they are.
-                // Anywhere else the scroll view takes the step's own height. One view either way,
-                // so folding the phone keeps the panel's identity.
-                ScrollView { stepSummary(step) }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .fixedSize(horizontal: false, vertical: surfaceFold.paneBelowHeight == nil)
+                stepSummary(step)
                     .id(step.id)
                     .transition(.opacity)
             }
@@ -744,18 +698,6 @@ struct LiveGoView: View {
             controls
         }
         .padding(16)
-        // Below iOS 26, `.thickMaterial`: a thinner one lets parks and water tint the panel, and
-        // this is the one surface that must stay readable while walking.
-        .floatingChrome(material: .thickMaterial, overContent: panelOverMap)
-        // Over the map on a wide screen, a column as the browse map's rider panel is, so the map it
-        // guides along stays in view beside it. From the size class, so a narrow split-screen
-        // window keeps the bar. Folded, the panel has a pane of its own and fills it.
-        .frame(maxWidth: horizontalSizeClass == .regular && panelOverMap ? Metrics.tripColumnWidth : .infinity)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding([.horizontal, .bottom], 12)
-        // Clear of a tab bar the system has moved to the trailing edge. Outside the material, so
-        // the panel moves rather than its background stretching.
-        .safeAreaPadding(.horizontal)
     }
 
     private func stepSummary(_ step: TripStep) -> some View {

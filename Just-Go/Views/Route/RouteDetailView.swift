@@ -1,7 +1,8 @@
 import SwiftUI
 import CoreLocation
 
-/// The pushes this screen can make, sharing one `navigationDestination(item:)` registration.
+/// The pages this screen can open, each pushed by the map as one of its own (`MapRoute.transfer`,
+/// `.routeStop`, `.confidence`).
 enum RouteDetailDestination: Hashable {
     case transfer(RouteSegment)
     case station(RouteStationStop)
@@ -9,12 +10,6 @@ enum RouteDetailDestination: Hashable {
     /// confidence and feasibility types are not `Hashable`, and a navigation value that went stale
     /// while pushed would show numbers the screen behind it no longer agrees with.
     case confidence(UUID)
-}
-
-extension RouteDetailDestination: Identifiable {
-    /// `sheet(item:)` needs one, and `Hashable` already gives a stable answer. Presented as a sheet
-    /// only on regular width; on a phone this is pushed and the id is unused.
-    var id: Self { self }
 }
 
 /// Everything the trip card can raise over itself, as one value with one `.sheet` registration on
@@ -87,45 +82,27 @@ struct RouteDetailView: View {
     let alternatives: [Route]
     let tripAnchor: TripTimeAnchor
     let accessibilityFilter: AccessibilityFilter
-    @State var selectedRouteID: UUID
+    /// The alternative on show. The map beside the panel draws it, so the shell holds it, and a
+    /// folding phone that rebuilds this page keeps the rider's choice.
+    @Binding var selectedRouteID: UUID
+    /// A transfer, a stop or the confidence breakdown, opened as a page of the panel's own.
+    let onOpen: (RouteDetailDestination) -> Void
+    /// Guidance replaces this page in the panel; the shell owns that.
+    let onNavigate: (Route) -> Void
     @State var tripCardSheet: TripCardSheet?
     @State private var scheduledReminderRouteID: UUID?
     @State private var lastDepartureReminderRouteID: UUID?
     @State var tripLoggedConfirmation = false
     @State private var reminderAlert: ReminderAlert?
     @State var tripNote = ""
-    @State var detailDestination: RouteDetailDestination?
     @State private var expandedLegs: Set<UUID> = []
     @State private var boardingServiceHours: BoardingServiceHours = .none
-    /// Which of the three stops the trip sheet is resting at.
-    @State private var tripCardDetent: PresentationDetent = .medium
-    /// The page is on screen and not being popped. Set on arrival, cleared as a pop starts.
-    @State private var isOnScreen = false
-    /// Where the header map is looking: seeded from the trip's bounds, then left to the rider.
-    @State private var headerRegion: MapVisibleRegion?
-    /// The route `headerRegion` was last seeded for, so a map rebuilt for the other size class (a
-    /// folding phone moving between its displays) keeps the rider's region instead of re-seeding.
-    @State private var seededRouteID: UUID?
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    /// Whether there is room to show the map and the trip side by side. The sheet's detents,
-    /// background interaction and dismiss lock describe a card over a phone-sized map; on an iPad
-    /// that card would float over a 1024 pt map with the route hidden behind it, so regular width
-    /// gets a column instead.
-    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
-    /// Where the sheet was resting before a push raised it, so coming back restores it.
-    @State private var stopBeforePush: PresentationDetent?
-    /// Guidance replaces this page's content rather than covering it.
-    @State private var isGuiding = false
     @State private var boardingArrivals: [RealTimeArrival] = []
     @State private var cityResources: [ExternalTransitResource] = []
     @State private var serviceNotices: [OperatorServiceNotice] = []
     // Raw theme hex for the Navigate button's solid fill: `Color.accentColor` is lightened for
     // foreground use in dark mode, and as a fill it loses contrast under white text.
     @AppStorage("selectedThemeHex") private var selectedThemeHex = AppTheme.default.rawValue
-    // Once per detail instance, not reset on disappear: leaving the auto-entered navigator re-fires
-    // `onAppear`, and a reset would re-enter it.
-    @State private var didAutoPresentLiveGo = false
     @Environment(DIContainer.self) private var container
     @Environment(AppState.self) var appState
     @Environment(TripMemoryService.self) var tripMemoryService
@@ -135,99 +112,39 @@ struct RouteDetailView: View {
         // The feasibility → confidence chain, computed once per render and passed down.
         let feasibility = currentFeasibility()
         let confidence = currentConfidence(feasibility: feasibility)
-        // Map on top, trip in a sheet over it. A `ZStack`, not a `Group`: modifiers on a `Group`
-        // attach to each branch, so swapping out of guidance would fire the page observer's
-        // `onLeaving` and close the returning card.
-        return ZStack {
-            if isGuiding {
-                // The page becomes the navigator rather than presenting a second one over itself.
-                LiveGoView(route: route, embedded: true) {
-                    withAnimation(.easeInOut(duration: 0.25)) { isGuiding = false }
+        return tripCardContent(feasibility: feasibility, confidence: confidence)
+            .navigationTitle(AppLocalization.localized("Route Details"))
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: selectedRouteID) { _, _ in
+                tripLoggedConfirmation = false
+            }
+            .onChange(of: routeSelectionSignature) {
+                ensureSelectedRouteIsCurrent()
+            }
+            .task(id: routeDataKey) {
+                // Everything the previous route put here, cleared together, so a walking alternative
+                // or a trip in another pack never shows the last route's notices or resources.
+                boardingServiceHours = .none
+                cityResources = []
+                serviceNotices = []
+                // Operator content belongs to a trip that uses that operator. A walking-only route
+                // rides nothing and has no `networkCityID`; wrong operator content is worse than
+                // none.
+                guard route.boardingTransitSegment != nil else { return }
+                async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
+                    for: route
+                )
+                if let cityID = route.networkCityID {
+                    cityResources = await container.officialStationData
+                        .cityExternalResources(for: [cityID])[cityID] ?? []
+                    // Best effort by design: a failed or slow fetch leaves the card showing what is
+                    // already verifiable. Operator notices are never a blocker.
+                    serviceNotices = (try? await container.serviceNoticeProvider.notices(cityID: cityID)) ?? []
+                    await loadServiceHours(cityID: cityID)
+                    await loadBoardingArrivals(cityID: cityID)
                 }
-            } else if isRegularWidth {
-                splitLayout(feasibility: feasibility, confidence: confidence)
-            } else {
-                mapHeader()
+                await transferAssets
             }
-        }
-        .background(Color.appBackground)
-        // Derived, not stored: guiding, a wide layout and a pop in progress each hide the card, and
-        // one expression cannot be left disagreeing with any of them. The card is never dismissed
-        // any other way (`interactiveDismissDisabled`), so the setter has nothing to record.
-        .sheet(isPresented: Binding(get: { isOnScreen && !isGuiding && !isRegularWidth }, set: { _ in })) {
-            tripCard(feasibility: feasibility, confidence: confidence)
-        }
-        // From `.task`, after the push settles: a sheet raised during a navigation transition fails
-        // with "whose view is not in the window hierarchy".
-        .task { isOnScreen = true }
-        // A sheet presented from a pushed view belongs to the navigation controller, so a pop does
-        // not take it along. `PageTransitionObserver` reports the pop starting, for the back button
-        // and a swipe alike, so the card slides down with the page; `onDisappear` is the backstop.
-        .onDisappear { isOnScreen = false }
-        .background(
-            PageTransitionObserver(
-                onLeaving: { isOnScreen = false },
-                onReturned: { isOnScreen = true }
-            )
-            .frame(width: 0, height: 0)
-        )
-        .navigationTitle(isGuiding
-            ? AppLocalization.text(english: "Guidance", simplified: "导航中", traditional: "導航中")
-            : AppLocalization.localized("Route Details"))
-        .navigationBarTitleDisplayMode(.inline)
-        // The trip fills the screen: a tab bar under the journey invites leaving mid-plan and takes
-        // height from it.
-        .toolbar(.hidden, for: .tabBar)
-        .onAppear {
-            // Step-by-Step Guidance (cognitive accessibility): go straight to the guided navigator;
-            // leaving it lands on the full detail.
-            if appState.accessibilityPreference.stepByStepGuidance, !didAutoPresentLiveGo {
-                didAutoPresentLiveGo = true
-                isGuiding = true
-            }
-            #if DEBUG
-            if ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SCREEN"] == "guiding" {
-                isGuiding = true
-            }
-            // The card's detent is a drag, which cannot be injected here, so its range is checked
-            // by seeding each end.
-            switch ProcessInfo.processInfo.environment["JUST_GO_DEBUG_MAP_FRACTION"] {
-            case "low": tripCardDetent = .fraction(0.3)
-            case "medium": tripCardDetent = .medium
-            case "top": tripCardDetent = .fraction(0.92)
-            default: break
-            }
-            #endif
-        }
-        .onChange(of: selectedRouteID) { _, _ in
-            tripLoggedConfirmation = false
-        }
-        .onChange(of: routeSelectionSignature) {
-            ensureSelectedRouteIsCurrent()
-        }
-        .task(id: routeDataKey) {
-            // Everything the previous route put here, cleared together, so a walking alternative or
-            // a trip in another pack never shows the last route's notices or resources.
-            boardingServiceHours = .none
-            cityResources = []
-            serviceNotices = []
-            // Operator content belongs to a trip that uses that operator. A walking-only route
-            // rides nothing and has no `networkCityID`; wrong operator content is worse than none.
-            guard route.boardingTransitSegment != nil else { return }
-            async let transferAssets: Void = container.officialStationData.prefetchTransferAssets(
-                for: route
-            )
-            if let cityID = route.networkCityID {
-                cityResources = await container.officialStationData
-                    .cityExternalResources(for: [cityID])[cityID] ?? []
-                // Best effort by design: a failed or slow fetch leaves the card showing what is
-                // already verifiable. Operator notices are never a blocker.
-                serviceNotices = (try? await container.serviceNoticeProvider.notices(cityID: cityID)) ?? []
-                await loadServiceHours(cityID: cityID)
-                await loadBoardingArrivals(cityID: cityID)
-            }
-            await transferAssets
-        }
     }
 
     init(
@@ -235,7 +152,10 @@ struct RouteDetailView: View {
         preference: RoutePreference = .fastest,
         alternatives: [Route] = [],
         tripAnchor: TripTimeAnchor = .now,
-        accessibilityFilter: AccessibilityFilter = .none
+        accessibilityFilter: AccessibilityFilter = .none,
+        selectedRouteID: Binding<UUID>,
+        onOpen: @escaping (RouteDetailDestination) -> Void,
+        onNavigate: @escaping (Route) -> Void
     ) {
         initialRoute = route
         self.preference = preference
@@ -244,7 +164,9 @@ struct RouteDetailView: View {
             : [route] + alternatives
         self.tripAnchor = tripAnchor
         self.accessibilityFilter = accessibilityFilter
-        _selectedRouteID = State(initialValue: route.id)
+        _selectedRouteID = selectedRouteID
+        self.onOpen = onOpen
+        self.onNavigate = onNavigate
     }
 
     var route: Route {
@@ -271,11 +193,6 @@ struct RouteDetailView: View {
         guard !alternatives.contains(where: { $0.id == selectedRouteID }),
               let firstRoute = alternatives.first else { return }
         selectedRouteID = firstRoute.id
-    }
-
-    func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
-        guard let idx = route.segments.firstIndex(where: { $0.id == transferSegment.id }) else { return nil }
-        return route.segments[(idx + 1)...].first { $0.type.isTransit }
     }
 
     /// The one number the rider came for, then where the trip runs and how long it takes, and the
@@ -384,7 +301,7 @@ struct RouteDetailView: View {
     /// Pinned rather than scrolled past: the one control reachable at any scroll position.
     private var navigateBar: some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.25)) { isGuiding = true }
+            onNavigate(route)
         } label: {
             Label(
                 AppLocalization.text(english: "Navigate", simplified: "开始导航", traditional: "開始導航"),
@@ -403,94 +320,6 @@ struct RouteDetailView: View {
         .safeAreaPadding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 8)
-        // Opaque: at the shortest detent the scroll view is taller than the visible card, and rows
-        // would show either side of the capsule.
-        .background(Color.appBackground)
-    }
-
-    /// Map and trip side by side, which a tablet has room for, or one to each side of a folding
-    /// phone's crease. The column has no `NavigationStack` of its own: one nested in a pushed
-    /// destination makes the whole screen fail to appear, with no error. The phone's sheet can
-    /// carry one because a sheet is its own presentation context.
-    private func splitLayout(
-        feasibility: RouteFeasibility,
-        confidence: RouteConfidence
-    ) -> some View {
-        SplitColumns(columnCap: Metrics.tripColumnWidth) {
-            mapHeader()
-        } secondary: {
-            tripCardContent(feasibility: feasibility, confidence: confidence)
-        }
-        // Sub-details are pushed inside the sheet on a phone and presented over the split here, so
-        // the map and the trip both stay on screen behind them.
-        .sheet(item: $detailDestination) { destination in
-            NavigationStack { destinationView(for: destination) }
-        }
-    }
-
-    /// A transfer, a station or the confidence breakdown, defined once: pushed inside the sheet's
-    /// stack on a phone, presented over the split on a tablet.
-    @ViewBuilder
-    private func destinationView(for destination: RouteDetailDestination) -> some View {
-        switch destination {
-        case .transfer(let segment):
-            TransferStationSheet(
-                transferSegment: segment,
-                nextTransitSegment: nextTransitSegment(after: segment),
-                cityID: segment.packCityID ?? route.networkCityID ?? "",
-                accessibilityFilter: accessibilityFilter
-            )
-        case .station(let stop):
-            RouteStationGuideSheet(
-                stop: stop,
-                cityID: stop.packCityID ?? route.networkCityID ?? ""
-            )
-        case .confidence:
-            let feasibility = currentFeasibility()
-            RouteConfidenceDetailView(
-                confidence: currentConfidence(feasibility: feasibility),
-                feasibility: feasibility
-            )
-        }
-    }
-
-    /// The trip as something to read, in the sheet over the map.
-    private func tripCard(
-        feasibility: RouteFeasibility,
-        confidence: RouteConfidence
-    ) -> some View {
-        // The sheet carries its own navigation stack, so a station or a transfer opens inside it,
-        // as in Maps, and nothing outside the sheet moves.
-        NavigationStack {
-            tripCardContent(feasibility: feasibility, confidence: confidence)
-            // Here, on the sheet's own stack: in the wide layout the same content sits in the page,
-            // where hiding the bar took the back button with it.
-            .toolbar(.hidden, for: .navigationBar)
-            // One destination registration: two `navigationDestination(item:)` modifiers on one
-            // node can shadow each other.
-            .navigationDestination(item: $detailDestination) { destinationView(for: $0) }
-        }
-        // Detents, background interaction and the dismiss lock describe a card over a map, so they
-        // apply only there; a column has no detent and nothing to dismiss.
-        .presentationDetents(isRegularWidth ? [.large] : Self.tripCardDetents, selection: $tripCardDetent)
-        .presentationDragIndicator(isRegularWidth ? .hidden : .visible)
-        // The map stays live at the two lower stops.
-        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-        // Nowhere to be dismissed to: a swiped-away card would leave this route's map with no trip
-        // on it.
-        .interactiveDismissDisabled()
-        // A pushed screen in a 30%-tall sheet is a letterbox, so the sheet rises for a push and
-        // returns to where the rider had it.
-        .onChange(of: detailDestination) { previous, current in
-            guard !isRegularWidth else { return }
-            if previous == nil, current != nil {
-                stopBeforePush = tripCardDetent
-                withAnimation { tripCardDetent = .fraction(0.92) }
-            } else if current == nil, let stopBeforePush {
-                withAnimation { tripCardDetent = stopBeforePush }
-                self.stopBeforePush = nil
-            }
-        }
     }
 
     private func tripCardContent(
@@ -499,6 +328,11 @@ struct RouteDetailView: View {
     ) -> some View {
         ScrollView {
             VStack(spacing: 14) {
+                // Here rather than over the map: the map beside the panel is the shell's, and the
+                // alternatives are a choice about this trip.
+                if alternatives.count > 1 {
+                    RouteTabs(routes: alternatives, selection: $selectedRouteID)
+                }
                 routeHero(feasibility: feasibility, confidence: confidence)
                 if let departurePlan {
                     DeparturePlanBanner(plan: departurePlan)
@@ -515,10 +349,10 @@ struct RouteDetailView: View {
         }
         // A `ScrollView`, not a `List`: inset-grouped spacing opens with empty space above the
         // duration, and a list row cannot draw the unbroken rail that makes the legs one journey.
-        .background(Color.appBackground)
-        .safeAreaInset(edge: .bottom) { navigateBar }
-        // Here, not on `body`: `body` is already presenting this card, and a node presents one
-        // sheet. `tripCardContent` is what both the phone sheet and the iPad column render.
+        .pageBackground()
+        // A bar the rows scroll under: at the panel's lowest stop the scroll view is taller than
+        // what shows, and rows would show either side of the capsule.
+        .pinnedBar(.bottom) { navigateBar }
         .sheet(item: $tripCardSheet) { sheet in
             switch sheet {
             case .tripNote:
@@ -658,47 +492,6 @@ struct RouteDetailView: View {
         return nil
     }
 
-    // MARK: - Resizable map header
-
-    /// The three stops the trip card rests at. The top one stops short of `.large`, which would
-    /// cover the navigation bar and the way back.
-    static let tripCardDetents: Set<PresentationDetent> = [.fraction(0.3), .medium, .fraction(0.92)]
-
-    private func mapHeader() -> some View {
-        TransitMapView(
-            visibleRegion: $headerRegion,
-            stations: route.mapStations,
-            alwaysShowsStations: true,
-            metroNetworks: [],
-            route: route,
-            showsUserLocation: false,
-            onRegionChanged: { headerRegion = $0 },
-            onStationSelected: { _ in }
-        )
-        .ignoresSafeArea(edges: .bottom)
-        // Seeded once per route: assigning on every pass would fight the rider for the camera.
-        .task(id: route.id) {
-            guard seededRouteID != route.id else { return }
-            seededRouteID = route.id
-            headerRegion = route.previewRegion
-        }
-        // At the map's top edge, the part the trip sheet never covers.
-        .overlay(alignment: .topLeading) {
-            VStack(alignment: .leading, spacing: 8) {
-                if alternatives.count > 1 {
-                    RouteTabs(routes: alternatives, selection: $selectedRouteID)
-                }
-                // The trip's track is the bundled OSM geometry, so it carries the ODbL attribution,
-                // placed where the trip card does not cover it.
-                if route.segments.contains(where: { $0.type.isTransit }) {
-                    MetroGeometryAttributionView()
-                        .padding(.leading, 12)
-                }
-            }
-            .padding(.top, 8)
-        }
-    }
-
     private var decisionDataConfidence: DataConfidence {
         let coverage = route.dataCoverage
         if coverage.scheduleConfidence == .official,
@@ -781,7 +574,7 @@ struct RouteDetailView: View {
             // The score grades station and network data, and a
             // walk uses neither.
             if route.boardingTransitSegment != nil {
-            Button { detailDestination = .confidence(route.id) } label: {
+            Button { onOpen(.confidence(route.id)) } label: {
                 detailRow(
                     icon: "checkmark.seal.fill",
                     tint: confidence.level.color,
@@ -1093,7 +886,7 @@ struct RouteDetailView: View {
         .onTapGesture {
             switch segment.type {
             case .transfer:
-                detailDestination = .transfer(segment)
+                onOpen(.transfer(segment))
             case .subway where !segment.stationStops.isEmpty:
                 withAnimation(.easeInOut(duration: 0.2)) {
                     if isExpanded { expandedLegs.remove(segment.id) } else { expandedLegs.insert(segment.id) }
@@ -1116,7 +909,7 @@ struct RouteDetailView: View {
                         .foregroundStyle(.secondary)
                         .padding(.top, 6)
                 }
-                Button { detailDestination = .station(stop) } label: {
+                Button { onOpen(.station(stop)) } label: {
                     HStack(spacing: 10) {
                         Circle()
                             .strokeBorder(Color(hex: segment.colorHex), lineWidth: 2)
@@ -1419,8 +1212,46 @@ struct RouteDetailView: View {
     }
 }
 
-/// Presented when a stop in the route's timeline is tapped: resolves it to a full `Station` and
-/// shows the standard `StationDetailView`.
+/// A transfer, a stop or the confidence breakdown of one route, as a page of the panel's own.
+struct RouteDetailDestinationPage: View {
+    let route: Route
+    let destination: RouteDetailDestination
+    let preference: RoutePreference
+    let alternatives: [Route]
+    let accessibilityFilter: AccessibilityFilter
+    @Environment(DIContainer.self) private var container
+
+    var body: some View {
+        switch destination {
+        case .transfer(let segment):
+            TransferStationSheet(
+                transferSegment: segment,
+                nextTransitSegment: route.nextTransitSegment(after: segment),
+                cityID: segment.packCityID ?? route.networkCityID ?? "",
+                accessibilityFilter: accessibilityFilter
+            )
+        case .station(let stop):
+            RouteStationGuideSheet(
+                stop: stop,
+                cityID: stop.packCityID ?? route.networkCityID ?? ""
+            )
+        case .confidence:
+            let feasibility = container.routeFeasibilityService.feasibility(for: route)
+            RouteConfidenceDetailView(
+                confidence: container.routeConfidenceService.confidence(
+                    for: route,
+                    feasibility: feasibility,
+                    preference: preference,
+                    alternatives: alternatives
+                ),
+                feasibility: feasibility
+            )
+        }
+    }
+}
+
+/// Opened when a stop in the route's timeline is tapped: resolves it to a full `Station` and shows
+/// the standard `StationDetailView`.
 private struct RouteStationGuideSheet: View {
     let stop: RouteStationStop
     let cityID: String
@@ -1431,9 +1262,11 @@ private struct RouteStationGuideSheet: View {
     var body: some View {
         Group {
             if let station {
-                StationDetailView(station: station)
+                // The map takes "Route here" through `pendingRouteInput` and rewrites the panel's
+                // pages itself.
+                StationDetailView(station: station, dismissesOnRouteSelection: false)
             } else if didResolve {
-                StationDetailView(station: fallbackStation)
+                StationDetailView(station: fallbackStation, dismissesOnRouteSelection: false)
             } else {
                 VStack(spacing: 14) {
                     Text(stop.name)
@@ -1442,7 +1275,7 @@ private struct RouteStationGuideSheet: View {
                     ProgressView()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.appBackground)
+                .pageBackground()
             }
         }
         .task {

@@ -21,11 +21,7 @@ struct SavedPlaceChips: View {
                         .fontWeight(.medium)
                         .lineLimit(1)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.appSurface, in: Capsule())
-                .overlay(Capsule().stroke(Color(.separator), lineWidth: 1))
-                .contentShape(Capsule())
+                .chipSurface()
             }
             .buttonStyle(.plain)
             .accessibilityHint(AppLocalization.text(

@@ -2,8 +2,9 @@ import SwiftUI
 import MapKit
 
 /// The map's search page: one field over the local station index and Apple's places. Stations come
-/// first and instantly; places come on request. Choosing either hands back to the map, which owns
-/// navigation: a station pushes its page, a place opens the same card a tapped pin does.
+/// first and instantly; places come on request. Choosing anything hands back to the map, which owns
+/// the panel's pages: a station opens its page, a place the same card a tapped pin does, and an
+/// endpoint being edited is filled and the page closed.
 struct SearchPageView: View {
     let onSelectStation: (Station) -> Void
     let onSelectPlace: (TransitPlace) -> Void
@@ -13,13 +14,11 @@ struct SearchPageView: View {
     /// Replaying a whole journey, supplied by the host: planning is the map stack's job. The
     /// endpoint editor passes nothing.
     var onSelectRecentTrip: ((TripRecord) -> Void)?
-    /// True when this page exists to return one answer (endpoint editing): station rows then close
-    /// the page, as place rows do.
-    var dismissesOnSelection = false
+    /// What the page is for, when it is filling one end of a trip.
+    var title: String?
 
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
-    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: StationSearchViewModel?
     // Tracked so a newer selection supersedes an older replay still loading its city.
     @State private var recentReplayTask: Task<Void, Never>?
@@ -31,23 +30,37 @@ struct SearchPageView: View {
     @State private var currentPlaceTask: Task<Void, Never>?
     @State private var isResolvingCurrentPlace = false
     @FocusState private var isSearchFocused: Bool
+    /// Active from the start: the rider tapped a search field to get here. Presented rather than
+    /// focused, because a focus set while the page is still zooming in is dropped.
+    @State private var isSearchActive = true
 
     var body: some View {
-            VStack(spacing: 0) {
-                searchBar
-                // Shown whether or not tags are saved: the current-location chip is the only way in
-                // the app to say "here".
-                if isIdle {
-                    quickTagBar
-                }
-                stationFilterBar
-                resultsList
+        VStack(spacing: 0) {
+            // Shown whether or not tags are saved: the current-location chip is the only way in
+            // the app to say "here".
+            if isIdle {
+                quickTagBar
             }
-            .navigationTitle(AppLocalization.localized("Search"))
-            // The back button is in the search bar, beside the field, so the field sits where the
-            // thumb is.
-            .toolbar(.hidden, for: .navigationBar)
-            .background(Color.appBackground)
+            stationFilterBar
+            resultsList
+        }
+        .navigationTitle(title ?? AppLocalization.localized("Search"))
+        .navigationBarTitleDisplayMode(.inline)
+        // The system's own field, under the bar and always showing: the rider came here to type.
+        .searchable(
+            text: searchText,
+            isPresented: $isSearchActive,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: Text(AppLocalization.text(
+                english: "Search places or stations",
+                simplified: "搜索地点或车站",
+                traditional: "搜尋地點或車站"
+            ))
+        )
+        .searchFocused($isSearchFocused)
+        .onSubmit(of: .search) { searchOnline() }
+        .pageBackground()
+        .animation(.default, value: isIdle)
         .onDisappear {
             recentReplayTask?.cancel()
             placeSearchTask?.cancel()
@@ -57,8 +70,6 @@ struct SearchPageView: View {
             if viewModel == nil {
                 viewModel = container.makeStationSearchViewModel()
             }
-            // Focused on arrival: the rider tapped a search field to get here.
-            isSearchFocused = true
             await viewModel?.loadInitialStations()
             #if DEBUG
             // A seeded query: this environment can push a screen but cannot type.
@@ -133,28 +144,6 @@ struct SearchPageView: View {
         }
     }
 
-    private var searchBar: some View {
-        HStack(spacing: 10) {
-            Button {
-                isSearchFocused = false
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.headline)
-                    .foregroundStyle(Color.primary)
-                    .tappable()
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(AppLocalization.text(english: "Back", simplified: "返回", traditional: "返回"))
-
-            searchField
-        }
-        .padding(.horizontal, 12)
-        .padding(.top, 6)
-        .padding(.bottom, 4)
-    }
-
     /// Step-free, lift, interchange: shown only when there are stations to narrow. The spinner
     /// matters: the first step-free or lift filter fetches official accessibility data for the
     /// whole list.
@@ -187,7 +176,7 @@ struct SearchPageView: View {
                             .padding(.leading, 2)
                     }
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, Metrics.l)
                 .padding(.vertical, 6)
             }
         }
@@ -215,10 +204,9 @@ struct SearchPageView: View {
                     // The coordinate is the whole answer: a Beijing "Home" plans against
                     // Beijing's network because that is where it is.
                     onSelectPlace(quickTag.transitPlace)
-                    dismiss()
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, Metrics.l)
             .padding(.vertical, 6)
         }
     }
@@ -247,12 +235,7 @@ struct SearchPageView: View {
                 .fontWeight(.medium)
                 .lineLimit(1)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.appSurface, in: Capsule())
-            .overlay(Capsule().stroke(Color.accentColor.opacity(0.4), lineWidth: 1))
-            .foregroundStyle(isLocationAvailable ? Color.accentColor : Color.secondary)
-            .contentShape(Capsule())
+            .chipSurface(isProminent: isLocationAvailable)
         }
         .buttonStyle(.plain)
         .disabled(!isLocationAvailable || isResolvingCurrentPlace)
@@ -285,7 +268,6 @@ struct SearchPageView: View {
             // The same hand-back as a quick tag or a place row: it fills an endpoint when editing
             // one and opens a card when browsing.
             onSelectPlace(place)
-            dismiss()
         }
     }
 
@@ -335,61 +317,42 @@ struct SearchPageView: View {
             || !lineResults.isEmpty
     }
 
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-
-            TextField(AppLocalization.text(
-                english: "Search places or stations",
-                simplified: "搜索地点或车站",
-                traditional: "搜尋地點或車站"
-            ), text: Binding(
-                get: { viewModel?.searchText ?? "" },
-                set: { newValue in
-                    viewModel?.searchText = newValue
-                    // Both local: the bundled station index and an in-memory line match. Place
-                    // search is 100 a day for the whole account and runs only on request.
-                    viewModel?.scheduleSearch()
-                    scheduleLineSearch(newValue)
-                    if placeResults.isEmpty == false || isSearchingPlaces {
-                        // Results for a query the rider has since edited are worse than none.
-                        placeSearchTask?.cancel()
-                        placeResults = []
-                        isSearchingPlaces = false
-                    }
+    /// The field's text. Both answers to typing are local: the bundled station index and an
+    /// in-memory line match. Place search is 100 a day for the whole account and runs only on
+    /// request (`searchOnline`).
+    private var searchText: Binding<String> {
+        Binding(
+            get: { viewModel?.searchText ?? "" },
+            set: { newValue in
+                guard newValue != (viewModel?.searchText ?? "") else { return }
+                // The field's own clear button, and Cancel, both arrive as an empty string.
+                guard !newValue.isEmpty else {
+                    clearSearch()
+                    return
                 }
-            ))
-            .textFieldStyle(.plain)
-            .focused($isSearchFocused)
-            .submitLabel(.search)
-            .onSubmit { searchOnline() }
-
-            if !(viewModel?.searchText.isEmpty ?? true) {
-                Button {
-                    viewModel?.clearSearch()
+                viewModel?.searchText = newValue
+                viewModel?.scheduleSearch()
+                scheduleLineSearch(newValue)
+                if placeResults.isEmpty == false || isSearchingPlaces {
+                    // Results for a query the rider has since edited are worse than none.
                     placeSearchTask?.cancel()
                     placeResults = []
                     isSearchingPlaces = false
-                    Task {
-                        await viewModel?.loadInitialStations()
-                    }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
-                        // The glyph is ~22 pt; the target has to be 44.
-                        .tappable()
                 }
-                .accessibilityLabel(AppLocalization.text(
-                    english: "Clear the search",
-                    simplified: "清除搜索内容",
-                    traditional: "清除搜尋內容"
-                ))
             }
+        )
+    }
+
+    private func clearSearch() {
+        viewModel?.clearSearch()
+        placeSearchTask?.cancel()
+        lineSearchTask?.cancel()
+        placeResults = []
+        lineResults = []
+        isSearchingPlaces = false
+        Task {
+            await viewModel?.loadInitialStations()
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: Radius.medium, style: .continuous))
     }
 
     /// Apple's places, under the stations. Choosing one hands back to the map, where its card
@@ -400,11 +363,9 @@ struct SearchPageView: View {
                 Button {
                     isSearchFocused = false
                     onSelectPlace(place)
-                    dismiss()
                 } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "mappin.circle.fill")
-                            .foregroundStyle(.secondary)
+                    HStack(spacing: 12) {
+                        SearchRowGlyph(systemName: "mappin", tint: .red)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(place.name)
                                 .font(.subheadline)
@@ -454,7 +415,6 @@ struct SearchPageView: View {
                         Button {
                             isSearchFocused = false
                             onSelectLine?(line)
-                            if dismissesOnSelection { dismiss() }
                         } label: {
                             lineRow(line)
                         }
@@ -482,7 +442,6 @@ struct SearchPageView: View {
                                 viewModel?.selectStation(station)
                                 isSearchFocused = false
                                 onSelectStation(station)
-                                if dismissesOnSelection { dismiss() }
                             }
                     }
                 } header: {
@@ -569,11 +528,9 @@ struct SearchPageView: View {
                 Button {
                     isSearchFocused = false
                     onSelectRecentTrip?(trip)
-                    if dismissesOnSelection { dismiss() }
                 } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "arrow.triangle.turn.up.right.circle")
-                            .foregroundStyle(Color.accentColor)
+                    HStack(spacing: 12) {
+                        SearchRowGlyph(systemName: "arrow.triangle.turn.up.right.diamond.fill", tint: .accentColor)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(verbatim: "\(trip.originName) → \(trip.destinationName)")
                                 .lineLimit(1)
@@ -609,7 +566,6 @@ struct SearchPageView: View {
                         if let station {
                             viewModel?.selectStation(station)
                             onSelectStation(station)
-                            if dismissesOnSelection { dismiss() }
                         } else {
                             // Station no longer in the pack: fall back to a name search through the
                             // field's own debounced slot.
@@ -618,9 +574,8 @@ struct SearchPageView: View {
                         }
                     }
                 } label: {
-                    HStack {
-                        Image(systemName: "clock")
-                            .foregroundStyle(.secondary)
+                    HStack(spacing: 12) {
+                        SearchRowGlyph(systemName: "clock", tint: .gray)
                         Text(search.stationName)
                         Spacer()
                         Image(systemName: "arrow.up.left")
@@ -647,12 +602,12 @@ struct SearchOnlineRow: View {
     var body: some View {
         Section {
             Button(action: action) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     if isSearching {
-                        ProgressView().controlSize(.small)
+                        ProgressView()
+                            .frame(width: SearchRowGlyph.size, height: SearchRowGlyph.size)
                     } else {
-                        Image(systemName: "magnifyingglass.circle.fill")
-                            .foregroundStyle(Color.accentColor)
+                        SearchRowGlyph(systemName: "magnifyingglass", tint: .accentColor)
                     }
                     Text(AppLocalization.text(
                         english: "Search online for places",
@@ -674,5 +629,23 @@ struct SearchOnlineRow: View {
                 traditional: "以上車站來自離線線網，已經完整。"
             ))
         }
+    }
+}
+
+/// The round glyph a search row leads with, as Maps draws it: what kind of thing the row is, before
+/// its name.
+struct SearchRowGlyph: View {
+    static let size: CGFloat = 30
+
+    let systemName: String
+    let tint: Color
+
+    var body: some View {
+        Image(systemName: systemName)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white)
+            .frame(width: Self.size, height: Self.size)
+            .background(tint, in: Circle())
+            .accessibilityHidden(true)
     }
 }

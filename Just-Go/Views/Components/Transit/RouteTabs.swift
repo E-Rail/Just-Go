@@ -84,12 +84,7 @@ struct Chip: View {
                     .font(.caption)
                     .lineLimit(1)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .background(isSelected ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
-            .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
-            .overlay(Capsule().stroke(isSelected ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))
-            .contentShape(Capsule())
+            .chipSurface(isProminent: isSelected)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])

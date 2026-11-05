@@ -50,9 +50,15 @@ struct TransitMapView: UIViewRepresentable {
     /// which the browse map gives to its search field and the rider's panel, so the rider is
     /// centred in the pane beyond rather than on the crease.
     var leadingChromeWidth: CGFloat = 0
-    /// How heavily to draw the network's lines: heavier on a page about one line, where the browse
-    /// map's weight reads as a hairline.
+    /// How heavily to draw the network's lines.
     var networkLineWidth: CGFloat = 6
+    /// How strongly the network is drawn: fully while browsing, faintly under a trip or a line the
+    /// map is showing, so the city stays legible behind it without competing. Set on the renderers
+    /// already on screen; re-adding a city's overlays is the hitch `addPolyline` batches against.
+    var networkAlpha: CGFloat = 1
+    /// Lines drawn over the network at the weight of a page about one line, where the browse map's
+    /// weight reads as a hairline.
+    var highlightLines: [MetroLine] = []
     /// Where *MapKit* draws the rider, in the map's GCJ-02 frame, which is not always what Core
     /// Location said (~540 m off in Beijing on a device reporting WGS-84). See
     /// `LocationService.mapSpaceCorrection`.
@@ -121,6 +127,9 @@ struct TransitMapView: UIViewRepresentable {
         private var networkSignature = ""
         private var stationSignature = ""
         private var routeSignature = ""
+        private var highlightSignature = ""
+        private var appliedNetworkAlpha: CGFloat = 1
+        private var appliedAlwaysShowsStations: Bool?
         private var markerVisibilityBand = -1
         /// Drives `strokeScale`. Seeded wide so a new map's first stroke suits the zoom it is
         /// actually at.
@@ -134,6 +143,9 @@ struct TransitMapView: UIViewRepresentable {
         /// Held apart from the rest of the network because these come and go with zoom.
         private var interchangeOverlays: [MKOverlay] = []
         private var routeOverlays: [MKOverlay] = []
+        private var highlightOverlays: [MKOverlay] = []
+        /// The network's and the interchanges' overlays together, for the fade.
+        private var networkOverlayIDs: Set<ObjectIdentifier> = []
         private var stationSymbolImages: [String: UIImage] = [:]
         private var poiTask: Task<Void, Never>?
 
@@ -164,7 +176,10 @@ struct TransitMapView: UIViewRepresentable {
             mapView.showsUserLocation = parent.showsUserLocation
             syncRegion(on: mapView)
             syncNetworks(on: mapView)
+            syncNetworkAlpha(on: mapView)
             syncStations(on: mapView)
+            syncMarkerRule(on: mapView)
+            syncHighlight(on: mapView)
             syncRoute(on: mapView)
         }
 
@@ -191,10 +206,56 @@ struct TransitMapView: UIViewRepresentable {
 
             addNetworks(parent.metroNetworks)
             addInterchanges(across: parent.metroNetworks)
+            networkOverlayIDs = Set((networkOverlays + interchangeOverlays).map { ObjectIdentifier($0) })
             if !networkOverlays.isEmpty {
                 mapView.addOverlays(networkOverlays, level: .aboveRoads)
             }
             syncInterchangeVisibility(on: mapView)
+        }
+
+        /// Fades the network in place. A renderer MapKit has not made yet takes the alpha when it is
+        /// made, in `rendererFor`.
+        private func syncNetworkAlpha(on mapView: MKMapView) {
+            guard parent.networkAlpha != appliedNetworkAlpha else { return }
+            appliedNetworkAlpha = parent.networkAlpha
+            for overlay in networkOverlays + interchangeOverlays {
+                guard let renderer = mapView.renderer(for: overlay) else { continue }
+                renderer.alpha = appliedNetworkAlpha
+                renderer.setNeedsDisplay()
+            }
+        }
+
+        /// Whether every station is drawn is otherwise re-applied only when the zoom crosses a
+        /// band, so a map that starts or stops showing a trip's stops at one zoom re-applies it.
+        private func syncMarkerRule(on mapView: MKMapView) {
+            guard parent.alwaysShowsStations != appliedAlwaysShowsStations else { return }
+            let isFirst = appliedAlwaysShowsStations == nil
+            appliedAlwaysShowsStations = parent.alwaysShowsStations
+            guard !isFirst else { return }
+            refreshMarkerVisibility(on: mapView)
+        }
+
+        private func syncHighlight(on mapView: MKMapView) {
+            let nextSignature = parent.highlightLines.map(\.id).joined(separator: ",")
+            guard nextSignature != highlightSignature else { return }
+            highlightSignature = nextSignature
+            mapView.removeOverlays(highlightOverlays)
+            clearOverlayMetadata(highlightOverlays)
+            highlightOverlays = []
+            for line in parent.highlightLines {
+                for path in line.paths where path.count >= 2 {
+                    addPolyline(
+                        path.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) },
+                        colorHex: line.colorHex,
+                        lineWidth: 9,
+                        simplify: false,
+                        collection: &highlightOverlays
+                    )
+                }
+            }
+            if !highlightOverlays.isEmpty {
+                mapView.addOverlays(highlightOverlays, level: .aboveLabels)
+            }
         }
 
         /// Interchange links are drawn exactly while the stations they join are: a link is an
@@ -656,6 +717,9 @@ struct TransitMapView: UIViewRepresentable {
             renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
             applyStrokeWidth(to: renderer, polyline: polyline)
             renderer.lineJoin = .round
+            if networkOverlayIDs.contains(ObjectIdentifier(polyline)) {
+                renderer.alpha = parent.networkAlpha
+            }
             return renderer
         }
     }

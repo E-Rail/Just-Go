@@ -40,6 +40,14 @@ struct PanelStops {
 
     var detents: Set<PresentationDetent> { Set(stops.map(\.detent)) }
 
+    /// The map stays live, and undimmed, above every stop but the full height. Named from the
+    /// page's own stops: the sheet looks the detent up among its own, and one it does not have (a
+    /// trip under way has no `.medium`) dimmed the map and took its touches at every height.
+    var backgroundInteraction: PresentationBackgroundInteraction {
+        guard let tallest = stops.last(where: { $0 != .large }) else { return .automatic }
+        return .enabled(upThrough: tallest.detent)
+    }
+
     /// Typing pages take the whole height for the keyboard. A page about somewhere opens halfway, so
     /// the map shows where it is; a route opens there too and can drop low to show more of the trip.
     /// A trip under way is exactly as tall as its step, and a change of lines, which the rider reads

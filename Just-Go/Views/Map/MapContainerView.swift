@@ -499,7 +499,7 @@ struct MapContainerView: View {
         .presentationDetents(stops.detents, selection: stopSelection(stops, on: shown.last))
         .presentationDragIndicator(.visible)
         // The map stays live above the panel's lower stops.
-        .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        .presentationBackgroundInteraction(stops.backgroundInteraction)
         .interactiveDismissDisabled()
     }
 
@@ -1004,12 +1004,32 @@ struct MapContainerView: View {
 
     /// The one way this screen puts the camera on the rider, for the locate button and the first
     /// appearance alike, so they cannot land at different zooms.
-    private func centerOnUser() {
+    ///
+    /// - Parameter onScreen: Moves the camera on screen, which is a page's own while a route, a
+    ///   line or a trip is shown: the browse map's, moved under it, would change nothing the rider
+    ///   can see. The first appearance means the browse map's whatever is open.
+    private func centerOnUser(onScreen: Bool = false) {
         centerOnUserTask?.cancel()
         locateFailure = nil
+        let focusKey = onScreen ? mapFocus.cameraKey : nil
         centerOnUserTask = Task {
-            guard let outcome = await viewModel?.centerOnUser() else { return }
-            if outcome.didCenter { didCenterOnUser = true }
+            guard let outcome = await viewModel?.locateUser() else { return }
+            if let coordinate = outcome.coordinate {
+                if let focusKey {
+                    // Only if that page is still the one on screen, and no wider than it had the
+                    // map, as `centre(on:)` keeps the browse map's zoom.
+                    guard mapFocus.cameraKey == focusKey else { return }
+                    let span = min(focusCameras[focusKey]?.fittedDelta ?? MapCameraSpan.focused, MapCameraSpan.focused)
+                    focusCameras[focusKey] = MapVisibleRegion(
+                        center: coordinate,
+                        latitudeDelta: span,
+                        longitudeDelta: span
+                    )
+                } else {
+                    viewModel?.updateCamera(to: coordinate)
+                    didCenterOnUser = true
+                }
+            }
             // Say why nothing moved: a fix that never arrives takes the full 15 s timeout, and
             // silence reads as a broken button.
             guard let failure = outcome.failureMessage else { return }
@@ -1022,7 +1042,7 @@ struct MapContainerView: View {
 
     private var mapLocateButton: some View {
         Button {
-            centerOnUser()
+            centerOnUser(onScreen: true)
         } label: {
             Image(systemName: "location.fill")
                 .font(.headline)
@@ -1420,7 +1440,8 @@ struct MapContainerView: View {
 
         // Pages opened and closed one after another, a few seconds apart, so a screen recording shows
         // the transitions between them: "search,home,results,detail,guiding,pop,pop,home". "station"
-        // opens the route's first stop; "trips" and "map" switch tabs.
+        // opens the route's first stop, "locate" is the map's locate button, and "trips" and "map"
+        // switch tabs.
         if let sequence = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SEQUENCE"] {
             let steps = sequence.split(separator: ",").map(String.init)
             let pause = Double(ProcessInfo.processInfo.environment["JUST_GO_DEBUG_STEP_SECONDS"] ?? "") ?? 2
@@ -1470,6 +1491,7 @@ struct MapContainerView: View {
             case "guiding": navigate(route)
             case "pop": if !path.isEmpty { path.removeLast() }
             case "station": if let station = route.mapStations.first { openStation(station) }
+            case "locate": centerOnUser(onScreen: true)
             case "trips": appState.selectedTab = .trips
             case "map": appState.selectedTab = .map
             default: break

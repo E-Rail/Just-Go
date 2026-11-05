@@ -200,30 +200,31 @@ final class MapViewModel {
         }
     }
 
-    /// Whether the camera reached the rider, and why not when it did not.
-    struct UserCameraOutcome {
-        let didCenter: Bool
-        /// Why the camera did not move, when the reason is one a rider should hear about.
-        /// Cancellation is not such a reason and leaves this nil. See `centerOnUser`.
+    /// Where the rider is, and why not when there is no fix.
+    struct UserLocateOutcome {
+        /// Where the map draws the rider. Nil without a fix, or when the locate was superseded.
+        var coordinate: CLLocationCoordinate2D?
+        /// Why there is no fix, when the reason is one a rider should hear about. Cancellation is
+        /// not such a reason and leaves this nil. See `locateUser`.
         var failureMessage: String? = nil
     }
 
-    func centerOnUser() async -> UserCameraOutcome {
+    /// Finds the rider and moves no camera: the caller knows which camera is on screen.
+    func locateUser() async -> UserLocateOutcome {
         do {
             let fix = try await locationService.requestCurrentLocation()
             // A superseded locate-me must not drag the camera off wherever the rider went next.
-            guard !Task.isCancelled else { return UserCameraOutcome(didCenter: false) }
+            guard !Task.isCancelled else { return UserLocateOutcome() }
             // Map space, not `fix.coordinate`: Core Location reports WGS-84 and the map is GCJ-02,
             // about 540 m apart in Beijing. See `LocationService.mapSpaceCorrection`.
-            updateCamera(to: locationService.mapSpaceLocation(from: fix).coordinate)
-            return UserCameraOutcome(didCenter: true)
+            return UserLocateOutcome(coordinate: locationService.mapSpaceLocation(from: fix).coordinate)
         } catch is CancellationError {
             // Superseded, not failed. The rider asked for something else; say nothing.
-            return UserCameraOutcome(didCenter: false)
+            return UserLocateOutcome()
         } catch {
             // A fix that never arrives ends here after the 15 s timeout. Say so, rather than leave
             // the map silently where it was.
-            return UserCameraOutcome(didCenter: false, failureMessage: error.localizedDescription)
+            return UserLocateOutcome(failureMessage: error.localizedDescription)
         }
     }
 

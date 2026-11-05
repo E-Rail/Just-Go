@@ -406,6 +406,98 @@ extension EnvironmentValues {
     /// Inside the map's panel, whose own surface is the page's background: the phone's sheet, the
     /// wide screen's glass card.
     @Entry var isInMapPanel = false
+
+    /// Whether the system keeps a vertical bar beside the app: the column at the trailing edge of an
+    /// iPhone Duo's cover display that holds the clock, the camera, navigation and toolbar items and
+    /// the tab bar. Set at the app's root by `readsVerticalBar()`; sheets inherit it.
+    @Entry var hasVerticalBar = false
+}
+
+extension SearchFieldPlacement {
+    /// A search page's field: pinned under the navigation bar, as a page the rider opened to type
+    /// wants it, except beside a vertical bar. There the page's navigation items move into the bar,
+    /// a pinned field stops short of it, and the bar's column beside the field is left empty but for
+    /// the clock. The system's own placement docks the field across the whole width instead, as
+    /// Apple's apps do (measured on iOS 27.2).
+    static func searchPage(besideVerticalBar: Bool) -> SearchFieldPlacement {
+        besideVerticalBar ? .automatic : .navigationBarDrawer(displayMode: .always)
+    }
+}
+
+extension View {
+    /// Puts `hasVerticalBar` in this view's environment and keeps it current: a fold moves the app
+    /// between a display with the bar and one without.
+    func readsVerticalBar() -> some View {
+        modifier(VerticalBarEnvironment())
+    }
+}
+
+private struct VerticalBarEnvironment: ViewModifier {
+    @State private var hasVerticalBar = false
+
+    func body(content: Content) -> some View {
+        content
+            .background(VerticalBarReader { hasVerticalBar = $0 })
+            .environment(\.hasVerticalBar, hasVerticalBar)
+    }
+}
+
+/// UIKit's `verticalBarEdge` trait, which SwiftUI does not carry, read from the window a zero-size
+/// view sits in. The trait is unspecified wherever the system places no bar.
+///
+/// Gated at compile time as well as at run time, on the same UIKit submodule `activeFold` uses: the
+/// trait first ships in the iOS 27.1 SDK and CI builds with an older one. Without it there is never
+/// a bar.
+private struct VerticalBarReader: UIViewRepresentable {
+    let onChange: (Bool) -> Void
+
+    func makeUIView(context: Context) -> ReaderView {
+        ReaderView(onChange: onChange)
+    }
+
+    func updateUIView(_ view: ReaderView, context: Context) {
+        view.onChange = onChange
+    }
+
+    final class ReaderView: UIView {
+        var onChange: (Bool) -> Void
+
+        init(onChange: @escaping (Bool) -> Void) {
+            self.onChange = onChange
+            super.init(frame: .zero)
+            isUserInteractionEnabled = false
+            #if canImport(UIKit.UIViewReservedRegion)
+            if #available(iOS 27.1, *) {
+                registerForTraitChanges(UITraitCollection.systemTraitsAffectingVerticalBarEdge) { (view: ReaderView, _: UITraitCollection) in
+                    view.report()
+                }
+            }
+            #endif
+        }
+
+        required init?(coder: NSCoder) {
+            nil
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            report()
+        }
+
+        private func report() {
+            guard window != nil else { return }
+            var hasBar = false
+            #if canImport(UIKit.UIViewReservedRegion)
+            if #available(iOS 27.1, *) {
+                hasBar = traitCollection.verticalBarEdge != .unspecified
+            }
+            #endif
+            // After the update that moved this view, never inside it: SwiftUI rejects state
+            // written mid-update.
+            let onChange = onChange
+            DispatchQueue.main.async { onChange(hasBar) }
+        }
+    }
 }
 
 /// A page's background: the grouped background on its own. On iOS 26 inside the map's panel,

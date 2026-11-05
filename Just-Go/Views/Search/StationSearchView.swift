@@ -29,6 +29,7 @@ struct SearchPageView: View {
     @State private var isSearchingPlaces = false
     @State private var currentPlaceTask: Task<Void, Never>?
     @State private var isResolvingCurrentPlace = false
+    @Environment(\.hasVerticalBar) private var hasVerticalBar
     @FocusState private var isSearchFocused: Bool
     /// Active from the start: the rider tapped a search field to get here. Presented rather than
     /// focused, because a focus set while the page is still zooming in is dropped.
@@ -47,10 +48,11 @@ struct SearchPageView: View {
         .navigationTitle(title ?? AppLocalization.localized("Search"))
         .navigationBarTitleDisplayMode(.inline)
         // The system's own field, under the bar and always showing: the rider came here to type.
+        // Beside a vertical bar, docked where the system puts it (see `searchPage`).
         .searchable(
             text: searchText,
             isPresented: $isSearchActive,
-            placement: .navigationBarDrawer(displayMode: .always),
+            placement: .searchPage(besideVerticalBar: hasVerticalBar),
             prompt: Text(AppLocalization.text(
                 english: "Search places or stations",
                 simplified: "搜索地点或车站",

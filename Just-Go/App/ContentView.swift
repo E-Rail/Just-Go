@@ -116,6 +116,7 @@ struct ContentView: View {
         }
         // A tab bar on a phone, a sidebar on an iPad.
         .tabViewStyle(.sidebarAdaptable)
+        .readsVerticalBar()
         .tint(Color.adaptive(hex: selectedThemeHex))
         .onAppear {
             if !hasSeenWelcome { showTour = true }

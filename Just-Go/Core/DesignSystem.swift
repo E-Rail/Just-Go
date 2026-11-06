@@ -15,17 +15,13 @@ enum Metrics {
     /// The smallest square a finger can reliably hit; Apple's floor.
     static let minimumTapTarget: CGFloat = 44
 
-    /// The trip column beside a map on regular width: wide enough for a journey row without
-    /// wrapping, narrow enough to leave the map the larger half.
+    /// The map's side panel on regular width: wide enough for a journey row without wrapping,
+    /// narrow enough to leave the map the larger half.
     ///
-    /// A **cap**, not a width. Beside a map, `SplitColumns` takes 45% below it, so a narrow
-    /// regular-width window still leaves the map the larger part, and where a phone folds the
-    /// crease decides instead. Over a map, it is the widest the floating panels get.
+    /// A **cap**, not a width. The panel takes 45% of the width below it, so a narrow regular-width
+    /// window still leaves the map the larger part, and where a phone folds the crease decides
+    /// instead (`MapPanelLayout`).
     static let tripColumnWidth: CGFloat = 420
-
-    /// The same cap for the stop list beside a line's map. Its own number because a list of station
-    /// names needs less room than a journey row with a line badge and a duration.
-    static let stopColumnWidth: CGFloat = 380
 
     /// How wide a column of text or cards may get before it stops being readable. 620 is all but
     /// inert on an iPhone Duo's inner display, 669 points across in portrait, which is fine: 620
@@ -159,18 +155,10 @@ struct FoldedSurface: Equatable {
         size = fold == nil ? .zero : proxy.size
     }
 
-    /// Folded side to side, as a book: one pane before the crease and one beyond it.
-    var besideCrease: Bool { fold?.axis == .vertical }
-
-    /// Side to side: how wide the pane before the crease is.
+    /// Folded side to side, as a book: how wide the pane before the crease is.
     var paneBeforeWidth: CGFloat? { sideBySide?.start }
     /// Side to side: where the pane beyond the crease begins.
     var paneAfterStart: CGFloat? { sideBySide?.end }
-    /// Side to side: how wide the pane beyond the crease is.
-    var paneAfterWidth: CGFloat? { sideBySide.map { max(0, size.width - $0.end) } }
-    /// Side to side: from the start of the crease's region to the trailing edge, the room a
-    /// trailing inset takes so that what it insets keeps to the pane before the crease.
-    var beyondCreaseWidth: CGFloat? { sideBySide.map { max(0, size.width - $0.start) } }
     /// Folded across, as a laptop: from the top of the crease's region down, the room a bottom inset
     /// takes so that what it insets keeps to the upper pane.
     var belowCreaseHeight: CGFloat? { stacked.map { max(0, size.height - $0.start) } }
@@ -217,48 +205,6 @@ extension GeometryProxy {
         }
         #endif
         return nil
-    }
-}
-
-/// A primary pane and a secondary column. Where the display folds they divide at the crease, one
-/// pane to each side; anywhere else the secondary takes its share of the width, capped at
-/// `columnCap`, proportional below the cap and fixed above it, so no screen needs a breakpoint.
-///
-/// One layout whatever the fold does, switched with `AnyLayout`, so both panes keep their identity
-/// when a crease becomes active, goes flat or turns with the phone: the map is not rebuilt and the
-/// column keeps its scroll position. Each pane stops at the edge of the crease's region and only
-/// the divider is drawn inside it. That is padding, not safe-area padding: a map that ignores its
-/// safe area, as a full-bleed one does, would otherwise draw its "Legal" link onto the fold.
-///
-/// The width comes from a `GeometryReader` on purpose. `containerRelativeFrame` is the obvious tool
-/// and the wrong one: inside an `HStack` it measured the column at zero points wide at 626, 1024
-/// and 1366, and its failure is the panel vanishing.
-struct SplitColumns<Primary: View, Secondary: View>: View {
-    let columnCap: CGFloat
-    @ViewBuilder var primary: Primary
-    @ViewBuilder var secondary: Secondary
-
-    var body: some View {
-        GeometryReader { geo in
-            let surface = FoldedSurface(geo)
-            let fold = surface.fold
-            let stacked = fold?.axis == .horizontal
-            let layout = stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))
-            layout {
-                primary
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(stacked ? .bottom : .trailing, fold?.clearanceBefore ?? 0)
-                Divider()
-                // Padding adds to the frame it pads, so the pane beyond a crease is its frame plus
-                // the clearance, and the two meet on the crease's centre line.
-                secondary
-                    .frame(
-                        width: fold == nil ? min(columnCap, geo.size.width * 0.45) : surface.paneAfterWidth,
-                        height: surface.paneBelowHeight
-                    )
-                    .padding(stacked ? .top : .leading, fold?.clearanceAfter ?? 0)
-            }
-        }
     }
 }
 
@@ -343,13 +289,16 @@ struct FloatingChrome: ViewModifier {
     /// is the opaque card surface. The glass is switched to `.identity` rather than removed: one
     /// view tree either way, so a panel that moves off the map keeps its identity.
     var overContent = true
+    /// Holds the content to the surface's shape, for content that draws edge to edge: the side
+    /// panel's pages.
+    var clipsContent = false
     /// Measured from where the surface sits; nil until then, and where nothing reports a container.
     @State private var concentricRadius: CGFloat?
 
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             let shape = RoundedRectangle(cornerRadius: concentricRadius ?? minimumRadius, style: .continuous)
-            content
+            clipped(content, to: shape)
                 .background(overContent ? Color.clear : Color.appSurface, in: shape)
                 .glassEffect(overContent ? .regular.tint(tint).interactive(isInteractive) : .identity, in: shape)
                 .elevated(overContent ? .resting : .floating)
@@ -361,10 +310,20 @@ struct FloatingChrome: ViewModifier {
         } else {
             // The tint over the material, not instead of it: a selected tab's wash is translucent.
             let shape = RoundedRectangle(cornerRadius: minimumRadius, style: .continuous)
-            content
+            clipped(content, to: shape)
                 .background(tint ?? .clear, in: shape)
                 .background(overContent ? AnyShapeStyle(material) : AnyShapeStyle(Color.appSurface), in: shape)
                 .elevated(.floating)
+        }
+    }
+
+    /// Fixed for a given surface, so the branch never changes under a view.
+    @ViewBuilder
+    private func clipped(_ content: Content, to shape: some Shape) -> some View {
+        if clipsContent {
+            content.clipShape(shape)
+        } else {
+            content
         }
     }
 }
@@ -417,14 +376,16 @@ extension View {
         tint: Color? = nil,
         isInteractive: Bool = false,
         material: Material = .regularMaterial,
-        overContent: Bool = true
+        overContent: Bool = true,
+        clipsContent: Bool = false
     ) -> some View {
         modifier(FloatingChrome(
             minimumRadius: minimumRadius,
             tint: tint,
             isInteractive: isInteractive,
             material: material,
-            overContent: overContent
+            overContent: overContent,
+            clipsContent: clipsContent
         ))
     }
 
@@ -438,5 +399,172 @@ extension View {
         overContent: Bool = false
     ) -> some View {
         modifier(CardSurface(radius: radius, elevation: elevation, overContent: overContent))
+    }
+}
+
+extension EnvironmentValues {
+    /// Inside the map's panel, whose own surface is the page's background: the phone's sheet, the
+    /// wide screen's glass card.
+    @Entry var isInMapPanel = false
+
+    /// Whether the system keeps a vertical bar beside the app: the column at the trailing edge of an
+    /// iPhone Duo's cover display that holds the clock, the camera, navigation and toolbar items and
+    /// the tab bar. Set at the app's root by `readsVerticalBar()`; sheets inherit it.
+    @Entry var hasVerticalBar = false
+}
+
+extension SearchFieldPlacement {
+    /// A search page's field: pinned under the navigation bar, as a page the rider opened to type
+    /// wants it, except beside a vertical bar. There the page's navigation items move into the bar,
+    /// a pinned field stops short of it, and the bar's column beside the field is left empty but for
+    /// the clock. The system's own placement docks the field across the whole width instead, as
+    /// Apple's apps do (measured on iOS 27.2).
+    static func searchPage(besideVerticalBar: Bool) -> SearchFieldPlacement {
+        besideVerticalBar ? .automatic : .navigationBarDrawer(displayMode: .always)
+    }
+}
+
+extension View {
+    /// Puts `hasVerticalBar` in this view's environment and keeps it current: a fold moves the app
+    /// between a display with the bar and one without.
+    func readsVerticalBar() -> some View {
+        modifier(VerticalBarEnvironment())
+    }
+}
+
+private struct VerticalBarEnvironment: ViewModifier {
+    @State private var hasVerticalBar = false
+
+    func body(content: Content) -> some View {
+        content
+            .background(VerticalBarReader { hasVerticalBar = $0 })
+            .environment(\.hasVerticalBar, hasVerticalBar)
+    }
+}
+
+/// UIKit's `verticalBarEdge` trait, which SwiftUI does not carry, read from the window a zero-size
+/// view sits in. The trait is unspecified wherever the system places no bar.
+///
+/// Gated at compile time as well as at run time, on the same UIKit submodule `activeFold` uses: the
+/// trait first ships in the iOS 27.1 SDK and CI builds with an older one. Without it there is never
+/// a bar.
+private struct VerticalBarReader: UIViewRepresentable {
+    let onChange: (Bool) -> Void
+
+    func makeUIView(context: Context) -> ReaderView {
+        ReaderView(onChange: onChange)
+    }
+
+    func updateUIView(_ view: ReaderView, context: Context) {
+        view.onChange = onChange
+    }
+
+    final class ReaderView: UIView {
+        var onChange: (Bool) -> Void
+
+        init(onChange: @escaping (Bool) -> Void) {
+            self.onChange = onChange
+            super.init(frame: .zero)
+            isUserInteractionEnabled = false
+            #if canImport(UIKit.UIViewReservedRegion)
+            if #available(iOS 27.1, *) {
+                registerForTraitChanges(UITraitCollection.systemTraitsAffectingVerticalBarEdge) { (view: ReaderView, _: UITraitCollection) in
+                    view.report()
+                }
+            }
+            #endif
+        }
+
+        required init?(coder: NSCoder) {
+            nil
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            report()
+        }
+
+        private func report() {
+            guard window != nil else { return }
+            var hasBar = false
+            #if canImport(UIKit.UIViewReservedRegion)
+            if #available(iOS 27.1, *) {
+                hasBar = traitCollection.verticalBarEdge != .unspecified
+            }
+            #endif
+            // After the update that moved this view, never inside it: SwiftUI rejects state
+            // written mid-update.
+            let onChange = onChange
+            DispatchQueue.main.async { onChange(hasBar) }
+        }
+    }
+}
+
+/// A page's background: the grouped background on its own. On iOS 26 inside the map's panel,
+/// nothing, so the panel's Liquid Glass shows between the page's cards; below it the panel is a
+/// material, and the page keeps its own.
+struct PageBackground: ViewModifier {
+    @Environment(\.isInMapPanel) private var isInMapPanel
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *), isInMapPanel {
+            content
+        } else {
+            content.background(Color.appBackground)
+        }
+    }
+}
+
+/// A row of chips' one look (a filter, a saved place, a sort order): Liquid Glass on iOS 26, the
+/// capsule below it. Prominent is the one on, or the one that does something: washed in the accent.
+struct ChipSurface: ViewModifier {
+    let isProminent: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .foregroundStyle(isProminent ? Color.accentColor : Color.primary)
+                .glassEffect(
+                    .regular.tint(isProminent ? Color.accentColor.opacity(0.2) : nil).interactive(),
+                    in: Capsule()
+                )
+                .contentShape(Capsule())
+        } else {
+            content
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(isProminent ? Color.accentColor.opacity(0.18) : Color.appSurface, in: Capsule())
+                .foregroundStyle(isProminent ? Color.accentColor : Color.primary)
+                .overlay(Capsule().stroke(isProminent ? Color.accentColor.opacity(0.55) : Color(.separator), lineWidth: 1))
+                .contentShape(Capsule())
+        }
+    }
+}
+
+extension View {
+    func pageBackground() -> some View {
+        modifier(PageBackground())
+    }
+
+    func chipSurface(isProminent: Bool = false) -> some View {
+        modifier(ChipSurface(isProminent: isProminent))
+    }
+
+    /// A bar pinned over a scrolling page's edge. On iOS 26 the system's own, which blurs what
+    /// scrolls under it; below it an inset, which draws `legacyBackground` so rows do not show
+    /// either side of what it holds.
+    @ViewBuilder
+    func pinnedBar<Bar: View>(
+        _ edge: VerticalEdge,
+        legacyBackground: some ShapeStyle = Color.appBackground,
+        @ViewBuilder bar: () -> Bar
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            safeAreaBar(edge: edge, spacing: 0) { bar() }
+        } else {
+            safeAreaInset(edge: edge, spacing: 0) { bar().background(legacyBackground) }
+        }
     }
 }

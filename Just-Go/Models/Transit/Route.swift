@@ -175,6 +175,12 @@ struct Route: Identifiable, Codable {
         accessGuidance.first { $0.kind == .destination }
     }
 
+    /// The ride a change leads onto: the first transit leg after this transfer.
+    func nextTransitSegment(after transferSegment: RouteSegment) -> RouteSegment? {
+        guard let index = segments.firstIndex(where: { $0.id == transferSegment.id }) else { return nil }
+        return segments[(index + 1)...].first { $0.type.isTransit }
+    }
+
     var previewRegion: MapVisibleRegion? {
         MapVisibleRegion(
             fitting: segments.flatMap(\.drawableCoordinates).map {

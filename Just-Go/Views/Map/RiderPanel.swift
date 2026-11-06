@@ -23,32 +23,34 @@ struct RiderPanel: View {
     let onSelectPlace: (StationQuickTag) -> Void
     let onAddPlace: () -> Void
     let onOpenStation: (Station) -> Void
-    /// How far from the leading edge the panel reaches, its own margin included: a column on a
-    /// wide screen, or the pane before a folding phone's crease. Nil runs the full width. The map
-    /// decides it, because the search field above shares it.
-    var columnWidth: CGFloat?
-    /// Folded across, how tall the pane below the crease is, which the panel keeps within.
-    var paneHeight: CGFloat?
+    /// Over a phone's map on its own, with its own glass and margins. False inside the wide
+    /// screen's card, which is already the glass and the column, and holds the rows to its height.
+    var standsAlone = true
 
-    /// The gap between the panel and the screen's edges, which `columnWidth` includes.
+    /// The gap between the panel and the screen's edges.
     static let margin = Metrics.m
 
     @AppStorage("riderPanelMinimized") private var isMinimized = false
 
     var body: some View {
+        if standsAlone {
+            rows
+                .floatingChrome()
+                .padding(.horizontal, Self.margin)
+                .padding(.bottom, Metrics.s)
+        } else {
+            rows
+        }
+    }
+
+    private var rows: some View {
         VStack(spacing: 0) {
             if isMinimized {
                 minimizedRow
             } else {
-                // Held to the pane below a crease, the rows scroll rather than reach onto the fold.
-                CappedScroll(maxHeight: paneHeight.map { $0 - Metrics.s }) { expandedRows }
+                expandedRows
             }
         }
-        .floatingChrome()
-        .frame(maxWidth: columnWidth.map { $0 - Self.margin } ?? .infinity)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Self.margin)
-        .padding(.bottom, Metrics.s)
         .animation(.easeInOut(duration: 0.2), value: isMinimized)
     }
 
@@ -138,11 +140,7 @@ struct RiderPanel: View {
                     .lineLimit(1)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.accentColor.opacity(0.18), in: Capsule())
-            .foregroundStyle(Color.accentColor)
-            .contentShape(Capsule())
+            .chipSurface(isProminent: true)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(AppLocalization.text(english: "Add a saved place", simplified: "添加常用地点", traditional: "新增常用地點"))

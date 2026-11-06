@@ -44,7 +44,7 @@ struct TransferStationSheet: View {
             }
             .padding()
         }
-        .background(Color.appBackground)
+        .pageBackground()
         .navigationTitle(stationName)
         .navigationBarTitleDisplayMode(.inline)
         .task {

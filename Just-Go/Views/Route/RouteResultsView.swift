@@ -81,9 +81,9 @@ struct RouteResultsView: View {
         // The chips sort the list directly below them, so no stock gap between them.
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
-        .background(Color.appBackground)
+        .pageBackground()
         // Pinned: where the trip starts and ends is what the rider checks first and changes most.
-        .safeAreaInset(edge: .top, spacing: 0) {
+        .pinnedBar(.top, legacyBackground: .regularMaterial) {
             VStack(spacing: 0) {
                 endpointHeader
                 timingHeader
@@ -123,7 +123,6 @@ struct RouteResultsView: View {
         // material, so the band still spans the width.
         .safeAreaPadding(.horizontal)
         .readableColumn()
-        .background(.regularMaterial)
         .overlay(alignment: .bottom) {
             Divider()
         }
@@ -158,7 +157,6 @@ struct RouteResultsView: View {
         .padding(.bottom, Metrics.s)
         .safeAreaPadding(.horizontal)
         .readableColumn()
-        .background(.regularMaterial)
         .overlay(alignment: .bottom) { Divider() }
         .onChange(of: timingMode) { _, mode in
             // A stale time is worse than none: returning to "Depart at" later must not offer the

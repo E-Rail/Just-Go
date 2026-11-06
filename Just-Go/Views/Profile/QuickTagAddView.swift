@@ -8,6 +8,7 @@ struct QuickTagAddView: View {
     @Environment(DIContainer.self) private var container
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.hasVerticalBar) private var hasVerticalBar
 
     @State private var searchText = ""
     @State private var stationResults: [Station] = []
@@ -95,7 +96,7 @@ struct QuickTagAddView: View {
             }
             .searchable(
                 text: $searchText,
-                placement: .navigationBarDrawer(displayMode: .always),
+                placement: .searchPage(besideVerticalBar: hasVerticalBar),
                 prompt: AppLocalization.text(
                     english: "Station or place name",
                     simplified: "车站或地点名称",

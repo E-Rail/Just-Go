@@ -94,7 +94,11 @@ CITIES = {
       { from: "广安门内", to: "牛街", kind: "outOfStation", fare: "continuous" },
       { from: "太平桥", to: "复兴门", kind: "outOfStation", fare: "continuous" },
       { at: "大钟寺", kind: "outOfStation", fare: "continuous" },
-      { at: "木樨地", kind: "outOfStation", fare: "continuous" }
+      { at: "木樨地", kind: "outOfStation", fare: "continuous" },
+      # Metro station first, the mainline station above it second, which 城市副中心线 calls at.
+      # Two stations: the railway has its own gates and its own ticket, so no fare is declared.
+      { from: "北京站", to: "北京", kind: "outOfStation" },
+      { from: "北京西站", to: "北京西", kind: "outOfStation" }
     ],
     # Priced on their own tariff, not the metro's distance fare: ¥25 flat, and up to ¥35.
     premium_fare_lines: ["首都机场线", "大兴机场线"]
@@ -184,7 +188,14 @@ CITIES = {
   "3302" => { name: "Ningbo", bbox: [29.65, 121.30, 30.10, 121.85], networks: ["宁波市轨道交通", "宁波轨道交通", "宁波地铁"] },
   "3202" => { name: "Wuxi", bbox: [31.35, 120.10, 31.75, 120.60], networks: ["无锡地铁", "无锡轨道交通"] },
   "5301" => { name: "Kunming", bbox: [24.70, 102.50, 25.20, 102.95], networks: ["昆明地铁", "昆明轨道交通"] },
-  "3601" => { name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"] },
+  "3601" => {
+    name: "Nanchang", bbox: [28.50, 115.65, 28.90, 116.10], networks: ["南昌地铁", "南昌轨道交通"],
+    # 2号线东延 has carried riders to 南昌东站 since 2025-06-28, and OpenStreetMap still files its
+    # track as `inactive` and maps none of the stations between 辛家庵 and 南昌东站. Read as in
+    # service, so the terminus stays reachable; the stations between are missing until they are
+    # mapped, and 辛家庵 to 南昌东站 reads as one stop until then.
+    inactive_in_service: ["2"]
+  },
   "3501" => { name: "Fuzhou", bbox: [25.85, 119.10, 26.30, 119.55], networks: ["福州地铁", "福州轨道交通"] },
   "3502" => { name: "Xiamen", bbox: [24.40, 117.95, 24.80, 118.25], networks: ["厦门地铁", "厦门轨道交通"], allow_unknown: true },
   "3401" => { name: "Hefei", bbox: [31.60, 117.00, 32.05, 117.50], networks: ["合肥轨道交通", "合肥地铁"] },
@@ -286,8 +297,17 @@ def passenger_line_name(tags)
   # the reduction leaves a bare number. Every other mainland city in the catalog displays
   # "<n>号线"; rendering it here keeps the map legend consistent instead of showing a lone digit.
   return "#{reference}号线" if !reference.empty? && value == reference && reference.match?(/\A\d+\z/)
+  # Beijing's suburban relations each name one train ("S102：乔庄东 -> 良乡", ref S102), which
+  # reduces to a train number no rider knows the line by, and the up and the down train then read
+  # as two lines. The relation still says which line it runs on, in its `wikipedia` tag.
+  return wikipedia_line_name(tags) || value if !reference.empty? && value == reference
 
   value || (reference.empty? ? "Metro" : reference)
+end
+
+# The title of the Chinese Wikipedia article a relation is tagged with, as a line name.
+def wikipedia_line_name(tags)
+  LineNames.clean(tags["wikipedia"].to_s[/\Azh(?:-[a-z]+)?:(.+)\z/i, 1])
 end
 
 def line_name_tokens(value)
@@ -1333,6 +1353,36 @@ def service_terminal_key(relation)
   terminals.length == 2 ? terminals.join("|") : nil
 end
 
+# A member filed as `inactive`, `inactive_stop`, `inactive_platform` or `stop_inactive` is a part
+# of the route no train serves. 重庆 15号线's relation carries its unopened western end that way,
+# beside the stations that are open: the stops fail the role test by themselves, but the track
+# does not, and a stop node lying on a relation's track is a station of that line.
+#
+# An inactive stop on track that is in service stays a station: a stop node on a line's track is
+# one whatever role the relation files it under, so 红庙 still ships on 北京 14号线, which runs
+# through it without calling. The role is not reliable enough at that grain to drop a station on:
+# 太原 2号线's 化章西街 is filed inactive and has been open since 2025-05-25.
+#
+# The role can outlive the opening it waited for. An inactive way that two of the relation's own
+# served stops lie on is carrying trains between them, whatever its role says: 长沙 2号线's track
+# from 龙虎岭 to 长沙火车西站 is filed inactive under two stops that are not. One served stop is not
+# enough, since the way past a terminus touches it too. A city's `inactive_in_service` names the
+# lines, by `ref`, whose inactive members are otherwise checked to be carrying riders.
+def without_inactive_members(relation, ways = {})
+  members = relation.fetch("members", [])
+  inactive, active = members.partition { |member| member["role"].to_s.include?("inactive") }
+  stop_nodes = lambda do |list|
+    list.select { |member| member["type"] == "node" }.map { |member| member["ref"] }.to_set
+  end
+  served = stop_nodes.call(active)
+  unserved = stop_nodes.call(inactive)
+  dropped = inactive.reject do |member|
+    nodes = member["type"] == "way" ? Array(ways.dig(member["ref"], "nodes")) : []
+    nodes.count { |node| served.include?(node) } >= 2 && nodes.none? { |node| unserved.include?(node) }
+  end
+  relation.merge("members" => members - dropped)
+end
+
 def relation_track_ways(relation, ways)
   relation.fetch("members", [])
     .select { |member| member["type"] == "way" && !member["role"].to_s.match?(/platform|stop/) }
@@ -1697,7 +1747,10 @@ def build_network(city_id, city, source)
   ways = elements.select { |item| item["type"] == "way" }.to_h { |way| [way["id"], way] }
   station_nodes = physical_station_nodes(elements)
   pattern_station_nodes = physical_station_nodes(elements, include_unbuilt: true)
-  relations = elements.select { |item| item["type"] == "relation" && supported_route_relation?(item) }
+  in_service = city.fetch(:inactive_in_service, [])
+  relations = elements.select { |item| item["type"] == "relation" && supported_route_relation?(item) }.map do |relation|
+    in_service.include?(relation.dig("tags", "ref")) ? relation : without_inactive_members(relation, ways)
+  end
   unverified = city.fetch(:unverified_stations, [])
   unless unverified.empty?
     named = lambda do |element|
@@ -2145,6 +2198,25 @@ def self_test
   fail_with("terminus pair test failed") unless LineNames.clean("常州地铁2号线 五一路-青枫公园") == "常州地铁2号线"
   fail_with("bare-ref line name test failed") unless
     passenger_line_name("name" => "1 窦官 - 小孟工业园", "ref" => "1") == "1号线"
+  inactive_fixture = { "members" => [
+    { "type" => "way", "ref" => 1, "role" => "" }, { "type" => "way", "ref" => 2, "role" => "inactive" },
+    { "type" => "node", "ref" => 3, "role" => "stop" }, { "type" => "node", "ref" => 4, "role" => "inactive_stop" },
+    { "type" => "node", "ref" => 5, "role" => "stop_inactive" }, { "type" => "way", "ref" => 6, "role" => "inactive_platform" }
+  ] }
+  fail_with("inactive members must leave the relation") unless
+    without_inactive_members(inactive_fixture)["members"].map { |member| member["ref"] } == [1, 3]
+  inactive_ways = { 2 => { "nodes" => [3, 9, 7] }, 6 => { "nodes" => [7, 4] } }
+  served_fixture = { "members" => inactive_fixture["members"] + [{ "type" => "node", "ref" => 7, "role" => "stop" }] }
+  fail_with("an inactive way under two served stops must stay, and one touching an unserved stop must not") unless
+    without_inactive_members(served_fixture, inactive_ways)["members"].map { |member| member["ref"] } == [1, 2, 3, 7]
+  fail_with("a train-numbered relation must take its line's name") unless passenger_line_name(
+    "name" => "S601：通州西 -> 怀柔北", "ref" => "S601", "wikipedia" => "zh:北京市郊铁路通密线"
+  ) == "北京市郊铁路通密线"
+  fail_with("a train-numbered relation with no article keeps its number") unless
+    passenger_line_name("name" => "S601：通州西 -> 怀柔北", "ref" => "S601") == "S601"
+  fail_with("an article must not rename a line that has a name") unless passenger_line_name(
+    "name" => "市郊铁路通密线: 通州西->怀柔北", "ref" => "S6", "wikipedia" => "zh:北京市郊铁路通密线"
+  ) == "市郊铁路通密线"
   # An explicit `ref` always wins; the cases below all exercise the name fallback, which is what
   # keys line merging. Dropping a designation letter here fuses two different lines.
   fail_with("designation must survive ref inference") unless

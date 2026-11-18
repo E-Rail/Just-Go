@@ -8,8 +8,8 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 353,
-    "boundCount": 348,
+    "entranceCount": 354,
+    "boundCount": 349,
     "unmatchedCount": 5,
     "ambiguousCount": 0,
     "stationsWithEntrances": 110,
@@ -2460,6 +2460,13 @@
         "longitude": 117.23137,
         "ref": "C",
         "name": "南珠桥地铁站-C口"
+      },
+      {
+        "osmNodeID": "14374228020",
+        "latitude": 39.0623664,
+        "longitude": 117.2314503,
+        "ref": "D（建设中）",
+        "name": "南珠桥地铁站-D口"
       }
     ],
     "f67891a33ba8de3f": [

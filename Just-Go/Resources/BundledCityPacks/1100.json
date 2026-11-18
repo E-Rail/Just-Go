@@ -16,34 +16,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 451,
+    "networkStations": 452,
     "matchedStations": {
-      "covered": 451,
-      "total": 451
+      "covered": 452,
+      "total": 452
     },
     "accessibility": {
       "covered": 43,
-      "total": 451
+      "total": 452
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 451
+      "total": 452
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 451
+      "total": 452
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 451
+      "total": 452
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 451
+      "total": 452
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 451
+      "total": 452
     }
   },
   "stations": [
@@ -6947,7 +6947,7 @@
           "latitude": 39.934854,
           "longitude": 116.461278,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -7644,6 +7644,16 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14311386080",
+          "name": "Entrance C: South-East",
+          "kind": "exit",
+          "latitude": 39.883956,
+          "longitude": 116.461763,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-385074709",
           "name": "",
           "kind": "exit",
@@ -7675,7 +7685,7 @@
         },
         {
           "id": "osm-385074716",
-          "name": "",
+          "name": "D",
           "kind": "exit",
           "latitude": 39.883838,
           "longitude": 116.460856,
@@ -7987,6 +7997,41 @@
       ]
     },
     {
+      "stationID": "52ff631e2ff7db5e",
+      "stationName": "北京西",
+      "stationNameEn": "Beijing West",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
       "stationID": "535db968b56cbbb6",
       "stationName": "呼家楼",
       "stationNameEn": "Hujialou",
@@ -8170,6 +8215,16 @@
           "kind": "exit",
           "latitude": 39.876051,
           "longitude": 116.460696,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14317157201",
+          "name": "Entrance A, Panjiayuan",
+          "kind": "exit",
+          "latitude": 39.876716,
+          "longitude": 116.460512,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -11159,63 +11214,6 @@
       ]
     },
     {
-      "stationID": "774deafe80689bc3",
-      "stationName": "福寿岭",
-      "stationNameEn": "Fushouling",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing Subway station-information landing page",
-          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
-          "provider": "Beijing Subway"
-        },
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing MTR station-information landing page",
-          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
-          "provider": "Beijing MTR"
-        }
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
-      ],
-      "stationAccessPoints": [
-        {
-          "id": "osm-1296102348",
-          "name": "",
-          "kind": "exit",
-          "latitude": 39.939892,
-          "longitude": 116.171572,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-1300399156",
-          "name": "",
-          "kind": "exit",
-          "latitude": 39.939602,
-          "longitude": 116.170831,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        }
-      ]
-    },
-    {
       "stationID": "781a2df2a0bb0f19",
       "stationName": "苏州街",
       "stationNameEn": "Suzhoujie",
@@ -12267,16 +12265,6 @@
           "kind": "exit",
           "latitude": 40.021804,
           "longitude": 116.374018,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-9471058656",
-          "name": "C2",
-          "kind": "exit",
-          "latitude": 40.02174,
-          "longitude": 116.374783,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -14141,6 +14129,18 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14244804908",
+          "name": "Lanxinzhuang D",
+          "kind": "exit",
+          "latitude": 39.856277,
+          "longitude": 116.568994,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -14645,41 +14645,6 @@
           "stepFree": "unknown",
           "source": "specificEntrance"
         }
-      ]
-    },
-    {
-      "stationID": "9ad492923495ed2f",
-      "stationName": "张辛",
-      "stationNameEn": "Zhangxin",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing Subway station-information landing page",
-          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
-          "provider": "Beijing Subway"
-        },
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing MTR station-information landing page",
-          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
-          "provider": "Beijing MTR"
-        }
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
       ]
     },
     {
@@ -16167,6 +16132,41 @@
       ]
     },
     {
+      "stationID": "a62f33414cb44a6a",
+      "stationName": "北京",
+      "stationNameEn": "北京",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ]
+    },
+    {
       "stationID": "a65d570225267778",
       "stationName": "科怡路",
       "stationNameEn": "Keyilu",
@@ -16809,6 +16809,41 @@
           "stepFree": "unknown",
           "source": "specificEntrance"
         }
+      ]
+    },
+    {
+      "stationID": "aa009eec6dd9941a",
+      "stationName": "朱房北",
+      "stationNameEn": "朱房北",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
       ]
     },
     {
@@ -18312,8 +18347,8 @@
           "id": "osm-12428545250",
           "name": "蓝靛厂站B口",
           "kind": "exit",
-          "latitude": 39.95782,
-          "longitude": 116.285148,
+          "latitude": 39.957503,
+          "longitude": 116.285142,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -19390,7 +19425,7 @@
         },
         {
           "id": "osm-9379477296",
-          "name": "",
+          "name": "C",
           "kind": "exit",
           "latitude": 39.875252,
           "longitude": 116.477706,
@@ -19398,41 +19433,6 @@
           "stepFree": "unknown",
           "source": "specificEntrance"
         }
-      ]
-    },
-    {
-      "stationID": "be756e348f254c61",
-      "stationName": "顺义",
-      "stationNameEn": "Shunyi",
-      "aliases": [
-
-      ],
-      "accessibility": null,
-      "schedules": [
-
-      ],
-      "stationFacilities": [
-
-      ],
-      "externalResources": [
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing Subway station-information landing page",
-          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
-          "provider": "Beijing Subway"
-        },
-        {
-          "kind": "operatorInformation",
-          "title": "Official Beijing MTR station-information landing page",
-          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
-          "provider": "Beijing MTR"
-        }
-      ],
-      "licensedMedia": [
-
-      ],
-      "liveArrivalReferences": [
-
       ]
     },
     {
@@ -23222,6 +23222,18 @@
       ],
       "liveArrivalReferences": [
 
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14340480958",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 39.892589,
+          "longitude": 116.410111,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
       ]
     },
     {
@@ -23260,6 +23272,16 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14311386079",
+          "name": "Entrance H",
+          "kind": "exit",
+          "latitude": 39.892852,
+          "longitude": 116.462312,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-6780237716",
           "name": "A",
           "kind": "exit",
@@ -23289,6 +23311,41 @@
           "stepFree": "unknown",
           "source": "specificEntrance"
         }
+      ]
+    },
+    {
+      "stationID": "e0a06bccf51c5471",
+      "stationName": "顺义",
+      "stationNameEn": "Shunyi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing Subway station-information landing page",
+          "landingPageURL": "https://www.bjsubway.com/station/xltcx/",
+          "provider": "Beijing Subway"
+        },
+        {
+          "kind": "operatorInformation",
+          "title": "Official Beijing MTR station-information landing page",
+          "landingPageURL": "https://www.mtr.bj.cn/service/line/",
+          "provider": "Beijing MTR"
+        }
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
       ]
     },
     {

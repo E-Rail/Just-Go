@@ -1768,6 +1768,7 @@
         "longitude": 108.9466562,
         "ref": "A1",
         "name": "永宁门-A1口",
+        "nameEn": "Yongningmen - exit A1",
         "wheelchair": "no"
       },
       {
@@ -1776,6 +1777,7 @@
         "longitude": 108.9461233,
         "ref": "A2",
         "name": "永宁门-A2口",
+        "nameEn": "Yongningmen - exit A2",
         "wheelchair": "no"
       },
       {
@@ -1800,6 +1802,7 @@
         "longitude": 108.9472172,
         "ref": "D1",
         "name": "永宁门-D1口",
+        "nameEn": "Yongningmen - exit D1",
         "wheelchair": "no"
       },
       {
@@ -1808,6 +1811,7 @@
         "longitude": 108.9477528,
         "ref": "D2",
         "name": "永宁门-D2口",
+        "nameEn": "Yongningmen - exit D2",
         "wheelchair": "yes"
       }
     ],
@@ -1963,6 +1967,7 @@
         "longitude": 108.9382367,
         "ref": "A1",
         "name": "广济街-A1口",
+        "nameEn": "Guangji Street - exit A1",
         "wheelchair": "no"
       },
       {
@@ -1971,6 +1976,7 @@
         "longitude": 108.940679,
         "ref": "C",
         "name": "广济街-C口",
+        "nameEn": "Guangjijie - exit C",
         "wheelchair": "no"
       },
       {
@@ -1979,6 +1985,7 @@
         "longitude": 108.9405482,
         "ref": "D1",
         "name": "广济街-D1口",
+        "nameEn": "Guangjijie - exit D1",
         "wheelchair": "no"
       },
       {
@@ -1987,6 +1994,7 @@
         "longitude": 108.9396569,
         "ref": "D2",
         "name": "广济街-D2口",
+        "nameEn": "Guangjijie - exit D2",
         "wheelchair": "no"
       }
     ],
@@ -4955,6 +4963,7 @@
         "longitude": 108.9465252,
         "ref": "B",
         "name": "钟楼-B口",
+        "nameEn": "Zhonglou - exit B",
         "wheelchair": "no"
       },
       {
@@ -4963,6 +4972,7 @@
         "longitude": 108.9470054,
         "ref": "C",
         "name": "钟楼-C口",
+        "nameEn": "Zhonglou - exit C",
         "wheelchair": "limited"
       },
       {
@@ -4971,6 +4981,7 @@
         "longitude": 108.9473376,
         "ref": "D",
         "name": "钟楼-D口",
+        "nameEn": "Zhonglou - exit D",
         "wheelchair": "no"
       },
       {
@@ -4979,6 +4990,7 @@
         "longitude": 108.9478592,
         "ref": "E",
         "name": "钟楼-E口",
+        "nameEn": "Zhonglou - exit E",
         "wheelchair": "yes"
       },
       {
@@ -5010,6 +5022,7 @@
         "longitude": 108.9478577,
         "ref": "J",
         "name": "钟楼-J口",
+        "nameEn": "Zhonglou - exit J",
         "wheelchair": "yes"
       },
       {
@@ -7050,14 +7063,16 @@
         "latitude": 34.2145656,
         "longitude": 109.0609591,
         "ref": "A",
-        "name": "西安东站-A口"
+        "name": "西安东站-A口",
+        "nameEn": "Xi'an East Railway Station - exit A"
       },
       {
         "osmNodeID": "13983518590",
         "latitude": 34.2136714,
         "longitude": 109.0609455,
         "ref": "B",
-        "name": "西安东站-B口"
+        "name": "西安东站-B口",
+        "nameEn": "Xi'an East Railway Station - exit B"
       },
       {
         "osmNodeID": "13983518592",
@@ -7065,6 +7080,7 @@
         "longitude": 109.0623427,
         "ref": "C",
         "name": "西安东站-C口",
+        "nameEn": "Xi'an East Railway Station - exit C",
         "wheelchair": "yes"
       },
       {
@@ -7073,6 +7089,7 @@
         "longitude": 109.0623335,
         "ref": "D",
         "name": "西安东站-D口",
+        "nameEn": "Xi'an East Railway Station - exit D",
         "wheelchair": "yes"
       },
       {
@@ -7080,14 +7097,16 @@
         "latitude": 34.2133388,
         "longitude": 109.0625019,
         "ref": "E",
-        "name": "西安东站-E口"
+        "name": "西安东站-E口",
+        "nameEn": "Xi'an East Railway Station - exit E"
       },
       {
         "osmNodeID": "13983518594",
         "latitude": 34.2150463,
         "longitude": 109.0625349,
         "ref": "K",
-        "name": "西安东站-K口"
+        "name": "西安东站-K口",
+        "nameEn": "Xi'an East Railway Station - exit K"
       }
     ],
     "f0be6e6e925e61a7": [
@@ -7378,6 +7397,7 @@
         "longitude": 108.9461371,
         "ref": "A1",
         "name": "电视塔-A1口",
+        "nameEn": "Dianshita - exit A1",
         "wheelchair": "no"
       },
       {
@@ -7386,6 +7406,7 @@
         "longitude": 108.9457283,
         "ref": "A2",
         "name": "电视塔-A2口",
+        "nameEn": "Dianshita - exit A2",
         "wheelchair": "yes"
       },
       {
@@ -7394,6 +7415,7 @@
         "longitude": 108.9469309,
         "ref": "B",
         "name": "电视塔-B口",
+        "nameEn": "Dianshita - exit B",
         "wheelchair": "no"
       },
       {
@@ -7402,6 +7424,7 @@
         "longitude": 108.9484329,
         "ref": "C",
         "name": "电视塔-C口",
+        "nameEn": "Dianshita - exit C",
         "wheelchair": "no"
       },
       {
@@ -7410,6 +7433,7 @@
         "longitude": 108.9474079,
         "ref": "D",
         "name": "电视塔-D口",
+        "nameEn": "Dianshita - exit D",
         "wheelchair": "no"
       },
       {
@@ -7418,6 +7442,7 @@
         "longitude": 108.945418,
         "ref": "E1",
         "name": "电视塔-E1口",
+        "nameEn": "Dianshita - exit E1",
         "wheelchair": "yes"
       },
       {
@@ -7426,6 +7451,7 @@
         "longitude": 108.9452284,
         "ref": "E2",
         "name": "电视塔-E2口",
+        "nameEn": "Dianshita - exit E2",
         "wheelchair": "no"
       },
       {
@@ -7434,6 +7460,7 @@
         "longitude": 108.9461977,
         "ref": "F",
         "name": "电视塔-F口",
+        "nameEn": "Dianshita - exit F",
         "wheelchair": "yes"
       }
     ],

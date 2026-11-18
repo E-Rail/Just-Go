@@ -21,7 +21,7 @@
       "total": 270
     },
     "accessibility": {
-      "covered": 10,
+      "covered": 11,
       "total": 270
     },
     "staticSchedules": {
@@ -622,8 +622,8 @@
           "id": "osm-8940374889",
           "name": "D",
           "kind": "exit",
-          "latitude": 30.168502,
-          "longitude": 120.136153,
+          "latitude": 30.168444,
+          "longitude": 120.136223,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -662,8 +662,8 @@
           "id": "osm-9452281728",
           "name": "垂梯",
           "kind": "exit",
-          "latitude": 30.168676,
-          "longitude": 120.136411,
+          "latitude": 30.168641,
+          "longitude": 120.136424,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3995,7 +3995,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-13337606527",
-          "name": "电梯",
+          "name": "C2口电梯",
           "kind": "exit",
           "latitude": 30.307267,
           "longitude": 120.147434,
@@ -4007,18 +4007,18 @@
           "id": "osm-9312301507",
           "name": "B",
           "kind": "exit",
-          "latitude": 30.308685,
-          "longitude": 120.150034,
+          "latitude": 30.308418,
+          "longitude": 120.149589,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
           "id": "osm-9312301508",
           "name": "A",
           "kind": "exit",
-          "latitude": 30.30837,
-          "longitude": 120.150445,
+          "latitude": 30.30813,
+          "longitude": 120.150204,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4037,8 +4037,8 @@
           "id": "osm-9312301510",
           "name": "C1",
           "kind": "exit",
-          "latitude": 30.308187,
-          "longitude": 120.148121,
+          "latitude": 30.30812,
+          "longitude": 120.148131,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4047,8 +4047,8 @@
           "id": "osm-9312301511",
           "name": "C2",
           "kind": "exit",
-          "latitude": 30.306942,
-          "longitude": 120.147062,
+          "latitude": 30.307012,
+          "longitude": 120.147232,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4057,8 +4057,28 @@
           "id": "osm-9312301512",
           "name": "D2",
           "kind": "exit",
-          "latitude": 30.306607,
-          "longitude": 120.147526,
+          "latitude": 30.306502,
+          "longitude": 120.147508,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9428208695",
+          "name": "C1口电梯",
+          "kind": "exit",
+          "latitude": 30.307832,
+          "longitude": 120.148527,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9428208708",
+          "name": "D2口电梯",
+          "kind": "exit",
+          "latitude": 30.306603,
+          "longitude": 120.147772,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6013,8 +6033,8 @@
           "id": "osm-7255102170",
           "name": "D1",
           "kind": "exit",
-          "latitude": 30.259333,
-          "longitude": 119.992274,
+          "latitude": 30.259342,
+          "longitude": 119.992307,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6023,8 +6043,8 @@
           "id": "osm-7255102176",
           "name": "D2",
           "kind": "exit",
-          "latitude": 30.259744,
-          "longitude": 119.992944,
+          "latitude": 30.259765,
+          "longitude": 119.992933,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6063,8 +6083,8 @@
           "id": "osm-8976075432",
           "name": "C",
           "kind": "exit",
-          "latitude": 30.259859,
-          "longitude": 119.990876,
+          "latitude": 30.259924,
+          "longitude": 119.990899,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6195,8 +6215,8 @@
           "id": "osm-12291620770",
           "name": "C1",
           "kind": "exit",
-          "latitude": 30.353558,
-          "longitude": 120.128905,
+          "latitude": 30.353569,
+          "longitude": 120.128808,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6225,8 +6245,8 @@
           "id": "osm-9435814547",
           "name": "C2",
           "kind": "exit",
-          "latitude": 30.35355,
-          "longitude": 120.12711,
+          "latitude": 30.353557,
+          "longitude": 120.127046,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6235,15 +6255,15 @@
           "id": "osm-9435814548",
           "name": "C3",
           "kind": "exit",
-          "latitude": 30.35402,
-          "longitude": 120.126846,
+          "latitude": 30.354048,
+          "longitude": 120.126748,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
         },
         {
           "id": "osm-9435814550",
-          "name": "A2",
+          "name": "B",
           "kind": "exit",
           "latitude": 30.354317,
           "longitude": 120.128598,
@@ -6464,11 +6484,27 @@
     {
       "stationID": "4b07f7548931f0e2",
       "stationName": "桃花湖公园",
-      "stationNameEn": "Taohua Lake Park",
+      "stationNameEn": "Taohuahu Park",
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "B1口电梯"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -6506,11 +6542,21 @@
           "source": "specificEntrance"
         },
         {
+          "id": "osm-14283353159",
+          "name": "B1口电梯",
+          "kind": "exit",
+          "latitude": 30.351598,
+          "longitude": 120.220742,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-9312432348",
           "name": "B1",
           "kind": "exit",
-          "latitude": 30.351801,
-          "longitude": 120.220786,
+          "latitude": 30.351774,
+          "longitude": 120.220709,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6529,8 +6575,8 @@
           "id": "osm-9312432350",
           "name": "C",
           "kind": "exit",
-          "latitude": 30.350933,
-          "longitude": 120.220761,
+          "latitude": 30.350941,
+          "longitude": 120.220754,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6539,8 +6585,8 @@
           "id": "osm-9312432351",
           "name": "D",
           "kind": "exit",
-          "latitude": 30.351322,
-          "longitude": 120.222063,
+          "latitude": 30.351369,
+          "longitude": 120.222144,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6550,7 +6596,7 @@
     {
       "stationID": "4dadc5909d0c8820",
       "stationName": "昙花庵路",
-      "stationNameEn": "Tanhuaan Road",
+      "stationNameEn": "Tanhua'an Road",
       "aliases": [
 
       ],
@@ -10282,6 +10328,46 @@
 
       ],
       "stationAccessPoints": [
+        {
+          "id": "osm-9832063945",
+          "name": "垂梯",
+          "kind": "exit",
+          "latitude": 30.2707,
+          "longitude": 120.112241,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9832064041",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 30.270045,
+          "longitude": 120.112558,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9832064042",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 30.270453,
+          "longitude": 120.11185,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-9832064043",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 30.271112,
+          "longitude": 120.113169,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
         {
           "id": "osm-9832064044",
           "name": "",

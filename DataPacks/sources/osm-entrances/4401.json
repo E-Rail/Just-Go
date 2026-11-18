@@ -8,11 +8,11 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 2410,
-    "boundCount": 1265,
-    "unmatchedCount": 1143,
+    "entranceCount": 2435,
+    "boundCount": 1281,
+    "unmatchedCount": 1152,
     "ambiguousCount": 2,
-    "stationsWithEntrances": 333,
+    "stationsWithEntrances": 336,
     "networkStationCount": 434
   },
   "stations": {
@@ -774,15 +774,15 @@
       },
       {
         "osmNodeID": "12452785439",
-        "latitude": 23.0973546,
-        "longitude": 113.2376495,
+        "latitude": 23.0973805,
+        "longitude": 113.2376416,
         "ref": "D",
         "name": "芳村站D出入口"
       },
       {
         "osmNodeID": "12452785431",
-        "latitude": 23.0985812,
-        "longitude": 113.2365773,
+        "latitude": 23.098681,
+        "longitude": 113.2365834,
         "ref": "E",
         "name": "芳村站E出入口"
       },
@@ -1683,6 +1683,28 @@
         "longitude": 113.324143,
         "ref": "D",
         "name": "林和西站 D出入口"
+      }
+    ],
+    "2d528bc9e0e1a497": [
+      {
+        "osmNodeID": "14325308802",
+        "latitude": 22.8973176,
+        "longitude": 113.6504796
+      },
+      {
+        "osmNodeID": "14325308803",
+        "latitude": 22.8977478,
+        "longitude": 113.6505579
+      },
+      {
+        "osmNodeID": "14325308804",
+        "latitude": 22.8973289,
+        "longitude": 113.6528972
+      },
+      {
+        "osmNodeID": "14325308805",
+        "latitude": 22.8969155,
+        "longitude": 113.6528082
       }
     ],
     "2d5954974e768365": [
@@ -2909,8 +2931,8 @@
       },
       {
         "osmNodeID": "9671332205",
-        "latitude": 22.970596,
-        "longitude": 113.3379202,
+        "latitude": 22.9706762,
+        "longitude": 113.337901,
         "ref": "C",
         "wheelchair": "yes"
       }
@@ -3286,13 +3308,6 @@
         "name": "烈士陵园站 B2出入口(停用)"
       },
       {
-        "osmNodeID": "3022185266",
-        "latitude": 23.1260284,
-        "longitude": 113.286987,
-        "ref": "B3(停用)",
-        "name": "烈士陵园站 B3出入口(停用)"
-      },
-      {
         "osmNodeID": "4283676590",
         "latitude": 23.1266464,
         "longitude": 113.2865431,
@@ -3305,6 +3320,34 @@
         "longitude": 113.2848339,
         "ref": "D",
         "name": "烈士陵园站 D出入口"
+      },
+      {
+        "osmNodeID": "14225688082",
+        "latitude": 23.1256158,
+        "longitude": 113.2864865,
+        "ref": "E1(在建)",
+        "name": "烈士陵园站 E1出入口(在建)"
+      },
+      {
+        "osmNodeID": "3022185266",
+        "latitude": 23.1260284,
+        "longitude": 113.286987,
+        "ref": "E2(在建)",
+        "name": "烈士陵园站 E2出入口(在建)"
+      },
+      {
+        "osmNodeID": "14225688084",
+        "latitude": 23.1263532,
+        "longitude": 113.2876169,
+        "ref": "E3(待建)",
+        "name": "烈士陵园站 E3出入口(待建)"
+      },
+      {
+        "osmNodeID": "14320056718",
+        "latitude": 23.1248529,
+        "longitude": 113.2863475,
+        "ref": "F(在建)",
+        "name": "烈士陵园站 F出入口(在建)"
       }
     ],
     "5d2a50d2ae4d522c": [
@@ -3442,8 +3485,8 @@
       },
       {
         "osmNodeID": "4522475593",
-        "latitude": 23.1189496,
-        "longitude": 113.33166,
+        "latitude": 23.1189347,
+        "longitude": 113.3315942,
         "ref": "D",
         "name": "猎德站 D出入口",
         "wheelchair": "no"
@@ -3796,6 +3839,24 @@
         "name": "双岗站 C出入口"
       }
     ],
+    "710143c75bd0986e": [
+      {
+        "osmNodeID": "13724084175",
+        "latitude": 22.9886553,
+        "longitude": 113.2755137,
+        "ref": "B",
+        "name": "B出入口",
+        "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "13724084174",
+        "latitude": 22.9891296,
+        "longitude": 113.2762775,
+        "ref": "C",
+        "name": "C出入口",
+        "wheelchair": "yes"
+      }
+    ],
     "712180761a1742ce": [
       {
         "osmNodeID": "11518559279",
@@ -3993,12 +4054,14 @@
       {
         "osmNodeID": "10586725845",
         "latitude": 23.0020385,
-        "longitude": 113.3445467
+        "longitude": 113.3445467,
+        "name": "南村万博E2"
       },
       {
         "osmNodeID": "10586725846",
         "latitude": 23.0027444,
-        "longitude": 113.3434369
+        "longitude": 113.3434369,
+        "name": "南村万博E1"
       },
       {
         "osmNodeID": "10106587714",
@@ -4102,11 +4165,18 @@
         "name": "中医药大学站C出口"
       },
       {
+        "osmNodeID": "14335961326",
+        "latitude": 23.1582111,
+        "longitude": 113.2695038,
+        "ref": "D1",
+        "name": "中医药大学站D1出口"
+      },
+      {
         "osmNodeID": "12432820067",
         "latitude": 23.1582006,
         "longitude": 113.2703732,
-        "ref": "D",
-        "name": "中医药大学站D出口"
+        "ref": "D2",
+        "name": "中医药大学站D2出口"
       }
     ],
     "7780ed88b85c7839": [
@@ -4271,8 +4341,8 @@
       },
       {
         "osmNodeID": "2690915459",
-        "latitude": 23.0717828,
-        "longitude": 113.2944641,
+        "latitude": 23.0717729,
+        "longitude": 113.2944681,
         "ref": "B",
         "name": "东晓南站 B出入口"
       },
@@ -4668,6 +4738,15 @@
         "name": "萝岗站 F出入口"
       }
     ],
+    "8688e5c0bcd7182b": [
+      {
+        "osmNodeID": "14180840191",
+        "latitude": 22.9907259,
+        "longitude": 113.3285208,
+        "ref": "B",
+        "name": "广州长隆站B出入口"
+      }
+    ],
     "86d715f2ee7e3a49": [
       {
         "osmNodeID": "13570687562",
@@ -4699,8 +4778,8 @@
     "871883100b209bc8": [
       {
         "osmNodeID": "4809874711",
-        "latitude": 23.0435777,
-        "longitude": 113.299122,
+        "latitude": 23.0435736,
+        "longitude": 113.2991205,
         "ref": "A",
         "name": "洛溪站 A出入口",
         "wheelchair": "no"
@@ -4739,7 +4818,7 @@
       {
         "osmNodeID": "7028035486",
         "latitude": 23.0639244,
-        "longitude": 113.2980835,
+        "longitude": 113.2980848,
         "ref": "C2",
         "name": "南洲站 C2出入口"
       },
@@ -5503,8 +5582,8 @@
     "970d6f075d96ec30": [
       {
         "osmNodeID": "12432890175",
-        "latitude": 23.1399196,
-        "longitude": 113.256545,
+        "latitude": 23.1399367,
+        "longitude": 113.2564868,
         "ref": "B",
         "name": "流花站B出口"
       },
@@ -5668,6 +5747,18 @@
         "ref": "B",
         "name": "淘金站 B出入口",
         "wheelchair": "yes"
+      },
+      {
+        "osmNodeID": "14322574960",
+        "latitude": 23.1338817,
+        "longitude": 113.2857245,
+        "ref": "H"
+      },
+      {
+        "osmNodeID": "14322574955",
+        "latitude": 23.1364438,
+        "longitude": 113.2854085,
+        "ref": "J"
       }
     ],
     "9ba0e298e2b46dba": [
@@ -6141,15 +6232,15 @@
     "ac961ac166e47ef8": [
       {
         "osmNodeID": "13403171830",
-        "latitude": 23.1018701,
-        "longitude": 113.3239855,
+        "latitude": 23.1018698,
+        "longitude": 113.3239873,
         "ref": "A",
         "name": "赤岗塔站 A出入口"
       },
       {
         "osmNodeID": "13661357608",
-        "latitude": 23.1017198,
-        "longitude": 113.3249461,
+        "latitude": 23.1017235,
+        "longitude": 113.3249307,
         "ref": "B",
         "name": "赤岗塔站 B出入口"
       }
@@ -7139,7 +7230,7 @@
     "c79d9dd67c79dd72": [
       {
         "osmNodeID": "13860028501",
-        "latitude": 22.9351165,
+        "latitude": 22.9351573,
         "longitude": 113.3845647,
         "ref": "A"
       },
@@ -7436,6 +7527,12 @@
         "longitude": 113.2629036,
         "ref": "D2",
         "name": "纪念堂站 D2出入口"
+      },
+      {
+        "osmNodeID": "14322652663",
+        "latitude": 23.1323436,
+        "longitude": 113.2631493,
+        "ref": "I"
       }
     ],
     "cfa9daead90fd107": [
@@ -7704,8 +7801,8 @@
       },
       {
         "osmNodeID": "4809858121",
-        "latitude": 22.8860136,
-        "longitude": 113.4786685,
+        "latitude": 22.8860076,
+        "longitude": 113.4786709,
         "ref": "B",
         "name": "东涌站 B出入口"
       },
@@ -7867,8 +7964,8 @@
       },
       {
         "osmNodeID": "13176650631",
-        "latitude": 23.2122238,
-        "longitude": 113.265769,
+        "latitude": 23.2122357,
+        "longitude": 113.2657653,
         "ref": "E"
       }
     ],
@@ -8589,6 +8686,20 @@
         "longitude": 113.5567688,
         "ref": "B",
         "name": "万顷沙站 B出入口"
+      },
+      {
+        "osmNodeID": "14331804987",
+        "latitude": 22.698322,
+        "longitude": 113.5563938,
+        "ref": "C",
+        "name": "万顷沙站 C出入口"
+      },
+      {
+        "osmNodeID": "14331804988",
+        "latitude": 22.697711,
+        "longitude": 113.5569802,
+        "ref": "D",
+        "name": "万顷沙站 D出入口"
       }
     ],
     "ec713ea9f059bf6d": [

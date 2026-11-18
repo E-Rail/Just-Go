@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 288,
+    "networkStations": 300,
     "matchedStations": {
       "covered": 87,
-      "total": 288
+      "total": 300
     },
     "accessibility": {
       "covered": 3,
-      "total": 288
+      "total": 300
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 288
+      "total": 300
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 288
+      "total": 300
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 288
+      "total": 300
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 288
+      "total": 300
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 288
+      "total": 300
     }
   },
   "stations": [
@@ -4012,8 +4012,8 @@
           "id": "osm-9702282474",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.558799,
-          "longitude": 106.54264,
+          "latitude": 29.558782,
+          "longitude": 106.542619,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4792,8 +4792,8 @@
           "id": "osm-9459669833",
           "name": "4",
           "kind": "exit",
-          "latitude": 29.550398,
-          "longitude": 106.504871,
+          "latitude": 29.550577,
+          "longitude": 106.504623,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4802,7 +4802,7 @@
           "id": "osm-9459669834",
           "name": "1",
           "kind": "exit",
-          "latitude": 29.551439,
+          "latitude": 29.551126,
           "longitude": 106.505333,
           "isAccessible": false,
           "stepFree": "unknown",
@@ -5355,8 +5355,8 @@
           "id": "osm-9702282491",
           "name": "2B",
           "kind": "exit",
-          "latitude": 29.552672,
-          "longitude": 106.549456,
+          "latitude": 29.552678,
+          "longitude": 106.549444,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5365,8 +5365,8 @@
           "id": "osm-9702282492",
           "name": "3",
           "kind": "exit",
-          "latitude": 29.552435,
-          "longitude": 106.549247,
+          "latitude": 29.552411,
+          "longitude": 106.549222,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5375,8 +5375,8 @@
           "id": "osm-9702282493",
           "name": "4",
           "kind": "exit",
-          "latitude": 29.552493,
-          "longitude": 106.54902,
+          "latitude": 29.552469,
+          "longitude": 106.549025,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

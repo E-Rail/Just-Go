@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 267,
+    "networkStations": 281,
     "matchedStations": {
-      "covered": 128,
-      "total": 267
+      "covered": 133,
+      "total": 281
     },
     "accessibility": {
       "covered": 11,
-      "total": 267
+      "total": 281
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 267
+      "total": 281
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 267
+      "total": 281
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 267
+      "total": 281
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 267
+      "total": 281
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 267
+      "total": 281
     }
   },
   "stations": [
@@ -627,7 +627,7 @@
     {
       "stationID": "105a71c181767b21",
       "stationName": "明故宫",
-      "stationNameEn": "明故宫",
+      "stationNameEn": "Minggugong",
       "aliases": [
 
       ],
@@ -851,7 +851,7 @@
     {
       "stationID": "160e05a9b6b20b74",
       "stationName": "岗子村",
-      "stationNameEn": "岗子村",
+      "stationNameEn": "Gangzicun",
       "aliases": [
 
       ],
@@ -2275,6 +2275,72 @@
       ]
     },
     {
+      "stationID": "47225ccbd47eb35d",
+      "stationName": "兴学路",
+      "stationNameEn": "Xingxuelu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14237795840",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.137255,
+          "longitude": 118.861042,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795841",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.137684,
+          "longitude": 118.860902,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795842",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.13777,
+          "longitude": 118.862488,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795843",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.137003,
+          "longitude": 118.862107,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "49db7d85b75709f3",
       "stationName": "葛塘",
       "stationNameEn": "Getang",
@@ -2574,6 +2640,62 @@
           "kind": "exit",
           "latitude": 31.959504,
           "longitude": 118.733463,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "5401a0b152bc469d",
+      "stationName": "科宁路",
+      "stationNameEn": "Keninglu",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-13720096297",
+          "name": "科宁路地铁站3号口",
+          "kind": "exit",
+          "latitude": 31.923639,
+          "longitude": 118.849345,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13720096298",
+          "name": "科宁路地铁站1号口",
+          "kind": "exit",
+          "latitude": 31.923743,
+          "longitude": 118.849865,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-13720096299",
+          "name": "科宁路地铁站2号口",
+          "kind": "exit",
+          "latitude": 31.924553,
+          "longitude": 118.849457,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3520,6 +3642,72 @@
           "kind": "exit",
           "latitude": 32.077512,
           "longitude": 118.830635,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "73592c1ec68373ba",
+      "stationName": "兴智街",
+      "stationNameEn": "Xingzhijie",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14237795849",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.138616,
+          "longitude": 118.875983,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795850",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.138156,
+          "longitude": 118.876093,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795851",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.137967,
+          "longitude": 118.877506,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14237795852",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.138762,
+          "longitude": 118.877877,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6304,6 +6492,42 @@
       ]
     },
     {
+      "stationID": "c796151885062c33",
+      "stationName": "燕江新城",
+      "stationNameEn": "Yanjiangxincheng",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14237795839",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.133812,
+          "longitude": 118.847734,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "c8cf0318200931b6",
       "stationName": "绿博园",
       "stationNameEn": "绿博园",
@@ -7539,6 +7763,42 @@
           "kind": "exit",
           "latitude": 32.030004,
           "longitude": 118.783902,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "f5abd8aaa8868316",
+      "stationName": "栖霞山",
+      "stationNameEn": "Qixiashan",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14205793487",
+          "name": "",
+          "kind": "exit",
+          "latitude": 32.146886,
+          "longitude": 118.950282,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

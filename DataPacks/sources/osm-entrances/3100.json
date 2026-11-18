@@ -8,11 +8,11 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 1509,
-    "boundCount": 1435,
+    "entranceCount": 1516,
+    "boundCount": 1442,
     "unmatchedCount": 72,
     "ambiguousCount": 2,
-    "stationsWithEntrances": 369,
+    "stationsWithEntrances": 371,
     "networkStationCount": 471
   },
   "stations": {
@@ -858,51 +858,59 @@
     "19ad07a00eb97bf8": [
       {
         "osmNodeID": "3116487429",
-        "latitude": 31.3321089,
-        "longitude": 121.2268592,
-        "ref": "1"
+        "latitude": 31.3321647,
+        "longitude": 121.2268278,
+        "ref": "1",
+        "wheelchair": "no"
       },
       {
         "osmNodeID": "3116487529",
-        "latitude": 31.3320064,
-        "longitude": 121.2268807,
-        "ref": "2"
+        "latitude": 31.3320295,
+        "longitude": 121.2268777,
+        "ref": "2",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "3116487030",
-        "latitude": 31.3316598,
-        "longitude": 121.2268338,
-        "ref": "3"
+        "latitude": 31.3316333,
+        "longitude": 121.2268411,
+        "ref": "3",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "3116487629",
-        "latitude": 31.3315298,
-        "longitude": 121.2267596,
-        "ref": "4"
+        "latitude": 31.3315084,
+        "longitude": 121.226761,
+        "ref": "4",
+        "wheelchair": "no"
       },
       {
         "osmNodeID": "3116487430",
-        "latitude": 31.3316162,
-        "longitude": 121.225403,
-        "ref": "5"
+        "latitude": 31.3316116,
+        "longitude": 121.2253747,
+        "ref": "5",
+        "wheelchair": "no"
       },
       {
         "osmNodeID": "3116487729",
-        "latitude": 31.3317808,
-        "longitude": 121.225329,
-        "ref": "6"
+        "latitude": 31.3317478,
+        "longitude": 121.2253247,
+        "ref": "6",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "3116487829",
-        "latitude": 31.3321611,
-        "longitude": 121.2253696,
-        "ref": "7"
+        "latitude": 31.3321436,
+        "longitude": 121.2253633,
+        "ref": "7",
+        "wheelchair": "yes"
       },
       {
         "osmNodeID": "3116488029",
-        "latitude": 31.332288,
-        "longitude": 121.2254474,
-        "ref": "8"
+        "latitude": 31.3322702,
+        "longitude": 121.2254402,
+        "ref": "8",
+        "wheelchair": "no"
       }
     ],
     "19c3bd48591f7032": [
@@ -2425,6 +2433,26 @@
         "ref": "4"
       }
     ],
+    "3f50bbe16aede6cc": [
+      {
+        "osmNodeID": "14285773318",
+        "latitude": 31.2511139,
+        "longitude": 121.5513294,
+        "ref": "1"
+      },
+      {
+        "osmNodeID": "14285773319",
+        "latitude": 31.2504605,
+        "longitude": 121.5524502,
+        "ref": "2"
+      },
+      {
+        "osmNodeID": "14285773320",
+        "latitude": 31.2504101,
+        "longitude": 121.5510253,
+        "ref": "4"
+      }
+    ],
     "403898988260423e": [
       {
         "osmNodeID": "3080500134",
@@ -2952,6 +2980,32 @@
         "longitude": 121.500115,
         "ref": "2",
         "wheelchair": "yes"
+      }
+    ],
+    "547a552dd1237d27": [
+      {
+        "osmNodeID": "14282943052",
+        "latitude": 31.255433,
+        "longitude": 121.3734375,
+        "ref": "1"
+      },
+      {
+        "osmNodeID": "14282943054",
+        "latitude": 31.2549593,
+        "longitude": 121.3730211,
+        "ref": "2"
+      },
+      {
+        "osmNodeID": "14282943055",
+        "latitude": 31.2553316,
+        "longitude": 121.3702995,
+        "ref": "4"
+      },
+      {
+        "osmNodeID": "14282943053",
+        "latitude": 31.2556494,
+        "longitude": 121.3715441,
+        "ref": "6"
       }
     ],
     "54dae2d80abf98b4": [
@@ -7734,9 +7788,9 @@
         "ref": "5"
       },
       {
-        "osmNodeID": "8714576163",
-        "latitude": 31.2126701,
-        "longitude": 121.3997752,
+        "osmNodeID": "6586071858",
+        "latitude": 31.2132602,
+        "longitude": 121.4001611,
         "ref": "6"
       }
     ],

@@ -13,7 +13,7 @@
     "unmatchedCount": 5,
     "ambiguousCount": 1,
     "stationsWithEntrances": 87,
-    "networkStationCount": 288
+    "networkStationCount": 300
   },
   "stations": {
     "012c7e6af502c995": [
@@ -1458,8 +1458,8 @@
     "bb591e5b18f7f085": [
       {
         "osmNodeID": "9702282474",
-        "latitude": 29.5587992,
-        "longitude": 106.5426395,
+        "latitude": 29.5587818,
+        "longitude": 106.5426187,
         "ref": "1"
       },
       {
@@ -1792,7 +1792,7 @@
     "dc01586a9b423559": [
       {
         "osmNodeID": "9459669834",
-        "latitude": 29.5514389,
+        "latitude": 29.5511264,
         "longitude": 106.5053327,
         "ref": "1"
       },
@@ -1804,8 +1804,8 @@
       },
       {
         "osmNodeID": "9459669833",
-        "latitude": 29.5503975,
-        "longitude": 106.504871,
+        "latitude": 29.5505768,
+        "longitude": 106.5046226,
         "ref": "4"
       }
     ],
@@ -1994,20 +1994,20 @@
       },
       {
         "osmNodeID": "9702282491",
-        "latitude": 29.5526715,
-        "longitude": 106.5494562,
+        "latitude": 29.5526775,
+        "longitude": 106.5494439,
         "ref": "2B"
       },
       {
         "osmNodeID": "9702282492",
-        "latitude": 29.5524348,
-        "longitude": 106.5492473,
+        "latitude": 29.5524111,
+        "longitude": 106.549222,
         "ref": "3"
       },
       {
         "osmNodeID": "9702282493",
-        "latitude": 29.5524927,
-        "longitude": 106.5490198,
+        "latitude": 29.5524692,
+        "longitude": 106.5490252,
         "ref": "4"
       },
       {

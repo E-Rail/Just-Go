@@ -29,14 +29,14 @@ struct SearchPageView: View {
     @State private var isSearchingPlaces = false
     @State private var currentPlaceTask: Task<Void, Never>?
     @State private var isResolvingCurrentPlace = false
-    @Environment(\.hasVerticalBar) private var hasVerticalBar
     @FocusState private var isSearchFocused: Bool
-    /// Active from the start: the rider tapped a search field to get here. Presented rather than
-    /// focused, because a focus set while the page is still zooming in is dropped.
-    @State private var isSearchActive = true
+    /// The field is focused once, as the page opens; coming back to the page from one it opened
+    /// leaves the keyboard down over the results being read.
+    @State private var hasFocusedOnArrival = false
 
     var body: some View {
         VStack(spacing: 0) {
+            searchField
             // Shown whether or not tags are saved: the current-location chip is the only way in
             // the app to say "here".
             if isIdle {
@@ -47,22 +47,13 @@ struct SearchPageView: View {
         }
         .navigationTitle(title ?? AppLocalization.localized("Search"))
         .navigationBarTitleDisplayMode(.inline)
-        // The system's own field, under the bar and always showing: the rider came here to type.
-        // Beside a vertical bar, docked where the system puts it (see `searchPage`).
-        .searchable(
-            text: searchText,
-            isPresented: $isSearchActive,
-            placement: .searchPage(besideVerticalBar: hasVerticalBar),
-            prompt: Text(AppLocalization.text(
-                english: "Search places or stations",
-                simplified: "搜索地点或车站",
-                traditional: "搜尋地點或車站"
-            ))
-        )
-        .searchFocused($isSearchFocused)
-        .onSubmit(of: .search) { searchOnline() }
         .pageBackground()
         .animation(.default, value: isIdle)
+        .onAppear {
+            guard !hasFocusedOnArrival else { return }
+            hasFocusedOnArrival = true
+            isSearchFocused = true
+        }
         .onDisappear {
             recentReplayTask?.cancel()
             placeSearchTask?.cancel()
@@ -100,6 +91,57 @@ struct SearchPageView: View {
         .onChange(of: container.locationService.mapSpaceLocation?.coordinate.latitude) { _, _ in
             viewModel?.riderPositionChanged()
         }
+    }
+
+    /// The page's own field, focused as the page opens: the rider came here to type. Not the system's
+    /// search bar (`searchable`): it cannot take focus until the panel has finished presenting, and
+    /// then animates into the navigation bar before it does, which holds the keyboard 1.7-2 s behind
+    /// the tap (measured on iOS 27.2). A field of the page's own takes focus while the panel is
+    /// still opening, and the keyboard rises with it. The same glass capsule as the map's search
+    /// pill, which the phone's panel opens from.
+    private var searchField: some View {
+        let prompt = AppLocalization.text(
+            english: "Search places or stations",
+            simplified: "搜索地点或车站",
+            traditional: "搜尋地點或車站"
+        )
+        return HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+                .frame(width: 20)
+                .accessibilityHidden(true)
+            TextField(text: searchText, prompt: Text(prompt)) {
+                Text(prompt)
+            }
+            .focused($isSearchFocused)
+            .submitLabel(.search)
+            // The one act on this page that spends a place search.
+            .onSubmit { searchOnline() }
+            .accessibilityAddTraits(.isSearchField)
+            if !isIdle {
+                Button {
+                    searchText.wrappedValue = ""
+                    isSearchFocused = true
+                } label: {
+                    // The target reaches out over the capsule's padding to its edges, and is taken
+                    // back out of the layout so the field keeps its height when the button appears.
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                        .padding(Metrics.m)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(-Metrics.m)
+                .accessibilityLabel(AppLocalization.text(english: "Clear", simplified: "清除", traditional: "清除"))
+            }
+        }
+        .padding(Metrics.m)
+        // The whole capsule is the field, not only its line of text.
+        .contentShape(Capsule())
+        .onTapGesture { isSearchFocused = true }
+        .floatingChrome(in: Capsule(), isInteractive: false)
+        .padding(.horizontal, Metrics.l)
+        .padding(.vertical, 6)
     }
 
     /// Lines are matched in memory against the station list the app holds, with a short debounce so
@@ -327,7 +369,7 @@ struct SearchPageView: View {
             get: { viewModel?.searchText ?? "" },
             set: { newValue in
                 guard newValue != (viewModel?.searchText ?? "") else { return }
-                // The field's own clear button, and Cancel, both arrive as an empty string.
+                // The field's clear button arrives as an empty string.
                 guard !newValue.isEmpty else {
                     clearSearch()
                     return

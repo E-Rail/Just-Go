@@ -26,10 +26,11 @@ struct TripsView: View {
     var body: some View {
         NavigationStack {
             List {
+                // What plans a trip in one tap first; the tally of past trips last.
                 Group {
-                    statisticsSection
                     savedPlacesSection
                     historySection
+                    statisticsSection
                 }
                 .listRowBackground(Color.clear)
             }
@@ -132,8 +133,26 @@ struct TripsView: View {
     private var historySection: some View {
         Section {
             if tripMemoryService.tripRecords.isEmpty {
-                Text(AppLocalization.localized("No trip history yet"))
-                    .foregroundStyle(.secondary)
+                // Apple's own empty state, with the one thing that fills this list.
+                ContentUnavailableView {
+                    Label(
+                        AppLocalization.text(english: "No Trips Yet", simplified: "还没有行程", traditional: "還沒有行程"),
+                        systemImage: "clock.arrow.circlepath"
+                    )
+                } description: {
+                    Text(AppLocalization.text(
+                        english: "Trips you plan appear here, to plan again in one tap.",
+                        simplified: "规划过的行程会出现在这里，点一下即可再次规划。",
+                        traditional: "規劃過的行程會出現在這裡，點一下即可再次規劃。"
+                    ))
+                } actions: {
+                    Button(AppLocalization.text(english: "Plan a Trip", simplified: "规划行程", traditional: "規劃行程")) {
+                        appState.pendingSearchOpen = true
+                        appState.selectedTab = .map
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .listRowSeparator(.hidden)
             } else {
                 ForEach(tripMemoryService.tripRecords) { record in
                     tripRow(record)
@@ -150,7 +169,10 @@ struct TripsView: View {
         } header: {
             Text(AppLocalization.localized("Trip History"))
         } footer: {
-            Text(AppLocalization.localized("Saved locally on this device."))
+            // Said of trips that exist; under the empty state it reads as a stray row.
+            if !tripMemoryService.tripRecords.isEmpty {
+                Text(AppLocalization.localized("Saved locally on this device."))
+            }
         }
     }
 

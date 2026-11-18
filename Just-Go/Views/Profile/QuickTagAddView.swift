@@ -87,7 +87,7 @@ struct QuickTagAddView: View {
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background(Color.appBackground)
-            .navigationTitle(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"))
+            .navigationTitle(AppLocalization.text(english: "Add Place", simplified: "添加地点", traditional: "新增地點"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -163,7 +163,7 @@ struct QuickTagAddView: View {
                     }
                 }
                 Spacer()
-                Image(systemName: isTagged ? "tag.fill" : "tag")
+                Image(systemName: isTagged ? "bookmark.fill" : "bookmark")
                     .foregroundStyle(isTagged ? Color.accentColor : Color.secondary)
             }
         }

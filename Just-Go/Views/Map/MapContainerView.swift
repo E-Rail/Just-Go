@@ -231,15 +231,31 @@ struct MapContainerView: View {
                 appState.pendingTripReplay = nil
                 replay(record)
             }
+            // New networks from a data update, or the bundled ones back after Clear Cache.
+            .onChange(of: container.cityDataUpdater?.revision) {
+                viewModel?.cityDataChanged()
+            }
+            .onChange(of: appState.pendingSearchOpen, initial: true) { _, pending in
+                guard pending else { return }
+                appState.pendingSearchOpen = false
+                if path.last != .search { show(.search) }
+            }
             .onChange(of: appState.pendingTripOpen, initial: true) { _, pending in
                 guard pending else { return }
                 appState.pendingTripOpen = false
                 openTrip()
             }
-            // Accessibility Settings reach the planner here: seeded on appear and re-seeded on
-            // change, so results planned under an old preference are dropped.
+            // Route preferences reach the planner here: seeded on appear and re-seeded on change.
+            // A plan on screen is planned again under the new ones, back on its results, since a
+            // route page shows a route the old rules chose. Under a trip being guided the pages
+            // stay: the trip keeps its route, and the next plan follows the new rules.
             .task(id: appState.accessibilityPreference) {
-                if planner.syncAccessibilityPreference(appState.accessibilityPreference) {
+                guard planner.syncAccessibilityPreference(appState.accessibilityPreference) else { return }
+                if path.contains(.guidance) { return }
+                if let results = path.firstIndex(of: .results) {
+                    path = Array(path.prefix(through: results))
+                    replan()
+                } else {
                     path.removeAll()
                 }
             }
@@ -947,7 +963,7 @@ struct MapContainerView: View {
         return Button {
             showPlaceTagDialog = true
         } label: {
-            Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
+            Image(systemName: currentQuickTag == nil ? "bookmark" : "bookmark.fill")
                 .font(.subheadline)
                 .fontWeight(.medium)
                 .padding(.vertical, 10)
@@ -961,8 +977,8 @@ struct MapContainerView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(currentQuickTag == nil
-            ? AppLocalization.localized("Add Quick Tag")
-            : AppLocalization.localized("Edit Quick Tag")
+            ? AppLocalization.text(english: "Save Place", simplified: "保存地点", traditional: "儲存地點")
+            : AppLocalization.text(english: "Edit Saved Place", simplified: "编辑常用地点", traditional: "編輯常用地點")
         )
     }
 

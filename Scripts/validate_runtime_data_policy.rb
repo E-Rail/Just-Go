@@ -122,8 +122,8 @@ expected_web_literals = Set.new([
   # it returns may be persisted or committed — the check below enforces that no response payload
   # ever lands in the repo.
   ["Just-Go/Services/Map/BaiduMapsClient.swift", "https://api.map.baidu.com"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
-  ["Just-Go/Views/Profile/ProfileView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
+  ["Just-Go/Views/Profile/SettingsView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
+  ["Just-Go/Views/Profile/SettingsView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],
@@ -181,7 +181,6 @@ end
   allowedExternalLandingPages
   validatesStation
   stationAccessPoints
-  loadGenerationMatches
   pruneSupersededVersions
 ].each do |marker|
   errors << "city-pack runtime policy is missing #{marker}" unless policy_source.include?(marker)
@@ -352,12 +351,39 @@ required_official_resource_callers.each do |relative_path|
     source.include?("OfficialTransitResourceButton(")
 end
 
-download_callers = swift_sources.each_with_object([]) do |(absolute_path, source), callers|
+# City data reaches the device one way: `syncCityData`, the pack service's only remote fetch,
+# called by the updater and nothing else. The updater runs it when the rider asks, or
+# automatically while the rider leaves "Update Automatically" on, at most every six hours, never
+# on a Low Data Mode network and never during a trip.
+sync_callers = swift_sources.each_with_object([]) do |(absolute_path, source), callers|
   relative_path = absolute_path.delete_prefix("#{ROOT}/")
-  callers << relative_path if source.include?("downloadCityPack(") && absolute_path != policy_path
+  callers << relative_path if source.include?("syncCityData(") && absolute_path != policy_path
 end
-unless download_callers == ["Just-Go/Views/Profile/TransitDataView.swift"]
-  errors << "remote city-pack downloads must only be initiated from TransitDataView: #{download_callers.join(", ")}"
+updater_path = "Just-Go/Services/Data/CityDataUpdates.swift"
+unless sync_callers == [updater_path]
+  errors << "city data downloads must only be initiated by #{updater_path}: #{sync_callers.join(", ")}"
+end
+updater_source = read.call(updater_path)
+[
+  "guard updatesAutomatically, activity == .idle, !isTripUnderWay()",
+  "static let automaticInterval: TimeInterval = 6 * 60 * 60"
+].each do |marker|
+  errors << "automatic city data updates lost a guard: #{marker}" unless updater_source.include?(marker)
+end
+[
+  "request.allowsConstrainedNetworkAccess = allowsConstrainedNetwork",
+  "loadRemoteManifest(allowsConstrainedNetwork: !automatic)",
+  # A pack is checked against the network it will be used with, before either is installed, and a
+  # pack that will not store takes its network back with it.
+  "Self.validatesCanonicalMembership(decoded, in: target)",
+  "InstalledCityNetworks.restore(previousNetwork, for: cityID)"
+].each do |marker|
+  errors << "city data sync lost a safeguard: #{marker}" unless policy_source.include?(marker)
+end
+# A downloaded network is hashed against the manifest and checked for structure before use.
+%w[entry.validates(data) validatesAsUpdate(for:].each do |marker|
+  errors << "downloaded networks must be validated (#{marker})" unless
+    policy_source.include?(marker) || updater_source.include?(marker)
 end
 
 errors << "runtime network image loading is forbidden" if swift_sources.values.any? { |source| source.include?("AsyncImage") }
@@ -481,12 +507,12 @@ errors << "data-rights epoch cleanup must sweep the station-information cache" u
 end
 
 # Clear Cache must stay wired end to end: the pack service exposes the full-clear API and
-# Settings actually calls it (through DIContainer.clearAllCaches).
+# Transit Data (Settings → Data) actually calls it (through DIContainer.clearAllCaches).
 errors << "city-pack service must expose clearAllCaches" unless
   policy_source.include?("func clearAllCaches")
-settings_source = read.call("Just-Go/Views/Profile/SettingsView.swift")
-errors << "Settings must expose the Clear Cache action" unless
-  settings_source.include?("clearAllCaches")
+transit_data_source = read.call("Just-Go/Views/Profile/TransitDataView.swift")
+errors << "Transit Data must expose the Clear Cache action" unless
+  transit_data_source.include?("clearAllCaches")
 
 station_detail_model = read.call("Just-Go/ViewModels/Map/StationDetailViewModel.swift")
 errors << "Hong Kong station information must preserve verified unavailable facilities" unless
@@ -542,4 +568,4 @@ unless errors.empty?
   exit 1
 end
 
-puts "runtime-data-policy validation ok: configured_origins=#{expected_settings.count { |_, value| !value.empty? }} runtime_web_links=#{actual_web_literals.length} remote_pack_callers=1 official_viewer=ephemeral beijing_native=cached_device_only quick_tags=unlimited_custom"
+puts "runtime-data-policy validation ok: configured_origins=#{expected_settings.count { |_, value| !value.empty? }} runtime_web_links=#{actual_web_literals.length} city_data_sync_callers=#{sync_callers.length} official_viewer=ephemeral beijing_native=cached_device_only quick_tags=unlimited_custom"

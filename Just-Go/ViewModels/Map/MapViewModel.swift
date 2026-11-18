@@ -86,6 +86,9 @@ final class MapViewModel {
     private let stationSearchService: StationSearchService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
+    /// Cities whose loaded network a data update replaced. Drawn as they are until the replacement
+    /// has loaded, so the lines do not blink out, and never kept by the next load.
+    @ObservationIgnored private var replacedCityIDs: Set<String> = []
     @ObservationIgnored nonisolated(unsafe) private var viewportLoadTask: Task<Void, Never>?
     // Publish token. A load only writes its results if no newer load has started since.
     private var networkLoadGeneration = 0
@@ -228,11 +231,20 @@ final class MapViewModel {
         }
     }
 
+    /// The data in use changed under the map (an update, or Clear Cache): load what the viewport
+    /// shows again.
+    func cityDataChanged() {
+        replacedCityIDs.formUnion(metroNetworks.map(\.cityID))
+        replacedCityIDs.formUnion(stationsByCity.keys)
+        if let visibleRegion { viewportChanged(to: visibleRegion) }
+    }
+
     /// Two stages: line geometry publishes as soon as the networks decode, then station markers,
     /// which `stations(in:)` builds one `Station` per station on the same actor.
     private func loadNetworks(cityIDs: [String], generation: Int) async {
         let requested = Set(cityIDs)
-        let retained = metroNetworks.filter { requested.contains($0.cityID) }
+        let replaced = replacedCityIDs
+        let retained = metroNetworks.filter { requested.contains($0.cityID) && !replaced.contains($0.cityID) }
         var loadedByCity = Dictionary(retained.map { ($0.cityID, $0) }, uniquingKeysWith: { first, _ in first })
 
         await withTaskGroup(of: MetroNetwork?.self) { group in
@@ -263,7 +275,7 @@ final class MapViewModel {
         // Stage 2: station markers.
         var loadedStationsByCity: [String: [Station]] = [:]
         await withTaskGroup(of: (String, [Station]).self) { group in
-            for cityID in loadedByCity.keys where stationsByCity[cityID] == nil {
+            for cityID in loadedByCity.keys where stationsByCity[cityID] == nil || replaced.contains(cityID) {
                 group.addTask { [metroNetworkProvider] in
                     (cityID, await metroNetworkProvider.stations(in: cityID))
                 }
@@ -275,6 +287,7 @@ final class MapViewModel {
         }
 
         guard !Task.isCancelled, generation == networkLoadGeneration else { return }
+        replacedCityIDs.subtract(replaced)
         stationsByCity.merge(loadedStationsByCity) { _, new in new }
         stationsByCity = stationsByCity.filter { requested.contains($0.key) }
         refreshVisibleStations()

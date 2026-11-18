@@ -521,11 +521,37 @@ module OSSDataValidators
       end
       (cities - bundled).each { |city| validate_pending_city!(city) }
       bundled.each { |city| validate_bundled_city!(city) }
+      validate_networks!(manifest["networks"])
       RightsValidator.new(root: root).validate!
       true
     end
 
     private
+
+    # The app updates a city's network from this list and verifies the bytes against it, so every
+    # entry must describe the file beside it exactly. One entry per bundled network, in ID order.
+    def validate_networks!(networks)
+      fail_validation("manifest networks must be an array") unless networks.is_a?(Array)
+      expected_ids = Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "*.json"))
+        .map { |path| File.basename(path, ".json") }.sort
+      unless networks.map { |entry| entry["cityID"] } == expected_ids
+        fail_validation("manifest networks must list every bundled network once, in cityID order")
+      end
+      networks.each do |entry|
+        city_id = entry.fetch("cityID")
+        exact_keys!(entry, %w[cityID version sizeBytes sha256 bundledResource downloadURL], "manifest network #{city_id}")
+        resource = "MetroNetworks/#{city_id}.json"
+        fail_validation("#{city_id} network bundledResource must be #{resource}") unless entry["bundledResource"] == resource
+        unless entry["downloadURL"] == "../Just-Go/Resources/#{resource}"
+          fail_validation("#{city_id} network downloadURL must be ../Just-Go/Resources/#{resource}")
+        end
+        bytes = File.binread(File.join(root, "Just-Go", "Resources", resource))
+        fail_validation("#{city_id} network sizeBytes mismatch") unless entry["sizeBytes"] == bytes.bytesize
+        fail_validation("#{city_id} network sha256 mismatch") unless entry["sha256"] == Digest::SHA256.hexdigest(bytes)
+        version = JSON.parse(bytes).fetch("version")
+        fail_validation("#{city_id} network version must be #{version}") unless entry["version"] == version
+      end
+    end
 
     def validate_pending_city!(city)
       city_id = city.fetch("cityID")

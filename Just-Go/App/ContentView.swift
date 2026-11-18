@@ -98,7 +98,7 @@ struct ContentView: View {
         @Bindable var appState = appState
         // The map is the app: planning and searching happen on the map's own navigation stack (see
         // `MapRoute`), so a rider looking at a place never has to switch tabs to route to it. Trips
-        // is its own tab because it is what the rider owns, not a setting.
+        // is its own tab because it is what the rider owns; Settings is how the app behaves.
         TabView(selection: $appState.selectedTab) {
             Tab(AppLocalization.localized("Map"), systemImage: "map.fill", value: AppState.Tab.map) {
                 MapContainerView()
@@ -110,8 +110,8 @@ struct ContentView: View {
             ) {
                 TripsView()
             }
-            Tab(AppLocalization.localized("Profile"), systemImage: "person.fill", value: AppState.Tab.profile) {
-                ProfileView()
+            Tab(AppLocalization.localized("Settings"), systemImage: "gearshape.fill", value: AppState.Tab.settings) {
+                SettingsView()
             }
         }
         // A tab bar on a phone, a sidebar on an iPad.

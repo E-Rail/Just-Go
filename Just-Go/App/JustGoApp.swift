@@ -13,12 +13,15 @@ struct JustGoApp: App {
     @State private var appState = AppState()
     @State private var container: DIContainer
     @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.system.rawValue
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         #if DEBUG
         MainThreadHangMonitor.start()
         #endif
         Self.applyDataRightsEpochIfNeeded()
+        // Before anything reads a network or a pack: downloads made under another build go.
+        CityDataBuildEpoch.applyIfNeeded()
         // Keeps iOS's language for this app in step with the in-app choice, including one saved by a
         // build whose picker did not write it. iOS reads it at launch, so it applies from the next.
         AppLocalization.applyToSystem(AppLocalization.launchPreference)
@@ -59,6 +62,12 @@ struct JustGoApp: App {
                 appState.pendingTripOpen = true
             }
             .task { await runLaunchStages() }
+            // Back from the background is when a rider would expect new data, and when a check
+            // that last ran yesterday is due. The updater decides whether one is.
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active, !appState.isLaunching else { return }
+                container.cityDataUpdater?.checkIfDue()
+            }
         }
     }
 
@@ -104,6 +113,10 @@ struct JustGoApp: App {
 
         await quickTagRepair
         await stationIndex
+
+        // Last, behind everything the first screen uses: a data update is never something the
+        // rider is waiting on.
+        container.cityDataUpdater?.checkIfDue()
     }
 
     /// Builds the nationwide station list behind the live UI, so the first search does not wait

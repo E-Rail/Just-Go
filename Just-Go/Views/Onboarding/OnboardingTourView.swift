@@ -88,15 +88,15 @@ struct OnboardingTourView: View {
                 icon: "paintpalette.fill",
                 title: AppLocalization.text(english: "Set it up", simplified: "个性化设置", traditional: "個人化設定"),
                 points: [
-                    ("tag.fill", AppLocalization.text(
-                        english: "Save Home, Work and your own tags, then plan a trip there with one tap on the map.",
-                        simplified: "保存家、公司和自定义标签，之后在地图上点一下就能规划前往。",
-                        traditional: "儲存家、公司和自訂標籤，之後在地圖上點一下就能規劃前往。"
+                    ("bookmark.fill", AppLocalization.text(
+                        english: "Save Home, Work and your own places, then plan a trip there with one tap on the map.",
+                        simplified: "保存家、公司和自定义地点，之后在地图上点一下就能规划前往。",
+                        traditional: "儲存家、公司和自訂地點，之後在地圖上點一下就能規劃前往。"
                     )),
                     ("figure.roll", AppLocalization.text(
-                        english: "Set step-free needs once in Profile → Accessibility. Route search follows them.",
-                        simplified: "在“个人 → 无障碍”中设置一次无障碍需求，路线搜索会据此规划。",
-                        traditional: "在「個人 → 無障礙」中設定一次無障礙需求，路線搜尋會據此規劃。"
+                        english: "Set step-free needs once in Settings → Routes. Every route follows them.",
+                        simplified: "在“设置 → 路线”中设置一次无障碍需求，每条路线都会遵循。",
+                        traditional: "在「設定 → 路線」中設定一次無障礙需求，每條路線都會遵循。"
                     ))
                 ],
                 showsThemePicker: true

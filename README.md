@@ -60,8 +60,14 @@ Bundled station accessibility coverage, by city:
 | Suzhou | 235 | 2 |
 
 The other 44 catalog cities are source-pending for station data. Bundled metro topology powers
-rail routing independently of optional city-pack details. No current city pack is presented as
-downloadable.
+rail routing independently of optional city-pack details.
+
+The app keeps its metro networks and city packs in step with this repository's `main` branch
+(Settings → Transit Data → Updates): on request, or automatically at most every six hours, never on
+a Low Data Mode network and never during a trip. `DataPacks/manifest.json` lists each network and
+pack with its size and SHA-256; a city's two files are downloaded only when their hash differs from
+what is in use, checked against each other, and installed together or not at all. Downloads are
+dropped when the app itself updates.
 
 ## Official Resource Directory
 
@@ -118,10 +124,10 @@ and are shown as a distance rather than a path.
 2. Open `Just-Go.xcodeproj` in Xcode.
 3. Build the `Just-Go` scheme.
 
-Release builds use the included baseline unless a first-party city-pack origin is configured
-through the build settings. Release does not fall back to GitHub, jsDelivr, or Wikimedia.
-Debug builds may use an explicitly configured development origin. A first-party mainland mirror
-can be supplied through `CITY_PACK_SECRET_MAINLAND_MIRROR_URL`; no mirror is configured here.
+Data updates come from the three origins in `Just-Go/Config/*.xcconfig`, tried in order: the
+mainland jsDelivr mirror, jsDelivr, and `raw.githubusercontent.com`, each serving this repository's
+`main` branch. `Scripts/validate_runtime_data_policy.rb` pins them by value. Wikimedia is never an
+origin.
 
 Regenerate and validate data from the vendored, reviewed inputs:
 

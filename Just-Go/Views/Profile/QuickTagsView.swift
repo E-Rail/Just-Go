@@ -13,7 +13,7 @@ struct QuickTagsView: View {
     @State private var showAddTag = false
 
     private var tagActionTitle: String {
-        AppLocalization.text(english: "Tag", simplified: "标签", traditional: "標籤")
+        AppLocalization.text(english: "Edit", simplified: "编辑", traditional: "編輯")
     }
 
     /// True when pushed onto an existing stack: a `NavigationStack` inside a pushed destination
@@ -37,7 +37,7 @@ struct QuickTagsView: View {
                         // separator aligned to its centred content, starting a third of the way
                         // across.
                         ContentUnavailableView {
-                            Label(AppLocalization.localized("No Quick Tags yet"), systemImage: "tag.circle")
+                            Label(AppLocalization.text(english: "No Saved Places Yet", simplified: "暂无常用地点", traditional: "暫無常用地點"), systemImage: "bookmark.circle")
                         } description: {
                             Text(AppLocalization.text(
                                 english: "Tap + to add one.",
@@ -62,11 +62,11 @@ struct QuickTagsView: View {
                                 Button {
                                     editingQuickTag = quickTag
                                 } label: {
-                                    Image(systemName: "tag")
+                                    Image(systemName: "bookmark")
                                         .imageScale(.medium)
                                 }
                                 .buttonStyle(.borderless)
-                                .accessibilityLabel(AppLocalization.localized("Edit Quick Tag"))
+                                .accessibilityLabel(AppLocalization.text(english: "Edit Saved Place", simplified: "编辑常用地点", traditional: "編輯常用地點"))
 
                                 Button(role: .destructive) {
                                     tripMemoryService.deleteQuickTag(id: quickTag.id)
@@ -75,13 +75,13 @@ struct QuickTagsView: View {
                                         .imageScale(.medium)
                                 }
                                 .buttonStyle(.borderless)
-                                .accessibilityLabel(AppLocalization.localized("Delete Quick Tag"))
+                                .accessibilityLabel(AppLocalization.text(english: "Remove Saved Place", simplified: "移除常用地点", traditional: "移除常用地點"))
                             }
                             .swipeActions(edge: .leading) {
                                 Button {
                                     editingQuickTag = quickTag
                                 } label: {
-                                    Label(tagActionTitle, systemImage: "tag")
+                                    Label(tagActionTitle, systemImage: "bookmark")
                                 }
                                 .tint(.accentColor)
                             }
@@ -96,7 +96,7 @@ struct QuickTagsView: View {
                                 Button {
                                     editingQuickTag = quickTag
                                 } label: {
-                                    Label(tagActionTitle, systemImage: "tag")
+                                    Label(tagActionTitle, systemImage: "bookmark")
                                 }
                             }
                         }
@@ -104,9 +104,9 @@ struct QuickTagsView: View {
                 } header: {
                     HStack {
                         Text(AppLocalization.text(
-                            english: "Saved tags",
-                            simplified: "已保存标签",
-                            traditional: "已儲存標籤"
+                            english: "Places",
+                            simplified: "地点",
+                            traditional: "地點"
                         ))
                         Spacer()
                         Text("\(tripMemoryService.stationQuickTags.count)")
@@ -119,7 +119,7 @@ struct QuickTagsView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
-        .navigationTitle(AppLocalization.localized("Quick Tags"))
+        .navigationTitle(AppLocalization.text(english: "Saved Places", simplified: "常用地点", traditional: "常用地點"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             // A title with the symbol: the system shows it when the bar overflows into a menu.
@@ -127,7 +127,7 @@ struct QuickTagsView: View {
                 Button {
                     showAddTag = true
                 } label: {
-                    Label(AppLocalization.text(english: "Add Tag", simplified: "添加标签", traditional: "新增標籤"), systemImage: "plus")
+                    Label(AppLocalization.text(english: "Add Place", simplified: "添加地点", traditional: "新增地點"), systemImage: "plus")
                 }
             }
             ToolbarItem(placement: .confirmationAction) {
@@ -158,18 +158,18 @@ struct QuickTagsView: View {
                 customTagText = quickTag.kind.customLabel ?? ""
                 customQuickTag = quickTag
             }
-            Button(AppLocalization.localized("Delete Quick Tag"), role: .destructive) {
+            Button(AppLocalization.text(english: "Remove Saved Place", simplified: "移除常用地点", traditional: "移除常用地點"), role: .destructive) {
                 tripMemoryService.deleteQuickTag(id: quickTag.id)
             }
         } message: { _ in
             Text(AppLocalization.text(
-                english: "Quick tags fill a start or destination field in one tap.",
-                simplified: "快捷标签可一键填入起点或终点。",
-                traditional: "快捷標籤可一鍵填入起點或終點。"
+                english: "Saved places sit on the map, ready to plan a trip there in one tap.",
+                simplified: "常用地点会显示在地图上，点一下即可规划前往。",
+                traditional: "常用地點會顯示在地圖上，點一下即可規劃前往。"
             ))
         }
         .alert(
-            AppLocalization.text(english: "Custom Tag", simplified: "自定义标签", traditional: "自訂標籤"),
+            AppLocalization.text(english: "Name This Place", simplified: "为地点命名", traditional: "為地點命名"),
             isPresented: Binding(
                 get: { customQuickTag != nil },
                 set: { if !$0 { customQuickTag = nil } }
@@ -177,7 +177,7 @@ struct QuickTagsView: View {
             presenting: customQuickTag
         ) { quickTag in
             TextField(
-                AppLocalization.text(english: "Tag name", simplified: "标签名称", traditional: "標籤名稱"),
+                AppLocalization.text(english: "Name", simplified: "名称", traditional: "名稱"),
                 text: $customTagText
             )
             Button(AppLocalization.localized("Save")) {

@@ -125,8 +125,8 @@ final class RoutePlannerViewModel {
     }
 
     /// Pulls the persisted accessibility defaults into the planner. Returns true when
-    /// route-affecting defaults changed while a search/current plan existed, so the view
-    /// can pop the stale results screen. Non-route accessibility toggles are ignored here.
+    /// route-affecting defaults changed while a search/current plan existed and the plan was
+    /// cleared, so the view can plan again. Non-route accessibility toggles are ignored here.
     @discardableResult
     func syncAccessibilityPreference(_ preference: AccessibilityPreference) -> Bool {
         let oldSignature = syncedDefaultAccessibilitySignature

@@ -10,7 +10,6 @@
 "Arrival Exit" = "出站出口";
 "Boarding Access" = "进站入口";
 "Cancel" = "取消";
-"Cognitive" = "认知";
 "Delete" = "删除";
 "Direct" = "直达";
 "Distance" = "距离";
@@ -45,7 +44,6 @@
 "Not verified" = "未验证";
 "Partial Accessibility" = "部分无障碍";
 "Privacy Policy" = "隐私政策";
-"Profile" = "个人";
 "Recent Searches" = "最近搜索";
 "Requires Wheelchair Access" = "需要轮椅通行";
 "Route Details" = "路线详情";
@@ -64,7 +62,6 @@
 "Terms of Service" = "服务条款";
 "Train Times" = "列车时刻";
 "Transit Data" = "公交数据";
-"Transit Data Sources" = "交通数据来源";
 "Essential Rider Information" = "出行必需信息";
 "Map, station search, and routes" = "地图、车站搜索和路线";
 "Accessibility and station facilities" = "无障碍与车站设施";
@@ -135,14 +132,11 @@
 "Apple Maps walking directions mention stairs." = "Apple 地图步行指引提到楼梯。";
 "Complete Trip" = "完成行程";
 "First" = "首班";
-"No Quick Tags yet" = "暂无快捷标签";
-"No trip history yet" = "暂无行程历史";
 "Official accessibility data is not available for this station yet." = "本站暂未提供官方无障碍数据。";
 "Official city data" = "官方城市数据";
 "Partial" = "部分";
 "Pending" = "待确认";
 "Personal" = "个人";
-"Quick Tags" = "快捷标签";
 "Save" = "保存";
 "Saved locally on this device." = "已保存在本设备。";
 "Specific entrance or exit is unavailable" = "暂无具体出入口信息";
@@ -170,14 +164,9 @@
 "Walking segment" = "步行路段";
 "Access" = "无障碍";
 "Train times" = "列车时刻";
-"Notifications" = "通知";
 "Avg duration" = "平均时长";
 "Total trips" = "总行程";
 "This month" = "本月";
 "Your stats" = "我的统计";
-"Add Quick Tag" = "添加快捷标签";
-"Edit Quick Tag" = "编辑快捷标签";
-"Delete Quick Tag" = "删除快捷标签";
-"Quick Tags appear as one-tap chips in Route Planner." = "快捷标签可一键填入起点或终点。";
 "Last" = "末班";
 "Center map on my location" = "将地图居中到我的位置";

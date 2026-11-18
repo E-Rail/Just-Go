@@ -52,6 +52,9 @@ final class DIContainer {
     /// Operator notices, fetched on the device and held in memory only. Only Beijing publishes a
     /// parseable list.
     let serviceNoticeProvider = BeijingServiceNoticeProvider()
+    /// Keeps networks and station packs in step with the repository. Nil only where a container is
+    /// built without `configure()`.
+    let cityDataUpdater: CityDataUpdater?
     private let memoryWarningReleaseTargets: MemoryWarningReleaseTargets
     private var memoryWarningObserver: NSObjectProtocol?
 
@@ -73,6 +76,7 @@ final class DIContainer {
         tripReminderService: TripReminderService,
         tripSession: TripSession,
         stationInformationDiskCache: OfficialStationInformationDiskCache? = nil,
+        cityDataUpdater: CityDataUpdater? = nil,
         memoryManagedOfficialStationData: OfficialCityPackService? = nil,
         memoryManagedStationInformationProvider: OfficialStationInformationRouter? = nil,
         memoryManagedMetroNetworkProvider: BundledMetroNetworkService? = nil,
@@ -98,6 +102,7 @@ final class DIContainer {
         self.tripReminderService = tripReminderService
         self.tripSession = tripSession
         self.stationInformationDiskCache = stationInformationDiskCache
+        self.cityDataUpdater = cityDataUpdater
         self.memoryWarningReleaseTargets = MemoryWarningReleaseTargets(
             officialStationData: memoryManagedOfficialStationData,
             stationInformationProvider: memoryManagedStationInformationProvider,
@@ -118,11 +123,14 @@ final class DIContainer {
     /// Settings → Clear Cache. Deletes every downloaded or cached tier (city packs on disk and in
     /// memory, device-local station-information snapshots, URL caches) and leaves user data
     /// untouched: tags, trips, preferences.
+    @MainActor
     func clearAllCaches() async {
         await memoryWarningReleaseTargets.officialStationData?.clearAllCaches()
         await stationInformationDiskCache?.clearAll()
         await memoryWarningReleaseTargets.releaseMemory()
         URLCache.shared.removeAllCachedResponses()
+        // The sweep took downloaded networks with the packs: everything holding one reloads.
+        await cityDataUpdater?.downloadsCleared()
     }
 
     @MainActor
@@ -220,7 +228,7 @@ final class DIContainer {
         // The bundled catalog's decode and validation is heavy, so the service gets a loader and
         // runs it lazily on its actor rather than on the main thread at launch.
         let officialStationData = OfficialCityPackService(
-            session: Self.makeEphemeralSession(),
+            session: Self.makeCityDataSession(),
             metroNetworks: metroNetworkProvider,
             realtimeArrivals: realtimeArrivalProvider,
             officialResourceCatalogLoader: { try .bundled() }
@@ -281,6 +289,12 @@ final class DIContainer {
             tripReminderService: tripReminderService,
             tripSession: tripSession,
             stationInformationDiskCache: stationInformationDiskCache,
+            cityDataUpdater: CityDataUpdater(
+                stationData: officialStationData,
+                networks: metroNetworkProvider,
+                releaseRoutingGraphs: { await transitRouteProvider.releaseMemory() },
+                isTripUnderWay: { tripSession.isActive }
+            ),
             memoryManagedOfficialStationData: officialStationData,
             memoryManagedStationInformationProvider: stationInformationRouter,
             memoryManagedMetroNetworkProvider: metroNetworkProvider,
@@ -293,6 +307,21 @@ final class DIContainer {
         return container
     }
 
+    /// The city-data session. In DEBUG, `JUST_GO_DEBUG_DATA_REMOTE=<folder>` serves that folder as
+    /// the repository behind every configured mirror, so an update can be run end to end against
+    /// data that is not on the default branch yet.
+    private static func makeCityDataSession() -> URLSession {
+        #if DEBUG
+        if let root = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_DATA_REMOTE"] {
+            DebugRepositoryURLProtocol.root = URL(fileURLWithPath: root, isDirectory: true)
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.protocolClasses = [DebugRepositoryURLProtocol.self]
+            return URLSession(configuration: configuration)
+        }
+        #endif
+        return makeEphemeralSession()
+    }
+
     private static func makeEphemeralSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil
@@ -302,3 +331,39 @@ final class DIContainer {
         return URLSession(configuration: configuration)
     }
 }
+
+#if DEBUG
+/// Answers a mirror URL from a local folder laid out like the repository: everything after the
+/// branch (`@main/` or `/main/`) is a path under `root`. See `DIContainer.makeCityDataSession`.
+final class DebugRepositoryURLProtocol: URLProtocol {
+    nonisolated(unsafe) static var root: URL?
+
+    override class func canInit(with request: URLRequest) -> Bool { root != nil }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let url = request.url, let root = Self.root else { return }
+        let path = url.path
+        let relative = ["@main/", "/main/"].lazy
+            .compactMap { marker in path.range(of: marker).map { String(path[$0.upperBound...]) } }
+            .first
+        let file = relative.map { root.appendingPathComponent($0) }
+        if let file, let data = try? Data(contentsOf: file) {
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Length": "\(data.count)"]
+            )!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+        } else {
+            let response = HTTPURLResponse(url: url, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil)!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        }
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+}
+#endif

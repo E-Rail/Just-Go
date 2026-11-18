@@ -27,19 +27,19 @@ private struct QuickTagEditor: ViewModifier {
                     showCustomAlert = true
                 }
                 if currentQuickTag != nil {
-                    Button(AppLocalization.localized("Delete Quick Tag"), role: .destructive) {
+                    Button(AppLocalization.text(english: "Remove Saved Place", simplified: "移除常用地点", traditional: "移除常用地點"), role: .destructive) {
                         onDelete()
                     }
                 }
             } message: {
-                Text(AppLocalization.localized("Quick Tags appear as one-tap chips in Route Planner."))
+                Text(AppLocalization.text(english: "Saved places sit on the map, ready to plan a trip there in one tap.", simplified: "常用地点会显示在地图上，点一下即可规划前往。", traditional: "常用地點會顯示在地圖上，點一下即可規劃前往。"))
             }
             .alert(
-                AppLocalization.text(english: "Custom Tag", simplified: "自定义标签", traditional: "自訂標籤"),
+                AppLocalization.text(english: "Name This Place", simplified: "为地点命名", traditional: "為地點命名"),
                 isPresented: $showCustomAlert
             ) {
                 TextField(
-                    AppLocalization.text(english: "Tag name", simplified: "标签名称", traditional: "標籤名稱"),
+                    AppLocalization.text(english: "Name", simplified: "名称", traditional: "名稱"),
                     text: $customText
                 )
                 Button(AppLocalization.localized("Save")) {

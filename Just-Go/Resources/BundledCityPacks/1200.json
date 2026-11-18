@@ -6343,6 +6343,16 @@
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14374228020",
+          "name": "南珠桥地铁站-D口",
+          "kind": "exit",
+          "latitude": 39.062366,
+          "longitude": 117.23145,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
         }
       ]
     },

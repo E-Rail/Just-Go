@@ -1,51 +1,69 @@
 import SwiftUI
 import UIKit
 
+enum AppWebLinks {
+    static let privacyPolicy = URL(string: "https://e-rail.github.io/just-go/docs/privacy/")!
+    static let termsOfService = URL(string: "https://e-rail.github.io/just-go/docs/terms/")!
+}
+
+/// The pages Settings pushes. A value per page, so a DEBUG launch can open one.
+enum SettingsDestination: String, Hashable {
+    case transitData
+    case systemAccessibility
+    case faq
+}
+
+/// The Settings tab: everything about how the app behaves, on one page, grouped by when it matters.
+/// How routes are planned, what a trip does while it runs, how the app looks, the data it runs
+/// on, then help and about. Pages are pushed, never presented: a tab is already a place.
 struct SettingsView: View {
-    /// False in a detail column, where `dismiss()` has nothing to dismiss and a Done button would
-    /// do nothing.
-    var showsDoneButton = true
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppState.self) private var appState
     @Environment(DIContainer.self) private var container
+    @Environment(\.openURL) private var openURL
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguagePreference.system.rawValue
     @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.system.rawValue
-    @AppStorage("reminderLeadMinutes") private var reminderLeadMinutes = 5
-    @AppStorage("arrivalAlertLeadMinutes") private var arrivalAlertLeadMinutes = 2
+    @AppStorage("showAccessibilityBadges") private var showBadges = true
+    @State private var path: [SettingsDestination] = []
     @State private var showTour = false
-    @State private var showClearCacheConfirmation = false
-    @State private var didClearCache = false
-
-    private let leadMinuteOptions = [5, 10, 15, 20, 30]
-    private let arrivalLeadMinuteOptions = [1, 2, 3, 5]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Form {
-                appearanceSection
-                notificationsSection
-                helpSection
-                // Last, so scrolling past an ordinary preference never means scrolling through the
-                // delete buttons.
+                RoutePreferencesSection()
+                TripGuidanceSection()
+                displaySection
                 dataSection
+                helpSection
+                aboutSection
             }
             .navigationTitle(AppLocalization.localized("Settings"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    if showsDoneButton {
-                        Button(AppLocalization.localized("Done")) { dismiss() }
-                    }
+            .navigationDestination(for: SettingsDestination.self) { destination in
+                switch destination {
+                case .transitData: TransitDataView()
+                case .systemAccessibility: SystemAccessibilityFeaturesView()
+                case .faq: HelpFAQView()
                 }
             }
             .fullScreenCover(isPresented: $showTour) {
                 OnboardingTourView { showTour = false }
             }
         }
+        #if DEBUG
+        // Every page here is behind a tap, and there is no tap injection.
+        .task {
+            if let seed = ProcessInfo.processInfo.environment["JUST_GO_DEBUG_SETTINGS"],
+               let destination = SettingsDestination(rawValue: seed),
+               path.isEmpty {
+                appState.selectedTab = .settings
+                path = [destination]
+            }
+        }
+        #endif
     }
 
-    // MARK: - Appearance
+    // MARK: - Display
 
-    private var appearanceSection: some View {
+    private var displaySection: some View {
         Section {
             ThemePickerRow()
                 .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
@@ -67,53 +85,69 @@ struct SettingsView: View {
             .onChange(of: languagePreference) { _, newValue in
                 AppLocalization.applyToSystem(AppLanguagePreference(rawValue: newValue) ?? .system)
             }
+            Toggle(AppLocalization.localized("Show Accessibility Badges"), isOn: $showBadges)
+            NavigationLink(value: SettingsDestination.systemAccessibility) {
+                Text(SystemAccessibilityFeaturesView.title)
+            }
         } header: {
-            Text(AppLocalization.text(english: "Appearance", simplified: "外观", traditional: "外觀"))
+            Text(AppLocalization.text(english: "Display", simplified: "显示", traditional: "顯示"))
         } footer: {
             if languagePreference != AppLocalization.launchPreference.rawValue {
                 Text(AppLocalization.localized("Takes effect after you quit and reopen the app."))
+            } else {
+                Text(AppLocalization.text(
+                    english: "Accessibility badges mark a station when elevator, ramp or tactile-path data exists.",
+                    simplified: "无障碍标记会在车站有电梯、坡道或盲道数据时显示。",
+                    traditional: "無障礙標記會在車站有電梯、坡道或導盲磚資料時顯示。"
+                ))
             }
         }
     }
 
-    // MARK: - Notifications
+    // MARK: - Data
 
-    private var notificationsSection: some View {
+    private var dataSection: some View {
         Section {
-            Picker(
-                AppLocalization.text(english: "Before you leave", simplified: "出发前提醒", traditional: "出發前提醒"),
-                selection: $reminderLeadMinutes
-            ) {
-                ForEach(leadMinuteOptions, id: \.self) { minutes in
-                    Text(AppLocalization.text(
-                        english: "\(minutes) min before departure",
-                        simplified: "出发前\(minutes)分钟",
-                        traditional: "出發前\(minutes)分鐘"
-                    )).tag(minutes)
-                }
-            }
-            Picker(
-                AppLocalization.text(english: "Before your stop", simplified: "下车提醒", traditional: "下車提醒"),
-                selection: $arrivalAlertLeadMinutes
-            ) {
-                ForEach(arrivalLeadMinuteOptions, id: \.self) { minutes in
-                    Text(AppLocalization.text(
-                        english: "\(minutes) min before the stop",
-                        simplified: "到站前\(minutes)分钟",
-                        traditional: "到站前\(minutes)分鐘"
-                    )).tag(minutes)
+            NavigationLink(value: SettingsDestination.transitData) {
+                LabeledContent {
+                    Text(transitDataStatus)
+                } label: {
+                    Label {
+                        Text(AppLocalization.localized("Transit Data"))
+                    } icon: {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                            .foregroundStyle(Color.accentColor)
+                    }
                 }
             }
         } header: {
-            Text(AppLocalization.localized("Notifications"))
+            Text(AppLocalization.text(english: "Data", simplified: "数据", traditional: "資料"))
         } footer: {
-            // The rows say "before you leave" and "before your stop"; the footer says the one thing
-            // neither can: iOS will ask permission.
             Text(AppLocalization.text(
-                english: "iOS asks for notification permission the first time you use either.",
-                simplified: "首次使用时，系统会询问通知权限。",
-                traditional: "首次使用時，系統會詢問通知權限。"
+                english: "Updates, the cities covered, sources and attribution.",
+                simplified: "更新、覆盖的城市、数据来源与署名。",
+                traditional: "更新、涵蓋的城市、資料來源與署名。"
             ))
+        }
+    }
+
+    /// The row's answer to "is my data current", in a word or two.
+    private var transitDataStatus: String {
+        guard let updater = container.cityDataUpdater else { return "" }
+        if updater.activity == .checking {
+            return AppLocalization.text(english: "Checking…", simplified: "正在检查…", traditional: "正在檢查…")
+        }
+        switch updater.lastOutcome?.status {
+        case .upToDate?:
+            return AppLocalization.text(english: "Up to date", simplified: "已是最新", traditional: "已是最新")
+        case .checked?:
+            return updater.lastOutcome?.updates.isEmpty == false
+                ? AppLocalization.text(english: "Updated", simplified: "已更新", traditional: "已更新")
+                : AppLocalization.text(english: "Incomplete", simplified: "未完成", traditional: "未完成")
+        case .unreachable?:
+            return AppLocalization.text(english: "Offline", simplified: "无法连接", traditional: "無法連線")
+        case .notConfigured?, nil:
+            return ""
         }
     }
 
@@ -143,67 +177,52 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            NavigationLink {
-                HelpFAQView()
-            } label: {
-                Label(
-                    AppLocalization.text(english: "FAQ", simplified: "常见问题", traditional: "常見問題"),
-                    systemImage: "questionmark.circle"
-                )
+            NavigationLink(value: SettingsDestination.faq) {
+                Label {
+                    Text(AppLocalization.text(english: "FAQ & Support", simplified: "常见问题与支持", traditional: "常見問題與支援"))
+                } icon: {
+                    Image(systemName: "questionmark.circle")
+                        .foregroundStyle(Color.accentColor)
+                }
             }
         } header: {
             Text(AppLocalization.text(english: "Help", simplified: "帮助", traditional: "幫助"))
         }
     }
 
-    // MARK: - Data
+    // MARK: - About
 
-    private var dataSection: some View {
+    private var aboutSection: some View {
         Section {
-            Button(role: .destructive) {
-                showClearCacheConfirmation = true
-            } label: {
-                // Tinted by hand: a destructive `Button` colours its title red but leaves the
-                // `Label`'s icon on the accent.
-                Label {
-                    Text(clearCacheTitle)
-                } icon: {
-                    Image(systemName: "trash").foregroundStyle(.red)
-                }
+            LabeledContent(AppLocalization.localized("Version")) {
+                // From the bundle, not a literal, so it follows MARKETING_VERSION. The localization
+                // validator cannot see this: its literal check requires a letter.
+                Text(verbatim: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
             }
-            .alert(clearCacheTitle, isPresented: $showClearCacheConfirmation) {
-                Button(clearCacheTitle, role: .destructive) {
-                    Task {
-                        await container.clearAllCaches()
-                        didClearCache = true
-                    }
-                }
-                Button(AppLocalization.localized("Cancel"), role: .cancel) {}
-            } message: {
-                // What goes and what stays, with no promises about the app's future behaviour.
-                Text(AppLocalization.text(
-                    english: "Goes: downloaded station information, cached pages. Stays: your tags, trips and settings.",
-                    simplified: "清除：已下载的车站信息、网页缓存。保留：标签、行程和设置。",
-                    traditional: "清除：已下載的車站資訊、網頁快取。保留：標籤、行程和設定。"
-                ))
-            }
+            linkRow(AppLocalization.localized("Privacy Policy"), url: AppWebLinks.privacyPolicy)
+            linkRow(AppLocalization.localized("Terms of Service"), url: AppWebLinks.termsOfService)
         } header: {
-            Text(AppLocalization.text(english: "On this device", simplified: "本机数据", traditional: "本機資料"))
-        } footer: {
-            if didClearCache {
-                Text(AppLocalization.text(
-                    english: "Cache cleared.",
-                    simplified: "缓存已清除。",
-                    traditional: "快取已清除。"
-                ))
-            }
+            Text(AppLocalization.localized("About"))
         }
     }
 
-    private var clearCacheTitle: String {
-        AppLocalization.text(english: "Clear Cache", simplified: "清除缓存", traditional: "清除快取")
+    /// A row that leaves the app: a plain-styled `Button`, not a `Link`, which tints its whole
+    /// label with the accent and ignores `.foregroundStyle(.primary)`.
+    private func linkRow(_ title: String, url: URL) -> some View {
+        Button {
+            openURL(url)
+        } label: {
+            HStack {
+                Text(title)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.caption)
+                    .foregroundStyle(Color.accentColor)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
-
 }
 
 struct HelpFAQView: View {
@@ -259,9 +278,9 @@ struct HelpFAQView: View {
                         traditional: "輪椅和無障礙、步行距離在哪裡設定？"
                     ),
                     answer: AppLocalization.text(
-                        english: "Profile → Accessibility. Route search uses those settings.",
-                        simplified: "个人 → 无障碍。路线搜索会按这些设置规划。",
-                        traditional: "個人 → 無障礙。路線搜尋會按這些設定規劃。"
+                        english: "Settings → Routes, or Options on any plan. Every route follows them.",
+                        simplified: "设置 → 路线，或在任一规划中点“选项”。每条路线都会遵循。",
+                        traditional: "設定 → 路線，或在任一規劃中點「選項」。每條路線都會遵循。"
                     )
                 )
                 faqRow(
@@ -292,7 +311,7 @@ struct HelpFAQView: View {
                 Text(AppLocalization.text(english: "FAQ", simplified: "常见问题", traditional: "常見問題"))
             }
         }
-        .navigationTitle(AppLocalization.text(english: "FAQ", simplified: "常见问题", traditional: "常見問題"))
+        .navigationTitle(AppLocalization.text(english: "FAQ & Support", simplified: "常见问题与支持", traditional: "常見問題與支援"))
         .navigationBarTitleDisplayMode(.inline)
     }
 

@@ -10,7 +10,6 @@
 "Arrival Exit" = "Arrival Exit";
 "Boarding Access" = "Boarding Access";
 "Cancel" = "Cancel";
-"Cognitive" = "Cognitive";
 "Delete" = "Delete";
 "Direct" = "Direct";
 "Distance" = "Distance";
@@ -45,7 +44,6 @@
 "Not verified" = "Not verified";
 "Partial Accessibility" = "Partial Accessibility";
 "Privacy Policy" = "Privacy Policy";
-"Profile" = "Profile";
 "Recent Searches" = "Recent Searches";
 "Requires Wheelchair Access" = "Requires Wheelchair Access";
 "Route Details" = "Route Details";
@@ -64,7 +62,6 @@
 "Terms of Service" = "Terms of Service";
 "Train Times" = "Train Times";
 "Transit Data" = "Transit Data";
-"Transit Data Sources" = "Transit Data Sources";
 "Essential Rider Information" = "Essential Rider Information";
 "Map, station search, and routes" = "Map, station search, and routes";
 "Accessibility and station facilities" = "Accessibility and station facilities";
@@ -135,14 +132,11 @@
 "Apple Maps walking directions mention stairs." = "Apple Maps walking directions mention stairs.";
 "Complete Trip" = "Complete Trip";
 "First" = "First";
-"No Quick Tags yet" = "No Quick Tags yet";
-"No trip history yet" = "No trip history yet";
 "Official accessibility data is not available for this station yet." = "Official accessibility data is not available for this station yet.";
 "Official city data" = "Official city data";
 "Partial" = "Partial";
 "Pending" = "Pending";
 "Personal" = "Personal";
-"Quick Tags" = "Quick Tags";
 "Save" = "Save";
 "Saved locally on this device." = "Saved locally on this device.";
 "Specific entrance or exit is unavailable" = "Specific entrance or exit is unavailable";
@@ -170,14 +164,9 @@
 "Walking segment" = "Walking segment";
 "Access" = "Access";
 "Train times" = "Train times";
-"Notifications" = "Notifications";
 "Avg duration" = "Avg duration";
 "Total trips" = "Total trips";
 "This month" = "This month";
 "Your stats" = "Your stats";
-"Add Quick Tag" = "Add Quick Tag";
-"Edit Quick Tag" = "Edit Quick Tag";
-"Delete Quick Tag" = "Delete Quick Tag";
-"Quick Tags appear as one-tap chips in Route Planner." = "Quick tags fill a start or destination field in one tap.";
 "Last" = "Last";
 "Center map on my location" = "Center map on my location";

@@ -15,34 +15,34 @@
     "verifiedTransferContexts": "source_pending"
   },
   "coverage": {
-    "networkStations": 351,
+    "networkStations": 359,
     "matchedStations": {
-      "covered": 89,
-      "total": 351
+      "covered": 91,
+      "total": 359
     },
     "accessibility": {
       "covered": 7,
-      "total": 351
+      "total": 359
     },
     "staticSchedules": {
       "covered": 0,
-      "total": 351
+      "total": 359
     },
     "liveArrivals": {
       "covered": 0,
-      "total": 351
+      "total": 359
     },
     "externalLayouts": {
       "covered": 0,
-      "total": 351
+      "total": 359
     },
     "licensedMedia": {
       "covered": 0,
-      "total": 351
+      "total": 359
     },
     "verifiedTransferContexts": {
       "covered": 0,
-      "total": 351
+      "total": 359
     }
   },
   "stations": [
@@ -1150,6 +1150,52 @@
           "kind": "exit",
           "latitude": 30.543103,
           "longitude": 114.268551,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "4989dea2f28e7024",
+      "stationName": "黄家湖地铁小镇",
+      "stationNameEn": "Huangjiahu Ditiexiaozhen",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14320082807",
+          "name": "黄家湖地铁小镇地铁站C口",
+          "kind": "exit",
+          "latitude": 30.436155,
+          "longitude": 114.297999,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14320082808",
+          "name": "黄家湖地铁小镇地铁站D口",
+          "kind": "exit",
+          "latitude": 30.437114,
+          "longitude": 114.298355,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3182,8 +3228,8 @@
           "id": "osm-12818439858",
           "name": "红霞地铁站B口",
           "kind": "exit",
-          "latitude": 30.431319,
-          "longitude": 114.261975,
+          "latitude": 30.431322,
+          "longitude": 114.261966,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3192,8 +3238,8 @@
           "id": "osm-12860132330",
           "name": "红霞地铁站A口",
           "kind": "exit",
-          "latitude": 30.430729,
-          "longitude": 114.26192,
+          "latitude": 30.430731,
+          "longitude": 114.261927,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3202,8 +3248,8 @@
           "id": "osm-12860132331",
           "name": "红霞地铁站D口",
           "kind": "exit",
-          "latitude": 30.430446,
-          "longitude": 114.261658,
+          "latitude": 30.430443,
+          "longitude": 114.261673,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3212,8 +3258,8 @@
           "id": "osm-12860132332",
           "name": "红霞地铁站C口",
           "kind": "exit",
-          "latitude": 30.431597,
-          "longitude": 114.261755,
+          "latitude": 30.431596,
+          "longitude": 114.261739,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -3802,7 +3848,7 @@
           "id": "osm-12866100800",
           "name": "军运村地铁站D口",
           "kind": "exit",
-          "latitude": 30.42778,
+          "latitude": 30.427784,
           "longitude": 114.295307,
           "isAccessible": false,
           "stepFree": "unknown",
@@ -4385,6 +4431,72 @@
       ]
     },
     {
+      "stationID": "c541ce4de8ed9b41",
+      "stationName": "四新大道",
+      "stationNameEn": "Sixin Boulevard",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14344756608",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.535598,
+          "longitude": 114.195423,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14344756609",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.535921,
+          "longitude": 114.19465,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14344756610",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.534534,
+          "longitude": 114.193671,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14344756611",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.534283,
+          "longitude": 114.194559,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "cc22a138e20e337e",
       "stationName": "徐州新村",
       "stationNameEn": "Xuzhouxincun",
@@ -4730,7 +4842,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-11475856983",
-          "name": "",
+          "name": "F",
           "kind": "exit",
           "latitude": 30.485718,
           "longitude": 114.503105,
@@ -4740,7 +4852,7 @@
         },
         {
           "id": "osm-11475856984",
-          "name": "",
+          "name": "G",
           "kind": "exit",
           "latitude": 30.485712,
           "longitude": 114.502627,
@@ -4784,16 +4896,6 @@
           "kind": "exit",
           "latitude": 30.485298,
           "longitude": 114.503503,
-          "isAccessible": false,
-          "stepFree": "unknown",
-          "source": "specificEntrance"
-        },
-        {
-          "id": "osm-11475856989",
-          "name": "",
-          "kind": "exit",
-          "latitude": 30.484881,
-          "longitude": 114.502231,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4956,8 +5058,8 @@
           "id": "osm-12860132326",
           "name": "黄家湖(武科大)地铁站B口",
           "kind": "exit",
-          "latitude": 30.443477,
-          "longitude": 114.263016,
+          "latitude": 30.443364,
+          "longitude": 114.263077,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4966,8 +5068,8 @@
           "id": "osm-12860132327",
           "name": "黄家湖(武科大)地铁站C口",
           "kind": "exit",
-          "latitude": 30.443568,
-          "longitude": 114.262796,
+          "latitude": 30.443436,
+          "longitude": 114.262847,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4976,8 +5078,8 @@
           "id": "osm-12860132328",
           "name": "黄家湖(武科大)地铁站A口",
           "kind": "exit",
-          "latitude": 30.442939,
-          "longitude": 114.262749,
+          "latitude": 30.442701,
+          "longitude": 114.26277,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4986,8 +5088,8 @@
           "id": "osm-12860132329",
           "name": "黄家湖(武科大)地铁站D口",
           "kind": "exit",
-          "latitude": 30.443001,
-          "longitude": 114.262526,
+          "latitude": 30.442556,
+          "longitude": 114.262448,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -5646,6 +5748,26 @@
           "kind": "exit",
           "latitude": 30.487806,
           "longitude": 114.479822,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14345068008",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 30.487992,
+          "longitude": 114.482325,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14345068009",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 30.487266,
+          "longitude": 114.48228,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

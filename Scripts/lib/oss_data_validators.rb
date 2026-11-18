@@ -521,11 +521,37 @@ module OSSDataValidators
       end
       (cities - bundled).each { |city| validate_pending_city!(city) }
       bundled.each { |city| validate_bundled_city!(city) }
+      validate_networks!(manifest["networks"])
       RightsValidator.new(root: root).validate!
       true
     end
 
     private
+
+    # The app updates a city's network from this list and verifies the bytes against it, so every
+    # entry must describe the file beside it exactly. One entry per bundled network, in ID order.
+    def validate_networks!(networks)
+      fail_validation("manifest networks must be an array") unless networks.is_a?(Array)
+      expected_ids = Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "*.json"))
+        .map { |path| File.basename(path, ".json") }.sort
+      unless networks.map { |entry| entry["cityID"] } == expected_ids
+        fail_validation("manifest networks must list every bundled network once, in cityID order")
+      end
+      networks.each do |entry|
+        city_id = entry.fetch("cityID")
+        exact_keys!(entry, %w[cityID version sizeBytes sha256 bundledResource downloadURL], "manifest network #{city_id}")
+        resource = "MetroNetworks/#{city_id}.json"
+        fail_validation("#{city_id} network bundledResource must be #{resource}") unless entry["bundledResource"] == resource
+        unless entry["downloadURL"] == "../Just-Go/Resources/#{resource}"
+          fail_validation("#{city_id} network downloadURL must be ../Just-Go/Resources/#{resource}")
+        end
+        bytes = File.binread(File.join(root, "Just-Go", "Resources", resource))
+        fail_validation("#{city_id} network sizeBytes mismatch") unless entry["sizeBytes"] == bytes.bytesize
+        fail_validation("#{city_id} network sha256 mismatch") unless entry["sha256"] == Digest::SHA256.hexdigest(bytes)
+        version = JSON.parse(bytes).fetch("version")
+        fail_validation("#{city_id} network version must be #{version}") unless entry["version"] == version
+      end
+    end
 
     def validate_pending_city!(city)
       city_id = city.fetch("cityID")
@@ -822,20 +848,20 @@ module OSSDataValidators
     # nobody has ever looked at. Losing these again would be silent without a pin, and in Xi'an,
     # where 455 of them are, it is the majority of what the survey actually says.
     OSM_ENTRANCE_PACK_EXPECTATIONS = {
-      "1200" => { stations: 110, exits: 348, accessibility: 5, surveyedNotStepFree: 1, network: 240 },
-      "3100" => { stations: 369, exits: 1435, accessibility: 56, surveyedNotStepFree: 128, network: 471 },
-      "3201" => { stations: 128, exits: 448, accessibility: 11, surveyedNotStepFree: 3, network: 267 },
+      "1200" => { stations: 110, exits: 349, accessibility: 5, surveyedNotStepFree: 1, network: 240 },
+      "3100" => { stations: 371, exits: 1442, accessibility: 57, surveyedNotStepFree: 132, network: 471 },
+      "3201" => { stations: 133, exits: 461, accessibility: 11, surveyedNotStepFree: 3, network: 281 },
       "3205" => { stations: 53, exits: 230, accessibility: 2, surveyedNotStepFree: 14, network: 235 },
-      "3301" => { stations: 262, exits: 1333, accessibility: 10, surveyedNotStepFree: 18, network: 270 },
-      "4201" => { stations: 89, exits: 318, accessibility: 7, surveyedNotStepFree: 10, network: 351 },
+      "3301" => { stations: 262, exits: 1340, accessibility: 11, surveyedNotStepFree: 19, network: 270 },
+      "4201" => { stations: 91, exits: 325, accessibility: 7, surveyedNotStepFree: 10, network: 359 },
       # Metro/intercity concourse pairs are declared in-station interchanges (see
       # `build_interchanges`), not merged into one node, so each half's doors match its own
       # platform. Two exits at 广州白云 are in range of both halves and are reported and dropped
       # rather than guessed at.
-      "4401" => { stations: 333, exits: 1265, accessibility: 40, surveyedNotStepFree: 81, network: 434 },
-      "4403" => { stations: 330, exits: 1539, accessibility: 29, surveyedNotStepFree: 44, network: 380 },
-      "5000" => { stations: 87, exits: 306, accessibility: 3, surveyedNotStepFree: 8, network: 288 },
-      "5101" => { stations: 192, exits: 805, accessibility: 10, surveyedNotStepFree: 15, network: 403 },
+      "4401" => { stations: 336, exits: 1281, accessibility: 41, surveyedNotStepFree: 81, network: 434 },
+      "4403" => { stations: 330, exits: 1546, accessibility: 29, surveyedNotStepFree: 44, network: 380 },
+      "5000" => { stations: 87, exits: 306, accessibility: 3, surveyedNotStepFree: 8, network: 300 },
+      "5101" => { stations: 196, exits: 818, accessibility: 10, surveyedNotStepFree: 15, network: 403 },
       "6101" => { stations: 231, exits: 934, accessibility: 167, surveyedNotStepFree: 457, network: 263 }
     }.freeze
 
@@ -847,15 +873,15 @@ module OSSDataValidators
         # stations with at least one entrance tagged wheelchair=yes. Pinned like the rest: a drop
         # means the entrance import silently stopped matching.
         {
-          "networkStations" => 451,
-          "matchedStations" => { "covered" => 451, "total" => 451 },
-          "accessibility" => { "covered" => 43, "total" => 451 },
-          # 77 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
-          "staticSchedules" => { "covered" => 0, "total" => 451 },
-          "liveArrivals" => { "covered" => 0, "total" => 451 },
-          "externalLayouts" => { "covered" => 0, "total" => 451 },
-          "licensedMedia" => { "covered" => 0, "total" => 451 },
-          "verifiedTransferContexts" => { "covered" => 0, "total" => 451 }
+          "networkStations" => 452,
+          "matchedStations" => { "covered" => 452, "total" => 452 },
+          "accessibility" => { "covered" => 43, "total" => 452 },
+          # 78 of Beijing's doors are surveyed unusable; see `surveyedNotStepFree` below.
+          "staticSchedules" => { "covered" => 0, "total" => 452 },
+          "liveArrivals" => { "covered" => 0, "total" => 452 },
+          "externalLayouts" => { "covered" => 0, "total" => 452 },
+          "licensedMedia" => { "covered" => 0, "total" => 452 },
+          "verifiedTransferContexts" => { "covered" => 0, "total" => 452 }
         }
       when "7101"
         # data.taipei covers the Taipei Metro proper; the New Taipei light-rail and branch lines

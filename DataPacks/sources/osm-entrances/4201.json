@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 332,
-    "boundCount": 318,
-    "unmatchedCount": 11,
+    "entranceCount": 340,
+    "boundCount": 325,
+    "unmatchedCount": 12,
     "ambiguousCount": 3,
-    "stationsWithEntrances": 89,
-    "networkStationCount": 351
+    "stationsWithEntrances": 91,
+    "networkStationCount": 359
   },
   "stations": {
     "0305a37edb2fbdd1": [
@@ -405,6 +405,22 @@
         "latitude": 30.5435238,
         "longitude": 114.2691469,
         "ref": "D"
+      }
+    ],
+    "4989dea2f28e7024": [
+      {
+        "osmNodeID": "14320082807",
+        "latitude": 30.4361548,
+        "longitude": 114.2979985,
+        "ref": "C",
+        "name": "黄家湖地铁小镇地铁站C口"
+      },
+      {
+        "osmNodeID": "14320082808",
+        "latitude": 30.4371135,
+        "longitude": 114.298355,
+        "ref": "D",
+        "name": "黄家湖地铁小镇地铁站D口"
       }
     ],
     "4b6ba7e4ceb8410e": [
@@ -1157,29 +1173,29 @@
     "90c7d5f65128a417": [
       {
         "osmNodeID": "12860132330",
-        "latitude": 30.4307287,
-        "longitude": 114.2619202,
+        "latitude": 30.4307307,
+        "longitude": 114.2619274,
         "ref": "A",
         "name": "红霞地铁站A口"
       },
       {
         "osmNodeID": "12818439858",
-        "latitude": 30.4313192,
-        "longitude": 114.2619747,
+        "latitude": 30.4313221,
+        "longitude": 114.2619663,
         "ref": "B",
         "name": "红霞地铁站B口"
       },
       {
         "osmNodeID": "12860132332",
-        "latitude": 30.4315971,
-        "longitude": 114.2617546,
+        "latitude": 30.4315956,
+        "longitude": 114.2617389,
         "ref": "C",
         "name": "红霞地铁站C口"
       },
       {
         "osmNodeID": "12860132331",
-        "latitude": 30.4304461,
-        "longitude": 114.2616582,
+        "latitude": 30.430443,
+        "longitude": 114.261673,
         "ref": "D",
         "name": "红霞地铁站D口"
       }
@@ -1411,7 +1427,7 @@
       },
       {
         "osmNodeID": "12866100800",
-        "latitude": 30.4277804,
+        "latitude": 30.4277836,
         "longitude": 114.2953065,
         "ref": "D",
         "name": "军运村地铁站D口"
@@ -1629,6 +1645,28 @@
         "ref": "D"
       }
     ],
+    "c541ce4de8ed9b41": [
+      {
+        "osmNodeID": "14344756608",
+        "latitude": 30.5355983,
+        "longitude": 114.1954231
+      },
+      {
+        "osmNodeID": "14344756609",
+        "latitude": 30.5359209,
+        "longitude": 114.1946501
+      },
+      {
+        "osmNodeID": "14344756610",
+        "latitude": 30.5345337,
+        "longitude": 114.193671
+      },
+      {
+        "osmNodeID": "14344756611",
+        "latitude": 30.5342826,
+        "longitude": 114.194559
+      }
+    ],
     "cc22a138e20e337e": [
       {
         "osmNodeID": "5483918124",
@@ -1747,12 +1785,14 @@
       {
         "osmNodeID": "11475856983",
         "latitude": 30.4857178,
-        "longitude": 114.503105
+        "longitude": 114.503105,
+        "name": "F"
       },
       {
         "osmNodeID": "11475856984",
         "latitude": 30.4857124,
-        "longitude": 114.5026267
+        "longitude": 114.5026267,
+        "name": "G"
       },
       {
         "osmNodeID": "11475856985",
@@ -1773,11 +1813,6 @@
         "osmNodeID": "11475856988",
         "latitude": 30.4852981,
         "longitude": 114.503503
-      },
-      {
-        "osmNodeID": "11475856989",
-        "latitude": 30.4848812,
-        "longitude": 114.5022312
       }
     ],
     "e85c50b31055166a": [
@@ -1828,26 +1863,26 @@
     "e95e66019dc57aac": [
       {
         "osmNodeID": "12860132326",
-        "latitude": 30.4434765,
-        "longitude": 114.2630158,
+        "latitude": 30.4433641,
+        "longitude": 114.2630771,
         "name": "黄家湖(武科大)地铁站B口"
       },
       {
         "osmNodeID": "12860132327",
-        "latitude": 30.4435681,
-        "longitude": 114.2627964,
+        "latitude": 30.443436,
+        "longitude": 114.2628473,
         "name": "黄家湖(武科大)地铁站C口"
       },
       {
         "osmNodeID": "12860132328",
-        "latitude": 30.4429394,
-        "longitude": 114.2627493,
+        "latitude": 30.4427013,
+        "longitude": 114.2627696,
         "name": "黄家湖(武科大)地铁站A口"
       },
       {
         "osmNodeID": "12860132329",
-        "latitude": 30.4430012,
-        "longitude": 114.2625262,
+        "latitude": 30.4425559,
+        "longitude": 114.2624484,
         "name": "黄家湖(武科大)地铁站D口"
       }
     ],
@@ -2060,6 +2095,12 @@
     ],
     "fedecaa0483d19d2": [
       {
+        "osmNodeID": "14345068009",
+        "latitude": 30.4872664,
+        "longitude": 114.4822797,
+        "name": "C"
+      },
+      {
         "osmNodeID": "11127321178",
         "latitude": 30.4870962,
         "longitude": 114.4799067,
@@ -2072,6 +2113,12 @@
         "longitude": 114.4812928,
         "ref": "B",
         "wheelchair": "no"
+      },
+      {
+        "osmNodeID": "14345068008",
+        "latitude": 30.4879924,
+        "longitude": 114.4823253,
+        "ref": "D"
       },
       {
         "osmNodeID": "11127321180",

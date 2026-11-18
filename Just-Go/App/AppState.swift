@@ -72,14 +72,14 @@ final class AppState {
     enum Tab: Hashable {
         case map
         case trips
-        case profile
+        case settings
     }
 
     #if DEBUG
     // Lets a headless diagnostic launch open on a given tab: this environment has no tap injection.
     var selectedTab: Tab = {
         switch ProcessInfo.processInfo.environment["JUST_GO_START_TAB"] {
-        case "profile": return .profile
+        case "settings", "profile": return .settings
         case "trips": return .trips
         default: return .map
         }
@@ -101,6 +101,10 @@ final class AppState {
     /// The rider tapped the trip on the Lock Screen or in the Dynamic Island, and wants its
     /// navigator. One-shot, like `pendingRouteInput`: the map reads it once and clears it.
     var pendingTripOpen = false
+
+    /// The rider asked to plan a trip from somewhere that cannot (the Trips tab's empty state).
+    /// One-shot: the map opens its search page and clears it.
+    var pendingSearchOpen = false
 
     var accessibilityPreference: AccessibilityPreference {
         didSet {

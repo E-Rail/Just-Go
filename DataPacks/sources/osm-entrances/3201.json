@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 457,
-    "boundCount": 448,
-    "unmatchedCount": 8,
+    "entranceCount": 469,
+    "boundCount": 461,
+    "unmatchedCount": 7,
     "ambiguousCount": 1,
-    "stationsWithEntrances": 128,
-    "networkStationCount": 267
+    "stationsWithEntrances": 133,
+    "networkStationCount": 281
   },
   "stations": {
     "005c57892b9ebb88": [
@@ -847,6 +847,28 @@
         "name": "草场门#2"
       }
     ],
+    "47225ccbd47eb35d": [
+      {
+        "osmNodeID": "14237795840",
+        "latitude": 32.1372547,
+        "longitude": 118.8610416
+      },
+      {
+        "osmNodeID": "14237795841",
+        "latitude": 32.1376841,
+        "longitude": 118.8609024
+      },
+      {
+        "osmNodeID": "14237795842",
+        "latitude": 32.1377702,
+        "longitude": 118.8624876
+      },
+      {
+        "osmNodeID": "14237795843",
+        "latitude": 32.1370032,
+        "longitude": 118.8621073
+      }
+    ],
     "49db7d85b75709f3": [
       {
         "osmNodeID": "7998554088",
@@ -949,6 +971,29 @@
         "latitude": 31.9595042,
         "longitude": 118.733463,
         "ref": "1"
+      }
+    ],
+    "5401a0b152bc469d": [
+      {
+        "osmNodeID": "13720096298",
+        "latitude": 31.9237427,
+        "longitude": 118.8498652,
+        "ref": "1",
+        "name": "科宁路地铁站1号口"
+      },
+      {
+        "osmNodeID": "13720096299",
+        "latitude": 31.9245527,
+        "longitude": 118.8494573,
+        "ref": "2",
+        "name": "科宁路地铁站2号口"
+      },
+      {
+        "osmNodeID": "13720096297",
+        "latitude": 31.9236389,
+        "longitude": 118.8493448,
+        "ref": "3",
+        "name": "科宁路地铁站3号口"
       }
     ],
     "547421f0bb6b6cb0": [
@@ -1340,6 +1385,28 @@
         "latitude": 32.0775117,
         "longitude": 118.8306345,
         "name": "蒋王庙#2"
+      }
+    ],
+    "73592c1ec68373ba": [
+      {
+        "osmNodeID": "14237795849",
+        "latitude": 32.1386156,
+        "longitude": 118.8759827
+      },
+      {
+        "osmNodeID": "14237795850",
+        "latitude": 32.1381557,
+        "longitude": 118.8760925
+      },
+      {
+        "osmNodeID": "14237795851",
+        "latitude": 32.1379667,
+        "longitude": 118.8775055
+      },
+      {
+        "osmNodeID": "14237795852",
+        "latitude": 32.1387621,
+        "longitude": 118.8778767
       }
     ],
     "740565f8cfc112a7": [
@@ -2508,6 +2575,13 @@
         "ref": "2"
       }
     ],
+    "c796151885062c33": [
+      {
+        "osmNodeID": "14237795839",
+        "latitude": 32.1338122,
+        "longitude": 118.8477335
+      }
+    ],
     "c8cf0318200931b6": [
       {
         "osmNodeID": "8003066310",
@@ -2979,6 +3053,13 @@
         "longitude": 118.7835838,
         "ref": "4",
         "name": "张府园#4"
+      }
+    ],
+    "f5abd8aaa8868316": [
+      {
+        "osmNodeID": "14205793487",
+        "latitude": 32.1468862,
+        "longitude": 118.9502821
       }
     ],
     "f5fcc6798220ea25": [

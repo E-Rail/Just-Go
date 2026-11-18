@@ -53,7 +53,12 @@ Just-Go 是一款面向 iPhone 和 iPad 的轨道交通出行助手，用于路�
 | 苏州 | 235 | 2 |
 
 其余 44 个目录城市的车站数据处于来源待接入状态。轨道路线由内置地铁网络计算，不依赖可选城市
-数据包。应用不会把当前任何城市包描述为可下载内容。
+数据包。
+
+应用会让地铁线网和城市数据包与本仓库 `main` 分支保持一致（设置 → 公交数据 → 更新）：可手动检查，
+也可自动检查，自动检查最多每六小时一次，低数据模式下或出行途中不会进行。`DataPacks/manifest.json`
+列出每个线网和数据包的大小与 SHA-256；只有哈希与正在使用的数据不同时才下载，同一城市的两份文件
+互相校验后一起安装，否则都不安装。应用本身更新后，已下载的数据会被清除。
 
 ## 官方资源目录
 
@@ -99,9 +104,9 @@ Just-Go 不提供站内导航。站内图引擎、逐步规划、检查点扫描
 2. 在 Xcode 中打开 `Just-Go.xcodeproj`。
 3. 构建 `Just-Go` scheme。
 
-Release 构建默认只使用内置基础数据；只有配置第一方城市数据源后才会启用远程更新。
-Release 不会回退到 GitHub、jsDelivr 或 Wikimedia。Debug 构建可使用明确配置的开发源；
-可通过 `CITY_PACK_SECRET_MAINLAND_MIRROR_URL` 配置第一方中国大陆镜像，本仓库默认未配置镜像。
+数据更新来自 `Just-Go/Config/*.xcconfig` 中的三个来源，按顺序尝试：中国大陆 jsDelivr 镜像、
+jsDelivr 和 `raw.githubusercontent.com`，均提供本仓库 `main` 分支的文件。
+`Scripts/validate_runtime_data_policy.rb` 按值锁定这三个来源。Wikimedia 永远不会作为来源。
 
 使用仓库中已经审核并固化的输入重新生成和验证数据：
 

@@ -17,7 +17,7 @@
   "coverage": {
     "networkStations": 403,
     "matchedStations": {
-      "covered": 192,
+      "covered": 196,
       "total": 403
     },
     "accessibility": {
@@ -1228,7 +1228,8 @@
 
         ],
         "accessibleEntrances": [
-          "E"
+          "E",
+          "C"
         ],
         "facilityNotes": [
 
@@ -1256,6 +1257,16 @@
           "kind": "exit",
           "latitude": 30.643929,
           "longitude": 104.07541,
+          "isAccessible": true,
+          "stepFree": "yes",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14354603817",
+          "name": "C",
+          "kind": "exit",
+          "latitude": 30.644863,
+          "longitude": 104.074793,
           "isAccessible": true,
           "stepFree": "yes",
           "source": "specificEntrance"
@@ -1856,6 +1867,26 @@
           "kind": "exit",
           "latitude": 30.49846,
           "longitude": 104.008711,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14310940437",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.498865,
+          "longitude": 104.009346,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14310940438",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.499289,
+          "longitude": 104.008874,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4478,7 +4509,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-11500333553",
-          "name": "",
+          "name": "牧华路",
           "kind": "exit",
           "latitude": 30.484641,
           "longitude": 104.012123,
@@ -4488,10 +4519,76 @@
         },
         {
           "id": "osm-11500333556",
-          "name": "",
+          "name": "牧华路",
           "kind": "exit",
-          "latitude": 30.485584,
-          "longitude": 104.010239,
+          "latitude": 30.485648,
+          "longitude": 104.010269,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "4c6b8c042bdb3910",
+      "stationName": "航都大街",
+      "stationNameEn": "Hangdu Street",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14379396175",
+          "name": "航都大街C口",
+          "kind": "exit",
+          "latitude": 30.591285,
+          "longitude": 103.936233,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14379396176",
+          "name": "航都大街A口",
+          "kind": "exit",
+          "latitude": 30.591135,
+          "longitude": 103.937597,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14379396177",
+          "name": "航都大街B口",
+          "kind": "exit",
+          "latitude": 30.591654,
+          "longitude": 103.937449,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14379396178",
+          "name": "航都大街A口",
+          "kind": "exit",
+          "latitude": 30.590516,
+          "longitude": 103.936755,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -4712,7 +4809,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-6257575031",
-          "name": "",
+          "name": "D",
           "kind": "exit",
           "latitude": 30.615802,
           "longitude": 104.067395,
@@ -5322,8 +5419,8 @@
           "id": "osm-14102373139",
           "name": "D",
           "kind": "exit",
-          "latitude": 30.74283,
-          "longitude": 104.059409,
+          "latitude": 30.742862,
+          "longitude": 104.059448,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -6741,6 +6838,62 @@
       ]
     },
     {
+      "stationID": "775bdaad1d05e60b",
+      "stationName": "小南街",
+      "stationNameEn": "Xiaonan Street",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14213426587",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.652386,
+          "longitude": 104.052688,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14213426588",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.653074,
+          "longitude": 104.05229,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14213426589",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.652723,
+          "longitude": 104.051874,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "7a00415481b4d159",
       "stationName": "琉璃场",
       "stationNameEn": "Liulichang",
@@ -7778,6 +7931,42 @@
           "kind": "exit",
           "latitude": 30.633272,
           "longitude": 104.065955,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "8d66a6599d38e690",
+      "stationName": "龙泉驿火车站南",
+      "stationNameEn": "Longquanyi Railway Station South",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14242783458",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 30.592389,
+          "longitude": 104.197432,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -10122,10 +10311,10 @@
       "stationAccessPoints": [
         {
           "id": "osm-12553350957",
-          "name": "",
+          "name": "D",
           "kind": "exit",
-          "latitude": 30.645839,
-          "longitude": 104.094016,
+          "latitude": 30.645926,
+          "longitude": 104.093973,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -11220,6 +11409,52 @@
           "kind": "exit",
           "latitude": 30.604579,
           "longitude": 104.15761,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "da867bbdedab67dc",
+      "stationName": "文翁石室",
+      "stationNameEn": "Wenweng Shishi",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14213426585",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.648456,
+          "longitude": 104.057555,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14213426586",
+          "name": "",
+          "kind": "exit",
+          "latitude": 30.649552,
+          "longitude": 104.056433,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

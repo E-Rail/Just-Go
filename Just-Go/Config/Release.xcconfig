@@ -11,8 +11,10 @@
 // `https:/$()/` is not a typo. An xcconfig treats `//` as the start of a comment, and `$()`
 // expands to nothing, so this is the only way to write a URL here at all.
 //
-// A download still happens only when a rider asks Transit Data to update a city and the mirror's
-// version and SHA-256 differ from what is installed. Nothing here is contacted on launch.
+// The manifest is fetched by a data update (`CityDataUpdater`): when the rider taps Check for
+// Updates, or automatically while Update Automatically is on, at most every six hours, never on a
+// Low Data Mode network and never during a trip. A city's network and pack are downloaded only
+// when their SHA-256 differs from what is in use, and are checked against each other first.
 CITY_PACK_MAINLAND_MIRROR_URL = https:/$()/cdn.jsdmirror.com/gh/E-Rail/Just-Go@main/DataPacks/manifest.json
 CITY_PACK_MANIFEST_URL = https:/$()/cdn.jsdelivr.net/gh/E-Rail/Just-Go@main/DataPacks/manifest.json
 CITY_PACK_BASE_URL = https:/$()/raw.githubusercontent.com/E-Rail/Just-Go/main/DataPacks/manifest.json

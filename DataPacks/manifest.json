@@ -5,8 +5,8 @@
     {
       "cityID": "1100",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 725570,
-      "sha256": "55a149b01f37c16f5669160f1b35b9b26149b36bcb34e6031f2e2423285dbf16",
+      "sizeBytes": 727088,
+      "sha256": "6aaafa4ee92dc3b9260dc9f30d3124e92381d6c3093491f962936c2e148d542a",
       "bundledResource": "BundledCityPacks/1100.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/1100.json",
       "rightsIDs": [
@@ -25,42 +25,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 451,
+        "networkStations": 452,
         "matchedStations": {
-          "covered": 451,
-          "total": 451
+          "covered": 452,
+          "total": 452
         },
         "accessibility": {
           "covered": 43,
-          "total": 451
+          "total": 452
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 451
+          "total": 452
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 451
+          "total": 452
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 451
+          "total": 452
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 451
+          "total": 452
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 451
+          "total": 452
         }
       }
     },
     {
       "cityID": "4401",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 520374,
-      "sha256": "4c3ccc02c8d991bc7ff0f3361f6d798dbd5b27f96f58e706018318509ec58abe",
+      "sizeBytes": 526660,
+      "sha256": "a6aca2c404294efe3580a2d03a9d6168f96d59229c1e3325665b322171aef6fa",
       "bundledResource": "BundledCityPacks/4401.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4401.json",
       "rightsIDs": [
@@ -80,11 +80,11 @@
       "coverage": {
         "networkStations": 434,
         "matchedStations": {
-          "covered": 333,
+          "covered": 336,
           "total": 434
         },
         "accessibility": {
-          "covered": 40,
+          "covered": 41,
           "total": 434
         },
         "staticSchedules": {
@@ -112,8 +112,8 @@
     {
       "cityID": "3100",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 569987,
-      "sha256": "c2d5220a1faefcff6a220f42eb17e718fa8fb556e7f0806322c8ac3b93aba985",
+      "sizeBytes": 573115,
+      "sha256": "f15e5734888277bdf733f6ad68130ff82139ac73070f4a4c5405a6f3d81e13db",
       "bundledResource": "BundledCityPacks/3100.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3100.json",
       "rightsIDs": [
@@ -133,11 +133,11 @@
       "coverage": {
         "networkStations": 471,
         "matchedStations": {
-          "covered": 369,
+          "covered": 371,
           "total": 471
         },
         "accessibility": {
-          "covered": 56,
+          "covered": 57,
           "total": 471
         },
         "staticSchedules": {
@@ -165,8 +165,8 @@
     {
       "cityID": "1200",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 149806,
-      "sha256": "df256c480f652bf5443c451d78b23b1bb92df0b9dcc74a7e34ef224ed74e8e8e",
+      "sizeBytes": 150105,
+      "sha256": "8291d2f4af9e5693dd04ef51a6c62dcd3822ac22a85cc4cc1243adc7db427d24",
       "bundledResource": "BundledCityPacks/1200.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/1200.json",
       "rightsIDs": [
@@ -218,8 +218,8 @@
     {
       "cityID": "5000",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 122440,
-      "sha256": "0f084e9c306bdbf6f3ed4232f44d8217a37174602170497e149b2fbe43c1a1ad",
+      "sizeBytes": 122442,
+      "sha256": "7a6eec35645e000fae090d7cc31cabbf5bb46edd6a5161b618d94cfab6056a7f",
       "bundledResource": "BundledCityPacks/5000.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/5000.json",
       "rightsIDs": [
@@ -237,34 +237,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 288,
+        "networkStations": 300,
         "matchedStations": {
           "covered": 87,
-          "total": 288
+          "total": 300
         },
         "accessibility": {
           "covered": 3,
-          "total": 288
+          "total": 300
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 288
+          "total": 300
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 288
+          "total": 300
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 288
+          "total": 300
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 288
+          "total": 300
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 288
+          "total": 300
         }
       }
     },
@@ -324,8 +324,8 @@
     {
       "cityID": "3201",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 185555,
-      "sha256": "fa92fc09554290924a2e0cfdac7bb83718596678d3f35d5c980c08989cec7560",
+      "sizeBytes": 191266,
+      "sha256": "ad93945100b28108cbaf3f9a8b21035d5f0fd9b0e5acd25e58f2cc525c860537",
       "bundledResource": "BundledCityPacks/3201.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3201.json",
       "rightsIDs": [
@@ -343,42 +343,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 267,
+        "networkStations": 281,
         "matchedStations": {
-          "covered": 128,
-          "total": 267
+          "covered": 133,
+          "total": 281
         },
         "accessibility": {
           "covered": 11,
-          "total": 267
+          "total": 281
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 267
+          "total": 281
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 267
+          "total": 281
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 267
+          "total": 281
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 267
+          "total": 281
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 267
+          "total": 281
         }
       }
     },
     {
       "cityID": "4201",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 129519,
-      "sha256": "c1af12a952e90830f7b734caadaae50bdec81421f83d45de48d88daeabd15226",
+      "sizeBytes": 132375,
+      "sha256": "5710a1ee3950ea34ac967ead30cac08a2cfacf73fc9a2eb07050868f40ab2f6d",
       "bundledResource": "BundledCityPacks/4201.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4201.json",
       "rightsIDs": [
@@ -396,42 +396,42 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 351,
+        "networkStations": 359,
         "matchedStations": {
-          "covered": 89,
-          "total": 351
+          "covered": 91,
+          "total": 359
         },
         "accessibility": {
           "covered": 7,
-          "total": 351
+          "total": 359
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 351
+          "total": 359
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 351
+          "total": 359
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 351
+          "total": 359
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 351
+          "total": 359
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 351
+          "total": 359
         }
       }
     },
     {
       "cityID": "5101",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 307031,
-      "sha256": "39d56ee04b258530e8e710f881b56a2af0dd918793c0a3c232f18a9d46be31a4",
+      "sizeBytes": 312403,
+      "sha256": "05ad0dcff2e0a966069a20818f15a578214dbb1ce939957b7243d0a863edb36c",
       "bundledResource": "BundledCityPacks/5101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/5101.json",
       "rightsIDs": [
@@ -451,7 +451,7 @@
       "coverage": {
         "networkStations": 403,
         "matchedStations": {
-          "covered": 192,
+          "covered": 196,
           "total": 403
         },
         "accessibility": {
@@ -483,8 +483,8 @@
     {
       "cityID": "6101",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 430345,
-      "sha256": "2769d08fb294ea00bd8fad1c043d47b856ced97882f5fed5cb6404602681ace7",
+      "sizeBytes": 430334,
+      "sha256": "a65c8e47c11d909d601986729670443cd9225d7d901b31ac505ab9268d14d2a8",
       "bundledResource": "BundledCityPacks/6101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/6101.json",
       "rightsIDs": [
@@ -661,34 +661,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 232,
+        "networkStations": 231,
         "matchedStations": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "accessibility": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 232
+          "total": 231
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 232
+          "total": 231
         }
       }
     },
@@ -926,34 +926,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 130,
+        "networkStations": 142,
         "matchedStations": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "accessibility": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 130
+          "total": 142
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 130
+          "total": 142
         }
       }
     },
@@ -1403,34 +1403,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 198,
+        "networkStations": 196,
         "matchedStations": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "accessibility": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 198
+          "total": 196
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 198
+          "total": 196
         }
       }
     },
@@ -1543,8 +1543,8 @@
     {
       "cityID": "3301",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 481933,
-      "sha256": "b2e06c82388652d8c00174638e021eda74098ceb9364addae84447d37ec8121b",
+      "sizeBytes": 484270,
+      "sha256": "6675654e16325b1c3e3c85f0d47f07755fe676dd3e57d4683f619b8a839a55c7",
       "bundledResource": "BundledCityPacks/3301.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/3301.json",
       "rightsIDs": [
@@ -1568,7 +1568,7 @@
           "total": 270
         },
         "accessibility": {
-          "covered": 10,
+          "covered": 11,
           "total": 270
         },
         "staticSchedules": {
@@ -1774,34 +1774,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 30,
+        "networkStations": 29,
         "matchedStations": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "accessibility": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 30
+          "total": 29
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 30
+          "total": 29
         }
       }
     },
@@ -1933,34 +1933,34 @@
         "verifiedTransferContexts": "source_pending"
       },
       "coverage": {
-        "networkStations": 97,
+        "networkStations": 95,
         "matchedStations": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "accessibility": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "staticSchedules": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "liveArrivals": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "externalLayouts": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "licensedMedia": {
           "covered": 0,
-          "total": 97
+          "total": 95
         },
         "verifiedTransferContexts": {
           "covered": 0,
-          "total": 97
+          "total": 95
         }
       }
     },
@@ -2126,8 +2126,8 @@
     {
       "cityID": "4403",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 574496,
-      "sha256": "6bfdbaaae0da7b61ebf3a4d929e07282122637e2413bfdffcba42088752a90e6",
+      "sizeBytes": 576487,
+      "sha256": "8cf89cdf3e567c161f1eb90901d0c7de16ca097436e91f5bab7985bb104cdd4f",
       "bundledResource": "BundledCityPacks/4403.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/4403.json",
       "rightsIDs": [
@@ -2875,8 +2875,8 @@
     {
       "cityID": "7101",
       "version": "oss-safe-v2-20260923",
-      "sizeBytes": 212623,
-      "sha256": "ac7cd20c7e71bcec24c5a849425fab53290286aca3511fbb885f22c7303d9934",
+      "sizeBytes": 212602,
+      "sha256": "1a491c63dc1ac41a1bbfa4d81450c3e85c27a4fc0ce1dd298f770ac3c97d12d6",
       "bundledResource": "BundledCityPacks/7101.json",
       "downloadURL": "../Just-Go/Resources/BundledCityPacks/7101.json",
       "rightsIDs": [
@@ -3084,6 +3084,432 @@
           "total": 18
         }
       }
+    }
+  ],
+  "networks": [
+    {
+      "cityID": "1100",
+      "version": "osm-20261115",
+      "sizeBytes": 342928,
+      "sha256": "c8703400d0bd039b24bfbe9277eb3e1c5c3baea85c477885aff9798660c6370e",
+      "bundledResource": "MetroNetworks/1100.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/1100.json"
+    },
+    {
+      "cityID": "1200",
+      "version": "osm-20261115",
+      "sizeBytes": 135593,
+      "sha256": "856a6f93346ba4b4a962057cb76e08382af4494822c5fd4ac1a0476b528bc0dd",
+      "bundledResource": "MetroNetworks/1200.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/1200.json"
+    },
+    {
+      "cityID": "1301",
+      "version": "osm-20261115",
+      "sizeBytes": 22788,
+      "sha256": "7320bba6011ef4867669aea21abc2975963d7a23f2e8093e35a6fbe05e88d076",
+      "bundledResource": "MetroNetworks/1301.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/1301.json"
+    },
+    {
+      "cityID": "1401",
+      "version": "osm-20261115",
+      "sizeBytes": 18813,
+      "sha256": "13e1d52b9df93b5e662a78fb13ae0895e4c9565e9d225904ef984f0204686198",
+      "bundledResource": "MetroNetworks/1401.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/1401.json"
+    },
+    {
+      "cityID": "1501",
+      "version": "osm-20261115",
+      "sizeBytes": 18724,
+      "sha256": "5c31843ba460184f8c562f4f8ae0272f9bf9c32abaeae9155f1e6cef1838a564",
+      "bundledResource": "MetroNetworks/1501.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/1501.json"
+    },
+    {
+      "cityID": "2101",
+      "version": "osm-20261115",
+      "sizeBytes": 87856,
+      "sha256": "8e85e4a159aa3ba281c90653e89e594dd7fb4d19b2d72f1c5770d32f57bdc518",
+      "bundledResource": "MetroNetworks/2101.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/2101.json"
+    },
+    {
+      "cityID": "2102",
+      "version": "osm-20261115",
+      "sizeBytes": 86745,
+      "sha256": "fa1a8f393bccdce375ea5cec4f20d44b012cc171bd96a5a1b889519975893243",
+      "bundledResource": "MetroNetworks/2102.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/2102.json"
+    },
+    {
+      "cityID": "2201",
+      "version": "osm-20261115",
+      "sizeBytes": 68033,
+      "sha256": "865c6bce0a50a83aea6e27add1a6746d73fcdcaf5ea26043b523292cf71b7a34",
+      "bundledResource": "MetroNetworks/2201.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/2201.json"
+    },
+    {
+      "cityID": "2301",
+      "version": "osm-20261115",
+      "sizeBytes": 34222,
+      "sha256": "8e5f82ec06095f75f535a57c07d892626dc1953bb8d94ed7a4625655ddb58b44",
+      "bundledResource": "MetroNetworks/2301.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/2301.json"
+    },
+    {
+      "cityID": "3100",
+      "version": "osm-20261115",
+      "sizeBytes": 337909,
+      "sha256": "a208f341b214e773abb86d93eaddf68589fc6b7de9d23ccc2f1002d138be286f",
+      "bundledResource": "MetroNetworks/3100.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3100.json"
+    },
+    {
+      "cityID": "3201",
+      "version": "osm-20261115",
+      "sizeBytes": 224583,
+      "sha256": "148f10efd6374aa707c8c62b31e13764f47d58e6911bca04d3758fbed3449c19",
+      "bundledResource": "MetroNetworks/3201.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3201.json"
+    },
+    {
+      "cityID": "3202",
+      "version": "osm-20261115",
+      "sizeBytes": 58414,
+      "sha256": "c6bcf51db050b9ce0bc496866d0b1a1036ba5d87b99f9b793fdf513189529984",
+      "bundledResource": "MetroNetworks/3202.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3202.json"
+    },
+    {
+      "cityID": "3203",
+      "version": "osm-20261115",
+      "sizeBytes": 43199,
+      "sha256": "e0325b1cb3d3be3824e9039b0d1ee4e20c3935f00f8b952059b8582bdda81e33",
+      "bundledResource": "MetroNetworks/3203.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3203.json"
+    },
+    {
+      "cityID": "3204",
+      "version": "osm-20261115",
+      "sizeBytes": 22127,
+      "sha256": "516296d298eb8977785166f61a8847a115021e5e9a80a34e57b233fa8d97c468",
+      "bundledResource": "MetroNetworks/3204.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3204.json"
+    },
+    {
+      "cityID": "3205",
+      "version": "osm-20261115",
+      "sizeBytes": 142782,
+      "sha256": "06fcad9684bb813209ffc103e5942a387915bc38974fa46f8d11971ee2f88134",
+      "bundledResource": "MetroNetworks/3205.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3205.json"
+    },
+    {
+      "cityID": "3206",
+      "version": "osm-20261115",
+      "sizeBytes": 23348,
+      "sha256": "98c071e00b5a11bd54aed3780290448341dfafaa55b6f1bc0ffae58f7cb3bbfa",
+      "bundledResource": "MetroNetworks/3206.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3206.json"
+    },
+    {
+      "cityID": "3301",
+      "version": "osm-20261115",
+      "sizeBytes": 193822,
+      "sha256": "2805e055d80d2443226be643231e7f010d50eed27a3cba709ad2dc91aab4e281",
+      "bundledResource": "MetroNetworks/3301.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3301.json"
+    },
+    {
+      "cityID": "3302",
+      "version": "osm-20261115",
+      "sizeBytes": 119467,
+      "sha256": "58981aa750ac7e763cb8a488cfa12ee883425fa592e5913f8c492bdb475ed573",
+      "bundledResource": "MetroNetworks/3302.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3302.json"
+    },
+    {
+      "cityID": "3303",
+      "version": "osm-20261115",
+      "sizeBytes": 31587,
+      "sha256": "dadd6cfc123e93e44e5ca0443d8e564d38bceb4bb599a612053a497c6b6817fe",
+      "bundledResource": "MetroNetworks/3303.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3303.json"
+    },
+    {
+      "cityID": "3306",
+      "version": "osm-20261115",
+      "sizeBytes": 24475,
+      "sha256": "be26199326b97085c0986652ef35993509ebfad60ca479dad18af9caff550f63",
+      "bundledResource": "MetroNetworks/3306.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3306.json"
+    },
+    {
+      "cityID": "3307",
+      "version": "osm-20261115",
+      "sizeBytes": 27722,
+      "sha256": "fb7948cedc5e848e3f02cf285756c88ce5e572fe37cfb43a9431e52f0fb6ab92",
+      "bundledResource": "MetroNetworks/3307.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3307.json"
+    },
+    {
+      "cityID": "3310",
+      "version": "osm-20261115",
+      "sizeBytes": 9372,
+      "sha256": "bd499b31fc6025306260a6492909ef0ca01d61d0c09c799eda0fc5fe500c8426",
+      "bundledResource": "MetroNetworks/3310.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3310.json"
+    },
+    {
+      "cityID": "3401",
+      "version": "osm-20261115",
+      "sizeBytes": 104225,
+      "sha256": "e05c90d7363c05247398d055a95bcaf62a3230417daf3c5c5fbdfc238d0b897c",
+      "bundledResource": "MetroNetworks/3401.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3401.json"
+    },
+    {
+      "cityID": "3402",
+      "version": "osm-20261115",
+      "sizeBytes": 19617,
+      "sha256": "07a274e59146c13a0abedd49e08d62d68d9c8f5751710febcda001c3cde453b4",
+      "bundledResource": "MetroNetworks/3402.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3402.json"
+    },
+    {
+      "cityID": "3411",
+      "version": "osm-20261115",
+      "sizeBytes": 13421,
+      "sha256": "71806caa8b8dedce62269c0b1b728e5fd0901296a48d37f4a38cc3b625a282e1",
+      "bundledResource": "MetroNetworks/3411.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3411.json"
+    },
+    {
+      "cityID": "3501",
+      "version": "osm-20261115",
+      "sizeBytes": 74592,
+      "sha256": "04a4c20ae0cfb502dc09ae5b697e2b0adbf11dfc4052423b4cb0595043243fe0",
+      "bundledResource": "MetroNetworks/3501.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3501.json"
+    },
+    {
+      "cityID": "3502",
+      "version": "osm-20261115",
+      "sizeBytes": 59573,
+      "sha256": "d80f913822cb380a05ed9b435f42eb1c2167e1758585009613102aa85512a48f",
+      "bundledResource": "MetroNetworks/3502.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3502.json"
+    },
+    {
+      "cityID": "3601",
+      "version": "osm-20261115",
+      "sizeBytes": 59071,
+      "sha256": "d6b156193bd15a27aba487185cfc18962e7f1751c963b096194d8225ea9f31dd",
+      "bundledResource": "MetroNetworks/3601.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3601.json"
+    },
+    {
+      "cityID": "3701",
+      "version": "osm-20261115",
+      "sizeBytes": 80665,
+      "sha256": "bf49afbdbfa2ed46500192685eddf8989951630427a6d8f2cf91387d3fd242c3",
+      "bundledResource": "MetroNetworks/3701.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3701.json"
+    },
+    {
+      "cityID": "3702",
+      "version": "osm-20261115",
+      "sizeBytes": 127459,
+      "sha256": "f4fad019aec699e9945816d1a54b1d1fa5762c2c86eadfd9cf3b9060c93a4a8a",
+      "bundledResource": "MetroNetworks/3702.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/3702.json"
+    },
+    {
+      "cityID": "4101",
+      "version": "osm-20261115",
+      "sizeBytes": 116784,
+      "sha256": "46274d2398ac417244ab5664cff5a995c4558452a31716c51f054f84336d365a",
+      "bundledResource": "MetroNetworks/4101.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4101.json"
+    },
+    {
+      "cityID": "4103",
+      "version": "osm-20261115",
+      "sizeBytes": 17541,
+      "sha256": "92169f39ef54c846fa2c1c34fe7007dc4724c5b901dfefbf3edc36a95107cc0a",
+      "bundledResource": "MetroNetworks/4103.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4103.json"
+    },
+    {
+      "cityID": "4110",
+      "version": "osm-20261115",
+      "sizeBytes": 14847,
+      "sha256": "0a659bb369b2319cc48018cb60274ffdf46cbb06cff6132ba2437a88c7bc2823",
+      "bundledResource": "MetroNetworks/4110.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4110.json"
+    },
+    {
+      "cityID": "4201",
+      "version": "osm-20261115",
+      "sizeBytes": 239436,
+      "sha256": "74644ba7c6b410bcbb3b7759bf3080336231522b6872b6b044a9078f3308fad6",
+      "bundledResource": "MetroNetworks/4201.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4201.json"
+    },
+    {
+      "cityID": "4301",
+      "version": "osm-20261115",
+      "sizeBytes": 93655,
+      "sha256": "22324e8e3b366b8f7c1b3abab23e7c4bead49fcc475caf19e56bc96551a50b6d",
+      "bundledResource": "MetroNetworks/4301.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4301.json"
+    },
+    {
+      "cityID": "4401",
+      "version": "osm-20261115",
+      "sizeBytes": 487527,
+      "sha256": "04a51b7d701c1e78d1f7288d1b76be43d63f13520118a762847abdd1802b9d16",
+      "bundledResource": "MetroNetworks/4401.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4401.json"
+    },
+    {
+      "cityID": "4403",
+      "version": "osm-20261115",
+      "sizeBytes": 275197,
+      "sha256": "3c804c8080366a0c1c82c1a9e7ec49f336a0596cdd1f60fd545d1909262335c3",
+      "bundledResource": "MetroNetworks/4403.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4403.json"
+    },
+    {
+      "cityID": "4406",
+      "version": "osm-20261115",
+      "sizeBytes": 211686,
+      "sha256": "dba2026f93451543f13250644c8de03229eaf4b8afe2e8e4bec2a0ab8c28687d",
+      "bundledResource": "MetroNetworks/4406.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4406.json"
+    },
+    {
+      "cityID": "4419",
+      "version": "osm-20261115",
+      "sizeBytes": 188567,
+      "sha256": "9dc43279f498704460a5a06496c12ca5f73da95afd50adeca3ec2b8ab82f812c",
+      "bundledResource": "MetroNetworks/4419.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4419.json"
+    },
+    {
+      "cityID": "4501",
+      "version": "osm-20261115",
+      "sizeBytes": 46398,
+      "sha256": "6455fec07b91f3ec33036985ca7e7d76102e325110affaba920b1920eea7b8fc",
+      "bundledResource": "MetroNetworks/4501.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/4501.json"
+    },
+    {
+      "cityID": "5000",
+      "version": "osm-20261115",
+      "sizeBytes": 260921,
+      "sha256": "dfc00141115d339106f5591bf8b013a093b812d1c239746bab1938000a12e5be",
+      "bundledResource": "MetroNetworks/5000.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/5000.json"
+    },
+    {
+      "cityID": "5101",
+      "version": "osm-20261115",
+      "sizeBytes": 277174,
+      "sha256": "0553d00b3156474aa09634ad3e68994d6c2b4337de555c3a3d62d71d4e4dd2d0",
+      "bundledResource": "MetroNetworks/5101.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/5101.json"
+    },
+    {
+      "cityID": "5201",
+      "version": "osm-20261115",
+      "sizeBytes": 63843,
+      "sha256": "018def2e7fb55d768774f8cb4fcfc3acaabb4e7f3f6d13b7e8d6db00f72aa90f",
+      "bundledResource": "MetroNetworks/5201.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/5201.json"
+    },
+    {
+      "cityID": "5301",
+      "version": "osm-20261115",
+      "sizeBytes": 65081,
+      "sha256": "9603c6e3755b9a1cf715f226fea192534602a38c70e9734a727d33c89b46680f",
+      "bundledResource": "MetroNetworks/5301.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/5301.json"
+    },
+    {
+      "cityID": "6101",
+      "version": "osm-20261115",
+      "sizeBytes": 142915,
+      "sha256": "936c59b95383c43680dd387eba534c8c65860affa3c12001473cd97dabc7d2d8",
+      "bundledResource": "MetroNetworks/6101.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/6101.json"
+    },
+    {
+      "cityID": "6201",
+      "version": "osm-20261115",
+      "sizeBytes": 14153,
+      "sha256": "3639818975592a97439cf5804ed5750ec8ce781ede25958e39d3896e522c53d4",
+      "bundledResource": "MetroNetworks/6201.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/6201.json"
+    },
+    {
+      "cityID": "6501",
+      "version": "osm-20261115",
+      "sizeBytes": 10084,
+      "sha256": "a5b8422bf18ea4d6869285ed3d76c591788d0ab698fe39ca19883567076c9167",
+      "bundledResource": "MetroNetworks/6501.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/6501.json"
+    },
+    {
+      "cityID": "7101",
+      "version": "osm-20261115",
+      "sizeBytes": 98754,
+      "sha256": "085ffd39847094ed97767e6e07624bc329671f7c502e3f63a37ee94dfebffe6d",
+      "bundledResource": "MetroNetworks/7101.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/7101.json"
+    },
+    {
+      "cityID": "7102",
+      "version": "osm-20261115",
+      "sizeBytes": 34943,
+      "sha256": "9b4cabf002d2ff4f425842a69bbe232ca1a2b13b3f67a3807e23c240ed3deab8",
+      "bundledResource": "MetroNetworks/7102.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/7102.json"
+    },
+    {
+      "cityID": "7104",
+      "version": "osm-20261115",
+      "sizeBytes": 9140,
+      "sha256": "e9d496fd397eaabaf2bc86549d6b1d5f7288ef7e28b1702b8e87383ab7d88972",
+      "bundledResource": "MetroNetworks/7104.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/7104.json"
+    },
+    {
+      "cityID": "7106",
+      "version": "osm-20261115",
+      "sizeBytes": 21051,
+      "sha256": "444298be6b35c9dc08c13006a0e25ac77fbbfd26f01dbbe2bf9483b4f7c3fd30",
+      "bundledResource": "MetroNetworks/7106.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/7106.json"
+    },
+    {
+      "cityID": "8100",
+      "version": "osm-20261115",
+      "sizeBytes": 234386,
+      "sha256": "d70f7c21aee9dfc773bc933f965e6ff22935f17fcde816a09488ddfe36149298",
+      "bundledResource": "MetroNetworks/8100.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/8100.json"
+    },
+    {
+      "cityID": "8200",
+      "version": "osm-20261115",
+      "sizeBytes": 10810,
+      "sha256": "52e7bb8d7f0673e1b1d1ca93e2f141396018649d9d7f6bdf661bd5765a4c2327",
+      "bundledResource": "MetroNetworks/8200.json",
+      "downloadURL": "../Just-Go/Resources/MetroNetworks/8200.json"
     }
   ]
 }

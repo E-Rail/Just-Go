@@ -174,6 +174,9 @@ private func makeDisplayStation(
 struct MetroNetwork: Codable, Equatable, Identifiable {
     let cityID: String
     let version: String
+    /// The OpenStreetMap snapshot the network was built from, `YYYY-MM-DD`. Optional so a network
+    /// written before the field decodes.
+    let sourceSnapshot: String?
     let bounds: MetroBounds
     let geometryKind: String
     let lines: [MetroLine]
@@ -274,6 +277,9 @@ protocol MetroNetworkProviding: Sendable {
     func stations(in cityID: String) async -> [Station]
     /// Every bundled station, everywhere. Search ranks these by distance from the rider.
     func allStations() async -> [Station]
+    /// Forget what is loaded for these cities (every city for nil), because a data update changed
+    /// the file underneath. The next read loads the network now in use.
+    func invalidate(cityIDs: Set<String>?) async
 }
 
 extension MetroNetworkProviding {
@@ -288,11 +294,17 @@ extension MetroNetworkProviding {
     func allStations() async -> [Station] {
         []
     }
+
+    func invalidate(cityIDs: Set<String>?) async {}
 }
 
+/// The networks the app routes and draws: each city's bundled file, or the one a data update
+/// installed in its place (`InstalledCityNetworks`). An installed file that will not load is passed
+/// over for the bundled one, never left to take the city off the map.
 actor BundledMetroNetworkService: MetroNetworkProviding {
     /// Every network the bundle carries, read off the `MetroNetworks` folder, so adding a city is a
-    /// data change.
+    /// data change. An update can replace a city's network but never add a city: the city list,
+    /// names and pack rules ship with the app.
     private static let supportedCityIDs = (Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: "MetroNetworks") ?? [])
         .map { $0.deletingPathExtension().lastPathComponent }
     private var networks: [String: MetroNetwork] = [:]
@@ -319,31 +331,33 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     }
 
     private func decodeNetwork(for cityID: String) async -> MetroNetwork? {
-        guard let url = bundledNetworkURL(for: cityID) else {
+        let urls = networkURLs(for: cityID)
+        guard !urls.isEmpty else {
             missingCityIDs.insert(cityID)
             return nil
         }
-        do {
-            // Decoded off the actor's thread, so the file read and parse do not pin the actor and
-            // several cities load in parallel.
-            let network = try await Self.decode(MetroNetwork.self, at: url)
-            guard network.cityID == cityID, network.geometryKind == "physicalTrack" else {
-                AppLog.data.error("Bundled metro network \(cityID, privacy: .public) failed validation (cityID or geometryKind mismatch)")
-                missingCityIDs.insert(cityID)
-                return nil
+        for url in urls {
+            do {
+                // Decoded off the actor's thread, so the file read and parse do not pin the actor
+                // and several cities load in parallel.
+                let network = try await Self.decode(MetroNetwork.self, at: url)
+                guard network.cityID == cityID, network.geometryKind == "physicalTrack" else {
+                    AppLog.data.error("Metro network \(cityID, privacy: .public) failed validation (cityID or geometryKind mismatch)")
+                    continue
+                }
+                networks[cityID] = network
+                summaries[cityID] = MetroNetworkSummary(
+                    cityID: network.cityID,
+                    bounds: network.bounds,
+                    geometryKind: network.geometryKind
+                )
+                return network
+            } catch {
+                AppLog.data.error("Failed to load metro network \(cityID, privacy: .public): \(error)")
             }
-            networks[cityID] = network
-            summaries[cityID] = MetroNetworkSummary(
-                cityID: network.cityID,
-                bounds: network.bounds,
-                geometryKind: network.geometryKind
-            )
-            return network
-        } catch {
-            AppLog.data.error("Failed to load bundled metro network \(cityID, privacy: .public): \(error)")
-            missingCityIDs.insert(cityID)
-            return nil
         }
+        missingCityIDs.insert(cityID)
+        return nil
     }
 
     func stations(in cityID: String) async -> [Station] {
@@ -361,12 +375,13 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     func allStations() async -> [Station] {
         if let allStationsCache { return allStationsCache }
         var stations: [Station] = []
-        var pendingURLs: [(cityID: String, url: URL)] = []
+        var pendingURLs: [(cityID: String, urls: [URL])] = []
         for cityID in Self.supportedCityIDs {
             if let cached = stationsByCity[cityID] {
                 stations += cached
-            } else if !missingCityIDs.contains(cityID), let url = bundledNetworkURL(for: cityID) {
-                pendingURLs.append((cityID, url))
+            } else if !missingCityIDs.contains(cityID) {
+                let urls = networkURLs(for: cityID)
+                if !urls.isEmpty { pendingURLs.append((cityID, urls)) }
             }
         }
 
@@ -374,7 +389,15 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         // are built here on the actor from the value-typed indexes the group returns.
         let indexes = await withTaskGroup(of: MetroNetworkStationIndex?.self) { group in
             for pending in pendingURLs {
-                group.addTask { try? await Self.decode(MetroNetworkStationIndex.self, at: pending.url) }
+                group.addTask {
+                    for url in pending.urls {
+                        if let index = try? await Self.decode(MetroNetworkStationIndex.self, at: url),
+                           index.cityID == pending.cityID {
+                            return index
+                        }
+                    }
+                    return nil
+                }
             }
             var decoded: [MetroNetworkStationIndex] = []
             for await index in group {
@@ -433,27 +456,40 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             return summary
         }
         guard !missingCityIDs.contains(cityID) else { return nil }
-        guard let url = bundledNetworkURL(for: cityID) else {
-            missingCityIDs.insert(cityID)
-            return nil
-        }
-        do {
-            let summary = try await Self.decode(MetroNetworkSummary.self, at: url)
-            guard summary.cityID == cityID, summary.geometryKind == "physicalTrack" else {
-                missingCityIDs.insert(cityID)
-                return nil
+        for url in networkURLs(for: cityID) {
+            do {
+                let summary = try await Self.decode(MetroNetworkSummary.self, at: url)
+                guard summary.cityID == cityID, summary.geometryKind == "physicalTrack" else { continue }
+                summaries[cityID] = summary
+                return summary
+            } catch {
+                AppLog.data.error("Failed to load metro network summary \(cityID, privacy: .public): \(error)")
             }
-            summaries[cityID] = summary
-            return summary
-        } catch {
-            AppLog.data.error("Failed to load bundled metro network summary \(cityID, privacy: .public): \(error)")
-            missingCityIDs.insert(cityID)
-            return nil
         }
+        missingCityIDs.insert(cityID)
+        return nil
     }
 
-    private func bundledNetworkURL(for cityID: String) -> URL? {
-        Bundle.main.url(forResource: cityID, withExtension: "json", subdirectory: "MetroNetworks")
+    /// Where to read a city's network, in order: what a data update installed, then the bundle. A
+    /// city the bundle does not carry has nothing, whatever is on disk.
+    private func networkURLs(for cityID: String) -> [URL] {
+        guard let bundled = Bundle.main.url(forResource: cityID, withExtension: "json", subdirectory: "MetroNetworks") else {
+            return []
+        }
+        return [InstalledCityNetworks.fileURL(for: cityID), bundled].compactMap { $0 }
+    }
+
+    func invalidate(cityIDs: Set<String>?) {
+        let affected = cityIDs ?? Set(Self.supportedCityIDs)
+        for cityID in affected {
+            networks[cityID] = nil
+            stationsByCity[cityID] = nil
+            summaries[cityID] = nil
+            missingCityIDs.remove(cityID)
+            inFlightNetworks[cityID] = nil
+        }
+        allStationsCache = nil
+        MetroNetwork.clearNormalizedIndexCache()
     }
 
     private static func decode<T: Decodable>(_ type: T.Type, at url: URL) async throws -> T {

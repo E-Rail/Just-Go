@@ -142,9 +142,26 @@ struct MapContainerView: View {
     /// Moved only by a real change of place: every frame of the dot's drift would otherwise redraw
     /// the panel.
     @State private var riderCoordinate: CLLocationCoordinate2D?
-    /// On a phone, the search pill and the panel it opens, which zooms out of it and back into it.
+    /// On a phone, the search pill and the panel it opens, which zooms out of it and back into it
+    /// where `zoomsPanelFromSearch` says the system can.
     @Namespace private var searchTransition
     private static let searchTransitionID = "search"
+
+    /// Whether the phone's panel grows out of the search pill: from iOS 26, where a sheet morphs
+    /// out of its source and keeps its stops.
+    ///
+    /// On iOS 18 the same transition is a full-screen zoom that owns the presentation. The sheet
+    /// keeps no stop below the full height, so a page opened from search never comes down to show
+    /// the map, and UIKit traps in the zoom's morph when the view it morphs to is out of the
+    /// hierarchy, as the pill is while a page is open. There the panel rises as any sheet does.
+    private static var zoomsPanelFromSearch: Bool {
+        #if DEBUG
+        // The path iOS 18 takes, on a simulator that has no iOS 18.
+        if ProcessInfo.processInfo.environment["JUST_GO_DEBUG_NO_PANEL_ZOOM"] != nil { return false }
+        #endif
+        if #available(iOS 26.0, *) { return true }
+        return false
+    }
 
     /// From the size class, so a narrow split-screen window keeps the phone's sheet, and an iPhone
     /// Duo moves between the two as it opens and closes.
@@ -214,15 +231,31 @@ struct MapContainerView: View {
                 appState.pendingTripReplay = nil
                 replay(record)
             }
+            // New networks from a data update, or the bundled ones back after Clear Cache.
+            .onChange(of: container.cityDataUpdater?.revision) {
+                viewModel?.cityDataChanged()
+            }
+            .onChange(of: appState.pendingSearchOpen, initial: true) { _, pending in
+                guard pending else { return }
+                appState.pendingSearchOpen = false
+                if path.last != .search { show(.search) }
+            }
             .onChange(of: appState.pendingTripOpen, initial: true) { _, pending in
                 guard pending else { return }
                 appState.pendingTripOpen = false
                 openTrip()
             }
-            // Accessibility Settings reach the planner here: seeded on appear and re-seeded on
-            // change, so results planned under an old preference are dropped.
+            // Route preferences reach the planner here: seeded on appear and re-seeded on change.
+            // A plan on screen is planned again under the new ones, back on its results, since a
+            // route page shows a route the old rules chose. Under a trip being guided the pages
+            // stay: the trip keeps its route, and the next plan follows the new rules.
             .task(id: appState.accessibilityPreference) {
-                if planner.syncAccessibilityPreference(appState.accessibilityPreference) {
+                guard planner.syncAccessibilityPreference(appState.accessibilityPreference) else { return }
+                if path.contains(.guidance) { return }
+                if let results = path.firstIndex(of: .results) {
+                    path = Array(path.prefix(through: results))
+                    replan()
+                } else {
                     path.removeAll()
                 }
             }
@@ -328,9 +361,7 @@ struct MapContainerView: View {
         VStack(spacing: 10) {
             if !usesSidePanel, path.isEmpty {
                 HStack(spacing: 10) {
-                    searchPill
-                        .floatingChrome(in: Capsule(), isInteractive: true)
-                        .matchedTransitionSource(id: Self.searchTransitionID, in: searchTransition)
+                    floatingSearchPill
                     stationLoadingSpinner
                 }
                 .transition(.opacity)
@@ -353,6 +384,19 @@ struct MapContainerView: View {
         .padding(.horizontal, Metrics.l)
         .padding(.top, 14)
         .padding(.bottom, 10)
+    }
+
+    /// The phone's search pill over the map, and what its panel zooms out of where it zooms at all.
+    /// Not a source otherwise: a source with no transition to match is one more thing for the
+    /// system to resolve.
+    @ViewBuilder
+    private var floatingSearchPill: some View {
+        let pill = searchPill.floatingChrome(in: Capsule(), isInteractive: true)
+        if Self.zoomsPanelFromSearch {
+            pill.matchedTransitionSource(id: Self.searchTransitionID, in: searchTransition)
+        } else {
+            pill
+        }
     }
 
     /// The attribution for what the map draws and the locate button, at the map's trailing edge.
@@ -471,10 +515,10 @@ struct MapContainerView: View {
     }
 
     /// Opened by the search pill, the panel zooms out of it, and closes back into it; anything else
-    /// rises as a sheet.
+    /// rises as a sheet, and so does this where `zoomsPanelFromSearch` is false.
     @ViewBuilder
     private var compactPanel: some View {
-        if (path.isEmpty ? lastPanelPath : path).first == .search {
+        if Self.zoomsPanelFromSearch, (path.isEmpty ? lastPanelPath : path).first == .search {
             compactPanelStack
                 .navigationTransition(.zoom(sourceID: Self.searchTransitionID, in: searchTransition))
         } else {
@@ -919,7 +963,7 @@ struct MapContainerView: View {
         return Button {
             showPlaceTagDialog = true
         } label: {
-            Image(systemName: currentQuickTag == nil ? "tag" : "tag.fill")
+            Image(systemName: currentQuickTag == nil ? "bookmark" : "bookmark.fill")
                 .font(.subheadline)
                 .fontWeight(.medium)
                 .padding(.vertical, 10)
@@ -933,8 +977,8 @@ struct MapContainerView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(currentQuickTag == nil
-            ? AppLocalization.localized("Add Quick Tag")
-            : AppLocalization.localized("Edit Quick Tag")
+            ? AppLocalization.text(english: "Save Place", simplified: "保存地点", traditional: "儲存地點")
+            : AppLocalization.text(english: "Edit Saved Place", simplified: "编辑常用地点", traditional: "編輯常用地點")
         )
     }
 

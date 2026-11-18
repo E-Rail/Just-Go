@@ -34,12 +34,14 @@ struct RouteResultsView: View {
     /// `routes` standing, which would re-time old results against a new clock.
     let onReplan: () -> Void
     @Environment(DIContainer.self) private var container
+    @Environment(AppState.self) private var appState
     @Environment(TripMemoryService.self) private var tripMemoryService
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRouteID: UUID?
     @State private var timingMode: TripTimingMode = .now
     @State private var chosenDate = Date()
+    @State private var showsRouteOptions = false
 
     var body: some View {
         List {
@@ -91,6 +93,11 @@ struct RouteResultsView: View {
         }
         .navigationTitle(AppLocalization.localized("Routes"))
         .navigationBarTitleDisplayMode(.inline)
+        // The map re-plans on a change (see `MapContainerView`), so the list below the sheet is
+        // already the new answer when it closes.
+        .sheet(isPresented: $showsRouteOptions) {
+            RouteOptionsSheet()
+        }
         .onAppear {
             ensureRouteSelection()
         }
@@ -270,6 +277,11 @@ struct RouteResultsView: View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
+                    // First, where a narrow screen cannot scroll it away: what every route here was
+                    // planned under, and the way to change it without leaving the plan.
+                    routeOptionsChip
+                    Divider()
+                        .frame(height: 20)
                     ForEach(RoutePreference.allCases) { strategy in
                         Chip(
                             title: strategy.title,
@@ -286,6 +298,33 @@ struct RouteResultsView: View {
                 .padding(.vertical, 2)
             }
         }
+    }
+
+    /// Prominent, and named for the need, while a mobility preference shapes every route listed.
+    private var routeOptionsChip: some View {
+        let preference = appState.accessibilityPreference
+        let title: String
+        if preference.requiresWheelchairAccess {
+            title = AppLocalization.text(english: "Step-free", simplified: "无障碍", traditional: "無障礙")
+        } else if preference.prefersElevator {
+            title = AppLocalization.text(english: "Elevator", simplified: "电梯", traditional: "電梯")
+        } else if preference.avoidStairs {
+            title = AppLocalization.text(english: "No stairs", simplified: "避开楼梯", traditional: "避開樓梯")
+        } else {
+            title = AppLocalization.text(english: "Options", simplified: "选项", traditional: "選項")
+        }
+        return Chip(
+            title: title,
+            icon: "slider.horizontal.3",
+            isSelected: preference.requiresStepFreeEntrance
+        ) {
+            showsRouteOptions = true
+        }
+        .accessibilityLabel(AppLocalization.text(
+            english: "Route options: \(title)",
+            simplified: "路线选项：\(title)",
+            traditional: "路線選項：\(title)"
+        ))
     }
 
     /// The latest any listed route can still leave and ride every train in it. Above the list,

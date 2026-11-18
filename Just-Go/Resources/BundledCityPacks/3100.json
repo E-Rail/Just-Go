@@ -17,11 +17,11 @@
   "coverage": {
     "networkStations": 471,
     "matchedStations": {
-      "covered": 369,
+      "covered": 371,
       "total": 471
     },
     "accessibility": {
-      "covered": 56,
+      "covered": 57,
       "total": 471
     },
     "staticSchedules": {
@@ -2238,7 +2238,26 @@
       "aliases": [
 
       ],
-      "accessibility": null,
+      "accessibility": {
+        "source": "openstreetmap/subway-entrances",
+        "hasElevator": null,
+        "hasEscalator": null,
+        "hasWheelchairRamp": null,
+        "hasTactilePath": null,
+        "hasAccessibleRestroom": null,
+        "elevatorLocations": [
+
+        ],
+        "accessibleEntrances": [
+          "3",
+          "2",
+          "6",
+          "7"
+        ],
+        "facilityNotes": [
+
+        ]
+      },
       "schedules": [
 
       ],
@@ -2259,80 +2278,80 @@
           "id": "osm-3116487030",
           "name": "3",
           "kind": "exit",
-          "latitude": 31.33166,
-          "longitude": 121.226834,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 31.331633,
+          "longitude": 121.226841,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487429",
           "name": "1",
           "kind": "exit",
-          "latitude": 31.332109,
-          "longitude": 121.226859,
+          "latitude": 31.332165,
+          "longitude": 121.226828,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487430",
           "name": "5",
           "kind": "exit",
-          "latitude": 31.331616,
-          "longitude": 121.225403,
+          "latitude": 31.331612,
+          "longitude": 121.225375,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487529",
           "name": "2",
           "kind": "exit",
-          "latitude": 31.332006,
-          "longitude": 121.226881,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 31.33203,
+          "longitude": 121.226878,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487629",
           "name": "4",
           "kind": "exit",
-          "latitude": 31.33153,
-          "longitude": 121.22676,
+          "latitude": 31.331508,
+          "longitude": 121.226761,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487729",
           "name": "6",
           "kind": "exit",
-          "latitude": 31.331781,
-          "longitude": 121.225329,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 31.331748,
+          "longitude": 121.225325,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116487829",
           "name": "7",
           "kind": "exit",
-          "latitude": 31.332161,
-          "longitude": 121.22537,
-          "isAccessible": false,
-          "stepFree": "unknown",
+          "latitude": 31.332144,
+          "longitude": 121.225363,
+          "isAccessible": true,
+          "stepFree": "yes",
           "source": "specificEntrance"
         },
         {
           "id": "osm-3116488029",
           "name": "8",
           "kind": "exit",
-          "latitude": 31.332288,
-          "longitude": 121.225447,
+          "latitude": 31.33227,
+          "longitude": 121.22544,
           "isAccessible": false,
-          "stepFree": "unknown",
+          "stepFree": "no",
           "source": "specificEntrance"
         }
       ]
@@ -6120,6 +6139,62 @@
       ]
     },
     {
+      "stationID": "3f50bbe16aede6cc",
+      "stationName": "歇浦路",
+      "stationNameEn": "Xiepu Road",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14285773318",
+          "name": "1",
+          "kind": "exit",
+          "latitude": 31.251114,
+          "longitude": 121.551329,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14285773319",
+          "name": "2",
+          "kind": "exit",
+          "latitude": 31.250461,
+          "longitude": 121.55245,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14285773320",
+          "name": "4",
+          "kind": "exit",
+          "latitude": 31.25041,
+          "longitude": 121.551025,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
       "stationID": "403898988260423e",
       "stationName": "上海科技馆",
       "stationNameEn": "Shanghai Science and Technology Museum",
@@ -7536,6 +7611,72 @@
           "longitude": 121.500115,
           "isAccessible": true,
           "stepFree": "yes",
+          "source": "specificEntrance"
+        }
+      ]
+    },
+    {
+      "stationID": "547a552dd1237d27",
+      "stationName": "真新新村",
+      "stationNameEn": "Zhenxin Xincun",
+      "aliases": [
+
+      ],
+      "accessibility": null,
+      "schedules": [
+
+      ],
+      "stationFacilities": [
+
+      ],
+      "externalResources": [
+
+      ],
+      "licensedMedia": [
+
+      ],
+      "liveArrivalReferences": [
+
+      ],
+      "stationAccessPoints": [
+        {
+          "id": "osm-14282943052",
+          "name": "1",
+          "kind": "exit",
+          "latitude": 31.255433,
+          "longitude": 121.373438,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14282943053",
+          "name": "6",
+          "kind": "exit",
+          "latitude": 31.255649,
+          "longitude": 121.371544,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14282943054",
+          "name": "2",
+          "kind": "exit",
+          "latitude": 31.254959,
+          "longitude": 121.373021,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14282943055",
+          "name": "4",
+          "kind": "exit",
+          "latitude": 31.255332,
+          "longitude": 121.3703,
+          "isAccessible": false,
+          "stepFree": "unknown",
           "source": "specificEntrance"
         }
       ]
@@ -19505,11 +19646,11 @@
           "source": "specificEntrance"
         },
         {
-          "id": "osm-8714576163",
+          "id": "osm-6586071858",
           "name": "6",
           "kind": "exit",
-          "latitude": 31.21267,
-          "longitude": 121.399775,
+          "latitude": 31.21326,
+          "longitude": 121.400161,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

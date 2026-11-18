@@ -71,9 +71,24 @@ struct Route: Identifiable, Codable {
 
     /// The stops this route calls at, as station pins for a route map.
     var mapStations: [Station] {
-        stationTimelineStops.compactMap { stop in
+        // The lines this trip rides at each station, in the order it rides them: one at a stop it
+        // passes, two where it changes. They colour the station's symbol; a station's other lines
+        // are not this map's subject.
+        var linesByStation: [String: [SubwayLine]] = [:]
+        for stop in segments.flatMap(\.stationStops) {
+            guard let colorHex = stop.lineColorHex, let name = stop.lineName else { continue }
+            let lineID = stop.lineID ?? name
+            guard linesByStation[stop.stationID]?.contains(where: { $0.lineID == lineID }) != true else { continue }
+            linesByStation[stop.stationID, default: []].append(SubwayLine(
+                lineID: lineID,
+                name: name,
+                colorHex: colorHex,
+                cityID: stop.packCityID ?? networkCityID ?? ""
+            ))
+        }
+        return stationTimelineStops.compactMap { stop in
             guard let coordinate = stop.coordinate else { return nil }
-            return Station(
+            let station = Station(
                 stationID: stop.stationID,
                 name: stop.name,
                 latitude: coordinate.latitude,
@@ -83,6 +98,8 @@ struct Route: Identifiable, Codable {
                 // between them: on a route map they are where the rider has to act.
                 isTransferStation: stop.isTransfer
             )
+            station.lines = linesByStation[stop.stationID] ?? []
+            return station
         }
     }
 

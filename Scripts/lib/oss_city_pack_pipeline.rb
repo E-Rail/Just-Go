@@ -644,8 +644,30 @@ module OSSCityPackPipeline
               "coverage" => empty_coverage(network_station_count)
             }
           end
+        end,
+        # Every bundled metro network, so a data update can bring a city's lines and stations
+        # with its pack. They travel together: a pack is checked against the network it was built
+        # from (station count and IDs), so a new pack beside an old network is refused on device.
+        # Relative paths for the reason `downloadURL` above is relative. An app that predates this
+        # key ignores it.
+        "networks" => network_city_ids.map do |city_id|
+          bytes = File.binread(network_path(city_id))
+          {
+            "cityID" => city_id,
+            "version" => JSON.parse(bytes).fetch("version"),
+            "sizeBytes" => bytes.bytesize,
+            "sha256" => Digest::SHA256.hexdigest(bytes),
+            "bundledResource" => "MetroNetworks/#{city_id}.json",
+            "downloadURL" => "../Just-Go/Resources/MetroNetworks/#{city_id}.json"
+          }
         end
       }
+    end
+
+    def network_city_ids
+      Dir.glob(File.join(root, "Just-Go", "Resources", "MetroNetworks", "*.json"))
+        .map { |path| File.basename(path, ".json") }
+        .sort
     end
 
     def source_metadata

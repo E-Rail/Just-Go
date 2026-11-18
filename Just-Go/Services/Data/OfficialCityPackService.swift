@@ -48,13 +48,17 @@ enum CityPackLoadStatus: Equatable {
 }
 
 protocol OfficialStationDataProviding {
-    func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus]
     func cityDataCoverage(for cityIDs: [String]) async -> [String: CityDataCoverage]
     func officialResourceCatalogCities() async -> [OfficialTransitResourceCity]
     func cityExternalResources(for cityIDs: [String]) async -> [String: [ExternalTransitResource]]
     func loadCityPack(for cityID: String) async -> CityPackLoadStatus
-    func downloadCityPack(for cityID: String) async -> CityPackLoadStatus
-    func deleteCityPack(for cityID: String) async -> CityPackLoadStatus
+    /// Brings every city's network and pack to what the repository publishes. See
+    /// `CityDataUpdater`, the only caller.
+    func syncCityData(automatic: Bool) async -> CityDataSyncOutcome
+    /// Drops a city's downloaded network and pack, so it uses the data that came with the app.
+    func restoreIncludedCityData(for cityID: String) async
+    /// Cities with a downloaded network or pack on disk.
+    func downloadedCityDataIDs() async -> Set<String>
     func enrichStation(_ station: Station) async -> Station
     func enrichStations(_ stations: [Station]) async -> [Station]
     func externalResources(for station: Station) async -> [ExternalTransitResource]
@@ -119,7 +123,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private var cachedOfficialResourceCatalog: OfficialTransitResourceCatalog?
     private let diskStore = CityPackDiskStore()
     private var manifests: [URL: OfficialManifest] = [:]
-    private var inFlightManifests: [URL: Task<OfficialManifest, Error>] = [:]
     private var failedManifestCooldownUntil: [URL: Date] = [:]
     private var packs: [String: LoadedPack] = [:]
     /// Bundled packs decoded to answer a question about them, newest use last. Bounded to four
@@ -134,8 +137,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     // installed or bundled data and never contacts a remote origin.
     private var failedCooldownUntil: [String: Date] = [:]
     private static let failureCooldown: TimeInterval = 45
-    private var loadGenerations: [String: Int] = [:]
-    private var inFlightLoads: [String: InFlightCityPackLoad] = [:]
 
     private func cachedStatus(for cityID: String) -> CityPackLoadStatus? {
         guard let status = loadStatuses[cityID] else { return nil }
@@ -152,24 +153,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     private func cacheStatus(_ status: CityPackLoadStatus, for cityID: String) {
         loadStatuses[cityID] = status
         failedCooldownUntil[cityID] = status == .failed ? Date().addingTimeInterval(Self.failureCooldown) : nil
-    }
-
-    private func advanceLoadGeneration(for cityID: String) -> Int {
-        let generation = (loadGenerations[cityID] ?? 0) + 1
-        loadGenerations[cityID] = generation
-        return generation
-    }
-
-    private func loadGenerationMatches(for cityID: String, generation: Int) -> Bool {
-        currentLoadGeneration(for: cityID) == generation
-    }
-
-    private func currentLoadGeneration(for cityID: String) -> Int {
-        loadGenerations[cityID] ?? 0
-    }
-
-    private func shouldContinueLoad(for cityID: String, generation: Int) -> Bool {
-        loadGenerationMatches(for: cityID, generation: generation) && !Task.isCancelled
     }
 
     init(
@@ -197,18 +180,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return catalog
     }
 
-    func cityPackStatuses(for cityIDs: [String]) async -> [String: CityPackLoadStatus] {
-        let remoteManifests = await loadRemoteManifests()
-        var statuses: [String: CityPackLoadStatus] = [:]
-        for cityID in Set(cityIDs) {
-            statuses[cityID] = await cityPackStatus(
-                for: cityID,
-                remoteManifests: remoteManifests
-            )
-        }
-        return statuses
-    }
-
     func cityDataCoverage(for cityIDs: [String]) async -> [String: CityDataCoverage] {
         var result: [String: CityDataCoverage] = [:]
         let catalog = bundledManifest()
@@ -234,50 +205,6 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             let resources = officialResourceCatalog().cityResources(cityID)
             if !resources.isEmpty { result[cityID] = resources }
         }
-    }
-
-    private func cityPackStatus(for cityID: String) async -> CityPackLoadStatus {
-        let remoteManifests = await loadRemoteManifests()
-        return await cityPackStatus(for: cityID, remoteManifests: remoteManifests)
-    }
-
-    private func cityPackStatus(
-        for cityID: String,
-        remoteManifests: [(url: URL, manifest: OfficialManifest)]
-    ) async -> CityPackLoadStatus {
-        let installed = packs[cityID] == nil
-            ? await validatedInstalledPack(for: cityID)
-            : nil
-        let localPack = packs[cityID] ?? installed ?? bundledBaselinePack(for: cityID)
-        let catalogEntry = bundledManifest()?.cities.first(where: { $0.cityID == cityID })
-        guard !Self.manifestURLs.isEmpty else {
-            return localPack?.loadStatus
-                ?? cachedStatus(for: cityID)
-                ?? catalogEntry.map(status(for:))
-                ?? .notConfigured
-        }
-
-        if let candidate = remoteEntries(for: cityID, in: remoteManifests).first {
-            let entry = candidate.entry
-            if let localPack,
-               localPack.manifestEntry.version == entry.version,
-               localPack.manifestEntry.sha256 == entry.sha256 {
-                return localPack.loadStatus
-            }
-            if entry.hasValidDownloadContract {
-                return localPack == nil
-                    ? .available(version: entry.version)
-                    : .updateAvailable(
-                        version: entry.version,
-                        installedVersion: localPack?.downloadedVersion
-                    )
-            }
-            if let localPack { return localPack.loadStatus }
-            return status(for: entry)
-        }
-        if let localPack { return localPack.loadStatus }
-        if let catalogEntry { return status(for: catalogEntry) }
-        return remoteManifests.isEmpty ? .failed : .notAvailable
     }
 
     private func status(for entry: OfficialManifestCity) -> CityPackLoadStatus {
@@ -313,61 +240,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return status
     }
 
-    func downloadCityPack(for cityID: String) async -> CityPackLoadStatus {
-        guard !Self.manifestURLs.isEmpty else { return await loadCityPack(for: cityID) }
-        // Coalesce only explicit update requests. Ordinary station reads never enter this path.
-        if let existing = inFlightLoads[cityID] {
-            let status = await existing.task.value
-            // A delete can invalidate the load this joined (its cancelled task yields `.failed`):
-            // report the current state instead.
-            guard loadGenerationMatches(for: cityID, generation: existing.generation) else {
-                return await cityPackStatus(for: cityID)
-            }
-            return status
-        }
-        let generation = advanceLoadGeneration(for: cityID)
-        let task = Task { [self] in await self.performDownload(for: cityID, generation: generation) }
-        inFlightLoads[cityID] = InFlightCityPackLoad(generation: generation, task: task)
-        let status = await task.value
-        if inFlightLoads[cityID]?.generation == generation {
-            inFlightLoads.removeValue(forKey: cityID)
-        }
-        guard loadGenerationMatches(for: cityID, generation: generation) else {
-            return await cityPackStatus(for: cityID)
-        }
-        cacheStatus(status, for: cityID)
-        return status
-    }
-
-    func deleteCityPack(for cityID: String) async -> CityPackLoadStatus {
-        _ = advanceLoadGeneration(for: cityID)
-        inFlightLoads.removeValue(forKey: cityID)?.task.cancel()
-        do {
-            try diskStore.deleteCity(cityID)
-        } catch {
-            AppLog.data.error("City pack deletion failed for \(cityID, privacy: .public): \(error)")
-            return .failed
-        }
-        packs.removeValue(forKey: cityID)
-        loadStatuses.removeValue(forKey: cityID)
-        failedCooldownUntil.removeValue(forKey: cityID)
-        return await cityPackStatus(for: cityID)
-    }
-
     /// Bumped by every cache wipe, so work in flight across one cannot write its result onto the
     /// table the wipe cleared.
     private var cacheWipeGeneration = 0
 
     func clearAllCaches() async {
         cacheWipeGeneration += 1
-        for cityID in Set(loadGenerations.keys).union(inFlightLoads.keys) {
-            _ = advanceLoadGeneration(for: cityID)
-            inFlightLoads.removeValue(forKey: cityID)?.task.cancel()
-        }
-        for task in inFlightManifests.values {
-            task.cancel()
-        }
-        inFlightManifests.removeAll()
         do {
             try diskStore.deleteAll()
         } catch {
@@ -383,128 +261,249 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         cachedOfficialResourceCatalog = nil
     }
 
-    private func performDownload(for cityID: String, generation: Int) async -> CityPackLoadStatus {
-        let current = packs[cityID]
-        let installed = await validatedInstalledPack(for: cityID)
-        let baseline = bundledBaselinePack(for: cityID)
-        var pendingStatus: CityPackLoadStatus?
-        let remoteManifests = await loadRemoteManifests()
+    // MARK: - Data updates
 
-        // Candidates with the same version are interchangeable, so they race; groups run newest
-        // version first, so a real update is never skipped for a faster old copy.
-        var groups: [[RemoteManifestEntry]] = []
-        for candidate in remoteEntries(for: cityID, in: remoteManifests) {
-            if groups.last?.first?.entry.version == candidate.entry.version {
-                groups[groups.count - 1].append(candidate)
-            } else {
-                groups.append([candidate])
+    /// Brings each city's metro network and station pack to what the repository's default branch
+    /// publishes, from the first origin that answers.
+    ///
+    /// A city's network and pack are one set. A pack is checked against the network it was built
+    /// from (`validatesCanonicalMembership`: station count and IDs), so a new pack beside an old
+    /// network would be refused the moment it loaded, and an old pack beside a new network would
+    /// enrich stations that are gone. Both files are downloaded and checked, the pack against the
+    /// network it will be used with, before either is installed; a city that fails anything keeps
+    /// everything it had.
+    ///
+    /// - Parameter automatic: A check the rider did not ask for this moment, which a Low Data Mode
+    ///   network refuses.
+    func syncCityData(automatic: Bool) async -> CityDataSyncOutcome {
+        let checkedAt = Date()
+        guard !Self.manifestURLs.isEmpty else {
+            return CityDataSyncOutcome(status: .notConfigured, checkedAt: checkedAt, updates: [], failedCityIDs: [])
+        }
+        // The rider asking again is the retry: a cooldown from a failure moments ago would answer
+        // "unreachable" without trying.
+        if !automatic { failedManifestCooldownUntil.removeAll() }
+        guard let remote = await loadRemoteManifest(allowsConstrainedNetwork: !automatic) else {
+            return CityDataSyncOutcome(status: .unreachable, checkedAt: checkedAt, updates: [], failedCityIDs: [])
+        }
+        let (plans, unusable) = cityDataPlans(from: remote.manifest)
+        var updates: [CityDataCityUpdate] = []
+        var failed = unusable
+        // A few cities at a time: a first update after a long gap can be most of the 53, and each
+        // is a download or two from one origin.
+        var queue = plans[...]
+        while !queue.isEmpty {
+            let batch = queue.prefix(4)
+            queue = queue.dropFirst(batch.count)
+            await withTaskGroup(of: (String, CityDataCityUpdate?).self) { group in
+                for plan in batch {
+                    group.addTask {
+                        (plan.cityID, await self.apply(plan, manifestURL: remote.url, automatic: automatic))
+                    }
+                }
+                for await (cityID, update) in group {
+                    if let update { updates.append(update) } else { failed.append(cityID) }
+                }
             }
         }
+        return CityDataSyncOutcome(
+            status: updates.isEmpty && failed.isEmpty ? .upToDate : .checked,
+            checkedAt: checkedAt,
+            updates: updates.sorted { $0.cityID < $1.cityID },
+            failedCityIDs: failed.sorted()
+        )
+    }
 
-        for group in groups {
-            guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
+    func restoreIncludedCityData(for cityID: String) async {
+        let removed = (try? InstalledCityNetworks.uninstall(cityID)) != nil
+        InstalledCityNetworks.prune(cityID)
+        do {
+            try diskStore.deleteCity(cityID)
+        } catch {
+            AppLog.data.error("Downloaded city pack could not be removed for \(cityID, privacy: .public): \(error)")
+        }
+        if removed { await metroNetworks.invalidate(cityIDs: [cityID]) }
+        forgetLoadedPack(cityID)
+    }
 
-            // Disk cache first, across the whole group: local, and as fresh as any candidate at
-            // this version.
-            for candidate in group {
-                let manifestURL = candidate.url
-                let entry = candidate.entry
-                pendingStatus = status(for: entry)
-                guard entry.hasValidDownloadContract else { continue }
-                guard resolvedURL(entry.downloadURL, relativeTo: manifestURL) != nil else {
-                    pendingStatus = .failed
-                    continue
-                }
-                guard let data = diskStore.packData(for: entry),
-                      let decoded = try? Self.decodeValidatedPack(data, matching: entry),
-                      await validatesCanonicalMembership(decoded) else { continue }
-                guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-                do {
-                    try diskStore.storePackData(data, for: entry, manifestURL: manifestURL)
-                } catch {
-                    continue
-                }
-                let loaded = LoadedPack(
-                    data: decoded,
-                    manifestURL: manifestURL,
-                    manifestEntry: entry,
-                    origin: .downloaded
-                )
-                packs[cityID] = loaded
-                return loaded.loadStatus
-            }
+    func downloadedCityDataIDs() async -> Set<String> {
+        Set(InstalledCityNetworks.installedCityIDs()).union(diskStore.installedCityIDs())
+    }
 
-            // No cached copy of this version: race the downloads, so a source that stalls cannot
-            // make a healthy mirror wait.
-            let downloadable: [(manifestURL: URL, entry: OfficialManifestCity, downloadURL: URL, maximumBytes: Int)] =
-                group.compactMap { candidate in
-                    let entry = candidate.entry
-                    guard entry.hasValidDownloadContract,
-                          let downloadURL = resolvedURL(entry.downloadURL, relativeTo: candidate.url),
-                          let maximumBytes = entry.sizeBytes,
-                          maximumBytes > 0, maximumBytes <= Self.maximumPackBytes else { return nil }
-                    return (candidate.url, entry, downloadURL, maximumBytes)
-                }
-            guard !downloadable.isEmpty else { continue }
-
-            typealias DownloadWin = (data: Data, decoded: OfficialPack, entry: OfficialManifestCity, manifestURL: URL)
-            let winner: DownloadWin? = await withThrowingTaskGroup(of: DownloadWin.self) { taskGroup in
-                defer { taskGroup.cancelAll() }
-                for candidate in downloadable {
-                    taskGroup.addTask { [self] in
-                        let data = try await download(from: candidate.downloadURL, maximumBytes: candidate.maximumBytes)
-                        // No size or SHA check here: `decodeValidatedPack` checks both before it
-                        // parses anything.
-                        let decoded = try Self.decodeValidatedPack(data, matching: candidate.entry)
-                        guard await validatesCanonicalMembership(decoded) else {
-                            throw CityPackCandidateFailed()
-                        }
-                        return (data, decoded, candidate.entry, candidate.manifestURL)
-                    }
-                }
-                while true {
-                    do {
-                        guard let value = try await taskGroup.next() else { return nil }
-                        return value
-                    } catch {
-                        AppLog.data.warning("City pack candidate failed for \(cityID, privacy: .public): \(error)")
-                    }
-                }
-            }
-
-            guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-            guard let winner else { continue }
-            do {
-                try diskStore.storePackData(winner.data, for: winner.entry, manifestURL: winner.manifestURL)
-            } catch {
+    /// What each city needs to match the repository, by comparing hashes: the manifest that answered
+    /// against what is installed, and what is installed against the bundle. Only cities this build
+    /// carries, and never a network older than this build's own: a release can carry data its
+    /// branch had before the default branch did. Returns the cities whose entries cannot be used.
+    private func cityDataPlans(from remote: OfficialManifest) -> (plans: [CityDataPlan], unusable: [String]) {
+        guard let bundled = bundledManifest() else { return ([], []) }
+        let bundledNetworks = Dictionary(
+            (bundled.networks ?? []).map { ($0.cityID, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var plans: [CityDataPlan] = []
+        var unusable: [String] = []
+        for remoteNetwork in remote.networks ?? [] {
+            let cityID = remoteNetwork.cityID
+            guard let bundledNetwork = bundledNetworks[cityID] else { continue }
+            guard remoteNetwork.hasValidContract else {
+                unusable.append(cityID)
                 continue
             }
-            packs[cityID] = LoadedPack(
-                data: winner.decoded,
-                manifestURL: winner.manifestURL,
-                manifestEntry: winner.entry,
-                origin: .downloaded
-            )
-            return .loaded(version: winner.decoded.version)
+            guard remoteNetwork.isNotOlder(than: bundledNetwork) else { continue }
+
+            let installedNetwork = InstalledCityNetworks.record(for: cityID)?.entry
+            let network: CityDataPlan.Network
+            if sameHash(remoteNetwork.sha256, bundledNetwork.sha256) {
+                network = installedNetwork == nil ? .keep : .bundled
+            } else if sameHash(remoteNetwork.sha256, installedNetwork?.sha256) {
+                network = .keep
+            } else {
+                network = .download(remoteNetwork)
+            }
+
+            let bundledPack = bundled.cities.first { $0.cityID == cityID && $0.hasBundledPack }
+            let installedPack = diskStore.installedEntry(for: cityID)
+            let pack: CityDataPlan.Pack
+            if let remotePack = remote.cities.first(where: { $0.cityID == cityID && $0.hasValidDownloadContract }) {
+                if sameHash(remotePack.sha256, bundledPack?.sha256) {
+                    pack = installedPack == nil ? .keep : .bundled
+                } else if sameHash(remotePack.sha256, installedPack?.sha256) {
+                    pack = .keep
+                } else {
+                    pack = .download(remotePack)
+                }
+            } else {
+                // The repository publishes no pack for this city now: whatever was downloaded goes.
+                pack = installedPack == nil ? .keep : .bundled
+            }
+
+            if case .keep = network, case .keep = pack { continue }
+            plans.append(CityDataPlan(cityID: cityID, network: network, pack: pack))
+        }
+        return (plans, unusable)
+    }
+
+    private func sameHash(_ lhs: String?, _ rhs: String?) -> Bool {
+        guard let lhs, let rhs else { return false }
+        return lhs.caseInsensitiveCompare(rhs) == .orderedSame
+    }
+
+    /// One city's update, all or nothing. Nil when anything failed, with nothing changed.
+    private func apply(_ plan: CityDataPlan, manifestURL: URL, automatic: Bool) async -> CityDataCityUpdate? {
+        let cityID = plan.cityID
+        let before = await metroNetworks.network(for: cityID)
+
+        // The network the city will use.
+        let target: MetroNetwork?
+        var networkDownload: (data: Data, entry: CityNetworkManifestEntry)?
+        switch plan.network {
+        case .keep:
+            target = before
+        case .bundled:
+            target = Self.bundledNetwork(for: cityID)
+        case .download(let entry):
+            guard let url = resolvedURL(entry.downloadURL, relativeTo: manifestURL),
+                  let data = try? await download(
+                      from: url,
+                      maximumBytes: entry.sizeBytes,
+                      allowsConstrainedNetwork: !automatic
+                  ),
+                  entry.validates(data),
+                  let decoded = try? JSONDecoder().decode(MetroNetwork.self, from: data),
+                  decoded.validatesAsUpdate(for: entry) else {
+                AppLog.data.warning("City data update: network for \(cityID, privacy: .public) failed to download or validate")
+                return nil
+            }
+            networkDownload = (data, entry)
+            target = decoded
+        }
+        guard let target else { return nil }
+
+        // The pack, checked against that network.
+        var packDownload: (data: Data, entry: OfficialManifestCity)?
+        if case .download(let entry) = plan.pack {
+            guard let url = resolvedURL(entry.downloadURL, relativeTo: manifestURL),
+                  let maximumBytes = entry.sizeBytes,
+                  maximumBytes > 0, maximumBytes <= Self.maximumPackBytes,
+                  let data = try? await download(
+                      from: url,
+                      maximumBytes: maximumBytes,
+                      allowsConstrainedNetwork: !automatic
+                  ),
+                  let decoded = try? Self.decodeValidatedPack(data, matching: entry),
+                  Self.validatesCanonicalMembership(decoded, in: target) else {
+                AppLog.data.warning("City data update: pack for \(cityID, privacy: .public) failed to download or validate")
+                return nil
+            }
+            packDownload = (data, entry)
         }
 
-        guard shouldContinueLoad(for: cityID, generation: generation) else { return .failed }
-        if let installed {
-            packs[cityID] = installed
-            return installed.loadStatus
+        // Installed network first; a pack that will not store takes the network back with it.
+        let previousNetwork: InstalledCityNetworks.Record?
+        do {
+            switch plan.network {
+            case .keep: previousNetwork = InstalledCityNetworks.record(for: cityID)
+            case .bundled: previousNetwork = try InstalledCityNetworks.uninstall(cityID)
+            case .download: previousNetwork = try networkDownload.map { try InstalledCityNetworks.install($0.data, for: $0.entry) } ?? nil
+            }
+        } catch {
+            AppLog.data.error("City data update: network for \(cityID, privacy: .public) could not be stored: \(error)")
+            return nil
         }
-        if let current {
-            packs[cityID] = current
-            return current.loadStatus
+        do {
+            switch plan.pack {
+            case .keep: break
+            case .bundled: try diskStore.deleteCity(cityID)
+            case .download:
+                if let packDownload {
+                    try diskStore.storePackData(packDownload.data, for: packDownload.entry, manifestURL: manifestURL)
+                }
+            }
+        } catch {
+            AppLog.data.error("City data update: pack for \(cityID, privacy: .public) could not be stored: \(error)")
+            InstalledCityNetworks.restore(previousNetwork, for: cityID)
+            InstalledCityNetworks.prune(cityID)
+            return nil
         }
-        if let baseline {
-            packs[cityID] = baseline
-            return baseline.loadStatus
+        InstalledCityNetworks.prune(cityID)
+
+        await metroNetworks.invalidate(cityIDs: [cityID])
+        forgetLoadedPack(cityID)
+        var seenNames = Set(before?.lines.map(\.name) ?? [])
+        let addedLines = before == nil ? [] : target.lines.compactMap { line -> CityDataLineName? in
+            guard seenNames.insert(line.name).inserted else { return nil }
+            return CityDataLineName(name: line.name, nameEn: line.nameEn)
         }
-        if let catalogEntry = bundledManifest()?.cities.first(where: { $0.cityID == cityID }) {
-            return pendingStatus ?? status(for: catalogEntry)
+        let returnedToIncluded: Bool
+        switch (plan.network, plan.pack) {
+        case (.download, _), (_, .download): returnedToIncluded = false
+        default: returnedToIncluded = true
         }
-        return pendingStatus ?? (Self.manifestURLs.isEmpty ? .notConfigured : .failed)
+        return CityDataCityUpdate(
+            cityID: cityID,
+            snapshot: target.sourceSnapshot,
+            stationsBefore: before?.stations.count,
+            stationsAfter: target.stations.count,
+            linesBefore: before?.lines.count,
+            linesAfter: target.lines.count,
+            addedLines: addedLines,
+            returnedToIncluded: returnedToIncluded
+        )
+    }
+
+    /// The next read of this city's pack loads what is on disk now.
+    private func forgetLoadedPack(_ cityID: String) {
+        packs[cityID] = nil
+        loadStatuses[cityID] = nil
+        failedCooldownUntil[cityID] = nil
+        bundledBaselinePacks[cityID] = nil
+        bundledBaselineOrder.removeAll { $0 == cityID }
+    }
+
+    nonisolated private static func bundledNetwork(for cityID: String) -> MetroNetwork? {
+        guard let url = Bundle.main.url(forResource: cityID, withExtension: "json", subdirectory: "MetroNetworks"),
+              let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(MetroNetwork.self, from: data)
     }
 
     func enrichStation(_ station: Station) async -> Station {
@@ -941,82 +940,37 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         return result
     }
 
-    private func loadManifest(from url: URL) async throws -> OfficialManifest {
-        if let manifest = manifests[url] { return manifest }
-        if let cooldownUntil = failedManifestCooldownUntil[url], Date() < cooldownUntil {
-            throw CityPackDiskError.manifestCooldown
-        }
-        if let existing = inFlightManifests[url] {
-            return try await existing.value
-        }
-
-        let task = Task { [self] in
-            let data = try await download(from: url, maximumBytes: Self.maximumManifestBytes)
-            return try Self.decodeValidatedManifest(data)
-        }
-        inFlightManifests[url] = task
-
-        // Which wipe this fetch belongs to. `clearAllCaches` cancels in-flight manifest fetches and
-        // clears the cooldowns synchronously, so a cancelled fetch resumes only after the wipe; its
-        // result belongs to a superseded generation and is discarded, or it would write a fresh
-        // cooldown onto the clean table.
-        let generation = cacheWipeGeneration
-
-        let decoded: OfficialManifest
-        do {
-            decoded = try await task.value
-        } catch {
-            guard generation == cacheWipeGeneration else { throw error }
-            inFlightManifests.removeValue(forKey: url)
-            failedManifestCooldownUntil[url] = Date().addingTimeInterval(Self.failureCooldown)
-            throw error
-        }
-        guard generation == cacheWipeGeneration else { return decoded }
-        inFlightManifests.removeValue(forKey: url)
-        failedManifestCooldownUntil.removeValue(forKey: url)
-        manifests[url] = decoded
-        return decoded
-    }
-
-    /// The first configured origin that answers, in order. The origins mirror one repository, so
-    /// asking all at once spends requests to learn one thing, and the unreachable ones each have to
-    /// time out.
-    private func loadRemoteManifests() async -> [(url: URL, manifest: OfficialManifest)] {
+    /// The repository's manifest as it is now, from the first configured origin that answers, in
+    /// order. Fetched afresh for every check: an update asks what the repository has at that
+    /// moment. The origins mirror one repository, so asking all at once spends requests to learn
+    /// one thing, and the unreachable ones each have to time out.
+    private func loadRemoteManifest(
+        allowsConstrainedNetwork: Bool
+    ) async -> (url: URL, manifest: OfficialManifest)? {
         for url in Self.manifestURLs {
+            if let cooldownUntil = failedManifestCooldownUntil[url], Date() < cooldownUntil { continue }
+            // Which wipe this fetch belongs to: one that resumes after `clearAllCaches` must not
+            // write a cooldown onto the clean table.
+            let generation = cacheWipeGeneration
             do {
-                return [(url, try await loadManifest(from: url))]
-            } catch CityPackDiskError.manifestCooldown {
-                continue
+                let data = try await download(
+                    from: url,
+                    maximumBytes: Self.maximumManifestBytes,
+                    allowsConstrainedNetwork: allowsConstrainedNetwork
+                )
+                let manifest = try Self.decodeValidatedManifest(data)
+                guard generation == cacheWipeGeneration else { return nil }
+                failedManifestCooldownUntil[url] = nil
+                return (url, manifest)
             } catch {
+                guard generation == cacheWipeGeneration else { return nil }
+                failedManifestCooldownUntil[url] = Date().addingTimeInterval(Self.failureCooldown)
                 AppLog.data.warning(
-                    "City pack manifest failed via \(url.absoluteString, privacy: .public): \(String(describing: error), privacy: .public)"
+                    "City data manifest failed via \(url.absoluteString, privacy: .public): \(String(describing: error), privacy: .public)"
                 )
             }
         }
-        return []
-    }
-
-    private func remoteEntries(
-        for cityID: String,
-        in manifests: [(url: URL, manifest: OfficialManifest)]
-    ) -> [RemoteManifestEntry] {
-        manifests.enumerated()
-            .compactMap { priority, item in
-                item.manifest.cities.first(where: { $0.cityID == cityID }).map {
-                    RemoteManifestEntry(url: item.url, entry: $0, priority: priority)
-                }
-            }
-            .sorted { lhs, rhs in
-                if lhs.entry.hasValidDownloadContract != rhs.entry.hasValidDownloadContract {
-                    return lhs.entry.hasValidDownloadContract
-                }
-                let order = lhs.entry.version.compare(
-                    rhs.entry.version,
-                    options: [.numeric, .caseInsensitive]
-                )
-                if order != .orderedSame { return order == .orderedDescending }
-                return lhs.priority < rhs.priority
-            }
+        return nil
     }
 
     private func bundledManifest() -> OfficialManifest? {
@@ -1046,7 +1000,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
     }
 
     private func validatesCanonicalMembership(_ pack: OfficialPack) async -> Bool {
-        guard let network = await metroNetworks.network(for: pack.cityID),
+        guard let network = await metroNetworks.network(for: pack.cityID) else { return false }
+        return Self.validatesCanonicalMembership(pack, in: network)
+    }
+
+    nonisolated private static func validatesCanonicalMembership(_ pack: OfficialPack, in network: MetroNetwork) -> Bool {
+        guard pack.cityID == network.cityID,
               pack.coverage.networkStations == network.stations.count else { return false }
         let canonicalIDs = Set(network.stations.map(\.id))
         return pack.stations.allSatisfy { station in
@@ -1094,6 +1053,12 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         for entry in manifest.cities {
             guard cityIDs.insert(entry.cityID).inserted,
                   validatesManifestEntry(entry) else {
+                throw CityPackDiskError.validationFailed
+            }
+        }
+        var networkCityIDs = Set<String>()
+        for entry in manifest.networks ?? [] {
+            guard networkCityIDs.insert(entry.cityID).inserted, entry.hasValidContract else {
                 throw CityPackDiskError.validationFailed
             }
         }
@@ -1263,7 +1228,13 @@ actor OfficialCityPackService: OfficialStationDataProviding {
         "8200": ["https://www.mlm.com.mo/en/"]
     ]
 
-    private func download(from url: URL, maximumBytes: Int) async throws -> Data {
+    /// - Parameter allowsConstrainedNetwork: False for a check the rider did not ask for this
+    ///   moment, which Low Data Mode then refuses.
+    private func download(
+        from url: URL,
+        maximumBytes: Int,
+        allowsConstrainedNetwork: Bool
+    ) async throws -> Data {
         // An idle timeout on a single fetch: the pack origins can stall rather than refuse on some
         // mainland networks, and URLSession's default is 60 s. A slow but flowing download is not
         // cut off.
@@ -1277,7 +1248,8 @@ actor OfficialCityPackService: OfficialStationDataProviding {
             seconds: 15,
             onTimeout: { RoutePlanningError.networkError }
         ) {
-            let request = URLRequest(url: url, timeoutInterval: 15)
+            var request = URLRequest(url: url, timeoutInterval: 15)
+            request.allowsConstrainedNetworkAccess = allowsConstrainedNetwork
             let redirectDelegate = SameOriginRedirectDelegate(originURL: url)
             // `data(for:)`, not `bytes(for:)`: `URLSession.AsyncBytes` yields one byte per async
             // iteration and measured 0.09 MB/s over loopback, so a pack could not finish inside the
@@ -1496,24 +1468,31 @@ private enum LoadedPackOrigin {
     case downloaded
 }
 
-private struct InFlightCityPackLoad {
-    let generation: Int
-    let task: Task<CityPackLoadStatus, Never>
-}
+/// What one city needs to match the repository: each file kept, downloaded, or returned to the
+/// copy the app bundles.
+private struct CityDataPlan: Sendable {
+    enum Network: Sendable {
+        case keep
+        case download(CityNetworkManifestEntry)
+        case bundled
+    }
 
-private struct RemoteManifestEntry {
-    let url: URL
-    let entry: OfficialManifestCity
-    let priority: Int
-}
+    enum Pack: Sendable {
+        case keep
+        case download(OfficialManifestCity)
+        case bundled
+    }
 
-/// Thrown by a single racing candidate in `performDownload`. Validation failed or the data
-/// didn't match its manifest entry. Never surfaces beyond the task group; siblings keep racing.
-private struct CityPackCandidateFailed: Error {}
+    let cityID: String
+    let network: Network
+    let pack: Pack
+}
 
 private struct OfficialManifest: Codable, Sendable {
     let schemaVersion: Int
     let cities: [OfficialManifestCity]
+    /// Absent from a manifest written before networks could be updated.
+    let networks: [CityNetworkManifestEntry]?
 }
 
 private struct OfficialManifestCity: Codable, Sendable {
@@ -1775,7 +1754,6 @@ private struct OfficialAccessPoint: Decodable {
 
 private enum CityPackDiskError: Error {
     case validationFailed
-    case manifestCooldown
 }
 
 private struct InstalledCityPackMetadata: Codable {
@@ -1827,6 +1805,23 @@ private struct CityPackDiskStore {
               let manifestURL = URL(string: metadata.manifestURL),
               let data = packData(for: metadata.entry) else { return nil }
         return (data, metadata.entry, manifestURL)
+    }
+
+    /// The installed pack's manifest entry, without reading the pack.
+    func installedEntry(for cityID: String) -> OfficialManifestCity? {
+        let metadataURL = rootURL
+            .appendingPathComponent(safeComponent(cityID), isDirectory: true)
+            .appendingPathComponent("installed.json")
+        guard let data = try? Data(contentsOf: metadataURL),
+              let metadata = try? JSONDecoder().decode(InstalledCityPackMetadata.self, from: data),
+              metadata.schemaVersion == 1,
+              metadata.entry.cityID == cityID else { return nil }
+        return metadata.entry
+    }
+
+    func installedCityIDs() -> [String] {
+        let children = (try? fileManager.contentsOfDirectory(atPath: rootURL.path)) ?? []
+        return children.filter { installedEntry(for: $0) != nil }.sorted()
     }
 
     func storePackData(_ data: Data, for entry: OfficialManifestCity, manifestURL: URL) throws {

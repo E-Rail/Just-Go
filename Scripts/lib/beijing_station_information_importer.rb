@@ -18,23 +18,22 @@ module BeijingStationInformationImporter
     "首都机场3号航站楼" => "3号航站楼"
   }.freeze
 
+  # 北京 and 北京西 are the mainline stations 城市副中心线 calls at, apart from the metro's 北京站
+  # and 北京西站 beneath them.
   OUTSIDE_DIRECTORY_STATIONS = %w[
-    三堡 东园 中仓 八达岭 北京东 北京北 南口 古北口 密云北 居庸关 康庄 延庆
-    张辛 怀柔 怀柔北 昌平北 沙城 清河 牛栏山 良乡 通州西 雁栖湖 黄土店 黑山寺
+    三堡 东园 中仓 八达岭 北京 北京东 北京北 北京西 南口 古北口 密云北 居庸关 康庄 延庆
+    怀柔 怀柔北 昌平北 沙城 清河 牛栏山 良乡 通州西 雁栖湖 黄土店 黑山寺
   ].freeze
-  UNLISTED_METRO_STATIONS = %w[八角游乐园 福寿岭 红庙 陶然桥].freeze
+  UNLISTED_METRO_STATIONS = %w[八角游乐园 红庙 陶然桥].freeze
   CURRENT_SUBURBAN_STATIONS = %w[
-    康庄 清河 怀柔北 中仓 北京东 八达岭 良乡 昌平北 沙城 北京北 雁栖湖
+    康庄 清河 怀柔北 中仓 北京 北京东 北京西 八达岭 良乡 昌平北 沙城 北京北 雁栖湖
     密云北 牛栏山 黑山寺 通州西 南口 古北口 延庆 怀柔
   ].freeze
-  NON_CURRENT_PASSENGER_STATIONS = %w[居庸关 三堡 黄土店 张辛 东园].freeze
-  UNOPENED_METRO_STATIONS = %w[福寿岭 红庙 陶然桥].freeze
+  NON_CURRENT_PASSENGER_STATIONS = %w[居庸关 三堡 黄土店 东园].freeze
+  UNOPENED_METRO_STATIONS = %w[红庙 陶然桥].freeze
   # Stations bjsubway.com publishes that the bundled network has no station for. A defect report,
-  # not a note: every name here is a station riders can use and the app cannot route to. What is
-  # left is the honest remainder: OSM holds no element at all for this one.
-  EXPECTED_SOURCE_ONLY_STATIONS = %w[
-    朱房北
-  ].freeze
+  # not a note: every name here would be a station riders can use and the app cannot route to.
+  EXPECTED_SOURCE_ONLY_STATIONS = [].freeze
   LEGACY_STATION_PAGES = {
     "八角游乐园" => "https://www.bjsubway.com/station/xltcx/line1/2013-08-19/5.html?sk=1"
   }.freeze
@@ -47,14 +46,6 @@ module BeijingStationInformationImporter
       "targetURL" => "https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html",
       "sourcePageURL" => "https://www.12306.cn/mormhweb/czyd_2143/bj/201001/t20100119_1582.html",
       "provider" => "China Railway 12306",
-      "format" => "webPage"
-    },
-    "福寿岭" => {
-      "kind" => "operatorInformation",
-      "title" => "Fushouling Station Project Status",
-      "targetURL" => "https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm",
-      "sourcePageURL" => "https://fgw.beijing.gov.cn/gzdt/fgzs/gzdt/202112/t20211224_2571614.htm",
-      "provider" => "Beijing Municipal Commission of Development and Reform",
       "format" => "webPage"
     },
     "陶然桥" => {
@@ -309,9 +300,9 @@ module BeijingStationInformationImporter
       .transform_values(&:length)
     expected_status_counts = {
       "exactPage" => 2,
-      "officialContextOnly" => 18,
-      "notOpenForPassengerService" => 3,
-      "noCurrentPassengerService" => 5
+      "officialContextOnly" => 20,
+      "notOpenForPassengerService" => 2,
+      "noCurrentPassengerService" => 4
     }
     raise ImportError, "canonical gap review statuses changed" unless status_counts == expected_status_counts
 

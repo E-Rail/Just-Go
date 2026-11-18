@@ -21,7 +21,7 @@ enum StationQuickTagKind: Codable, Equatable, Hashable {
         switch self {
         case .home: return "house.fill"
         case .work: return "building.2.fill"
-        case .custom: return "tag.fill"
+        case .custom: return "bookmark.fill"
         }
     }
 

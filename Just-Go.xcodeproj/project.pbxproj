@@ -22,10 +22,9 @@
 		A100000E /* Route/RoutePlannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000E /* Route/RoutePlannerViewModel.swift */; };
 		A1000010 /* Search/StationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* Search/StationSearchView.swift */; };
 		A1000011 /* Search/StationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* Search/StationSearchViewModel.swift */; };
-		A1000012 /* Profile/ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* Profile/ProfileView.swift */; };
 		A1000013 /* Profile/SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* Profile/SettingsView.swift */; };
 		A1000014 /* Profile/TransitDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000014 /* Profile/TransitDataView.swift */; };
-		A1000015 /* Accessibility/AccessibilitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015 /* Accessibility/AccessibilitySettingsView.swift */; };
+		A1000015 /* Accessibility/RidingPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015 /* Accessibility/RidingPreferences.swift */; };
 		A1000017 /* Components/Transit/StationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* Components/Transit/StationRow.swift */; };
 		A1000018 /* Components/Glass/GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* Components/Glass/GlassCard.swift */; };
 		A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* Components/Transit/LineColorIndicator.swift */; };
@@ -66,6 +65,7 @@
 		A1000984 /* Components/SavedPlaceChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000984 /* Components/SavedPlaceChips.swift */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
+		A1000702 /* Data/CityDataUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000702 /* Data/CityDataUpdates.swift */; };
 		A100004B /* Transit/TransitFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004B /* Transit/TransitFormatting.swift */; };
 		A1000050 /* Station/StationFacility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000050 /* Station/StationFacility.swift */; };
 		A1000051 /* User/TripMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000051 /* User/TripMemory.swift */; };
@@ -174,10 +174,9 @@
 		A200000E /* Route/RoutePlannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route/RoutePlannerViewModel.swift; sourceTree = "<group>"; };
 		A2000010 /* Search/StationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search/StationSearchView.swift; sourceTree = "<group>"; };
 		A2000011 /* Search/StationSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search/StationSearchViewModel.swift; sourceTree = "<group>"; };
-		A2000012 /* Profile/ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/ProfileView.swift; sourceTree = "<group>"; };
 		A2000013 /* Profile/SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/SettingsView.swift; sourceTree = "<group>"; };
 		A2000014 /* Profile/TransitDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile/TransitDataView.swift; sourceTree = "<group>"; };
-		A2000015 /* Accessibility/AccessibilitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/AccessibilitySettingsView.swift; sourceTree = "<group>"; };
+		A2000015 /* Accessibility/RidingPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessibility/RidingPreferences.swift; sourceTree = "<group>"; };
 		A2000017 /* Components/Transit/StationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/StationRow.swift; sourceTree = "<group>"; };
 		A2000018 /* Components/Glass/GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Glass/GlassCard.swift; sourceTree = "<group>"; };
 		A2000019 /* Components/Transit/LineColorIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Transit/LineColorIndicator.swift; sourceTree = "<group>"; };
@@ -224,6 +223,7 @@
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		A2000049 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		A200004A /* Data/OfficialCityPackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/OfficialCityPackService.swift; sourceTree = "<group>"; };
+		A2000702 /* Data/CityDataUpdates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/CityDataUpdates.swift; sourceTree = "<group>"; };
 		A200004B /* Transit/TransitFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transit/TransitFormatting.swift; sourceTree = "<group>"; };
 		A2000050 /* Station/StationFacility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station/StationFacility.swift; sourceTree = "<group>"; };
 		A2000051 /* User/TripMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User/TripMemory.swift; sourceTree = "<group>"; };
@@ -417,6 +417,7 @@
 				A2000906 /* Transit/BaiduTripObservationService.swift */,
 				A2000701 /* Diagnostics/MainThreadHangMonitor.swift */,
 				A200004A /* Data/OfficialCityPackService.swift */,
+				A2000702 /* Data/CityDataUpdates.swift */,
 				A200005A /* Data/BundledMetroNetworkService.swift */,
 				A2000502 /* Transit/HongKongRealtimeArrivalProvider.swift */,
 				A2000603 /* Transit/OfficialStationInformationProvider.swift */,
@@ -475,13 +476,12 @@
 				A2000066 /* Route/RouteDetailView+Sheets.swift */,
 				A2000067 /* Route/RouteDetailSupportViews.swift */,
 				A2000010 /* Search/StationSearchView.swift */,
-				A2000012 /* Profile/ProfileView.swift */,
 				A2000013 /* Profile/SettingsView.swift */,
 				A2000014 /* Profile/TransitDataView.swift */,
 				A2000310 /* Profile/QuickTagsView.swift */,
 				A2000970 /* Trips/TripsView.swift */,
 				A2000605 /* Profile/QuickTagAddView.swift */,
-				A2000015 /* Accessibility/AccessibilitySettingsView.swift */,
+				A2000015 /* Accessibility/RidingPreferences.swift */,
 				A2000401 /* Onboarding/OnboardingTourView.swift */,
 				A2000075 /* Onboarding/LaunchStageView.swift */,
 				A2000017 /* Components/Transit/StationRow.swift */,
@@ -679,10 +679,9 @@
 				A100000E /* Route/RoutePlannerViewModel.swift in Sources */,
 				A1000010 /* Search/StationSearchView.swift in Sources */,
 				A1000011 /* Search/StationSearchViewModel.swift in Sources */,
-				A1000012 /* Profile/ProfileView.swift in Sources */,
 				A1000013 /* Profile/SettingsView.swift in Sources */,
 				A1000014 /* Profile/TransitDataView.swift in Sources */,
-				A1000015 /* Accessibility/AccessibilitySettingsView.swift in Sources */,
+				A1000015 /* Accessibility/RidingPreferences.swift in Sources */,
 				A1000017 /* Components/Transit/StationRow.swift in Sources */,
 				A1000018 /* Components/Glass/GlassCard.swift in Sources */,
 				A1000019 /* Components/Transit/LineColorIndicator.swift in Sources */,
@@ -697,6 +696,7 @@
 				A1000905 /* Map/BaiduPlaceSearchProvider.swift in Sources */,
 				A1000906 /* Transit/BaiduTripObservationService.swift in Sources */,
 				A100004A /* Data/OfficialCityPackService.swift in Sources */,
+				A1000702 /* Data/CityDataUpdates.swift in Sources */,
 				A1000600 /* Data/OfficialTransitResourceCatalog.swift in Sources */,
 				A1000602 /* Components/Web/OfficialTransitResourceViewer.swift in Sources */,
 				A1000604 /* Components/QuickTagEditorSheet.swift in Sources */,

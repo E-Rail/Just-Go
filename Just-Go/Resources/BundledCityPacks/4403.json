@@ -11076,7 +11076,7 @@
       "stationAccessPoints": [
         {
           "id": "osm-5187456117",
-          "name": "D",
+          "name": "西丽湖站D入口",
           "kind": "exit",
           "latitude": 22.593679,
           "longitude": 113.966945,
@@ -11086,7 +11086,7 @@
         },
         {
           "id": "osm-5187458726",
-          "name": "A",
+          "name": "西丽湖站A入口",
           "kind": "exit",
           "latitude": 22.593844,
           "longitude": 113.966475,
@@ -11096,7 +11096,7 @@
         },
         {
           "id": "osm-5187458727",
-          "name": "B",
+          "name": "西丽湖站B入口",
           "kind": "exit",
           "latitude": 22.59359,
           "longitude": 113.965053,
@@ -11243,11 +11243,41 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-2613258333",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.524845,
+          "longitude": 113.967558,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-2613258341",
           "name": "",
           "kind": "exit",
           "latitude": 22.524898,
           "longitude": 113.969012,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2613258523",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.52491,
+          "longitude": 113.967736,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-2613258568",
+          "name": "",
+          "kind": "exit",
+          "latitude": 22.525398,
+          "longitude": 113.967669,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"
@@ -19295,11 +19325,51 @@
       ],
       "stationAccessPoints": [
         {
+          "id": "osm-14275516189",
+          "name": "A",
+          "kind": "exit",
+          "latitude": 22.52152,
+          "longitude": 114.073537,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14275516190",
+          "name": "B",
+          "kind": "exit",
+          "latitude": 22.521316,
+          "longitude": 114.07421,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14275516191",
+          "name": "E",
+          "kind": "exit",
+          "latitude": 22.521913,
+          "longitude": 114.073671,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
+          "id": "osm-14275516192",
+          "name": "D",
+          "kind": "exit",
+          "latitude": 22.522067,
+          "longitude": 114.074031,
+          "isAccessible": false,
+          "stepFree": "unknown",
+          "source": "specificEntrance"
+        },
+        {
           "id": "osm-5435820780",
           "name": "F",
           "kind": "exit",
-          "latitude": 22.521861,
-          "longitude": 114.073234,
+          "latitude": 22.521882,
+          "longitude": 114.073163,
           "isAccessible": false,
           "stepFree": "unknown",
           "source": "specificEntrance"

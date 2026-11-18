@@ -8,12 +8,12 @@
   "coordinateSystem": "gcj02",
   "maxMatchMetres": 300.0,
   "stats": {
-    "entranceCount": 1115,
-    "boundCount": 1106,
-    "unmatchedCount": 9,
+    "entranceCount": 1119,
+    "boundCount": 1108,
+    "unmatchedCount": 11,
     "ambiguousCount": 0,
-    "stationsWithEntrances": 276,
-    "networkStationCount": 451
+    "stationsWithEntrances": 277,
+    "networkStationCount": 452
   },
   "stations": {
     "00170074e2fd8df1": [
@@ -1809,7 +1809,8 @@
         "latitude": 39.9348539,
         "longitude": 116.4612783,
         "name": "A 出口",
-        "nameEn": "Exit A"
+        "nameEn": "Exit A",
+        "wheelchair": "no"
       },
       {
         "osmNodeID": "12433719330",
@@ -2007,7 +2008,14 @@
       {
         "osmNodeID": "385074716",
         "latitude": 39.8838379,
-        "longitude": 116.4608564
+        "longitude": 116.4608564,
+        "name": "D"
+      },
+      {
+        "osmNodeID": "14311386080",
+        "latitude": 39.8839556,
+        "longitude": 116.4617631,
+        "name": "Entrance C: South-East"
       }
     ],
     "51996f7397cbaae3": [
@@ -2155,6 +2163,12 @@
       }
     ],
     "5408aad4a29eab7a": [
+      {
+        "osmNodeID": "14317157201",
+        "latitude": 39.8767161,
+        "longitude": 116.4605116,
+        "name": "Entrance A, Panjiayuan"
+      },
       {
         "osmNodeID": "1423628507",
         "latitude": 39.8760507,
@@ -2968,18 +2982,6 @@
         "ref": "D"
       }
     ],
-    "774deafe80689bc3": [
-      {
-        "osmNodeID": "1296102348",
-        "latitude": 39.9398915,
-        "longitude": 116.171572
-      },
-      {
-        "osmNodeID": "1300399156",
-        "latitude": 39.9396016,
-        "longitude": 116.1708306
-      }
-    ],
     "781a2df2a0bb0f19": [
       {
         "osmNodeID": "11471883327",
@@ -3235,12 +3237,6 @@
         "latitude": 40.0218044,
         "longitude": 116.3740178,
         "ref": "C1"
-      },
-      {
-        "osmNodeID": "9471058656",
-        "latitude": 40.0217403,
-        "longitude": 116.3747829,
-        "ref": "C2"
       },
       {
         "osmNodeID": "7603978077",
@@ -3735,6 +3731,14 @@
         "latitude": 39.8452077,
         "longitude": 116.399137,
         "ref": "D"
+      }
+    ],
+    "92842589f4196677": [
+      {
+        "osmNodeID": "14244804908",
+        "latitude": 39.8562771,
+        "longitude": 116.5689942,
+        "name": "Lanxinzhuang D"
       }
     ],
     "92ee7a62d621937f": [
@@ -4929,8 +4933,8 @@
       },
       {
         "osmNodeID": "12428545250",
-        "latitude": 39.9578203,
-        "longitude": 116.285148,
+        "latitude": 39.9575028,
+        "longitude": 116.2851415,
         "name": "蓝靛厂站B口"
       }
     ],
@@ -5120,7 +5124,8 @@
       {
         "osmNodeID": "9379477296",
         "latitude": 39.8752522,
-        "longitude": 116.4777055
+        "longitude": 116.4777055,
+        "name": "C"
       }
     ],
     "beb2ae8e54aeb88e": [
@@ -6122,7 +6127,21 @@
         "longitude": 116.3365688
       }
     ],
+    "df71ccf13836ada1": [
+      {
+        "osmNodeID": "14340480958",
+        "latitude": 39.892589,
+        "longitude": 116.4101113,
+        "name": "C"
+      }
+    ],
     "e0871c4ef41d0cf3": [
+      {
+        "osmNodeID": "14311386079",
+        "latitude": 39.8928523,
+        "longitude": 116.4623119,
+        "name": "Entrance H"
+      },
       {
         "osmNodeID": "6780237716",
         "latitude": 39.893785,

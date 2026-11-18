@@ -132,8 +132,10 @@ struct StationDetailView: View {
                     showQuickTagDialog = true
                 } label: {
                     Label(
-                        AppLocalization.localized(currentQuickTag == nil ? "Add Quick Tag" : "Edit Quick Tag"),
-                        systemImage: currentQuickTag == nil ? "tag" : "tag.fill"
+                        currentQuickTag == nil
+                            ? AppLocalization.text(english: "Save Place", simplified: "保存地点", traditional: "儲存地點")
+                            : AppLocalization.text(english: "Edit Saved Place", simplified: "编辑常用地点", traditional: "編輯常用地點"),
+                        systemImage: currentQuickTag == nil ? "bookmark" : "bookmark.fill"
                     )
                     .foregroundStyle(currentQuickTag == nil ? .primary : Color.accentColor)
                 }

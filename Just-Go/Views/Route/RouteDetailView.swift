@@ -785,6 +785,8 @@ struct RouteDetailView: View {
     /// Distance from a row's top edge to the top of its marker, so the marker lands on the title
     /// line rather than floating above it.
     private static let markerInset: CGFloat = 13
+    /// Between the lines of a leg's text.
+    private static let legLineSpacing: CGFloat = 3
 
     private func legRow(_ segment: RouteSegment, index: Int) -> some View {
         let isExpanded = expandedLegs.contains(segment.id)
@@ -807,7 +809,7 @@ struct RouteDetailView: View {
             }
             .frame(width: Self.railWidth)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: Self.legLineSpacing) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(journeyTitle(segment, index: index))
                         .font(.body)
@@ -873,8 +875,7 @@ struct RouteDetailView: View {
                         .foregroundStyle(Color.accentColor)
                 }
                 liveArrivalsRow(for: segment)
-                handoffRow(for: segment)
-                bikeScannerRow(for: segment)
+                legActions(for: segment)
                 if isExpanded {
                     stationStops(segment)
                 }
@@ -1020,6 +1021,20 @@ struct RouteDetailView: View {
         }
     }
 
+    /// What a bike or car leg hands to other apps, under the leg's text: the apps that navigate it,
+    /// then the scanners that unlock a bike. One stack, so every gap in it is the same one, the gap
+    /// above it included.
+    @ViewBuilder
+    private func legActions(for segment: RouteSegment) -> some View {
+        if segment.type.isAccessLeg, segment.accessLegMode != .walking {
+            VStack(alignment: .leading, spacing: Metrics.s) {
+                handoffRow(for: segment)
+                bikeScannerRow(for: segment)
+            }
+            .padding(.top, Metrics.s - Self.legLineSpacing)
+        }
+    }
+
     /// The step between "cycle this bit" and cycling it: a shared bike in mainland China is
     /// unlocked by scanning its QR code in Alipay or WeChat.
     ///
@@ -1030,19 +1045,13 @@ struct RouteDetailView: View {
         if segment.accessLegMode == .cycling {
             let scanners = ExternalRouteHandoff.bikeScanners()
             if !scanners.isEmpty {
-                HStack(spacing: 8) {
+                ChipFlowLayout(spacing: Metrics.s) {
                     ForEach(scanners) { scanner in
-                        Button {
+                        LegActionChip(title: scanner.title, systemImage: "qrcode.viewfinder") {
                             ExternalRouteHandoff.open(scanner)
-                        } label: {
-                            Label(scanner.title, systemImage: "qrcode.viewfinder")
-                                .font(.footnote)
                         }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
                     }
                 }
-                .padding(.top, 2)
             }
         }
     }
